@@ -6,5 +6,13 @@
       "package_name": "com.kuaforumcepte",
       "sha256_cert_fingerprints": ["RELEASE_VEYA_PLAY_APP_SIGNING_SHA256_PARMAK_IZINIZ"]
     }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kuaforumcepte.debug",
+      "sha256_cert_fingerprints": ["02:62:50:E1:51:0C:DB:86:80:ED:EC:A8:A5:88:68:1C:3B:18:F0:10:B6:88:DE:B8:26:59:C6:33:72:9E:4C:71"]
+    }
   }
 ]

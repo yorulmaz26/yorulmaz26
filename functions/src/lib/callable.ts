@@ -3,6 +3,12 @@ import { logger } from "firebase-functions/v2";
 import { isEmulator } from "./admin";
 import { fail } from "./errors";
 
+/**
+ * App Check zorunluluğu. Üretimde açık kalmalıdır. Yalnızca test projesinde, debug token kaydı yapılamıyorsa
+ * functions/.env içinde APP_CHECK_ENFORCE=false ile kapatılabilir (bkz. docs/FIREBASE_KURULUM.md).
+ */
+export const enforceAppCheck = !isEmulator && process.env.APP_CHECK_ENFORCE !== "false";
+
 export interface Caller {
   uid: string;
   /** Firebase Auth'un doğruladığı telefon (E.164) — yalnızca telefonla giriş yapılmışsa. */
@@ -16,7 +22,7 @@ export interface Caller {
  * Beklenmeyen hatalar istemciye ayrıntı sızdırmadan INTERNAL olarak döner.
  */
 export function authedCallable<Req, Res>(name: string, handler: (data: Req, caller: Caller, req: CallableRequest<Req>) => Promise<Res>) {
-  return onCall<Req, Promise<Res>>({ enforceAppCheck: !isEmulator, memory: "256MiB" }, async (req) => {
+  return onCall<Req, Promise<Res>>({ enforceAppCheck, memory: "256MiB" }, async (req) => {
     if (!req.auth) fail("unauthenticated", "UNAUTHENTICATED");
     const phone = (req.auth.token.phone_number as string | undefined) ?? null;
     try {
@@ -31,7 +37,7 @@ export function authedCallable<Req, Res>(name: string, handler: (data: Req, call
 
 /** Oturum gerektirmeyen (ama App Check gerektiren) callable — ör. salon kodu çözümleme. */
 export function publicCallable<Req, Res>(name: string, handler: (data: Req) => Promise<Res>) {
-  return onCall<Req, Promise<Res>>({ enforceAppCheck: !isEmulator, memory: "256MiB" }, async (req) => {
+  return onCall<Req, Promise<Res>>({ enforceAppCheck, memory: "256MiB" }, async (req) => {
     try {
       return await handler((req.data ?? {}) as Req);
     } catch (e) {

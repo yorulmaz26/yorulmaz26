@@ -1,0 +1,62 @@
+name: Firebase'e Yükle
+
+# Elle çalıştırılır: GitHub › Actions › "Firebase'e Yükle" › Run workflow.
+# Gerekli gizli değişkenler (Settings › Secrets and variables › Actions):
+#   FIREBASE_SERVICE_ACCOUNT  — Firebase Console › Proje ayarları › Hizmet hesapları › "Yeni özel anahtar oluştur" JSON içeriği
+#   GOOGLE_SERVICES_JSON      — Android uygulamasının google-services.json içeriği (proje kimliği buradan okunur)
+# Ayrıntı: docs/FIREBASE_KURULUM.md
+on:
+  workflow_dispatch:
+    inputs:
+      app_check:
+        description: "App Check zorunlu olsun mu? (test için 'false' — uygulamada debug token kaydı gerekmez)"
+        type: choice
+        options: ["false", "true"]
+        default: "false"
+      targets:
+        description: "Yüklenecekler"
+        type: string
+        default: "functions,firestore,storage,hosting"
+
+concurrency:
+  group: firebase-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Fonksiyonlar, kurallar, indeksler ve web sayfası
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Gizli değişkenleri kontrol et
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          GS: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          [ -n "$SA" ] || { echo "::error::FIREBASE_SERVICE_ACCOUNT gizli değişkeni tanımlı değil"; exit 1; }
+          [ -n "$GS" ] || { echo "::error::GOOGLE_SERVICES_JSON gizli değişkeni tanımlı değil"; exit 1; }
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          PROJECT_ID=$(printf '%s' "$GS" | jq -r '.project_info.project_id')
+          [ -n "$PROJECT_ID" ] && [ "$PROJECT_ID" != "null" ] || { echo "::error::google-services.json içinde project_id bulunamadı"; exit 1; }
+          echo "PROJECT_ID=$PROJECT_ID" >> "$GITHUB_ENV"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+          echo "Proje: $PROJECT_ID"
+      - name: Bağımlılıklar
+        run: |
+          npm i -g firebase-tools@14
+          cd functions && npm ci
+      - name: Fonksiyon ayarları
+        run: |
+          echo "APP_CHECK_ENFORCE=${{ inputs.app_check }}" > functions/.env
+          cat functions/.env
+      - name: Yükle
+        run: firebase deploy --project "$PROJECT_ID" --only "${{ inputs.targets }}" --force --non-interactive
+      - name: Sonuç
+        if: success()
+        run: |
+          echo "Tamam. Web: https://$PROJECT_ID.web.app"
+          echo "İlk yüklemede 'izinler yayılıyor' hatası alırsanız birkaç dakika sonra yeniden çalıştırın."

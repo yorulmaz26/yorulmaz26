@@ -29,6 +29,8 @@ jobs:
         run: |
           if [ -n "$GOOGLE_SERVICES_JSON" ]; then
             printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+            # Randevu linki ve takvim aboneliği adresi projenin Hosting alan adını kullanır.
+            echo "appLinkHost=$(jq -r '.project_info.project_id' app/google-services.json).web.app" >> local.properties
             echo "Firebase yapılandırması eklendi."
           else
             echo "GOOGLE_SERVICES_JSON tanımlı değil: Firebase'siz APK derlenecek."

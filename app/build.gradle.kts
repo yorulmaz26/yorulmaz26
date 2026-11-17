@@ -49,6 +49,17 @@ android {
     }
 
     signingConfigs {
+        // Ortak test imzası: her bilgisayarda/CI'da aynı SHA parmak izi → Firebase telefon girişi ve App Check
+        // tek seferlik kayıtla çalışır. Yalnızca debug içindir; yayın anahtarı keystore.properties ile ayrıdır.
+        getByName("debug") {
+            val shared = file("debug.keystore")
+            if (shared.exists()) {
+                storeFile = shared
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+            }
+        }
         if (keystoreProps.isNotEmpty()) {
             create("release") {
                 storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
