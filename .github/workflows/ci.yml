@@ -21,9 +21,26 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
-      # google-services.json olmadan derlenir (uygulama "Firebase yapılandırılmadı" ekranını gösterir).
+      # GOOGLE_SERVICES_JSON gizli değişkeni (Settings › Secrets › Actions) tanımlıysa gerçek Firebase'e bağlı APK üretilir;
+      # tanımlı değilse uygulama derlenir ama açılışta "Firebase yapılandırılmadı" ekranını gösterir.
+      - name: google-services.json (gizli değişkenden, varsa)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+            echo "Firebase yapılandırması eklendi."
+          else
+            echo "GOOGLE_SERVICES_JSON tanımlı değil: Firebase'siz APK derlenecek."
+          fi
       - name: Domain testleri, debug APK, unit testler ve UI test derlemesi
         run: ./gradlew :core:domain:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest --stacktrace
+      - name: APK'yı indirilebilir yap
+        uses: actions/upload-artifact@v4
+        with:
+          name: kuaforum-cepte-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 30
       - name: Test raporları
         if: always()
         uses: actions/upload-artifact@v4
