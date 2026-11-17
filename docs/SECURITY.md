@@ -45,10 +45,33 @@
 - **Kapatma:** "KAPAT" onayı + gerekçe; işlemdeki randevu varsa engellenir; gelecekteki randevular gerekçeyle iptal edilir ve
   müşterilere bildirilir; üyelikler sona erer; finans kayıtları korunur. Ardından sahip hesabını silebilir.
 
-## Uzman çakışması
-Uzman kilidi kişi bazlıdır (`staffDayLocks/{uzman}_{gün}`): aynı uzman birden çok salonda çalışsa bile hiçbir salonda
-aynı saate ikinci randevu alınamaz.
+## Kişi bazlı çakışma
+Kilit kişi bazlıdır (`staffDayLocks/{kişi}_{gün}`), uzman (STAFF) ve müşteri (CUSTOMER) aralıklarını birlikte tutar:
+aynı uzman birden çok salonda çalışsa bile aynı saate ikinci randevu alınamaz; bir kişi kendisi için aynı saatte iki randevu
+alamaz ve uzman olarak hizmet verdiği saatte başka salondan kendisi için randevu alamaz (tersi de geçerli). Başkası adına
+alınan randevu müşterinin kendi takvimini kilitlemez. Müşteri aynı anda en fazla 3 aktif randevu tutar.
+
+## İptal kuralları
+- Müşteri başlangıçtan en geç 2 saat öncesine kadar uygulamadan iptal eder; son 2 saatte `CANCEL_WINDOW_CLOSED`.
+  Bu durumda uygulama `getAppointmentContacts` ile yalnızca o randevunun müşterisine uzman/sahip/salon telefonunu verir.
+- Uzman ve salon sahibi her zaman (son 2 saat dahil) gerekçeyle iptal edebilir. Her iptalde diğer taraflar bildirim alır
+  (müşteri iptali → uzman + sahip; uzman iptali → müşteri + sahip; sahip iptali → müşteri + uzman).
+
+## Yeni veri alanları ve erişim
+| Koleksiyon | Okuma | Yazma |
+|---|---|---|
+| `users/{uid}/favorites` | kişinin kendisi | kişinin kendisi (alan doğrulamalı oluştur/sil) |
+| `salons/{id}/staffPrivate/{uid}` (prim oranı) | sahip, uzmanın kendisi | yalnızca sunucu |
+| `salons/{id}/customers/{uid}` (tamamlanan/gelmeyen, sadakat) | müşterinin kendisi, sahip, aktif uzman | yalnızca sunucu |
+| `salons/{id}/discountCodes` | sahip, aktif uzman (müşteri listeleyemez) | yalnızca sunucu |
+| `waitlist` | kaydın sahibi | yalnızca sunucu |
+| `discountCodeUses`, `calendarTokens` | kapalı | yalnızca sunucu |
+
+Takvim aboneliği adresi tahmin edilemez bir anahtar içerir (24 bayt); uzman/sahip için müşteri adlarını içerdiğinden kullanıcı
+uyarılır ve "Adresi yenile" eski adresi geçersiz kılar. Elden randevularda müşterinin hesabı yoktur; bildirim gönderilmez.
+Salon onayı: yeni salon `verified:false` ile oluşur; platform yöneticisi onaylayana kadar aramada ve konum aramasında görünmez.
 
 ## Bilinen açık noktalar (yayın öncesi karar gerektirir)
 - Yasal metinler TASLAK; hukuki inceleme ve veri sorumlusu bilgisi gerekli. Yurt dışı aktarım dayanağı netleştirilmeli.
-- Müşterinin, kendisinin uzman olarak çalıştığı bir saatte başka salondan müşteri olarak randevu alması engellenmez.
+- Kişi çakışması randevular üzerinden denetlenir; uzmanın mesai saatinde (randevusu olmayan boş saatinde) kendisi için başka salondan randevu alması bilinçli olarak serbesttir.
+- Takvim aboneliği adresi paylaşılırsa randevu bilgileri görülebilir; kullanıcı adresi yenileyerek eskisini iptal edebilir.

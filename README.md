@@ -113,9 +113,10 @@ Komut satırı:
 |---|---|
 | `./gradlew :core:domain:test` | Para/kuruş, durum makinesi, 2 saat iptal sınırı, İstanbul dönem sınırları, yetki matrisi, telefon normalizasyonu, hizmet seçimi toplamları |
 | `./gradlew :app:testDebugUnitTest` | Splash yönlendirme kararı (Beni hatırla), giriş sonrası rol/salon yönlendirmesi |
-| `./gradlew :app:connectedDebugAndroidTest` | Compose UI: rol seçimi, boş/hata durumları, yükleniyor butonu, alan hatası erişilebilirliği, yıldız seçici, çakışma penceresi, salon kodu kartı, süresi dolmuş bilet, saat seçici |
+| `./gradlew :app:connectedDebugAndroidTest` | Compose UI: rol seçimi, boş/hata durumları, yükleniyor butonu, alan hatası erişilebilirliği, yıldız seçici, çakışma penceresi, salon kodu kartı, süresi dolmuş bilet, saat seçici, bekleme listesi düğmesi, başkası adına/indirimli bilet |
 | `cd functions && npm test` | Müsaitlik/slot algoritması, molalar, kapalı günler, çakışma, zaman dilimi ve dönem anahtarları, durum geçişleri, salon kodu tahsisi, puan ortalaması, il/ilçe |
 | `cd functions && npm run test:integration` | Emulator: kayıtlar, benzersiz salon kodu, davetler, salon profili/görseller, takvim değişikliği çakışma analizi, kapatmalar, hizmet etkisi, müsaitlik, eşzamanlı aynı slot (yalnızca biri), tek aktif randevu, fiyat değişimi, PENDING süre aşımı, iptal sonrası slot açılması, 2 saat kuralı, uzman değiştirme, saat değiştirme, gizleme, zamanlanmış işlerin tekilliği, bildirim gönderimi, tek/eşzamanlı tamamlama (çift sayım yok), fiyat düzeltmeleri, rapor yetkileri, sayaçların ledger'dan yeniden üretimi, puanlama (yalnızca tamamlanan, tek sefer, eşzamanlı, ayrı ortalamalar) |
+| `cd functions && npm run test:integration` (features) | Elden randevu, indirim kodu (önizleme, tek kullanım, iade), sadakat ödülü, prim, bekleme listesi tetikleyicisi, son 2 saat iletişim ve iptal bildirimleri, 24 saat hatırlatma, yorum yanıtı, salon onayı + yakındaki salonlar + yeniden açma, takvim aboneliği, 3 aktif randevu ve kişi çakışması |
 | `cd tests/rules && npm install && npm test` | Firestore güvenlik kuralları (Emulator) |
 
 ## Geliştirmede SMS girişi
@@ -148,21 +149,26 @@ ekleyin. Bu numaralara gerçek SMS gitmez; kod sabittir. Auth Emulator kullanıy
 1. **Salon sahibi** (telefon A): Kuaför Girişi → salon kaydı (logo + 2 foto) → Hizmetlerim'e 2 hizmet → Çalışma Saatleri.
 2. **Personel** (telefon B): Sahip Stilist Yönetimi'nden B numarasını davet eder → B, Kuaför Girişi ile daveti kabul eder → kendi hizmetini ekler.
 3. **Müşteri** (telefon C): Müşteri Girişi → kayıt → salonu bul (arama/filtre) → uzman B → 2 hizmet → saat → özet → onay.
-4. B'ye bildirim gelir → Onayla → C'ye "onaylandı" bildirimi. C ikinci randevu almaya çalışır → "aktif randevunuz var".
+4. B'ye bildirim gelir → Onayla → C'ye "onaylandı" bildirimi. C aynı saate kendisi için ikinci randevu almaya çalışır → "bu saatte başka randevunuz var"; "Başkası için" seçerek alabilir. 4. aktif randevu → sınır uyarısı.
+4a. Randevuya 2 saatten az kala C iptal edemez → "İptal için salonla iletişime geç" → uzman/sahip araması. B iptal eder → C ve A bildirim alır.
+4b. A: Kampanyalar ve Sadakat → kod oluştur → C özet ekranında kodu uygular. B: Randevular sekmesi → "Elden Randevu".
+4c. Hesap → Takvim Entegrasyonu → takvim uygulamasında abone ol; onay/iptal takvime yansır.
 5. Başlangıçta B'ye "Müşteri geldi mi?" → Geldi → (isteğe bağlı) Fiyatı Düzelt → İşlemi Tamamla.
 6. A'nın İstatistikler'inde gün/hafta/ay kartları ve B satırı; B'de yalnızca kendi kartı.
 7. C'ye değerlendirme daveti → puanlama → salon listesinde puan güncellenir.
 8. A çalışma saatini daraltır → çakışma önizlemesi → uygular → randevu "İlgilenilmeli" → Saati Değiştir.
 9. C: Randevularım → geçmişi gizle; Hesap → Hesabımı Sil (aktif randevu yokken).
 
-## Platform yöneticisi (yorum moderasyonu)
+## Platform yöneticisi (yorum moderasyonu ve salon onayı)
 
 ```bash
 cd functions
 GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/setAdmin.js +905XXXXXXXXX   # yetki ver
 GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/setAdmin.js <uid> --revoke   # geri al
 ```
-Servis hesabı anahtarını repoya eklemeyin. Kullanıcı çıkış yapıp tekrar girince Hesap ekranında "Yorum Moderasyonu" görünür.
+Servis hesabı anahtarını repoya eklemeyin. Kullanıcı çıkış yapıp tekrar girince Hesap ekranında "Moderasyon ve Salon Onayı" görünür.
+**Önemli:** Yeni salonlar onaylanana kadar müşteri aramasında listelenmez (kod/QR/link ile randevu alınabilir). Yayına çıkmadan
+önce en az bir yönetici atayın. Takvim aboneliği için Hosting'in `/cal/**` yönlendirmesi `firebase deploy --only hosting` ile yayınlanmalıdır.
 
 ## Lisanslar
 

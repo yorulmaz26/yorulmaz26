@@ -76,4 +76,25 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `deleteAccount` | `{confirm: "SIL"}` | `{deleted}` | Bkz. docs/SECURITY.md. |
 | `dailyCleanup` (zamanlanmış, 04:17) | — | — | 24 saati geçen geçici yüklemeler ve süresi dolmuş idempotency/hız limiti kayıtları. |
 
-`staffDayLocks` belge kimliği artık `{staffUid}_{YYYY-MM-DD}` (kişi bazlı); aralıklar `salonId` alanını taşır.
+`staffDayLocks` belge kimliği `{kişiUid}_{YYYY-MM-DD}` (kişi bazlı); aralıklar `salonId` ve `role: STAFF|CUSTOMER` taşır.
+
+## İşletme ve müşteri deneyimi (2. tur)
+| Fonksiyon | Girdi | Çıktı | Notlar |
+|---|---|---|---|
+| `createAppointment` (genişletildi) | `+ guestName?, discountCode?, useLoyaltyReward?` | `+ finalKurus` | En fazla 3 aktif randevu (`ACTIVE_APPOINTMENT_LIMIT`). Kendisi için ise müşterinin kişi kilidi de kontrol edilir (`CUSTOMER_BUSY`). Kod/ödül: `DISCOUNT_CONFLICT`, `CODE_NOT_FOUND\|INACTIVE\|NOT_STARTED\|EXPIRED\|EXHAUSTED\|ALREADY_USED`, `LOYALTY_NOT_AVAILABLE`. |
+| `getAvailability` (genişletildi) | `+ forSelf?` | — | Yeni randevuda müşterinin kendi meşgul saatleri gizlenir; `forSelf:false` (başkası adına) gizlemez. |
+| `createWalkInAppointment` | `{salonId, staffUid, serviceIds, startAt, customerName, customerPhone?, idempotencyKey}` | `{appointmentId, number}` | Uzman (kendi adına) / sahip. Doğrudan CONFIRMED, `customerUid:null`, `walkIn:true`. Mesai dışı serbest; çakışma ve ufuk denetlenir. |
+| `getAppointmentContacts` | `{appointmentId}` | `{contacts:[{role: STAFF\|OWNER\|SALON, name, phoneE164}]}` | Yalnızca randevunun müşterisi, aktif randevu. Son 2 saatte iptal için arama. |
+| `previewBookingPrice` | `{salonId, staffUid, serviceIds, discountCode?, useLoyaltyReward?}` | `{totalKurus, discountKurus, finalKurus, codeError, loyalty}` | Bağlayıcı değil. |
+| `upsertDiscountCode` | `{salonId, code, percent\|amountKurus, validFrom?, validUntil?, maxUses?, active, description?}` | `{code}` | OWNER. Kişi başı bir kullanım (`discountCodeUses`); kullanım randevuda ayrılır, iptal/süre aşımı/gelmedi'de iade. |
+| `updateLoyaltyProgram` | `{salonId, enabled, visitsRequired 3–50, rewardPercent 5–100}` | program | OWNER. Ödül = floor(tamamlanan/gerekli) − kullanılan (`salons/{id}/customers/{uid}`). |
+| `updateStaffMember` (genişletildi) | `+ commissionPercent?` | — | Yalnızca sahip; `salons/{id}/staffPrivate/{uid}`. Tamamlamada ledger'a `commissionKurus` yazılır; raporlarda toplanır. |
+| `joinWaitlist` / `leaveWaitlist` | `{salonId, staffUid, localDate}` / `{id}` | `{id}` / `{ok}` | En fazla 10 kayıt. `onAppointmentFreed` (Firestore tetikleyici) iptal/süre aşımı/taşımada listedekilere bildirim gönderir (30 dk'da bir). |
+| `replyToReview` | `{reviewId, text}` | `{replied}` | OWNER; boş metin yanıtı kaldırır; ilk yanıtta müşteriye bildirim. |
+| `reviewSalon` | `{salonId, action: APPROVE\|REJECT, note?}` | `{verified}` | Yalnızca `admin`. Onaysız salon aramada görünmez (kod/QR ile ulaşılır). |
+| `requestSalonReview` | `{salonId}` | `{status}` | Reddedilen salonun sahibi yeniden incelemeye gönderir. |
+| `reopenSalon` | `{salonId}` | `{status}` | Eski sahip; başka salonu yoksa (`ALREADY_OWNER`). Diğer uzmanlar yeniden davet edilir. |
+| `searchNearbySalons` | `{lat, lng, radiusKm 1–50, type?}` | `{salons:[…, distanceKm]}` | Geohash öneki + Haversine; aktif ve onaylı salonlar, en yakın 50. |
+| `getCalendarFeed` | `{rotate?}` | `{token, path}` | Kişiye özel iCalendar aboneliği; `calendarFeed` HTTP: `GET /cal/{token}.ics` (Hosting yönlendirmesi). |
+| `scanAppointments` (genişletildi) | — | — | 24 saat (son 2 saat iptal kuralı hatırlatmasıyla) ve 2 saat hatırlatma. |
+
