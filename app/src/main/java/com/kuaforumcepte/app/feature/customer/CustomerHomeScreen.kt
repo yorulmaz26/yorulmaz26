@@ -15,11 +15,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kuaforumcepte.app.core.common.UiState
 import com.kuaforumcepte.app.core.designsystem.component.ErrorState
-import com.kuaforumcepte.app.core.designsystem.component.InfoBanner
 import com.kuaforumcepte.app.core.designsystem.component.KcTextButton
 import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
 import com.kuaforumcepte.app.core.designsystem.component.asString
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
+import com.kuaforumcepte.app.feature.salon.SalonHoursSection
 import com.kuaforumcepte.app.feature.salon.SalonInfoContent
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
@@ -103,7 +103,8 @@ fun CustomerHomeScreen(onOpenAccount: () -> Unit, viewModel: CustomerHomeViewMod
                 is UiState.Success -> Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(Spacing.screen)) {
                     SalonInfoContent(st.data) { m -> scope.launch { snackbar.showSnackbar(m) } }
                     Spacer(Modifier.height(Spacing.l))
-                    InfoBanner("Uzmanların çalışma saatleri ve salonun kapalı günleri, çalışma takvimi aşamasında burada gösterilecek.")
+                    SalonHoursSection(st.data.id, st.data.weeklyClosedDays)
+                    Spacer(Modifier.height(Spacing.s))
                     KcTextButton("Salonu değiştir", viewModel::clearSelection)
                 }
             }

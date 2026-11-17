@@ -28,10 +28,15 @@ Ortak hata nedenleri: `UNAUTHENTICATED`, `PERMISSION_DENIED`, `INVALID_ARGUMENT`
 | `updateSalonProfile` | `{salonId, name, type, businessPhone, city, district, addressLine, description, location?:{lat,lng}}` | `{ok}` | OWNER. İl/ilçe listesiyle, koordinat Türkiye sınırıyla doğrulanır. Ad değişirse tüm üyelerin `memberships` aynası aynı transaction'da güncellenir. Kod değiştirilemez. |
 | `updateSalonMedia` | `{salonId, logoPendingPath?, photos:[{existingPath}\|{pendingPath}] (≤5, sıralı)}` | `{logoUrl, photos}` | OWNER. Yeni görseller geçici alandan kalıcı alana taşınır; çıkarılan dosyalar ve eski logo silinir. Eşzamanlı değişiklikte `STATE_CHANGED`. |
 | `salonLanding` (HTTPS, Hosting `/s/{kod}`) | — | HTML | Uygulama yüklü değilse açılan web sayfası: yalnızca kamuya açık salon alanları, "Uygulamada Aç" intent'i, Play bağlantısı. |
-| `updateSalonClosures` | `{salonId, weeklyClosedDays[], dryRun}` | `{conflicts:[AppointmentSummary]}` | `dryRun=false` ise yazar; çakışan randevular için yeniden planlama/iptal iş akışı başlatılır. |
-| `upsertSalonDateClosure` / `deleteSalonDateClosure` | `{salonId, closureId?, startDate, endDate, publicNote, dryRun}` | `{conflicts}` | OWNER. |
-| `updateWeeklySchedule` | `{salonId, staffUid, days, weeklyDaysOff, dryRun}` | `{conflicts}` | Kendisi (veya sahibi görüntüler; düzenleme yalnızca kendisi). Doğrulama: bitiş>başlangıç, vardiya çakışmaz, mola vardiya içinde, gece yarısı geçmez. |
-| `upsertStaffDateClosure` / `deleteStaffDateClosure` | `{salonId, closureId?, startDate, endDate, note, dryRun}` | `{conflicts}` | |
+| `updateWeeklySchedule` | `{salonId, days:{"1".."7":{shifts,breaks}}, weeklyDaysOff[], dryRun, acknowledgeConflicts}` | `{applied, conflicts}` | Yalnızca kendi programı. Doğrulama: bitiş>başlangıç, vardiyalar/molalar çakışmaz, mola vardiya içinde, gece yarısı geçmez, gün başına ≤4 vardiya ≤6 mola. |
+| `upsertStaffDateClosure` / `deleteStaffDateClosure` | `{salonId, closureId?, startDate, endDate, note, dryRun, acknowledgeConflicts}` | `{applied, conflicts, closureId}` | Geçmiş tarih yok, ≤366 gün; not yalnızca kişi + sahip görür. |
+| `updateSalonClosedDays` | `{salonId, weeklyClosedDays[], dryRun, acknowledgeConflicts}` | `{applied, conflicts}` | OWNER; 7 günün tamamı kapatılamaz (`ALL_DAYS_CLOSED`). Tüm uzmanların randevuları analiz edilir. |
+| `upsertSalonDateClosure` / `deleteSalonDateClosure` | `{salonId, closureId?, startDate, endDate, note, dryRun, acknowledgeConflicts}` | `{applied, conflicts, closureId}` | OWNER; not `publicNote` olarak kamuya açık. |
+| `serviceImpact` | `{salonId, serviceId}` | `{futureAppointments}` | Hizmetin sahibi veya salon sahibi. Bilgilendirme: randevular snapshot taşır, hizmet değişikliği onları etkilemez. |
+
+**Çakışma akışı:** İstemci önce `dryRun:true` çağırır. `conflicts` boşsa uygular; doluysa kullanıcıya listeler ve onayla `acknowledgeConflicts:true` gönderir. Onaysız uygulamada çakışma varsa `CONFLICTS_NOT_ACKNOWLEDGED {conflicts}`. Uygulanan değişiklikte çakışan randevular iptal edilmez: `attention:{reason, source, at}` ile işaretlenir, uzman ve salon sahibine `SCHEDULE_CONFLICT` bildirimi düşer; yeniden planlama/iptal randevu yönetiminden yapılır. `conflicts[]` = `{appointmentId, staffUid, localDate, start, end, status, customerName, reason}`; `reason` ∈ `SALON_CLOSED_DAY | SALON_CLOSURE | STAFF_DAY_OFF | STAFF_CLOSURE | OUTSIDE_WORKING_HOURS | OVERLAPS_BREAK`.
+
+Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kuralları sahipliği (staffUid == uid, aktif üye), fiyat (1–1.000.000 TL, kuruş) ve süre (5–600 dk, 5'in katı) sınırlarını denetler. Silme yumuşaktır (`deleted:true`).
 
 ## Randevu (Aşama 5–6)
 | `getAvailability` | `{salonId, staffUid, serviceIds[], fromDate, days ≤ 14}` | `{totalMinutes, totalKurus, days:[{date, slots:[{startAt(ISO UTC), label "HH:mm"}]}]}` | Sunucu algoritması (§6). |

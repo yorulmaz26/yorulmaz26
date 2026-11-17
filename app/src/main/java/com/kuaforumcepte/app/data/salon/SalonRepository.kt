@@ -40,6 +40,7 @@ data class SalonProfile(
     val ownerDisplayName: String,
     val rating: Rating,
     val active: Boolean,
+    val weeklyClosedDays: Set<Int> = emptySet(),
 ) {
     val fullAddress: String get() = "$addressLine, $district / $city"
 }
@@ -160,5 +161,6 @@ internal fun DocumentSnapshot.toSalon(): SalonProfile? {
         ownerDisplayName = getString("ownerDisplayName").orEmpty(),
         rating = Rating(getLong("ratingSum") ?: 0, getLong("ratingCount") ?: 0),
         active = getString("status") == "ACTIVE",
+        weeklyClosedDays = (get("weeklyClosedDays") as? List<Number>).orEmpty().map { it.toInt() }.toSet(),
     )
 }

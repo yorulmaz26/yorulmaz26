@@ -19,6 +19,12 @@ import com.kuaforumcepte.app.feature.salon.SalonDetailScreen
 import com.kuaforumcepte.app.feature.salonsettings.MediaManagerScreen
 import com.kuaforumcepte.app.feature.salonsettings.ShopSettingsScreen
 import com.kuaforumcepte.app.feature.share.ShareSalonScreen
+import com.kuaforumcepte.app.feature.schedule.ClosureScope
+import com.kuaforumcepte.app.feature.schedule.DateClosuresScreen
+import com.kuaforumcepte.app.feature.schedule.SalonClosedDaysScreen
+import com.kuaforumcepte.app.feature.schedule.WeeklyDaysOffScreen
+import com.kuaforumcepte.app.feature.schedule.WorkingHoursScreen
+import com.kuaforumcepte.app.feature.services.ServicesScreen
 import com.kuaforumcepte.domain.link.DeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
@@ -187,6 +193,11 @@ fun KcNavHost(
                 onOpenShopSettings = { navController.navigate(ShopSettingsRoute) { single() } },
                 onOpenMedia = { navController.navigate(MediaManagerRoute) { single() } },
                 onOpenShare = { navController.navigate(ShareSalonRoute) { single() } },
+                onOpenWorkingHours = { navController.navigate(WorkingHoursRoute) { single() } },
+                onOpenDaysOff = { navController.navigate(WeeklyDaysOffRoute) { single() } },
+                onOpenMyClosures = { navController.navigate(DateClosuresRoute(ClosureScope.STAFF.name)) { single() } },
+                onOpenServices = { navController.navigate(ServicesRoute) { single() } },
+                onOpenSalonClosedDays = { navController.navigate(SalonClosedDaysRoute) { single() } },
                 onOpenAccount = { navController.navigate(AccountRoute(EntryRole.BUSINESS.name)) { single() } },
                 onSwitchSalon = { navController.navigate(SalonPickerRoute) { single() } },
             )
@@ -197,6 +208,13 @@ fun KcNavHost(
         }
         composable<MediaManagerRoute> { MediaManagerScreen(onBack = back) }
         composable<ShareSalonRoute> { ShareSalonScreen(onBack = back) }
+        composable<WorkingHoursRoute> { WorkingHoursScreen(onBack = back) }
+        composable<WeeklyDaysOffRoute> { WeeklyDaysOffScreen(onBack = back) }
+        composable<DateClosuresRoute> { DateClosuresScreen(onBack = back) }
+        composable<SalonClosedDaysRoute> {
+            SalonClosedDaysScreen(onBack = back, onOpenDateClosures = { navController.navigate(DateClosuresRoute(ClosureScope.SALON.name)) { single() } })
+        }
+        composable<ServicesRoute> { ServicesScreen(onBack = back) }
 
         // ---- Salon sayfası (link / QR hedefi) ----
         composable<SalonDetailRoute> { SalonDetailScreen(onBack = back) }

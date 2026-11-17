@@ -29,6 +29,12 @@ import kotlinx.serialization.Serializable
 @Serializable data object ShopSettingsRoute
 @Serializable data object MediaManagerRoute
 @Serializable data object ShareSalonRoute
+@Serializable data object WorkingHoursRoute
+@Serializable data object WeeklyDaysOffRoute
+/** scope: ClosureScope.name (STAFF | SALON) */
+@Serializable data class DateClosuresRoute(val scope: String)
+@Serializable data object SalonClosedDaysRoute
+@Serializable data object ServicesRoute
 
 // Salon (herkese açık sayfa; deep link / QR hedefi)
 @Serializable data class SalonDetailRoute(val salonId: String)

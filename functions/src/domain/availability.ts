@@ -150,3 +150,63 @@ export function computeSlots(input: AvailabilityInput): Slot[] {
   }
   return slots;
 }
+
+// ---------------------------------------------------------------------------
+// Takvim değişikliği etki analizi
+// ---------------------------------------------------------------------------
+
+/** Mevcut bir randevunun yerel gün ve dakika aralığı (gece yarısını geçmez). */
+export interface BookedInterval {
+  localDate: string;
+  startMinute: number;
+  endMinute: number;
+}
+
+export interface ScheduleContext {
+  salonWeeklyClosedDays: number[];
+  salonClosures: DateRangeClosure[];
+  staffSchedule: WeeklySchedule;
+  staffClosures: DateRangeClosure[];
+}
+
+export type ConflictReason =
+  | "SALON_CLOSED_DAY"
+  | "SALON_CLOSURE"
+  | "STAFF_DAY_OFF"
+  | "STAFF_CLOSURE"
+  | "OUTSIDE_WORKING_HOURS"
+  | "OVERLAPS_BREAK";
+
+/**
+ * Randevu verilen takvimde hâlâ geçerli mi? Geçerli değilse ilk bulunan neden döner.
+ * Kural: tüm [start,end) aralığı tek bir vardiyanın içinde olmalı ve hiçbir molayla kesişmemeli.
+ */
+export function conflictReason(b: BookedInterval, ctx: ScheduleContext): ConflictReason | null {
+  const weekday = isoWeekday(b.localDate);
+  if (ctx.salonWeeklyClosedDays.includes(weekday)) return "SALON_CLOSED_DAY";
+  if (closureCovers(ctx.salonClosures, b.localDate)) return "SALON_CLOSURE";
+  if (ctx.staffSchedule.weeklyDaysOff.includes(weekday)) return "STAFF_DAY_OFF";
+  if (closureCovers(ctx.staffClosures, b.localDate)) return "STAFF_CLOSURE";
+  const day = ctx.staffSchedule.days[String(weekday)];
+  const interval: Interval = { start: b.startMinute, end: b.endMinute };
+  const shifts = (day?.shifts ?? []).map(toInterval);
+  if (!shifts.some((s) => interval.start >= s.start && interval.end <= s.end)) return "OUTSIDE_WORKING_HOURS";
+  if ((day?.breaks ?? []).map(toInterval).some((br) => overlaps(br, interval))) return "OVERLAPS_BREAK";
+  return null;
+}
+
+const LOCAL_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+/** Kapatma aralığı doğrulaması: bugünden önce başlayamaz, en fazla 366 gün. */
+export function validateClosureRange(startDate: string, endDate: string, today: string): "INVALID_DATE" | "PAST_DATE" | "RANGE_TOO_LONG" | null {
+  if (!LOCAL_DATE.test(startDate) || !LOCAL_DATE.test(endDate) || endDate < startDate) return "INVALID_DATE";
+  try {
+    isoWeekday(startDate);
+    isoWeekday(endDate);
+  } catch {
+    return "INVALID_DATE";
+  }
+  if (startDate < today) return "PAST_DATE";
+  if (endDate > addDays(startDate, 365)) return "RANGE_TOO_LONG";
+  return null;
+}

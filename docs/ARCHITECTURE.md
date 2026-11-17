@@ -134,7 +134,8 @@ Alt koleksiyonlar:
 | customerName, customerPhoneE164 | Belge yalnızca müşteri, atanmış uzman, salon sahibi tarafından okunur |
 | items: `[{serviceId, name, priceKurus, durationMinutes}]` | **appointmentItems** snapshot'ı (gömülü) |
 | totalKurus, totalMinutes, finalKurus | finalKurus = yetkili düzeltmeler sonrası |
-| startAt, endAt (UTC), localDate "YYYY-MM-DD", startMinuteOfDay, timezone | |
+| startAt, endAt (UTC), localDate "YYYY-MM-DD", startMinuteOfDay, endMinuteOfDay, timezone | Takvim etki analizi yerel dakikalarla yapılır |
+| attention? `{reason, source, at}` | Takvim değişikliği sonrası "ilgilenilmesi gerekiyor" işareti |
 | status | Durum makinesi §5 |
 | pendingExpiresAt | `min(createdAt + pendingTtl, startAt)` |
 | cancelReason, cancelledBy | |

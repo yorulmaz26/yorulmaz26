@@ -64,6 +64,8 @@ fun SalonDetailScreen(onBack: () -> Unit, viewModel: SalonDetailViewModel = hilt
             is UiState.Success -> Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(Spacing.screen)) {
                 SalonInfoContent(s.data, toast)
                 Spacer(Modifier.height(Spacing.l))
+                SalonHoursSection(s.data.id, s.data.weeklyClosedDays)
+                Spacer(Modifier.height(Spacing.l))
                 InfoBanner("Uzman ve hizmet seçerek randevu alma bir sonraki geliştirme aşamasında bu sayfaya eklenecek.")
             }
         }

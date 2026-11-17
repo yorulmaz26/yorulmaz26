@@ -14,6 +14,11 @@ import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.EventNote
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.ManageAccounts
+import androidx.compose.material.icons.outlined.BeachAccess
+import androidx.compose.material.icons.outlined.ContentCut
+import androidx.compose.material.icons.outlined.DoorFront
+import androidx.compose.material.icons.outlined.EventBusy
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material.icons.outlined.Storefront
@@ -63,6 +68,11 @@ fun BusinessHomeScreen(
     onOpenShopSettings: () -> Unit,
     onOpenMedia: () -> Unit,
     onOpenShare: () -> Unit,
+    onOpenWorkingHours: () -> Unit,
+    onOpenDaysOff: () -> Unit,
+    onOpenMyClosures: () -> Unit,
+    onOpenServices: () -> Unit,
+    onOpenSalonClosedDays: () -> Unit,
     onOpenAccount: () -> Unit,
     onSwitchSalon: () -> Unit,
     viewModel: BusinessHomeViewModel = hiltViewModel(),
@@ -123,6 +133,15 @@ fun BusinessHomeScreen(
                             )
                         }
                         BusinessTab.MANAGE -> {
+                            Text("Kişisel", style = MaterialTheme.typography.titleMedium)
+                            MenuRow(Icons.Outlined.Schedule, "Çalışma Saatleri ve Molalar", "Gün gün vardiyalar ve molalar", onOpenWorkingHours)
+                            MenuRow(Icons.Outlined.BeachAccess, "Haftalık İzin Günleri", "Her hafta çalışmadığınız günler", onOpenDaysOff)
+                            MenuRow(Icons.Outlined.EventBusy, "Özel Tarih Kapatma", "İzin, rapor vb. tarih veya aralıklar", onOpenMyClosures)
+                            MenuRow(Icons.Outlined.ContentCut, "Hizmetlerim", "Hizmet adı, fiyat, süre, aktif/pasif", onOpenServices)
+                            if (Permission.MANAGE_SALON_SETTINGS in s.permissions) Text("Salon", style = MaterialTheme.typography.titleMedium)
+                            if (Permission.MANAGE_SALON_CLOSURES in s.permissions) {
+                                MenuRow(Icons.Outlined.DoorFront, "Salon Kapalı Günleri", "Haftalık kapalı günler ve özel kapalı tarihler", onOpenSalonClosedDays)
+                            }
                             if (Permission.MANAGE_SALON_SETTINGS in s.permissions) {
                                 MenuRow(Icons.Outlined.Storefront, "Dükkan Ayarları", "Ad, tür, telefon, adres, açıklama, konum", onOpenShopSettings)
                             }
@@ -133,7 +152,6 @@ fun BusinessHomeScreen(
                                 MenuRow(Icons.Outlined.Groups, "Stilist Yönetimi", "Uzman davet et, listele, düzenle, pasife al", onOpenStaff)
                             }
                             MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, Beni hatırla, tema, çıkış", onOpenAccount)
-                            InfoBanner("Çalışma saatleri, izinler, kapalı günler ve hizmet yönetimi sonraki aşamada bu menüye eklenecek.")
                         }
                         BusinessTab.APPOINTMENTS -> EmptyState(
                             icon = Icons.Outlined.EditCalendar,
