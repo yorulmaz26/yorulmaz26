@@ -78,6 +78,12 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: ./gradlew :app:connectedDebugAndroidTest --stacktrace
+      - name: Ekran görüntülerini günlüğe yaz (inceleme için)
+        if: always()
+        run: |
+          find app/build/outputs/connected_android_test_additional_output -name "*.png" | sort | while read f; do
+            echo "IMG_BEGIN $(basename "$f")"; base64 -w0 "$f"; echo; echo "IMG_END"
+          done
       - name: Tasarım ekran görüntüleri
         if: always()
         uses: actions/upload-artifact@v4
