@@ -40,6 +40,8 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         testInstrumentationRunner = "com.kuaforumcepte.app.HiltTestRunner"
+        // Tasarım ekran görüntüleri TestStorage ile kaydedilir; AGP bunları build/outputs altına çeker.
+        testInstrumentationRunnerArguments["useTestStorageService"] = "true"
         vectorDrawables.useSupportLibrary = true
 
         val appLinkHost = localProps.getProperty("appLinkHost", "kuaforumcepte.web.app")
@@ -164,5 +166,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.compose.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)
+    androidTestImplementation(libs.androidx.test.storage)
+    androidTestUtil(libs.androidx.test.services)
     kspAndroidTest(libs.hilt.compiler)
 }

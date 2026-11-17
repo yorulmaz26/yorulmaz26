@@ -22,7 +22,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.services.storage.TestStorage
 import com.kuaforumcepte.app.core.designsystem.theme.KuaforumTheme
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.app.data.appointments.Appointment
@@ -37,7 +37,6 @@ import com.kuaforumcepte.domain.model.Kurus
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.io.File
 import java.time.Instant
 
 /**
@@ -50,8 +49,7 @@ class ScreenshotTests {
 
     private fun save(name: String) {
         val bmp = compose.onRoot().captureToImage().asAndroidBitmap()
-        val dir = File(InstrumentationRegistry.getInstrumentation().targetContext.getExternalFilesDir(null), "screenshots").apply { mkdirs() }
-        File(dir, "$name.png").outputStream().use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
+        TestStorage().openOutputFile("screenshots/$name.png").use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
     }
 
     @Test fun girisEkraniKoyu() {

@@ -77,15 +77,13 @@ jobs:
           target: google_apis
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: |
-            ./gradlew :app:connectedDebugAndroidTest --stacktrace
-            mkdir -p screenshots && adb pull /sdcard/Android/data/com.kuaforumcepte.debug/files/screenshots/. screenshots/ || true
+          script: ./gradlew :app:connectedDebugAndroidTest --stacktrace
       - name: Tasarım ekran görüntüleri
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ui-screenshots
-          path: screenshots
+          path: app/build/outputs/connected_android_test_additional_output
           if-no-files-found: ignore
       - name: UI test raporları
         if: always()
