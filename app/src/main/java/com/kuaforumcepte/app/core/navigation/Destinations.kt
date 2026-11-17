@@ -39,6 +39,12 @@ import kotlinx.serialization.Serializable
 // Salon (herkese açık sayfa; deep link / QR hedefi)
 @Serializable data class SalonDetailRoute(val salonId: String)
 
+// Rezervasyon akışı (her ekran verisini sunucudan tazeler; süreç ölümüne dayanıklı)
+@Serializable data class SlotPickerRoute(val salonId: String, val staffUid: String, val serviceIds: List<String>)
+@Serializable data class BookingSummaryRoute(val salonId: String, val staffUid: String, val serviceIds: List<String>, val startAt: String)
+@Serializable data class BookingSuccessRoute(val appointmentId: String)
+@Serializable data class AppointmentDetailRoute(val appointmentId: String)
+
 // Müşteri
 @Serializable data object CustomerHomeRoute
 

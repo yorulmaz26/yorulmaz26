@@ -146,8 +146,8 @@ Alt koleksiyonlar:
 Değişiklik geçmişi: `appointments/{id}/events/{eventId}` 🔒 `{from, to, actorUid, actorRole, reason, at}` (randevuya özel denetim kaydı).
 
 ### 4.5 Kilitler 🔒 (istemci erişimi yok)
-- `staffDayLocks/{salonId}_{staffUid}_{YYYY-MM-DD}` — `{intervals: [{appointmentId, startMin, endMin}]}` (yalnızca PENDING/CONFIRMED/IN_PROGRESS).
-- `customerLocks/{uid}` — `{activeAppointmentId | null}`.
+- `staffDayLocks/{salonId}_{staffUid}_{YYYY-MM-DD}` — `{intervals: [{appointmentId, startMin, endMin, expiresAtMs}]}` (yalnızca PENDING/CONFIRMED/IN_PROGRESS). `expiresAtMs` doluysa PENDING'dir; o andan sonra slotu tutmaz (zamanlayıcı gecikse bile slot serbest kalır). Onayda `null` yapılır.
+- `customerLocks/{uid}` — `{activeAppointmentId | null, expiresAtMs}`. Yeni randevuda işaret edilen randevu okunur; süresi dolmuş PENDING ise aynı transaction'da EXPIRED yapılır.
 - `salonOwners/{uid}` — `{salonId, code, salonName}`; v1'de kişi başına tek sahip olunan salon ve kayıt tekrarlarında idempotentlik.
 - `idempotencyKeys/{uid}_{key}` — `{result, createdAt, expireAt}` (TTL politikası).
 - `rateLimits/{uid}_{action}_{window}` — sayaç.

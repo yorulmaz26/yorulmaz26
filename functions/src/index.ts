@@ -33,3 +33,7 @@ export {
   deleteSalonDateClosure,
   serviceImpact,
 } from "./schedule/scheduleFunctions";
+
+// Aşama 5 — müsaitlik ve rezervasyon
+export { getAvailability } from "./booking/availabilityFn";
+export { createAppointment, transitionAppointment } from "./booking/appointments";

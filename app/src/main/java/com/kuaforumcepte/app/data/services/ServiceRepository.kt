@@ -43,19 +43,14 @@ class ServiceRepository @Inject constructor(
     fun observeMine(salonId: String, uid: String): Flow<List<StaffService>> =
         col(salonId).whereEqualTo("staffUid", uid).whereEqualTo("deleted", false)
             .orderBy("nameLower", Query.Direction.ASCENDING).snapshots()
-            .map { qs ->
-                qs.documents.map { d ->
-                    StaffService(
-                        id = d.id,
-                        staffUid = d.getString("staffUid").orEmpty(),
-                        name = d.getString("name").orEmpty(),
-                        description = d.getString("description").orEmpty(),
-                        price = Kurus(d.getLong("priceKurus") ?: 0),
-                        durationMinutes = (d.getLong("durationMinutes") ?: 0).toInt(),
-                        active = d.getBoolean("active") == true,
-                    )
-                }
-            }
+            .map { qs -> qs.documents.map { it.toService() } }
+            .catch { throw AppException.from(it) }
+
+    /** Müşteriye gösterilen: uzmanın aktif ve silinmemiş hizmetleri. */
+    fun observeActiveOf(salonId: String, staffUid: String): Flow<List<StaffService>> =
+        col(salonId).whereEqualTo("staffUid", staffUid).whereEqualTo("active", true).whereEqualTo("deleted", false)
+            .orderBy("nameLower", Query.Direction.ASCENDING).snapshots()
+            .map { qs -> qs.documents.map { it.toService() } }
             .catch { throw AppException.from(it) }
 
     private fun fields(salonId: String, d: ServiceDraft): Map<String, Any> = mapOf(
@@ -95,3 +90,13 @@ class ServiceRepository @Inject constructor(
         throw AppException.from(t)
     }
 }
+
+private fun com.google.firebase.firestore.DocumentSnapshot.toService() = StaffService(
+    id = id,
+    staffUid = getString("staffUid").orEmpty(),
+    name = getString("name").orEmpty(),
+    description = getString("description").orEmpty(),
+    price = Kurus(getLong("priceKurus") ?: 0),
+    durationMinutes = (getLong("durationMinutes") ?: 0).toInt(),
+    active = getBoolean("active") == true,
+)

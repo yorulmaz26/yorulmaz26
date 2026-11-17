@@ -7,6 +7,10 @@ import com.kuaforumcepte.app.core.data.ErrorMessages
 import com.kuaforumcepte.app.core.datastore.AppPreferences
 import com.kuaforumcepte.app.data.salon.SalonProfile
 import com.kuaforumcepte.app.data.salon.SalonRepository
+import com.kuaforumcepte.app.data.appointments.Appointment
+import com.kuaforumcepte.app.data.appointments.AppointmentRepository
+import com.kuaforumcepte.app.data.session.SessionRepository
+import java.time.Clock
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
@@ -27,7 +31,16 @@ import javax.inject.Inject
 class CustomerHomeViewModel @Inject constructor(
     private val preferences: AppPreferences,
     private val salons: SalonRepository,
+    session: SessionRepository,
+    appointments: AppointmentRepository,
+    clock: Clock,
 ) : ViewModel() {
+
+    /** Tek aktif randevu kuralı: varsa "Randevu Al" sekmesinin başında kart gösterilir. */
+    val activeAppointment: StateFlow<Appointment?> = session.uidFlow.flatMapLatest { uid ->
+        if (uid == null) flowOf(null)
+        else appointments.observeCustomerActive(uid).map { list -> list.firstOrNull { it.isActive(clock.instant()) } }.catch { emit(null) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     /** null = seçili salon yok. */
     val selectedSalon: StateFlow<UiState<SalonProfile>?> = preferences.settings

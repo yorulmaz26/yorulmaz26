@@ -156,7 +156,7 @@ fun BusinessHomeScreen(
                         BusinessTab.APPOINTMENTS -> EmptyState(
                             icon = Icons.Outlined.EditCalendar,
                             title = if (m.role == MemberRole.OWNER) "Randevu yönetimi hazırlanıyor" else "Randevularım",
-                            message = "Müşteri rezervasyonu ve randevu onay/iptal akışı sonraki aşamalarda etkinleşecek. Henüz randevu yok.",
+                            message = "Müşteriler artık randevu talebi oluşturabiliyor; yeni talepler bildirim kutunuza düşer. Talepleri listeleme, onaylama/iptal ve “Geldi/Tamamla” işlemleri bir sonraki aşamada bu sekmeye eklenecek.",
                         )
                     }
                 }

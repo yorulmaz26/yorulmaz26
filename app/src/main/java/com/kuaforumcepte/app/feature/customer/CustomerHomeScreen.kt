@@ -20,6 +20,9 @@ import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
 import com.kuaforumcepte.app.core.designsystem.component.asString
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.app.feature.salon.SalonHoursSection
+import com.kuaforumcepte.app.feature.appointments.MyAppointmentsContent
+import com.kuaforumcepte.app.feature.booking.ActiveAppointmentCard
+import com.kuaforumcepte.app.feature.booking.SalonListContent
 import com.kuaforumcepte.app.feature.salon.SalonInfoContent
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
@@ -52,9 +55,15 @@ private enum class CustomerTab(val label: String, val icon: ImageVector) {
 
 /** Müşteri ana kabuğu. Sekme içerikleri Aşama 5 (rezervasyon) ve Aşama 8'de (salon bilgileri) dolar. */
 @Composable
-fun CustomerHomeScreen(onOpenAccount: () -> Unit, viewModel: CustomerHomeViewModel = hiltViewModel()) {
+fun CustomerHomeScreen(
+    onOpenAccount: () -> Unit,
+    onOpenSalon: (String) -> Unit,
+    onOpenAppointment: (String) -> Unit,
+    viewModel: CustomerHomeViewModel = hiltViewModel(),
+) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val selected by viewModel.selectedSalon.collectAsStateWithLifecycle()
+    val active by viewModel.activeAppointment.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -73,23 +82,21 @@ fun CustomerHomeScreen(onOpenAccount: () -> Unit, viewModel: CustomerHomeViewMod
         },
     ) { padding ->
         when (CustomerTab.entries[tab]) {
-            CustomerTab.BOOK -> EmptyState(
-                icon = Icons.Outlined.ContentCut,
-                title = "Kayıtlı Kuaförlerimiz",
-                message = "Salon listesi, uzman ve hizmet seçimi ile randevu alma bir sonraki geliştirme aşamasında burada etkinleşecek.",
+            CustomerTab.BOOK -> SalonListContent(
+                onOpenSalon = onOpenSalon,
+                header = { active?.let { a -> ActiveAppointmentCard(a, onOpen = { onOpenAppointment(a.id) }) } },
                 modifier = Modifier.padding(padding),
             )
-            CustomerTab.MINE -> EmptyState(
-                icon = Icons.Outlined.EventAvailable,
-                title = "Henüz randevunuz yok",
-                message = "Aldığınız randevular burada aktif ve geçmiş olarak listelenecek.",
+            CustomerTab.MINE -> MyAppointmentsContent(
+                onOpen = onOpenAppointment,
+                onBook = { tab = CustomerTab.BOOK.ordinal },
                 modifier = Modifier.padding(padding),
             )
             CustomerTab.SALON -> when (val st = selected) {
                 null -> EmptyState(
                     icon = Icons.Outlined.Storefront,
                     title = "Önce kuaför seçiniz",
-                    message = "Bir salonun sayfasında “Bu salonu seç” dediğinizde (ör. salonun paylaştığı link veya QR ile) bilgileri burada görünür.",
+                    message = "Randevu Al sekmesinden bir salon açıp “Bu salonu seç” dediğinizde bilgileri burada görünür.",
                     actionLabel = "Randevu Al'a git",
                     onAction = { tab = CustomerTab.BOOK.ordinal },
                     modifier = Modifier.padding(padding),

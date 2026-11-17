@@ -16,6 +16,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kuaforumcepte.app.feature.link.DeepLinkViewModel
 import com.kuaforumcepte.app.feature.link.LinkEvent
 import com.kuaforumcepte.app.feature.salon.SalonDetailScreen
+import com.kuaforumcepte.app.feature.appointments.BookingSuccessScreen
+import com.kuaforumcepte.app.feature.appointments.CustomerAppointmentDetailScreen
+import com.kuaforumcepte.app.feature.booking.BookingSummaryScreen
+import com.kuaforumcepte.app.feature.booking.SlotPickerScreen
 import com.kuaforumcepte.app.feature.salonsettings.MediaManagerScreen
 import com.kuaforumcepte.app.feature.salonsettings.ShopSettingsScreen
 import com.kuaforumcepte.app.feature.share.ShareSalonScreen
@@ -79,6 +83,7 @@ fun KcNavHost(
         linkViewModel.events.collect { e ->
             when (e) {
                 is LinkEvent.OpenSalon -> navController.navigate(SalonDetailRoute(e.salonId)) { launchSingleTop = true }
+                is LinkEvent.OpenAppointment -> navController.navigate(AppointmentDetailRoute(e.appointmentId)) { launchSingleTop = true }
                 is LinkEvent.Failed -> Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
         }
@@ -217,11 +222,49 @@ fun KcNavHost(
         composable<ServicesRoute> { ServicesScreen(onBack = back) }
 
         // ---- Salon sayfası (link / QR hedefi) ----
-        composable<SalonDetailRoute> { SalonDetailScreen(onBack = back) }
+        composable<SalonDetailRoute> {
+            SalonDetailScreen(
+                onBack = back,
+                onPickTime = { salonId, staffUid, ids -> navController.navigate(SlotPickerRoute(salonId, staffUid, ids)) },
+                onOpenAppointment = { id -> navController.navigate(AppointmentDetailRoute(id)) { single() } },
+            )
+        }
+
+        // ---- Rezervasyon ----
+        composable<SlotPickerRoute> { entry ->
+            val r = entry.toRoute<SlotPickerRoute>()
+            SlotPickerScreen(onBack = back, onSlotSelected = { slot ->
+                navController.navigate(BookingSummaryRoute(r.salonId, r.staffUid, r.serviceIds, slot.startAt.toString()))
+            })
+        }
+        composable<BookingSummaryRoute> {
+            BookingSummaryScreen(
+                onBack = back,
+                onCreated = { id ->
+                    navController.navigate(BookingSuccessRoute(id)) { popUpTo<CustomerHomeRoute> { inclusive = false } }
+                },
+                onBackToSlots = { navController.popBackStack<SlotPickerRoute>(inclusive = false) },
+                onOpenAppointment = { id -> navController.navigate(AppointmentDetailRoute(id)) { popUpTo<CustomerHomeRoute> { inclusive = false } } },
+            )
+        }
+        composable<BookingSuccessRoute> { entry ->
+            val id = entry.toRoute<BookingSuccessRoute>().appointmentId
+            BookingSuccessScreen(
+                onOpenAppointment = { navController.navigate(AppointmentDetailRoute(id)) { popUpTo<CustomerHomeRoute> { inclusive = false } } },
+                onHome = {
+                    if (!navController.popBackStack<CustomerHomeRoute>(inclusive = false)) navController.navigateAsRoot(SessionGateRoute(EntryRole.CUSTOMER.name))
+                },
+            )
+        }
+        composable<AppointmentDetailRoute> { CustomerAppointmentDetailScreen(onBack = back) }
 
         // ---- Müşteri ----
         composable<CustomerHomeRoute> {
-            CustomerHomeScreen(onOpenAccount = { navController.navigate(AccountRoute(EntryRole.CUSTOMER.name)) { single() } })
+            CustomerHomeScreen(
+                onOpenAccount = { navController.navigate(AccountRoute(EntryRole.CUSTOMER.name)) { single() } },
+                onOpenSalon = { id -> navController.navigate(SalonDetailRoute(id)) { single() } },
+                onOpenAppointment = { id -> navController.navigate(AppointmentDetailRoute(id)) { single() } },
+            )
         }
 
         // ---- Hesap ----

@@ -15,6 +15,7 @@ import javax.inject.Inject
 
 sealed interface LinkEvent {
     data class OpenSalon(val salonId: String) : LinkEvent
+    data class OpenAppointment(val appointmentId: String) : LinkEvent
     data class Failed(val message: String) : LinkEvent
 }
 
@@ -52,8 +53,11 @@ class DeepLinkViewModel @Inject constructor(
                     )
                 }
             }
-            // Randevu bağlantıları (bildirim tıklaması) randevu yönetimi aşamasında işlenecek.
-            is DeepLink.Appointment -> Unit
+            // Bildirim tıklaması: randevu detayına (okuma yetkisi Firestore kurallarıyla denetlenir).
+            is DeepLink.Appointment -> {
+                links.consume(link)
+                viewModelScope.launch { _events.send(LinkEvent.OpenAppointment(link.appointmentId)) }
+            }
         }
     }
 }
