@@ -1,0 +1,32 @@
+name: "Test: Randevuyu Geldi Yap"
+
+# YALNIZCA TEST PROJESİ. Randevuyu saat kuralını beklemeden "Geldi" (işlemde) durumuna getirir;
+# ardından uygulamada uzman "İşlemi Tamamla" der ve müşteri puanlama yapar.
+on:
+  workflow_dispatch:
+    inputs:
+      number:
+        description: "Randevu numarası (ör. KC-AB12CD34). Boş: en son bekleyen/onaylı randevu"
+        required: false
+        type: string
+
+jobs:
+  mark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Randevuyu Geldi yap
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          NUMBER: ${{ inputs.number }}
+        run: |
+          [ -n "$SA" ] || { echo "::error::FIREBASE_SERVICE_ACCOUNT gizli değişkeni tanımlı değil"; exit 1; }
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          export GCLOUD_PROJECT=$(jq -r '.project_id' "$RUNNER_TEMP/sa.json")
+          cd functions && npm ci --omit=dev
+          node scripts/testMarkArrived.js "$NUMBER"
