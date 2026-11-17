@@ -36,6 +36,18 @@ class MainActivity : Activity() {
         super.onPause()
     }
 
+    override fun onDestroy() {
+        gameView.release()
+        super.onDestroy()
+    }
+
+    /** Oyundayken geri tuşu menüye döner; menüdeyken uygulamadan çıkar. */
+    @Deprecated("Deprecated in Java")
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        if (!gameView.onBack()) super.onBackPressed()
+    }
+
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) hideSystemBars()

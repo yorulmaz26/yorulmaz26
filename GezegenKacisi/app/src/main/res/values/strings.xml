@@ -9,7 +9,30 @@
     <string name="score_label">SKOR</string>
     <string name="best_label">EN İYİ</string>
     <string name="new_record">YENİ REKOR!</string>
-    <string name="tap_to_retry">Tekrar denemek için dokun</string>
     <string name="paused">DURAKLATILDI</string>
     <string name="tap_to_continue">Devam etmek için dokun</string>
+
+    <!-- Menü -->
+    <string name="label_map">HARİTA</string>
+    <string name="label_level">SEVİYE</string>
+    <string name="start">BAŞLA</string>
+    <string name="retry">TEKRAR</string>
+    <string name="menu">MENÜ</string>
+
+    <!-- Seviyeler -->
+    <string name="diff_easy">KOLAY</string>
+    <string name="diff_normal">ORTA</string>
+    <string name="diff_hard">ZOR</string>
+
+    <!-- Haritalar -->
+    <string name="map_earth">Dünya Yörüngesi</string>
+    <string name="map_earth_desc">Dengeli rota · karışık gezegenler</string>
+    <string name="map_ice">Buz Kuşağı</string>
+    <string name="map_ice_desc">Düşük yer çekimi · süzülerek uç</string>
+    <string name="map_lava">Lav Denizi</string>
+    <string name="map_lava_desc">Kızgın gezegenler · daha hızlı akış</string>
+    <string name="map_gas">Gaz Devleri</string>
+    <string name="map_gas_desc">Dev halkalı gezegenler</string>
+    <string name="map_asteroid">Asteroit Kuşağı</string>
+    <string name="map_asteroid_desc">Kuleler yukarı aşağı kayıyor</string>
 </resources>

@@ -37,13 +37,14 @@ import kotlin.random.Random
  * Gezegen Kaçışı: dokununca roket itiş yapar, yer çekimi aşağı çeker.
  * Engeller, yukarıdan ve aşağıdan uzanan gezegen + uydu kuleleridir; aradaki boşluktan geçilir.
  *
+ * Akış: MENÜ (harita + seviye seçimi) → HAZIR (dokun ve başla) → OYUN → PATLAMA → OYUN BİTTİ.
+ *
  * Dünya koordinatları: ekran yüksekliği her zaman 1000 birimdir, genişlik ekran oranına göre değişir.
  * Böylece oyun her telefonda aynı hissettirir.
  */
 class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
-    private enum class State { READY, PLAYING, DYING, OVER }
-    private enum class PlanetType { GAS, ROCKY, ICE, LAVA, OCEAN, MOON }
+    private enum class State { MENU, READY, PLAYING, DYING, OVER }
 
     private class Palette(val base: Int, val dark: Int, val light: Int, val accent: Int, val atmo: Int)
 
@@ -52,8 +53,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private class Planet(val dx: Float, val y: Float, val r: Float, val art: PlanetArt)
 
-    private class Column(var x: Float, val planets: List<Planet>) {
+    /** Bir engel kulesi. Asteroit Kuşağı'nda tüm kule [swayAmp] kadar yukarı aşağı salınır. */
+    private class Column(var x: Float, val planets: List<Planet>, val swayAmp: Float, val swayPhase: Float) {
         var scored = false
+        var offset = 0f
         val halfWidth: Float = planets.maxOf { abs(it.dx) + it.art.padX * it.r / it.art.baseR }
     }
 
@@ -69,20 +72,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     companion object {
-        // --- Oyun ayarları (zorluğu buradan değiştirebilirsin) ---
+        // --- Temel fizik (seviye ve harita ayarları GameConfig.kt dosyasında) ---
         private const val WORLD_H = 1000f
         private const val GRAVITY = 1850f        // yer çekimi
         private const val FLAP_V = -540f         // dokununca kazanılan yukarı hız
         private const val MAX_FALL = 820f        // en yüksek düşüş hızı
-        private const val BASE_SPEED = 210f      // başlangıç kaydırma hızı
-        private const val COLUMN_SPACING = 330f  // iki gezegen kulesi arası mesafe
-        private const val START_GAP = 300f       // başlangıçtaki geçiş boşluğu
-        private const val MIN_GAP = 230f         // en dar geçiş boşluğu
         private const val MAIN_R = 86f
         private const val MOON_R = 56f
+        private const val SWAY_SPEED = 1.7f      // asteroit kulelerinin salınım hızı
 
         private const val PREFS = "gezegen_kacisi"
-        private const val KEY_BEST = "best"
+        private const val KEY_BEST_LEGACY = "best"
+        private const val KEY_MAP = "map"
+        private const val KEY_DIFF = "difficulty"
+        private const val KEY_SOUND = "sound"
 
         private val DEG = (PI / 180.0).toFloat()
         private val TWO_PI = (PI * 2.0).toFloat()
@@ -95,14 +98,22 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private val prefs: SharedPreferences =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    private val sound = SoundManager(context)
+
+    // --- Seçimler ---
+    private var mapIndex = prefs.getInt(KEY_MAP, 0).coerceIn(0, Maps.ALL.size - 1)
+    private var map: GameMap = Maps.ALL[mapIndex]
+    private var difficulty: Difficulty =
+        Difficulty.entries.getOrElse(prefs.getInt(KEY_DIFF, Difficulty.NORMAL.ordinal)) { Difficulty.NORMAL }
 
     // --- Ekran ölçeği ---
     private var scale = 1f
     private var worldW = 500f
     private var artScale = 0f
+    private var artMap = -1
 
     // --- Oyun durumu ---
-    private var state = State.READY
+    private var state = State.MENU
     private var paused = false
     private var running = false
     private var lastFrameNs = 0L
@@ -116,9 +127,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var boost = 0f
     private var emitAcc = 0f
 
-    private var speed = BASE_SPEED
+    private var speed = difficulty.baseSpeed
     private var score = 0
-    private var best = prefs.getInt(KEY_BEST, 0)
+    private var best = 0
     private var newBest = false
     private var scorePulse = 0f
     private var lastGapY = WORLD_H / 2f
@@ -133,6 +144,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var shootLife = 0f
     private var shootX = 0f
     private var shootY = 0f
+
+    // --- Menü ---
+    private var cardAnim = 0f      // harita değişince kart içeriği kayar (-1..1 → 0)
+    private var downX = 0f
+    private var downY = 0f
+    private var downTime = 0f
 
     private val columns = ArrayList<Column>()
     private val mainArts = ArrayList<PlanetArt>()
@@ -151,9 +168,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strScoreLabel = context.getString(R.string.score_label)
     private val strBestLabel = context.getString(R.string.best_label)
     private val strNewRecord = context.getString(R.string.new_record)
-    private val strTapToRetry = context.getString(R.string.tap_to_retry)
     private val strPaused = context.getString(R.string.paused)
     private val strTapToContinue = context.getString(R.string.tap_to_continue)
+    private val strMapLabel = context.getString(R.string.label_map)
+    private val strLevelLabel = context.getString(R.string.label_level)
+    private val strStart = context.getString(R.string.start)
+    private val strRetry = context.getString(R.string.retry)
+    private val strMenu = context.getString(R.string.menu)
+    private val mapNames = Maps.ALL.map { context.getString(it.nameRes) }
+    private val mapDescs = Maps.ALL.map { context.getString(it.descRes) }
+    private val diffNames = Difficulty.entries.map { context.getString(it.nameRes) }
     private var scoreText = "0"
     private var bestValueText = "0"
     private var bestText = ""
@@ -167,6 +191,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val colPanelEdge = hex(0xFF8FA2FF)
     private val colAccent = hex(0xFFFF5B4A)
     private val colFin = hex(0xFFD8402F)
+    private val colDarkText = hex(0xFF2A1A00)
 
     // --- Fırçalar ---
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -188,6 +213,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val dst = RectF()
     private val tmpRect = RectF()
     private val tmpArtRect = RectF()
+    private val iconPath = Path()
+
+    // --- Arayüz düğmeleri (dünya birimi; layoutUi() içinde yerleştirilir) ---
+    private val soundBtn = RectF()
+    private val mapCard = RectF()
+    private val arrowLeft = RectF()
+    private val arrowRight = RectF()
+    private val diffBtns = Array(Difficulty.entries.size) { RectF() }
+    private val startBtn = RectF()
+    private val retryBtn = RectF()
+    private val menuBtn = RectF()
 
     // --- Roket geometrisi (sağa bakar, merkez 0,0) ---
     private val bodyPath = Path().apply {
@@ -263,6 +299,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     init {
         isFocusable = true
         isFocusableInTouchMode = true
+        sound.enabled = prefs.getBoolean(KEY_SOUND, true)
+        sound.setMusicTheme(map.musicTheme)
         refreshBestTexts()
     }
 
@@ -271,6 +309,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     // =====================================================================
 
     fun resume() {
+        sound.onResume()
         if (running) return
         running = true
         lastFrameNs = 0L
@@ -281,6 +320,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (state == State.PLAYING) paused = true
         running = false
         Choreographer.getInstance().removeFrameCallback(this)
+        sound.onPause()
+    }
+
+    fun release() {
+        sound.release()
+    }
+
+    /** Geri tuşu. true dönerse olay tüketildi; false ise uygulama kapanabilir. */
+    fun onBack(): Boolean {
+        when (state) {
+            State.MENU -> return false
+            State.PLAYING -> if (!paused) paused = true else toMenu()
+            else -> toMenu()
+        }
+        return true
     }
 
     override fun onAttachedToWindow() {
@@ -312,9 +366,37 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         rocketX = worldW * 0.3f
         buildBackground(w, h)
         // Gezegen görselleri pahalı; ölçek çok değişmediyse yeniden üretme.
-        if (mainArts.isEmpty() || abs(scale - artScale) / artScale > 0.15f) buildPlanetArts()
+        if (mainArts.isEmpty() || artMap != mapIndex || abs(scale - artScale) / artScale > 0.15f) buildPlanetArts()
         buildStars()
-        if (state == State.READY) resetGame()
+        layoutUi()
+        if (state == State.MENU || state == State.READY) resetGame()
+    }
+
+    /** Menü ve oyun sonu düğmelerinin yerleri. */
+    private fun layoutUi() {
+        val cx = worldW / 2f
+        soundBtn.set(worldW - 78f, 24f, worldW - 22f, 80f)
+
+        val cardHalf = min(worldW / 2f - 60f, 210f)
+        mapCard.set(cx - cardHalf, 262f, cx + cardHalf, 592f)
+        arrowLeft.set(mapCard.left - 54f, 398f, mapCard.left - 6f, 458f)
+        arrowRight.set(mapCard.right + 6f, 398f, mapCard.right + 54f, 458f)
+
+        val rowHalf = min(worldW / 2f - 26f, 230f)
+        val gap = 10f
+        val n = diffBtns.size
+        val bw = (rowHalf * 2f - gap * (n - 1)) / n
+        for (i in 0 until n) {
+            val l = cx - rowHalf + i * (bw + gap)
+            diffBtns[i].set(l, 694f, l + bw, 752f)
+        }
+
+        val sw = min(worldW - 96f, 300f)
+        startBtn.set(cx - sw / 2f, 794f, cx + sw / 2f, 870f)
+
+        val half = min(worldW / 2f - 28f, 180f)
+        retryBtn.set(cx - half, 684f, cx - 7f, 748f)
+        menuBtn.set(cx + 7f, 684f, cx + half, 748f)
     }
 
     // =====================================================================
@@ -323,22 +405,42 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val action = event.actionMasked
-        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) onTap()
+        val wx = event.x / scale
+        val wy = event.y / scale
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                downX = wx
+                downY = wy
+                downTime = time
+                onPress()
+            }
+            // İkinci parmakla da itiş yapılabilsin
+            MotionEvent.ACTION_POINTER_DOWN -> if (state == State.PLAYING) onPress()
+            MotionEvent.ACTION_UP -> onRelease(wx, wy)
+        }
         return true
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_SPACE || keyCode == KeyEvent.KEYCODE_ENTER ||
-            keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_DPAD_UP
-        ) {
-            if (event.repeatCount == 0) onTap()
-            return true
+        if (event.repeatCount > 0) return super.onKeyDown(keyCode, event)
+        when (keyCode) {
+            KeyEvent.KEYCODE_SPACE, KeyEvent.KEYCODE_ENTER,
+            KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_DPAD_UP -> {
+                when (state) {
+                    State.MENU -> if (keyCode != KeyEvent.KEYCODE_DPAD_UP) startReady()
+                    State.OVER -> if (stateTimer > 0.6f) startReady()
+                    else -> onPress()
+                }
+                return true
+            }
+            KeyEvent.KEYCODE_DPAD_LEFT -> if (state == State.MENU) { changeMap(-1); return true }
+            KeyEvent.KEYCODE_DPAD_RIGHT -> if (state == State.MENU) { changeMap(1); return true }
         }
         return super.onKeyDown(keyCode, event)
     }
 
-    private fun onTap() {
+    /** Parmak ekrana değdiği an: oyunda gecikmesiz itiş. */
+    private fun onPress() {
         if (paused) {
             paused = false
             if (state == State.PLAYING) flap()
@@ -351,15 +453,104 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 flap()
             }
             State.PLAYING -> flap()
-            State.DYING -> Unit
-            State.OVER -> if (stateTimer > 0.6f) resetGame()
+            else -> Unit
         }
     }
 
+    /** Parmak kalktığında: menü ve oyun sonu düğmeleri. */
+    private fun onRelease(x: Float, y: Float) {
+        val dx = x - downX
+        val dy = y - downY
+        val moved = abs(dx) > 28f || abs(dy) > 28f
+        when (state) {
+            State.MENU -> {
+                val swipe = abs(dx) > 60f && abs(dx) > abs(dy) * 1.3f &&
+                    downY > mapCard.top - 40f && downY < mapCard.bottom + 40f
+                if (swipe) changeMap(if (dx < 0f) 1 else -1)
+                else if (!moved) menuTap(downX, downY)
+            }
+            State.OVER -> if (!moved && stateTimer > 0.6f) {
+                when {
+                    hit(soundBtn, downX, downY) -> toggleSound()
+                    hit(menuBtn, downX, downY) -> { sound.play(SoundManager.Sfx.CLICK); toMenu() }
+                    else -> startReady() // "Tekrar" ya da ekranın herhangi bir yeri
+                }
+            }
+            else -> Unit
+        }
+    }
+
+    private fun menuTap(x: Float, y: Float) {
+        when {
+            hit(soundBtn, x, y) -> toggleSound()
+            hit(arrowLeft, x, y, 18f) -> changeMap(-1)
+            hit(arrowRight, x, y, 18f) -> changeMap(1)
+            hit(startBtn, x, y) -> startReady()
+            else -> {
+                for (i in diffBtns.indices) {
+                    if (hit(diffBtns[i], x, y, 6f)) {
+                        selectDifficulty(Difficulty.entries[i])
+                        return
+                    }
+                }
+            }
+        }
+    }
+
+    private fun hit(r: RectF, x: Float, y: Float, pad: Float = 10f): Boolean =
+        x >= r.left - pad && x <= r.right + pad && y >= r.top - pad && y <= r.bottom + pad
+
     private fun flap() {
-        rocketVy = FLAP_V
+        rocketVy = FLAP_V * map.flapMul
         boost = 1f
         repeat(8) { emitExhaust(1.3f) }
+        sound.play(SoundManager.Sfx.FLAP)
+    }
+
+    // =====================================================================
+    // Menü işlemleri
+    // =====================================================================
+
+    private fun changeMap(dir: Int) {
+        val n = Maps.ALL.size
+        mapIndex = ((mapIndex + dir) % n + n) % n
+        map = Maps.ALL[mapIndex]
+        prefs.edit().putInt(KEY_MAP, mapIndex).apply()
+        if (width > 0 && height > 0) {
+            buildBackground(width, height)
+            buildPlanetArts()
+            buildStars()
+        }
+        cardAnim = dir.toFloat()
+        sound.setMusicTheme(map.musicTheme)
+        sound.play(SoundManager.Sfx.SWIPE)
+        refreshBestTexts()
+    }
+
+    private fun selectDifficulty(d: Difficulty) {
+        if (d != difficulty) {
+            difficulty = d
+            prefs.edit().putInt(KEY_DIFF, d.ordinal).apply()
+            refreshBestTexts()
+        }
+        sound.play(SoundManager.Sfx.CLICK)
+    }
+
+    private fun toggleSound() {
+        sound.enabled = !sound.enabled
+        prefs.edit().putBoolean(KEY_SOUND, sound.enabled).apply()
+        sound.play(SoundManager.Sfx.CLICK)
+    }
+
+    private fun toMenu() {
+        resetGame()
+        state = State.MENU
+    }
+
+    private fun startReady() {
+        resetGame()
+        state = State.READY
+        sound.play(SoundManager.Sfx.START)
     }
 
     // =====================================================================
@@ -368,7 +559,6 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private fun resetGame() {
         columns.clear()
-        state = State.READY
         stateTimer = 0f
         rocketY = WORLD_H * 0.45f
         rocketVy = 0f
@@ -376,7 +566,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         score = 0
         scoreText = "0"
         newBest = false
-        speed = BASE_SPEED
+        speed = difficulty.baseSpeed * map.speedMul
         lastGapY = WORLD_H / 2f
         paused = false
     }
@@ -389,16 +579,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         shake = max(0f, shake - dt)
         flash = max(0f, flash - dt)
         shockT += dt
+        cardAnim *= exp(-dt * 12f)
+        if (abs(cardAnim) < 0.002f) cardAnim = 0f
 
+        val base = difficulty.baseSpeed * map.speedMul
         val worldSpeed = when (state) {
-            State.READY -> BASE_SPEED * 0.7f
+            State.MENU -> base * 0.5f
+            State.READY -> base * 0.7f
             State.PLAYING -> speed
-            State.DYING, State.OVER -> BASE_SPEED * 0.12f
+            State.DYING, State.OVER -> base * 0.12f
         }
         updateStars(dt, worldSpeed)
         updateShootingStar(dt)
 
         when (state) {
+            State.MENU -> Unit
             State.READY -> {
                 // Başlamadan önce roket hafifçe süzülür
                 rocketY = WORLD_H * 0.45f + sin(time * 2.6f) * 14f
@@ -406,7 +601,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 emit(dt, 28f, 0.8f)
             }
             State.PLAYING -> {
-                rocketVy = min(rocketVy + GRAVITY * dt, MAX_FALL)
+                rocketVy = min(rocketVy + GRAVITY * map.gravityMul * dt, MAX_FALL)
                 rocketY += rocketVy * dt
                 if (rocketY < 22f) {
                     rocketY = 22f
@@ -414,7 +609,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 }
                 val target = (rocketVy / MAX_FALL * 75f).coerceIn(-28f, 75f)
                 rocketAngle += (target - rocketAngle) * min(1f, dt * 12f)
-                speed = BASE_SPEED + min(score, 30) * 3f
+                speed = (difficulty.baseSpeed +
+                    min(score, difficulty.speedCapScore) * difficulty.speedPerScore) * map.speedMul
                 updateColumns(dt)
                 emit(dt, 55f, 1f + boost * 0.6f)
                 if (rocketHits()) crash()
@@ -422,6 +618,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             State.DYING -> if (stateTimer > 0.9f) {
                 state = State.OVER
                 stateTimer = 0f
+                sound.play(if (newBest) SoundManager.Sfx.RECORD else SoundManager.Sfx.GAME_OVER)
             }
             State.OVER -> Unit
         }
@@ -429,14 +626,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun updateColumns(dt: Float) {
-        for (col in columns) col.x -= speed * dt
+        for (col in columns) {
+            col.x -= speed * dt
+            if (col.swayAmp > 0f) col.offset = col.swayAmp * sin(time * SWAY_SPEED + col.swayPhase)
+        }
 
         val spawnX = worldW + 200f
         val last = columns.lastOrNull()
         if (last == null) {
             columns.add(makeColumn(spawnX))
-        } else if (last.x + COLUMN_SPACING <= spawnX) {
-            columns.add(makeColumn(last.x + COLUMN_SPACING))
+        } else if (last.x + difficulty.spacing <= spawnX) {
+            columns.add(makeColumn(last.x + difficulty.spacing))
         }
 
         val iter = columns.iterator()
@@ -451,38 +651,45 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 score++
                 scoreText = score.toString()
                 scorePulse = 1f
+                sound.play(SoundManager.Sfx.SCORE)
             }
         }
     }
 
     /** Ortada bir geçiş boşluğu bırakan, üstte ve altta gezegen kulesi olan bir engel üretir. */
     private fun makeColumn(x: Float): Column {
-        val gapH = max(MIN_GAP, START_GAP - score * 3.5f)
-        val minY = 110f + gapH / 2f
-        val maxY = WORLD_H - 110f - gapH / 2f
-        val gapY = (lastGapY + rnd(-240f, 240f)).coerceIn(minY, maxY)
+        val d = difficulty
+        val gapH = max(d.minGap, d.startGap - score * d.gapShrink)
+        val amp = if (map.sway) d.swayAmp else 0f
+        val minY = 110f + gapH / 2f + amp
+        val maxY = WORLD_H - 110f - gapH / 2f - amp
+        val gapY = (lastGapY + rnd(-d.gapJump, d.gapJump)).coerceIn(minY, maxY)
         lastGapY = gapY
 
         val planets = ArrayList<Planet>()
-        buildStack(planets, gapY - gapH / 2f, -1f) // üst kule
-        buildStack(planets, gapY + gapH / 2f, 1f)  // alt kule
-        return Column(x, planets)
+        buildStack(planets, gapY - gapH / 2f, -1f, amp) // üst kule
+        buildStack(planets, gapY + gapH / 2f, 1f, amp)  // alt kule
+        val col = Column(x, planets, amp, rnd(0f, TWO_PI))
+        if (amp > 0f) col.offset = amp * sin(time * SWAY_SPEED + col.swayPhase)
+        return col
     }
 
     /**
      * Boşluğun kenarına büyük bir gezegen koyar, ekranın kenarına kadar da uydularla doldurur.
      * Daireler birbirine bindiği için aralarından sızılamaz.
      */
-    private fun buildStack(out: MutableList<Planet>, gapEdge: Float, dir: Float) {
+    private fun buildStack(out: MutableList<Planet>, gapEdge: Float, dir: Float, extra: Float) {
         val stack = ArrayList<Planet>()
-        val mainR = rnd(60f, MAIN_R)
+        val mainR = rnd(60f, MAIN_R) * map.planetMul
         var cy = gapEdge + dir * mainR
         stack.add(Planet(0f, cy, mainR, mainArts[Random.nextInt(mainArts.size)]))
 
         var prevR = mainR
         var farEdge = cy + dir * mainR
         var guard = 0
-        while (guard++ < 14 && (if (dir < 0f) farEdge > -10f else farEdge < WORLD_H + 10f)) {
+        val topLimit = -10f - extra
+        val bottomLimit = WORLD_H + 10f + extra
+        while (guard++ < 16 && (if (dir < 0f) farEdge > topLimit else farEdge < bottomLimit)) {
             val r = rnd(34f, MOON_R)
             val dx = rnd(-0.25f, 0.25f) * min(r, prevR)
             cy = farEdge + dir * (r * 0.7f)
@@ -507,7 +714,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 if (abs(col.x - hx) > col.halfWidth + hr) continue
                 for (pl in col.planets) {
                     val dx = col.x + pl.dx - hx
-                    val dy = pl.y - hy
+                    val dy = pl.y + col.offset - hy
                     val rr = pl.r * 0.96f + hr
                     if (dx * dx + dy * dy < rr * rr) return true
                 }
@@ -523,15 +730,24 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         shake = 0.45f
         flash = 0.2f
         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        sound.play(SoundManager.Sfx.CRASH)
         if (score > best) {
             best = score
             newBest = true
+            prefs.edit().putInt(bestKey(), best).apply()
             refreshBestTexts()
-            prefs.edit().putInt(KEY_BEST, best).apply()
         }
     }
 
+    /** Her harita + seviye ikilisinin kendi rekoru var. */
+    private fun bestKey() = "best_${mapIndex}_${difficulty.ordinal}"
+
     private fun refreshBestTexts() {
+        best = prefs.getInt(bestKey(), 0)
+        // Eski sürümdeki tek rekor, ilk harita + orta seviyeye taşınır
+        if (best == 0 && mapIndex == 0 && difficulty == Difficulty.NORMAL) {
+            best = prefs.getInt(KEY_BEST_LEGACY, 0)
+        }
         bestValueText = best.toString()
         bestText = context.getString(R.string.best_format, best)
     }
@@ -554,7 +770,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 else -> 0.22f
             }
             val color = when (Random.nextInt(5)) {
-                0 -> hex(0xFFBFD4FF)
+                0 -> map.starTint
                 1 -> hex(0xFFFFE6C2)
                 else -> Color.WHITE
             }
@@ -670,7 +886,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val bg = bgBitmap
-        if (bg != null) canvas.drawBitmap(bg, 0f, 0f, null) else canvas.drawColor(hex(0xFF060920))
+        if (bg != null) canvas.drawBitmap(bg, 0f, 0f, null) else canvas.drawColor(map.bgColors[0])
 
         canvas.save()
         canvas.scale(scale, scale)
@@ -725,7 +941,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val art = pl.art
                 val k = pl.r / art.baseR
                 val px = col.x + pl.dx
-                dst.set(px - art.padX * k, pl.y - art.padY * k, px + art.padX * k, pl.y + art.padY * k)
+                val py = pl.y + col.offset
+                dst.set(px - art.padX * k, py - art.padY * k, px + art.padX * k, py + art.padY * k)
                 cv.drawBitmap(art.bitmap, null, dst, bitmapPaint)
             }
         }
@@ -823,6 +1040,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private fun drawHud(cv: Canvas) {
         val cx = worldW / 2f
         when (state) {
+            State.MENU -> drawMenu(cv, cx)
             State.READY -> drawReady(cv, cx)
             State.PLAYING, State.DYING -> drawScore(cv, cx)
             State.OVER -> drawGameOver(cv, cx)
@@ -830,11 +1048,182 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (paused) drawPaused(cv, cx)
     }
 
+    private fun drawMenu(cv: Canvas, cx: Float) {
+        val bob = sin(time * 1.6f) * 3f
+        titlePaint.textSize = 60f
+        drawShadowText(cv, strTitle1, cx, 122f + bob, titlePaint, colText)
+        drawShadowText(cv, strTitle2, cx, 184f + bob, titlePaint, colWarm)
+        drawSoundButton(cv, 255)
+
+        // --- Harita kartı ---
+        labelPaint.textSize = 19f
+        labelPaint.color = colDim
+        cv.drawText(strMapLabel, cx, mapCard.top - 16f, labelPaint)
+
+        paint.color = withAlpha(colPanel, 215)
+        cv.drawRoundRect(mapCard, 30f, 30f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2.5f
+        paint.color = withAlpha(map.accent, 200)
+        cv.drawRoundRect(mapCard, 30f, 30f, paint)
+        paint.style = Paint.Style.FILL
+
+        cv.save()
+        cv.clipRect(mapCard.left + 2f, mapCard.top + 2f, mapCard.right - 2f, mapCard.bottom - 2f)
+        val slide = cardAnim * 70f
+        val ca = ((1f - abs(cardAnim)) * 255).toInt()
+        bitmapPaint.alpha = ca
+        val pcx = mapCard.centerX() + slide
+        val pcy = mapCard.top + 128f + sin(time * 1.3f) * 4f
+        moonArts.firstOrNull()?.let { drawArtAt(cv, it, pcx + 92f, pcy + 58f, 24f) }
+        mainArts.firstOrNull()?.let { drawArtAt(cv, it, pcx, pcy, 72f * map.planetMul.coerceAtMost(1.1f)) }
+        bitmapPaint.alpha = 255
+
+        titlePaint.textSize = 31f
+        titlePaint.color = withAlpha(colText, ca)
+        drawFitW(cv, mapNames[mapIndex], pcx, mapCard.bottom - 66f, titlePaint, mapCard.width() - 28f)
+        textPaint.textSize = 18f
+        textPaint.color = withAlpha(colDim, ca)
+        drawFitW(cv, mapDescs[mapIndex], pcx, mapCard.bottom - 32f, textPaint, mapCard.width() - 28f)
+        cv.restore()
+
+        drawArrow(cv, arrowLeft, -1f)
+        drawArrow(cv, arrowRight, 1f)
+
+        // Sayfa noktaları
+        val n = Maps.ALL.size
+        for (i in 0 until n) {
+            val x = cx + (i - (n - 1) / 2f) * 20f
+            paint.color = if (i == mapIndex) map.accent else withAlpha(colDim, 90)
+            cv.drawCircle(x, mapCard.bottom + 24f, if (i == mapIndex) 5.5f else 4f, paint)
+        }
+
+        // --- Seviye ---
+        labelPaint.textSize = 19f
+        labelPaint.color = colDim
+        cv.drawText(strLevelLabel, cx, diffBtns[0].top - 16f, labelPaint)
+        for (i in diffBtns.indices) {
+            val d = Difficulty.entries[i]
+            val sel = d == difficulty
+            drawButton(cv, diffBtns[i], diffNames[i], d.color, if (sel) colDarkText else d.color, sel, 255)
+        }
+
+        // --- Başla ---
+        val pulse = 1f + 0.025f * sin(time * 4f)
+        cv.save()
+        cv.scale(pulse, pulse, startBtn.centerX(), startBtn.centerY())
+        paint.color = hex(0x55000000)
+        tmpRect.set(startBtn)
+        tmpRect.offset(0f, 5f)
+        cv.drawRoundRect(tmpRect, startBtn.height() / 2f, startBtn.height() / 2f, paint)
+        drawButton(cv, startBtn, strStart, colWarm, colDarkText, true, 255, 28f)
+        cv.restore()
+
+        labelPaint.textSize = 19f
+        labelPaint.color = colGold
+        drawFit(cv, bestText, cx, startBtn.bottom + 52f, labelPaint)
+    }
+
+    private fun drawArtAt(cv: Canvas, art: PlanetArt, x: Float, y: Float, r: Float) {
+        val k = r / art.baseR
+        dst.set(x - art.padX * k, y - art.padY * k, x + art.padX * k, y + art.padY * k)
+        cv.drawBitmap(art.bitmap, null, dst, bitmapPaint)
+    }
+
+    private fun drawArrow(cv: Canvas, r: RectF, dir: Float) {
+        val cx = r.centerX()
+        val cy = r.centerY()
+        paint.color = withAlpha(colPanel, 200)
+        cv.drawCircle(cx, cy, 22f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 4f
+        paint.strokeCap = Paint.Cap.ROUND
+        paint.strokeJoin = Paint.Join.ROUND
+        paint.color = colText
+        iconPath.reset()
+        iconPath.moveTo(cx - 4f * dir, cy - 9f)
+        iconPath.lineTo(cx + 5f * dir, cy)
+        iconPath.lineTo(cx - 4f * dir, cy + 9f)
+        cv.drawPath(iconPath, paint)
+        paint.style = Paint.Style.FILL
+    }
+
+    /** Hap şeklinde düğme. Seçili/dolu ise renkle doldurulur, değilse yalnızca kenarlık. */
+    private fun drawButton(
+        cv: Canvas, r: RectF, text: String, color: Int, textColor: Int, filled: Boolean, alpha: Int,
+        size: Float = 20f
+    ) {
+        val rad = r.height() / 2f
+        if (filled) {
+            paint.color = withAlpha(color, alpha)
+            cv.drawRoundRect(r, rad, rad, paint)
+        } else {
+            paint.color = withAlpha(colPanel, (alpha * 0.8f).toInt())
+            cv.drawRoundRect(r, rad, rad, paint)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 2f
+            paint.color = withAlpha(color, (alpha * 0.7f).toInt())
+            cv.drawRoundRect(r, rad, rad, paint)
+            paint.style = Paint.Style.FILL
+        }
+        labelPaint.textSize = size
+        labelPaint.color = withAlpha(textColor, alpha)
+        val y = r.centerY() + labelPaint.textSize * 0.36f
+        drawFitW(cv, text, r.centerX(), y, labelPaint, r.width() - 14f)
+        labelPaint.textSize = 20f
+    }
+
+    private fun drawSoundButton(cv: Canvas, alpha: Int) {
+        val cx = soundBtn.centerX()
+        val cy = soundBtn.centerY()
+        paint.color = withAlpha(colPanel, (alpha * 0.8f).toInt())
+        cv.drawCircle(cx, cy, 26f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(colPanelEdge, (alpha * 0.5f).toInt())
+        cv.drawCircle(cx, cy, 26f, paint)
+        paint.style = Paint.Style.FILL
+
+        // Hoparlör
+        val x0 = cx - 6f
+        paint.color = withAlpha(colText, alpha)
+        iconPath.reset()
+        iconPath.moveTo(x0 - 7f, cy - 5f)
+        iconPath.lineTo(x0 - 1f, cy - 5f)
+        iconPath.lineTo(x0 + 7f, cy - 12f)
+        iconPath.lineTo(x0 + 7f, cy + 12f)
+        iconPath.lineTo(x0 - 1f, cy + 5f)
+        iconPath.lineTo(x0 - 7f, cy + 5f)
+        iconPath.close()
+        cv.drawPath(iconPath, paint)
+
+        paint.style = Paint.Style.STROKE
+        paint.strokeCap = Paint.Cap.ROUND
+        paint.strokeWidth = 2.6f
+        if (sound.enabled) {
+            tmpRect.set(x0 + 3f, cy - 7f, x0 + 17f, cy + 7f)
+            cv.drawArc(tmpRect, -50f, 100f, false, paint)
+            tmpRect.set(x0 + 1f, cy - 13f, x0 + 25f, cy + 13f)
+            cv.drawArc(tmpRect, -50f, 100f, false, paint)
+        } else {
+            paint.color = withAlpha(colAccent, alpha)
+            cv.drawLine(x0 + 12f, cy - 6f, x0 + 22f, cy + 6f, paint)
+            cv.drawLine(x0 + 22f, cy - 6f, x0 + 12f, cy + 6f, paint)
+        }
+        paint.style = Paint.Style.FILL
+    }
+
     private fun drawReady(cv: Canvas, cx: Float) {
         val bob = sin(time * 1.6f) * 4f
-        titlePaint.textSize = 78f
-        drawShadowText(cv, strTitle1, cx, 215f + bob, titlePaint, colText)
-        drawShadowText(cv, strTitle2, cx, 292f + bob, titlePaint, colWarm)
+        titlePaint.textSize = 50f
+        drawShadowText(cv, mapNames[mapIndex], cx, 210f + bob, titlePaint, colText)
+
+        // Seviye etiketi
+        val d = difficulty
+        labelPaint.textSize = 20f
+        val tw = labelPaint.measureText(diffNames[d.ordinal]) + 44f
+        tmpRect.set(cx - tw / 2f, 240f, cx + tw / 2f, 282f)
+        drawButton(cv, tmpRect, diffNames[d.ordinal], d.color, colDarkText, true, 255)
 
         val pulse = 0.5f + 0.5f * sin(time * 4f)
         textPaint.textSize = 30f
@@ -901,16 +1290,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             tmpRect.set(cx - pw / 2f, py - ph / 2f, cx + pw / 2f, py + ph / 2f)
             paint.color = withAlpha(colGold, a)
             cv.drawRoundRect(tmpRect, ph / 2f, ph / 2f, paint)
-            labelPaint.color = withAlpha(hex(0xFF2A1A00), a)
+            labelPaint.color = withAlpha(colDarkText, a)
             labelPaint.textSize = 20f
             cv.drawText(strNewRecord, cx, py + 7f, labelPaint)
         }
 
-        if (stateTimer > 0.6f) {
-            val pulse = 0.5f + 0.5f * sin(time * 4f)
-            textPaint.textSize = 26f
-            textPaint.color = withAlpha(colText, (130 + 125 * pulse).toInt())
-            drawFit(cv, strTapToRetry, cx, top + panelH + 90f, textPaint)
+        // Düğmeler, panel yerine oturduktan sonra belirir
+        val ba = (((stateTimer - 0.45f) / 0.25f).coerceIn(0f, 1f) * 255).toInt()
+        if (ba > 0) {
+            drawButton(cv, retryBtn, strRetry, colWarm, colDarkText, true, ba, 22f)
+            drawButton(cv, menuBtn, strMenu, colPanelEdge, colText, false, ba, 22f)
+            drawSoundButton(cv, ba)
+
+            labelPaint.textSize = 18f
+            labelPaint.color = withAlpha(colDim, ba)
+            drawFit(cv, mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal], cx, retryBtn.bottom + 56f, labelPaint)
         }
     }
 
@@ -922,6 +1316,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         textPaint.textSize = 26f
         textPaint.color = colDim
         drawFit(cv, strTapToContinue, cx, 530f, textPaint)
+    }
+
+    /** Metni verilen genişliğe sığmazsa küçülterek çizer. */
+    private fun drawFitW(cv: Canvas, text: String, x: Float, y: Float, p: Paint, maxW: Float) {
+        val w = p.measureText(text)
+        if (w <= maxW) {
+            cv.drawText(text, x, y, p)
+        } else {
+            val old = p.textSize
+            p.textSize = old * maxW / w
+            cv.drawText(text, x, y, p)
+            p.textSize = old
+        }
     }
 
     private fun drawShadowText(cv: Canvas, text: String, x: Float, y: Float, p: Paint, color: Int) {
@@ -955,14 +1362,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val p = Paint(Paint.ANTI_ALIAS_FLAG)
         p.shader = LinearGradient(
             0f, 0f, 0f, h.toFloat(),
-            intArrayOf(hex(0xFF060920), hex(0xFF0E1140), hex(0xFF1C0E3A)),
+            map.bgColors,
             floatArrayOf(0f, 0.55f, 1f), Shader.TileMode.CLAMP
         )
         cv.drawRect(0f, 0f, w.toFloat(), h.toFloat(), p)
 
         // Bulutsular
-        val nebula = intArrayOf(hex(0xFF7B3BFF), hex(0xFF2BB8FF), hex(0xFFFF4B9A), hex(0xFF3B5BFF), hex(0xFF9B3BFF))
-        for (i in 0 until 5) {
+        val nebula = map.nebula
+        for (i in nebula.indices) {
             val cx = rnd(-0.1f, 1.1f) * w
             val cy = rnd(0f, 1f) * h
             val rr = rnd(0.35f, 0.75f) * max(w, h) * 0.6f
@@ -985,21 +1392,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         bgBitmap = bmp
     }
 
+    /** Seçili haritanın gezegen ve uydu görsellerini üretir. */
     private fun buildPlanetArts() {
         artScale = scale
+        artMap = mapIndex
         mainArts.clear()
         moonArts.clear()
-        val mainTypes = listOf(
-            PlanetType.GAS, PlanetType.GAS, PlanetType.ROCKY, PlanetType.ICE, PlanetType.LAVA,
-            PlanetType.OCEAN, PlanetType.GAS, PlanetType.ROCKY, PlanetType.ICE, PlanetType.OCEAN
-        )
-        mainTypes.forEachIndexed { i, t ->
-            val ringed = (t == PlanetType.GAS && i % 2 == 0) || (t == PlanetType.ICE && i < 5)
-            mainArts.add(renderArt(MAIN_R, t, ringed))
+        val mainR = MAIN_R * map.planetMul
+        repeat(8) { i ->
+            val t = map.mainTypes[i % map.mainTypes.size]
+            // İlk görsel menüde önizleme olarak gösterilir; halkalı haritada halkalı olsun
+            val ringed = if (i == 0) map.ringChance >= 0.3f else Random.nextFloat() < map.ringChance
+            mainArts.add(renderArt(mainR, t, ringed))
         }
-        repeat(9) { moonArts.add(renderArt(MOON_R, PlanetType.MOON, false)) }
-        for (t in listOf(PlanetType.ROCKY, PlanetType.ICE, PlanetType.LAVA, PlanetType.GAS)) {
-            moonArts.add(renderArt(MOON_R, t, false))
+        repeat(10) { i ->
+            moonArts.add(renderArt(MOON_R, map.moonTypes[i % map.moonTypes.size], false))
         }
     }
 
