@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    name: Android (derleme + unit testler)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      # google-services.json olmadan derlenir (uygulama "Firebase yapılandırılmadı" ekranını gösterir).
+      - name: Domain testleri, debug APK, unit testler ve UI test derlemesi
+        run: ./gradlew :core:domain:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest --stacktrace
+      - name: Test raporları
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-test-reports
+          path: |
+            core/domain/build/reports/tests
+            app/build/reports/tests
+          if-no-files-found: ignore
+
+  backend:
+    name: Cloud Functions + güvenlik kuralları (Emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Bağımlılıklar
+        run: |
+          npm ci --prefix functions
+          npm ci --prefix tests/rules
+      - name: TypeScript ve birim testleri
+        run: |
+          npm run lint --prefix functions
+          npm test --prefix functions
+      - name: Entegrasyon testleri (Firestore/Auth/Storage Emulator)
+        run: tests/rules/node_modules/.bin/firebase emulators:exec --only firestore,auth,storage --project demo-kuaforum "cd functions && npx jest -c jest.integration.config.js --runInBand --forceExit"
+      - name: Firestore güvenlik kuralı testleri
+        run: npm test --prefix tests/rules

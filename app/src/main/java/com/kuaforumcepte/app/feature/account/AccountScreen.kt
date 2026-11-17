@@ -13,6 +13,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.ContentCut
+import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Policy
+import androidx.compose.material3.TextButton
+import com.kuaforumcepte.app.data.registration.LegalDocument
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -50,6 +54,7 @@ fun AccountScreen(
     onBack: () -> Unit,
     onSwitchRole: (EntryRole) -> Unit,
     onSignedOut: () -> Unit,
+    onOpenLegal: (LegalDocument) -> Unit,
     viewModel: AccountViewModel = hiltViewModel(),
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
@@ -59,6 +64,8 @@ fun AccountScreen(
     val msg = message?.asString()
     var confirmLeave by remember { mutableStateOf(false) }
     var confirmSignOut by remember { mutableStateOf(false) }
+    var confirmDelete by remember { mutableStateOf(false) }
+    val deleting by viewModel.deleting.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) { viewModel.signedOut.collect { onSignedOut() } }
     LaunchedEffect(msg) { if (msg != null) { snackbar.showSnackbar(msg); viewModel.consumeMessage() } }
@@ -116,6 +123,13 @@ fun AccountScreen(
                 KcSecondaryButton("${active.salonName} salonundan ayrıl", { confirmLeave = true }, loading = leaving)
             }
             KcSecondaryButton("Çıkış Yap", { confirmSignOut = true }, leadingIcon = Icons.AutoMirrored.Outlined.Logout)
+            HorizontalDivider()
+            Text("Gizlilik", style = MaterialTheme.typography.titleMedium)
+            MenuRow(Icons.Outlined.Policy, "KVKK Aydınlatma Metni", "Kişisel verilerinizin nasıl işlendiği", { onOpenLegal(LegalDocument.KVKK) })
+            MenuRow(Icons.Outlined.Description, "Kullanım Koşulları", "Hizmet kuralları", { onOpenLegal(LegalDocument.TERMS) })
+            TextButton(onClick = { confirmDelete = true }, enabled = !deleting) {
+                Text(if (deleting) "Hesap siliniyor…" else "Hesabımı Sil", color = MaterialTheme.colorScheme.error)
+            }
         }
     }
 
@@ -127,6 +141,18 @@ fun AccountScreen(
             destructive = true,
             onConfirm = { confirmLeave = false; viewModel.leaveActiveSalon() },
             onDismiss = { confirmLeave = false },
+        )
+    }
+    if (confirmDelete) {
+        ConfirmDialog(
+            title = "Hesabınız kalıcı olarak silinsin mi?",
+            message = "Profiliniz, cihaz kayıtlarınız ve bildirimleriniz silinir; geçmiş randevu ve değerlendirmelerinizdeki adınız ve telefonunuz anonimleştirilir. " +
+                "Salonların yasal olarak saklaması gereken işlem kayıtları kişisel veri içermeden korunur. Aktif randevunuz varsa önce iptal etmeniz gerekir. " +
+                "Salon sahibiyseniz salonun kapatılması/devri için destekle iletişime geçin. Bu işlem geri alınamaz.",
+            confirmLabel = "Kalıcı Olarak Sil",
+            destructive = true,
+            onConfirm = { confirmDelete = false; viewModel.deleteAccount() },
+            onDismiss = { confirmDelete = false },
         )
     }
     if (confirmSignOut) {

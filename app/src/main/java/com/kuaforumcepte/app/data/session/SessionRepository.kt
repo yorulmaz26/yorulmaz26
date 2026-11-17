@@ -100,6 +100,16 @@ class SessionRepository @Inject constructor(
 
     suspend fun selectActiveSalon(salonId: String) = preferences.setActiveBusinessSalon(salonId)
 
+    /** Hesabı kalıcı olarak siler (sunucu kişisel verileri anonimleştirir) ve yerel oturumu kapatır. */
+    suspend fun deleteAccount() {
+        devices.unregister()
+        functions.call("deleteAccount", mapOf("confirm" to "SIL"))
+        runCatching { auth.get().signOut() }
+        phoneAuth.reset()
+        preferences.clearSessionScoped()
+        _snapshot.value = null
+    }
+
     suspend fun signOut() {
         devices.unregister()
         auth.get().signOut()

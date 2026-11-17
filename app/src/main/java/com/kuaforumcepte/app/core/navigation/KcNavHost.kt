@@ -299,6 +299,7 @@ fun KcNavHost(
                 onBack = back,
                 onSwitchRole = { role -> navController.navigateAsRoot(SessionGateRoute(role.name)) },
                 onSignedOut = toRoleSelection,
+                onOpenLegal = openLegal,
             )
         }
     }

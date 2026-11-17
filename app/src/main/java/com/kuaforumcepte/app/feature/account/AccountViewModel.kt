@@ -81,6 +81,20 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    private val _deleting = MutableStateFlow(false)
+    val deleting: StateFlow<Boolean> = _deleting.asStateFlow()
+
+    fun deleteAccount() {
+        if (_deleting.value) return
+        _deleting.value = true
+        viewModelScope.launch {
+            runCatching { session.deleteAccount() }
+                .onSuccess { _signedOut.send(Unit) }
+                .onFailure { _message.value = ErrorMessages.of(it) }
+            _deleting.value = false
+        }
+    }
+
     fun signOut() = viewModelScope.launch {
         session.signOut()
         _signedOut.send(Unit)

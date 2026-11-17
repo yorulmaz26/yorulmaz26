@@ -84,6 +84,9 @@ object ErrorMessages {
         "INVALID_RATING" to "Lütfen 1 ile 5 arasında yıldız seçin.",
         "NO_CHANGE" to "Yeni tutar mevcut tutarla aynı.",
         "LEDGER_MISSING" to "Bu randevunun finans kaydı bulunamadı.",
+        "CONFIRMATION_REQUIRED" to "Silme işlemi onaylanmadı.",
+        "OWNER_MUST_CLOSE_SALON" to "Salon sahibi hesabı doğrudan silinemez. Salonun kapatılması veya devri için destekle iletişime geçin.",
+        "STAFF_HAS_ACTIVE_APPOINTMENTS" to "Size atanmış aktif randevular var. Önce salon sahibinizle bu randevuları devredin veya iptal edin.",
         "QR_VERIFY_FAILED" to "QR kod doğrulanamadı. Lütfen tekrar oluşturun.",
     )
 
