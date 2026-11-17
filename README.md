@@ -7,6 +7,9 @@ Kotlin + Jetpack Compose (Material 3) istemci, Firebase (Auth, Firestore, Functi
 
 - Mimari, rol–yetki matrisi, veri modeli, durum makinesi, müsaitlik ve finans: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md)
 - Cloud Functions API sözleşmeleri: [`docs/API_CONTRACTS.md`](docs/API_CONTRACTS.md)
+- Güvenlik ve gizlilik özeti: [`docs/SECURITY.md`](docs/SECURITY.md)
+- Yayın kontrol listesi: [`docs/RELEASE_CHECKLIST.md`](docs/RELEASE_CHECKLIST.md) · Play veri güvenliği taslağı: [`docs/PLAY_DATA_SAFETY.md`](docs/PLAY_DATA_SAFETY.md)
+- İlk derleme sorun giderme: [`docs/FIRST_BUILD_CHECKLIST.md`](docs/FIRST_BUILD_CHECKLIST.md)
 
 ## Depo yapısı
 
@@ -97,13 +100,19 @@ Komut satırı:
 ./gradlew :app:connectedDebugAndroidTest     # bağlı cihaz/emülatör gerekir
 ```
 
+## Sürekli entegrasyon
+
+`.github/workflows/ci.yml` her push'ta çalışır:
+- **Android:** `:core:domain:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`
+- **Backend:** Functions TypeScript + birim testleri, Emulator entegrasyon testleri, Firestore kural testleri
+
 ## Testler
 
 | Komut | Kapsam |
 |---|---|
 | `./gradlew :core:domain:test` | Para/kuruş, durum makinesi, 2 saat iptal sınırı, İstanbul dönem sınırları, yetki matrisi, telefon normalizasyonu, hizmet seçimi toplamları |
 | `./gradlew :app:testDebugUnitTest` | Splash yönlendirme kararı (Beni hatırla), giriş sonrası rol/salon yönlendirmesi |
-| `./gradlew :app:connectedDebugAndroidTest` | Compose UI: rol seçimi |
+| `./gradlew :app:connectedDebugAndroidTest` | Compose UI: rol seçimi, boş/hata durumları, yükleniyor butonu, alan hatası erişilebilirliği, yıldız seçici, çakışma penceresi, salon kodu kartı, süresi dolmuş bilet, saat seçici |
 | `cd functions && npm test` | Müsaitlik/slot algoritması, molalar, kapalı günler, çakışma, zaman dilimi ve dönem anahtarları, durum geçişleri, salon kodu tahsisi, puan ortalaması, il/ilçe |
 | `cd functions && npm run test:integration` | Emulator: kayıtlar, benzersiz salon kodu, davetler, salon profili/görseller, takvim değişikliği çakışma analizi, kapatmalar, hizmet etkisi, müsaitlik, eşzamanlı aynı slot (yalnızca biri), tek aktif randevu, fiyat değişimi, PENDING süre aşımı, iptal sonrası slot açılması, 2 saat kuralı, uzman değiştirme, saat değiştirme, gizleme, zamanlanmış işlerin tekilliği, bildirim gönderimi, tek/eşzamanlı tamamlama (çift sayım yok), fiyat düzeltmeleri, rapor yetkileri, sayaçların ledger'dan yeniden üretimi, puanlama (yalnızca tamamlanan, tek sefer, eşzamanlı, ayrı ortalamalar) |
 | `cd tests/rules && npm install && npm test` | Firestore güvenlik kuralları (Emulator) |
@@ -133,6 +142,18 @@ ekleyin. Bu numaralara gerçek SMS gitmez; kod sabittir. Auth Emulator kullanıy
   simgesinden okunur.
 - Emülatörde FCM gönderilmez (`push.result = NO_DEVICE/FAILED`); gerçek cihaz testi için gerçek Firebase projesi kullanın.
 
+## Uçtan uca test senaryosu (gerçek cihazlar)
+
+1. **Salon sahibi** (telefon A): Kuaför Girişi → salon kaydı (logo + 2 foto) → Hizmetlerim'e 2 hizmet → Çalışma Saatleri.
+2. **Personel** (telefon B): Sahip Stilist Yönetimi'nden B numarasını davet eder → B, Kuaför Girişi ile daveti kabul eder → kendi hizmetini ekler.
+3. **Müşteri** (telefon C): Müşteri Girişi → kayıt → salonu bul (arama/filtre) → uzman B → 2 hizmet → saat → özet → onay.
+4. B'ye bildirim gelir → Onayla → C'ye "onaylandı" bildirimi. C ikinci randevu almaya çalışır → "aktif randevunuz var".
+5. Başlangıçta B'ye "Müşteri geldi mi?" → Geldi → (isteğe bağlı) Fiyatı Düzelt → İşlemi Tamamla.
+6. A'nın İstatistikler'inde gün/hafta/ay kartları ve B satırı; B'de yalnızca kendi kartı.
+7. C'ye değerlendirme daveti → puanlama → salon listesinde puan güncellenir.
+8. A çalışma saatini daraltır → çakışma önizlemesi → uygular → randevu "İlgilenilmeli" → Saati Değiştir.
+9. C: Randevularım → geçmişi gizle; Hesap → Hesabımı Sil (aktif randevu yokken).
+
 ## Lisanslar
 
 `app/src/main/assets/tr_locations.json` (81 il / 973 ilçe) `turkey-neighbourhoods` paketinden (MIT, PTT verisi) türetilmiştir; ayrıntı `assets/THIRD_PARTY_NOTICES.txt`.
@@ -156,4 +177,4 @@ Kapalıysa uygulama her soğuk başlatmada oturumu kapatır ve rol seçimine dö
 | 6 | Randevu yönetimi, bildirimler, zamanlanmış hatırlatmalar | ✅ |
 | 7 | Finansal ledger ve raporlar | ✅ |
 | 8 | Geçmiş, puanlama, salon bilgileri, takvim ve harita | ✅ |
-| 9 | Güvenlik sertleştirme, testler, release ve yayın kontrol listesi | ⏳ |
+| 9 | Güvenlik sertleştirme, testler, release ve yayın kontrol listesi | ✅ |
