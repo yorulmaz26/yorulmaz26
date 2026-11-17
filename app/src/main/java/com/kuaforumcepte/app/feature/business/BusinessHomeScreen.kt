@@ -26,7 +26,7 @@ import androidx.compose.material.icons.outlined.PhotoLibrary
 import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material.icons.outlined.SwapHoriz
-import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +47,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.Alignment
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.background
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -64,10 +73,11 @@ import com.kuaforumcepte.app.feature.reports.ReportsSection
 import com.kuaforumcepte.domain.model.MemberRole
 import kotlinx.coroutines.launch
 
+/** Sekmeler: günlük iş (Randevular) önce; Raporlar; Salonum = tüm ayarlar gruplu. */
 private enum class BusinessTab(val label: String, val icon: ImageVector) {
-    STATS("İstatistikler", Icons.Outlined.BarChart),
-    MANAGE("Bilgileri Yönet", Icons.Outlined.Tune),
     APPOINTMENTS("Randevular", Icons.AutoMirrored.Outlined.EventNote),
+    STATS("Raporlar", Icons.Outlined.BarChart),
+    MANAGE("Salonum", Icons.Outlined.Storefront),
 }
 
 @Composable
@@ -152,38 +162,33 @@ fun BusinessHomeScreen(
                         Text(m.role.label, style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(horizontal = Spacing.m, vertical = Spacing.xs))
                     }
                     if (m.role == com.kuaforumcepte.domain.model.MemberRole.OWNER) SalonVerificationBanner(m.salonId)
+                    val p = s.permissions
                     when (BusinessTab.entries[tab]) {
                         BusinessTab.STATS -> {
-                            if (Permission.SHARE_BOOKING_LINK in s.permissions) {
-                                MenuRow(Icons.Outlined.QrCode2, "Randevu Linki ve QR Kod", "WhatsApp'ta paylaş, QR'ı görüntüle, yazdır", onOpenShare)
-                            }
-                            SalonCodeCard(m.salonCode, onCopied = { scope.launch { snackbar.showSnackbar("Salon kodu kopyalandı") } })
-                            ReportsSection(isOwner = Permission.VIEW_SALON_REPORTS in s.permissions)
+                            ReportsSection(isOwner = Permission.VIEW_SALON_REPORTS in p)
                         }
                         BusinessTab.MANAGE -> {
-                            Text("Kişisel", style = MaterialTheme.typography.titleMedium)
-                            MenuRow(Icons.Outlined.Schedule, "Çalışma Saatleri ve Molalar", "Gün gün vardiyalar ve molalar", onOpenWorkingHours)
-                            MenuRow(Icons.Outlined.BeachAccess, "Haftalık İzin Günleri", "Her hafta çalışmadığınız günler", onOpenDaysOff)
-                            MenuRow(Icons.Outlined.EventBusy, "Özel Tarih Kapatma", "İzin, rapor vb. tarih veya aralıklar", onOpenMyClosures)
-                            MenuRow(Icons.Outlined.ContentCut, "Hizmetlerim", "Hizmet adı, fiyat, süre, aktif/pasif", onOpenServices)
-                            if (Permission.MANAGE_SALON_SETTINGS in s.permissions) Text("Salon", style = MaterialTheme.typography.titleMedium)
-                            if (Permission.MANAGE_SALON_CLOSURES in s.permissions) {
-                                MenuRow(Icons.Outlined.DoorFront, "Salon Kapalı Günleri", "Haftalık kapalı günler ve özel kapalı tarihler", onOpenSalonClosedDays)
+                            MenuSection("Müşteri kazan", "Salonunuzu paylaşın ve görünür olun") {
+                                if (Permission.SHARE_BOOKING_LINK in p) MenuTile(Icons.Outlined.QrCode2, "Link ve QR Kod", "WhatsApp, yazdır", onOpenShare)
+                                MenuTile(Icons.Outlined.Reviews, "Salon Sayfam", "Yorumlar ve yanıtlar") { onOpenSalonPage(m.salonId) }
+                                if (Permission.MANAGE_SALON_SETTINGS in p) MenuTile(Icons.Outlined.Loyalty, "Kampanyalar", "İndirim kodu, sadakat", onOpenPromotions)
                             }
-                            if (Permission.MANAGE_SALON_SETTINGS in s.permissions) {
-                                MenuRow(Icons.Outlined.Storefront, "Dükkan Ayarları", "Ad, tür, telefon, adres, açıklama, konum", onOpenShopSettings)
+                            SalonCodeCard(m.salonCode, onCopied = { scope.launch { snackbar.showSnackbar("Salon kodu kopyalandı") } })
+                            MenuSection("Benim çalışma düzenim", "Sadece sizin takviminiz ve hizmetleriniz") {
+                                MenuTile(Icons.Outlined.ContentCut, "Hizmetlerim", "Fiyat ve süre", onOpenServices)
+                                MenuTile(Icons.Outlined.Schedule, "Çalışma Saatleri", "Vardiya ve molalar", onOpenWorkingHours)
+                                MenuTile(Icons.Outlined.BeachAccess, "İzin Günleri", "Haftalık izin", onOpenDaysOff)
+                                MenuTile(Icons.Outlined.EventBusy, "Tarih Kapatma", "İzin, rapor", onOpenMyClosures)
                             }
-                            if (Permission.MANAGE_SALON_MEDIA in s.permissions) {
-                                MenuRow(Icons.Outlined.PhotoLibrary, "Logo ve Fotoğrafları Güncelle", "Logoyu değiştir, galeriyi düzenle", onOpenMedia)
+                            if (Permission.MANAGE_SALON_SETTINGS in p || Permission.MANAGE_STAFF in p || Permission.MANAGE_SALON_CLOSURES in p || Permission.MANAGE_SALON_MEDIA in p) {
+                                MenuSection("Salon yönetimi", "Tüm salonu etkileyen ayarlar") {
+                                    if (Permission.MANAGE_STAFF in p) MenuTile(Icons.Outlined.Groups, "Ekibim", "Uzman, davet, prim", onOpenStaff)
+                                    if (Permission.MANAGE_SALON_SETTINGS in p) MenuTile(Icons.Outlined.Storefront, "Dükkan Bilgileri", "Ad, adres, konum", onOpenShopSettings)
+                                    if (Permission.MANAGE_SALON_MEDIA in p) MenuTile(Icons.Outlined.PhotoLibrary, "Logo ve Fotoğraflar", "Galeri", onOpenMedia)
+                                    if (Permission.MANAGE_SALON_CLOSURES in p) MenuTile(Icons.Outlined.DoorFront, "Salon Kapalı Günleri", "Tatil, bayram", onOpenSalonClosedDays)
+                                }
                             }
-                            if (Permission.MANAGE_STAFF in s.permissions) {
-                                MenuRow(Icons.Outlined.Groups, "Stilist Yönetimi", "Uzman davet et, listele, düzenle, prim oranı, pasife al", onOpenStaff)
-                            }
-                            if (Permission.MANAGE_SALON_SETTINGS in s.permissions) {
-                                MenuRow(Icons.Outlined.Loyalty, "Kampanyalar ve Sadakat", "İndirim kodları, sadakat programı", onOpenPromotions)
-                                MenuRow(Icons.Outlined.Reviews, "Salon Sayfam ve Yorumlar", "Müşterinin gördüğü sayfa; yorumlara yanıt verin") { onOpenSalonPage(m.salonId) }
-                            }
-                            MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, Beni hatırla, tema, çıkış", onOpenAccount)
+                            MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, takvim, tema, çıkış", onOpenAccount)
                         }
                         BusinessTab.APPOINTMENTS -> Unit
                     }
@@ -198,13 +203,59 @@ private fun AccountAction(onOpenAccount: () -> Unit) {
     IconButton(onClick = onOpenAccount) { Icon(Icons.Outlined.AccountCircle, contentDescription = "Hesap") }
 }
 
+/** Başlıklı menü grubu; içindeki kutucuklar iki sütunlu ızgarada dizilir. */
+@Composable
+internal fun MenuSection(title: String, subtitle: String, content: MenuSectionScope.() -> Unit) {
+    val scope = MenuSectionScope().apply { content() }
+    if (scope.items.isEmpty()) return
+    Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+        Column {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        scope.items.chunked(2).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                row.forEach { item -> Box(Modifier.weight(1f)) { item() } }
+                if (row.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+internal class MenuSectionScope {
+    val items = mutableListOf<@Composable () -> Unit>()
+}
+
+internal fun MenuSectionScope.MenuTile(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+    items += { MenuTileView(icon, title, subtitle, onClick) }
+}
+
+@Composable
+private fun MenuTileView(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 108.dp),
+    ) {
+        Column(Modifier.padding(Spacing.m), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+            Box(Modifier.size(40.dp).clip(CircleShape).background(MaterialTheme.colorScheme.primaryContainer), contentAlignment = Alignment.Center) {
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(22.dp))
+            }
+            Text(title, style = MaterialTheme.typography.titleSmall, maxLines = 2)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 2)
+        }
+    }
+}
+
 @Composable
 fun MenuRow(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
     Surface(onClick = onClick, shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, tonalElevation = 1.dp) {
         ListItem(
             headlineContent = { Text(title, style = MaterialTheme.typography.titleMedium) },
             supportingContent = { Text(subtitle) },
-            leadingContent = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.secondary) },
+            leadingContent = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
             trailingContent = { Icon(Icons.AutoMirrored.Outlined.ArrowForward, contentDescription = null) },
         )
     }

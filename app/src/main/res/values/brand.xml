@@ -5,5 +5,5 @@
       dosyasını logo ile değiştirin ve aşağıdaki değeri true yapın. false iken uygulama
       logo varmış gibi davranmaz; yalnızca tipografik "Kuaförüm Cepte" yazısını gösterir.
     -->
-    <bool name="has_brand_logo">false</bool>
+    <bool name="has_brand_logo">true</bool>
 </resources>

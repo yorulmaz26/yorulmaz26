@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="kc_navy">#FF14243A</color>
+    <color name="kc_navy">#FF2B2420</color>
     <color name="kc_gold">#FFC59A64</color>
     <color name="kc_offwhite">#FFF7F5F1</color>
     <color name="kc_green">#FF20877B</color>
     <color name="kc_red">#FFD45B5B</color>
-    <color name="kc_navy_deep">#FF0B1626</color>
+    <color name="kc_navy_deep">#FF131110</color>
 </resources>

@@ -1,7 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Yer tutucu: marka logosuyla değiştirin (bkz. values/brand.xml). Şu an boş/şeffaftır. -->
+<!-- Kuaförüm Cepte amblemi: espresso daire, altın halka, altın makas. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="96dp" android:height="96dp"
     android:viewportWidth="96" android:viewportHeight="96">
-    <path android:fillColor="#00000000" android:pathData="M0,0h96v96h-96z" />
+    <!-- Zemin ve halkalar -->
+    <path android:fillColor="#2B2420" android:pathData="M48,2a46,46 0,1 0,0.01 0z" />
+    <path android:strokeColor="#C9A06A" android:strokeWidth="2.5" android:fillColor="#00000000"
+        android:pathData="M48,6a42,42 0,1 0,0.01 0z" />
+    <path android:strokeColor="#8E6A3C" android:strokeWidth="0.8" android:fillColor="#00000000"
+        android:pathData="M48,11a37,37 0,1 0,0.01 0z" />
+    <!-- Makas ağızları (sivri, çapraz) -->
+    <path android:fillColor="#E6CFA8"
+        android:pathData="M37.5,60.5 L42.3,62.6 L64.6,20.6 L62.8,19.6 Z" />
+    <path android:fillColor="#C9A06A"
+        android:pathData="M58.5,60.5 L53.7,62.6 L31.4,20.6 L33.2,19.6 Z" />
+    <!-- Parmak halkaları -->
+    <path android:strokeColor="#C9A06A" android:strokeWidth="3.4" android:fillColor="#00000000"
+        android:pathData="M35,69m-7,0a7,7 0,1 0,14 0a7,7 0,1 0,-14 0" />
+    <path android:strokeColor="#E6CFA8" android:strokeWidth="3.4" android:fillColor="#00000000"
+        android:pathData="M61,69m-7,0a7,7 0,1 0,14 0a7,7 0,1 0,-14 0" />
+    <!-- Pim -->
+    <path android:fillColor="#2B2420" android:pathData="M48,47.5m-3.2,0a3.2,3.2 0,1 0,6.4 0a3.2,3.2 0,1 0,-6.4 0" />
+    <path android:fillColor="#E6CFA8" android:pathData="M48,47.5m-1.8,0a1.8,1.8 0,1 0,3.6 0a1.8,1.8 0,1 0,-3.6 0" />
+    <!-- Parıltı -->
+    <path android:fillColor="#E6CFA8"
+        android:pathData="M70,30 l1.2,3 l3,1.2 l-3,1.2 l-1.2,3 l-1.2,-3 l-3,-1.2 l3,-1.2 z" />
 </vector>

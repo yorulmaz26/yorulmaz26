@@ -28,7 +28,7 @@ fun SplashScreen(onDecision: (SplashDecision) -> Unit, viewModel: SplashViewMode
     LaunchedEffect(Unit) { progress.animateTo(1f, tween(700, easing = FastOutSlowInEasing)) }
     LaunchedEffect(decision) { decision?.let(onDecision) }
 
-    Box(Modifier.fillMaxSize().background(Brand.Navy).padding(Spacing.screen), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize().background(Brand.EspressoDeep).padding(Spacing.screen), contentAlignment = Alignment.Center) {
         BrandMark(
             color = Brand.OffWhite,
             accent = Brand.Gold,
