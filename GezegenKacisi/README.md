@@ -11,6 +11,23 @@ uzanan gezegen kulelerinin arasındaki boşluktan geçtikçe puan kazanırsın.
 - En iyi skor telefonda saklanır.
 - Uygulamadan çıkınca oyun duraklar, dokununca kaldığın yerden devam edersin.
 
+### 1.1 ile gelenler
+
+- **Ses ve müzik:** İtiş, puan, patlama, rekor ve menü sesleri ile her haritaya özel döngülü müzik.
+  Ses dosyası yok, hepsi `SoundManager.kt` içinde kodla üretiliyor. Menüdeki hoparlör düğmesi sesi açıp kapatır.
+- **5 harita** (menüde oklarla ya da kaydırarak seçilir):
+
+  | Harita | Fark |
+  |---|---|
+  | Dünya Yörüngesi | Dengeli, karışık gezegenler |
+  | Buz Kuşağı | Düşük yer çekimi, roket süzülür |
+  | Lav Denizi | Daha hızlı akış, biraz daha güçlü yer çekimi |
+  | Gaz Devleri | Büyük ve halkalı gezegenler |
+  | Asteroit Kuşağı | Kuleler yukarı aşağı salınır |
+
+- **Seviyeler:** Kolay, Orta, Zor. Geçiş boşluğu, hız, kule aralığı ve salınım seviyeye göre değişir.
+- Her harita ve seviye için ayrı rekor tutulur. Oyun sonunda **Tekrar** ya da **Menü** seçilir, geri tuşu menüye döner.
+
 ## Çalıştırma
 
 1. **Android Studio**'yu aç ve **File › Open** ile bu `GezegenKacisi` klasörünü seç.
@@ -25,16 +42,10 @@ Emülatörde fareyle tıklamanın yanında **Boşluk** veya **Enter** tuşu da �
 
 ## Zorluğu ayarlama
 
-Ayarların hepsi [`GameView.kt`](app/src/main/java/com/example/gezegenkacisi/GameView.kt) dosyasının başındaki
-`companion object` bloğunda:
-
-| Sabit | Ne işe yarar |
-|---|---|
-| `GRAVITY` | Yer çekimi. Büyüdükçe roket daha hızlı düşer. |
-| `FLAP_V` | Dokunuşta kazanılan yukarı hız. Daha negatif olursa daha yükseğe zıplar. |
-| `BASE_SPEED` | Başlangıçtaki kaydırma hızı. |
-| `COLUMN_SPACING` | İki gezegen kulesi arasındaki mesafe. |
-| `START_GAP` / `MIN_GAP` | Geçiş boşluğunun başlangıçtaki ve en dar hâli. |
+- Seviyeler ve haritalar [`GameConfig.kt`](app/src/main/java/com/example/gezegenkacisi/GameConfig.kt) dosyasında.
+  `Difficulty` içinde boşluk (`startGap`, `minGap`), hız (`baseSpeed`, `speedPerScore`) ve kule aralığı (`spacing`) var.
+  Her `GameMap` için yer çekimi, itiş, hız ve gezegen boyutu çarpanları ayarlanabilir.
+- Temel fizik (`GRAVITY`, `FLAP_V`, `MAX_FALL`) [`GameView.kt`](app/src/main/java/com/example/gezegenkacisi/GameView.kt) içindeki `companion object` bloğunda.
 
 Tüm ölçüler "dünya birimi" cinsinden. Ekranın yüksekliği her zaman 1000 birim sayılır, böylece oyun
 her telefonda aynı hissettirir.
@@ -45,8 +56,10 @@ her telefonda aynı hissettirir.
 app/src/main/
 ├── AndroidManifest.xml
 ├── java/com/example/gezegenkacisi/
-│   ├── MainActivity.kt   tam ekran ayarı ve yaşam döngüsü
-│   └── GameView.kt       oyun döngüsü, fizik, çarpışma ve tüm çizimler
+│   ├── MainActivity.kt   tam ekran ayarı, yaşam döngüsü, geri tuşu
+│   ├── GameView.kt       menü, oyun döngüsü, fizik, çarpışma ve tüm çizimler
+│   ├── GameConfig.kt     haritalar ve seviyeler
+│   └── SoundManager.kt   kodla üretilen ses efektleri ve müzik
 └── res/
     ├── drawable/          uygulama ikonu (roket ve gezegen)
     ├── mipmap-anydpi-v26/
