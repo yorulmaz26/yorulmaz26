@@ -45,11 +45,13 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `reassignAppointment` | `{appointmentId, newStaffUid}` | `{staffUid}` | OWNER; PENDING/CONFIRMED. Kalemler (fiyat/süre snapshot) korunur. Hedef uzman o aralıkta çalışıyor olmalı (`STAFF_NOT_AVAILABLE`) ve boş olmalı (`SLOT_TAKEN`). Kilit taşınır, `attention` temizlenir; müşteri + iki uzman bilgilendirilir. |
 | `rescheduleAppointment` | `{appointmentId, newStartAt}` | `{startAt}` | Atanmış uzman veya OWNER; yeni başlangıç güncel müsaitlikte (randevunun kendisi hariç) geçerli slot olmalı. Tarih değişirse kilit taşınır, hatırlatma bayrakları sıfırlanır, müşteriye bildirilir (müşteri uygun değilse kendi iptal hakkını kullanır). |
 | `getAvailability` (yeniden planlama modu) | `{appointmentId, fromDate, days}` | aynı | Randevunun süresiyle, kendisi meşgul sayılmadan. Uzman/OWNER. |
-| `adjustAppointmentPrice` | `{appointmentId, newFinalKurus, reason, idempotencyKey}` | `{finalKurus}` | Audit log. |
+| `adjustAppointmentPrice` | `{appointmentId, newFinalKurus, reason}` | `{finalKurus}` | Gerekçe 3–300 karakter, 0 ≤ tutar ≤ 1.000.000 TL. IN_PROGRESS: atanmış uzman/sahip, yalnızca `finalKurus`. COMPLETED: yalnızca sahip; `adjustment_{id}_{n}` ledger farkı **orijinal tamamlama dönemlerine** işlenir (sayım değişmez). Olay + denetim kaydı. `NO_CHANGE`, `STATE_CHANGED`. |
 | `hideAppointments` | `{appointmentIds[] ≤ 100}` | `{hidden}` | Yalnızca terminal durumdaki ve kullanıcının görebildiği randevular (`CANNOT_HIDE_ACTIVE`). `hiddenFor` dizisine çağıran eklenir; kayıt silinmez. |
 
 ## Finans (Aşama 7)
-| `getReports` | `{salonId, periodType: DAY\|WEEK\|MONTH, anchorDate, staffUid?}` | `{period:{start,end,label}, salon?:{count, amountKurus}, staff:[{staffUid, name, count, amountKurus}]}` | OWNER tümünü; STAFF yalnızca kendi `staffUid`'si (diğer parametreler reddedilir). |
+| `getReports` | `{salonId, periodType: DAY\|WEEK\|MONTH, anchorDate}` | `{period:{type,key,start,end}, salon: {completedCount, amountKurus, listedKurus} \| null, staff:[{staffUid, name, role, status, completedCount, amountKurus, listedKurus}]}` | OWNER: salon + tüm uzmanlar; aktif STAFF: `salon=null`, yalnızca kendi satırı. |
+| `rebuildReportAggregates` | `{salonId}` | `{entries, aggregates}` | OWNER; sayaçları değişmez ledger'dan yeniden üretir (bakım). |
+| `transitionAppointment` `COMPLETE` | — | — | IN_PROGRESS → COMPLETED; aynı transaction'da `financialLedger/completion_{id}` (`tx.create`) + 6 `reportAggregates` artışı (salon ALL ve uzman × D/W/M, tamamlama anının İstanbul dönemleri). İkinci/eşzamanlı tamamlama `STATE_CHANGED`. Müşteriye `REVIEW_INVITE`. |
 
 ## Puan ve bildirim (Aşama 6, 8)
 | `submitReview` | `{appointmentId, salonRating, staffRating, serviceRating?, comment?}` | `{}` | `NOT_COMPLETED`, `ALREADY_REVIEWED`. |

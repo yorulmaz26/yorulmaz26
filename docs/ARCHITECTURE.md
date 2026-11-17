@@ -159,7 +159,7 @@ Doküman ID = randevu ID → randevu başına tek değerlendirme seti. `{salonId
 `{salonId, staffUid, appointmentId, type SERVICE_COMPLETED|ADJUSTMENT|REVERSAL, amountKurus (işaretli Long), currency "TRY", occurredAt, localDate, periodKeys {day, week, month}, createdBy, reason?}`. Okuma: salon sahibi (salon kapsamı), personel yalnızca `staffUid == auth.uid`. Asla silinmez/güncellenmez.
 
 ### 4.8 `reportAggregates/{salonId}_{scope}_{periodKey}` 🔒
-`scope` = `ALL` veya `staffUid`; `periodKey` = `D2026-11-17`, `W2026-11-16` (haftanın pazartesi tarihi), `M2026-11`. Alanlar: `{salonId, staffUid|null, periodType, periodKey, completedCount, amountKurus, updatedAt}`. Ledger ile aynı transaction'da artırılır; `rebuildAggregates` yönetim fonksiyonu ledger'dan yeniden üretebilir.
+`scope` = `ALL` veya `staffUid`; `periodKey` = `D2026-11-17`, `W2026-11-16` (haftanın pazartesi tarihi), `M2026-11`. Alanlar: `{salonId, staffUid|null, periodType, periodKey, completedCount, amountKurus, listedKurus, updatedAt}` (`listedKurus` = rezervasyondaki liste tutarı; `amountKurus − listedKurus` raporda "fark" olarak gösterilir). Ledger ile aynı transaction'da artırılır; `rebuildAggregates` yönetim fonksiyonu ledger'dan yeniden üretebilir.
 
 ### 4.9 `auditLogs/{id}` 🔒
 Hassas işlemler (salon oluşturma, davet, üyelik değişimi, fiyat düzeltme, yeniden atama, takvim değişikliği etkisi). İstemci okuyamaz (v1).

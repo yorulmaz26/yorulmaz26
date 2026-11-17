@@ -12,7 +12,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.EventRepeat
+import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material.icons.outlined.HowToReg
 import androidx.compose.material.icons.outlined.PersonOff
 import androidx.compose.material.icons.outlined.SwapHoriz
@@ -79,6 +81,8 @@ fun BusinessAppointmentScreen(onBack: () -> Unit, onReschedule: (String) -> Unit
     var reasonFor by remember { mutableStateOf<AppointmentAction?>(null) }
     var confirmNoShow by remember { mutableStateOf(false) }
     var reassigning by remember { mutableStateOf(false) }
+    var confirmComplete by remember { mutableStateOf(false) }
+    var adjusting by remember { mutableStateOf(false) }
     LaunchedEffect(msg) { if (msg != null) { snackbar.showSnackbar(msg); viewModel.consumeMessage() } }
 
     Scaffold(topBar = { KcTopBar("Randevu Detayı", onBack) }, snackbarHost = { SnackbarHost(snackbar) }) { padding ->
@@ -134,14 +138,22 @@ fun BusinessAppointmentScreen(onBack: () -> Unit, onReschedule: (String) -> Unit
                             AppointmentAction.MARK_ARRIVED -> KcPrimaryButton("Geldi", { viewModel.act(action) }, loading = busy, leadingIcon = Icons.Outlined.HowToReg)
                             AppointmentAction.MARK_NO_SHOW -> KcSecondaryButton("Gelmedi", { confirmNoShow = true }, enabled = !busy, leadingIcon = Icons.Outlined.PersonOff)
                             AppointmentAction.CANCEL_BY_STAFF -> KcSecondaryButton("Gerekçeyle İptal Et", { reasonFor = action }, enabled = !busy)
+                            AppointmentAction.COMPLETE -> KcPrimaryButton("İşlemi Tamamla", { confirmComplete = true }, loading = busy, leadingIcon = Icons.Outlined.TaskAlt)
                             else -> Unit
                         }
                     }
                     if (status == AppointmentStatus.CONFIRMED && AppointmentAction.MARK_ARRIVED !in d.actions) {
                         Text("“Geldi” en erken başlangıçtan 15 dakika önce, “Gelmedi” başlangıç saatinden sonra işaretlenebilir.", style = MaterialTheme.typography.bodySmall)
                     }
-                    if (status == AppointmentStatus.IN_PROGRESS) {
-                        InfoBanner("Müşteri geldi. “İşlemi Tamamla” ve gerçekleşen hizmet bedelinin finans kaydı bir sonraki aşamada etkinleşecek.")
+                    val canAdjust = status == AppointmentStatus.IN_PROGRESS || (status == AppointmentStatus.COMPLETED && d.actor == ActorRole.OWNER)
+                    if (canAdjust) {
+                        KcSecondaryButton(
+                            if (status == AppointmentStatus.COMPLETED) "Fiyat Düzeltmesi Yap" else "Fiyatı Düzelt",
+                            { adjusting = true }, enabled = !busy, leadingIcon = Icons.Outlined.Edit,
+                        )
+                    }
+                    if (a.finalTotal != a.total) {
+                        Text("Liste tutarı ${a.total.formatTry()} · gerçekleşen ${a.finalTotal.formatTry()}", style = MaterialTheme.typography.bodySmall)
                     }
                     if (status == AppointmentStatus.PENDING || status == AppointmentStatus.CONFIRMED) {
                         KcSecondaryButton("Saati Değiştir", { onReschedule(a.id) }, enabled = !busy, leadingIcon = Icons.Outlined.EventRepeat)
@@ -205,6 +217,39 @@ fun BusinessAppointmentScreen(onBack: () -> Unit, onReschedule: (String) -> Unit
                 }
             },
             dismissButton = { TextButton(onClick = { reasonFor = null }) { Text("Vazgeç") } },
+        )
+    }
+    val ready = state as? BizApptDetailState.Ready
+    if (confirmComplete && ready != null) {
+        ConfirmDialog(
+            "İşlem tamamlandı mı?",
+            "Gerçekleşen hizmet bedeli ${ready.d.appointment.finalTotal.formatTry()} olarak raporlara bir kez işlenecek. Tutar farklıysa önce “Fiyatı Düzelt” kullanın.",
+            "Tamamla",
+            onConfirm = { confirmComplete = false; viewModel.act(AppointmentAction.COMPLETE) },
+            onDismiss = { confirmComplete = false },
+        )
+    }
+    if (adjusting && ready != null) {
+        var amount by remember { mutableStateOf("") }
+        var reason by remember { mutableStateOf("") }
+        val parsed = com.kuaforumcepte.domain.model.Kurus.parseTry(amount)
+        AlertDialog(
+            onDismissRequest = { adjusting = false },
+            title = { Text("Tutarı düzelt") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                    Text("Mevcut: ${ready.d.appointment.finalTotal.formatTry()}. Düzeltme gerekçesiyle birlikte işlem geçmişine ve denetim kaydına yazılır; " +
+                        if (ready.d.appointment.status == AppointmentStatus.COMPLETED) "raporlarda ayrı bir düzeltme hareketi olarak görünür." else "tamamlandığında bu tutar raporlanır.",
+                        style = MaterialTheme.typography.bodySmall)
+                    KcTextField(amount, { amount = it.filter { c -> c.isDigit() || c == ',' || c == '.' }.take(12) }, "Yeni tutar (TL)", prefix = "₺ ",
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Decimal, error = if (amount.isNotEmpty() && parsed == null) "Geçerli bir tutar girin" else null)
+                    KcTextField(reason, { reason = it }, "Gerekçe", maxLength = 300, singleLine = false, minLines = 2)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { adjusting = false; viewModel.adjustPrice(parsed!!, reason) }, enabled = parsed != null && reason.trim().length >= 3) { Text("Kaydet") }
+            },
+            dismissButton = { TextButton(onClick = { adjusting = false }) { Text("Vazgeç") } },
         )
     }
     if (confirmNoShow) {

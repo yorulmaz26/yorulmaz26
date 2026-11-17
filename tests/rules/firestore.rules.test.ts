@@ -163,6 +163,18 @@ describe("finans ve kullanıcı", () => {
     await assertSucceeds(updateDoc(doc(db(CUSTOMER), "users", CUSTOMER), { firstName: "Veli", updatedAt: serverTimestamp() }));
     await assertFails(updateDoc(doc(db(CUSTOMER), "users", CUSTOMER), { phoneE164: "+905000000000", updatedAt: serverTimestamp() }));
   });
+  test("rapor sayaçları: sahip salon toplamını, uzman yalnızca kendi satırını okur", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "reportAggregates", "a_ALL"), { salonId: SALON, staffUid: null, amountKurus: 1 });
+      await setDoc(doc(ctx.firestore(), "reportAggregates", "a_staff"), { salonId: SALON, staffUid: STAFF, amountKurus: 1 });
+      await setDoc(doc(ctx.firestore(), "reportAggregates", "a_other"), { salonId: SALON, staffUid: OTHER_STAFF, amountKurus: 1 });
+    });
+    await assertSucceeds(getDoc(doc(db(OWNER), "reportAggregates", "a_ALL")));
+    await assertFails(getDoc(doc(db(STAFF), "reportAggregates", "a_ALL")));
+    await assertSucceeds(getDoc(doc(db(STAFF), "reportAggregates", "a_staff")));
+    await assertFails(getDoc(doc(db(STAFF), "reportAggregates", "a_other")));
+    await assertFails(setDoc(doc(db(OWNER), "reportAggregates", "a_ALL"), { salonId: SALON, amountKurus: 999 }));
+  });
   test("kullanıcı yalnızca kendi üyelik aynasını okur, yazamaz", async () => {
     await env.withSecurityRulesDisabled(async (ctx) => {
       await setDoc(doc(ctx.firestore(), "users", STAFF, "memberships", SALON), { salonId: SALON, role: "STAFF", status: "ACTIVE" });

@@ -20,6 +20,7 @@ import {
   overlaps,
 } from "../domain";
 import { busyOf, liveIntervals, LockInterval, loadBookingContext, lockRef } from "./context";
+import { ledgerCol, periodKeysOf, writeLedger } from "../finance/ledger";
 
 export const appts = () => db.collection("appointments");
 export const customerLockRef = (uid: string) => db.collection("customerLocks").doc(uid);
@@ -191,7 +192,7 @@ const ACTIONS: AppointmentAction[] = ["CONFIRM", "REJECT", "CANCEL_BY_CUSTOMER",
 /**
  * Randevu durum geçişleri (durum makinesi sunucuda denetlenir). Süresi dolmuş PENDING talep
  * herhangi bir eylemde önce EXPIRED yapılır ve sonuç { status: "EXPIRED", applied: false } döner.
- * COMPLETE (finans kaydıyla birlikte) Aşama 7'de etkinleşir.
+ * COMPLETE: aynı transaction'da completion_{id} ledger kaydı + rapor sayaçları (çift sayım imkânsız).
  */
 export const transitionAppointment = authedCallable<TransitionReq, { status: AppointmentStatus; applied: boolean }>(
   "transitionAppointment",
@@ -199,7 +200,6 @@ export const transitionAppointment = authedCallable<TransitionReq, { status: App
     const appointmentId = docId(data.appointmentId, "appointmentId");
     const action = data.action as AppointmentAction;
     if (!ACTIONS.includes(action)) fail("invalid-argument", "INVALID_ARGUMENT", { field: "action" });
-    if (action === "COMPLETE") fail("failed-precondition", "COMPLETION_NOT_AVAILABLE");
     const reason = optString(data.reason, "reason", 300) || null;
 
     return db.runTransaction(async (tx) => {
@@ -251,6 +251,25 @@ export const transitionAppointment = authedCallable<TransitionReq, { status: App
         if (custLock.get("activeAppointmentId") === appointmentId) tx.update(custLock.ref, { expiresAtMs: null });
       }
       if (to === "IN_PROGRESS") update.arrivedAt = FieldValue.serverTimestamp();
+      if (to === "COMPLETED") {
+        // Gerçekleşen hizmet bedeli: finalKurus (yetkili düzeltmeler dahil). Liste tutarı ayrıca tutulur.
+        const completion = await tx.get(ledgerCol().doc(`completion_${appointmentId}`));
+        if (completion.exists) fail("failed-precondition", "STATE_CHANGED", { status: "COMPLETED" });
+        update.completedAt = FieldValue.serverTimestamp();
+        writeLedger(tx, {
+          id: `completion_${appointmentId}`,
+          type: "SERVICE_COMPLETED",
+          salonId,
+          staffUid,
+          appointmentId,
+          amountKurus: appt.get("finalKurus") as number,
+          listedKurus: appt.get("totalKurus") as number,
+          countDelta: 1,
+          occurredAt: now,
+          periodKeys: periodKeysOf(now),
+          createdBy: caller.uid,
+        });
+      }
       tx.update(appt.ref, update);
       if (!ACTIVE_STATUSES.has(to)) releaseLocks(tx, appt, lock, custLock);
       addEvent(tx, appointmentId, status, to, caller.uid, actor, reason);
@@ -265,6 +284,9 @@ export const transitionAppointment = authedCallable<TransitionReq, { status: App
         case "CANCELLED_BY_STAFF":
           n(customerUid, "APPOINTMENT_CANCELLED", "Randevunuz iptal edildi", `${salonName} randevunuzu iptal etti.`);
           if (actor === "OWNER" && caller.uid !== staffUid) n(staffUid, "APPOINTMENT_CANCELLED", "Randevu iptal edildi", "Salon sahibi size atanmış bir randevuyu iptal etti.");
+          break;
+        case "COMPLETED":
+          n(customerUid, "REVIEW_INVITE", "Hizmetiniz tamamlandı", `${salonName} deneyiminizi puanlamak ister misiniz?`);
           break;
         case "CANCELLED_BY_CUSTOMER":
           n(staffUid, "APPOINTMENT_CANCELLED", "Randevu iptal edildi", "Müşteri randevusunu iptal etti; saat yeniden müsait.");

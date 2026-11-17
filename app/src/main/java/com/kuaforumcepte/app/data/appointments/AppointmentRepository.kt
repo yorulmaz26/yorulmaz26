@@ -120,6 +120,11 @@ class AppointmentRepository @Inject constructor(
     suspend fun hide(ids: Collection<String>): Int =
         ((functions.call("hideAppointments", mapOf("appointmentIds" to ids.toList()))["hidden"] as? Number)?.toInt()) ?: 0
 
+    /** Yetkili fiyat düzeltmesi (gerekçe zorunlu). İşlemdeyken uzman/sahip; tamamlandıysa yalnızca sahip. */
+    suspend fun adjustPrice(id: String, newFinal: Kurus, reason: String) {
+        functions.call("adjustAppointmentPrice", mapOf("appointmentId" to id, "newFinalKurus" to newFinal.value, "reason" to reason.trim()))
+    }
+
     /** @return yeni durum; süresi dolmuş taleplerde "EXPIRED". */
     suspend fun transition(id: String, action: String, reason: String? = null): AppointmentStatus {
         val r = functions.call("transitionAppointment", mapOf("appointmentId" to id, "action" to action, "reason" to reason))

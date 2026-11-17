@@ -42,3 +42,6 @@ export { createAppointment, transitionAppointment } from "./booking/appointments
 export { reassignAppointment, rescheduleAppointment, hideAppointments } from "./booking/manage";
 export { pushOnNotification } from "./notify/push";
 export { scanAppointments } from "./scheduled/scan";
+
+// Aşama 7 — finans ve raporlar (tamamlama: transitionAppointment COMPLETE)
+export { adjustAppointmentPrice, getReports, rebuildReportAggregates } from "./finance/financeFunctions";

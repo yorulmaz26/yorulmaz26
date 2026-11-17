@@ -55,6 +55,7 @@ import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.domain.auth.Permission
 import com.kuaforumcepte.app.feature.bizappointments.BusinessAppointmentsContent
 import com.kuaforumcepte.app.feature.inbox.InboxBell
+import com.kuaforumcepte.app.feature.reports.ReportsSection
 import com.kuaforumcepte.domain.model.MemberRole
 import kotlinx.coroutines.launch
 
@@ -139,11 +140,7 @@ fun BusinessHomeScreen(
                                 MenuRow(Icons.Outlined.QrCode2, "Randevu Linki ve QR Kod", "WhatsApp'ta paylaş, QR'ı görüntüle, yazdır", onOpenShare)
                             }
                             SalonCodeCard(m.salonCode, onCopied = { scope.launch { snackbar.showSnackbar("Salon kodu kopyalandı") } })
-                            InfoBanner(
-                                if (Permission.VIEW_SALON_REPORTS in s.permissions)
-                                    "Dönemsel işlem sayısı ve gerçekleşen hizmet bedeli raporları sonraki aşamada bu sekmeye eklenecek."
-                                else "Kişisel işlem ve tutar raporlarınız sonraki aşamada bu sekmede görünecek.",
-                            )
+                            ReportsSection(isOwner = Permission.VIEW_SALON_REPORTS in s.permissions)
                         }
                         BusinessTab.MANAGE -> {
                             Text("Kişisel", style = MaterialTheme.typography.titleMedium)

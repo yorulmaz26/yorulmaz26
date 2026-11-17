@@ -75,7 +75,7 @@ class BusinessAppointmentViewModel @Inject constructor(
             val staff = if (isOwner) staffRepo.members(a.salonId).catch { emit(emptyList()) } else flowOf(emptyList())
             combine(appointments.observeEvents(id), staff, ticker) { events, members, now ->
                 val actions = AppointmentTransitions.availableActions(a.status, actor, now, a.startAt, a.pendingExpiresAt)
-                    .filter { it != AppointmentAction.COMPLETE && it != AppointmentAction.EXPIRE && it != AppointmentAction.CANCEL_BY_CUSTOMER }
+                    .filter { it != AppointmentAction.EXPIRE && it != AppointmentAction.CANCEL_BY_CUSTOMER }
                 BizApptDetailState.Ready(
                     BizApptDetail(
                         appointment = a, actor = actor, actions = if (a.effectiveStatus(now) == AppointmentStatus.EXPIRED) emptyList() else actions,
@@ -111,6 +111,7 @@ class BusinessAppointmentViewModel @Inject constructor(
             AppointmentAction.CANCEL_BY_STAFF -> "Randevu iptal edildi; müşteriye bildirildi."
             AppointmentAction.MARK_ARRIVED -> "Müşteri geldi olarak işaretlendi."
             AppointmentAction.MARK_NO_SHOW -> "Gelmedi olarak işaretlendi. Bu randevu gelir olarak sayılmaz."
+            AppointmentAction.COMPLETE -> "İşlem tamamlandı; raporlara bir kez işlendi. Müşteriye değerlendirme daveti gönderildi."
             else -> "İşlem tamamlandı."
         }
         if (_busy.value) return
@@ -124,6 +125,9 @@ class BusinessAppointmentViewModel @Inject constructor(
             _busy.value = false
         }
     }
+
+    fun adjustPrice(newFinal: com.kuaforumcepte.domain.model.Kurus, reason: String) =
+        run("Tutar güncellendi; işlem geçmişine ve denetim kaydına yazıldı.") { appointments.adjustPrice(id, newFinal, reason) }
 
     fun reassign(m: StaffMember) = run("Randevu ${m.fullName} uzmanına atandı; müşteri ve uzmanlar bilgilendirildi.") { appointments.reassign(id, m.uid) }
 }
