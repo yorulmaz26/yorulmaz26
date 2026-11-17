@@ -163,7 +163,20 @@ describe("finans ve kullanıcı", () => {
     await assertSucceeds(updateDoc(doc(db(CUSTOMER), "users", CUSTOMER), { firstName: "Veli", updatedAt: serverTimestamp() }));
     await assertFails(updateDoc(doc(db(CUSTOMER), "users", CUSTOMER), { phoneE164: "+905000000000", updatedAt: serverTimestamp() }));
   });
+  test("kullanıcı yalnızca kendi üyelik aynasını okur, yazamaz", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "users", STAFF, "memberships", SALON), { salonId: SALON, role: "STAFF", status: "ACTIVE" });
+    });
+    await assertSucceeds(getDocs(collection(db(STAFF), "users", STAFF, "memberships")));
+    await assertFails(getDocs(collection(db(CUSTOMER), "users", STAFF, "memberships")));
+    await assertFails(setDoc(doc(db(STAFF), "users", STAFF, "memberships", "x"), { role: "OWNER", status: "ACTIVE" }));
+  });
+  test("sahip davet listesini okur; personel okuyamaz", async () => {
+    await assertSucceeds(getDocs(collection(db(OWNER), "salons", SALON, "invitations")));
+    await assertFails(getDocs(collection(db(STAFF), "salons", SALON, "invitations")));
+  });
   test("kilit koleksiyonları istemciye kapalı", async () => {
+    await assertFails(getDoc(doc(db(OWNER), "salonOwners", OWNER)));
     await assertFails(getDoc(doc(db(CUSTOMER), "customerLocks", CUSTOMER)));
     await assertFails(setDoc(doc(db(STAFF), "staffDayLocks", "x"), { intervals: [] }));
   });

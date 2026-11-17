@@ -1,10 +1,20 @@
 /**
- * Kuaförüm Cepte — Cloud Functions giriş noktası.
- * Aşama 1: ortak yapılandırma + domain çekirdeği (src/domain). Callable fonksiyonlar
- * docs/API_CONTRACTS.md sözleşmesine göre sonraki aşamalarda buradan export edilir.
+ * Kuaförüm Cepte — Cloud Functions giriş noktası (bölge: europe-west1).
+ * Sözleşmeler: docs/API_CONTRACTS.md. Domain kuralları: src/domain.
  */
 import { setGlobalOptions } from "firebase-functions/v2";
 
 setGlobalOptions({ region: "europe-west1", maxInstances: 20 });
 
-// Domain çekirdeği (src/domain) fonksiyonlar tarafından import edilir; buradan dışa açılmaz.
+// Aşama 2 — kimlik, kayıt, personel daveti ve rol sistemi
+export { bootstrapSession, registerCustomer } from "./auth/session";
+export { registerSalonOwner } from "./salon/registerSalonOwner";
+export {
+  createStaffInvitation,
+  revokeInvitation,
+  acceptInvitation,
+  declineInvitation,
+  updateStaffMember,
+  setMemberStatus,
+  leaveSalon,
+} from "./staff/invitations";

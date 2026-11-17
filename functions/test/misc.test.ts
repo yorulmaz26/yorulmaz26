@@ -58,3 +58,16 @@ test("rapor yetkisi", () => {
   expect(canReadReport("s1", "owner", true, { kind: "STAFF", staffUid: "s1" })).toBe(true);
   expect(canReadReport("s1", "owner", false, { kind: "STAFF", staffUid: "s1" })).toBe(false);
 });
+
+import { CITY_COUNT, isValidCityDistrict, searchKey } from "../src/domain";
+
+test("arama anahtarı Kotlin SearchKey ile aynı", () => {
+  expect(searchKey("  İSTANBUL   Güzellik Salonu ")).toBe("istanbul guzellik salonu");
+  expect(searchKey("IŞIK Kuaför")).toBe("isik kuafor");
+});
+
+test("il/ilçe listesi", () => {
+  expect(CITY_COUNT).toBe(81);
+  expect(isValidCityDistrict("İstanbul", "Kadıköy")).toBe(true);
+  expect(isValidCityDistrict("İstanbul", "Çankaya")).toBe(false);
+});

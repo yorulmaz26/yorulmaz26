@@ -4,11 +4,31 @@ import kotlinx.serialization.Serializable
 
 /**
  * Type-safe navigation route'ları. Ekran haritası: docs/ARCHITECTURE.md §3.
- * Sonraki aşamalarda auth, customer ve business grafikleri buraya eklenir.
+ * role alanları EntryRole.name (CUSTOMER | BUSINESS) taşır.
  */
 @Serializable data object SplashRoute
 @Serializable data object FirebaseSetupRoute
 @Serializable data object RoleSelectionRoute
 
-/** role: EntryRole.name (CUSTOMER | BUSINESS) */
-@Serializable data class AuthRoute(val role: String)
+// Kimlik
+@Serializable data class PhoneEntryRoute(val role: String)
+@Serializable data class OtpRoute(val role: String)
+@Serializable data class SessionGateRoute(val role: String)
+
+// Kayıt
+@Serializable data object CustomerRegisterRoute
+@Serializable data object OwnerRegisterRoute
+@Serializable data class OwnerRegisterSuccessRoute(val salonName: String, val code: String)
+@Serializable data class LegalRoute(val document: String)
+
+// İşletme
+@Serializable data object InvitationsRoute
+@Serializable data object SalonPickerRoute
+@Serializable data object BusinessHomeRoute
+@Serializable data object StaffManagementRoute
+
+// Müşteri
+@Serializable data object CustomerHomeRoute
+
+// Ortak
+@Serializable data class AccountRoute(val role: String)

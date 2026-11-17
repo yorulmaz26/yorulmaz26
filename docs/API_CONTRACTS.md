@@ -4,6 +4,8 @@ Tümü **HTTPS Callable**, bölge `europe-west1`, `enforceAppCheck: true`, kimli
 
 Mutasyon yapan tüm çağrılar `idempotencyKey: string (UUID)` alır. Aynı kullanıcı + aynı anahtar ikinci kez gelirse ilk sonucun aynısı döner.
 
+`consents` = `{kvkkVersion, termsVersion}`; sunucudaki `LEGAL_VERSIONS` ile aynı olmalı, aksi halde `CONSENT_REQUIRED`.
+
 Ortak hata nedenleri: `UNAUTHENTICATED`, `PERMISSION_DENIED`, `INVALID_ARGUMENT`, `NOT_FOUND`, `STATE_CHANGED`, `RATE_LIMITED`, `APP_CHECK_FAILED`.
 
 ## Kimlik ve kayıt (Aşama 2)
@@ -11,10 +13,12 @@ Ortak hata nedenleri: `UNAUTHENTICATED`, `PERMISSION_DENIED`, `INVALID_ARGUMENT`
 |---|---|---|---|
 | `bootstrapSession` | `{}` | `{user: {exists, firstName?, lastName?}, memberships:[{salonId, salonName, role, status}], pendingInvitations:[{salonId, inviteId, salonName, specialty}], activeAppointmentId?}` | Giriş sonrası yönlendirme kararı. |
 | `registerCustomer` | `{firstName, lastName, consents:{kvkkVersion, explicitConsentVersion}, idempotencyKey}` | `{uid}` | Telefon token'dan alınır. |
-| `registerSalonOwner` | `{firstName, lastName, consents, salon:{name, businessPhone, type, city, district, addressLine, description}, logoUploadPath, photoUploadPaths[≤5], idempotencyKey}` | `{salonId, code}` | Atomik: salon + kod rezervasyonu + OWNER üyelik + varsayılan program. Görseller önce `uploads/{uid}/pending/...` alanına yüklenir; fonksiyon doğrulayıp `salons/{salonId}/...` altına taşır. |
+| `registerSalonOwner` | `{firstName, lastName, consents, salon:{name, businessPhone, type, city, district, addressLine, description}, logoPath, photoPaths[≤5], idempotencyKey}` | `{salonId, code, salonName}` | Atomik: salon + kod rezervasyonu + OWNER üyelik + varsayılan program. Görseller önce `uploads/{uid}/pending/...` alanına yüklenir; fonksiyon doğrulayıp `salons/{salonId}/...` altına taşır. |
 | `createStaffInvitation` | `{salonId, firstName, lastName, specialty, phone, idempotencyKey}` | `{inviteId}` | Yalnızca OWNER. Telefon E.164'e normalize. Aynı telefona açık davet varsa `ALREADY_INVITED`. |
-| `revokeInvitation` | `{salonId, inviteId}` | `{}` | OWNER. |
-| `acceptInvitation` | `{salonId, inviteId}` | `{salonId}` | `auth.token.phone_number == invite.phoneE164` zorunlu. Kod bilmek yetmez. |
+| `revokeInvitation` | `{salonId, inviteId}` | `{status}` | OWNER; yalnızca PENDING. |
+| `declineInvitation` | `{salonId, inviteId}` | `{status}` | Davetli (telefon eşleşmeli). |
+| `updateStaffMember` | `{salonId, memberUid, firstName, lastName, specialty}` | `{ok}` | OWNER herkesi, üye yalnızca kendini düzenler. |
+| `acceptInvitation` | `{salonId, inviteId, consents?}` | `{salonId, salonName}` | `auth.token.phone_number == invite.phoneE164` zorunlu. Kod bilmek yetmez. Profil yoksa davet bilgileriyle oluşturulur (onaylar gerekir). Ayrılmış üye yeniden katılabilir (puanları korunur). |
 | `setMemberStatus` | `{salonId, memberUid, status: ACTIVE\|INACTIVE}` | `{affectedFutureAppointments:[id]}` | OWNER; sahip kendini pasifleştiremez. |
 | `leaveSalon` | `{salonId}` | `{affectedFutureAppointments}` | STAFF. |
 

@@ -147,6 +147,7 @@ Değişiklik geçmişi: `appointments/{id}/events/{eventId}` 🔒 `{from, to, ac
 ### 4.5 Kilitler 🔒 (istemci erişimi yok)
 - `staffDayLocks/{salonId}_{staffUid}_{YYYY-MM-DD}` — `{intervals: [{appointmentId, startMin, endMin}]}` (yalnızca PENDING/CONFIRMED/IN_PROGRESS).
 - `customerLocks/{uid}` — `{activeAppointmentId | null}`.
+- `salonOwners/{uid}` — `{salonId, code, salonName}`; v1'de kişi başına tek sahip olunan salon ve kayıt tekrarlarında idempotentlik.
 - `idempotencyKeys/{uid}_{key}` — `{result, createdAt, expireAt}` (TTL politikası).
 - `rateLimits/{uid}_{action}_{window}` — sayaç.
 

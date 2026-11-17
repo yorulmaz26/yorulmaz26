@@ -1,0 +1,3 @@
+tr_locations.json — il/ilçe listesi "turkey-neighbourhoods" (v4.0.3) paketinden türetilmiştir.
+Kaynak verisi: PTT posta kodu listesi. MIT License, Copyright (c) 2020 Murat Gözel.
+https://github.com/muratgozel/turkey-neighbourhoods

@@ -221,6 +221,7 @@ service cloud.firestore {
     match /idempotencyKeys/{id} { allow read, write: if false; }
     match /rateLimits/{id} { allow read, write: if false; }
     match /auditLogs/{id} { allow read, write: if false; }
+    match /salonOwners/{id} { allow read, write: if false; }
 
     // Davetli kişinin kendi davetlerini bulması için collection-group sorgusu.
     match /{path=**}/invitations/{inviteId} {

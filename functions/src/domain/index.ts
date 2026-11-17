@@ -5,3 +5,5 @@ export * from "./phone";
 export * from "./salonCode";
 export * from "./money";
 export * from "./permissions";
+export * from "./text";
+export * from "./locations";

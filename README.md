@@ -102,10 +102,21 @@ Komut satırı:
 | Komut | Kapsam |
 |---|---|
 | `./gradlew :core:domain:test` | Para/kuruş, durum makinesi, 2 saat iptal sınırı, İstanbul dönem sınırları, yetki matrisi, telefon normalizasyonu, hizmet seçimi toplamları |
-| `./gradlew :app:testDebugUnitTest` | Splash yönlendirme kararı (Beni hatırla politikası) |
+| `./gradlew :app:testDebugUnitTest` | Splash yönlendirme kararı (Beni hatırla), giriş sonrası rol/salon yönlendirmesi |
 | `./gradlew :app:connectedDebugAndroidTest` | Compose UI: rol seçimi |
-| `cd functions && npm test` | Müsaitlik/slot algoritması, molalar, kapalı günler, çakışma, zaman dilimi ve dönem anahtarları, durum geçişleri, salon kodu tahsisi, puan ortalaması |
+| `cd functions && npm test` | Müsaitlik/slot algoritması, molalar, kapalı günler, çakışma, zaman dilimi ve dönem anahtarları, durum geçişleri, salon kodu tahsisi, puan ortalaması, il/ilçe |
+| `cd functions && npm run test:integration` | Emulator: müşteri/salon sahibi kaydı, atomik salon + benzersiz kod (eşzamanlı), davet oluştur/kabul/ret/iptal, telefon eşleşmesi, pasife alma, ayrılma |
 | `cd tests/rules && npm install && npm test` | Firestore güvenlik kuralları (Emulator) |
+
+## Geliştirmede SMS girişi
+
+Firebase Console → Authentication → Sign-in method → Phone → **Phone numbers for testing** bölümüne örneğin
+`+90 555 000 00 01 / 123456` (müşteri), `+90 555 000 00 02 / 123456` (salon sahibi), `+90 555 000 00 03 / 123456` (personel)
+ekleyin. Bu numaralara gerçek SMS gitmez; kod sabittir. Auth Emulator kullanıyorsanız kod emülatör konsoluna yazılır.
+
+## Lisanslar
+
+`app/src/main/assets/tr_locations.json` (81 il / 973 ilçe) `turkey-neighbourhoods` paketinden (MIT, PTT verisi) türetilmiştir; ayrıntı `assets/THIRD_PARTY_NOTICES.txt`.
 
 ## Oturum politikası ("Beni hatırla")
 
@@ -119,7 +130,7 @@ Kapalıysa uygulama her soğuk başlatmada oturumu kapatır ve rol seçimine dö
 |---|---|---|
 | 0 | Mimari, veri modeli, kurallar, indeksler, API sözleşmeleri, domain çekirdeği | ✅ |
 | 1 | Gradle, tema, navigasyon, DI, Firebase şablonu, splash, rol seçimi | ✅ |
-| 2 | Telefon OTP, müşteri/salon sahibi kaydı, personel daveti, rol sistemi | ⏳ |
+| 2 | Telefon OTP, müşteri/salon sahibi kaydı, personel daveti, rol sistemi | ✅ |
 | 3 | Salon profili, logo/galeri, il/ilçe, salon kodu, paylaşım/QR | ⏳ |
 | 4 | Çalışma takvimi, izinler, kapamalar, hizmetler | ⏳ |
 | 5 | Salon listesi, detay, uzman/hizmet seçimi, müsaitlik, rezervasyon | ⏳ |
