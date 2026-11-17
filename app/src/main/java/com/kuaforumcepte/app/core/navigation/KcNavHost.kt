@@ -16,6 +16,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.kuaforumcepte.app.feature.link.DeepLinkViewModel
 import com.kuaforumcepte.app.feature.link.LinkEvent
 import com.kuaforumcepte.app.feature.salon.SalonDetailScreen
+import com.kuaforumcepte.app.feature.bizappointments.BusinessAppointmentScreen
+import com.kuaforumcepte.app.feature.bizappointments.RescheduleScreen
+import com.kuaforumcepte.app.feature.inbox.InboxScreen
 import com.kuaforumcepte.app.feature.appointments.BookingSuccessScreen
 import com.kuaforumcepte.app.feature.appointments.CustomerAppointmentDetailScreen
 import com.kuaforumcepte.app.feature.booking.BookingSummaryScreen
@@ -83,7 +86,9 @@ fun KcNavHost(
         linkViewModel.events.collect { e ->
             when (e) {
                 is LinkEvent.OpenSalon -> navController.navigate(SalonDetailRoute(e.salonId)) { launchSingleTop = true }
-                is LinkEvent.OpenAppointment -> navController.navigate(AppointmentDetailRoute(e.appointmentId)) { launchSingleTop = true }
+                is LinkEvent.OpenAppointment -> navController.navigate(
+                    if (e.asCustomer) AppointmentDetailRoute(e.appointmentId) else BusinessAppointmentRoute(e.appointmentId),
+                ) { launchSingleTop = true }
                 is LinkEvent.Failed -> Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
             }
         }
@@ -205,6 +210,8 @@ fun KcNavHost(
                 onOpenSalonClosedDays = { navController.navigate(SalonClosedDaysRoute) { single() } },
                 onOpenAccount = { navController.navigate(AccountRoute(EntryRole.BUSINESS.name)) { single() } },
                 onSwitchSalon = { navController.navigate(SalonPickerRoute) { single() } },
+                onOpenInbox = { navController.navigate(InboxRoute(EntryRole.BUSINESS.name)) { single() } },
+                onOpenAppointment = { id -> navController.navigate(BusinessAppointmentRoute(id)) { single() } },
             )
         }
         composable<StaffManagementRoute> { StaffManagementScreen(onBack = back) }
@@ -264,7 +271,20 @@ fun KcNavHost(
                 onOpenAccount = { navController.navigate(AccountRoute(EntryRole.CUSTOMER.name)) { single() } },
                 onOpenSalon = { id -> navController.navigate(SalonDetailRoute(id)) { single() } },
                 onOpenAppointment = { id -> navController.navigate(AppointmentDetailRoute(id)) { single() } },
+                onOpenInbox = { navController.navigate(InboxRoute(EntryRole.CUSTOMER.name)) { single() } },
             )
+        }
+
+        // ---- İşletme randevuları ve bildirimler ----
+        composable<BusinessAppointmentRoute> {
+            BusinessAppointmentScreen(onBack = back, onReschedule = { id -> navController.navigate(RescheduleRoute(id)) { single() } })
+        }
+        composable<RescheduleRoute> { RescheduleScreen(onBack = back, onDone = back) }
+        composable<InboxRoute> { entry ->
+            val role = roleOf(entry.toRoute<InboxRoute>().role)
+            InboxScreen(onBack = back, onOpenAppointment = { id ->
+                navController.navigate(if (role == EntryRole.CUSTOMER) AppointmentDetailRoute(id) else BusinessAppointmentRoute(id)) { single() }
+            })
         }
 
         // ---- Hesap ----

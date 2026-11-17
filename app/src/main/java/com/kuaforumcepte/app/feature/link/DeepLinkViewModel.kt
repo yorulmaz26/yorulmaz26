@@ -9,13 +9,14 @@ import com.kuaforumcepte.domain.link.DeepLink
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed interface LinkEvent {
     data class OpenSalon(val salonId: String) : LinkEvent
-    data class OpenAppointment(val appointmentId: String) : LinkEvent
+    data class OpenAppointment(val appointmentId: String, val asCustomer: Boolean) : LinkEvent
     data class Failed(val message: String) : LinkEvent
 }
 
@@ -28,6 +29,7 @@ class DeepLinkViewModel @Inject constructor(
     private val links: DeepLinkRepository,
     private val salons: SalonRepository,
     private val session: SessionRepository,
+    private val appointments: com.kuaforumcepte.app.data.appointments.AppointmentRepository,
 ) : ViewModel() {
 
     val pending: StateFlow<DeepLink?> = links.pending
@@ -55,8 +57,17 @@ class DeepLinkViewModel @Inject constructor(
             }
             // Bildirim tıklaması: randevu detayına (okuma yetkisi Firestore kurallarıyla denetlenir).
             is DeepLink.Appointment -> {
-                links.consume(link)
-                viewModelScope.launch { _events.send(LinkEvent.OpenAppointment(link.appointmentId)) }
+                resolving = true
+                viewModelScope.launch {
+                    links.consume(link)
+                    // Müşteri mi yoksa salon tarafı mı? Okuma yetkisi Firestore kurallarıyla denetlenir.
+                    val appt = runCatching { appointments.observe(link.appointmentId).first() }.getOrNull()
+                    resolving = false
+                    _events.send(
+                        if (appt == null) LinkEvent.Failed("Randevu bulunamadı veya görüntüleme yetkiniz yok.")
+                        else LinkEvent.OpenAppointment(appt.id, asCustomer = appt.customerUid == session.currentUid),
+                    )
+                }
             }
         }
     }

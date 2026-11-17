@@ -42,9 +42,11 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `getAvailability` | `{salonId, staffUid, serviceIds[], fromDate, days ≤ 14}` | `{totalMinutes, totalKurus, horizonDays, slotMinutes, days:[{date, slots:[{startAt(ISO UTC), label "HH:mm"}]}]}` | Sunucu algoritması (§6). Hizmetler aynı uzmana ait, aktif ve silinmemiş olmalı (`SERVICE_STAFF_MISMATCH`, `SERVICE_INACTIVE`). |
 | `createAppointment` | `{salonId, staffUid, serviceIds[], startAt, expectedTotalKurus, idempotencyKey}` | `{appointmentId, number, status:"PENDING", pendingExpiresAt}` | Tek transaction: fiyat + müsaitlik yeniden doğrulanır, `staffDayLocks` ile çakışma, `customerLocks` ile tek aktif randevu. Hatalar: `SLOT_TAKEN`, `SLOT_UNAVAILABLE`, `PRICE_CHANGED {newTotalKurus}`, `ACTIVE_APPOINTMENT_EXISTS {appointmentId}`, `SERVICE_INACTIVE`, `STAFF_INACTIVE`, `CANNOT_BOOK_SELF`, `PROFILE_REQUIRED`, `RATE_LIMITED` (10/saat). |
 | `transitionAppointment` | `{appointmentId, action: CONFIRM\|REJECT\|CANCEL_BY_CUSTOMER\|CANCEL_BY_STAFF\|MARK_ARRIVED\|MARK_NO_SHOW\|COMPLETE, reason?}` | `{status, applied}` | Durum makinesi (§5). Süresi dolmuş PENDING önce EXPIRED yapılır (`applied:false`). Terminal geçişte kilitler serbest bırakılır; CONFIRM kilitteki son kullanmayı kaldırır. Hatalar: `STATE_CHANGED`, `PERMISSION_DENIED`, `REASON_REQUIRED`, `CANCEL_WINDOW_CLOSED`, `TOO_EARLY`. `COMPLETE` finans kaydıyla birlikte Aşama 7'de (`COMPLETION_NOT_AVAILABLE`). |
-| `reassignAppointment` | `{appointmentId, newStaffUid, idempotencyKey}` | `{}` | OWNER; hedef uzmanda aynı aralık müsait olmalı. |
+| `reassignAppointment` | `{appointmentId, newStaffUid}` | `{staffUid}` | OWNER; PENDING/CONFIRMED. Kalemler (fiyat/süre snapshot) korunur. Hedef uzman o aralıkta çalışıyor olmalı (`STAFF_NOT_AVAILABLE`) ve boş olmalı (`SLOT_TAKEN`). Kilit taşınır, `attention` temizlenir; müşteri + iki uzman bilgilendirilir. |
+| `rescheduleAppointment` | `{appointmentId, newStartAt}` | `{startAt}` | Atanmış uzman veya OWNER; yeni başlangıç güncel müsaitlikte (randevunun kendisi hariç) geçerli slot olmalı. Tarih değişirse kilit taşınır, hatırlatma bayrakları sıfırlanır, müşteriye bildirilir (müşteri uygun değilse kendi iptal hakkını kullanır). |
+| `getAvailability` (yeniden planlama modu) | `{appointmentId, fromDate, days}` | aynı | Randevunun süresiyle, kendisi meşgul sayılmadan. Uzman/OWNER. |
 | `adjustAppointmentPrice` | `{appointmentId, newFinalKurus, reason, idempotencyKey}` | `{finalKurus}` | Audit log. |
-| `hideAppointments` | `{appointmentIds[] ≤ 100}` | `{hidden}` | Yalnızca terminal durumdaki ve kullanıcının görebildiği randevular. |
+| `hideAppointments` | `{appointmentIds[] ≤ 100}` | `{hidden}` | Yalnızca terminal durumdaki ve kullanıcının görebildiği randevular (`CANNOT_HIDE_ACTIVE`). `hiddenFor` dizisine çağıran eklenir; kayıt silinmez. |
 
 ## Finans (Aşama 7)
 | `getReports` | `{salonId, periodType: DAY\|WEEK\|MONTH, anchorDate, staffUid?}` | `{period:{start,end,label}, salon?:{count, amountKurus}, staff:[{staffUid, name, count, amountKurus}]}` | OWNER tümünü; STAFF yalnızca kendi `staffUid`'si (diğer parametreler reddedilir). |
@@ -56,5 +58,5 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `requestAccountDeletion` | `{}` | `{requestId}` | |
 
 ## Zamanlanmış
-| `scanAppointments` (her 1 dk) | PENDING süre aşımı → EXPIRED; CONFIRMED & start−2s → hatırlatma; start → "Müşteri geldi mi?"; bayraklarla idempotent. |
-| `onAppointmentWritten` (Firestore trigger) | Durum değişiminde bildirim üretimi (event ID ile tekilleştirme). |
+| `scanAppointments` (her 1 dk, Europe/Istanbul) | PENDING süre aşımı → EXPIRED (kilitler serbest, müşteri + uzmana bildirim); CONFIRMED ve başlangıca ≤2 saat → müşteriye hatırlatma (`flags.reminder2hSentAt`); başlangıç geldi → uzmana "Müşteri geldi mi?" (`flags.arrivalPromptSentAt`, 6 saate kadar). Her biri transaction + bayrakla tek sefer. |
+| `pushOnNotification` (Firestore `users/{uid}/notifications/{id}` oluşturma) | Kullanıcının cihazlarına FCM **data** mesajı (`type, title, body, notificationId, appointmentId, salonId`). `push.claimedAt` ile tek gönderim; geçersiz token'lar silinir; `push.result` = SENT/FAILED/NO_DEVICE. İçerikte müşteri adı/telefonu yok; Android kilit ekranında genel metin gösterir. |

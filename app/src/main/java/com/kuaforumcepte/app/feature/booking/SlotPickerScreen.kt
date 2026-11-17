@@ -51,22 +51,45 @@ private val dayName = DateTimeFormatter.ofPattern("EEE", BusinessTime.LOCALE)
 private val dayNum = DateTimeFormatter.ofPattern("d MMM", BusinessTime.LOCALE)
 private val fullDay = DateTimeFormatter.ofPattern("d MMMM EEEE", BusinessTime.LOCALE)
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SlotPickerScreen(onBack: () -> Unit, onSlotSelected: (Slot) -> Unit, viewModel: SlotPickerViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
+    SlotPickerContent(
+        title = "Tarih ve Saat", ui = ui, canPrev = viewModel.canPrev, canNext = viewModel.canNext,
+        onBack = onBack, onReload = viewModel::load, onSelectDate = viewModel::selectDate, onShift = viewModel::shiftWindow,
+        onSlotSelected = onSlotSelected,
+        footer = "Yalnızca hizmetlerin toplam süresinin tamamının sığdığı başlangıç saatleri gösterilir. Gösterilen saat, onayladığınız anda sunucuda yeniden kontrol edilir.",
+    )
+}
+
+/** Müşteri rezervasyonu ve salonun "Saati Değiştir" ekranının ortak tarih/saat seçici arayüzü. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun SlotPickerContent(
+    title: String,
+    ui: SlotPickerUi,
+    canPrev: Boolean,
+    canNext: Boolean,
+    onBack: () -> Unit,
+    onReload: () -> Unit,
+    onSelectDate: (java.time.LocalDate) -> Unit,
+    onShift: (Boolean) -> Unit,
+    onSlotSelected: (Slot) -> Unit,
+    footer: String,
+    showPrice: Boolean = true,
+) {
     Scaffold(topBar = {
-        KcTopBar("Tarih ve Saat", onBack, actions = { IconButton(onClick = viewModel::load) { Icon(Icons.Outlined.Refresh, "Saatleri yenile") } })
+        KcTopBar(title, onBack, actions = { IconButton(onClick = onReload) { Icon(Icons.Outlined.Refresh, "Saatleri yenile") } })
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(vertical = Spacing.s)) {
             ui.availability?.let { a ->
                 Text(
-                    "Toplam ${formatDuration(a.totalMinutes)} · ${a.total.formatTry()}",
+                    if (showPrice) "Toplam ${formatDuration(a.totalMinutes)} · ${a.total.formatTry()}" else "Süre ${formatDuration(a.totalMinutes)}",
                     style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(horizontal = Spacing.screen),
                 )
             }
             Row(Modifier.fillMaxWidth().padding(horizontal = Spacing.s), verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = { viewModel.shiftWindow(false) }, enabled = viewModel.canPrev && !ui.loading) {
+                IconButton(onClick = { onShift(false) }, enabled = canPrev && !ui.loading) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Önceki günler")
                 }
                 LazyRow(Modifier.weight(1f), horizontalArrangement = Arrangement.spacedBy(Spacing.xs), contentPadding = PaddingValues(horizontal = Spacing.xs)) {
@@ -74,7 +97,7 @@ fun SlotPickerScreen(onBack: () -> Unit, onSlotSelected: (Slot) -> Unit, viewMod
                         val selected = d.date == ui.selectedDate
                         val has = d.slots.isNotEmpty()
                         Surface(
-                            onClick = { viewModel.selectDate(d.date) },
+                            onClick = { onSelectDate(d.date) },
                             shape = MaterialTheme.shapes.medium,
                             color = when {
                                 selected -> MaterialTheme.colorScheme.primary
@@ -92,14 +115,14 @@ fun SlotPickerScreen(onBack: () -> Unit, onSlotSelected: (Slot) -> Unit, viewMod
                         }
                     }
                 }
-                IconButton(onClick = { viewModel.shiftWindow(true) }, enabled = viewModel.canNext && !ui.loading) {
+                IconButton(onClick = { onShift(true) }, enabled = canNext && !ui.loading) {
                     Icon(Icons.AutoMirrored.Outlined.ArrowForward, "Sonraki günler")
                 }
             }
             Column(Modifier.padding(Spacing.screen), verticalArrangement = Arrangement.spacedBy(Spacing.m)) {
                 when {
                     ui.loading -> SkeletonCardList(2, Modifier.padding(0.dp))
-                    ui.error != null -> ErrorState(ui.error!!.asString(), onRetry = viewModel::load)
+                    ui.error != null -> ErrorState(ui.error!!.asString(), onRetry = onReload)
                     ui.selectedDate == null -> Unit
                     ui.slotsOfSelected.isEmpty() -> EmptyState(
                         title = "${ui.selectedDate!!.format(fullDay)} için uygun saat yok",
@@ -114,7 +137,7 @@ fun SlotPickerScreen(onBack: () -> Unit, onSlotSelected: (Slot) -> Unit, viewMod
                         }
                     }
                 }
-                InfoBanner("Yalnızca hizmetlerin toplam süresinin tamamının sığdığı başlangıç saatleri gösterilir. Gösterilen saat, onayladığınız anda sunucuda yeniden kontrol edilir.")
+                InfoBanner(footer)
             }
         }
     }

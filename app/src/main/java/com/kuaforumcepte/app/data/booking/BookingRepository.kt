@@ -18,10 +18,15 @@ data class CreatedAppointment(val id: String, val number: String, val pendingExp
 class BookingRepository @Inject constructor(private val functions: FunctionsClient) {
 
     suspend fun availability(salonId: String, staffUid: String, serviceIds: List<String>, from: LocalDate, days: Int): Availability {
-        val r = functions.call(
-            "getAvailability",
-            mapOf("salonId" to salonId, "staffUid" to staffUid, "serviceIds" to serviceIds, "fromDate" to from.toString(), "days" to days),
+        return parse(
+            functions.call(
+                "getAvailability",
+                mapOf("salonId" to salonId, "staffUid" to staffUid, "serviceIds" to serviceIds, "fromDate" to from.toString(), "days" to days),
+            ),
         )
+    }
+
+    private fun parse(r: Map<String, Any?>): Availability {
         return Availability(
             total = Kurus((r["totalKurus"] as Number).toLong()),
             totalMinutes = (r["totalMinutes"] as Number).toInt(),
@@ -34,6 +39,10 @@ class BookingRepository @Inject constructor(private val functions: FunctionsClie
             },
         )
     }
+
+    /** Yeniden planlama: mevcut randevunun süresiyle, kendisi hariç müsaitlik. */
+    suspend fun availabilityForReschedule(appointmentId: String, from: LocalDate, days: Int): Availability =
+        parse(functions.call("getAvailability", mapOf("appointmentId" to appointmentId, "fromDate" to from.toString(), "days" to days)))
 
     /**
      * Sunucu fiyatı ve müsaitliği transaction içinde yeniden doğrular. Hata nedenleri:

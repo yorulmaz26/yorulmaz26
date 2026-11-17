@@ -32,20 +32,16 @@ data class SlotPickerUi(
     val slotsOfSelected: List<Slot> get() = availability?.days?.firstOrNull { it.date == selectedDate }?.slots.orEmpty()
 }
 
-@HiltViewModel
-class SlotPickerViewModel @Inject constructor(
-    savedState: SavedStateHandle,
-    private val booking: BookingRepository,
-    clock: Clock,
-) : ViewModel() {
-    val route = savedState.toRoute<SlotPickerRoute>()
+/** Pencereli (14 gün) müsaitlik yükleyici; müşteri rezervasyonu ve salonun yeniden planlaması paylaşır. */
+abstract class BaseSlotViewModel(savedState: SavedStateHandle, clock: Clock) : ViewModel() {
+    protected abstract suspend fun fetch(from: LocalDate, days: Int): Availability
     val today: LocalDate = LocalDate.now(clock.withZone(BusinessTime.ZONE))
     private val _ui = MutableStateFlow(SlotPickerUi(windowStart = savedState.get<String>("window")?.let(LocalDate::parse) ?: today))
     val ui: StateFlow<SlotPickerUi> = _ui.asStateFlow()
     private val saved = savedState
     private var job: Job? = null
 
-    init { load() }
+    protected fun start() = load()
 
     val horizonEnd: LocalDate get() = today.plusDays((_ui.value.availability?.horizonDays ?: 60).toLong())
     val canPrev: Boolean get() = _ui.value.windowStart.isAfter(today)
@@ -56,7 +52,7 @@ class SlotPickerViewModel @Inject constructor(
         val start = _ui.value.windowStart
         _ui.update { it.copy(loading = true, error = null) }
         job = viewModelScope.launch {
-            runCatching { booking.availability(route.salonId, route.staffUid, route.serviceIds, start, WINDOW) }
+            runCatching { fetch(start, WINDOW) }
                 .onSuccess { a ->
                     _ui.update { s ->
                         val keep = s.selectedDate?.takeIf { d -> a.days.any { it.date == d } }
@@ -81,4 +77,15 @@ class SlotPickerViewModel @Inject constructor(
     companion object {
         const val WINDOW = 14
     }
+}
+
+@HiltViewModel
+class SlotPickerViewModel @Inject constructor(
+    savedState: SavedStateHandle,
+    private val booking: BookingRepository,
+    clock: Clock,
+) : BaseSlotViewModel(savedState, clock) {
+    val route = savedState.toRoute<SlotPickerRoute>()
+    override suspend fun fetch(from: LocalDate, days: Int) = booking.availability(route.salonId, route.staffUid, route.serviceIds, from, days)
+    init { start() }
 }

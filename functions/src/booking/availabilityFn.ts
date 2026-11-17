@@ -6,6 +6,8 @@ import { addDays, assertLocalDate, computeSlots, localDateOf } from "../domain";
 import { busyOf, liveIntervals, loadBookingContext, lockRef } from "./context";
 
 interface Req {
+  /** Yeniden planlama modu: mevcut randevunun süresi kullanılır ve kendisi meşgul sayılmaz. */
+  appointmentId?: unknown;
   salonId?: unknown;
   staffUid?: unknown;
   serviceIds?: unknown;
@@ -24,11 +26,28 @@ export interface AvailabilityDay {
  */
 export const getAvailability = authedCallable<Req, { totalKurus: number; totalMinutes: number; horizonDays: number; slotMinutes: number; days: AvailabilityDay[] }>(
   "getAvailability",
-  async (data) => {
-    const salonId = docId(data.salonId, "salonId");
-    const staffUid = docId(data.staffUid, "staffUid");
-    if (!Array.isArray(data.serviceIds)) fail("invalid-argument", "INVALID_ARGUMENT", { field: "serviceIds" });
-    const serviceIds = (data.serviceIds as unknown[]).map((s) => docId(s, "serviceIds"));
+  async (data, caller) => {
+    let salonId: string;
+    let staffUid: string;
+    let serviceIds: string[] | null;
+    let excludeId: string | null = null;
+    let fixedMinutes: number | null = null;
+    if (data.appointmentId !== undefined) {
+      excludeId = docId(data.appointmentId, "appointmentId");
+      const appt = await db.collection("appointments").doc(excludeId).get();
+      if (!appt.exists) fail("not-found", "APPOINTMENT_NOT_FOUND");
+      salonId = appt.get("salonId");
+      staffUid = appt.get("staffUid");
+      const owner = (await db.collection("salons").doc(salonId).get()).get("ownerUid");
+      if (caller.uid !== staffUid && caller.uid !== owner) fail("permission-denied", "PERMISSION_DENIED");
+      serviceIds = null;
+      fixedMinutes = appt.get("totalMinutes");
+    } else {
+      salonId = docId(data.salonId, "salonId");
+      staffUid = docId(data.staffUid, "staffUid");
+      if (!Array.isArray(data.serviceIds)) fail("invalid-argument", "INVALID_ARGUMENT", { field: "serviceIds" });
+      serviceIds = (data.serviceIds as unknown[]).map((s) => docId(s, "serviceIds"));
+    }
     const now = new Date();
     const today = localDateOf(now);
     const fromDate = typeof data.fromDate === "string" ? data.fromDate : today;
@@ -44,9 +63,10 @@ export const getAvailability = authedCallable<Req, { totalKurus: number; totalMi
     const locks = await db.getAll(...dates.map((d) => lockRef(salonId, staffUid, d)));
     const nowMs = now.getTime();
 
+    const totalMinutes = fixedMinutes ?? ctx.totalMinutes;
     return {
       totalKurus: ctx.totalKurus,
-      totalMinutes: ctx.totalMinutes,
+      totalMinutes,
       horizonDays: ctx.settings.horizonDays,
       slotMinutes: ctx.settings.slotMinutes,
       days: dates.map((date, i) => ({
@@ -54,7 +74,7 @@ export const getAvailability = authedCallable<Req, { totalKurus: number; totalMi
         slots: computeSlots({
           localDate: date,
           now,
-          totalMinutes: ctx.totalMinutes,
+          totalMinutes,
           slotMinutes: ctx.settings.slotMinutes,
           minLeadMinutes: ctx.settings.minLeadMinutes,
           horizonDays: ctx.settings.horizonDays,
@@ -62,7 +82,7 @@ export const getAvailability = authedCallable<Req, { totalKurus: number; totalMi
           salonClosures: ctx.salonClosures,
           staffSchedule: ctx.schedule,
           staffClosures: ctx.staffClosures,
-          busy: busyOf(liveIntervals(locks[i], nowMs)),
+          busy: busyOf(liveIntervals(locks[i], nowMs).filter((x) => x.appointmentId !== excludeId)),
         }).map((s) => ({ startAt: s.startAt.toISOString(), label: s.label })),
       })),
     };

@@ -105,7 +105,7 @@ Komut satırı:
 | `./gradlew :app:testDebugUnitTest` | Splash yönlendirme kararı (Beni hatırla), giriş sonrası rol/salon yönlendirmesi |
 | `./gradlew :app:connectedDebugAndroidTest` | Compose UI: rol seçimi |
 | `cd functions && npm test` | Müsaitlik/slot algoritması, molalar, kapalı günler, çakışma, zaman dilimi ve dönem anahtarları, durum geçişleri, salon kodu tahsisi, puan ortalaması, il/ilçe |
-| `cd functions && npm run test:integration` | Emulator: kayıtlar, benzersiz salon kodu, davetler, salon profili/görseller, takvim değişikliği çakışma analizi, kapatmalar, hizmet etkisi, müsaitlik, eşzamanlı aynı slot (yalnızca biri), tek aktif randevu, fiyat değişimi, PENDING süre aşımı, iptal sonrası slot açılması, 2 saat kuralı |
+| `cd functions && npm run test:integration` | Emulator: kayıtlar, benzersiz salon kodu, davetler, salon profili/görseller, takvim değişikliği çakışma analizi, kapatmalar, hizmet etkisi, müsaitlik, eşzamanlı aynı slot (yalnızca biri), tek aktif randevu, fiyat değişimi, PENDING süre aşımı, iptal sonrası slot açılması, 2 saat kuralı, uzman değiştirme, saat değiştirme, gizleme, zamanlanmış işlerin tekilliği, bildirim gönderimi |
 | `cd tests/rules && npm install && npm test` | Firestore güvenlik kuralları (Emulator) |
 
 ## Geliştirmede SMS girişi
@@ -124,6 +124,14 @@ ekleyin. Bu numaralara gerçek SMS gitmez; kod sabittir. Auth Emulator kullanıy
   ikinci bir giriş ekleyebilir veya şu komutla deneyebilirsiniz:
   `adb shell am start -a android.intent.action.VIEW -d "kuaforumcepte://salon/<kod>" com.kuaforumcepte.debug`
 - Play Store adresi farklıysa fonksiyon ortam değişkeni `PLAY_STORE_URL` ile verin.
+
+## Bildirimler (FCM) ve zamanlanmış işler
+
+- Push için ek anahtar gerekmez; `google-services.json` ve Blaze planı yeterlidir. Cloud Scheduler, `scanAppointments`
+  ilk dağıtımda otomatik oluşturulur (bölge `europe-west1`).
+- Uygulama bildirim iznini ilk randevudan sonra ister (Android 13+). İzin yoksa bildirimler uygulama içindeki zil
+  simgesinden okunur.
+- Emülatörde FCM gönderilmez (`push.result = NO_DEVICE/FAILED`); gerçek cihaz testi için gerçek Firebase projesi kullanın.
 
 ## Lisanslar
 
@@ -145,7 +153,7 @@ Kapalıysa uygulama her soğuk başlatmada oturumu kapatır ve rol seçimine dö
 | 3 | Salon profili, logo/galeri, il/ilçe, salon kodu, paylaşım/QR | ✅ |
 | 4 | Çalışma takvimi, izinler, kapamalar, hizmetler | ✅ |
 | 5 | Salon listesi, detay, uzman/hizmet seçimi, müsaitlik, rezervasyon | ✅ |
-| 6 | Randevu yönetimi, bildirimler, zamanlanmış hatırlatmalar | ⏳ |
+| 6 | Randevu yönetimi, bildirimler, zamanlanmış hatırlatmalar | ✅ |
 | 7 | Finansal ledger ve raporlar | ⏳ |
 | 8 | Geçmiş, puanlama, salon bilgileri, takvim ve harita | ⏳ |
 | 9 | Güvenlik sertleştirme, testler, release ve yayın kontrol listesi | ⏳ |

@@ -21,20 +21,20 @@ import {
 } from "../domain";
 import { busyOf, liveIntervals, LockInterval, loadBookingContext, lockRef } from "./context";
 
-const appts = () => db.collection("appointments");
-const customerLockRef = (uid: string) => db.collection("customerLocks").doc(uid);
+export const appts = () => db.collection("appointments");
+export const customerLockRef = (uid: string) => db.collection("customerLocks").doc(uid);
 
 /** Kullanıcıya gösterilen kısa randevu numarası (belge kimliğinden türetilir). */
 export const bookingNumber = (id: string) => `KC-${id.slice(0, 8).toUpperCase()}`;
 
-function addEvent(tx: Transaction, appointmentId: string, from: AppointmentStatus | null, to: AppointmentStatus, actorUid: string, actorRole: string, reason?: string | null) {
+export function addEvent(tx: Transaction, appointmentId: string, from: AppointmentStatus | null, to: AppointmentStatus, actorUid: string, actorRole: string, reason?: string | null) {
   tx.create(appts().doc(appointmentId).collection("events").doc(), {
     from, to, actorUid, actorRole, reason: reason ?? null, at: FieldValue.serverTimestamp(),
   });
 }
 
 /** Terminal duruma geçişte uzman kilidinden ve müşteri kilidinden randevuyu çıkarır. */
-function releaseLocks(tx: Transaction, appt: DocumentSnapshot, lock: DocumentSnapshot, customerLock: DocumentSnapshot) {
+export function releaseLocks(tx: Transaction, appt: DocumentSnapshot, lock: DocumentSnapshot, customerLock: DocumentSnapshot) {
   const intervals = ((lock.get("intervals") as LockInterval[] | undefined) ?? []).filter((i) => i.appointmentId !== appt.id);
   if (lock.exists) tx.update(lock.ref, { intervals, updatedAt: FieldValue.serverTimestamp() });
   if (customerLock.get("activeAppointmentId") === appt.id) tx.set(customerLock.ref, { activeAppointmentId: null, expiresAtMs: null, updatedAt: FieldValue.serverTimestamp() });

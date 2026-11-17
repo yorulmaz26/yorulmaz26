@@ -29,15 +29,16 @@ data class ScheduleConflict(
     val customerName: String,
     val reason: String,
 ) {
-    val reasonLabel: String
-        get() = when (reason) {
-            "SALON_CLOSED_DAY" -> "Salon o gün kapalı olacak"
-            "SALON_CLOSURE" -> "Salon tarih kapatması"
-            "STAFF_DAY_OFF" -> "Uzmanın haftalık izin günü"
-            "STAFF_CLOSURE" -> "Uzmanın kapattığı tarih"
-            "OVERLAPS_BREAK" -> "Molayla çakışıyor"
-            else -> "Çalışma saatleri dışında kalıyor"
-        }
+    val reasonLabel: String get() = conflictReasonLabel(reason)
+}
+
+fun conflictReasonLabel(reason: String): String = when (reason) {
+    "SALON_CLOSED_DAY" -> "Salon o gün kapalı olacak"
+    "SALON_CLOSURE" -> "Salon tarih kapatması"
+    "STAFF_DAY_OFF" -> "Uzmanın haftalık izin günü"
+    "STAFF_CLOSURE" -> "Uzmanın kapattığı tarih"
+    "OVERLAPS_BREAK" -> "Molayla çakışıyor"
+    else -> "Çalışma saatleri dışında kalıyor"
 }
 
 /** Önizleme veya uygulama sonucu; applied=false ve conflicts doluysa kullanıcı onayı beklenir. */

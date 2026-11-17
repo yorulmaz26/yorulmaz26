@@ -44,6 +44,10 @@ import kotlinx.serialization.Serializable
 @Serializable data class BookingSummaryRoute(val salonId: String, val staffUid: String, val serviceIds: List<String>, val startAt: String)
 @Serializable data class BookingSuccessRoute(val appointmentId: String)
 @Serializable data class AppointmentDetailRoute(val appointmentId: String)
+@Serializable data class BusinessAppointmentRoute(val appointmentId: String)
+@Serializable data class RescheduleRoute(val appointmentId: String)
+/** role: CUSTOMER | BUSINESS — bildirime dokununca hangi randevu ekranının açılacağını belirler. */
+@Serializable data class InboxRoute(val role: String)
 
 // Müşteri
 @Serializable data object CustomerHomeRoute

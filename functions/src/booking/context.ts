@@ -66,7 +66,8 @@ export async function loadBookingContext(
   tx: Reader,
   salonId: string,
   staffUid: string,
-  serviceIds: string[],
+  /** null → hizmet doğrulaması yapılmaz (ör. snapshot'lı mevcut randevunun saatini değiştirme). */
+  serviceIds: string[] | null,
   today: string,
 ): Promise<BookingContext> {
   const salonRef = db.collection("salons").doc(salonId);
@@ -81,10 +82,13 @@ export async function loadBookingContext(
   if (!salon.exists || salon.get("status") !== "ACTIVE") fail("failed-precondition", "SALON_INACTIVE");
   if (!member.exists || member.get("status") !== "ACTIVE" || member.get("acceptsBookings") === false) fail("failed-precondition", "STAFF_INACTIVE");
 
-  const unique = [...new Set(serviceIds)];
-  if (unique.length === 0 || unique.length > 10 || unique.length !== serviceIds.length) fail("invalid-argument", "INVALID_ARGUMENT", { field: "serviceIds" });
-  const refs = unique.map((id) => salonRef.collection("services").doc(id));
-  const svcs = tx ? await tx.getAll(...refs) : await db.getAll(...refs);
+  let svcs: DocumentSnapshot[] = [];
+  if (serviceIds !== null) {
+    const unique = [...new Set(serviceIds)];
+    if (unique.length === 0 || unique.length > 10 || unique.length !== serviceIds.length) fail("invalid-argument", "INVALID_ARGUMENT", { field: "serviceIds" });
+    const refs = unique.map((id) => salonRef.collection("services").doc(id));
+    svcs = tx ? await tx.getAll(...refs) : await db.getAll(...refs);
+  }
   const items: ServiceSnapshot[] = svcs.map((s) => {
     if (!s.exists || s.get("deleted") === true || s.get("active") !== true) fail("failed-precondition", "SERVICE_INACTIVE", { serviceId: s.id });
     // Seçili hizmetler yalnızca seçilen uzmana ait olabilir.

@@ -53,6 +53,8 @@ import com.kuaforumcepte.app.core.designsystem.component.KcTopBar
 import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.domain.auth.Permission
+import com.kuaforumcepte.app.feature.bizappointments.BusinessAppointmentsContent
+import com.kuaforumcepte.app.feature.inbox.InboxBell
 import com.kuaforumcepte.domain.model.MemberRole
 import kotlinx.coroutines.launch
 
@@ -75,6 +77,8 @@ fun BusinessHomeScreen(
     onOpenSalonClosedDays: () -> Unit,
     onOpenAccount: () -> Unit,
     onSwitchSalon: () -> Unit,
+    onOpenInbox: () -> Unit,
+    onOpenAppointment: (String) -> Unit,
     viewModel: BusinessHomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -101,6 +105,7 @@ fun BusinessHomeScreen(
                         if (s.active.allActive.size > 1) {
                             IconButton(onClick = onSwitchSalon) { Icon(Icons.Outlined.SwapHoriz, contentDescription = "Salon değiştir") }
                         }
+                        InboxBell(onOpenInbox)
                         AccountAction(onOpenAccount)
                     })
                 },
@@ -113,6 +118,14 @@ fun BusinessHomeScreen(
                     }
                 },
             ) { padding ->
+                if (BusinessTab.entries[tab] == BusinessTab.APPOINTMENTS) {
+                    BusinessAppointmentsContent(
+                        onOpen = onOpenAppointment,
+                        onMessage = { m -> scope.launch { snackbar.showSnackbar(m) } },
+                        modifier = Modifier.padding(padding),
+                    )
+                    return@Scaffold
+                }
                 Column(
                     Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(Spacing.screen),
                     verticalArrangement = Arrangement.spacedBy(Spacing.l),
@@ -153,11 +166,7 @@ fun BusinessHomeScreen(
                             }
                             MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, Beni hatırla, tema, çıkış", onOpenAccount)
                         }
-                        BusinessTab.APPOINTMENTS -> EmptyState(
-                            icon = Icons.Outlined.EditCalendar,
-                            title = if (m.role == MemberRole.OWNER) "Randevu yönetimi hazırlanıyor" else "Randevularım",
-                            message = "Müşteriler artık randevu talebi oluşturabiliyor; yeni talepler bildirim kutunuza düşer. Talepleri listeleme, onaylama/iptal ve “Geldi/Tamamla” işlemleri bir sonraki aşamada bu sekmeye eklenecek.",
-                        )
+                        BusinessTab.APPOINTMENTS -> Unit
                     }
                 }
             }

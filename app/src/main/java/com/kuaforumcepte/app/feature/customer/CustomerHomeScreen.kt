@@ -23,6 +23,7 @@ import com.kuaforumcepte.app.feature.salon.SalonHoursSection
 import com.kuaforumcepte.app.feature.appointments.MyAppointmentsContent
 import com.kuaforumcepte.app.feature.booking.ActiveAppointmentCard
 import com.kuaforumcepte.app.feature.booking.SalonListContent
+import com.kuaforumcepte.app.feature.inbox.InboxBell
 import com.kuaforumcepte.app.feature.salon.SalonInfoContent
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
@@ -59,6 +60,7 @@ fun CustomerHomeScreen(
     onOpenAccount: () -> Unit,
     onOpenSalon: (String) -> Unit,
     onOpenAppointment: (String) -> Unit,
+    onOpenInbox: () -> Unit,
     viewModel: CustomerHomeViewModel = hiltViewModel(),
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -69,6 +71,7 @@ fun CustomerHomeScreen(
     Scaffold(
         topBar = {
             KcTopBar(CustomerTab.entries[tab].label, actions = {
+                InboxBell(onOpenInbox)
                 IconButton(onClick = onOpenAccount) { Icon(Icons.Outlined.AccountCircle, contentDescription = "Hesap") }
             })
         },

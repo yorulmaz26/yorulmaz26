@@ -75,6 +75,10 @@ object ErrorMessages {
         "PENDING_EXPIRED" to "Talebin onay süresi dolmuş.",
         "REASON_REQUIRED" to "Lütfen kısa bir gerekçe yazın (en az 3 karakter).",
         "TOO_EARLY" to "Bu işlem için henüz erken.",
+        "SAME_STAFF" to "Randevu zaten bu uzmana atanmış.",
+        "STAFF_NOT_AVAILABLE" to "Seçilen uzman bu saatte çalışmıyor veya izinli.",
+        "CANNOT_HIDE_ACTIVE" to "Aktif randevular gizlenemez; yalnızca geçmiş randevular listeden kaldırılabilir.",
+        "COMPLETION_NOT_AVAILABLE" to "İşlemi tamamlama, finans kaydıyla birlikte bir sonraki sürümde etkinleşecek.",
         "QR_VERIFY_FAILED" to "QR kod doğrulanamadı. Lütfen tekrar oluşturun.",
     )
 

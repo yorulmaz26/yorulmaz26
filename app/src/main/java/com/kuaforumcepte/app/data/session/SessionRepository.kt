@@ -38,6 +38,7 @@ class SessionRepository @Inject constructor(
     private val functions: FunctionsClient,
     private val preferences: AppPreferences,
     private val phoneAuth: PhoneAuthRepository,
+    private val devices: com.kuaforumcepte.app.core.push.DeviceTokenRegistrar,
 ) {
     private val _snapshot = MutableStateFlow<SessionSnapshot?>(null)
     /** Son bootstrap sonucu (profil adı, bekleyen davetler). */
@@ -76,6 +77,7 @@ class SessionRepository @Inject constructor(
             activeAppointmentId = r.str("activeAppointmentId"),
         )
         _snapshot.value = snap
+        devices.register()
         return snap
     }
 
@@ -99,6 +101,7 @@ class SessionRepository @Inject constructor(
     suspend fun selectActiveSalon(salonId: String) = preferences.setActiveBusinessSalon(salonId)
 
     suspend fun signOut() {
+        devices.unregister()
         auth.get().signOut()
         phoneAuth.reset()
         preferences.clearSessionScoped()

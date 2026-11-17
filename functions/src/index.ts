@@ -37,3 +37,8 @@ export {
 // Aşama 5 — müsaitlik ve rezervasyon
 export { getAvailability } from "./booking/availabilityFn";
 export { createAppointment, transitionAppointment } from "./booking/appointments";
+
+// Aşama 6 — randevu yönetimi, bildirimler, zamanlanmış işler
+export { reassignAppointment, rescheduleAppointment, hideAppointments } from "./booking/manage";
+export { pushOnNotification } from "./notify/push";
+export { scanAppointments } from "./scheduled/scan";

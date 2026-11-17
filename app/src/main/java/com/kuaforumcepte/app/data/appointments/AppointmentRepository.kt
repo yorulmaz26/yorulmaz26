@@ -18,6 +18,8 @@ import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
+data class AppointmentEvent(val to: AppointmentStatus?, val actorRole: String, val reason: String?, val at: Instant?)
+
 data class AppointmentItem(val serviceId: String, val name: String, val price: Kurus, val durationMinutes: Int)
 
 data class Appointment(
@@ -73,6 +75,50 @@ class AppointmentRepository @Inject constructor(
         col().whereEqualTo("customerUid", uid).orderBy("startAt", Query.Direction.DESCENDING).limit(limit).snapshots()
             .map { qs -> qs.documents.mapNotNull { it.toAppointment() } }
             .catch { throw AppException.from(it) }
+
+    /** Salon sahibi: salondaki tüm randevular [from, to). */
+    fun observeSalonRange(salonId: String, from: Instant, to: Instant): Flow<List<Appointment>> =
+        col().whereEqualTo("salonId", salonId)
+            .whereGreaterThanOrEqualTo("startAt", com.google.firebase.Timestamp(java.util.Date.from(from)))
+            .whereLessThan("startAt", com.google.firebase.Timestamp(java.util.Date.from(to)))
+            .orderBy("startAt", Query.Direction.ASCENDING).limit(500).snapshots()
+            .map { qs -> qs.documents.mapNotNull { it.toAppointment() } }
+            .catch { throw AppException.from(it) }
+
+    /** Uzman: yalnızca kendisine atanmış randevular (Firestore kuralı da bunu zorunlu kılar). */
+    fun observeStaffRange(salonId: String, staffUid: String, from: Instant, to: Instant): Flow<List<Appointment>> =
+        col().whereEqualTo("staffUid", staffUid).whereEqualTo("salonId", salonId)
+            .whereGreaterThanOrEqualTo("startAt", com.google.firebase.Timestamp(java.util.Date.from(from)))
+            .whereLessThan("startAt", com.google.firebase.Timestamp(java.util.Date.from(to)))
+            .orderBy("startAt", Query.Direction.ASCENDING).limit(500).snapshots()
+            .map { qs -> qs.documents.mapNotNull { it.toAppointment() } }
+            .catch { throw AppException.from(it) }
+
+    fun observeEvents(id: String): Flow<List<AppointmentEvent>> =
+        col().document(id).collection("events").orderBy("at", Query.Direction.DESCENDING).snapshots()
+            .map { qs ->
+                qs.documents.map { d ->
+                    AppointmentEvent(
+                        to = AppointmentStatus.fromWire(d.getString("to")),
+                        actorRole = d.getString("actorRole").orEmpty(),
+                        reason = d.getString("reason"),
+                        at = d.getTimestamp("at")?.toInstant(),
+                    )
+                }
+            }
+            .catch { emit(emptyList()) }
+
+    suspend fun reassign(id: String, newStaffUid: String) {
+        functions.call("reassignAppointment", mapOf("appointmentId" to id, "newStaffUid" to newStaffUid))
+    }
+
+    suspend fun reschedule(id: String, newStartAt: Instant) {
+        functions.call("rescheduleAppointment", mapOf("appointmentId" to id, "newStartAt" to newStartAt.toString()))
+    }
+
+    /** Yalnızca kendi görünümünden gizler; kayıtlar silinmez. */
+    suspend fun hide(ids: Collection<String>): Int =
+        ((functions.call("hideAppointments", mapOf("appointmentIds" to ids.toList()))["hidden"] as? Number)?.toInt()) ?: 0
 
     /** @return yeni durum; süresi dolmuş taleplerde "EXPIRED". */
     suspend fun transition(id: String, action: String, reason: String? = null): AppointmentStatus {
