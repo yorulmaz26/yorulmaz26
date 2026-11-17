@@ -1,0 +1,38 @@
+rules_version = '2';
+
+// Kuaförüm Cepte — Storage kuralları
+// - uploads/{uid}/pending/**   : kayıt sırasında geçici yükleme alanı (yalnızca sahibi).
+//                                registerSalonOwner fonksiyonu doğrulayıp salons/ altına taşır.
+// - salons/{salonId}/**        : kamuya açık salon görselleri; yalnızca salon sahibi yazar.
+// Kabul: image/jpeg, image/png, image/webp; en fazla 5 MB (istemci yüklemeden önce sıkıştırır).
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() { return request.auth != null; }
+    function isImage() {
+      return request.resource.contentType.matches('image/(jpeg|png|webp)');
+    }
+    function underLimit() { return request.resource.size < 5 * 1024 * 1024; }
+    function isSalonOwner(salonId) {
+      return signedIn() &&
+        firestore.get(/databases/(default)/documents/salons/$(salonId)).data.ownerUid == request.auth.uid;
+    }
+
+    match /uploads/{userId}/pending/{fileName} {
+      allow read, delete: if signedIn() && request.auth.uid == userId;
+      allow create, update: if signedIn() && request.auth.uid == userId && isImage() && underLimit();
+    }
+
+    match /salons/{salonId}/{kind}/{fileName} {
+      allow read: if true; // salon logosu/fotoğrafları kamuya açıktır
+      allow create, update: if (kind == 'logo' || kind == 'photos')
+        && isSalonOwner(salonId) && isImage() && underLimit();
+      allow delete: if (kind == 'logo' || kind == 'photos') && isSalonOwner(salonId);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

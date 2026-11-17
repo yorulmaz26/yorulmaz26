@@ -1,0 +1,31 @@
+{
+  "name": "kuaforum-cepte-functions",
+  "private": true,
+  "description": "Kuaförüm Cepte — yetkili sunucu işlemleri (Cloud Functions, TypeScript)",
+  "main": "lib/src/index.js",
+  "engines": { "node": "22" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "test": "jest",
+    "serve": "npm run build && firebase emulators:start --only functions,firestore,auth,storage",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0",
+    "firebase-functions": "^6.4.0",
+    "luxon": "^3.7.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/luxon": "^3.7.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.4",
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "roots": ["<rootDir>/test"]
+  }
+}

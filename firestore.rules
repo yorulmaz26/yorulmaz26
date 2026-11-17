@@ -1,0 +1,232 @@
+rules_version = '2';
+
+// Kuaförüm Cepte — Firestore güvenlik kuralları (v1)
+// İlke: Hassas alanlar (durum, ücret, sahiplik, rol, puan, finans, kilitler) yalnızca
+// Cloud Functions (Admin SDK, kuralları atlar) tarafından yazılır. İstemciye yalnızca
+// kendi profil adı, cihaz token'ı, bildirim "okundu" bayrağı, kendi hizmetleri ve
+// salon sahibinin profil alanları için alan-bazlı yazma izni verilir.
+// Ayrıntı: docs/ARCHITECTURE.md §4
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ---------- Yardımcılar ----------
+    function signedIn() {
+      return request.auth != null;
+    }
+    function uid() {
+      return request.auth.uid;
+    }
+    function isSelf(userId) {
+      return signedIn() && uid() == userId;
+    }
+    function salonDoc(salonId) {
+      return get(/databases/$(database)/documents/salons/$(salonId));
+    }
+    function memberPath(salonId, memberUid) {
+      return /databases/$(database)/documents/salons/$(salonId)/members/$(memberUid);
+    }
+    function isOwner(salonId) {
+      return signedIn() && salonDoc(salonId).data.ownerUid == uid();
+    }
+    function isActiveMember(salonId) {
+      return signedIn()
+        && exists(memberPath(salonId, uid()))
+        && get(memberPath(salonId, uid())).data.status == 'ACTIVE';
+    }
+    function changedOnly(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+    function nonEmptyString(v, maxLen) {
+      return v is string && v.size() > 0 && v.size() <= maxLen;
+    }
+    function optionalString(v, maxLen) {
+      return v == null || (v is string && v.size() <= maxLen);
+    }
+
+    // ---------- Kullanıcılar ----------
+    match /users/{userId} {
+      allow read: if isSelf(userId);
+      // Profil dokümanı registerCustomer / registerSalonOwner fonksiyonlarıyla oluşturulur.
+      allow create, delete: if false;
+      // Kullanıcı yalnızca adını/soyadını düzenleyebilir.
+      allow update: if isSelf(userId)
+        && changedOnly(['firstName', 'lastName', 'updatedAt'])
+        && nonEmptyString(request.resource.data.firstName, 50)
+        && nonEmptyString(request.resource.data.lastName, 50)
+        && request.resource.data.updatedAt == request.time;
+
+      match /devices/{installationId} {
+        allow read, delete: if isSelf(userId);
+        allow create, update: if isSelf(userId)
+          && request.resource.data.keys().hasOnly(['token', 'platform', 'updatedAt'])
+          && nonEmptyString(request.resource.data.token, 4096)
+          && request.resource.data.platform == 'android'
+          && request.resource.data.updatedAt == request.time;
+      }
+
+      match /notifications/{notificationId} {
+        allow read: if isSelf(userId);
+        allow update: if isSelf(userId)
+          && changedOnly(['read'])
+          && request.resource.data.read == true;
+        allow create, delete: if false;
+      }
+
+      match /memberships/{salonId} {
+        allow read: if isSelf(userId);
+        allow write: if false;
+      }
+    }
+
+    // ---------- Salonlar ----------
+    match /salons/{salonId} {
+      allow read: if signedIn();
+      allow create, delete: if false; // registerSalonOwner fonksiyonu
+      // Sahip yalnızca profil alanlarını düzenleyebilir. ownerUid, code, status, rating*,
+      // bookingSettings, weeklyClosedDays, timezone fonksiyonlarla yönetilir.
+      allow update: if isOwner(salonId)
+        && changedOnly(['name', 'nameLower', 'type', 'businessPhoneE164', 'city', 'district',
+                        'addressLine', 'description', 'location', 'logoUrl', 'logoPath',
+                        'photos', 'updatedAt'])
+        && nonEmptyString(request.resource.data.name, 80)
+        && nonEmptyString(request.resource.data.nameLower, 80) // istemci: SearchKey.of(name)
+        && request.resource.data.type in ['BEAUTY_SALON', 'MEN_HAIRDRESSER',
+                                          'WOMEN_HAIRDRESSER', 'UNISEX_HAIRDRESSER']
+        && request.resource.data.businessPhoneE164.matches('^\\+90[0-9]{10}$')
+        && nonEmptyString(request.resource.data.city, 40)
+        && nonEmptyString(request.resource.data.district, 60)
+        && nonEmptyString(request.resource.data.addressLine, 300)
+        && optionalString(request.resource.data.description, 1000)
+        && nonEmptyString(request.resource.data.logoUrl, 2048)
+        && request.resource.data.photos is list
+        && request.resource.data.photos.size() <= 5
+        && request.resource.data.updatedAt == request.time;
+
+      // Kamuya açık uzman kartı (telefon içermez)
+      match /members/{memberUid} {
+        allow read: if signedIn();
+        allow write: if false;
+
+        match /schedule/{docId} {
+          allow read: if signedIn();
+          allow write: if false; // updateWeeklySchedule
+        }
+        match /closures/{closureId} {
+          allow read: if isSelf(memberUid) || isOwner(salonId);
+          allow write: if false;
+        }
+      }
+
+      match /closures/{closureId} {
+        allow read: if signedIn();
+        allow write: if false;
+      }
+
+      match /invitations/{inviteId} {
+        allow read: if isOwner(salonId)
+          || (signedIn()
+              && request.auth.token.phone_number != null
+              && resource.data.phoneE164 == request.auth.token.phone_number);
+        allow write: if false;
+      }
+
+      // Hizmetler: her uzman yalnızca kendi hizmetlerini yönetir.
+      match /services/{serviceId} {
+        allow read: if signedIn();
+
+        function validService(d) {
+          return d.keys().hasOnly(['staffUid', 'salonId', 'name', 'nameLower', 'description',
+                                   'priceKurus', 'durationMinutes', 'active', 'deleted',
+                                   'createdAt', 'updatedAt'])
+            && d.salonId == salonId
+            && nonEmptyString(d.name, 60)
+            && nonEmptyString(d.nameLower, 60)
+            && optionalString(d.description, 500)
+            && d.priceKurus is int && d.priceKurus >= 100 && d.priceKurus <= 100000000
+            && d.durationMinutes is int && d.durationMinutes >= 5 && d.durationMinutes <= 600
+            && d.durationMinutes % 5 == 0
+            && d.active is bool
+            && d.deleted is bool
+            && d.updatedAt == request.time;
+        }
+
+        allow create: if isActiveMember(salonId)
+          && request.resource.data.staffUid == uid()
+          && request.resource.data.deleted == false
+          && request.resource.data.createdAt == request.time
+          && validService(request.resource.data);
+
+        // Silme = deleted:true (geçmiş randevu snapshot'ları etkilenmez). Silinmiş hizmet geri açılamaz.
+        allow update: if isActiveMember(salonId)
+          && resource.data.staffUid == uid()
+          && resource.data.deleted == false
+          && request.resource.data.staffUid == resource.data.staffUid
+          && request.resource.data.createdAt == resource.data.createdAt
+          && validService(request.resource.data)
+          && (request.resource.data.deleted == false || request.resource.data.active == false);
+
+        allow delete: if false;
+      }
+    }
+
+    // Deep link / QR çözümleme: tek doküman okunabilir, listelenemez.
+    match /salonCodes/{code} {
+      allow get: if signedIn();
+      allow list, write: if false;
+    }
+
+    // ---------- Randevular ----------
+    match /appointments/{appointmentId} {
+      allow read: if signedIn() && (
+        resource.data.customerUid == uid()
+        || resource.data.staffUid == uid()
+        || isOwner(resource.data.salonId)
+      );
+      allow write: if false;
+
+      match /events/{eventId} {
+        allow read: if signedIn() && (
+          get(/databases/$(database)/documents/appointments/$(appointmentId)).data.staffUid == uid()
+          || isOwner(get(/databases/$(database)/documents/appointments/$(appointmentId)).data.salonId)
+        );
+        allow write: if false;
+      }
+    }
+
+    // ---------- Değerlendirmeler ----------
+    match /reviews/{appointmentId} {
+      allow read: if signedIn();
+      allow write: if false;
+    }
+
+    // ---------- Finans ----------
+    match /financialLedger/{entryId} {
+      allow read: if signedIn() && (
+        isOwner(resource.data.salonId) || resource.data.staffUid == uid()
+      );
+      allow write: if false;
+    }
+    match /reportAggregates/{aggregateId} {
+      allow read: if signedIn() && (
+        isOwner(resource.data.salonId) || resource.data.staffUid == uid()
+      );
+      allow write: if false;
+    }
+
+    // ---------- Yalnızca sunucu ----------
+    match /reviewsPrivate/{id} { allow read, write: if false; }
+    match /staffDayLocks/{id} { allow read, write: if false; }
+    match /customerLocks/{id} { allow read, write: if false; }
+    match /idempotencyKeys/{id} { allow read, write: if false; }
+    match /rateLimits/{id} { allow read, write: if false; }
+    match /auditLogs/{id} { allow read, write: if false; }
+
+    // Davetli kişinin kendi davetlerini bulması için collection-group sorgusu.
+    match /{path=**}/invitations/{inviteId} {
+      allow read: if signedIn()
+        && request.auth.token.phone_number != null
+        && resource.data.phoneE164 == request.auth.token.phone_number;
+    }
+  }
+}

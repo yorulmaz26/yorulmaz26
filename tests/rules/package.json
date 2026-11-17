@@ -1,0 +1,23 @@
+{
+  "name": "kuaforum-cepte-rules-tests",
+  "private": true,
+  "description": "Firestore & Storage güvenlik kuralı testleri (Firebase Emulator Suite)",
+  "scripts": {
+    "test": "cd ../.. && tests/rules/node_modules/.bin/firebase emulators:exec --only firestore --project demo-kuaforum \"npm --prefix tests/rules run jest\"",
+    "jest": "jest --runInBand"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "@types/jest": "^29.5.14",
+    "firebase": "^11.10.0",
+    "firebase-tools": "^14.20.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.4",
+    "typescript": "^5.9.3"
+  },
+  "jest": {
+    "preset": "ts-jest",
+    "testEnvironment": "node",
+    "testTimeout": 20000
+  }
+}

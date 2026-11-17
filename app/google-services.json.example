@@ -1,0 +1,10 @@
+{
+  "_README": "Bu dosyayı Firebase Console > Proje Ayarları > Android uygulaması (com.kuaforumcepte ve com.kuaforumcepte.debug) üzerinden indirdiğiniz google-services.json ile değiştirin. Gerçek dosyayı repoya eklemeyin.",
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "FIREBASE_PROJE_KIMLIGINIZ",
+    "storage_bucket": "FIREBASE_PROJE_KIMLIGINIZ.firebasestorage.app"
+  },
+  "client": [],
+  "configuration_version": "1"
+}

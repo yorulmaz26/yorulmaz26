@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kuaförüm Cepte</string>
+    <string name="slogan">Güzelliğe Bir Dokunuş, Randevuya Tek Tık.</string>
+
+    <!-- Rol seçimi -->
+    <string name="role_title">Hoş geldiniz</string>
+    <string name="role_subtitle">Devam etmek için giriş türünü seçin.</string>
+    <string name="role_customer">Müşteri Girişi</string>
+    <string name="role_customer_desc">Salon bulun, uzmanınızı seçin ve randevunuzu saniyeler içinde alın.</string>
+    <string name="role_business">Kuaför / Uzman Girişi</string>
+    <string name="role_business_desc">Salonunuzu, randevularınızı, hizmetlerinizi ve raporlarınızı yönetin.</string>
+    <string name="role_note">Aynı telefon numarasıyla hem müşteri hem uzman olarak giriş yapabilirsiniz. Yetkileriniz hesabınıza bağlı salon üyeliklerinden belirlenir.</string>
+
+    <!-- Firebase kurulumu -->
+    <string name="setup_title">Firebase yapılandırması bulunamadı</string>
+    <string name="setup_body">Bu derleme bir Firebase projesine bağlı değil. Geliştirici: Firebase Console\'dan indirilen google-services.json dosyasını app/ klasörüne ekleyip uygulamayı yeniden derleyin. Ayrıntılar README.md dosyasındadır.</string>
+    <string name="setup_close">Uygulamayı Kapat</string>
+
+    <!-- Kimlik doğrulama (Aşama 2) -->
+    <string name="auth_title_customer">Müşteri Girişi</string>
+    <string name="auth_title_business">Kuaför / Uzman Girişi</string>
+
+    <!-- Ortak durumlar -->
+    <string name="action_retry">Tekrar Dene</string>
+    <string name="action_back">Geri</string>
+    <string name="state_loading">Yükleniyor</string>
+    <string name="error_generic">Bir şeyler ters gitti. Lütfen tekrar deneyin.</string>
+    <string name="error_network">İnternet bağlantısı yok veya zayıf. Bağlantınızı kontrol edip tekrar deneyin.</string>
+</resources>

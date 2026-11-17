@@ -1,0 +1,10 @@
+# Android Studio sdk.dir satırını otomatik ekler.
+# sdk.dir=/Users/<kullanici>/Library/Android/sdk
+
+# Debug build'i Firebase Emulator Suite'e bağlar (release'te etkisizdir).
+useFirebaseEmulator=false
+# Android emülatöründen bilgisayara: 10.0.2.2 ; gerçek cihazda bilgisayarın LAN IP'si.
+firebaseEmulatorHost=10.0.2.2
+
+# Salon paylaşım linki / App Link alan adı (Firebase Hosting).
+appLinkHost=kuaforumcepte.web.app

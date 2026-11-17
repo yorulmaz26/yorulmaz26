@@ -1,0 +1,29 @@
+# Gradle / Android
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.kotlin/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Gizli dosyalar — repoya eklemeyin
+app/google-services.json
+keystore.properties
+keystore/
+*.jks
+*.keystore
+.firebaserc
+.env
+.env.*
+!.env.example
+
+# Node / Firebase
+node_modules/
+functions/lib/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+.firebase/

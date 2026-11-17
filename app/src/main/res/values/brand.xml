@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      LOGO ALANI: Gerçek marka logosu hazır olduğunda res/drawable/brand_logo.xml (veya .png/.webp)
+      dosyasını logo ile değiştirin ve aşağıdaki değeri true yapın. false iken uygulama
+      logo varmış gibi davranmaz; yalnızca tipografik "Kuaförüm Cepte" yazısını gösterir.
+    -->
+    <bool name="has_brand_logo">false</bool>
+</resources>
