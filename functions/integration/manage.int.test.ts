@@ -94,7 +94,7 @@ test("zamanlanmış işler: süre aşımı, hatırlatma ve 'Müşteri geldi mi?'
   expect(await expirePending(new Date())).toBe(0);
   expect((await db.doc(`appointments/${a.appointmentId}`).get()).get("status")).toBe("EXPIRED");
   expect(await lockOf("staff")).toEqual([]);
-  expect((await db.doc("customerLocks/c1").get()).get("activeAppointmentId")).toBeNull();
+  expect((await db.doc("customerLocks/c1").get()).get("active")).toEqual([]);
   expect((await db.collection("users/c1/notifications").where("type", "==", "APPOINTMENT_EXPIRED").get()).size).toBe(1);
 
   const b = await bookKesim(720);

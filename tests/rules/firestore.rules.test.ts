@@ -214,4 +214,36 @@ describe("finans ve kullanıcı", () => {
     await assertFails(getDoc(doc(db(CUSTOMER), "customerLocks", CUSTOMER)));
     await assertFails(setDoc(doc(db(STAFF), "staffDayLocks", "x"), { intervals: [] }));
   });
+  test("favoriler: yalnızca kendisi ekler/siler/okur; alan doğrulaması", async () => {
+    const fav = { salonId: SALON, salonName: "Işıltı", city: "İstanbul", district: "Kadıköy", createdAt: serverTimestamp() };
+    await assertSucceeds(setDoc(doc(db(CUSTOMER), "users", CUSTOMER, "favorites", SALON), fav));
+    await assertFails(setDoc(doc(db(STRANGER), "users", CUSTOMER, "favorites", "x"), { ...fav, salonId: "x" }));
+    await assertFails(setDoc(doc(db(CUSTOMER), "users", CUSTOMER, "favorites", "y"), { ...fav, salonId: "baska" }));
+    await assertFails(setDoc(doc(db(CUSTOMER), "users", CUSTOMER, "favorites", "z"), { ...fav, salonId: "z", extra: 1 }));
+    await assertSucceeds(getDocs(collection(db(CUSTOMER), "users", CUSTOMER, "favorites")));
+    await assertFails(getDocs(collection(db(STRANGER), "users", CUSTOMER, "favorites")));
+  });
+  test("prim oranı, müşteri istatistiği ve indirim kodları rol bazlı okunur; istemci yazamaz", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      const f = ctx.firestore();
+      await setDoc(doc(f, "salons", SALON, "staffPrivate", STAFF), { commissionPercent: 40 });
+      await setDoc(doc(f, "salons", SALON, "customers", CUSTOMER), { completedCount: 2, noShowCount: 1 });
+      await setDoc(doc(f, "salons", SALON, "discountCodes", "YAZ20"), { percent: 20, active: true });
+      await setDoc(doc(f, "waitlist", "w1"), { customerUid: CUSTOMER, staffUid: STAFF });
+    });
+    await assertSucceeds(getDoc(doc(db(STAFF), "salons", SALON, "staffPrivate", STAFF)));
+    await assertSucceeds(getDoc(doc(db(OWNER), "salons", SALON, "staffPrivate", STAFF)));
+    await assertFails(getDoc(doc(db(CUSTOMER), "salons", SALON, "staffPrivate", STAFF)));
+    await assertSucceeds(getDoc(doc(db(CUSTOMER), "salons", SALON, "customers", CUSTOMER)));
+    await assertSucceeds(getDoc(doc(db(STAFF), "salons", SALON, "customers", CUSTOMER)));
+    await assertFails(getDoc(doc(db(OTHER_STAFF), "salons", SALON, "customers", CUSTOMER))); // pasif uzman
+    await assertFails(getDoc(doc(db(STRANGER), "salons", SALON, "customers", CUSTOMER)));
+    await assertFails(getDoc(doc(db(CUSTOMER), "salons", SALON, "discountCodes", "YAZ20")));
+    await assertSucceeds(getDoc(doc(db(OWNER), "salons", SALON, "discountCodes", "YAZ20")));
+    await assertFails(setDoc(doc(db(OWNER), "salons", SALON, "discountCodes", "YENI"), { percent: 90 }));
+    await assertSucceeds(getDoc(doc(db(CUSTOMER), "waitlist", "w1")));
+    await assertFails(getDoc(doc(db(STRANGER), "waitlist", "w1")));
+    await assertFails(getDoc(doc(db(CUSTOMER), "calendarTokens", "t")));
+    await assertFails(getDoc(doc(db(CUSTOMER), "discountCodeUses", "u")));
+  });
 });

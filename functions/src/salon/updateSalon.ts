@@ -4,7 +4,7 @@ import { fail } from "../lib/errors";
 import { optString, reqString, docId } from "../lib/validation";
 import { auditInTx } from "../lib/audit";
 import { assertPendingImage, deleteQuietly, promoteImage, StoredImage } from "../lib/storageFiles";
-import { isValidCityDistrict, normalizeTrPhone, searchKey } from "../domain";
+import { isValidCityDistrict, normalizeTrPhone, searchKey, encodeGeohash } from "../domain";
 import { MAX_SALON_PHOTOS, SALON_TYPES, SalonType } from "./defaults";
 
 async function requireOwnedSalon(salonId: string, caller: Caller) {
@@ -73,6 +73,8 @@ export const updateSalonProfile = authedCallable<UpdateProfileReq, { ok: true }>
       addressLine,
       description,
       location,
+      // "Yakınımdaki salonlar" araması için (hücre önekleriyle aralık sorgusu).
+      geohash: location ? encodeGeohash(location.lat, location.lng, 9) : null,
       updatedAt: FieldValue.serverTimestamp(),
     });
     if (nameChanged) {

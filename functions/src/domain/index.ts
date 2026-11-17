@@ -7,3 +7,6 @@ export * from "./money";
 export * from "./permissions";
 export * from "./text";
 export * from "./locations";
+export * from "./promo";
+export * from "./geo";
+export * from "./ics";

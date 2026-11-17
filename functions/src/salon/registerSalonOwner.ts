@@ -127,6 +127,10 @@ export const registerSalonOwner = authedCallable<RegisterSalonOwnerReq, Register
             ownerDisplayName,
             code,
             status: "ACTIVE",
+            // Yeni salon platform onayına kadar aramada/listede görünmez; kod/QR ile ulaşılabilir.
+            verified: false,
+            verification: { status: "PENDING", note: null, reviewedAt: null },
+            geohash: null,
             ratingSum: 0,
             ratingCount: 0,
             ratingAvg: null,

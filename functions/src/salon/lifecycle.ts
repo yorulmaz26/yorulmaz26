@@ -4,8 +4,7 @@ import { fail } from "../lib/errors";
 import { docId, reqString } from "../lib/validation";
 import { auditInTx } from "../lib/audit";
 import { notifyInTx } from "../lib/notify";
-import { addEvent, appts, customerLockRef, releaseLocks } from "../booking/appointments";
-import { lockRef } from "../booking/context";
+import { addEvent, appts, readLocks, releaseLocks } from "../booking/appointments";
 
 async function requireOwner(salonId: string, uid: string) {
   const salon = await db.collection("salons").doc(salonId).get();
@@ -38,10 +37,10 @@ export const closeSalon = authedCallable<{ salonId?: unknown; confirm?: unknown;
       const done = await db.runTransaction(async (tx) => {
         const a = await tx.get(doc.ref);
         if (!["PENDING", "CONFIRMED"].includes(a.get("status"))) return false;
-        const [lock, cl] = await Promise.all([tx.get(lockRef(salonId, a.get("staffUid"), a.get("localDate"))), tx.get(customerLockRef(a.get("customerUid")))]);
+        const locks = await readLocks(tx, a);
         const from = a.get("status");
         tx.update(a.ref, { status: "CANCELLED_BY_STAFF", cancelReason: `Salon kapandı: ${reason}`, cancelledBy: caller.uid, cancelledAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-        releaseLocks(tx, a, lock, cl);
+        releaseLocks(tx, a, locks);
         addEvent(tx, a.id, from, "CANCELLED_BY_STAFF", caller.uid, "OWNER", `Salon kapandı: ${reason}`);
         notifyInTx(tx, a.get("customerUid"), { type: "APPOINTMENT_CANCELLED", title: "Randevunuz iptal edildi", body: `${salon.get("name")} hizmet vermeyi bıraktığı için randevunuz iptal edildi.`, salonId, appointmentId: a.id });
         return true;

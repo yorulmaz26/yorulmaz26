@@ -36,7 +36,7 @@ export {
 
 // Aşama 5 — müsaitlik ve rezervasyon
 export { getAvailability } from "./booking/availabilityFn";
-export { createAppointment, transitionAppointment } from "./booking/appointments";
+export { createAppointment, createWalkInAppointment, transitionAppointment, getAppointmentContacts } from "./booking/appointments";
 
 // Aşama 6 — randevu yönetimi, bildirimler, zamanlanmış işler
 export { reassignAppointment, rescheduleAppointment, hideAppointments } from "./booking/manage";
@@ -55,3 +55,10 @@ export { deleteAccount } from "./account/deleteAccount";
 export { dailyCleanup } from "./scheduled/cleanup";
 export { closeSalon, transferSalonOwnership } from "./salon/lifecycle";
 export { updateMyName, syncPhoneNumber } from "./account/profile";
+
+// Sonradan eklenenler — işletme ve müşteri deneyimi
+export { reviewSalon, requestSalonReview, reopenSalon, searchNearbySalons } from "./salon/platform";
+export { replyToReview } from "./reviews/reply";
+export { upsertDiscountCode, updateLoyaltyProgram, previewBookingPrice } from "./promo/promotions";
+export { joinWaitlist, leaveWaitlist, onAppointmentFreed } from "./waitlist/waitlist";
+export { getCalendarFeed, calendarFeed } from "./calendar/calendarFeed";

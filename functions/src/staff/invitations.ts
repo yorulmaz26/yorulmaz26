@@ -228,6 +228,7 @@ interface UpdateMemberReq extends MemberRef {
   firstName?: unknown;
   lastName?: unknown;
   specialty?: unknown;
+  commissionPercent?: unknown;
 }
 
 /** Sahip herhangi bir üyenin, üye yalnızca kendi kartını (ad, uzmanlık) düzenler. */
@@ -240,11 +241,23 @@ export const updateStaffMember = authedCallable<UpdateMemberReq, { ok: true }>("
   const salon = await salonRef(salonId).get();
   if (!salon.exists) fail("not-found", "SALON_NOT_FOUND");
   if (salon.get("ownerUid") !== caller.uid && memberUid !== caller.uid) fail("permission-denied", "PERMISSION_DENIED");
+  // Prim oranı yalnızca salon sahibince belirlenir (0–100, tam sayı). Gönderilmezse değişmez.
+  let commission: number | undefined;
+  if (data.commissionPercent !== undefined && data.commissionPercent !== null) {
+    if (salon.get("ownerUid") !== caller.uid) fail("permission-denied", "PERMISSION_DENIED");
+    const c = Number(data.commissionPercent);
+    if (!Number.isInteger(c) || c < 0 || c > 100) fail("invalid-argument", "INVALID_ARGUMENT", { field: "commissionPercent" });
+    commission = c;
+  }
   const ref = salonRef(salonId).collection("members").doc(memberUid);
   await db.runTransaction(async (tx) => {
     const m = await tx.get(ref);
     if (!m.exists) fail("not-found", "MEMBER_NOT_FOUND");
     tx.update(ref, { firstName, lastName, specialty, updatedAt: FieldValue.serverTimestamp() });
+    // Prim oranı herkese açık uzman kartında değil, yalnızca sahip ve uzmanın okuyabildiği belgede tutulur.
+    if (commission !== undefined) {
+      tx.set(salonRef(salonId).collection("staffPrivate").doc(memberUid), { commissionPercent: commission, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+    }
     if (m.get("role") === "OWNER") {
       tx.update(salonRef(salonId), { ownerDisplayName: `${firstName} ${lastName}`, updatedAt: FieldValue.serverTimestamp() });
     }

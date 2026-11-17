@@ -7,7 +7,7 @@ import { auditInTx } from "../lib/audit";
 import { BUSINESS_ZONE, computeSlots, conflictReason, formatHm, localDateOf, overlaps } from "../domain";
 import { DateTime } from "luxon";
 import { busyOf, liveIntervals, LockInterval, loadBookingContext, lockRef } from "./context";
-import { addEvent, appts } from "./appointments";
+import { ActiveEntry, addEvent, appts, customerLockRef } from "./appointments";
 
 const ACTIVE_EDITABLE = new Set(["PENDING", "CONFIRMED"]);
 
@@ -38,8 +38,8 @@ export const reassignAppointment = authedCallable<{ appointmentId?: unknown; new
         tx.get(memberRef.collection("schedule").doc("weekly")),
         tx.get(memberRef.collection("closures").where("endDate", ">=", localDate)),
         tx.get(db.collection("salons").doc(salonId).collection("closures").where("endDate", ">=", localDate)),
-        tx.get(lockRef(salonId, oldStaff, localDate)),
-        tx.get(lockRef(salonId, newStaffUid, localDate)),
+        tx.get(lockRef(oldStaff, localDate)),
+        tx.get(lockRef(newStaffUid, localDate)),
       ]);
       if (salon.get("ownerUid") !== caller.uid) fail("permission-denied", "PERMISSION_DENIED");
       if (!ACTIVE_EDITABLE.has(appt.get("status"))) fail("failed-precondition", "STATE_CHANGED", { status: appt.get("status") });
@@ -63,7 +63,7 @@ export const reassignAppointment = authedCallable<{ appointmentId?: unknown; new
       tx.set(oldLock.ref, { intervals: ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).filter((i) => i.appointmentId !== appointmentId), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
       tx.set(newLock.ref, {
         staffUid: newStaffUid, localDate,
-        intervals: [...newLive, { appointmentId, salonId, startMin: start, endMin: end, expiresAtMs: mine?.expiresAtMs ?? null }],
+        intervals: [...newLive, { appointmentId, salonId, startMin: start, endMin: end, expiresAtMs: mine?.expiresAtMs ?? null, role: "STAFF" }],
         updatedAt: FieldValue.serverTimestamp(),
       });
       const newName = `${member.get("firstName")} ${member.get("lastName")}`;
@@ -105,7 +105,15 @@ export const rescheduleAppointment = authedCallable<{ appointmentId?: unknown; n
       // Hizmetler snapshot'tan gelir; yalnızca salon/uzman/program/kapatmalar yeniden okunur.
       const ctx = await loadBookingContext(tx, salonId, staffUid, null, localDateOf(now));
       const salon = ctx.salon;
-      const [oldLock, newLock] = await Promise.all([tx.get(lockRef(salonId, staffUid, oldDate)), tx.get(lockRef(salonId, staffUid, newDate))]);
+      const customerUid = appt.get("customerUid") as string | null;
+      const personLock = appt.get("personLock") === true && customerUid;
+      const [oldLock, newLock, pOld, pNew, custLock] = await Promise.all([
+        tx.get(lockRef(staffUid, oldDate)),
+        tx.get(lockRef(staffUid, newDate)),
+        personLock ? tx.get(lockRef(customerUid, oldDate)) : Promise.resolve(null),
+        personLock ? tx.get(lockRef(customerUid, newDate)) : Promise.resolve(null),
+        customerUid ? tx.get(customerLockRef(customerUid)) : Promise.resolve(null),
+      ]);
       if (!ACTIVE_EDITABLE.has(appt.get("status"))) fail("failed-precondition", "STATE_CHANGED", { status: appt.get("status") });
 
       const minutes = appt.get("totalMinutes") as number;
@@ -117,14 +125,22 @@ export const rescheduleAppointment = authedCallable<{ appointmentId?: unknown; n
         staffSchedule: ctx.schedule, staffClosures: ctx.staffClosures, busy: busyOf(others),
       });
       if (!slots.some((s) => s.startAt.getTime() === start.toMillis())) fail("failed-precondition", "SLOT_UNAVAILABLE");
+      // Müşteri kendisi için almışsa yeni saatte başka randevusu olmamalı.
+      const pOthers = pNew ? liveIntervals(pNew, nowMs).filter((i) => i.appointmentId !== appointmentId) : [];
+      if (pOthers.some((i) => overlaps({ start: i.startMin, end: i.endMin }, { start: newStart, end: newStart + minutes }))) fail("failed-precondition", "CUSTOMER_BUSY");
 
       const mine = ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).find((i) => i.appointmentId === appointmentId);
-      const moved: LockInterval = { appointmentId, salonId, startMin: newStart, endMin: newStart + minutes, expiresAtMs: mine?.expiresAtMs ?? null };
-      if (oldDate === newDate) {
-        tx.set(newLock.ref, { staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
-      } else {
-        tx.set(oldLock.ref, { intervals: ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).filter((i) => i.appointmentId !== appointmentId), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-        tx.set(newLock.ref, { staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
+      const moved: LockInterval = { appointmentId, salonId, startMin: newStart, endMin: newStart + minutes, expiresAtMs: mine?.expiresAtMs ?? null, role: "STAFF" };
+      const without = (l: FirebaseFirestore.DocumentSnapshot) => ((l.get("intervals") as LockInterval[] | undefined) ?? []).filter((i) => i.appointmentId !== appointmentId);
+      if (oldDate !== newDate) tx.set(oldLock.ref, { intervals: without(oldLock), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      tx.set(newLock.ref, { staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
+      if (pOld && pNew) {
+        if (oldDate !== newDate) tx.set(pOld.ref, { intervals: without(pOld), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+        tx.set(pNew.ref, { staffUid: customerUid, localDate: newDate, intervals: [...pOthers, { ...moved, role: "CUSTOMER" }], updatedAt: FieldValue.serverTimestamp() });
+      }
+      if (custLock?.exists) {
+        const active = ((custLock.get("active") as ActiveEntry[] | undefined) ?? []).map((e) => (e.appointmentId === appointmentId ? { ...e, startAtMs: start.toMillis() } : e));
+        tx.update(custLock.ref, { active });
       }
       const startAt = start.toJSDate();
       const pendingExp = (appt.get("pendingExpiresAt") as Timestamp).toMillis();

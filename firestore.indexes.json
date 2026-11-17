@@ -9,6 +9,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "nameLower",
           "order": "ASCENDING"
         }
@@ -20,6 +24,10 @@
       "fields": [
         {
           "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
           "order": "ASCENDING"
         },
         {
@@ -41,6 +49,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "type",
           "order": "ASCENDING"
         },
@@ -56,6 +68,10 @@
       "fields": [
         {
           "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
           "order": "ASCENDING"
         },
         {
@@ -78,6 +94,10 @@
       "fields": [
         {
           "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
           "order": "ASCENDING"
         },
         {
@@ -103,6 +123,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "city",
           "order": "ASCENDING"
         },
@@ -129,6 +153,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "city",
           "order": "ASCENDING"
         },
@@ -144,6 +172,10 @@
       "fields": [
         {
           "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
           "order": "ASCENDING"
         },
         {
@@ -519,6 +551,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "type",
           "order": "ASCENDING"
         },
@@ -538,6 +574,10 @@
       "fields": [
         {
           "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
           "order": "ASCENDING"
         },
         {
@@ -567,6 +607,10 @@
           "order": "ASCENDING"
         },
         {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
           "fieldPath": "type",
           "order": "ASCENDING"
         },
@@ -590,6 +634,10 @@
       "fields": [
         {
           "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
           "order": "ASCENDING"
         },
         {
@@ -725,6 +773,98 @@
         {
           "fieldPath": "createdAt",
           "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "salons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "geohash",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "salons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "ownerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "salons",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "verified",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "createdAt",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "appointments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "staffUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "startAt",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "appointments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "createdBy",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "idempotencyKey",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "waitlist",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "customerUid",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "localDate",
+          "order": "ASCENDING"
         }
       ]
     }

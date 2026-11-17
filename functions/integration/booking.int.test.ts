@@ -79,20 +79,42 @@ test("kısmi çakışma da reddedilir; farklı uzman aynı saatte alınabilir", 
   await expectReason(book(req({ serviceIds: ["kesim"], expectedTotalKurus: 40000, startAt: at(630) }), "c2", "+905320000002"), "SLOT_TAKEN");
   const ok = await book(req({ staffUid: "owner", serviceIds: ["boya"], expectedTotalKurus: 90000 }), "c2", "+905320000002");
   expect(ok.status).toBe("PENDING");
-  const after = await avail({ salonId, staffUid: "staff", serviceIds: ["kesim"], fromDate: TUESDAY, days: 1 }, "c2", "+905320000002");
+  // c2'nin kendi 10:00–11:00 randevusu da var; uzmanın doluluğunu görmek için "başkası adına" modu.
+  const after = await avail({ salonId, staffUid: "staff", serviceIds: ["kesim"], fromDate: TUESDAY, days: 1, forSelf: false }, "c2", "+905320000002");
   const labels = after.days[0].slots.map((s: { label: string }) => s.label);
   expect(labels).not.toContain("10:00");
   expect(labels).not.toContain("10:15"); // 10:15–10:45 dolu aralıkla kesişir
   expect(labels).toContain("10:45");
 });
 
-test("müşteri başına tek aktif randevu (eşzamanlı iki farklı slot dahil)", async () => {
+test("müşteri en fazla 3 aktif randevu tutar; kendisi için aynı saate iki randevu alamaz", async () => {
   const results = await Promise.allSettled([
     book(req({ startAt: at(600) }), "c1", "+905320000001"),
     book(req({ startAt: at(720) }), "c1", "+905320000001"),
   ]);
-  expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
-  await expectReason(book(req({ startAt: at(840) }), "c1", "+905320000001"), "ACTIVE_APPOINTMENT_EXISTS");
+  expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(2);
+  // Aynı saatte başka uzmana (kendisi için) → CUSTOMER_BUSY; başkası adına alınabilir.
+  await expectReason(book(req({ staffUid: "owner", serviceIds: ["boya"], expectedTotalKurus: 90000, startAt: at(600) }), "c1", "+905320000001"), "CUSTOMER_BUSY");
+  const guest = await book(req({ staffUid: "owner", serviceIds: ["boya"], expectedTotalKurus: 90000, startAt: at(600), guestName: "Elif Kaya" }), "c1", "+905320000001");
+  const g = await db.doc(`appointments/${guest.appointmentId}`).get();
+  expect(g.get("customerName")).toBe("Elif Kaya");
+  expect(g.get("bookedByName")).toBe("Müşteri Birinci");
+  expect(g.get("personLock")).toBe(false);
+  await expectReason(book(req({ startAt: at(840) }), "c1", "+905320000001"), "ACTIVE_APPOINTMENT_LIMIT");
+  // Müsaitlikte müşterinin kendi meşgul olduğu saatler görünmez (başkası adına modunda görünür).
+  const mine = await avail({ salonId, staffUid: "owner", serviceIds: ["boya"], fromDate: TUESDAY, days: 1 }, "c1", "+905320000001");
+  expect(mine.days[0].slots.map((x: { label: string }) => x.label)).not.toContain("12:00");
+  const forGuest = await avail({ salonId, staffUid: "owner", serviceIds: ["boya"], fromDate: TUESDAY, days: 1, forSelf: false }, "c1", "+905320000001");
+  expect(forGuest.days[0].slots.map((x: { label: string }) => x.label)).toContain("12:00");
+});
+
+test("uzman, kendi randevusu olduğu saatte başka salonda müşteri olarak hizmet veremez (ve tersi)", async () => {
+  // c1 (staff uid'li kişi değil) → staff kişisi müşteri olarak sahibe 10:00'da randevu alır.
+  await book(req({ staffUid: "owner", serviceIds: ["boya"], expectedTotalKurus: 90000, startAt: at(600) }), "staff", STAFF_PHONE);
+  // Artık staff'a 10:00–10:45 verilemez: kişi o saatte müşteri.
+  await expectReason(book(req(), "c1", "+905320000001"), "SLOT_TAKEN");
+  const a = await avail({ salonId, staffUid: "staff", serviceIds: ["kesim"], fromDate: TUESDAY, days: 1 }, "c1", "+905320000001");
+  expect(a.days[0].slots.map((x: { label: string }) => x.label)).not.toContain("10:00");
 });
 
 test("fiyat değişmişse yeniden onay istenir; pasif hizmet ve kendi kendine randevu reddedilir", async () => {
@@ -130,8 +152,9 @@ test("süresi dolan PENDING slotu serbest bırakır ve müşteri yeniden randevu
   // Başka müşteri aynı slotu alabilir; ilk müşteri de yeni randevu alabilir.
   await book(req(), "c2", "+905320000002");
   await book(req({ startAt: at(720) }), "c1", "+905320000001");
+  // Geç onay uygulanmaz: talep o anda EXPIRED yapılır (zamanlanmış iş de aynısını yapar).
+  expect(await transition({ appointmentId: a.appointmentId, action: "CONFIRM" }, "staff", STAFF_PHONE)).toEqual({ status: "EXPIRED", applied: false });
   expect((await db.doc(`appointments/${a.appointmentId}`).get()).get("status")).toBe("EXPIRED");
-  // Geç onay reddedilir (durum EXPIRED).
   await expectReason(transition({ appointmentId: a.appointmentId, action: "CONFIRM" }, "staff", STAFF_PHONE), "STATE_CHANGED");
 });
 
@@ -147,6 +170,8 @@ test("onay, iptal sonrası slot açılır; yetkiler ve 2 saat kuralı", async ()
   expect((await transition({ appointmentId: a.appointmentId, action: "CANCEL_BY_CUSTOMER", reason: "Planım değişti" }, "c1", "+905320000001")).status).toBe("CANCELLED_BY_CUSTOMER");
   expect((await db.doc(`staffDayLocks/staff_${TUESDAY}`).get()).get("intervals")).toEqual([]);
   // Slot ve müşteri kilidi serbest: aynı müşteri aynı slotu tekrar alabilir.
+  expect((await db.doc("customerLocks/c1").get()).get("active")).toEqual([]);
+  expect((await db.doc(`staffDayLocks/c1_${TUESDAY}`).get()).get("intervals")).toEqual([]);
   await book(req(), "c1", "+905320000001");
 
   // 2 saatten az kala müşteri iptal edemez; salon gerekçeyle iptal edebilir.

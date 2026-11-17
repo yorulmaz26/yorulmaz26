@@ -13,8 +13,11 @@ export interface BookingSettings {
 }
 
 /**
- * Uzman × yerel gün kilidi — salondan bağımsız, KİŞİ bazlıdır: aynı uzman birden çok salonda çalışıyorsa
- * hiçbir salonda çakışan randevu alamaz. expiresAtMs doluysa PENDING'dir ve o andan sonra slotu tutmaz.
+ * Kişi × yerel gün kilidi (staffDayLocks/{uid}_{tarih}) — salondan ve rolden bağımsızdır:
+ *  - role STAFF: kişinin uzman olarak verdiği hizmet (birden çok salonda çalışsa da tek takvim),
+ *  - role CUSTOMER: kişinin kendisi için aldığı randevu.
+ * Böylece bir kişi aynı saatte hem hizmet verip hem hizmet alamaz, iki salona aynı saatte gidemez.
+ * expiresAtMs doluysa PENDING'dir ve o andan sonra aralığı tutmaz.
  */
 export interface LockInterval {
   appointmentId: string;
@@ -23,10 +26,12 @@ export interface LockInterval {
   startMin: number;
   endMin: number;
   expiresAtMs: number | null;
+  /** Eski kayıtlarda yoktur → STAFF kabul edilir. */
+  role?: "STAFF" | "CUSTOMER";
 }
 
-export const lockId = (_salonId: string, staffUid: string, localDate: string) => `${staffUid}_${localDate}`;
-export const lockRef = (salonId: string, staffUid: string, localDate: string) => db.collection("staffDayLocks").doc(lockId(salonId, staffUid, localDate));
+export const lockId = (personUid: string, localDate: string) => `${personUid}_${localDate}`;
+export const lockRef = (personUid: string, localDate: string) => db.collection("staffDayLocks").doc(lockId(personUid, localDate));
 
 export function liveIntervals(snap: DocumentSnapshot | undefined, nowMs: number): LockInterval[] {
   const list = (snap?.get("intervals") as LockInterval[] | undefined) ?? [];

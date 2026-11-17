@@ -13,7 +13,9 @@ export interface InboxItem {
   appointmentId?: string;
 }
 
-export function notifyInTx(tx: Transaction, uid: string, item: InboxItem): void {
+/** uid null/boş ise (ör. uygulaması olmayan elden randevu müşterisi) hiçbir şey yazılmaz. */
+export function notifyInTx(tx: Transaction, uid: string | null | undefined, item: InboxItem): void {
+  if (!uid) return;
   const ref = db.collection("users").doc(uid).collection("notifications").doc();
   tx.create(ref, { ...item, read: false, createdAt: FieldValue.serverTimestamp() });
 }

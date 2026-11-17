@@ -1,6 +1,7 @@
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { logger } from "firebase-functions/v2";
 import { bucket, db, Timestamp } from "../lib/admin";
+import { localDateOf } from "../domain";
 
 const PENDING_MAX_AGE_MS = 24 * 3600_000;
 
@@ -25,7 +26,16 @@ export async function cleanupExpiredKeys(now = Date.now()): Promise<number> {
   return removed;
 }
 
+/** Geçmiş günlere ait bekleme listesi kayıtları silinir. */
+export async function cleanupWaitlist(now = new Date()): Promise<number> {
+  const snap = await db.collection("waitlist").where("localDate", "<", localDateOf(now)).limit(500).get();
+  const batch = db.batch();
+  snap.docs.forEach((d) => batch.delete(d.ref));
+  if (!snap.empty) await batch.commit();
+  return snap.size;
+}
+
 export const dailyCleanup = onSchedule({ schedule: "every day 04:17", timeZone: "Europe/Istanbul", memory: "256MiB", retryCount: 1 }, async () => {
-  const [uploads, keys] = [await cleanupPendingUploads(), await cleanupExpiredKeys()];
-  logger.info("dailyCleanup", { uploads, keys });
+  const [uploads, keys, waitlist] = [await cleanupPendingUploads(), await cleanupExpiredKeys(), await cleanupWaitlist()];
+  logger.info("dailyCleanup", { uploads, keys, waitlist });
 });

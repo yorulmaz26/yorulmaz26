@@ -41,6 +41,9 @@ export const adjustAppointmentPrice = authedCallable<{ appointmentId?: unknown; 
         const completion = await tx.get(ledgerCol().doc(`completion_${appointmentId}`));
         if (!completion.exists) fail("failed-precondition", "LEDGER_MISSING");
         const seq = ((appt.get("adjustmentCount") as number | undefined) ?? 0) + 1;
+        // Prim, tamamlama anındaki oranla yeniden hesaplanır; fark ledger'a işlenir.
+        const pct = (completion.get("commissionPercent") as number | undefined) ?? 0;
+        const commissionDelta = Math.round((newFinal * pct) / 100) - Math.round((current * pct) / 100);
         writeLedger(tx, {
           id: `adjustment_${appointmentId}_${seq}`,
           type: "ADJUSTMENT",
@@ -49,6 +52,8 @@ export const adjustAppointmentPrice = authedCallable<{ appointmentId?: unknown; 
           appointmentId,
           amountKurus: newFinal - current,
           listedKurus: 0,
+          commissionPercent: pct,
+          commissionKurus: commissionDelta,
           countDelta: 0,
           occurredAt: new Date(),
           periodKeys: completion.get("periodKeys") as PeriodKeys,
@@ -81,6 +86,8 @@ export interface ReportLine {
   completedCount: number;
   amountKurus: number;
   listedKurus: number;
+  /** Uzman primi toplamı (tamamlama anındaki oranlarla). */
+  commissionKurus: number;
 }
 
 export interface StaffReportLine extends ReportLine {
@@ -88,9 +95,11 @@ export interface StaffReportLine extends ReportLine {
   name: string;
   role: string;
   status: string;
+  /** Uzmanın güncel prim oranı (%). */
+  commissionPercent: number;
 }
 
-const EMPTY: ReportLine = { completedCount: 0, amountKurus: 0, listedKurus: 0 };
+const EMPTY: ReportLine = { completedCount: 0, amountKurus: 0, listedKurus: 0, commissionKurus: 0 };
 
 /**
  * Dönem raporu. Sahip: salon toplamı + tüm uzmanların kırılımı. Uzman: yalnızca kendi satırı
@@ -117,9 +126,14 @@ export const getReports = authedCallable<ReportReq, {
   if (!isOwner && (members.length === 0 || members[0].get("status") !== "ACTIVE")) fail("permission-denied", "PERMISSION_DENIED");
 
   const refs = [...(isOwner ? [aggregateRef(salonId, "ALL", range.key)] : []), ...members.map((m) => aggregateRef(salonId, m.id, range.key))];
-  const snaps = await db.getAll(...refs);
+  const [snaps, privates] = await Promise.all([
+    db.getAll(...refs),
+    members.length ? db.getAll(...members.map((m) => salon.ref.collection("staffPrivate").doc(m.id))) : Promise.resolve([]),
+  ]);
   const line = (s: FirebaseFirestore.DocumentSnapshot): ReportLine =>
-    s.exists ? { completedCount: s.get("completedCount") ?? 0, amountKurus: s.get("amountKurus") ?? 0, listedKurus: s.get("listedKurus") ?? 0 } : { ...EMPTY };
+    s.exists
+      ? { completedCount: s.get("completedCount") ?? 0, amountKurus: s.get("amountKurus") ?? 0, listedKurus: s.get("listedKurus") ?? 0, commissionKurus: s.get("commissionKurus") ?? 0 }
+      : { ...EMPTY };
   const staffSnaps = isOwner ? snaps.slice(1) : snaps;
   return {
     period: { type, key: range.key, start: range.start.toISOString(), end: range.end.toISOString() },
@@ -130,6 +144,7 @@ export const getReports = authedCallable<ReportReq, {
         name: `${m.get("firstName")} ${m.get("lastName")}`,
         role: m.get("role"),
         status: m.get("status"),
+        commissionPercent: (privates[i]?.get("commissionPercent") as number | undefined) ?? 0,
         ...line(staffSnaps[i]),
       }))
       // Ayrılmış/pasif ve o dönem işlemi olmayanlar listeyi kalabalıklaştırmasın; aktifler her zaman görünür.
@@ -160,6 +175,7 @@ export const rebuildReportAggregates = authedCallable<{ salonId?: unknown }, { e
           cur.completedCount += count;
           cur.amountKurus += e.get("amountKurus") as number;
           cur.listedKurus += (e.get("listedKurus") as number | undefined) ?? 0;
+          cur.commissionKurus += (e.get("commissionKurus") as number | undefined) ?? 0;
           sums.set(id, cur);
         }
       }

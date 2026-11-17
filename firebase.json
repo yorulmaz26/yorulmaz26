@@ -35,6 +35,13 @@
           "functionId": "salonLanding",
           "region": "europe-west1"
         }
+      },
+      {
+        "source": "/cal/**",
+        "function": {
+          "functionId": "calendarFeed",
+          "region": "europe-west1"
+        }
       }
     ],
     "headers": [

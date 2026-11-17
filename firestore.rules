@@ -77,6 +77,19 @@ service cloud.firestore {
         allow read: if isSelf(userId);
         allow write: if false;
       }
+
+      // Favori salonlar: yalnızca kişinin kendisi okur/ekler/siler.
+      match /favorites/{salonId} {
+        allow read, delete: if isSelf(userId);
+        allow create: if isSelf(userId)
+          && request.resource.data.keys().hasOnly(['salonId', 'salonName', 'city', 'district', 'createdAt'])
+          && request.resource.data.salonId == salonId
+          && nonEmptyString(request.resource.data.salonName, 80)
+          && optionalString(request.resource.data.city, 60)
+          && optionalString(request.resource.data.district, 60)
+          && request.resource.data.createdAt == request.time;
+        allow update: if false;
+      }
     }
 
     // ---------- Salonlar ----------
@@ -104,6 +117,24 @@ service cloud.firestore {
 
       match /closures/{closureId} {
         allow read: if signedIn();
+        allow write: if false;
+      }
+
+      // Uzman prim oranı: yalnızca sahip ve uzmanın kendisi.
+      match /staffPrivate/{memberUid} {
+        allow read: if isSelf(memberUid) || isOwner(salonId);
+        allow write: if false;
+      }
+
+      // Salon × müşteri istatistiği (tamamlanan/gelmeyen, sadakat): müşterinin kendisi, sahip ve aktif uzmanlar.
+      match /customers/{customerUid} {
+        allow read: if isSelf(customerUid) || isOwner(salonId) || isActiveMember(salonId);
+        allow write: if false;
+      }
+
+      // İndirim kodları listelenemez (müşteri kodu bilerek girer); sahip ve aktif uzmanlar görür.
+      match /discountCodes/{code} {
+        allow read: if isOwner(salonId) || isActiveMember(salonId);
         allow write: if false;
       }
 
@@ -160,6 +191,12 @@ service cloud.firestore {
       allow list, write: if false;
     }
 
+    // ---------- Bekleme listesi ----------
+    match /waitlist/{id} {
+      allow read: if signedIn() && resource.data.customerUid == uid();
+      allow write: if false;
+    }
+
     // ---------- Randevular ----------
     match /appointments/{appointmentId} {
       allow read: if signedIn() && (
@@ -214,6 +251,8 @@ service cloud.firestore {
     match /rateLimits/{id} { allow read, write: if false; }
     match /auditLogs/{id} { allow read, write: if false; }
     match /salonOwners/{id} { allow read, write: if false; }
+    match /discountCodeUses/{id} { allow read, write: if false; }
+    match /calendarTokens/{id} { allow read, write: if false; }
 
     // Davetli kişinin kendi davetlerini bulması için collection-group sorgusu.
     match /{path=**}/invitations/{inviteId} {

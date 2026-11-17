@@ -17,6 +17,9 @@ export interface LedgerWrite {
   amountKurus: number;
   /** Tamamlama kaydında: randevudaki liste (rezervasyon) toplamı. */
   listedKurus: number;
+  /** Uzman primi: tamamlama anındaki oran (%) ve tutar. Düzeltmelerde fark tutarı. */
+  commissionPercent?: number;
+  commissionKurus?: number;
   countDelta: number;
   occurredAt: Date;
   /** Raporun yazılacağı dönemler (düzeltmelerde orijinal tamamlama dönemleri). */
@@ -38,6 +41,8 @@ export function writeLedger(tx: Transaction, e: LedgerWrite): void {
     appointmentId: e.appointmentId,
     amountKurus: e.amountKurus,
     listedKurus: e.listedKurus,
+    commissionPercent: e.commissionPercent ?? 0,
+    commissionKurus: e.commissionKurus ?? 0,
     currency: "TRY",
     occurredAt: Timestamp.fromDate(e.occurredAt),
     localDate: localDateOf(e.occurredAt),
@@ -59,6 +64,7 @@ export function writeLedger(tx: Transaction, e: LedgerWrite): void {
           completedCount: FieldValue.increment(e.countDelta),
           amountKurus: FieldValue.increment(e.amountKurus),
           listedKurus: FieldValue.increment(e.listedKurus),
+          commissionKurus: FieldValue.increment(e.commissionKurus ?? 0),
           updatedAt: FieldValue.serverTimestamp(),
         },
         { merge: true },

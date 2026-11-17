@@ -13,6 +13,8 @@ interface Req {
   serviceIds?: unknown;
   fromDate?: unknown;
   days?: unknown;
+  /** false: randevu başkası adına alınacak; müşterinin kendi meşguliyeti dikkate alınmaz. */
+  forSelf?: unknown;
 }
 
 export interface AvailabilityDay {
@@ -60,7 +62,10 @@ export const getAvailability = authedCallable<Req, { totalKurus: number; totalMi
 
     const ctx = await loadBookingContext(null, salonId, staffUid, serviceIds, today);
     const dates = Array.from({ length: days }, (_, i) => addDays(fromDate < today ? today : fromDate, i));
-    const locks = await db.getAll(...dates.map((d) => lockRef(salonId, staffUid, d)));
+    const locks = await db.getAll(...dates.map((d) => lockRef(staffUid, d)));
+    // Yeni randevuda müşterinin kendi meşgul olduğu saatler de gösterilmez (başka randevusu ya da
+    // uzman olarak verdiği hizmet). Başkası adına alınacaksa istemci forSelf=false gönderir.
+    const own = excludeId === null && data.forSelf !== false ? await db.getAll(...dates.map((d) => lockRef(caller.uid, d))) : null;
     const nowMs = now.getTime();
 
     const totalMinutes = fixedMinutes ?? ctx.totalMinutes;
@@ -82,7 +87,10 @@ export const getAvailability = authedCallable<Req, { totalKurus: number; totalMi
           salonClosures: ctx.salonClosures,
           staffSchedule: ctx.schedule,
           staffClosures: ctx.staffClosures,
-          busy: busyOf(liveIntervals(locks[i], nowMs).filter((x) => x.appointmentId !== excludeId)),
+          busy: busyOf([
+            ...liveIntervals(locks[i], nowMs).filter((x) => x.appointmentId !== excludeId),
+            ...(own ? liveIntervals(own[i], nowMs) : []),
+          ]),
         }).map((s) => ({ startAt: s.startAt.toISOString(), label: s.label })),
       })),
     };
