@@ -62,3 +62,4 @@ export { replyToReview } from "./reviews/reply";
 export { upsertDiscountCode, updateLoyaltyProgram, previewBookingPrice } from "./promo/promotions";
 export { joinWaitlist, leaveWaitlist, onAppointmentFreed } from "./waitlist/waitlist";
 export { getCalendarFeed, calendarFeed } from "./calendar/calendarFeed";
+export { adminRemoveSalon, setPlatformAdmin } from "./salon/admin";

@@ -65,6 +65,8 @@ export const reopenSalon = authedCallable<{ salonId?: unknown }, { status: "ACTI
     if (!salon.exists) fail("not-found", "SALON_NOT_FOUND");
     if (salon.get("ownerUid") !== caller.uid) fail("permission-denied", "PERMISSION_DENIED");
     if (salon.get("status") !== "CLOSED") fail("failed-precondition", "STATE_CHANGED", { status: salon.get("status") });
+    // Platform yöneticisinin kaldırdığı salon sahibi tarafından yeniden açılamaz.
+    if (salon.get("removedByAdmin") === true) fail("failed-precondition", "SALON_REMOVED");
     if (ownerLock.exists) fail("failed-precondition", "ALREADY_OWNER");
     tx.update(ref, { status: "ACTIVE", reopenedAt: FieldValue.serverTimestamp(), closedReason: FieldValue.delete(), updatedAt: FieldValue.serverTimestamp() });
     if (member.exists) tx.update(member.ref, { status: "ACTIVE", acceptsBookings: true, updatedAt: FieldValue.serverTimestamp() });

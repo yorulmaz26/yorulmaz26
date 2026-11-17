@@ -27,11 +27,12 @@ import com.kuaforumcepte.domain.model.EntryRole
 fun SessionGateScreen(
     role: EntryRole,
     onRoute: (SessionTarget) -> Unit,
+    skipAdmin: Boolean = false,
     onSignedOut: () -> Unit,
     viewModel: SessionGateViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(role) { viewModel.start(role) }
+    LaunchedEffect(role) { viewModel.start(role, skipAdmin) }
     LaunchedEffect(state) { (state as? GateState.Route)?.let { onRoute(it.target) } }
 
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

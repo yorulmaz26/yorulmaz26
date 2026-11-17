@@ -13,7 +13,8 @@ import kotlinx.serialization.Serializable
 // Kimlik
 @Serializable data class PhoneEntryRoute(val role: String)
 @Serializable data class OtpRoute(val role: String)
-@Serializable data class SessionGateRoute(val role: String)
+/** skipAdmin: moderatör "müşteri/kuaför olarak devam" dediğinde panel yerine normal akış. */
+@Serializable data class SessionGateRoute(val role: String, val skipAdmin: Boolean = false)
 
 // Kayıt
 @Serializable data object CustomerRegisterRoute
@@ -58,6 +59,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class AccountRoute(val role: String)
 @Serializable data object ChangePhoneRoute
 @Serializable data object ModerationRoute
+/** Moderatör girişte doğrudan bu panele açılır. */
+@Serializable data object AdminHomeRoute
 @Serializable data object CalendarSyncRoute
 @Serializable data object PromotionsRoute
 @Serializable data object NearbySalonsRoute

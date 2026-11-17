@@ -9,6 +9,7 @@
  */
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
+const { getFirestore } = require("firebase-admin/firestore");
 
 async function main() {
   const [who, flag] = process.argv.slice(2);
@@ -23,6 +24,12 @@ async function main() {
   if (flag === "--revoke") delete claims.admin;
   else claims.admin = true;
   await auth.setCustomUserClaims(user.uid, claims);
+  // Uygulamadaki "Yöneticiler" listesi için kayıt.
+  await getFirestore().collection("platformAdmins").doc(user.uid).set(
+    flag === "--revoke"
+      ? { phoneE164: user.phoneNumber || null, revoked: true, revokedAt: new Date(), revokedBy: "script" }
+      : { phoneE164: user.phoneNumber || null, grantedAt: new Date(), grantedBy: "script" },
+  );
   console.log(`${user.uid} (${user.phoneNumber || "-"}) admin=${claims.admin === true}`);
 }
 

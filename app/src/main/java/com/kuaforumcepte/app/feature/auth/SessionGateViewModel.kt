@@ -31,9 +31,11 @@ class SessionGateViewModel @Inject constructor(
     private val _state = MutableStateFlow<GateState>(GateState.Loading)
     val state: StateFlow<GateState> = _state.asStateFlow()
     private var role: EntryRole = EntryRole.CUSTOMER
+    private var skipAdmin: Boolean = false
 
-    fun start(role: EntryRole) {
+    fun start(role: EntryRole, skipAdmin: Boolean = false) {
         this.role = role
+        this.skipAdmin = skipAdmin
         if (_state.value is GateState.Route) return
         load()
     }
@@ -46,7 +48,9 @@ class SessionGateViewModel @Inject constructor(
             try {
                 preferences.setLastEntryRole(role)
                 val snap = session.bootstrap()
-                val target = SessionRouting.decide(role, snap, preferences.current().activeBusinessSalonId)
+                // Moderatör hesabı girişte doğrudan panele gider (müşteri/kuaför tarafına panelden geçebilir).
+                val isAdmin = !skipAdmin && runCatching { session.isPlatformAdmin(forceRefresh = true) }.getOrDefault(false)
+                val target = if (isAdmin) SessionTarget.AdminPanel else SessionRouting.decide(role, snap, preferences.current().activeBusinessSalonId)
                 if (target is SessionTarget.BusinessHome) session.selectActiveSalon(target.salonId)
                 _state.value = GateState.Route(target)
             } catch (t: Throwable) {

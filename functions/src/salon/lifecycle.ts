@@ -29,40 +29,7 @@ export const closeSalon = authedCallable<{ salonId?: unknown; confirm?: unknown;
     if (data.confirm !== "KAPAT") fail("invalid-argument", "CONFIRMATION_REQUIRED");
     const reason = reqString(data.reason, "reason", 3, 300);
 
-    const active = await appts().where("salonId", "==", salonId).where("status", "in", ["PENDING", "CONFIRMED", "IN_PROGRESS"]).get();
-    if (active.docs.some((d) => d.get("status") === "IN_PROGRESS")) fail("failed-precondition", "IN_PROGRESS_APPOINTMENTS");
-
-    let cancelled = 0;
-    for (const doc of active.docs) {
-      const done = await db.runTransaction(async (tx) => {
-        const a = await tx.get(doc.ref);
-        if (!["PENDING", "CONFIRMED"].includes(a.get("status"))) return false;
-        const locks = await readLocks(tx, a);
-        const from = a.get("status");
-        tx.update(a.ref, { status: "CANCELLED_BY_STAFF", cancelReason: `Salon kapandı: ${reason}`, cancelledBy: caller.uid, cancelledAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
-        releaseLocks(tx, a, locks);
-        addEvent(tx, a.id, from, "CANCELLED_BY_STAFF", caller.uid, "OWNER", `Salon kapandı: ${reason}`);
-        notifyInTx(tx, a.get("customerUid"), { type: "APPOINTMENT_CANCELLED", title: "Randevunuz iptal edildi", body: `${salon.get("name")} hizmet vermeyi bıraktığı için randevunuz iptal edildi.`, salonId, appointmentId: a.id });
-        return true;
-      });
-      if (done) cancelled++;
-    }
-
-    const members = await salon.ref.collection("members").get();
-    await db.runTransaction(async (tx) => {
-      const fresh = await tx.get(salon.ref);
-      if (fresh.get("ownerUid") !== caller.uid) fail("permission-denied", "PERMISSION_DENIED");
-      tx.update(salon.ref, { status: "CLOSED", closedAt: FieldValue.serverTimestamp(), closedReason: reason, updatedAt: FieldValue.serverTimestamp() });
-      for (const m of members.docs) {
-        tx.update(m.ref, { status: "LEFT", acceptsBookings: false, updatedAt: FieldValue.serverTimestamp() });
-        tx.set(db.collection("users").doc(m.id).collection("memberships").doc(salonId), { status: "LEFT", updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-        if (m.id !== caller.uid && m.get("status") === "ACTIVE") {
-          notifyInTx(tx, m.id, { type: "SALON_CLOSED", title: "Salon kapatıldı", body: `${salon.get("name")} salonu kapatıldı; üyeliğiniz sona erdi.`, salonId });
-        }
-      }
-      tx.delete(db.collection("salonOwners").doc(caller.uid));
-      auditInTx(tx, { action: "SALON_CLOSED", actorUid: caller.uid, salonId, data: { reason, cancelled } });
-    });
+    const cancelled = await shutDownSalon(salon, { actorUid: caller.uid, actorRole: "OWNER", reason, byAdmin: false });
     return { cancelledAppointments: cancelled };
   },
 );
@@ -107,3 +74,57 @@ export const transferSalonOwnership = authedCallable<{ salonId?: unknown; newOwn
   },
 );
 
+
+/**
+ * Salonu kapatmanın ortak gövdesi (sahip kapatması ve platform yöneticisinin kaldırması):
+ * gelecekteki aktif randevular gerekçeyle iptal edilir (kilitler serbest, müşteriler bilgilendirilir),
+ * salon CLOSED olur, tüm üyelikler sonlanır, sahiplik kilidi kalkar. Finans/denetim kayıtları korunur.
+ */
+export async function shutDownSalon(
+  salon: FirebaseFirestore.DocumentSnapshot,
+  o: { actorUid: string; actorRole: "OWNER" | "ADMIN"; reason: string; byAdmin: boolean },
+): Promise<number> {
+  const salonId = salon.id;
+  const active = await appts().where("salonId", "==", salonId).where("status", "in", ["PENDING", "CONFIRMED", "IN_PROGRESS"]).get();
+  // Sahip kapatmasında işlemi süren randevu önce kapatılmalı; yönetici kaldırmasında o da iptal edilir.
+  if (!o.byAdmin && active.docs.some((d) => d.get("status") === "IN_PROGRESS")) fail("failed-precondition", "IN_PROGRESS_APPOINTMENTS");
+  const label = o.byAdmin ? `Salon platformdan kaldırıldı: ${o.reason}` : `Salon kapandı: ${o.reason}`;
+  let cancelled = 0;
+  for (const doc of active.docs) {
+    const done = await db.runTransaction(async (tx) => {
+      const a = await tx.get(doc.ref);
+      if (!["PENDING", "CONFIRMED", "IN_PROGRESS"].includes(a.get("status"))) return false;
+      const locks = await readLocks(tx, a);
+      const from = a.get("status");
+      tx.update(a.ref, { status: "CANCELLED_BY_STAFF", cancelReason: label, cancelledBy: o.actorUid, cancelledByRole: o.actorRole, cancelledAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+      releaseLocks(tx, a, locks);
+      addEvent(tx, a.id, from, "CANCELLED_BY_STAFF", o.actorUid, o.actorRole, label);
+      notifyInTx(tx, a.get("customerUid"), { type: "APPOINTMENT_CANCELLED", title: "Randevunuz iptal edildi", body: `${salon.get("name")} artık hizmet vermediği için randevunuz iptal edildi.`, salonId, appointmentId: a.id });
+      return true;
+    });
+    if (done) cancelled++;
+  }
+
+  const members = await salon.ref.collection("members").get();
+  const ownerUid = salon.get("ownerUid") as string;
+  await db.runTransaction(async (tx) => {
+    const fresh = await tx.get(salon.ref);
+    if (!o.byAdmin && fresh.get("ownerUid") !== o.actorUid) fail("permission-denied", "PERMISSION_DENIED");
+    tx.update(salon.ref, {
+      status: "CLOSED", closedAt: FieldValue.serverTimestamp(), closedReason: o.reason, updatedAt: FieldValue.serverTimestamp(),
+      ...(o.byAdmin ? { removedByAdmin: true, removedBy: o.actorUid } : {}),
+    });
+    for (const m of members.docs) {
+      tx.update(m.ref, { status: "LEFT", acceptsBookings: false, updatedAt: FieldValue.serverTimestamp() });
+      tx.set(db.collection("users").doc(m.id).collection("memberships").doc(salonId), { status: "LEFT", updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+      if (m.id !== o.actorUid && m.get("status") === "ACTIVE") {
+        notifyInTx(tx, m.id, o.byAdmin
+          ? { type: "SALON_REMOVED", title: "Salon platformdan kaldırıldı", body: `${salon.get("name")} kaldırıldı. Gerekçe: ${o.reason}`, salonId }
+          : { type: "SALON_CLOSED", title: "Salon kapatıldı", body: `${salon.get("name")} salonu kapatıldı; üyeliğiniz sona erdi.`, salonId });
+      }
+    }
+    tx.delete(db.collection("salonOwners").doc(ownerUid));
+    auditInTx(tx, { action: o.byAdmin ? "SALON_REMOVED_BY_ADMIN" : "SALON_CLOSED", actorUid: o.actorUid, salonId, data: { reason: o.reason, cancelled } });
+  });
+  return cancelled;
+}

@@ -112,6 +112,7 @@ fun KcNavHost(
             SessionTarget.OwnerRegister -> OwnerRegisterRoute
             SessionTarget.SalonPicker -> SalonPickerRoute
             is SessionTarget.BusinessHome -> BusinessHomeRoute
+            SessionTarget.AdminPanel -> AdminHomeRoute
         }
         navController.navigateAsRoot(route)
     }
@@ -158,8 +159,10 @@ fun KcNavHost(
             OtpScreen(onBack = back, onSignedIn = { navController.navigateAsRoot(SessionGateRoute(role.name)) })
         }
         composable<SessionGateRoute> { entry ->
+            val r = entry.toRoute<SessionGateRoute>()
             SessionGateScreen(
-                role = roleOf(entry.toRoute<SessionGateRoute>().role),
+                role = roleOf(r.role),
+                skipAdmin = r.skipAdmin,
                 onRoute = ::routeAfterSession,
                 onSignedOut = toRoleSelection,
             )
@@ -299,6 +302,13 @@ fun KcNavHost(
         composable<ReviewRoute> { ReviewScreen(onBack = back) }
         composable<ChangePhoneRoute> { ChangePhoneScreen(onBack = back) }
         composable<ModerationRoute> { ModerationScreen(onBack = back) }
+        composable<AdminHomeRoute> {
+            ModerationScreen(
+                onBack = null,
+                onContinueAs = { role -> navController.navigateAsRoot(SessionGateRoute(role, skipAdmin = true)) },
+                onSignOut = toRoleSelection,
+            )
+        }
 
         // ---- Müşteri ----
         composable<CustomerHomeRoute> {

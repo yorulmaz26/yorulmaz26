@@ -10,6 +10,8 @@ sealed interface SessionTarget {
     data object OwnerRegister : SessionTarget
     data object SalonPicker : SessionTarget
     data class BusinessHome(val salonId: String) : SessionTarget
+    /** Platform yöneticisi (moderatör): girişte Moderatör Paneli açılır. */
+    data object AdminPanel : SessionTarget
 }
 
 /**

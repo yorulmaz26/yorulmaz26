@@ -98,3 +98,11 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `getCalendarFeed` | `{rotate?}` | `{token, path}` | Kişiye özel iCalendar aboneliği; `calendarFeed` HTTP: `GET /cal/{token}.ics` (Hosting yönlendirmesi). |
 | `scanAppointments` (genişletildi) | — | — | 24 saat (son 2 saat iptal kuralı hatırlatmasıyla) ve 2 saat hatırlatma. |
 
+
+## Moderatör paneli
+| Fonksiyon | Girdi | Çıktı | Notlar |
+|---|---|---|---|
+| `adminRemoveSalon` | `{salonId, reason, confirm: "KALDIR"}` | `{cancelledAppointments}` | Yalnızca `admin`. Salon CLOSED + `removedByAdmin`; işlemdekiler dahil aktif randevular iptal, üyelikler biter; sahip `reopenSalon` ile açamaz (`SALON_REMOVED`). |
+| `setPlatformAdmin` | `{phone, grant}` | `{uid, admin}` | Yalnızca `admin`. Kişi en az bir kez giriş yapmış olmalı (`USER_NOT_FOUND`); kendi yetkisini kaldıramaz (`CANNOT_REVOKE_SELF`). `platformAdmins/{uid}` listesi. |
+
+Moderatör hesabı girişte doğrudan **Moderatör Paneli**'ne açılır (Salon onayı, Salonlar/kaldırma, salon bazında Yorumlar/silme-geri yükleme, Şikâyetler, Yöneticiler).

@@ -224,6 +224,10 @@ service cloud.firestore {
       allow read: if signedIn() && (resource.data.get('hidden', false) != true || isPlatformAdmin());
       allow write: if false;
     }
+    match /platformAdmins/{uid} {
+      allow read: if isPlatformAdmin();
+      allow write: if false;
+    }
     match /reviewReports/{reportId} {
       allow read: if isPlatformAdmin();
       allow write: if false;

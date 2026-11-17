@@ -157,3 +157,40 @@ test("ad ve telefon değişikliği aktif randevulara yansır; telefon yalnızca 
   expect((await db.doc(`appointments/${a.appointmentId}`).get()).get("customerPhoneE164")).toBe(NEW);
   await expectReason(caller(syncPhoneNumber)({}, "c1"), "PHONE_NOT_VERIFIED");
 });
+
+describe("platform yöneticisi", () => {
+  test("salonu kaldırır: işlemdeki dahil randevular iptal, üyelikler biter, sahip yeniden açamaz", async () => {
+    const { adminRemoveSalon } = await import("../src/salon/admin");
+    const { reopenSalon } = await import("../src/salon/platform");
+    const remove = caller(adminRemoveSalon);
+    const a = await bookAt(salonA, "c1", "+905320000001", 600);
+    await transition({ appointmentId: a.appointmentId, action: "CONFIRM" }, "staff", STAFF);
+    await db.doc(`appointments/${a.appointmentId}`).update({ startAt: Timestamp.fromMillis(Date.now() - 60_000) });
+    await transition({ appointmentId: a.appointmentId, action: "MARK_ARRIVED" }, "staff", STAFF);
+    await expectReason(remove({ salonId: salonA, reason: "Sahte işletme", confirm: "KALDIR" }, "owner", OWNER), "ADMIN_ONLY");
+    await expectReason(remove({ salonId: salonA, reason: "Sahte işletme" }, "admin", undefined, { admin: true }), "CONFIRMATION_REQUIRED");
+    const r = await remove({ salonId: salonA, reason: "Sahte işletme", confirm: "KALDIR" }, "admin", undefined, { admin: true });
+    expect(r.cancelledAppointments).toBe(1);
+    const s = await db.doc(`salons/${salonA}`).get();
+    expect([s.get("status"), s.get("removedByAdmin")]).toEqual(["CLOSED", true]);
+    expect((await db.doc(`appointments/${a.appointmentId}`).get()).get("status")).toBe("CANCELLED_BY_STAFF");
+    expect((await db.doc(`salons/${salonA}/members/staff`).get()).get("status")).toBe("LEFT");
+    expect((await db.doc("salonOwners/owner").get()).exists).toBe(false);
+    await expectReason(caller(reopenSalon)({ salonId: salonA }, "owner", OWNER), "SALON_REMOVED");
+  });
+
+  test("yönetici yetkisini telefonla verir/geri alır; kendi yetkisini geri alamaz", async () => {
+    const { getAuth } = await import("firebase-admin/auth");
+    const { setPlatformAdmin } = await import("../src/salon/admin");
+    const grant = caller(setPlatformAdmin);
+    const u = await getAuth().createUser({ phoneNumber: "+905550000009" }).catch(() => getAuth().getUserByPhoneNumber("+905550000009"));
+    await expectReason(grant({ phone: "05550000009" }, "owner", OWNER), "ADMIN_ONLY");
+    expect(await grant({ phone: "0555 000 00 09" }, "admin", undefined, { admin: true })).toEqual({ uid: u.uid, admin: true });
+    expect((await getAuth().getUser(u.uid)).customClaims?.admin).toBe(true);
+    expect((await db.doc(`platformAdmins/${u.uid}`).get()).get("phoneE164")).toBe("+905550000009");
+    await expectReason(grant({ phone: "+905559999999" }, "admin", undefined, { admin: true }), "USER_NOT_FOUND");
+    await expectReason(grant({ phone: "+905550000009", grant: false }, u.uid, "+905550000009", { admin: true }), "CANNOT_REVOKE_SELF");
+    await grant({ phone: "+905550000009", grant: false }, "admin", undefined, { admin: true });
+    expect((await getAuth().getUser(u.uid)).customClaims?.admin).toBeUndefined();
+  });
+});

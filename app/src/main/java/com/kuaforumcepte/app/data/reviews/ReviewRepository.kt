@@ -57,6 +57,12 @@ class ReviewRepository @Inject constructor(
             .map { qs -> qs.documents.map { it.toReview() } }
             .catch { throw AppException.from(it) }
 
+    /** Yönetici: bir salonun tüm yorumları (kaldırılanlar dahil), en yeniden eskiye. */
+    fun observeSalonAll(salonId: String): Flow<List<Review>> =
+        reviews().whereEqualTo("salonId", salonId).orderBy("createdAt", Query.Direction.DESCENDING).limit(200).snapshots()
+            .map { qs -> qs.documents.map { it.toReview() } }
+            .catch { throw AppException.from(it) }
+
     /** Yönetici: şikâyet eşiğini aşan, yayındaki yorumlar. */
     fun observeFlagged(): Flow<List<Review>> =
         reviews().whereEqualTo("flagged", true).whereEqualTo("hidden", false)

@@ -209,6 +209,11 @@ describe("finans ve kullanıcı", () => {
     await assertSucceeds(getDoc(doc(admin, "reviewReports", "gizli_x")));
     await assertFails(setDoc(doc(admin, "reviews", "gizli"), { hidden: false }));
   });
+  test("moderatör listesi yalnızca moderatörlere açık", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => { await setDoc(doc(ctx.firestore(), "platformAdmins", "a1"), { phoneE164: "+905550000001" }); });
+    await assertFails(getDoc(doc(db(OWNER), "platformAdmins", "a1")));
+    await assertSucceeds(getDoc(doc(env.authenticatedContext("admin", { admin: true }).firestore(), "platformAdmins", "a1")));
+  });
   test("kilit koleksiyonları istemciye kapalı", async () => {
     await assertFails(getDoc(doc(db(OWNER), "salonOwners", OWNER)));
     await assertFails(getDoc(doc(db(CUSTOMER), "customerLocks", CUSTOMER)));
