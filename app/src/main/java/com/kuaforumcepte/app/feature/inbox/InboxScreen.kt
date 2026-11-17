@@ -94,8 +94,6 @@ fun InboxScreen(
     onOpenAppointment: (String) -> Unit,
     /** Randevusuz bildirimler (bekleme listesinde yer açıldı, salon onayı) için salon sayfası. */
     onOpenSalon: ((String) -> Unit)? = null,
-    /** "Onay bekleyen değerlendirme" bildirimi salon sahibini onay ekranına götürür. */
-    onOpenReviewApproval: (() -> Unit)? = null,
     viewModel: InboxViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -113,8 +111,7 @@ fun InboxScreen(
                         onClick = {
                             viewModel.open(item)
                             val appt = item.appointmentId
-                            if (item.type == "REVIEW_PENDING" && onOpenReviewApproval != null) onOpenReviewApproval()
-                            else if (appt != null && item.type != "REVIEW_REPLIED") onOpenAppointment(appt) else item.salonId?.let { sid -> onOpenSalon?.invoke(sid) }
+                            if (appt != null && item.type != "REVIEW_REPLIED") onOpenAppointment(appt) else item.salonId?.let { sid -> onOpenSalon?.invoke(sid) }
                         },
                         shape = MaterialTheme.shapes.medium,
                         color = if (item.read) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.secondaryContainer,

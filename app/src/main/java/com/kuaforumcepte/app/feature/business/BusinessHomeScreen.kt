@@ -14,7 +14,6 @@ import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.automirrored.outlined.EventNote
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.Loyalty
-import androidx.compose.material.icons.outlined.RateReview
 import androidx.compose.material.icons.outlined.Reviews
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.ManageAccounts
@@ -89,7 +88,6 @@ fun BusinessHomeScreen(
     onAddWalkIn: () -> Unit,
     onOpenPromotions: () -> Unit,
     onOpenSalonPage: (String) -> Unit,
-    onOpenReviewApproval: () -> Unit,
     viewModel: BusinessHomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -183,7 +181,6 @@ fun BusinessHomeScreen(
                             }
                             if (Permission.MANAGE_SALON_SETTINGS in s.permissions) {
                                 MenuRow(Icons.Outlined.Loyalty, "Kampanyalar ve Sadakat", "İndirim kodları, sadakat programı", onOpenPromotions)
-                                MenuRow(Icons.Outlined.RateReview, "Değerlendirme Onayı", "Müşteri puan ve yorumları onayınızla yayınlanır", onOpenReviewApproval)
                                 MenuRow(Icons.Outlined.Reviews, "Salon Sayfam ve Yorumlar", "Müşterinin gördüğü sayfa; yorumlara yanıt verin") { onOpenSalonPage(m.salonId) }
                             }
                             MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, Beni hatırla, tema, çıkış", onOpenAccount)

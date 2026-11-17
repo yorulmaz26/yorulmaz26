@@ -108,11 +108,7 @@ fun ReviewScreen(onBack: () -> Unit, viewModel: ReviewViewModel = hiltViewModel(
         val a = ui.appointment
         when {
             ui.loading -> SkeletonCardList(2, Modifier.padding(padding))
-            ui.done -> SuccessState(
-                "Değerlendirmeniz için teşekkürler",
-                "Değerlendirmeniz salon sahibinin onayına gönderildi. Onaylanınca yayınlanır ve puanlara eklenir; size bildirim gelir.",
-                Modifier.padding(padding), "Geri dön", onBack,
-            )
+            ui.done -> SuccessState("Değerlendirmeniz için teşekkürler", "Puanınız salon ve uzman puanlarına eklendi.", Modifier.padding(padding), "Geri dön", onBack)
             a == null || a.status != AppointmentStatus.COMPLETED -> EmptyState("Bu randevu puanlanamaz", "Yalnızca tamamlanmış randevular puanlanabilir.", Modifier.padding(padding))
             else -> Column(
                 Modifier.fillMaxSize().padding(padding).imePadding().verticalScroll(rememberScrollState()).padding(Spacing.screen),
@@ -124,7 +120,7 @@ fun ReviewScreen(onBack: () -> Unit, viewModel: ReviewViewModel = hiltViewModel(
                 StarPicker("Hizmet (isteğe bağlı)", ui.service, viewModel::setService)
                 if (ui.service > 0) TextButton(onClick = { viewModel.setService(ui.service) }) { Text("Hizmet puanını kaldır") }
                 KcTextField(ui.comment, viewModel::setComment, "Kısa yorum (isteğe bağlı)", maxLength = 500, singleLine = false, minLines = 3, imeAction = ImeAction.Default)
-                InfoBanner("Değerlendirmeniz salon sahibi onayladıktan sonra yayınlanır. Onaylanınca salon puanı salonun, uzman puanı uzmanın ortalamasına eklenir; hizmet puanı ayrı gösterilir. Yorumunuz adınız ve soyadınızın baş harfiyle yayınlanır. Gönderildikten sonra değiştirilemez.")
+                InfoBanner("Salon puanı salonun, uzman puanı uzmanın ortalamasına eklenir. Hizmet puanı ayrı gösterilir ve ortalamalara girmez. Yorumunuz adınız ve soyadınızın baş harfiyle yayınlanır. Değerlendirme gönderildikten sonra değiştirilemez.")
                 KcPrimaryButton("Gönder", viewModel::submit, loading = ui.submitting, enabled = ui.salon > 0 && ui.staff > 0)
             }
         }

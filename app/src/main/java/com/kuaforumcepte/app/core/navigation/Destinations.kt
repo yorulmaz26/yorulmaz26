@@ -59,7 +59,6 @@ import kotlinx.serialization.Serializable
 @Serializable data object ChangePhoneRoute
 @Serializable data object ModerationRoute
 @Serializable data object CalendarSyncRoute
-@Serializable data object ReviewApprovalRoute
 @Serializable data object PromotionsRoute
 @Serializable data object NearbySalonsRoute
 @Serializable data object WaitlistRoute

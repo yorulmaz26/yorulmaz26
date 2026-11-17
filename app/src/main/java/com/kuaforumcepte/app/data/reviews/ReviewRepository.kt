@@ -85,18 +85,6 @@ class ReviewRepository @Inject constructor(
     }
 
     /** action: HIDE | RESTORE | DISMISS (yalnızca platform yöneticisi). */
-    /** Salon sahibi: onayını bekleyen değerlendirmeler (yayında değil, puanlara girmemiş). */
-    fun observePendingApproval(salonId: String): Flow<List<Review>> =
-        reviews().whereEqualTo("salonId", salonId).whereEqualTo("approval", "PENDING")
-            .orderBy("createdAt", Query.Direction.DESCENDING).limit(100).snapshots()
-            .map { qs -> qs.documents.map { it.toReview() } }
-            .catch { throw AppException.from(it) }
-
-    /** Salon sahibi kararı: onay (yayınla + puanlara ekle) veya gerekçeli ret. */
-    suspend fun decide(reviewId: String, approve: Boolean, note: String?) {
-        functions.call("decideReview", mapOf("reviewId" to reviewId, "action" to if (approve) "APPROVE" else "REJECT", "note" to note?.trim()?.ifBlank { null }))
-    }
-
     /** Salon sahibinin yanıtı; boş metin yanıtı kaldırır. */
     suspend fun reply(reviewId: String, text: String) {
         functions.call("replyToReview", mapOf("reviewId" to reviewId, "text" to text.trim()))

@@ -45,8 +45,6 @@ data class Appointment(
     val attentionReason: String?,
     val hiddenFor: List<String>,
     val reviewId: String? = null,
-    /** Değerlendirmenin salon onay durumu: PENDING | APPROVED | REJECTED (eski kayıtlarda null = yayında). */
-    val reviewStatus: String? = null,
     /** Uygulaması olmayan müşteri için salonun açtığı kayıt (müşteri hesabı ve bildirimi yok). */
     val walkIn: Boolean = false,
     /** Başkası adına alınmışsa randevuyu alan kişinin adı. */
@@ -220,7 +218,6 @@ internal fun DocumentSnapshot.toAppointment(): Appointment? {
         attentionReason = (get("attention") as? Map<String, Any?>)?.str("reason"),
         hiddenFor = (get("hiddenFor") as? List<String>).orEmpty(),
         reviewId = getString("reviewId"),
-        reviewStatus = getString("reviewStatus"),
         walkIn = getBoolean("walkIn") == true,
         bookedByName = getString("bookedByName"),
         guestName = getString("guestName"),
