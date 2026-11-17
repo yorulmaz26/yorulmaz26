@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -63,6 +65,7 @@ fun RoleSelectionScreen(
     RoleSelectionContent(onChoose = viewModel::choose, hasPendingSalonLink = hasPendingSalonLink)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RoleSelectionContent(onChoose: (EntryRole) -> Unit, hasPendingSalonLink: Boolean = false) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -80,7 +83,10 @@ fun RoleSelectionContent(onChoose: (EntryRole) -> Unit, hasPendingSalonLink: Boo
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     BrandMark(color = Color(0xFFF3EEE7), accent = Brand.Gold, logoSize = 112.dp)
                     Spacer(Modifier.height(Spacing.l))
-                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(Spacing.s, Alignment.CenterHorizontally),
+                        verticalArrangement = Arrangement.spacedBy(Spacing.s),
+                    ) {
                         FeaturePill(Icons.Outlined.Bolt, "Hızlı randevu")
                         FeaturePill(Icons.Outlined.Verified, "Anlık onay")
                         FeaturePill(Icons.Outlined.NotificationsActive, "Hatırlatma")
@@ -135,7 +141,7 @@ private fun FeaturePill(icon: ImageVector, label: String) {
         Row(Modifier.padding(horizontal = 10.dp, vertical = 6.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(icon, null, tint = Brand.Gold, modifier = Modifier.size(14.dp))
             Spacer(Modifier.width(4.dp))
-            Text(label, style = MaterialTheme.typography.labelMedium, color = Color(0xFFF3EEE7))
+            Text(label, style = MaterialTheme.typography.labelMedium, color = Color(0xFFF3EEE7), maxLines = 1, softWrap = false)
         }
     }
 }
