@@ -70,6 +70,9 @@ fun ReportsSection(isOwner: Boolean, viewModel: ReportsViewModel = hiltViewModel
                                 Column(Modifier.weight(1f)) {
                                     Text(s.name + if (s.role == "OWNER") " (Salon Sahibi)" else "", style = MaterialTheme.typography.titleSmall)
                                     Text("${s.line.completedCount} işlem" + if (!s.active) " · artık aktif değil" else "", style = MaterialTheme.typography.bodySmall)
+                                    if (s.line.commission.value != 0L || s.commissionPercent > 0) {
+                                        Text("Prim ${s.line.commission.formatTry()} (güncel oran %${s.commissionPercent})", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                    }
                                 }
                                 Text(s.line.amount.formatTry(), style = MaterialTheme.typography.titleSmall)
                             }
@@ -95,10 +98,13 @@ private fun MetricCards(title: String, line: ReportLine) {
         Metric("Tamamlanan işlem", "${line.completedCount}", Modifier.weight(1f))
         Metric("Gerçekleşen hizmet bedeli", line.amount.formatTry(), Modifier.weight(1f))
     }
+    if (line.commission.value != 0L) {
+        Text("Uzman primi toplamı: ${line.commission.formatTry()} (tamamlama anındaki oranlarla)", style = MaterialTheme.typography.bodySmall)
+    }
     val diff = line.difference
     if (diff != Kurus.ZERO) {
         Text(
-            "Liste fiyatı toplamı ${line.listed.formatTry()} · fark ${if (diff.value > 0) "+" else ""}${diff.formatTry()} (yetkili fiyat düzeltmeleri)",
+            "Liste fiyatı toplamı ${line.listed.formatTry()} · fark ${if (diff.value > 0) "+" else ""}${diff.formatTry()} (indirimler ve yetkili fiyat düzeltmeleri)",
             style = MaterialTheme.typography.bodySmall,
             color = if (diff.value < 0) KcTheme.colors.cancel else KcTheme.colors.success,
         )

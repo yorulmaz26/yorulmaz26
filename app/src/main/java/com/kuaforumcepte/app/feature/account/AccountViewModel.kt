@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -37,7 +38,20 @@ class AccountViewModel @Inject constructor(
     private val session: SessionRepository,
     private val preferences: AppPreferences,
     private val staff: StaffRepository,
+    private val salons: com.kuaforumcepte.app.data.salon.SalonRepository,
 ) : ViewModel() {
+
+    /** Kullanıcının sahibi olduğu, kapatılmış salonlar (yeniden açma için). */
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    val closedSalons: StateFlow<List<com.kuaforumcepte.app.data.salon.SalonProfile>> = session.uidFlow
+        .flatMapLatest { uid -> if (uid == null) kotlinx.coroutines.flow.flowOf(emptyList()) else salons.observeClosedOwned(uid) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    fun reopenSalon(salonId: String, onDone: () -> Unit) = viewModelScope.launch {
+        runCatching { salons.reopenSalon(salonId) }
+            .onSuccess { _message.value = UiText.Plain("Salon yeniden açıldı."); onDone() }
+            .onFailure { _message.value = ErrorMessages.of(it) }
+    }
 
     val ui: StateFlow<AccountUi> = combine(
         preferences.settings, session.memberships, session.activeSalon, session.snapshot,

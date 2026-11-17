@@ -41,9 +41,23 @@ data class SalonProfile(
     val rating: Rating,
     val active: Boolean,
     val weeklyClosedDays: Set<Int> = emptySet(),
+    /** Platform onayı: aramada görünür ve "Onaylı" rozeti alır. */
+    val verified: Boolean = false,
+    /** PENDING | APPROVED | REJECTED */
+    val verificationStatus: String = "PENDING",
+    val verificationNote: String? = null,
+    val closed: Boolean = false,
+    val loyalty: LoyaltyProgram? = null,
 ) {
     val fullAddress: String get() = "$addressLine, $district / $city"
 }
+
+data class LoyaltyProgram(val enabled: Boolean, val visitsRequired: Int, val rewardPercent: Int)
+
+data class NearbySalon(
+    val salonId: String, val name: String, val type: SalonType?, val city: String, val district: String, val addressLine: String,
+    val logoUrl: String?, val rating: Rating, val location: GeoPoint, val distanceKm: Double,
+)
 
 /** Galeri düzenlemesinde her öğe ya mevcut bir Storage yolu ya da yeni işlenmiş yerel dosyadır. */
 sealed interface MediaItem {
@@ -101,6 +115,60 @@ class SalonRepository @Inject constructor(
     /** Salonu kalıcı olarak kapatır (gelecek randevular gerekçeyle iptal edilir). @return iptal edilen randevu sayısı */
     suspend fun closeSalon(salonId: String, reason: String): Int =
         ((functions.call("closeSalon", mapOf("salonId" to salonId, "confirm" to "KAPAT", "reason" to reason.trim()))["cancelledAppointments"] as? Number)?.toInt()) ?: 0
+
+    /** Kapatılmış salonu eski sahibi yeniden açar (başka salonu yoksa). Diğer uzmanlar yeniden davet edilir. */
+    suspend fun reopenSalon(salonId: String) {
+        functions.call("reopenSalon", mapOf("salonId" to salonId))
+    }
+
+    /** Kullanıcının sahibi olduğu, kapatılmış salonlar (yeniden açma için). */
+    fun observeClosedOwned(uid: String): Flow<List<SalonProfile>> =
+        firestore.get().collection("salons").whereEqualTo("ownerUid", uid).whereEqualTo("status", "CLOSED").snapshots()
+            .map { qs -> qs.documents.mapNotNull { it.toSalon() } }
+            .catch { emit(emptyList()) }
+
+    /** Reddedilen başvuruyu bilgiler düzeltildikten sonra yeniden incelemeye gönderir. */
+    suspend fun requestReview(salonId: String) {
+        functions.call("requestSalonReview", mapOf("salonId" to salonId))
+    }
+
+    /** Platform yöneticisi: onay bekleyen salonlar. */
+    fun observePendingVerification(): Flow<List<SalonProfile>> =
+        firestore.get().collection("salons").whereEqualTo("verified", false).whereEqualTo("status", "ACTIVE")
+            .orderBy("createdAt").limit(100).snapshots()
+            .map { qs -> qs.documents.mapNotNull { it.toSalon() }.filter { it.verificationStatus == "PENDING" } }
+            .catch { throw AppException.from(it) }
+
+    /** Platform yöneticisi: APPROVE | REJECT (gerekçe zorunlu). */
+    suspend fun reviewSalon(salonId: String, approve: Boolean, note: String?) {
+        functions.call("reviewSalon", mapOf("salonId" to salonId, "action" to if (approve) "APPROVE" else "REJECT", "note" to note?.trim()?.ifBlank { null }))
+    }
+
+    /** Konuma göre yakın, onaylı salonlar (en yakından uzağa). */
+    suspend fun nearby(lat: Double, lng: Double, radiusKm: Int, type: SalonType?): List<NearbySalon> {
+        val r = functions.call("searchNearbySalons", mapOf("lat" to lat, "lng" to lng, "radiusKm" to radiusKm, "type" to type?.name))
+        @Suppress("UNCHECKED_CAST")
+        return (r["salons"] as? List<Map<String, Any?>>).orEmpty().map { m ->
+            val avg = (m["ratingAvg"] as? Number)?.toDouble()
+            val count = (m["ratingCount"] as? Number)?.toLong() ?: 0
+            NearbySalon(
+                salonId = m["salonId"] as String, name = m["name"] as? String ?: "", type = SalonType.fromWire(m["type"] as? String),
+                city = m["city"] as? String ?: "", district = m["district"] as? String ?: "", addressLine = m["addressLine"] as? String ?: "",
+                logoUrl = m["logoUrl"] as? String,
+                // Ortalama ve sayıdan yaklaşık toplam (yalnızca gösterim için).
+                rating = Rating(((avg ?: 0.0) * count).toLong(), count),
+                location = GeoPoint((m["lat"] as Number).toDouble(), (m["lng"] as Number).toDouble()),
+                distanceKm = (m["distanceKm"] as Number).toDouble(),
+            )
+        }
+    }
+
+    suspend fun updateLoyalty(salonId: String, program: LoyaltyProgram) {
+        functions.call(
+            "updateLoyaltyProgram",
+            mapOf("salonId" to salonId, "enabled" to program.enabled, "visitsRequired" to program.visitsRequired, "rewardPercent" to program.rewardPercent),
+        )
+    }
 
     /** Sahipliği salonun aktif bir uzmanına devreder; eski sahip uzman olarak kalır. */
     suspend fun transferOwnership(salonId: String, newOwnerUid: String) {
@@ -171,5 +239,12 @@ internal fun DocumentSnapshot.toSalon(): SalonProfile? {
         rating = Rating(getLong("ratingSum") ?: 0, getLong("ratingCount") ?: 0),
         active = getString("status") == "ACTIVE",
         weeklyClosedDays = (get("weeklyClosedDays") as? List<Number>).orEmpty().map { it.toInt() }.toSet(),
+        verified = getBoolean("verified") == true,
+        verificationStatus = (get("verification") as? Map<String, Any?>)?.get("status") as? String ?: if (getBoolean("verified") == true) "APPROVED" else "PENDING",
+        verificationNote = (get("verification") as? Map<String, Any?>)?.get("note") as? String,
+        closed = getString("status") == "CLOSED",
+        loyalty = (get("loyalty") as? Map<String, Any?>)?.let { l ->
+            LoyaltyProgram(l["enabled"] == true, (l["visitsRequired"] as? Number)?.toInt() ?: 10, (l["rewardPercent"] as? Number)?.toInt() ?: 20)
+        },
     )
 }

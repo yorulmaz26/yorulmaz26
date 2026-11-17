@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -118,11 +119,22 @@ class StaffRepository @Inject constructor(
         functions.call("declineInvitation", mapOf("salonId" to salonId, "inviteId" to inviteId))
     }
 
-    suspend fun updateMember(salonId: String, memberUid: String, firstName: String, lastName: String, specialty: String) {
+    /** commissionPercent yalnızca sahip tarafından gönderilir (null → değişmez). */
+    suspend fun updateMember(salonId: String, memberUid: String, firstName: String, lastName: String, specialty: String, commissionPercent: Int? = null) {
         functions.call(
             "updateStaffMember",
-            mapOf("salonId" to salonId, "memberUid" to memberUid, "firstName" to firstName.trim(), "lastName" to lastName.trim(), "specialty" to specialty.trim()),
+            mapOf(
+                "salonId" to salonId, "memberUid" to memberUid, "firstName" to firstName.trim(), "lastName" to lastName.trim(),
+                "specialty" to specialty.trim(), "commissionPercent" to commissionPercent,
+            ),
         )
+    }
+
+    /** Uzman prim oranı (%); yalnızca sahip ve uzmanın kendisi okuyabilir. */
+    suspend fun commissionOf(salonId: String, memberUid: String): Int = try {
+        (salon(salonId).collection("staffPrivate").document(memberUid).get().await().getLong("commissionPercent") ?: 0).toInt()
+    } catch (t: Throwable) {
+        throw AppException.from(t)
     }
 
     /** @return etkilenen gelecek randevu sayısı */

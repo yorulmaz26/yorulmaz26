@@ -29,6 +29,8 @@ class SalonDetailViewModel @Inject constructor(
     savedState: SavedStateHandle,
     private val salons: SalonRepository,
     private val preferences: AppPreferences,
+    private val favorites: com.kuaforumcepte.app.data.favorites.FavoritesRepository,
+    private val session: com.kuaforumcepte.app.data.session.SessionRepository,
 ) : ViewModel() {
     private val salonId = savedState.toRoute<SalonDetailRoute>().salonId
     private val retry = MutableStateFlow(0)
@@ -44,6 +46,22 @@ class SalonDetailViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
 
     fun retry() { retry.value++ }
+
+    val isFavorite: StateFlow<Boolean> = session.uidFlow.flatMapLatest { uid ->
+        if (uid == null) kotlinx.coroutines.flow.flowOf(false) else favorites.isFavorite(uid, salonId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), false)
+
+    /** @return kullanıcıya gösterilecek kısa mesaj */
+    fun toggleFavorite(onDone: (String) -> Unit) {
+        val uid = session.currentUid ?: return
+        val salon = (state.value as? UiState.Success)?.data ?: return
+        val wasFavorite = isFavorite.value
+        viewModelScope.launch {
+            runCatching { if (wasFavorite) favorites.remove(uid, salonId) else favorites.add(uid, salon) }
+                .onSuccess { onDone(if (wasFavorite) "Favorilerden çıkarıldı" else "Favorilere eklendi") }
+                .onFailure { onDone(ErrorMessages.text(it)) }
+        }
+    }
 
     /** Müşterinin "Salon Bilgileri" sekmesi için tek kaynaklı salon seçimi. */
     fun select() = viewModelScope.launch { preferences.setSelectedCustomerSalon(salonId) }

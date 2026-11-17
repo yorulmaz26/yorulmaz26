@@ -155,6 +155,11 @@ fun StaffManagementScreen(onBack: () -> Unit, viewModel: StaffManagementViewMode
                     KcTextField(f.firstName, { v -> viewModel.onEdit { it.copy(firstName = v) } }, "Ad", capitalization = KeyboardCapitalization.Words, maxLength = 50)
                     KcTextField(f.lastName, { v -> viewModel.onEdit { it.copy(lastName = v) } }, "Soyad", capitalization = KeyboardCapitalization.Words, maxLength = 50)
                     KcTextField(f.specialty, { v -> viewModel.onEdit { it.copy(specialty = v) } }, "Uzmanlık alanı", maxLength = 60, imeAction = ImeAction.Done)
+                    KcTextField(
+                        f.commission ?: "", { v -> viewModel.onEdit { it.copy(commission = v.filter(Char::isDigit).take(3)) } }, "Prim oranı (%)",
+                        enabled = f.commission != null, keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                        supporting = "Tamamlanan hizmet bedelinin bu yüzdesi raporlarda uzman primi olarak gösterilir. Yalnızca siz ve uzman görür.",
+                    )
                 }
             },
             confirmButton = { TextButton(onClick = viewModel::submitEdit, enabled = !f.submitting) { Text(if (f.submitting) "Kaydediliyor…" else "Kaydet") } },

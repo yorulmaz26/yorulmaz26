@@ -3,6 +3,7 @@ package com.kuaforumcepte.app.feature.appointments
 import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -18,6 +19,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Call
+import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Share
@@ -79,6 +82,7 @@ fun AppointmentTicket(a: Appointment, now: Instant) {
             HorizontalDivider()
             Text(a.whenLabel(), style = MaterialTheme.typography.titleMedium)
             Text("Uzman: ${a.staffName}", style = MaterialTheme.typography.bodyMedium)
+            a.guestName?.let { Text("Hizmeti alacak: $it", style = MaterialTheme.typography.bodyMedium) }
             a.items.forEach { i ->
                 Row {
                     Text("${i.name} · ${formatDuration(i.durationMinutes)}", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
@@ -86,6 +90,12 @@ fun AppointmentTicket(a: Appointment, now: Instant) {
                 }
             }
             HorizontalDivider()
+            if (a.discount.value > 0) {
+                Row {
+                    Text(if (a.discountType == "LOYALTY") "Sadakat ödülü" else "İndirim (${a.discountCode})", Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                    Text("−${a.discount.formatTry()}", color = MaterialTheme.colorScheme.primary)
+                }
+            }
             Row {
                 Text("Toplam · ${formatDuration(a.totalMinutes)}", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                 Text(a.finalTotal.formatTry(), fontWeight = FontWeight.Bold)
@@ -149,9 +159,15 @@ fun BookingSuccessScreen(onOpenAppointment: () -> Unit, onHome: () -> Unit, view
 }
 
 @Composable
-fun CustomerAppointmentDetailScreen(onBack: () -> Unit, onReview: (String) -> Unit, viewModel: CustomerAppointmentViewModel = hiltViewModel()) {
+fun CustomerAppointmentDetailScreen(
+    onBack: () -> Unit,
+    onReview: (String) -> Unit,
+    onRebook: (Appointment) -> Unit,
+    viewModel: CustomerAppointmentViewModel = hiltViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
+    val contacts by viewModel.contacts.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
@@ -178,7 +194,19 @@ fun CustomerAppointmentDetailScreen(onBack: () -> Unit, onReview: (String) -> Un
                             KcSecondaryButton("Randevuyu İptal Et", { askCancel = true }, loading = busy)
                             Text("Başlangıçtan en geç 2 saat öncesine kadar iptal edebilirsiniz.", style = MaterialTheme.typography.bodySmall)
                         }
-                        status.isActive -> InfoBanner("Randevuya 2 saatten az kaldığı için uygulamadan iptal edilemez. Gelemeyecekseniz lütfen salonu arayın.")
+                        a.customerMustCallToCancel(now) -> {
+                            InfoBanner("Randevuya 2 saatten az kaldığı için uygulamadan iptal edilemez. Gelemeyecekseniz uzmanı veya salon sahibini arayın; iptali salon yapar.")
+                            val list = contacts
+                            if (list == null) {
+                                KcSecondaryButton("İptal için salonla iletişime geç", viewModel::loadContacts, loading = busy, leadingIcon = Icons.Outlined.Call)
+                            } else {
+                                list.forEach { c ->
+                                    KcSecondaryButton("${c.roleLabel}: ${c.name} — Ara", {
+                                        try { context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${c.phoneE164}"))) } catch (_: ActivityNotFoundException) { }
+                                    }, leadingIcon = Icons.Outlined.Call)
+                                }
+                            }
+                        }
                         status == AppointmentStatus.EXPIRED -> InfoBanner("Salon talebinizi süresi içinde yanıtlamadığı için talep düştü. Yeni randevu alabilirsiniz.")
                         else -> Unit
                     }
@@ -187,6 +215,8 @@ fun CustomerAppointmentDetailScreen(onBack: () -> Unit, onReview: (String) -> Un
                         else InfoBanner("Bu randevuyu değerlendirdiniz. Teşekkürler!")
                     }
                     if (status.isTerminal) {
+                        KcPrimaryButton("Tekrar Randevu Al", { onRebook(a) }, leadingIcon = Icons.Outlined.Replay)
+                        Text("Aynı salon, uzman ve hizmetlerle yeni saat seçersiniz.", style = MaterialTheme.typography.bodySmall)
                         KcSecondaryButton("Listemden Gizle", { viewModel.hide(onBack) }, loading = busy, leadingIcon = Icons.Outlined.VisibilityOff)
                         Text("Yalnızca sizin listenizden kaldırılır; salon kayıtları ve değerlendirmeler silinmez.", style = MaterialTheme.typography.bodySmall)
                     }

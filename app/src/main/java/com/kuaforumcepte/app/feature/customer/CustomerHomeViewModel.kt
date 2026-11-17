@@ -9,6 +9,8 @@ import com.kuaforumcepte.app.data.salon.SalonProfile
 import com.kuaforumcepte.app.data.salon.SalonRepository
 import com.kuaforumcepte.app.data.appointments.Appointment
 import com.kuaforumcepte.app.data.appointments.AppointmentRepository
+import com.kuaforumcepte.app.data.favorites.FavoriteSalon
+import com.kuaforumcepte.app.data.favorites.FavoritesRepository
 import com.kuaforumcepte.app.data.session.SessionRepository
 import java.time.Clock
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,14 +35,19 @@ class CustomerHomeViewModel @Inject constructor(
     private val salons: SalonRepository,
     session: SessionRepository,
     appointments: AppointmentRepository,
+    private val favoritesRepo: FavoritesRepository,
     clock: Clock,
 ) : ViewModel() {
 
-    /** Tek aktif randevu kuralı: varsa "Randevu Al" sekmesinin başında kart gösterilir. */
-    val activeAppointment: StateFlow<Appointment?> = session.uidFlow.flatMapLatest { uid ->
-        if (uid == null) flowOf(null)
-        else appointments.observeCustomerActive(uid).map { list -> list.firstOrNull { it.isActive(clock.instant()) } }.catch { emit(null) }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+    /** Aktif randevular (en fazla 3): "Randevu Al" sekmesinin başında kart olarak gösterilir. */
+    val activeAppointments: StateFlow<List<Appointment>> = session.uidFlow.flatMapLatest { uid ->
+        if (uid == null) flowOf(emptyList())
+        else appointments.observeCustomerActive(uid).map { list -> list.filter { it.isActive(clock.instant()) }.sortedBy { it.startAt } }.catch { emit(emptyList()) }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    val favorites: StateFlow<List<FavoriteSalon>> = session.uidFlow.flatMapLatest { uid ->
+        if (uid == null) flowOf(emptyList()) else favoritesRepo.observe(uid)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     /** null = seçili salon yok. */
     val selectedSalon: StateFlow<UiState<SalonProfile>?> = preferences.settings

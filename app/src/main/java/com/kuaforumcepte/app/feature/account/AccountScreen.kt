@@ -45,6 +45,8 @@ import com.kuaforumcepte.app.core.designsystem.component.KcTopBar
 import com.kuaforumcepte.app.core.designsystem.component.asString
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.app.feature.business.MenuRow
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Storefront
 import com.kuaforumcepte.domain.model.EntryRole
 import com.kuaforumcepte.domain.model.MemberRole
 import com.kuaforumcepte.domain.phone.PhoneNumbers
@@ -58,8 +60,12 @@ fun AccountScreen(
     onOpenLegal: (LegalDocument) -> Unit,
     onChangePhone: () -> Unit,
     onOpenModeration: () -> Unit,
+    onOpenCalendarSync: () -> Unit,
+    onSalonReopened: () -> Unit,
     viewModel: AccountViewModel = hiltViewModel(),
 ) {
+    val closedSalons by viewModel.closedSalons.collectAsStateWithLifecycle()
+    var reopening by remember { mutableStateOf<com.kuaforumcepte.app.data.salon.SalonProfile?>(null) }
     val ui by viewModel.ui.collectAsStateWithLifecycle()
     val leaving by viewModel.leaving.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
@@ -87,7 +93,11 @@ fun AccountScreen(
                 TextButton(onClick = { editingName = true }) { Text("Adımı düzenle") }
                 TextButton(onClick = onChangePhone) { Text("Telefonu değiştir") }
             }
-            if (isAdmin) MenuRow(Icons.Outlined.Gavel, "Yorum Moderasyonu", "Şikâyet edilen değerlendirmeleri incele", onOpenModeration)
+            if (isAdmin) MenuRow(Icons.Outlined.Gavel, "Moderasyon ve Salon Onayı", "Şikâyet edilen yorumlar, onay bekleyen salonlar", onOpenModeration)
+            MenuRow(Icons.Outlined.CalendarMonth, "Takvim Entegrasyonu", "Randevularınız Google/Outlook/Apple takviminde otomatik güncel", onOpenCalendarSync)
+            closedSalons.forEach { cs ->
+                MenuRow(Icons.Outlined.Storefront, "Kapattığınız salon: ${cs.name}", "Salonu yeniden açın (uzmanları yeniden davet edersiniz)") { reopening = cs }
+            }
 
             if (ui.memberships.isNotEmpty()) {
                 Text("Salon üyelikleri", style = MaterialTheme.typography.titleMedium)
@@ -171,6 +181,15 @@ fun AccountScreen(
             },
             confirmButton = { TextButton(onClick = { viewModel.updateName(first, last) { editingName = false } }, enabled = valid && !savingName) { Text(if (savingName) "Kaydediliyor…" else "Kaydet") } },
             dismissButton = { TextButton(onClick = { editingName = false }, enabled = !savingName) { Text("Vazgeç") } },
+        )
+    }
+    reopening?.let { cs ->
+        ConfirmDialog(
+            title = "${cs.name} yeniden açılsın mı?",
+            message = "Salon tekrar aktif olur ve randevu almaya açılır. Daha önce çalışan uzmanlar otomatik dönmez; Stilist Yönetimi'nden yeniden davet edersiniz. Başka bir salonun sahibiyseniz yeniden açamazsınız.",
+            confirmLabel = "Yeniden Aç",
+            onConfirm = { reopening = null; viewModel.reopenSalon(cs.id, onSalonReopened) },
+            onDismiss = { reopening = null },
         )
     }
     if (confirmDelete) {

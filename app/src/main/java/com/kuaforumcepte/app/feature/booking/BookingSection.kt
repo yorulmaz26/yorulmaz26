@@ -49,9 +49,19 @@ fun BookingSection(salonId: String, onActiveAppointment: (String) -> Unit, viewM
 
     Column(verticalArrangement = Arrangement.spacedBy(Spacing.m)) {
         Text("Randevu Al", style = MaterialTheme.typography.headlineSmall)
-        ui.activeAppointment?.let { a ->
-            ActiveAppointmentCard(a, onOpen = { onActiveAppointment(a.id) })
+        if (ui.limitReached) {
+            InfoBanner(
+                "Aynı anda en fazla ${BookingSectionUi.MAX_ACTIVE_APPOINTMENTS} aktif randevunuz olabilir. Yeni randevu için birinin tamamlanmasını bekleyin veya birini iptal edin.",
+                container = KcTheme.colors.pendingContainer,
+            )
+            ui.activeAppointments.forEach { a -> ActiveAppointmentCard(a, onOpen = { onActiveAppointment(a.id) }) }
             return@Column
+        }
+        if (ui.activeAppointments.isNotEmpty()) {
+            Text(
+                "${ui.activeAppointments.size} aktif randevunuz var. Kendiniz için aynı saate ikinci randevu alınamaz; başkası adına alabilirsiniz.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -90,12 +100,9 @@ fun BookingSection(salonId: String, onActiveAppointment: (String) -> Unit, viewM
 fun ActiveAppointmentCard(a: com.kuaforumcepte.app.data.appointments.Appointment, onOpen: () -> Unit) {
     Surface(onClick = onOpen, shape = MaterialTheme.shapes.large, color = KcTheme.colors.pendingContainer) {
         Column(Modifier.fillMaxWidth().padding(Spacing.l), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
-            Text("Bekleyen/aktif randevunuz bulunmaktadır", style = MaterialTheme.typography.titleMedium)
+            Text(if (a.status.name == "PENDING") "Onay bekleyen randevunuz" else "Yaklaşan randevunuz", style = MaterialTheme.typography.titleMedium)
             Text("${a.salonName} · ${com.kuaforumcepte.app.feature.appointments.apptDate.format(a.startAt)} ${com.kuaforumcepte.app.feature.appointments.apptTime.format(a.startAt)}", style = MaterialTheme.typography.bodyMedium)
-            Text(
-                "Aynı anda yalnızca bir aktif randevunuz olabilir. Randevunuz tamamlandığında, iptal edildiğinde veya talebiniz düştüğünde yeni randevu alabilirsiniz.",
-                style = MaterialTheme.typography.bodySmall,
-            )
+            a.guestName?.let { Text("Hizmeti alacak: $it", style = MaterialTheme.typography.bodySmall) }
             Text("Görüntüle / İptal et →", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
         }
     }

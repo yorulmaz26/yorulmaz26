@@ -53,7 +53,15 @@ data class InviteForm(
     val key: String,
 )
 
-data class EditForm(val member: StaffMember, val firstName: String, val lastName: String, val specialty: String, val submitting: Boolean = false)
+data class EditForm(
+    val member: StaffMember,
+    val firstName: String,
+    val lastName: String,
+    val specialty: String,
+    val submitting: Boolean = false,
+    /** Prim oranı (%) metni; null = henüz yüklenmedi. */
+    val commission: String? = null,
+)
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -159,7 +167,14 @@ class StaffManagementViewModel @Inject constructor(
         }
     }
 
-    fun openEdit(member: StaffMember) { _edit.value = EditForm(member, member.firstName, member.lastName, member.specialty) }
+    fun openEdit(member: StaffMember) {
+        _edit.value = EditForm(member, member.firstName, member.lastName, member.specialty)
+        val sid = salonId ?: return
+        viewModelScope.launch {
+            val pct = runCatching { repo.commissionOf(sid, member.uid) }.getOrDefault(0)
+            _edit.update { f -> if (f?.member?.uid == member.uid && f.commission == null) f.copy(commission = pct.toString()) else f }
+        }
+    }
     fun closeEdit() { if (_edit.value?.submitting != true) _edit.value = null }
     fun onEdit(transform: (EditForm) -> EditForm) = _edit.update { it?.let(transform) }
 
@@ -170,9 +185,11 @@ class StaffManagementViewModel @Inject constructor(
             _message.value = UiText.Plain("Ad, soyad (2–50 harf) ve uzmanlık alanını (2–60 karakter) kontrol edin.")
             return
         }
+        val pct = f.commission?.let { it.toIntOrNull() ?: -1 }
+        if (pct != null && pct !in 0..100) { _message.value = UiText.Plain("Prim oranı 0 ile 100 arasında olmalı."); return }
         _edit.value = f.copy(submitting = true)
         viewModelScope.launch {
-            runCatching { repo.updateMember(sid, f.member.uid, f.firstName, f.lastName, f.specialty) }
+            runCatching { repo.updateMember(sid, f.member.uid, f.firstName, f.lastName, f.specialty, pct) }
                 .onSuccess { _edit.value = null; _message.value = UiText.Plain("Bilgiler güncellendi.") }
                 .onFailure { _edit.value = f.copy(submitting = false); _message.value = ErrorMessages.of(it) }
         }

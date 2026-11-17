@@ -45,6 +45,15 @@ data class Appointment(
     val attentionReason: String?,
     val hiddenFor: List<String>,
     val reviewId: String? = null,
+    /** Uygulaması olmayan müşteri için salonun açtığı kayıt (müşteri hesabı ve bildirimi yok). */
+    val walkIn: Boolean = false,
+    /** Başkası adına alınmışsa randevuyu alan kişinin adı. */
+    val bookedByName: String? = null,
+    val guestName: String? = null,
+    /** "CODE" veya "LOYALTY"; indirim yoksa null. */
+    val discountType: String? = null,
+    val discountCode: String? = null,
+    val discount: Kurus = Kurus(0),
 ) {
     /** Zamanlayıcı henüz işlemediyse bile süresi dolmuş talep EXPIRED gösterilir. */
     fun effectiveStatus(now: Instant): AppointmentStatus =
@@ -53,7 +62,24 @@ data class Appointment(
     fun isActive(now: Instant): Boolean = effectiveStatus(now).isActive
     fun customerCanCancel(now: Instant): Boolean = isActive(now) && status != AppointmentStatus.IN_PROGRESS &&
         AppointmentTransitions.canCustomerCancel(now, startAt)
+
+    /** Aktif ama son 2 saate girildiği için müşteri uygulamadan iptal edemez → salonla iletişim. */
+    fun customerMustCallToCancel(now: Instant): Boolean =
+        isActive(now) && status != AppointmentStatus.IN_PROGRESS && !AppointmentTransitions.canCustomerCancel(now, startAt)
+
+    val serviceSummary: String get() = items.joinToString(", ") { it.name }
 }
+
+data class AppointmentContact(val role: String, val name: String, val phoneE164: String) {
+    val roleLabel: String get() = when (role) {
+        "STAFF" -> "Uzman"
+        "OWNER" -> "Salon sahibi"
+        else -> "Salon"
+    }
+}
+
+/** Salon × müşteri geçmişi (uzman/sahip için gelmeme uyarısı). */
+data class CustomerStats(val completedCount: Int, val noShowCount: Int)
 
 @Singleton
 class AppointmentRepository @Inject constructor(
@@ -126,6 +152,36 @@ class AppointmentRepository @Inject constructor(
         functions.call("adjustAppointmentPrice", mapOf("appointmentId" to id, "newFinalKurus" to newFinal.value, "reason" to reason.trim()))
     }
 
+    /** Son 2 saatte iptal için: uzmanın, salon sahibinin ve salonun telefonu (yalnızca randevunun müşterisine). */
+    suspend fun contacts(id: String): List<AppointmentContact> {
+        val r = functions.call("getAppointmentContacts", mapOf("appointmentId" to id))
+        @Suppress("UNCHECKED_CAST")
+        return (r["contacts"] as? List<Map<String, Any?>>).orEmpty().map {
+            AppointmentContact(it.str("role").orEmpty(), it.str("name").orEmpty(), it.str("phoneE164").orEmpty())
+        }
+    }
+
+    /** Elden randevu (uzman kendi adına, sahip herhangi bir uzman adına). Doğrudan onaylıdır. */
+    suspend fun createWalkIn(
+        salonId: String, staffUid: String, serviceIds: List<String>, startAt: Instant,
+        customerName: String, customerPhone: String?, idempotencyKey: String,
+    ): String {
+        val r = functions.call(
+            "createWalkInAppointment",
+            mapOf(
+                "salonId" to salonId, "staffUid" to staffUid, "serviceIds" to serviceIds, "startAt" to startAt.toString(),
+                "customerName" to customerName.trim(), "customerPhone" to customerPhone?.trim()?.ifBlank { null },
+                "idempotencyKey" to idempotencyKey,
+            ),
+        )
+        return r.str("appointmentId").orEmpty()
+    }
+
+    fun observeCustomerStats(salonId: String, customerUid: String): Flow<CustomerStats?> =
+        firestore.get().collection("salons").document(salonId).collection("customers").document(customerUid).snapshots()
+            .map { d -> if (!d.exists()) null else CustomerStats((d.getLong("completedCount") ?: 0).toInt(), (d.getLong("noShowCount") ?: 0).toInt()) }
+            .catch { emit(null) }
+
     /** @return yeni durum; süresi dolmuş taleplerde "EXPIRED". */
     suspend fun transition(id: String, action: String, reason: String? = null): AppointmentStatus {
         val r = functions.call("transitionAppointment", mapOf("appointmentId" to id, "action" to action, "reason" to reason))
@@ -162,5 +218,11 @@ internal fun DocumentSnapshot.toAppointment(): Appointment? {
         attentionReason = (get("attention") as? Map<String, Any?>)?.str("reason"),
         hiddenFor = (get("hiddenFor") as? List<String>).orEmpty(),
         reviewId = getString("reviewId"),
+        walkIn = getBoolean("walkIn") == true,
+        bookedByName = getString("bookedByName"),
+        guestName = getString("guestName"),
+        discountType = (get("discount") as? Map<String, Any?>)?.str("type"),
+        discountCode = (get("discount") as? Map<String, Any?>)?.str("code"),
+        discount = Kurus(((get("discount") as? Map<String, Any?>)?.get("discountKurus") as? Number)?.toLong() ?: 0),
     )
 }

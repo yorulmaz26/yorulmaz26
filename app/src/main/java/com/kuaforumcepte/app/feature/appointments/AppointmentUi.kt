@@ -42,15 +42,31 @@ private fun StatusPillBox(text: String, fg: Color, bg: Color, modifier: Modifier
 
 /** Android takvim uygulamasına (Google Takvim dahil) etkinlik ekleme formu; kullanıcı onaylar. */
 object CalendarIntents {
-    fun insert(a: Appointment): Intent = Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
+    /**
+     * Cihaz takvimine (Google Takvim, Samsung Takvim vb.) tek etkinlik ekler; izin gerektirmez.
+     * asBusiness: uzman/sahip görünümü — başlıkta müşteri adı ve hizmet, açıklamada telefon.
+     */
+    fun insert(a: Appointment, asBusiness: Boolean = false): Intent = Intent(Intent.ACTION_INSERT, CalendarContract.Events.CONTENT_URI).apply {
         putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, a.startAt.toEpochMilli())
         putExtra(CalendarContract.EXTRA_EVENT_END_TIME, a.endAt.toEpochMilli())
+        if (asBusiness) {
+            putExtra(CalendarContract.Events.TITLE, "${a.customerName} – ${a.serviceSummary}")
+            putExtra(CalendarContract.Events.EVENT_LOCATION, a.salonAddress)
+            putExtra(
+                CalendarContract.Events.DESCRIPTION,
+                "Kuaförüm Cepte · ${a.number}\nUzman: ${a.staffName}\nMüşteri: ${a.customerName}" +
+                    (if (a.customerPhoneE164.isNotBlank()) " (${a.customerPhoneE164})" else "") +
+                    "\nDurum takvimde otomatik güncellenmez; sürekli güncel takvim için Hesabım › Takvim aboneliği.",
+            )
+            putExtra(CalendarContract.Events.EVENT_TIMEZONE, BusinessTime.ZONE.id)
+            return@apply
+        }
         putExtra(CalendarContract.Events.TITLE, "${a.salonName} randevusu")
         putExtra(CalendarContract.Events.EVENT_LOCATION, a.salonAddress)
         putExtra(
             CalendarContract.Events.DESCRIPTION,
             "Kuaförüm Cepte · ${a.number}\nUzman: ${a.staffName}\nHizmetler: ${a.items.joinToString { it.name }}\n" +
-                "Durum takvimde otomatik güncellenmez; güncel durumu uygulamadan kontrol edin.",
+                "Durum takvimde otomatik güncellenmez; sürekli güncel takvim için Hesabım › Takvim aboneliği.",
         )
         putExtra(CalendarContract.Events.EVENT_TIMEZONE, BusinessTime.ZONE.id)
     }

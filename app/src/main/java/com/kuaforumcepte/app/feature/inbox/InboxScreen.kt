@@ -89,7 +89,13 @@ private val fmt = DateTimeFormatter.ofPattern("d MMM HH:mm", BusinessTime.LOCALE
 
 /** Uygulama içi bildirim kutusu. Push izni kapalı veya cihaz çevrimdışı olsa bile tüm bildirimler burada. */
 @Composable
-fun InboxScreen(onBack: () -> Unit, onOpenAppointment: (String) -> Unit, viewModel: InboxViewModel = hiltViewModel()) {
+fun InboxScreen(
+    onBack: () -> Unit,
+    onOpenAppointment: (String) -> Unit,
+    /** Randevusuz bildirimler (bekleme listesinde yer açıldı, salon onayı) için salon sayfası. */
+    onOpenSalon: ((String) -> Unit)? = null,
+    viewModel: InboxViewModel = hiltViewModel(),
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val unread by viewModel.unread.collectAsStateWithLifecycle()
     Scaffold(topBar = {
@@ -102,7 +108,11 @@ fun InboxScreen(onBack: () -> Unit, onOpenAppointment: (String) -> Unit, viewMod
             is UiState.Success -> LazyColumn(Modifier.fillMaxSize().padding(padding), contentPadding = PaddingValues(Spacing.screen), verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
                 items(s.data, key = { it.id }) { item ->
                     Surface(
-                        onClick = { viewModel.open(item); item.appointmentId?.let(onOpenAppointment) },
+                        onClick = {
+                            viewModel.open(item)
+                            val appt = item.appointmentId
+                            if (appt != null && item.type != "REVIEW_REPLIED") onOpenAppointment(appt) else item.salonId?.let { sid -> onOpenSalon?.invoke(sid) }
+                        },
                         shape = MaterialTheme.shapes.medium,
                         color = if (item.read) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.secondaryContainer,
                     ) {

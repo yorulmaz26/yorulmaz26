@@ -134,4 +134,34 @@ class ComponentUiTests {
         compose.onAllNodesWithContentDescription("Önceki günler")[0].assertIsNotEnabled()
         compose.onNodeWithText("uygun saat yok", substring = true).assertIsDisplayed()
     }
+
+    @Test fun doluGundeBeklemeListesiDugmesiCalisir() {
+        val days = listOf(AvailabilityDay(LocalDate.of(2026, 11, 22), emptyList()))
+        val ui = SlotPickerUi(LocalDate.of(2026, 11, 22), loading = false, availability = Availability(Kurus(40000), 30, 60, days), selectedDate = days[0].date)
+        var joined: LocalDate? = null
+        compose.setContent {
+            KuaforumTheme {
+                SlotPickerContent("Tarih ve Saat", ui, canPrev = false, canNext = true, onBack = {}, onReload = {},
+                    onSelectDate = {}, onShift = {}, onSlotSelected = {}, footer = "Not", onJoinWaitlist = { joined = it })
+            }
+        }
+        compose.onNodeWithText("Bu gün için bekleme listesine katıl").performClick()
+        assertEquals(LocalDate.of(2026, 11, 22), joined)
+    }
+
+    @Test fun biletBaskasiAdinaVeIndirimiGosterir() {
+        val now = Instant.parse("2026-11-17T10:00:00Z")
+        val a = Appointment(
+            id = "ap2", number = "KC-AP200000", salonId = "s", salonName = "Işıltı", salonAddress = "Kızılay Mah. 1, Çankaya / Ankara",
+            staffUid = "u", staffName = "Can Er", customerUid = "c", customerName = "Elif Kaya", customerPhoneE164 = "+905320000001",
+            items = listOf(AppointmentItem("kesim", "Kesim", Kurus(40000), 30)), total = Kurus(40000), finalTotal = Kurus(32000), totalMinutes = 30,
+            startAt = Instant.parse("2026-11-18T07:00:00Z"), endAt = Instant.parse("2026-11-18T07:30:00Z"),
+            status = AppointmentStatus.CONFIRMED, pendingExpiresAt = Instant.parse("2026-11-18T07:00:00Z"),
+            cancelReason = null, attentionReason = null, hiddenFor = emptyList(),
+            guestName = "Elif Kaya", bookedByName = "Ali Kaya", discountType = "CODE", discountCode = "YAZ20", discount = Kurus(8000),
+        )
+        compose.setContent { KuaforumTheme { AppointmentTicket(a, now) } }
+        compose.onNodeWithText("Hizmeti alacak: Elif Kaya").assertIsDisplayed()
+        compose.onNodeWithText("İndirim (YAZ20)").assertIsDisplayed()
+    }
 }

@@ -53,7 +53,7 @@ interface UpsertCodeReq {
 export const upsertDiscountCode = authedCallable<UpsertCodeReq, { code: string }>("upsertDiscountCode", async (data, caller) => {
   const salonId = docId(data.salonId, "salonId");
   const code = normalizeCode(String(data.code ?? ""));
-  if (!DISCOUNT_CODE_RE.test(code)) fail("invalid-argument", "INVALID_CODE", { field: "code" });
+  if (!DISCOUNT_CODE_RE.test(code)) fail("invalid-argument", "INVALID_DISCOUNT_CODE", { field: "code" });
   const description = optString(data.description, "description", 120);
   const percent = data.percent === undefined || data.percent === null || data.percent === "" ? null : Number(data.percent);
   const amountKurus = data.amountKurus === undefined || data.amountKurus === null || data.amountKurus === "" ? null : Number(data.amountKurus);

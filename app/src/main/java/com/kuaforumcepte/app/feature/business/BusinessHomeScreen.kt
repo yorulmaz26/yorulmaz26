@@ -13,6 +13,9 @@ import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.automirrored.outlined.EventNote
 import androidx.compose.material.icons.outlined.Groups
+import androidx.compose.material.icons.outlined.Loyalty
+import androidx.compose.material.icons.outlined.Reviews
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material.icons.outlined.BeachAccess
 import androidx.compose.material.icons.outlined.ContentCut
@@ -24,6 +27,7 @@ import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -54,6 +58,7 @@ import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.domain.auth.Permission
 import com.kuaforumcepte.app.feature.bizappointments.BusinessAppointmentsContent
+import com.kuaforumcepte.app.feature.platform.SalonVerificationBanner
 import com.kuaforumcepte.app.feature.inbox.InboxBell
 import com.kuaforumcepte.app.feature.reports.ReportsSection
 import com.kuaforumcepte.domain.model.MemberRole
@@ -80,6 +85,9 @@ fun BusinessHomeScreen(
     onSwitchSalon: () -> Unit,
     onOpenInbox: () -> Unit,
     onOpenAppointment: (String) -> Unit,
+    onAddWalkIn: () -> Unit,
+    onOpenPromotions: () -> Unit,
+    onOpenSalonPage: (String) -> Unit,
     viewModel: BusinessHomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -111,6 +119,15 @@ fun BusinessHomeScreen(
                     })
                 },
                 snackbarHost = { SnackbarHost(snackbar) },
+                floatingActionButton = {
+                    if (BusinessTab.entries[tab] == BusinessTab.APPOINTMENTS) {
+                        ExtendedFloatingActionButton(
+                            onClick = onAddWalkIn,
+                            icon = { Icon(Icons.Outlined.PersonAdd, contentDescription = null) },
+                            text = { Text("Elden Randevu") },
+                        )
+                    }
+                },
                 bottomBar = {
                     NavigationBar {
                         BusinessTab.entries.forEachIndexed { i, t ->
@@ -134,6 +151,7 @@ fun BusinessHomeScreen(
                     Surface(shape = MaterialTheme.shapes.extraLarge, color = MaterialTheme.colorScheme.secondaryContainer) {
                         Text(m.role.label, style = MaterialTheme.typography.labelLarge, modifier = Modifier.padding(horizontal = Spacing.m, vertical = Spacing.xs))
                     }
+                    if (m.role == com.kuaforumcepte.domain.model.MemberRole.OWNER) SalonVerificationBanner(m.salonId)
                     when (BusinessTab.entries[tab]) {
                         BusinessTab.STATS -> {
                             if (Permission.SHARE_BOOKING_LINK in s.permissions) {
@@ -159,7 +177,11 @@ fun BusinessHomeScreen(
                                 MenuRow(Icons.Outlined.PhotoLibrary, "Logo ve Fotoğrafları Güncelle", "Logoyu değiştir, galeriyi düzenle", onOpenMedia)
                             }
                             if (Permission.MANAGE_STAFF in s.permissions) {
-                                MenuRow(Icons.Outlined.Groups, "Stilist Yönetimi", "Uzman davet et, listele, düzenle, pasife al", onOpenStaff)
+                                MenuRow(Icons.Outlined.Groups, "Stilist Yönetimi", "Uzman davet et, listele, düzenle, prim oranı, pasife al", onOpenStaff)
+                            }
+                            if (Permission.MANAGE_SALON_SETTINGS in s.permissions) {
+                                MenuRow(Icons.Outlined.Loyalty, "Kampanyalar ve Sadakat", "İndirim kodları, sadakat programı", onOpenPromotions)
+                                MenuRow(Icons.Outlined.Reviews, "Salon Sayfam ve Yorumlar", "Müşterinin gördüğü sayfa; yorumlara yanıt verin") { onOpenSalonPage(m.salonId) }
                             }
                             MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, Beni hatırla, tema, çıkış", onOpenAccount)
                         }

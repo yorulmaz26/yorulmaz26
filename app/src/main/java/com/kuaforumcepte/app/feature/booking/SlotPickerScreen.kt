@@ -18,7 +18,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -26,7 +29,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.selected
@@ -38,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kuaforumcepte.app.core.designsystem.component.EmptyState
 import com.kuaforumcepte.app.core.designsystem.component.ErrorState
 import com.kuaforumcepte.app.core.designsystem.component.InfoBanner
+import com.kuaforumcepte.app.core.designsystem.component.KcSecondaryButton
 import com.kuaforumcepte.app.core.designsystem.component.KcTopBar
 import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
 import com.kuaforumcepte.app.core.designsystem.component.asString
@@ -52,13 +58,31 @@ private val dayNum = DateTimeFormatter.ofPattern("d MMM", BusinessTime.LOCALE)
 private val fullDay = DateTimeFormatter.ofPattern("d MMMM EEEE", BusinessTime.LOCALE)
 
 @Composable
-fun SlotPickerScreen(onBack: () -> Unit, onSlotSelected: (Slot) -> Unit, viewModel: SlotPickerViewModel = hiltViewModel()) {
+fun SlotPickerScreen(onBack: () -> Unit, onSlotSelected: (Slot, Boolean) -> Unit, viewModel: SlotPickerViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
+    val forSelf by viewModel.forSelf.collectAsStateWithLifecycle()
+    val joining by viewModel.joining.collectAsStateWithLifecycle()
+    val message by viewModel.message.collectAsStateWithLifecycle()
+    val snackbar = remember { SnackbarHostState() }
+    LaunchedEffect(message) { message?.let { snackbar.showSnackbar(it); viewModel.messageShown() } }
     SlotPickerContent(
         title = "Tarih ve Saat", ui = ui, canPrev = viewModel.canPrev, canNext = viewModel.canNext,
         onBack = onBack, onReload = viewModel::load, onSelectDate = viewModel::selectDate, onShift = viewModel::shiftWindow,
-        onSlotSelected = onSlotSelected,
+        onSlotSelected = { onSlotSelected(it, forSelf) },
         footer = "Yalnızca hizmetlerin toplam süresinin tamamının sığdığı başlangıç saatleri gösterilir. Gösterilen saat, onayladığınız anda sunucuda yeniden kontrol edilir.",
+        header = {
+            Column(Modifier.padding(horizontal = Spacing.screen), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                Text("Randevu kimin için?", style = MaterialTheme.typography.labelLarge)
+                Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                    FilterChip(selected = forSelf, onClick = { viewModel.setForSelf(true) }, label = { Text("Kendim için") })
+                    FilterChip(selected = !forSelf, onClick = { viewModel.setForSelf(false) }, label = { Text("Başkası için (çocuk, yakın)") })
+                }
+                if (forSelf) Text("Başka randevunuz olan saatler gösterilmez.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        },
+        onJoinWaitlist = viewModel::joinWaitlist,
+        joiningWaitlist = joining,
+        snackbarHost = { SnackbarHost(snackbar) },
     )
 }
 
@@ -77,11 +101,17 @@ fun SlotPickerContent(
     onSlotSelected: (Slot) -> Unit,
     footer: String,
     showPrice: Boolean = true,
+    header: @Composable () -> Unit = {},
+    /** Boş günde "bekleme listesine katıl" (yalnızca müşteri rezervasyonunda). */
+    onJoinWaitlist: ((java.time.LocalDate) -> Unit)? = null,
+    joiningWaitlist: Boolean = false,
+    snackbarHost: @Composable () -> Unit = {},
 ) {
     Scaffold(topBar = {
         KcTopBar(title, onBack, actions = { IconButton(onClick = onReload) { Icon(Icons.Outlined.Refresh, "Saatleri yenile") } })
-    }) { padding ->
+    }, snackbarHost = snackbarHost) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(vertical = Spacing.s)) {
+            header()
             ui.availability?.let { a ->
                 Text(
                     if (showPrice) "Toplam ${formatDuration(a.totalMinutes)} · ${a.total.formatTry()}" else "Süre ${formatDuration(a.totalMinutes)}",
@@ -124,10 +154,17 @@ fun SlotPickerContent(
                     ui.loading -> SkeletonCardList(2, Modifier.padding(0.dp))
                     ui.error != null -> ErrorState(ui.error!!.asString(), onRetry = onReload)
                     ui.selectedDate == null -> Unit
-                    ui.slotsOfSelected.isEmpty() -> EmptyState(
-                        title = "${ui.selectedDate!!.format(fullDay)} için uygun saat yok",
-                        message = "Uzman o gün çalışmıyor, salon kapalı veya tüm saatler dolu olabilir. Başka bir gün seçin.",
-                    )
+                    ui.slotsOfSelected.isEmpty() -> {
+                        EmptyState(
+                            title = "${ui.selectedDate!!.format(fullDay)} için uygun saat yok",
+                            message = "Uzman o gün çalışmıyor, salon kapalı veya tüm saatler dolu olabilir. Başka bir gün seçin" +
+                                if (onJoinWaitlist != null) " ya da bekleme listesine katılın; yer açılırsa haber veririz." else ".",
+                        )
+                        if (onJoinWaitlist != null) {
+                            val date = ui.selectedDate!!
+                            KcSecondaryButton("Bu gün için bekleme listesine katıl", onClick = { onJoinWaitlist(date) }, loading = joiningWaitlist)
+                        }
+                    }
                     else -> {
                         Text(ui.selectedDate!!.format(fullDay), style = MaterialTheme.typography.titleMedium)
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(Spacing.s), verticalArrangement = Arrangement.spacedBy(Spacing.s)) {

@@ -13,6 +13,8 @@ plugins {
 // Dosya yoksa uygulama derlenir ve açılışta "Firebase yapılandırılmadı" ekranını gösterir.
 if (file("google-services.json").exists()) {
     apply(plugin = libs.plugins.google.services.get().pluginId)
+    // Çökme raporları (Crashlytics) yalnızca Firebase yapılandırılmışken; debug'da toplama kapalı (KuaforumCepteApp).
+    apply(plugin = libs.plugins.firebase.crashlytics.get().pluginId)
 } else {
     logger.warn("⚠ app/google-services.json bulunamadı: Firebase devre dışı derleniyor.")
 }
@@ -133,6 +135,7 @@ dependencies {
     implementation(libs.firebase.storage)
     implementation(libs.firebase.messaging)
     implementation(libs.firebase.appcheck.playintegrity)
+    implementation(libs.firebase.crashlytics)
     debugImplementation(libs.firebase.appcheck.debug)
 
     implementation(libs.kotlinx.coroutines.android)

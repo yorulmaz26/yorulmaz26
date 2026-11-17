@@ -88,7 +88,18 @@ fun StarRow(value: Int, size: Dp = 16.dp) {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class SalonReviewsViewModel @Inject constructor(private val repo: ReviewRepository) : ViewModel() {
+class SalonReviewsViewModel @Inject constructor(
+    private val repo: ReviewRepository,
+    private val session: com.kuaforumcepte.app.data.session.SessionRepository,
+) : ViewModel() {
+    fun isOwner(ownerUid: String?): Boolean = ownerUid != null && ownerUid == session.currentUid
+
+    fun reply(review: Review, text: String) = viewModelScope.launch {
+        runCatching { repo.reply(review.id, text) }
+            .onSuccess { _message.value = if (text.isBlank()) "Yanıt kaldırıldı." else "Yanıtınız yayınlandı; müşteriye bildirildi." }
+            .onFailure { _message.value = (ErrorMessages.of(it) as UiText.Plain).value }
+    }
+
     private val salonId = MutableStateFlow<String?>(null)
     val reviews: StateFlow<List<Review>?> = salonId.filterNotNull().flatMapLatest { repo.observeSalon(it) }
         .catch { emit(emptyList()) }
@@ -137,7 +148,34 @@ private val dateFmt = DateTimeFormatter.ofPattern("d MMM yyyy", BusinessTime.LOC
 
 /** Salon puanı (salon değerlendirmelerinin ortalaması) ve son yorumlar. */
 @Composable
-fun SalonReviewsSection(salonId: String, rating: Rating, viewModel: SalonReviewsViewModel = hiltViewModel(key = "reviews_$salonId")) {
+fun SalonReviewsSection(
+    salonId: String,
+    rating: Rating,
+    ownerUid: String? = null,
+    viewModel: SalonReviewsViewModel = hiltViewModel(key = "reviews_$salonId"),
+) {
+    val canReply = viewModel.isOwner(ownerUid)
+    var replying by remember { mutableStateOf<Review?>(null) }
+    var replyText by remember { mutableStateOf("") }
+    replying?.let { r ->
+        AlertDialog(
+            onDismissRequest = { replying = null },
+            title = { Text("Yoruma yanıt") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                    Text("Yanıtınız herkese açık görünür. Kişisel veri (telefon, ad soyad) yazmayın.", style = MaterialTheme.typography.bodySmall)
+                    KcTextField(replyText, { replyText = it }, "Yanıtınız", singleLine = false, minLines = 3, maxLength = 500)
+                }
+            },
+            confirmButton = { TextButton(onClick = { viewModel.reply(r, replyText); replying = null }, enabled = replyText.isNotBlank()) { Text("Yayınla") } },
+            dismissButton = {
+                Row {
+                    if (r.ownerReply != null) TextButton(onClick = { viewModel.reply(r, ""); replying = null }) { Text("Yanıtı kaldır", color = MaterialTheme.colorScheme.error) }
+                    TextButton(onClick = { replying = null }) { Text("Vazgeç") }
+                }
+            },
+        )
+    }
     LaunchedEffect(salonId) { viewModel.bind(salonId) }
     val reviews by viewModel.reviews.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
@@ -168,7 +206,20 @@ fun SalonReviewsSection(salonId: String, rating: Rating, viewModel: SalonReviews
                     r.serviceRating?.let { s -> Row(verticalAlignment = Alignment.CenterVertically) { Text("Hizmet ", style = MaterialTheme.typography.labelMedium); StarRow(s) } }
                     if (r.comment.isNotBlank()) Text(r.comment, style = MaterialTheme.typography.bodyMedium)
                     if (r.serviceNames.isNotEmpty()) Text(r.serviceNames.joinToString(), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    TextButton(onClick = { reporting = r }) { Text("Şikâyet et", style = MaterialTheme.typography.labelMedium) }
+                    r.ownerReply?.let { reply ->
+                        Surface(shape = MaterialTheme.shapes.small, color = MaterialTheme.colorScheme.secondaryContainer) {
+                            Column(Modifier.fillMaxWidth().padding(Spacing.s)) {
+                                Text("Salonun yanıtı", style = MaterialTheme.typography.labelMedium)
+                                Text(reply, style = MaterialTheme.typography.bodySmall)
+                            }
+                        }
+                    }
+                    Row {
+                        if (canReply) TextButton(onClick = { replyText = r.ownerReply.orEmpty(); replying = r }) {
+                            Text(if (r.ownerReply == null) "Yanıtla" else "Yanıtı düzenle", style = MaterialTheme.typography.labelMedium)
+                        }
+                        if (!canReply) TextButton(onClick = { reporting = r }) { Text("Şikâyet et", style = MaterialTheme.typography.labelMedium) }
+                    }
                 }
             }
         }

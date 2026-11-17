@@ -39,7 +39,8 @@ class SalonPage(val items: List<SalonProfile>, val cursor: DocumentSnapshot?, va
 class SalonDirectoryRepository @Inject constructor(private val firestore: Lazy<FirebaseFirestore>) {
 
     suspend fun page(q: SalonListQuery, after: DocumentSnapshot?, size: Long = PAGE_SIZE): SalonPage = try {
-        var query: Query = firestore.get().collection("salons").whereEqualTo("status", "ACTIVE")
+        // Yalnızca platform onaylı salonlar listelenir; onaysız salona kod/QR/link ile ulaşılabilir.
+        var query: Query = firestore.get().collection("salons").whereEqualTo("status", "ACTIVE").whereEqualTo("verified", true)
         q.type?.let { query = query.whereEqualTo("type", it.name) }
         q.city?.let { query = query.whereEqualTo("city", it) }
         q.district?.let { query = query.whereEqualTo("district", it) }

@@ -1,6 +1,9 @@
 package com.kuaforumcepte.app.feature.customer
 
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -32,6 +35,11 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.EventAvailable
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.HourglassTop
+import androidx.compose.material.icons.outlined.NearMe
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,11 +71,14 @@ fun CustomerHomeScreen(
     onOpenAppointment: (String) -> Unit,
     onOpenInbox: () -> Unit,
     onReview: (String) -> Unit,
+    onOpenNearby: () -> Unit,
+    onOpenWaitlist: () -> Unit,
     viewModel: CustomerHomeViewModel = hiltViewModel(),
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
     val selected by viewModel.selectedSalon.collectAsStateWithLifecycle()
-    val active by viewModel.activeAppointment.collectAsStateWithLifecycle()
+    val active by viewModel.activeAppointments.collectAsStateWithLifecycle()
+    val favorites by viewModel.favorites.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     Scaffold(
@@ -89,7 +100,27 @@ fun CustomerHomeScreen(
         when (CustomerTab.entries[tab]) {
             CustomerTab.BOOK -> SalonListContent(
                 onOpenSalon = onOpenSalon,
-                header = { active?.let { a -> ActiveAppointmentCard(a, onOpen = { onOpenAppointment(a.id) }) } },
+                header = {
+                    Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                        active.forEach { a -> ActiveAppointmentCard(a, onOpen = { onOpenAppointment(a.id) }) }
+                        Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                            AssistChip(onClick = onOpenNearby, label = { Text("Yakınımdakiler") }, leadingIcon = { Icon(Icons.Outlined.NearMe, null) })
+                            AssistChip(onClick = onOpenWaitlist, label = { Text("Bekleme listem") }, leadingIcon = { Icon(Icons.Outlined.HourglassTop, null) })
+                        }
+                        if (favorites.isNotEmpty()) {
+                            Text("Favorilerim", style = MaterialTheme.typography.titleMedium)
+                            Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                                favorites.forEach { f ->
+                                    AssistChip(
+                                        onClick = { onOpenSalon(f.salonId) },
+                                        label = { Text(f.salonName + (f.district?.let { d -> " · $d" } ?: "")) },
+                                        leadingIcon = { Icon(Icons.Outlined.Favorite, null, tint = MaterialTheme.colorScheme.primary) },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                },
                 modifier = Modifier.padding(padding),
             )
             CustomerTab.MINE -> MyAppointmentsContent(
@@ -119,7 +150,7 @@ fun CustomerHomeScreen(
                     Spacer(Modifier.height(Spacing.l))
                     SalonHoursSection(st.data.id, st.data.weeklyClosedDays)
                     Spacer(Modifier.height(Spacing.l))
-                    SalonReviewsSection(st.data.id, st.data.rating)
+                    SalonReviewsSection(st.data.id, st.data.rating, ownerUid = st.data.ownerUid)
                     Spacer(Modifier.height(Spacing.s))
                     KcTextButton("Salonu değiştir", viewModel::clearSelection)
                 }

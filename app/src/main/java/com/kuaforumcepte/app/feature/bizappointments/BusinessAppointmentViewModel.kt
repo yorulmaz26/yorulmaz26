@@ -44,6 +44,8 @@ data class BizApptDetail(
     /** Yalnızca sahip için: atanabilecek aktif uzmanlar. */
     val reassignTargets: List<StaffMember>,
     val now: Instant,
+    /** Bu müşterinin salondaki geçmişi (gelmeme uyarısı); elden randevuda null. */
+    val customerStats: com.kuaforumcepte.app.data.appointments.CustomerStats? = null,
 )
 
 sealed interface BizApptDetailState {
@@ -73,7 +75,8 @@ class BusinessAppointmentViewModel @Inject constructor(
             val isOwner = salon?.ownerUid == uid
             val actor = if (isOwner) ActorRole.OWNER else ActorRole.STAFF
             val staff = if (isOwner) staffRepo.members(a.salonId).catch { emit(emptyList()) } else flowOf(emptyList())
-            combine(appointments.observeEvents(id), staff, ticker) { events, members, now ->
+            val stats = if (a.customerUid.isBlank()) flowOf(null) else appointments.observeCustomerStats(a.salonId, a.customerUid)
+            combine(appointments.observeEvents(id), staff, ticker, stats) { events, members, now, st ->
                 val actions = AppointmentTransitions.availableActions(a.status, actor, now, a.startAt, a.pendingExpiresAt)
                     .filter { it != AppointmentAction.EXPIRE && it != AppointmentAction.CANCEL_BY_CUSTOMER }
                 BizApptDetailState.Ready(
@@ -82,6 +85,7 @@ class BusinessAppointmentViewModel @Inject constructor(
                         events = events,
                         reassignTargets = members.filter { it.status == MemberStatus.ACTIVE && it.uid != a.staffUid && it.uid != a.customerUid },
                         now = now,
+                        customerStats = st,
                     ),
                 ) as BizApptDetailState
             }

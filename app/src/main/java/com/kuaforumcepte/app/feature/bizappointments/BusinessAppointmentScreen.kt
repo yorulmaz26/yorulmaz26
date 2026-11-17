@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Edit
@@ -54,6 +55,7 @@ import com.kuaforumcepte.app.core.designsystem.theme.KcTheme
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.app.data.schedule.conflictReasonLabel
 import com.kuaforumcepte.app.feature.appointments.AppointmentStatusChip
+import com.kuaforumcepte.app.feature.appointments.CalendarIntents
 import com.kuaforumcepte.app.feature.appointments.whenLabel
 import com.kuaforumcepte.app.feature.salon.MapIntents
 import com.kuaforumcepte.domain.booking.formatDuration
@@ -105,7 +107,9 @@ fun BusinessAppointmentScreen(onBack: () -> Unit, onReschedule: (String) -> Unit
                                 AppointmentStatusChip(status)
                             }
                             Text(a.customerName, style = MaterialTheme.typography.headlineSmall)
-                            Text(PhoneNumbers.formatForDisplay(a.customerPhoneE164), style = MaterialTheme.typography.bodyMedium)
+                            if (a.walkIn) Text("Elden randevu (müşterinin uygulama hesabı yok)", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                            a.bookedByName?.takeIf { a.guestName != null }?.let { Text("Randevuyu alan: $it", style = MaterialTheme.typography.bodySmall) }
+                            if (a.customerPhoneE164.isNotBlank()) Text(PhoneNumbers.formatForDisplay(a.customerPhoneE164), style = MaterialTheme.typography.bodyMedium)
                             Text(a.whenLabel(), style = MaterialTheme.typography.titleMedium)
                             Text("Uzman: ${a.staffName}", style = MaterialTheme.typography.bodyMedium)
                             HorizontalDivider()
@@ -113,11 +117,28 @@ fun BusinessAppointmentScreen(onBack: () -> Unit, onReschedule: (String) -> Unit
                                 Row { Text("${i.name} · ${formatDuration(i.durationMinutes)}", Modifier.weight(1f)); Text(i.price.formatTry()) }
                             }
                             HorizontalDivider()
+                            if (a.discount.value > 0) {
+                                Row {
+                                    Text(if (a.discountType == "LOYALTY") "Sadakat ödülü" else "İndirim kodu ${a.discountCode}", Modifier.weight(1f), color = MaterialTheme.colorScheme.primary)
+                                    Text("−${a.discount.formatTry()}", color = MaterialTheme.colorScheme.primary)
+                                }
+                            }
                             Row {
                                 Text("Toplam · ${formatDuration(a.totalMinutes)}", Modifier.weight(1f), style = MaterialTheme.typography.titleSmall)
                                 Text(a.finalTotal.formatTry(), fontWeight = FontWeight.Bold)
                             }
                             a.cancelReason?.let { Text("Gerekçe: $it", style = MaterialTheme.typography.bodySmall, color = KcTheme.colors.cancel) }
+                        }
+                    }
+                    d.customerStats?.let { st ->
+                        if (st.noShowCount > 0) {
+                            InfoBanner(
+                                "Dikkat: Bu müşteri salonunuza daha önce ${st.noShowCount} kez gelmedi (${st.completedCount} tamamlanmış ziyaret). " +
+                                    "Onaylamadan önce müşteriyi arayabilirsiniz.",
+                                container = KcTheme.colors.cancelContainer,
+                            )
+                        } else if (st.completedCount > 0) {
+                            Text("Bu müşterinin salonunuzda ${st.completedCount} tamamlanmış ziyareti var.", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                     if (a.attentionReason != null && status.isActive) {
@@ -161,10 +182,15 @@ fun BusinessAppointmentScreen(onBack: () -> Unit, onReschedule: (String) -> Unit
                             KcSecondaryButton("Uzmanı Değiştir", { reassigning = true }, enabled = !busy && d.reassignTargets.isNotEmpty(), leadingIcon = Icons.Outlined.SwapHoriz)
                         }
                     }
-                    if (status.isActive) {
+                    if (status.isActive && a.customerPhoneE164.isNotBlank()) {
                         KcSecondaryButton("Müşteriyi Ara", {
                             try { context.startActivity(MapIntents.dial(a.customerPhoneE164)) } catch (_: ActivityNotFoundException) { }
                         }, leadingIcon = Icons.Outlined.Call)
+                    }
+                    if (status == AppointmentStatus.PENDING || status == AppointmentStatus.CONFIRMED) {
+                        KcSecondaryButton("Takvime Ekle", {
+                            try { context.startActivity(CalendarIntents.insert(a, asBusiness = true)) } catch (_: ActivityNotFoundException) { }
+                        }, leadingIcon = Icons.Outlined.CalendarMonth)
                     }
 
                     if (d.events.isNotEmpty()) {

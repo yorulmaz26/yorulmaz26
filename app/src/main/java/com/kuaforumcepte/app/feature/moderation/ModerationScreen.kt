@@ -61,7 +61,23 @@ import javax.inject.Inject
 class ModerationViewModel @Inject constructor(
     private val repo: ReviewRepository,
     private val session: SessionRepository,
+    private val salons: com.kuaforumcepte.app.data.salon.SalonRepository,
 ) : ViewModel() {
+    val pendingSalons: StateFlow<List<com.kuaforumcepte.app.data.salon.SalonProfile>?> =
+        salons.observePendingVerification().catch { emit(emptyList()) }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
+
+    fun reviewSalon(salonId: String, approve: Boolean, note: String) {
+        if (_busy.value != null) return
+        if (!approve && note.isBlank()) { _message.value = UiText.Plain("Reddetmek için gerekçe yazın (sahibe iletilir)."); return }
+        _busy.value = salonId
+        viewModelScope.launch {
+            runCatching { salons.reviewSalon(salonId, approve, note) }
+                .onSuccess { _message.value = UiText.Plain(if (approve) "Salon onaylandı; artık aramada görünüyor." else "Salon reddedildi; sahibe gerekçe iletildi.") }
+                .onFailure { _message.value = ErrorMessages.of(it) }
+            _busy.value = null
+        }
+    }
+
     private val _isAdmin = MutableStateFlow<Boolean?>(null)
     val isAdmin: StateFlow<Boolean?> = _isAdmin.asStateFlow()
     val flagged: StateFlow<List<Review>?> = repo.observeFlagged().catch { emit(emptyList()) }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
@@ -102,6 +118,7 @@ fun ModerationScreen(onBack: () -> Unit, viewModel: ModerationViewModel = hiltVi
     val isAdmin by viewModel.isAdmin.collectAsStateWithLifecycle()
     val flagged by viewModel.flagged.collectAsStateWithLifecycle()
     val hidden by viewModel.hidden.collectAsStateWithLifecycle()
+    val pendingSalons by viewModel.pendingSalons.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -115,9 +132,20 @@ fun ModerationScreen(onBack: () -> Unit, viewModel: ModerationViewModel = hiltVi
             false -> EmptyState("Bu bölüm yalnızca platform yöneticilerine açıktır", modifier = Modifier.padding(padding))
             true -> Column(Modifier.fillMaxSize().padding(padding)) {
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(Spacing.screen)) {
-                    listOf("İnceleme kuyruğu", "Kaldırılanlar").forEachIndexed { i, label ->
-                        SegmentedButton(selected = tab == i, onClick = { tab = i }, shape = SegmentedButtonDefaults.itemShape(i, 2)) { Text(label) }
+                    listOf("Yorum kuyruğu", "Kaldırılanlar", "Salon onayı").forEachIndexed { i, label ->
+                        SegmentedButton(selected = tab == i, onClick = { tab = i }, shape = SegmentedButtonDefaults.itemShape(i, 3)) { Text(label) }
                     }
+                }
+                if (tab == 2) {
+                    val ps = pendingSalons
+                    when {
+                        ps == null -> SkeletonCardList(2)
+                        ps.isEmpty() -> EmptyState(icon = Icons.Outlined.VerifiedUser, title = "Onay bekleyen salon yok")
+                        else -> LazyColumn(contentPadding = PaddingValues(Spacing.screen), verticalArrangement = Arrangement.spacedBy(Spacing.m)) {
+                            items(ps, key = { it.id }) { salon -> SalonReviewCard(salon, isBusy = busy == salon.id, onDecide = { ok, note -> viewModel.reviewSalon(salon.id, ok, note) }) }
+                        }
+                    }
+                    return@Column
                 }
                 val list = if (tab == 0) flagged else hidden
                 when {
@@ -152,6 +180,26 @@ private fun ModerationCard(r: Review, vm: ModerationViewModel, isBusy: Boolean, 
                     TextButton(onClick = { vm.moderate(r, "DISMISS", note) }, enabled = !isBusy) { Text("Şikâyeti reddet") }
                     TextButton(onClick = { vm.moderate(r, "HIDE", note) }, enabled = !isBusy) { Text("Yayından kaldır", color = MaterialTheme.colorScheme.error) }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SalonReviewCard(salon: com.kuaforumcepte.app.data.salon.SalonProfile, isBusy: Boolean, onDecide: (Boolean, String) -> Unit) {
+    var note by remember { mutableStateOf("") }
+    Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer) {
+        Column(Modifier.fillMaxWidth().padding(Spacing.l), verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+            Text(salon.name, style = MaterialTheme.typography.titleMedium)
+            Text("${salon.type?.label ?: ""} · Kod ${salon.code}", style = MaterialTheme.typography.bodySmall)
+            Text(salon.fullAddress, style = MaterialTheme.typography.bodyMedium)
+            Text("Sahip: ${salon.ownerDisplayName} · ${com.kuaforumcepte.domain.phone.PhoneNumbers.formatForDisplay(salon.businessPhoneE164)}", style = MaterialTheme.typography.bodySmall)
+            if (salon.description.isNotBlank()) Text(salon.description, style = MaterialTheme.typography.bodySmall)
+            Text(if (salon.location != null) "Konum işaretli" else "Konum işaretlenmemiş", style = MaterialTheme.typography.labelSmall)
+            KcTextField(note, { note = it }, "Not / ret gerekçesi", maxLength = 300, singleLine = false)
+            Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                TextButton(onClick = { onDecide(false, note) }, enabled = !isBusy) { Text("Reddet", color = MaterialTheme.colorScheme.error) }
+                TextButton(onClick = { onDecide(true, note) }, enabled = !isBusy) { Text("Onayla") }
             }
         }
     }

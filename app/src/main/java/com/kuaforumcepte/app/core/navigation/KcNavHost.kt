@@ -61,6 +61,11 @@ import com.kuaforumcepte.app.feature.setup.FirebaseSetupRequiredScreen
 import com.kuaforumcepte.app.feature.splash.SplashDecision
 import com.kuaforumcepte.app.feature.splash.SplashScreen
 import com.kuaforumcepte.app.feature.staff.StaffManagementScreen
+import com.kuaforumcepte.app.feature.calendar.CalendarSyncScreen
+import com.kuaforumcepte.app.feature.platform.NearbySalonsScreen
+import com.kuaforumcepte.app.feature.promotions.PromotionsScreen
+import com.kuaforumcepte.app.feature.waitlist.WaitlistScreen
+import com.kuaforumcepte.app.feature.walkin.WalkInScreen
 import com.kuaforumcepte.domain.model.EntryRole
 
 private fun roleOf(name: String): EntryRole = EntryRole.entries.firstOrNull { it.name == name } ?: EntryRole.CUSTOMER
@@ -215,8 +220,18 @@ fun KcNavHost(
                 onSwitchSalon = { navController.navigate(SalonPickerRoute) { single() } },
                 onOpenInbox = { navController.navigate(InboxRoute(EntryRole.BUSINESS.name)) { single() } },
                 onOpenAppointment = { id -> navController.navigate(BusinessAppointmentRoute(id)) { single() } },
+                onAddWalkIn = { navController.navigate(WalkInRoute()) { single() } },
+                onOpenPromotions = { navController.navigate(PromotionsRoute) { single() } },
+                onOpenSalonPage = { sid -> navController.navigate(SalonDetailRoute(sid)) { single() } },
             )
         }
+        composable<WalkInRoute> {
+            WalkInScreen(onBack = back, onCreated = { id ->
+                Toast.makeText(context, "Elden randevu kaydedildi.", Toast.LENGTH_SHORT).show()
+                navController.navigate(BusinessAppointmentRoute(id)) { popUpTo<WalkInRoute> { inclusive = true } }
+            })
+        }
+        composable<PromotionsRoute> { PromotionsScreen(onBack = back) }
         composable<StaffManagementRoute> { StaffManagementScreen(onBack = back) }
         composable<ShopSettingsRoute> {
             ShopSettingsScreen(
@@ -251,8 +266,8 @@ fun KcNavHost(
         // ---- Rezervasyon ----
         composable<SlotPickerRoute> { entry ->
             val r = entry.toRoute<SlotPickerRoute>()
-            SlotPickerScreen(onBack = back, onSlotSelected = { slot ->
-                navController.navigate(BookingSummaryRoute(r.salonId, r.staffUid, r.serviceIds, slot.startAt.toString()))
+            SlotPickerScreen(onBack = back, onSlotSelected = { slot, forSelf ->
+                navController.navigate(BookingSummaryRoute(r.salonId, r.staffUid, r.serviceIds, slot.startAt.toString(), forSelf))
             })
         }
         composable<BookingSummaryRoute> {
@@ -275,7 +290,11 @@ fun KcNavHost(
             )
         }
         composable<AppointmentDetailRoute> {
-            CustomerAppointmentDetailScreen(onBack = back, onReview = { id -> navController.navigate(ReviewRoute(id)) { single() } })
+            CustomerAppointmentDetailScreen(
+                onBack = back,
+                onReview = { id -> navController.navigate(ReviewRoute(id)) { single() } },
+                onRebook = { a -> navController.navigate(SlotPickerRoute(a.salonId, a.staffUid, a.items.map { it.serviceId })) { single() } },
+            )
         }
         composable<ReviewRoute> { ReviewScreen(onBack = back) }
         composable<ChangePhoneRoute> { ChangePhoneScreen(onBack = back) }
@@ -289,8 +308,13 @@ fun KcNavHost(
                 onOpenAppointment = { id -> navController.navigate(AppointmentDetailRoute(id)) { single() } },
                 onOpenInbox = { navController.navigate(InboxRoute(EntryRole.CUSTOMER.name)) { single() } },
                 onReview = { id -> navController.navigate(ReviewRoute(id)) { single() } },
+                onOpenNearby = { navController.navigate(NearbySalonsRoute) { single() } },
+                onOpenWaitlist = { navController.navigate(WaitlistRoute) { single() } },
             )
         }
+        composable<NearbySalonsRoute> { NearbySalonsScreen(onBack = back, onOpenSalon = { id -> navController.navigate(SalonDetailRoute(id)) { single() } }) }
+        composable<WaitlistRoute> { WaitlistScreen(onBack = back, onOpenSalon = { id -> navController.navigate(SalonDetailRoute(id)) { single() } }) }
+        composable<CalendarSyncRoute> { CalendarSyncScreen(onBack = back) }
 
         // ---- İşletme randevuları ve bildirimler ----
         composable<BusinessAppointmentRoute> {
@@ -299,9 +323,13 @@ fun KcNavHost(
         composable<RescheduleRoute> { RescheduleScreen(onBack = back, onDone = back) }
         composable<InboxRoute> { entry ->
             val role = roleOf(entry.toRoute<InboxRoute>().role)
-            InboxScreen(onBack = back, onOpenAppointment = { id ->
-                navController.navigate(if (role == EntryRole.CUSTOMER) AppointmentDetailRoute(id) else BusinessAppointmentRoute(id)) { single() }
-            })
+            InboxScreen(
+                onBack = back,
+                onOpenAppointment = { id ->
+                    navController.navigate(if (role == EntryRole.CUSTOMER) AppointmentDetailRoute(id) else BusinessAppointmentRoute(id)) { single() }
+                },
+                onOpenSalon = { sid -> navController.navigate(SalonDetailRoute(sid)) { single() } },
+            )
         }
 
         // ---- Hesap ----
@@ -314,6 +342,8 @@ fun KcNavHost(
                 onOpenLegal = openLegal,
                 onChangePhone = { navController.navigate(ChangePhoneRoute) { single() } },
                 onOpenModeration = { navController.navigate(ModerationRoute) { single() } },
+                onOpenCalendarSync = { navController.navigate(CalendarSyncRoute) { single() } },
+                onSalonReopened = { navController.navigateAsRoot(SessionGateRoute(EntryRole.BUSINESS.name)) },
             )
         }
     }

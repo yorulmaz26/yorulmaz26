@@ -9,6 +9,7 @@ import com.kuaforumcepte.app.core.data.AppException
 import com.kuaforumcepte.app.core.data.ErrorMessages
 import com.kuaforumcepte.app.core.navigation.BookingSummaryRoute
 import com.kuaforumcepte.app.data.booking.BookingRepository
+import com.kuaforumcepte.app.data.booking.PricePreview
 import com.kuaforumcepte.app.data.salon.SalonProfile
 import com.kuaforumcepte.app.data.salon.SalonRepository
 import com.kuaforumcepte.app.data.services.ServiceRepository
@@ -55,6 +56,16 @@ data class SummaryUi(
     val submitting: Boolean = false,
     val problem: SummaryProblem? = null,
     val error: UiText? = null,
+    /** Başkası adına randevuda hizmeti alacak kişinin adı. */
+    val guestName: String = "",
+    val guestNameError: String? = null,
+    val codeInput: String = "",
+    /** Önizlemede geçerli bulunan ve randevuya uygulanacak kod. */
+    val appliedCode: String? = null,
+    val codeError: String? = null,
+    val useLoyalty: Boolean = false,
+    val previewing: Boolean = false,
+    val preview: PricePreview? = null,
 )
 
 @HiltViewModel
@@ -77,6 +88,38 @@ class BookingSummaryViewModel @Inject constructor(
 
     init { load() }
 
+    fun setGuestName(v: String) = _ui.update { it.copy(guestName = v, guestNameError = null) }
+    fun setCodeInput(v: String) = _ui.update { it.copy(codeInput = v.uppercase().filter { c -> c.isLetterOrDigit() }.take(16), codeError = null) }
+
+    /** Fiyat önizlemesi (kod/ödül). Geçersiz kod randevuya uygulanmaz. */
+    private fun refreshPreview(code: String?, loyalty: Boolean) {
+        _ui.update { it.copy(previewing = true) }
+        viewModelScope.launch {
+            runCatching { booking.preview(route.salonId, route.staffUid, route.serviceIds, code, loyalty) }
+                .onSuccess { p ->
+                    _ui.update {
+                        it.copy(
+                            previewing = false, preview = p,
+                            appliedCode = if (code != null && p.codeError == null) code else null,
+                            codeError = p.codeError?.let { r -> ErrorMessages.text(AppException(r)) },
+                            useLoyalty = loyalty && p.loyalty?.rewardsAvailable?.let { n -> n > 0 } == true,
+                        )
+                    }
+                }
+                .onFailure { e -> _ui.update { it.copy(previewing = false, error = ErrorMessages.of(e)) } }
+        }
+    }
+
+    fun applyCode() {
+        val code = _ui.value.codeInput.trim()
+        if (code.length < 4) { _ui.update { it.copy(codeError = "Kod en az 4 karakter olmalı.") }; return }
+        refreshPreview(code, false)
+    }
+
+    fun removeCode() { _ui.update { it.copy(codeInput = "", appliedCode = null, codeError = null) }; refreshPreview(null, _ui.value.useLoyalty) }
+
+    fun setUseLoyalty(v: Boolean) { _ui.update { it.copy(appliedCode = if (v) null else it.appliedCode) }; refreshPreview(if (v) null else _ui.value.appliedCode, v) }
+
     fun load() {
         _ui.update { it.copy(loading = true, error = null) }
         viewModelScope.launch {
@@ -87,6 +130,7 @@ class BookingSummaryViewModel @Inject constructor(
                 val items = route.serviceIds.map { id -> active.firstOrNull { it.id == id } ?: throw AppException("SERVICE_INACTIVE") }
                 val data = SummaryData(salon, member, items)
                 _ui.update { it.copy(loading = false, data = data, expectedTotal = it.expectedTotal ?: data.total) }
+                refreshPreview(_ui.value.appliedCode, _ui.value.useLoyalty)
             } catch (t: Throwable) {
                 _ui.update { it.copy(loading = false, error = ErrorMessages.of(t)) }
             }
@@ -97,22 +141,34 @@ class BookingSummaryViewModel @Inject constructor(
         val s = _ui.value
         val expected = s.expectedTotal ?: return
         if (s.submitting) return
+        val guest = s.guestName.trim().replace(Regex("\\s+"), " ")
+        if (!route.forSelf && !Regex("^\\p{L}[\\p{L} .'-]{0,48}[\\p{L}.]$").matches(guest)) {
+            _ui.update { it.copy(guestNameError = "Hizmeti alacak kişinin adını ve soyadını yazın.") }
+            return
+        }
         _ui.update { it.copy(submitting = true, problem = null) }
         viewModelScope.launch {
             try {
-                val created = booking.create(route.salonId, route.staffUid, route.serviceIds, startAt, expected, idempotencyKey)
+                val created = booking.create(
+                    route.salonId, route.staffUid, route.serviceIds, startAt, expected, idempotencyKey,
+                    guestName = if (route.forSelf) null else guest, discountCode = s.appliedCode, useLoyaltyReward = s.useLoyalty,
+                )
                 _ui.update { it.copy(submitting = false) }
                 _events.send(SummaryEvent.Created(created.id))
             } catch (t: Throwable) {
                 val e = AppException.from(t)
                 val problem = when (e.reason) {
                     "PRICE_CHANGED" -> SummaryProblem.PriceChanged(Kurus((e.details["newTotalKurus"] as? Number)?.toLong() ?: 0))
-                    "SLOT_TAKEN", "SLOT_UNAVAILABLE" -> SummaryProblem.SlotGone(ErrorMessages.of(e))
-                    "ACTIVE_APPOINTMENT_EXISTS" -> SummaryProblem.ActiveExists(e.details["appointmentId"] as? String)
+                    "SLOT_TAKEN", "SLOT_UNAVAILABLE", "CUSTOMER_BUSY" -> SummaryProblem.SlotGone(ErrorMessages.of(e))
+                    "ACTIVE_APPOINTMENT_EXISTS", "ACTIVE_APPOINTMENT_LIMIT" -> SummaryProblem.ActiveExists(e.details["appointmentId"] as? String)
                     else -> null
                 }
                 _ui.update { it.copy(submitting = false, problem = problem, error = if (problem == null) ErrorMessages.of(e) else null) }
                 if (e.reason == "SERVICE_INACTIVE" || e.reason == "STAFF_INACTIVE") load()
+                if (e.reason.startsWith("CODE_") || e.reason == "LOYALTY_NOT_AVAILABLE") {
+                    _ui.update { it.copy(appliedCode = null, useLoyalty = false) }
+                    refreshPreview(null, false)
+                }
             }
         }
     }

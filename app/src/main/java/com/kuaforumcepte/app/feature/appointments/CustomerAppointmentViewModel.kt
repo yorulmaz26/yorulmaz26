@@ -7,6 +7,7 @@ import com.kuaforumcepte.app.core.common.UiState
 import com.kuaforumcepte.app.core.common.UiText
 import com.kuaforumcepte.app.core.data.ErrorMessages
 import com.kuaforumcepte.app.data.appointments.Appointment
+import com.kuaforumcepte.app.data.appointments.AppointmentContact
 import com.kuaforumcepte.app.data.appointments.AppointmentRepository
 import com.kuaforumcepte.domain.model.AppointmentStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,6 +52,21 @@ class CustomerAppointmentViewModel @Inject constructor(
     private val _message = MutableStateFlow<UiText?>(null)
     val message: StateFlow<UiText?> = _message.asStateFlow()
     fun consumeMessage() { _message.value = null }
+
+    /** Son 2 saatte iptal için aranacak kişiler (yalnızca istenince sunucudan alınır). */
+    private val _contacts = MutableStateFlow<List<AppointmentContact>?>(null)
+    val contacts: StateFlow<List<AppointmentContact>?> = _contacts.asStateFlow()
+
+    fun loadContacts() {
+        if (_busy.value) return
+        _busy.value = true
+        viewModelScope.launch {
+            runCatching { appointments.contacts(id) }
+                .onSuccess { _contacts.value = it; if (it.isEmpty()) _message.value = UiText.Plain("Salonun iletişim bilgisi bulunamadı.") }
+                .onFailure { _message.value = ErrorMessages.of(it) }
+            _busy.value = false
+        }
+    }
 
     /** Geçmiş randevuyu yalnızca müşterinin listesinden gizler (kayıt silinmez). */
     fun hide(onDone: () -> Unit) {

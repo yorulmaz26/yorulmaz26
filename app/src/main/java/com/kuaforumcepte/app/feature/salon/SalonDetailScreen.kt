@@ -9,6 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.MaterialTheme
@@ -51,17 +55,24 @@ fun SalonDetailScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val booking by bookingViewModel.ui.collectAsStateWithLifecycle()
     val selected by viewModel.isSelected.collectAsStateWithLifecycle()
+    val favorite by viewModel.isFavorite.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val toast: (String) -> Unit = { m -> scope.launch { snackbar.showSnackbar(m) } }
 
     Scaffold(
-        topBar = { KcTopBar((state as? UiState.Success)?.data?.name ?: "Salon", onBack) },
+        topBar = {
+            KcTopBar((state as? UiState.Success)?.data?.name ?: "Salon", onBack, actions = {
+                if (state is UiState.Success) IconButton(onClick = { viewModel.toggleFavorite(toast) }) {
+                    Icon(if (favorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder, contentDescription = if (favorite) "Favorilerden çıkar" else "Favorilere ekle")
+                }
+            })
+        },
         snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             val salonState = state
             val sel = booking.selection
-            if (salonState is UiState.Success && !sel.isEmpty && booking.activeAppointment == null) Surface(tonalElevation = 3.dp) {
+            if (salonState is UiState.Success && !sel.isEmpty && !booking.limitReached) Surface(tonalElevation = 3.dp) {
                 Column(Modifier.navigationBarsPadding().padding(Spacing.l)) {
                     Text(
                         "${sel.items.size} hizmet · ${formatDuration(sel.totalMinutes)} · ${sel.totalPrice.formatTry()}",
@@ -92,13 +103,19 @@ fun SalonDetailScreen(
             is UiState.Empty -> EmptyState("Salon bulunamadı", s.message, Modifier.padding(padding))
             is UiState.Error -> ErrorState(s.message.asString(), Modifier.padding(padding), onRetry = viewModel::retry)
             is UiState.Success -> Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(Spacing.screen)) {
+                if (s.data.verified) {
+                    Text("✓ Onaylı salon", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                }
+                s.data.loyalty?.takeIf { it.enabled }?.let { l ->
+                    Text("Sadakat programı: her ${l.visitsRequired} ziyarette %${l.rewardPercent} indirim", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                }
                 SalonInfoContent(s.data, toast)
                 Spacer(Modifier.height(Spacing.xl))
                 BookingSection(s.data.id, onActiveAppointment = onOpenAppointment, viewModel = bookingViewModel)
                 Spacer(Modifier.height(Spacing.xl))
                 SalonHoursSection(s.data.id, s.data.weeklyClosedDays)
                 Spacer(Modifier.height(Spacing.xl))
-                SalonReviewsSection(s.data.id, s.data.rating)
+                SalonReviewsSection(s.data.id, s.data.rating, ownerUid = s.data.ownerUid)
                 Spacer(Modifier.height(Spacing.l))
             }
         }

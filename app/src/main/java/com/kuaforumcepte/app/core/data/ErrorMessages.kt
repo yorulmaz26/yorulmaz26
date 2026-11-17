@@ -96,7 +96,31 @@ object ErrorMessages {
         "NEW_OWNER_ALREADY_OWNS_SALON" to "Seçilen kişi zaten başka bir salonun sahibi.",
         "ERROR_CREDENTIAL_ALREADY_IN_USE" to "Bu telefon numarası başka bir hesapta kullanılıyor.",
         "QR_VERIFY_FAILED" to "QR kod doğrulanamadı. Lütfen tekrar oluşturun.",
+        "ACTIVE_APPOINTMENT_LIMIT" to "Aynı anda en fazla 3 aktif randevunuz olabilir. Yenisini almak için birinin tamamlanmasını bekleyin veya birini iptal edin.",
+        "CUSTOMER_BUSY" to "Bu saatte başka bir randevunuz var (ya da o saatte uzman olarak hizmet veriyorsunuz). Başka bir saat seçin veya başkası adına alın.",
+        "DISCOUNT_CONFLICT" to "İndirim kodu ve sadakat ödülü birlikte kullanılamaz.",
+        "CODE_NOT_FOUND" to "İndirim kodu bulunamadı.",
+        "CODE_INACTIVE" to "Bu indirim kodu şu anda kullanılamıyor.",
+        "CODE_NOT_STARTED" to "Bu indirim kodu henüz başlamadı.",
+        "CODE_EXPIRED" to "Bu indirim kodunun süresi doldu.",
+        "CODE_EXHAUSTED" to "Bu indirim kodunun kullanım hakkı doldu.",
+        "CODE_ALREADY_USED" to "Bu indirim kodunu daha önce kullandınız.",
+        "INVALID_DISCOUNT_CODE" to "Kod 4–16 karakter, yalnızca harf ve rakam olmalıdır.",
+        "DISCOUNT_KIND_REQUIRED" to "Yüzde veya sabit tutar indiriminden birini girin.",
+        "INVALID_DATE_RANGE" to "Bitiş tarihi başlangıçtan önce olamaz.",
+        "LOYALTY_NOT_AVAILABLE" to "Kullanılabilir sadakat ödülünüz yok.",
+        "WAITLIST_LIMIT" to "En fazla 10 bekleme listesi kaydınız olabilir.",
+        "START_IN_PAST" to "Başlangıç saati 1 saatten daha eski olamaz.",
+        "BEYOND_HORIZON" to "Bu tarih salonun randevu ufkunun dışında.",
+        "CROSSES_MIDNIGHT" to "Randevu gece yarısını aşamaz.",
+        "ADMIN_ONLY" to "Bu işlem yalnızca platform yöneticisine açık.",
+        "REASON_REQUIRED" to "Lütfen bir gerekçe yazın.",
+        "ALREADY_OWNER" to "Zaten aktif bir salonunuz var; ikinci salonu yeniden açamazsınız.",
+        "INVALID_COORDINATES" to "Konum alınamadı veya hizmet bölgesi dışında.",
+        "PROFILE_REQUIRED" to "Önce profilinizi tamamlayın.",
     )
+
+    fun text(t: Throwable): String = (of(t) as UiText.Plain).value
 
     fun of(t: Throwable): UiText {
         val e = AppException.from(t)

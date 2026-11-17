@@ -28,6 +28,9 @@ data class Review(
     val reportCount: Int = 0,
     val flagged: Boolean = false,
     val hidden: Boolean = false,
+    /** Salon sahibinin herkese açık yanıtı. */
+    val ownerReply: String? = null,
+    val ownerReplyAt: Instant? = null,
 )
 
 enum class ReportReason(val label: String) {
@@ -82,6 +85,11 @@ class ReviewRepository @Inject constructor(
     }
 
     /** action: HIDE | RESTORE | DISMISS (yalnızca platform yöneticisi). */
+    /** Salon sahibinin yanıtı; boş metin yanıtı kaldırır. */
+    suspend fun reply(reviewId: String, text: String) {
+        functions.call("replyToReview", mapOf("reviewId" to reviewId, "text" to text.trim()))
+    }
+
     suspend fun moderate(reviewId: String, action: String, note: String) {
         functions.call("moderateReview", mapOf("reviewId" to reviewId, "action" to action, "note" to note.trim()))
     }
@@ -112,4 +120,6 @@ private fun com.google.firebase.firestore.DocumentSnapshot.toReview() = Review(
     reportCount = (getLong("reportCount") ?: 0).toInt(),
     flagged = getBoolean("flagged") == true,
     hidden = getBoolean("hidden") == true,
+    ownerReply = (get("ownerReply") as? Map<String, Any?>)?.get("text") as? String,
+    ownerReplyAt = ((get("ownerReply") as? Map<String, Any?>)?.get("at") as? com.google.firebase.Timestamp)?.toInstant(),
 )

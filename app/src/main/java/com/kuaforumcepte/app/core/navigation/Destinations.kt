@@ -41,7 +41,8 @@ import kotlinx.serialization.Serializable
 
 // Rezervasyon akışı (her ekran verisini sunucudan tazeler; süreç ölümüne dayanıklı)
 @Serializable data class SlotPickerRoute(val salonId: String, val staffUid: String, val serviceIds: List<String>)
-@Serializable data class BookingSummaryRoute(val salonId: String, val staffUid: String, val serviceIds: List<String>, val startAt: String)
+/** forSelf=false: randevu başkası adına (özet ekranında hizmeti alacak kişinin adı istenir). */
+@Serializable data class BookingSummaryRoute(val salonId: String, val staffUid: String, val serviceIds: List<String>, val startAt: String, val forSelf: Boolean = true)
 @Serializable data class BookingSuccessRoute(val appointmentId: String)
 @Serializable data class AppointmentDetailRoute(val appointmentId: String)
 @Serializable data class BusinessAppointmentRoute(val appointmentId: String)
@@ -57,3 +58,9 @@ import kotlinx.serialization.Serializable
 @Serializable data class AccountRoute(val role: String)
 @Serializable data object ChangePhoneRoute
 @Serializable data object ModerationRoute
+@Serializable data object CalendarSyncRoute
+@Serializable data object PromotionsRoute
+@Serializable data object NearbySalonsRoute
+@Serializable data object WaitlistRoute
+/** Elden randevu (uygulaması olmayan müşteri). staffUid boşsa sahip uzmanı seçer. */
+@Serializable data class WalkInRoute(val staffUid: String? = null)

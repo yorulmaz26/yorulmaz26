@@ -81,11 +81,42 @@ abstract class BaseSlotViewModel(savedState: SavedStateHandle, clock: Clock) : V
 
 @HiltViewModel
 class SlotPickerViewModel @Inject constructor(
-    savedState: SavedStateHandle,
+    private val savedState: SavedStateHandle,
     private val booking: BookingRepository,
     clock: Clock,
 ) : BaseSlotViewModel(savedState, clock) {
     val route = savedState.toRoute<SlotPickerRoute>()
-    override suspend fun fetch(from: LocalDate, days: Int) = booking.availability(route.salonId, route.staffUid, route.serviceIds, from, days)
+
+    /** Kendim için (varsayılan) / başkası adına. Başkası adına seçilince kendi meşgul saatlerim gizlenmez. */
+    private val _forSelf = MutableStateFlow(savedState.get<Boolean>("forSelf") ?: true)
+    val forSelf: StateFlow<Boolean> = _forSelf.asStateFlow()
+    private val _message = MutableStateFlow<String?>(null)
+    val message: StateFlow<String?> = _message.asStateFlow()
+    private val _joining = MutableStateFlow(false)
+    val joining: StateFlow<Boolean> = _joining.asStateFlow()
+
+    override suspend fun fetch(from: LocalDate, days: Int) =
+        booking.availability(route.salonId, route.staffUid, route.serviceIds, from, days, forSelf = _forSelf.value)
+
     init { start() }
+
+    fun setForSelf(value: Boolean) {
+        if (value == _forSelf.value) return
+        _forSelf.value = value
+        savedState["forSelf"] = value
+        load()
+    }
+
+    fun joinWaitlist(date: LocalDate) {
+        if (_joining.value) return
+        _joining.value = true
+        viewModelScope.launch {
+            runCatching { booking.joinWaitlist(route.salonId, route.staffUid, date) }
+                .onSuccess { _message.value = "Bekleme listesine eklendiniz. Bu günde yer açılırsa bildirim alacaksınız." }
+                .onFailure { _message.value = ErrorMessages.text(it) }
+            _joining.value = false
+        }
+    }
+
+    fun messageShown() { _message.value = null }
 }

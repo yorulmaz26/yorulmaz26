@@ -9,12 +9,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /** Dönemdeki tamamlanan işlem sayısı ve gerçekleşen hizmet bedeli (tahsilat değildir). */
-data class ReportLine(val completedCount: Int, val amount: Kurus, val listed: Kurus) {
+data class ReportLine(val completedCount: Int, val amount: Kurus, val listed: Kurus, val commission: Kurus = Kurus(0)) {
     /** Gerçekleşen − liste (rezervasyondaki) tutar; düzeltmeler/indirimler. */
     val difference: Kurus get() = amount - listed
 }
 
-data class StaffReportLine(val staffUid: String, val name: String, val role: String, val active: Boolean, val line: ReportLine)
+data class StaffReportLine(val staffUid: String, val name: String, val role: String, val active: Boolean, val line: ReportLine, val commissionPercent: Int = 0)
 
 data class Report(val period: ReportPeriod, val salon: ReportLine?, val staff: List<StaffReportLine>)
 
@@ -29,13 +29,14 @@ class ReportsRepository @Inject constructor(private val functions: FunctionsClie
             (m["completedCount"] as? Number)?.toInt() ?: 0,
             Kurus((m["amountKurus"] as? Number)?.toLong() ?: 0),
             Kurus((m["listedKurus"] as? Number)?.toLong() ?: 0),
+            Kurus((m["commissionKurus"] as? Number)?.toLong() ?: 0),
         )
         val salon = r["salon"] as? Map<*, *>
         @Suppress("UNCHECKED_CAST")
         return Report(
             period = period,
             salon = salon?.let { line(it as Map<String, Any?>) },
-            staff = r.list("staff").map { StaffReportLine(it.str("staffUid").orEmpty(), it.str("name").orEmpty(), it.str("role").orEmpty(), it.str("status") == "ACTIVE", line(it)) },
+            staff = r.list("staff").map { StaffReportLine(it.str("staffUid").orEmpty(), it.str("name").orEmpty(), it.str("role").orEmpty(), it.str("status") == "ACTIVE", line(it), (it["commissionPercent"] as? Number)?.toInt() ?: 0) },
         )
     }
 }

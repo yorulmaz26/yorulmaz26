@@ -38,10 +38,17 @@ data class BookingSectionUi(
     val services: List<StaffService>? = null,
     val serviceSearch: String = "",
     val selection: ServiceSelection = ServiceSelection.EMPTY,
-    /** Müşterinin aktif randevusu varsa yeni randevu akışı kilitlenir. */
-    val activeAppointment: Appointment? = null,
+    /** Müşterinin aktif randevuları; sınır (3) doluysa yeni randevu akışı kilitlenir. */
+    val activeAppointments: List<Appointment> = emptyList(),
     val selfIsStaff: Boolean = false,
-)
+) {
+    val limitReached: Boolean get() = activeAppointments.size >= MAX_ACTIVE_APPOINTMENTS
+
+    companion object {
+        /** Sunucudaki MAX_ACTIVE_APPOINTMENTS ile aynı. */
+        const val MAX_ACTIVE_APPOINTMENTS = 3
+    }
+}
 
 private data class Inputs(val salonId: String)
 
@@ -90,7 +97,7 @@ class BookingSectionViewModel @Inject constructor(
             services = services?.filter { key.isEmpty() || SearchKey.of(it.name).contains(key) || SearchKey.of(it.description).contains(key) },
             serviceSearch = q,
             selection = sel,
-            activeAppointment = active.firstOrNull { it.isActive(clock.instant()) },
+            activeAppointments = active.filter { it.isActive(clock.instant()) },
             selfIsStaff = uid != null && uid == session.currentUid,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), BookingSectionUi())
