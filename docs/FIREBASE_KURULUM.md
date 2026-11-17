@@ -46,8 +46,9 @@ GitHub › **Actions › "Firebase'e Yükle" › Run workflow** (App Check: `fal
 ## D. APK'yı al ve dene
 1. GitHub › **Actions › CI › Run workflow** (veya yeni bir push). Bitince çalıştırma sayfasının altındaki
    **Artifacts › kuaforum-cepte-debug-apk** dosyasını indirip kurun. Bu APK artık Firebase'e bağlıdır.
-2. Sahip olmak için yöneticiye ihtiyaç yok; ancak salonların **müşteri aramasında görünmesi için onay** gerekir.
-   Yönetici atamak için: Actions sayfasında ileride eklenecek "Yönetici ata" adımı yoksa salonu **kod/QR/link** ile açın.
+2. Yeni salonlar **onaylanana kadar müşteri aramasında görünmez** (kod/QR/link ile her zaman açılır).
+   Kendinizi yönetici yapın: uygulamaya bir kez giriş yaptıktan sonra GitHub › **Actions › "Yönetici Ata" › Run workflow**
+   › telefonunuz (ör. `+905550000001`). Uygulamada çıkış yapıp yeniden girin › Hesap › **Moderasyon ve Salon Onayı** › Salon onayı.
 3. Önerilen deneme (3 telefon veya tek telefonda çıkış/giriş):
    - 0001 ile **Kuaför Girişi** › salon kaydı › Hizmetlerim › çalışma saatleri.
    - Stilist Yönetimi › 0002 numarasını davet et › 0002 ile Kuaför Girişi › daveti kabul.

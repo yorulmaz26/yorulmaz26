@@ -1,0 +1,37 @@
+name: Yönetici Ata
+
+# Platform yöneticisi (yorum moderasyonu ve salon onayı) yetkisi verir veya geri alır.
+# Gerekli gizli değişken: FIREBASE_SERVICE_ACCOUNT (bkz. docs/FIREBASE_KURULUM.md)
+on:
+  workflow_dispatch:
+    inputs:
+      phone:
+        description: "Telefon (ör. +905550000001) — kişi uygulamaya en az bir kez giriş yapmış olmalı"
+        required: true
+        type: string
+      revoke:
+        description: "Yetkiyi geri al"
+        type: boolean
+        default: false
+
+jobs:
+  set-admin:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Yetkiyi ayarla
+        env:
+          SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          PHONE: ${{ inputs.phone }}
+        run: |
+          [ -n "$SA" ] || { echo "::error::FIREBASE_SERVICE_ACCOUNT gizli değişkeni tanımlı değil"; exit 1; }
+          printf '%s' "$SA" > "$RUNNER_TEMP/sa.json"
+          export GOOGLE_APPLICATION_CREDENTIALS="$RUNNER_TEMP/sa.json"
+          export GCLOUD_PROJECT=$(jq -r '.project_id' "$RUNNER_TEMP/sa.json")
+          cd functions && npm ci --omit=dev
+          if [ "${{ inputs.revoke }}" = "true" ]; then node scripts/setAdmin.js "$PHONE" --revoke; else node scripts/setAdmin.js "$PHONE"; fi
+          echo "Kişi uygulamada çıkış yapıp yeniden girince Hesap ekranında 'Moderasyon ve Salon Onayı' görünür."
