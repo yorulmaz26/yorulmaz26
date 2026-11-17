@@ -14,6 +14,9 @@ import androidx.compose.material.icons.outlined.EditCalendar
 import androidx.compose.material.icons.outlined.EventNote
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.ManageAccounts
+import androidx.compose.material.icons.outlined.PhotoLibrary
+import androidx.compose.material.icons.outlined.QrCode2
+import androidx.compose.material.icons.outlined.Storefront
 import androidx.compose.material.icons.outlined.SwapHoriz
 import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.Icon
@@ -57,6 +60,9 @@ private enum class BusinessTab(val label: String, val icon: ImageVector) {
 @Composable
 fun BusinessHomeScreen(
     onOpenStaff: () -> Unit,
+    onOpenShopSettings: () -> Unit,
+    onOpenMedia: () -> Unit,
+    onOpenShare: () -> Unit,
     onOpenAccount: () -> Unit,
     onSwitchSalon: () -> Unit,
     viewModel: BusinessHomeViewModel = hiltViewModel(),
@@ -106,19 +112,28 @@ fun BusinessHomeScreen(
                     }
                     when (BusinessTab.entries[tab]) {
                         BusinessTab.STATS -> {
+                            if (Permission.SHARE_BOOKING_LINK in s.permissions) {
+                                MenuRow(Icons.Outlined.QrCode2, "Randevu Linki ve QR Kod", "WhatsApp'ta paylaş, QR'ı görüntüle, yazdır", onOpenShare)
+                            }
                             SalonCodeCard(m.salonCode, onCopied = { scope.launch { snackbar.showSnackbar("Salon kodu kopyalandı") } })
                             InfoBanner(
                                 if (Permission.VIEW_SALON_REPORTS in s.permissions)
-                                    "Randevu paylaşım linki, QR kod ve dönemsel işlem/tutar raporları sonraki aşamalarda bu sekmeye eklenecek."
+                                    "Dönemsel işlem sayısı ve gerçekleşen hizmet bedeli raporları sonraki aşamada bu sekmeye eklenecek."
                                 else "Kişisel işlem ve tutar raporlarınız sonraki aşamada bu sekmede görünecek.",
                             )
                         }
                         BusinessTab.MANAGE -> {
+                            if (Permission.MANAGE_SALON_SETTINGS in s.permissions) {
+                                MenuRow(Icons.Outlined.Storefront, "Dükkan Ayarları", "Ad, tür, telefon, adres, açıklama, konum", onOpenShopSettings)
+                            }
+                            if (Permission.MANAGE_SALON_MEDIA in s.permissions) {
+                                MenuRow(Icons.Outlined.PhotoLibrary, "Logo ve Fotoğrafları Güncelle", "Logoyu değiştir, galeriyi düzenle", onOpenMedia)
+                            }
                             if (Permission.MANAGE_STAFF in s.permissions) {
                                 MenuRow(Icons.Outlined.Groups, "Stilist Yönetimi", "Uzman davet et, listele, düzenle, pasife al", onOpenStaff)
                             }
                             MenuRow(Icons.Outlined.ManageAccounts, "Hesap ve Oturum", "Profil, Beni hatırla, tema, çıkış", onOpenAccount)
-                            InfoBanner("Çalışma saatleri, izinler, kapalı günler, hizmetler ve dükkan ayarları sonraki aşamalarda bu menüye eklenecek.")
+                            InfoBanner("Çalışma saatleri, izinler, kapalı günler ve hizmet yönetimi sonraki aşamada bu menüye eklenecek.")
                         }
                         BusinessTab.APPOINTMENTS -> EmptyState(
                             icon = Icons.Outlined.EditCalendar,

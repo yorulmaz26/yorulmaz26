@@ -38,17 +38,22 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kuaforumcepte.app.R
 import com.kuaforumcepte.app.core.designsystem.component.BrandMark
+import com.kuaforumcepte.app.core.designsystem.component.InfoBanner
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
 import com.kuaforumcepte.domain.model.EntryRole
 
 @Composable
-fun RoleSelectionScreen(onRoleChosen: (EntryRole) -> Unit, viewModel: RoleSelectionViewModel = hiltViewModel()) {
+fun RoleSelectionScreen(
+    onRoleChosen: (EntryRole) -> Unit,
+    hasPendingSalonLink: Boolean = false,
+    viewModel: RoleSelectionViewModel = hiltViewModel(),
+) {
     LaunchedEffect(Unit) { viewModel.navigate.collect(onRoleChosen) }
-    RoleSelectionContent(onChoose = viewModel::choose)
+    RoleSelectionContent(onChoose = viewModel::choose, hasPendingSalonLink = hasPendingSalonLink)
 }
 
 @Composable
-fun RoleSelectionContent(onChoose: (EntryRole) -> Unit) {
+fun RoleSelectionContent(onChoose: (EntryRole) -> Unit, hasPendingSalonLink: Boolean = false) {
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(
             Modifier
@@ -65,6 +70,10 @@ fun RoleSelectionContent(onChoose: (EntryRole) -> Unit) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            if (hasPendingSalonLink) {
+                Spacer(Modifier.height(Spacing.m))
+                InfoBanner("Bir salonun randevu bağlantısıyla geldiniz. “Müşteri Girişi” yaptıktan sonra salon sayfası otomatik açılacak.")
+            }
             Spacer(Modifier.height(Spacing.xl))
             RoleCard(
                 icon = Icons.Outlined.Person,

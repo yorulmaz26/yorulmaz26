@@ -18,3 +18,7 @@ export {
   setMemberStatus,
   leaveSalon,
 } from "./staff/invitations";
+
+// Aşama 3 — salon profili, görseller, paylaşım sayfası
+export { updateSalonProfile, updateSalonMedia } from "./salon/updateSalon";
+export { salonLanding } from "./salon/landing";

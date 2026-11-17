@@ -26,6 +26,12 @@ import kotlinx.serialization.Serializable
 @Serializable data object SalonPickerRoute
 @Serializable data object BusinessHomeRoute
 @Serializable data object StaffManagementRoute
+@Serializable data object ShopSettingsRoute
+@Serializable data object MediaManagerRoute
+@Serializable data object ShareSalonRoute
+
+// Salon (herkese açık sayfa; deep link / QR hedefi)
+@Serializable data class SalonDetailRoute(val salonId: String)
 
 // Müşteri
 @Serializable data object CustomerHomeRoute

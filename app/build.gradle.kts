@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.exifinterface)
+    implementation(libs.androidx.print)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

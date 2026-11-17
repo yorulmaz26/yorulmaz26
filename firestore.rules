@@ -83,25 +83,9 @@ service cloud.firestore {
     match /salons/{salonId} {
       allow read: if signedIn();
       allow create, delete: if false; // registerSalonOwner fonksiyonu
-      // Sahip yalnızca profil alanlarını düzenleyebilir. ownerUid, code, status, rating*,
-      // bookingSettings, weeklyClosedDays, timezone fonksiyonlarla yönetilir.
-      allow update: if isOwner(salonId)
-        && changedOnly(['name', 'nameLower', 'type', 'businessPhoneE164', 'city', 'district',
-                        'addressLine', 'description', 'location', 'logoUrl', 'logoPath',
-                        'photos', 'updatedAt'])
-        && nonEmptyString(request.resource.data.name, 80)
-        && nonEmptyString(request.resource.data.nameLower, 80) // istemci: SearchKey.of(name)
-        && request.resource.data.type in ['BEAUTY_SALON', 'MEN_HAIRDRESSER',
-                                          'WOMEN_HAIRDRESSER', 'UNISEX_HAIRDRESSER']
-        && request.resource.data.businessPhoneE164.matches('^\\+90[0-9]{10}$')
-        && nonEmptyString(request.resource.data.city, 40)
-        && nonEmptyString(request.resource.data.district, 60)
-        && nonEmptyString(request.resource.data.addressLine, 300)
-        && optionalString(request.resource.data.description, 1000)
-        && nonEmptyString(request.resource.data.logoUrl, 2048)
-        && request.resource.data.photos is list
-        && request.resource.data.photos.size() <= 5
-        && request.resource.data.updatedAt == request.time;
+      // Profil ve görseller updateSalonProfile / updateSalonMedia fonksiyonlarıyla güncellenir
+      // (il/ilçe doğrulaması, arama anahtarı ve üyelik aynası tutarlılığı için).
+      allow update: if false;
 
       // Kamuya açık uzman kartı (telefon içermez)
       match /members/{memberUid} {

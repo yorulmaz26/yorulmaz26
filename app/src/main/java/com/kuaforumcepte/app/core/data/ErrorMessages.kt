@@ -40,6 +40,14 @@ object ErrorMessages {
         "IMAGE_TYPE_NOT_SUPPORTED" to "Bu dosya türü desteklenmiyor. JPG, PNG, WEBP veya HEIC seçin.",
         "IMAGE_TOO_LARGE" to "Seçilen dosya çok büyük (en fazla 20 MB).",
         "IMAGE_DECODE_FAILED" to "Görsel okunamadı. Başka bir görsel seçin.",
+        "INVALID_COORDINATES" to "Konum Türkiye sınırları içinde olmalıdır.",
+        "LOCATION_DISABLED" to "Cihazınızda konum kapalı. Ayarlardan açıp tekrar deneyin.",
+        "LOCATION_UNAVAILABLE" to "Konum alınamadı. Açık alanda tekrar deneyin veya adresten bulun.",
+        "LOCATION_PERMISSION" to "Konum izni verilmedi. Adresten bulma seçeneğini kullanabilirsiniz.",
+        "GEOCODER_UNAVAILABLE" to "Bu cihazda adresten konum bulma desteklenmiyor.",
+        "ADDRESS_NOT_FOUND" to "Adres haritada bulunamadı. İl/ilçe ve açık adresi kontrol edin.",
+        "SALON_LINK_INVALID" to "Bu salon bağlantısı geçersiz veya salon artık aktif değil.",
+        "QR_VERIFY_FAILED" to "QR kod doğrulanamadı. Lütfen tekrar oluşturun.",
     )
 
     fun of(t: Throwable): UiText {

@@ -90,8 +90,8 @@ describe("randevular", () => {
 });
 
 describe("salon", () => {
-  test("sahip profil alanını güncelleyebilir", async () => {
-    await assertSucceeds(updateDoc(doc(db(OWNER), "salons", SALON), {
+  test("sahip bile salonu doğrudan güncelleyemez (yalnızca fonksiyonlar)", async () => {
+    await assertFails(updateDoc(doc(db(OWNER), "salons", SALON), {
       description: "Yeni açıklama", updatedAt: serverTimestamp(),
     }));
   });

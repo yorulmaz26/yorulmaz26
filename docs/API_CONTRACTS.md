@@ -23,11 +23,15 @@ Ortak hata nedenleri: `UNAUTHENTICATED`, `PERMISSION_DENIED`, `INVALID_ARGUMENT`
 | `leaveSalon` | `{salonId}` | `{affectedFutureAppointments}` | STAFF. |
 
 ## Salon (Aşama 3–4)
+| Fonksiyon | Girdi | Çıktı | Notlar |
+|---|---|---|---|
+| `updateSalonProfile` | `{salonId, name, type, businessPhone, city, district, addressLine, description, location?:{lat,lng}}` | `{ok}` | OWNER. İl/ilçe listesiyle, koordinat Türkiye sınırıyla doğrulanır. Ad değişirse tüm üyelerin `memberships` aynası aynı transaction'da güncellenir. Kod değiştirilemez. |
+| `updateSalonMedia` | `{salonId, logoPendingPath?, photos:[{existingPath}\|{pendingPath}] (≤5, sıralı)}` | `{logoUrl, photos}` | OWNER. Yeni görseller geçici alandan kalıcı alana taşınır; çıkarılan dosyalar ve eski logo silinir. Eşzamanlı değişiklikte `STATE_CHANGED`. |
+| `salonLanding` (HTTPS, Hosting `/s/{kod}`) | — | HTML | Uygulama yüklü değilse açılan web sayfası: yalnızca kamuya açık salon alanları, "Uygulamada Aç" intent'i, Play bağlantısı. |
 | `updateSalonClosures` | `{salonId, weeklyClosedDays[], dryRun}` | `{conflicts:[AppointmentSummary]}` | `dryRun=false` ise yazar; çakışan randevular için yeniden planlama/iptal iş akışı başlatılır. |
 | `upsertSalonDateClosure` / `deleteSalonDateClosure` | `{salonId, closureId?, startDate, endDate, publicNote, dryRun}` | `{conflicts}` | OWNER. |
 | `updateWeeklySchedule` | `{salonId, staffUid, days, weeklyDaysOff, dryRun}` | `{conflicts}` | Kendisi (veya sahibi görüntüler; düzenleme yalnızca kendisi). Doğrulama: bitiş>başlangıç, vardiya çakışmaz, mola vardiya içinde, gece yarısı geçmez. |
 | `upsertStaffDateClosure` / `deleteStaffDateClosure` | `{salonId, closureId?, startDate, endDate, note, dryRun}` | `{conflicts}` | |
-| `resolveSalonCode` | `{code}` | `{salonId}` | Deep link / QR çözümlemesi; oturum gerektirmez (App Check gerekir). |
 
 ## Randevu (Aşama 5–6)
 | `getAvailability` | `{salonId, staffUid, serviceIds[], fromDate, days ≤ 14}` | `{totalMinutes, totalKurus, days:[{date, slots:[{startAt(ISO UTC), label "HH:mm"}]}]}` | Sunucu algoritması (§6). |

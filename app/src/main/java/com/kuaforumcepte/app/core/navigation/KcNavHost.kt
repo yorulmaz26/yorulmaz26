@@ -4,7 +4,22 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.compose.currentBackStackEntryAsState
+import com.kuaforumcepte.app.feature.link.DeepLinkViewModel
+import com.kuaforumcepte.app.feature.link.LinkEvent
+import com.kuaforumcepte.app.feature.salon.SalonDetailScreen
+import com.kuaforumcepte.app.feature.salonsettings.MediaManagerScreen
+import com.kuaforumcepte.app.feature.salonsettings.ShopSettingsScreen
+import com.kuaforumcepte.app.feature.share.ShareSalonScreen
+import com.kuaforumcepte.domain.link.DeepLink
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
@@ -42,8 +57,26 @@ private fun NavHostController.navigateAsRoot(route: Any) {
 private fun NavOptionsBuilder.single() { launchSingleTop = true }
 
 @Composable
-fun KcNavHost(navController: NavHostController = rememberNavController()) {
+fun KcNavHost(
+    navController: NavHostController = rememberNavController(),
+    linkViewModel: DeepLinkViewModel = hiltViewModel(),
+) {
     val back: () -> Unit = { navController.popBackStack() }
+    val context = LocalContext.current
+    val pendingLink by linkViewModel.pending.collectAsStateWithLifecycle()
+    val currentEntry by navController.currentBackStackEntryAsState()
+    val atHome = currentEntry?.destination?.let { d -> d.hasRoute<CustomerHomeRoute>() || d.hasRoute<BusinessHomeRoute>() } == true
+
+    // Bekleyen salon bağlantısı: kullanıcı oturum açıp bir ana ekrana ulaştığında açılır.
+    LaunchedEffect(pendingLink, atHome) { if (pendingLink != null && atHome) linkViewModel.resolvePending() }
+    LaunchedEffect(Unit) {
+        linkViewModel.events.collect { e ->
+            when (e) {
+                is LinkEvent.OpenSalon -> navController.navigate(SalonDetailRoute(e.salonId)) { launchSingleTop = true }
+                is LinkEvent.Failed -> Toast.makeText(context, e.message, Toast.LENGTH_LONG).show()
+            }
+        }
+    }
     val openLegal: (LegalDocument) -> Unit = { navController.navigate(LegalRoute(it.name)) { single() } }
     val toRoleSelection: () -> Unit = { navController.navigateAsRoot(RoleSelectionRoute) }
 
@@ -80,7 +113,10 @@ fun KcNavHost(navController: NavHostController = rememberNavController()) {
         }
         composable<FirebaseSetupRoute> { FirebaseSetupRequiredScreen() }
         composable<RoleSelectionRoute> {
-            RoleSelectionScreen(onRoleChosen = { role -> navController.navigate(PhoneEntryRoute(role.name)) { single() } })
+            RoleSelectionScreen(
+                hasPendingSalonLink = pendingLink is DeepLink.Salon,
+                onRoleChosen = { role -> navController.navigate(PhoneEntryRoute(role.name)) { single() } },
+            )
         }
 
         // ---- Kimlik ----
@@ -148,11 +184,22 @@ fun KcNavHost(navController: NavHostController = rememberNavController()) {
         composable<BusinessHomeRoute> {
             BusinessHomeScreen(
                 onOpenStaff = { navController.navigate(StaffManagementRoute) { single() } },
+                onOpenShopSettings = { navController.navigate(ShopSettingsRoute) { single() } },
+                onOpenMedia = { navController.navigate(MediaManagerRoute) { single() } },
+                onOpenShare = { navController.navigate(ShareSalonRoute) { single() } },
                 onOpenAccount = { navController.navigate(AccountRoute(EntryRole.BUSINESS.name)) { single() } },
                 onSwitchSalon = { navController.navigate(SalonPickerRoute) { single() } },
             )
         }
         composable<StaffManagementRoute> { StaffManagementScreen(onBack = back) }
+        composable<ShopSettingsRoute> {
+            ShopSettingsScreen(onBack = back, onOpenMedia = { navController.navigate(MediaManagerRoute) { single() } })
+        }
+        composable<MediaManagerRoute> { MediaManagerScreen(onBack = back) }
+        composable<ShareSalonRoute> { ShareSalonScreen(onBack = back) }
+
+        // ---- Salon sayfası (link / QR hedefi) ----
+        composable<SalonDetailRoute> { SalonDetailScreen(onBack = back) }
 
         // ---- Müşteri ----
         composable<CustomerHomeRoute> {

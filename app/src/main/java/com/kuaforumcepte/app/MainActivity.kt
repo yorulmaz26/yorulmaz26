@@ -10,14 +10,20 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.kuaforumcepte.app.core.designsystem.theme.KuaforumTheme
 import com.kuaforumcepte.app.core.navigation.KcNavHost
+import com.kuaforumcepte.app.data.link.DeepLinkRepository
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
+    @Inject lateinit var deepLinks: DeepLinkRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        // Uygulamayı açan bağlantı (App Link / QR / bildirim) oturum hazır olana kadar bekletilir.
+        if (savedInstanceState == null) deepLinks.offer(intent?.dataString)
         enableEdgeToEdge()
         setContent {
             val appViewModel: AppViewModel = hiltViewModel()
@@ -30,7 +36,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        // Navigation Compose, singleTask aktivitede yeni deep link intent'ini işler.
         setIntent(intent)
+        deepLinks.offer(intent.dataString)
     }
 }

@@ -29,9 +29,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AddPhotoAlternate
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -73,7 +70,7 @@ import com.kuaforumcepte.app.core.designsystem.component.KcTopBar
 import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
 import com.kuaforumcepte.app.core.designsystem.component.asString
 import com.kuaforumcepte.app.core.designsystem.theme.Spacing
-import com.kuaforumcepte.app.data.media.FitMode
+import com.kuaforumcepte.app.feature.media.ImagePreviewDialog
 import com.kuaforumcepte.app.data.media.ImageKind
 import com.kuaforumcepte.app.data.registration.DraftImage
 import com.kuaforumcepte.app.data.registration.LegalDocument
@@ -97,7 +94,7 @@ fun OwnerRegisterScreen(
 
     LaunchedEffect(Unit) { viewModel.created.collect(onCreated) }
     LaunchedEffect(err) { if (err != null) { snackbar.showSnackbar(err); viewModel.dismissError() } }
-    val goBack = { if (!viewModel.back()) confirmExit = true }
+    val goBack: () -> Unit = { if (!viewModel.back()) { confirmExit = true } }
     BackHandler(onBack = goBack)
 
     Scaffold(
@@ -145,33 +142,7 @@ fun OwnerRegisterScreen(
     }
 
     ui.pendingImage?.let { p ->
-        AlertDialog(
-            onDismissRequest = viewModel::cancelPending,
-            title = { Text(if (p.kind == ImageKind.LOGO) "Logo önizleme" else "Fotoğraf önizleme") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(Spacing.m)) {
-                    Box(
-                        Modifier.fillMaxWidth().aspectRatio(p.kind.aspect).clip(MaterialTheme.shapes.medium)
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        if (p.processing || p.preview == null) CircularProgressIndicator()
-                        else AsyncImage(File(p.preview.localPath), contentDescription = "Önizleme", contentScale = ContentScale.Fit, modifier = Modifier.fillMaxSize())
-                    }
-                    Row(horizontalArrangement = Arrangement.spacedBy(Spacing.s)) {
-                        FilterChip(selected = p.mode == FitMode.CROP, onClick = { viewModel.onPendingMode(FitMode.CROP) }, label = { Text("Kırp (doldur)") })
-                        FilterChip(selected = p.mode == FitMode.FIT, onClick = { viewModel.onPendingMode(FitMode.FIT) }, label = { Text("Sığdır (tamamı)") })
-                    }
-                    Text(
-                        if (p.kind == ImageKind.LOGO) "Logo kare (1:1) olarak kaydedilir." else "Fotoğraf 4:3 oranında kaydedilir.",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
-                    p.preview?.let { Text("Boyut: ${it.widthPx}×${it.heightPx} px, ${it.sizeBytes / 1024} KB", style = MaterialTheme.typography.bodySmall) }
-                }
-            },
-            confirmButton = { TextButton(onClick = viewModel::confirmPending, enabled = p.preview != null && !p.processing) { Text("Kullan") } },
-            dismissButton = { TextButton(onClick = viewModel::cancelPending) { Text("Vazgeç") } },
-        )
+        ImagePreviewDialog(p, viewModel::onPendingMode, viewModel::confirmPending, viewModel::cancelPending)
     }
 
     if (confirmExit) {

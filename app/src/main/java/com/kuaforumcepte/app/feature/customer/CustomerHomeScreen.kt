@@ -1,6 +1,27 @@
 package com.kuaforumcepte.app.feature.customer
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kuaforumcepte.app.core.common.UiState
+import com.kuaforumcepte.app.core.designsystem.component.ErrorState
+import com.kuaforumcepte.app.core.designsystem.component.InfoBanner
+import com.kuaforumcepte.app.core.designsystem.component.KcTextButton
+import com.kuaforumcepte.app.core.designsystem.component.SkeletonCardList
+import com.kuaforumcepte.app.core.designsystem.component.asString
+import com.kuaforumcepte.app.core.designsystem.theme.Spacing
+import com.kuaforumcepte.app.feature.salon.SalonInfoContent
+import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
@@ -31,14 +52,18 @@ private enum class CustomerTab(val label: String, val icon: ImageVector) {
 
 /** Müşteri ana kabuğu. Sekme içerikleri Aşama 5 (rezervasyon) ve Aşama 8'de (salon bilgileri) dolar. */
 @Composable
-fun CustomerHomeScreen(onOpenAccount: () -> Unit) {
+fun CustomerHomeScreen(onOpenAccount: () -> Unit, viewModel: CustomerHomeViewModel = hiltViewModel()) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    val selected by viewModel.selectedSalon.collectAsStateWithLifecycle()
+    val snackbar = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             KcTopBar(CustomerTab.entries[tab].label, actions = {
                 IconButton(onClick = onOpenAccount) { Icon(Icons.Outlined.AccountCircle, contentDescription = "Hesap") }
             })
         },
+        snackbarHost = { SnackbarHost(snackbar) },
         bottomBar = {
             NavigationBar {
                 CustomerTab.entries.forEachIndexed { i, t ->
@@ -60,14 +85,28 @@ fun CustomerHomeScreen(onOpenAccount: () -> Unit) {
                 message = "Aldığınız randevular burada aktif ve geçmiş olarak listelenecek.",
                 modifier = Modifier.padding(padding),
             )
-            CustomerTab.SALON -> EmptyState(
-                icon = Icons.Outlined.Storefront,
-                title = "Önce kuaför seçiniz",
-                message = "Randevu Al sekmesinden bir salon seçtiğinizde salon bilgileri burada görünür.",
-                actionLabel = "Randevu Al'a git",
-                onAction = { tab = CustomerTab.BOOK.ordinal },
-                modifier = Modifier.padding(padding),
-            )
+            CustomerTab.SALON -> when (val st = selected) {
+                null -> EmptyState(
+                    icon = Icons.Outlined.Storefront,
+                    title = "Önce kuaför seçiniz",
+                    message = "Bir salonun sayfasında “Bu salonu seç” dediğinizde (ör. salonun paylaştığı link veya QR ile) bilgileri burada görünür.",
+                    actionLabel = "Randevu Al'a git",
+                    onAction = { tab = CustomerTab.BOOK.ordinal },
+                    modifier = Modifier.padding(padding),
+                )
+                UiState.Loading -> SkeletonCardList(3, Modifier.padding(padding))
+                is UiState.Empty -> EmptyState(
+                    title = "Salon bulunamadı", message = st.message, actionLabel = "Seçimi kaldır",
+                    onAction = viewModel::clearSelection, modifier = Modifier.padding(padding),
+                )
+                is UiState.Error -> ErrorState(st.message.asString(), Modifier.padding(padding))
+                is UiState.Success -> Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(Spacing.screen)) {
+                    SalonInfoContent(st.data) { m -> scope.launch { snackbar.showSnackbar(m) } }
+                    Spacer(Modifier.height(Spacing.l))
+                    InfoBanner("Uzmanların çalışma saatleri ve salonun kapalı günleri, çalışma takvimi aşamasında burada gösterilecek.")
+                    KcTextButton("Salonu değiştir", viewModel::clearSelection)
+                }
+            }
         }
     }
 }

@@ -6,6 +6,21 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <!-- Android 13+: bağlamsal olarak (ilk randevu sonrası) istenir; reddedilirse uygulama içi kutu çalışır. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Yalnızca salon sahibi "Bulunduğum yer" ile salon konumunu seçerken, bağlamsal istenir. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <queries>
+        <package android:name="com.whatsapp" />
+        <package android:name="com.whatsapp.w4b" />
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="geo" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL" />
+        </intent>
+    </queries>
 
     <application
         android:name=".KuaforumCepteApp"
@@ -31,19 +46,32 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Salon randevu sayfası App Link'i: https://<host>/s/<salonKodu> (Aşama 3'te doğrulanır) -->
+            <!-- Salon randevu sayfası App Link'i: https://<host>/s/<salonKodu> (hosting/public/.well-known/assetlinks.json ile doğrulanır) -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="${appLinkHost}" android:pathPrefix="/s/" />
             </intent-filter>
-            <!-- Bildirim tıklamaları için iç deep link: kuaforumcepte://appointment/<id> -->
+            <!-- Web sayfasındaki "Uygulamada Aç" ve bildirimler: kuaforumcepte://salon/<kod>, kuaforumcepte://appointment/<id> -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:scheme="kuaforumcepte" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="kuaforumcepte" android:host="salon" />
+                <data android:scheme="kuaforumcepte" android:host="appointment" />
             </intent-filter>
         </activity>
+
+        <!-- QR afişini paylaşmak için (yalnızca cache/shared). -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

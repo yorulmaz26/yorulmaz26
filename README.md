@@ -114,6 +114,17 @@ Firebase Console → Authentication → Sign-in method → Phone → **Phone num
 `+90 555 000 00 01 / 123456` (müşteri), `+90 555 000 00 02 / 123456` (salon sahibi), `+90 555 000 00 03 / 123456` (personel)
 ekleyin. Bu numaralara gerçek SMS gitmez; kod sabittir. Auth Emulator kullanıyorsanız kod emülatör konsoluna yazılır.
 
+## Randevu linki, App Link ve web sayfası
+
+- Paylaşılan link: `https://<appLinkHost>/s/<salonKodu>`. Uygulama yüklüyse doğrudan salon sayfası açılır (giriş yoksa
+  önce giriş, ardından otomatik olarak salon sayfası). Yüklü değilse Firebase Hosting → `salonLanding` fonksiyonu salon
+  bilgilerini, "Uygulamada Aç" ve Google Play bağlantısını içeren bir sayfa döndürür.
+- App Link doğrulaması için `hosting/public/.well-known/assetlinks.json` içindeki parmak izini **Play App Signing SHA-256**
+  ile değiştirip `firebase deploy --only hosting,functions` çalıştırın. Debug paketi (`com.kuaforumcepte.debug`) için
+  ikinci bir giriş ekleyebilir veya şu komutla deneyebilirsiniz:
+  `adb shell am start -a android.intent.action.VIEW -d "kuaforumcepte://salon/<kod>" com.kuaforumcepte.debug`
+- Play Store adresi farklıysa fonksiyon ortam değişkeni `PLAY_STORE_URL` ile verin.
+
 ## Lisanslar
 
 `app/src/main/assets/tr_locations.json` (81 il / 973 ilçe) `turkey-neighbourhoods` paketinden (MIT, PTT verisi) türetilmiştir; ayrıntı `assets/THIRD_PARTY_NOTICES.txt`.
@@ -131,7 +142,7 @@ Kapalıysa uygulama her soğuk başlatmada oturumu kapatır ve rol seçimine dö
 | 0 | Mimari, veri modeli, kurallar, indeksler, API sözleşmeleri, domain çekirdeği | ✅ |
 | 1 | Gradle, tema, navigasyon, DI, Firebase şablonu, splash, rol seçimi | ✅ |
 | 2 | Telefon OTP, müşteri/salon sahibi kaydı, personel daveti, rol sistemi | ✅ |
-| 3 | Salon profili, logo/galeri, il/ilçe, salon kodu, paylaşım/QR | ⏳ |
+| 3 | Salon profili, logo/galeri, il/ilçe, salon kodu, paylaşım/QR | ✅ |
 | 4 | Çalışma takvimi, izinler, kapamalar, hizmetler | ⏳ |
 | 5 | Salon listesi, detay, uzman/hizmet seçimi, müsaitlik, rezervasyon | ⏳ |
 | 6 | Randevu yönetimi, bildirimler, zamanlanmış hatırlatmalar | ⏳ |

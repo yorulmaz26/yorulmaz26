@@ -11,6 +11,7 @@ import com.kuaforumcepte.app.data.location.LocationRepository
 import com.kuaforumcepte.app.data.media.FitMode
 import com.kuaforumcepte.app.data.media.ImageKind
 import com.kuaforumcepte.app.data.media.ImageProcessor
+import com.kuaforumcepte.app.data.media.PendingImage
 import com.kuaforumcepte.app.data.registration.DraftImage
 import com.kuaforumcepte.app.data.registration.OwnerDraft
 import com.kuaforumcepte.app.data.registration.OwnerDraftStore
@@ -37,8 +38,6 @@ enum class OwnerStep(val title: String) {
     PERSONAL("Kişisel Bilgiler"), VENUE("Mekan Bilgileri"), ADDRESS("Adres"), MEDIA("Logo ve Fotoğraflar"), REVIEW("Özet ve Onay")
 }
 
-/** Seçilen görselin kırp/sığdır önizlemesi; "Kullan" ile taslağa eklenir. */
-data class PendingImage(val source: Uri, val kind: ImageKind, val mode: FitMode, val preview: DraftImage?, val processing: Boolean)
 
 data class OwnerRegisterUi(
     val loading: Boolean = true,

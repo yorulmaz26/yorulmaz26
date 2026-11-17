@@ -16,6 +16,7 @@ kotlin {
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
+    api(libs.zxing.core)
     testImplementation(libs.kotlin.test)
     testImplementation(libs.junit)
 }

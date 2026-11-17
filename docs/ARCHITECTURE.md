@@ -113,7 +113,7 @@ Okuma: yalnızca sahibi. Alt koleksiyonlar:
 `name, nameLower, type (BEAUTY_SALON|MEN_HAIRDRESSER|WOMEN_HAIRDRESSER|UNISEX_HAIRDRESSER), businessPhoneE164, city, district, addressLine, description, location {lat,lng}?, logoUrl, logoPath, photos [{url,path}] (≤5), ownerUid 🔒, ownerDisplayName 🔒, code 🔒 (6 hane), status 🔒 (ACTIVE|SUSPENDED|TEMP_CLOSED*), ratingSum 🔒, ratingCount 🔒, ratingAvg 🔒, weeklyClosedDays [1..7] (ISO, 1=Pzt), bookingSettings 🔒 {slotMinutes:15, horizonDays:60, pendingTtlMinutes:30, customerCancelCutoffMinutes:120, minLeadMinutes:30}, timezone 🔒`
 
 *`TEMP_CLOSED` salon sahibince istenebilir (fonksiyon üzerinden).
-Okuma: herkes (oturumlu). Yazma: sahibi yalnızca profil alanlarını (ad, tür, telefon, il/ilçe, adres, açıklama, konum, logo/foto, weeklyClosedDays*) — kurallar alan bazında denetler. `weeklyClosedDays` değişimi gelecekteki randevuları etkileyebileceği için `updateSalonClosures` fonksiyonu ile yapılır (kurallarda kapalı).
+Okuma: herkes (oturumlu). İstemci yazımı kapalıdır: profil `updateSalonProfile`, görseller `updateSalonMedia`, kapalı günler `updateSalonClosures` fonksiyonlarıyla güncellenir (il/ilçe doğrulaması, arama anahtarı, üyelik aynası tutarlılığı ve görsel dosya yaşam döngüsü için).
 
 Alt koleksiyonlar:
 - `salons/{salonId}/members/{uid}` 🔒 — kamuya açık uzman kartı: `{uid, role OWNER|STAFF, status ACTIVE|INACTIVE|LEFT, firstName, lastName, specialty, ratingSum, ratingCount, ratingAvg, acceptsBookings, joinedAt}`. Telefon **yok**.
@@ -254,5 +254,5 @@ Push yükü: `{type, appointmentId}` + genel başlık ("Randevunuz onaylandı").
 9. **Hesap silme**: `requestAccountDeletion` fonksiyonu; mali/denetim kayıtları yasal saklama süresince anonimleştirilerek tutulur (hukuki inceleme gerekir).
 10. **Salon kodu**: 6 hane, `100000–999999` (900.000 kapasite). Rastgele üretim + `salonCodes` create-if-absent transaction'ı, 10 deneme; doluluk %80'i aşınca alarm (audit). Kod kimliktir, yetki vermez.
 11. **Değerlendirme düzenleme**: v1'de yok (manipülasyonu önlemek için).
-12. **App Link alan adı**: `kuaforumcepte.web.app` (Firebase Hosting) varsayıldı; kendi alan adınız varsa `assetlinks.json` ve manifest güncellenir.
+12. **App Link alan adı**: `kuaforumcepte.web.app` (Firebase Hosting) varsayıldı; kendi alan adınız varsa `local.properties → appLinkHost` ve `assetlinks.json` güncellenir. Salon konumu harita SDK'sı olmadan seçilir (cihaz konumu veya adresten Geocoder) ve harita uygulamasında kontrol ettirilir; Google Maps API anahtarı gerekmez.
 13. **İl/ilçe verisi** uygulamaya gömülü statik JSON (81 il) — değişmeyen referans verisi; dinamik veri değildir.
