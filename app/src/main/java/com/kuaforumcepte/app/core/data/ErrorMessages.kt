@@ -118,12 +118,16 @@ object ErrorMessages {
         "ALREADY_OWNER" to "Zaten aktif bir salonunuz var; ikinci salonu yeniden açamazsınız.",
         "INVALID_COORDINATES" to "Konum alınamadı veya hizmet bölgesi dışında.",
         "PROFILE_REQUIRED" to "Önce profilinizi tamamlayın.",
+        "AUTH_PHONE_DISABLED" to "Telefonla giriş Firebase projesinde açık değil (Authentication › Sign-in method › Telefon).",
+        "AUTH_APP_NOT_AUTHORIZED" to "Uygulama Firebase tarafından doğrulanamadı. Firebase'de paket adı (com.kuaforumcepte.debug) ve SHA-1/SHA-256 parmak izlerini kontrol edin.",
+        "AUTH_BILLING" to "SMS gönderimi için Firebase projesinin Blaze planında olması gerekir.",
     )
 
     fun text(t: Throwable): String = (of(t) as UiText.Plain).value
 
     fun of(t: Throwable): UiText {
         val e = AppException.from(t)
-        return UiText.Plain(messages[e.reason] ?: "Bir şeyler ters gitti. Lütfen tekrar deneyin. (${e.reason})")
+        val code = (e.details["code"] as? String)?.let { " — $it" } ?: ""
+        return UiText.Plain(messages[e.reason]?.let { m -> if (e.reason == "AUTH_APP_NOT_AUTHORIZED") m + code else m } ?: "Bir şeyler ters gitti. Lütfen tekrar deneyin. (${e.reason}$code)")
     }
 }

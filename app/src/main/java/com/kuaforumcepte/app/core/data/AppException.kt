@@ -53,13 +53,18 @@ class AppException(
                 "ERROR_INVALID_VERIFICATION_CODE" -> AppException(INVALID_CODE, cause = t)
                 "ERROR_SESSION_EXPIRED", "ERROR_CODE_EXPIRED" -> AppException(CODE_EXPIRED, cause = t)
                 "ERROR_INVALID_PHONE_NUMBER" -> AppException(INVALID_PHONE, cause = t)
+                "ERROR_INVALID_APP_CREDENTIAL", "ERROR_MISSING_APP_CREDENTIAL", "ERROR_APP_NOT_AUTHORIZED" ->
+                    AppException("AUTH_APP_NOT_AUTHORIZED", mapOf("code" to t.errorCode), t)
                 else -> AppException(INVALID_CODE, cause = t)
             }
             is FirebaseAuthException -> when (t.errorCode) {
                 "ERROR_TOO_MANY_REQUESTS", "ERROR_QUOTA_EXCEEDED" -> AppException(RATE_LIMITED, cause = t)
+                "ERROR_OPERATION_NOT_ALLOWED" -> AppException("AUTH_PHONE_DISABLED", cause = t)
+                "ERROR_APP_NOT_AUTHORIZED", "ERROR_MISSING_CLIENT_IDENTIFIER", "ERROR_INVALID_APP_CREDENTIAL",
+                "ERROR_MISSING_APP_CREDENTIAL" -> AppException("AUTH_APP_NOT_AUTHORIZED", mapOf("code" to t.errorCode), t)
                 "ERROR_SESSION_EXPIRED" -> AppException(CODE_EXPIRED, cause = t)
                 "ERROR_CREDENTIAL_ALREADY_IN_USE", "ERROR_PROVIDER_ALREADY_LINKED" -> AppException("ERROR_CREDENTIAL_ALREADY_IN_USE", cause = t)
-                else -> AppException(UNKNOWN, cause = t)
+                else -> AppException(UNKNOWN, mapOf("code" to t.errorCode), t)
             }
             is FirebaseFirestoreException -> when (t.code) {
                 FirebaseFirestoreException.Code.UNAVAILABLE -> AppException(NETWORK, cause = t)
@@ -71,7 +76,16 @@ class AppException(
                 StorageException.ERROR_NOT_AUTHORIZED -> AppException("UPLOAD_REJECTED", cause = t)
                 else -> AppException("UPLOAD_FAILED", cause = t)
             }
-            else -> AppException(UNKNOWN, cause = t)
+            else -> {
+                val msg = t.message.orEmpty()
+                when {
+                    msg.contains("BILLING_NOT_ENABLED", true) -> AppException("AUTH_BILLING", cause = t)
+                    msg.contains("app identifier", true) || msg.contains("Play Integrity", true) || msg.contains("reCAPTCHA", true) ->
+                        AppException("AUTH_APP_NOT_AUTHORIZED", mapOf("code" to msg.take(80)), t)
+                    // Tanınmayan hata: ekrana kısa teşhis bilgisi taşınır (destek/hata ayıklama için).
+                    else -> AppException(UNKNOWN, mapOf("code" to (t.javaClass.simpleName + ": " + msg).take(120)), t)
+                }
+            }
         }
     }
 }

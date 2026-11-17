@@ -83,6 +83,9 @@ class PhoneAuthRepository @Inject constructor(
             }
         }
 
+        // Yalnızca debug/test sürümü: Firebase Console'daki "test telefon numaraları" için Play Integrity/reCAPTCHA
+        // uygulama doğrulaması atlanır (gerçek numaralar bu ayardan etkilenmez, yine doğrulanır).
+        if (com.kuaforumcepte.app.BuildConfig.DEBUG) auth.get().firebaseAuthSettings.setAppVerificationDisabledForTesting(true)
         val builder = PhoneAuthOptions.newBuilder(auth.get())
             .setPhoneNumber(phoneE164)
             .setTimeout(60L, TimeUnit.SECONDS)
