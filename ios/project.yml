@@ -1,0 +1,62 @@
+# Kuaförüm Cepte — iOS (SwiftUI). Xcode projesi XcodeGen ile üretilir: `xcodegen generate`
+# GoogleService-Info.plist depoya konmaz; CI gizli değişkenden yazar (bkz. ios/README.md).
+name: KuaforumCepte
+options:
+  bundleIdPrefix: com.kuaforumcepte
+  deploymentTarget:
+    iOS: "16.0"
+  developmentLanguage: tr
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    DEVELOPMENT_TEAM: ""
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: 11.0.0
+targets:
+  KuaforumCepte:
+    type: application
+    platform: iOS
+    sources:
+      - path: KuaforumCepte
+        excludes:
+          - "Info.plist"
+          - "Resources/Legal/**"
+      - path: KuaforumCepte/Resources/Legal
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kuaforumcepte.ios
+        INFOPLIST_FILE: KuaforumCepte/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        TARGETED_DEVICE_FAMILY: "1"
+        ENABLE_PREVIEWS: YES
+    dependencies:
+      - package: Firebase
+        product: FirebaseCore
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore
+      - package: Firebase
+        product: FirebaseFunctions
+  KuaforumCepteTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [KuaforumCepteTests]
+    dependencies:
+      - target: KuaforumCepte
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+schemes:
+  KuaforumCepte:
+    build:
+      targets:
+        KuaforumCepte: all
+        KuaforumCepteTests: [test]
+    test:
+      targets: [KuaforumCepteTests]

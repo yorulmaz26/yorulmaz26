@@ -1,0 +1,58 @@
+name: iOS
+
+on:
+  push:
+    paths: ["ios/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: iOS derleme + simülatör testleri
+    runs-on: macos-15
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode ve araçlar
+        run: |
+          sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)"
+          xcodebuild -version
+          brew install xcodegen
+      - name: GoogleService-Info.plist (gizli değişkenden, varsa)
+        env:
+          PLIST: ${{ secrets.GOOGLE_SERVICE_INFO_PLIST }}
+        run: |
+          if [ -n "$PLIST" ]; then
+            printf '%s' "$PLIST" > KuaforumCepte/Resources/GoogleService-Info.plist
+            # reCAPTCHA dönüşü için REVERSED_CLIENT_ID URL şemasına eklenir
+            RID=$(/usr/libexec/PlistBuddy -c "Print :REVERSED_CLIENT_ID" KuaforumCepte/Resources/GoogleService-Info.plist 2>/dev/null || true)
+            if [ -n "$RID" ]; then /usr/libexec/PlistBuddy -c "Add :CFBundleURLTypes:0:CFBundleURLSchemes:1 string $RID" KuaforumCepte/Info.plist; fi
+            echo "Firebase yapılandırması eklendi."
+          else
+            echo "GOOGLE_SERVICE_INFO_PLIST tanımlı değil: Firebase'siz derlenecek."
+          fi
+      - name: Xcode projesini üret
+        run: xcodegen generate
+      - name: Derle ve test et (iPhone simülatörü)
+        run: |
+          SIM=$(xcrun simctl list devices available | grep -E "iPhone 1[5-7]" | head -1 | sed -E 's/^ *([^(]+) \(.*/\1/' | sed 's/ *$//')
+          echo "Simülatör: $SIM"
+          set -o pipefail
+          xcodebuild test -project KuaforumCepte.xcodeproj -scheme KuaforumCepte \
+            -destination "platform=iOS Simulator,name=$SIM" \
+            -skipPackagePluginValidation -skipMacroValidation \
+            CODE_SIGNING_ALLOWED=NO | tee build.log | grep -E "error:|warning: unre|Test Case|Executed|\*\* (BUILD|TEST)" || true
+          grep -q "\*\* TEST SUCCEEDED \*\*" build.log
+      - name: Derleme günlüğü
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-build-log
+          path: ios/build.log
+          if-no-files-found: ignore
