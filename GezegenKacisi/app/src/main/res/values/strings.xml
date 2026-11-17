@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Gezegen Kaçışı</string>
+    <string name="title_line1">GEZEGEN</string>
+    <string name="title_line2">KAÇIŞI</string>
+    <string name="tap_to_start">Başlamak için dokun</string>
+    <string name="hint">Roketi gezegenlerin arasından geçir</string>
+    <string name="best_format">EN İYİ: %1$d</string>
+    <string name="game_over">GÖREV BİTTİ</string>
+    <string name="score_label">SKOR</string>
+    <string name="best_label">EN İYİ</string>
+    <string name="new_record">YENİ REKOR!</string>
+    <string name="tap_to_retry">Tekrar denemek için dokun</string>
+    <string name="paused">DURAKLATILDI</string>
+    <string name="tap_to_continue">Devam etmek için dokun</string>
+</resources>

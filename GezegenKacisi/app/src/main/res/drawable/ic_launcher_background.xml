@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Uzay -->
+    <path
+        android:fillColor="#0B0E33"
+        android:pathData="M0,0h108v108h-108z" />
+
+    <!-- Uzaktaki gezegen -->
+    <path
+        android:fillColor="#FFB36B"
+        android:pathData="M34,76m-11,0a11,11 0,1 1,22 0a11,11 0,1 1,-22 0" />
+    <path
+        android:fillColor="#C2563A"
+        android:pathData="M37,80m-4,0a4,2 0,1 1,8 0a4,2 0,1 1,-8 0" />
+
+    <!-- Yıldızlar -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,34m-1.2,0a1.2,1.2 0,1 1,2.4 0a1.2,1.2 0,1 1,-2.4 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M74,28m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillColor="#BFD4FF"
+        android:pathData="M80,62m-1.4,0a1.4,1.4 0,1 1,2.8 0a1.4,1.4 0,1 1,-2.8 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M44,24m-0.8,0a0.8,0.8 0,1 1,1.6 0a0.8,0.8 0,1 1,-1.6 0" />
+    <path
+        android:fillColor="#FFE6C2"
+        android:pathData="M68,82m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,54m-0.9,0a0.9,0.9 0,1 1,1.8 0a0.9,0.9 0,1 1,-1.8 0" />
+</vector>
