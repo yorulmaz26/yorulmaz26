@@ -79,6 +79,11 @@ object ErrorMessages {
         "STAFF_NOT_AVAILABLE" to "Seçilen uzman bu saatte çalışmıyor veya izinli.",
         "CANNOT_HIDE_ACTIVE" to "Aktif randevular gizlenemez; yalnızca geçmiş randevular listeden kaldırılabilir.",
         "COMPLETION_NOT_AVAILABLE" to "İşlemi tamamlama, finans kaydıyla birlikte bir sonraki sürümde etkinleşecek.",
+        "NOT_COMPLETED" to "Yalnızca tamamlanmış randevular puanlanabilir.",
+        "ALREADY_REVIEWED" to "Bu randevuyu zaten değerlendirdiniz.",
+        "INVALID_RATING" to "Lütfen 1 ile 5 arasında yıldız seçin.",
+        "NO_CHANGE" to "Yeni tutar mevcut tutarla aynı.",
+        "LEDGER_MISSING" to "Bu randevunun finans kaydı bulunamadı.",
         "QR_VERIFY_FAILED" to "QR kod doğrulanamadı. Lütfen tekrar oluşturun.",
     )
 

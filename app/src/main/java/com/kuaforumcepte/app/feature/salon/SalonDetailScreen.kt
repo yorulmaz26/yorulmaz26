@@ -14,6 +14,7 @@ import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import com.kuaforumcepte.app.feature.booking.BookingSection
+import com.kuaforumcepte.app.feature.reviews.SalonReviewsSection
 import com.kuaforumcepte.app.feature.booking.BookingSectionViewModel
 import com.kuaforumcepte.domain.booking.formatDuration
 import androidx.compose.material.icons.outlined.Storefront
@@ -96,6 +97,8 @@ fun SalonDetailScreen(
                 BookingSection(s.data.id, onActiveAppointment = onOpenAppointment, viewModel = bookingViewModel)
                 Spacer(Modifier.height(Spacing.xl))
                 SalonHoursSection(s.data.id, s.data.weeklyClosedDays)
+                Spacer(Modifier.height(Spacing.xl))
+                SalonReviewsSection(s.data.id, s.data.rating)
                 Spacer(Modifier.height(Spacing.l))
             }
         }

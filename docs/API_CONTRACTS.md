@@ -54,7 +54,7 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `transitionAppointment` `COMPLETE` | — | — | IN_PROGRESS → COMPLETED; aynı transaction'da `financialLedger/completion_{id}` (`tx.create`) + 6 `reportAggregates` artışı (salon ALL ve uzman × D/W/M, tamamlama anının İstanbul dönemleri). İkinci/eşzamanlı tamamlama `STATE_CHANGED`. Müşteriye `REVIEW_INVITE`. |
 
 ## Puan ve bildirim (Aşama 6, 8)
-| `submitReview` | `{appointmentId, salonRating, staffRating, serviceRating?, comment?}` | `{}` | `NOT_COMPLETED`, `ALREADY_REVIEWED`. |
+| `submitReview` | `{appointmentId, salonRating 1–5, staffRating 1–5, serviceRating? 1–5, comment? ≤500}` | `{reviewId, salonRatingAvg, staffRatingAvg}` | Yalnızca randevunun müşterisi ve COMPLETED. `reviews/{appointmentId}` transaction içinde `create` → randevu başına bir set (eşzamanlı ikinci istek düşer). Salon `ratingSum/Count/Avg` ← salonRating; uzman üyeliği ← staffRating; serviceRating ortalamalara girmez. Kamuya açık belgede müşteri uid yok (`reviewsPrivate`), yazar "Ad S.". Düzenleme yok (v1). Hatalar: `NOT_COMPLETED`, `ALREADY_REVIEWED`, `INVALID_RATING`, `PERMISSION_DENIED`. |
 | `registerDevice` | `{installationId, token}` | `{}` | |
 | `markNotificationsRead` | `{ids[] \| all:true}` | `{}` | |
 | `requestAccountDeletion` | `{}` | `{requestId}` | |

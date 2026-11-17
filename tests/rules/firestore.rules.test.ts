@@ -187,6 +187,15 @@ describe("finans ve kullanıcı", () => {
     await assertSucceeds(getDocs(collection(db(OWNER), "salons", SALON, "invitations")));
     await assertFails(getDocs(collection(db(STAFF), "salons", SALON, "invitations")));
   });
+  test("değerlendirmeler herkese açık okunur ama istemci yazamaz; müşteri kimliği gizli koleksiyonda", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "reviews", "ap1"), { salonId: SALON, salonRating: 5 });
+      await setDoc(doc(ctx.firestore(), "reviewsPrivate", "ap1"), { customerUid: CUSTOMER });
+    });
+    await assertSucceeds(getDoc(doc(db(STRANGER), "reviews", "ap1")));
+    await assertFails(setDoc(doc(db(CUSTOMER), "reviews", "ap2"), { salonId: SALON, salonRating: 5 }));
+    await assertFails(getDoc(doc(db(OWNER), "reviewsPrivate", "ap1")));
+  });
   test("kilit koleksiyonları istemciye kapalı", async () => {
     await assertFails(getDoc(doc(db(OWNER), "salonOwners", OWNER)));
     await assertFails(getDoc(doc(db(CUSTOMER), "customerLocks", CUSTOMER)));

@@ -21,6 +21,8 @@ import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.NotificationsActive
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.StarRate
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -147,7 +149,7 @@ fun BookingSuccessScreen(onOpenAppointment: () -> Unit, onHome: () -> Unit, view
 }
 
 @Composable
-fun CustomerAppointmentDetailScreen(onBack: () -> Unit, viewModel: CustomerAppointmentViewModel = hiltViewModel()) {
+fun CustomerAppointmentDetailScreen(onBack: () -> Unit, onReview: (String) -> Unit, viewModel: CustomerAppointmentViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val busy by viewModel.busy.collectAsStateWithLifecycle()
     val message by viewModel.message.collectAsStateWithLifecycle()
@@ -179,6 +181,14 @@ fun CustomerAppointmentDetailScreen(onBack: () -> Unit, viewModel: CustomerAppoi
                         status.isActive -> InfoBanner("Randevuya 2 saatten az kaldığı için uygulamadan iptal edilemez. Gelemeyecekseniz lütfen salonu arayın.")
                         status == AppointmentStatus.EXPIRED -> InfoBanner("Salon talebinizi süresi içinde yanıtlamadığı için talep düştü. Yeni randevu alabilirsiniz.")
                         else -> Unit
+                    }
+                    if (status == AppointmentStatus.COMPLETED) {
+                        if (a.reviewId == null) KcPrimaryButton("Hizmeti / Kuaförü Puanla", { onReview(a.id) }, leadingIcon = Icons.Outlined.StarRate)
+                        else InfoBanner("Bu randevuyu değerlendirdiniz. Teşekkürler!")
+                    }
+                    if (status.isTerminal) {
+                        KcSecondaryButton("Listemden Gizle", { viewModel.hide(onBack) }, loading = busy, leadingIcon = Icons.Outlined.VisibilityOff)
+                        Text("Yalnızca sizin listenizden kaldırılır; salon kayıtları ve değerlendirmeler silinmez.", style = MaterialTheme.typography.bodySmall)
                     }
                     if (status.isActive) {
                         KcSecondaryButton("Google Takvim'e Ekle", {

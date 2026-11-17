@@ -19,6 +19,7 @@ import com.kuaforumcepte.app.feature.salon.SalonDetailScreen
 import com.kuaforumcepte.app.feature.bizappointments.BusinessAppointmentScreen
 import com.kuaforumcepte.app.feature.bizappointments.RescheduleScreen
 import com.kuaforumcepte.app.feature.inbox.InboxScreen
+import com.kuaforumcepte.app.feature.reviews.ReviewScreen
 import com.kuaforumcepte.app.feature.appointments.BookingSuccessScreen
 import com.kuaforumcepte.app.feature.appointments.CustomerAppointmentDetailScreen
 import com.kuaforumcepte.app.feature.booking.BookingSummaryScreen
@@ -263,7 +264,10 @@ fun KcNavHost(
                 },
             )
         }
-        composable<AppointmentDetailRoute> { CustomerAppointmentDetailScreen(onBack = back) }
+        composable<AppointmentDetailRoute> {
+            CustomerAppointmentDetailScreen(onBack = back, onReview = { id -> navController.navigate(ReviewRoute(id)) { single() } })
+        }
+        composable<ReviewRoute> { ReviewScreen(onBack = back) }
 
         // ---- Müşteri ----
         composable<CustomerHomeRoute> {
@@ -272,6 +276,7 @@ fun KcNavHost(
                 onOpenSalon = { id -> navController.navigate(SalonDetailRoute(id)) { single() } },
                 onOpenAppointment = { id -> navController.navigate(AppointmentDetailRoute(id)) { single() } },
                 onOpenInbox = { navController.navigate(InboxRoute(EntryRole.CUSTOMER.name)) { single() } },
+                onReview = { id -> navController.navigate(ReviewRoute(id)) { single() } },
             )
         }
 

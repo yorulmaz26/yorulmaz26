@@ -52,6 +52,18 @@ class CustomerAppointmentViewModel @Inject constructor(
     val message: StateFlow<UiText?> = _message.asStateFlow()
     fun consumeMessage() { _message.value = null }
 
+    /** Geçmiş randevuyu yalnızca müşterinin listesinden gizler (kayıt silinmez). */
+    fun hide(onDone: () -> Unit) {
+        if (_busy.value) return
+        _busy.value = true
+        viewModelScope.launch {
+            runCatching { appointments.hide(listOf(id)) }
+                .onSuccess { onDone() }
+                .onFailure { _message.value = ErrorMessages.of(it) }
+            _busy.value = false
+        }
+    }
+
     fun cancel(reason: String) {
         if (_busy.value) return
         _busy.value = true

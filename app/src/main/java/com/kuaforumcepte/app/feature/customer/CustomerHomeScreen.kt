@@ -24,6 +24,7 @@ import com.kuaforumcepte.app.feature.appointments.MyAppointmentsContent
 import com.kuaforumcepte.app.feature.booking.ActiveAppointmentCard
 import com.kuaforumcepte.app.feature.booking.SalonListContent
 import com.kuaforumcepte.app.feature.inbox.InboxBell
+import com.kuaforumcepte.app.feature.reviews.SalonReviewsSection
 import com.kuaforumcepte.app.feature.salon.SalonInfoContent
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.Icons
@@ -61,6 +62,7 @@ fun CustomerHomeScreen(
     onOpenSalon: (String) -> Unit,
     onOpenAppointment: (String) -> Unit,
     onOpenInbox: () -> Unit,
+    onReview: (String) -> Unit,
     viewModel: CustomerHomeViewModel = hiltViewModel(),
 ) {
     var tab by rememberSaveable { mutableIntStateOf(0) }
@@ -93,6 +95,8 @@ fun CustomerHomeScreen(
             CustomerTab.MINE -> MyAppointmentsContent(
                 onOpen = onOpenAppointment,
                 onBook = { tab = CustomerTab.BOOK.ordinal },
+                onReview = onReview,
+                onMessage = { m -> scope.launch { snackbar.showSnackbar(m) } },
                 modifier = Modifier.padding(padding),
             )
             CustomerTab.SALON -> when (val st = selected) {
@@ -114,6 +118,8 @@ fun CustomerHomeScreen(
                     SalonInfoContent(st.data) { m -> scope.launch { snackbar.showSnackbar(m) } }
                     Spacer(Modifier.height(Spacing.l))
                     SalonHoursSection(st.data.id, st.data.weeklyClosedDays)
+                    Spacer(Modifier.height(Spacing.l))
+                    SalonReviewsSection(st.data.id, st.data.rating)
                     Spacer(Modifier.height(Spacing.s))
                     KcTextButton("Salonu değiştir", viewModel::clearSelection)
                 }

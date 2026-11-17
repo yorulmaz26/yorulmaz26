@@ -45,3 +45,6 @@ export { scanAppointments } from "./scheduled/scan";
 
 // Aşama 7 — finans ve raporlar (tamamlama: transitionAppointment COMPLETE)
 export { adjustAppointmentPrice, getReports, rebuildReportAggregates } from "./finance/financeFunctions";
+
+// Aşama 8 — değerlendirmeler
+export { submitReview } from "./reviews/submitReview";

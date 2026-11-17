@@ -44,6 +44,7 @@ data class Appointment(
     val cancelReason: String?,
     val attentionReason: String?,
     val hiddenFor: List<String>,
+    val reviewId: String? = null,
 ) {
     /** Zamanlayıcı henüz işlemediyse bile süresi dolmuş talep EXPIRED gösterilir. */
     fun effectiveStatus(now: Instant): AppointmentStatus =
@@ -160,5 +161,6 @@ internal fun DocumentSnapshot.toAppointment(): Appointment? {
         cancelReason = getString("cancelReason"),
         attentionReason = (get("attention") as? Map<String, Any?>)?.str("reason"),
         hiddenFor = (get("hiddenFor") as? List<String>).orEmpty(),
+        reviewId = getString("reviewId"),
     )
 }
