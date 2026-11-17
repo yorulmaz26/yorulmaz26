@@ -102,7 +102,7 @@ Komut satırı:
 
 ## Sürekli entegrasyon
 
-`.github/workflows/ci.yml` her push'ta çalışır:
+`.github/workflows/ci.yml` her push'ta çalışır (son çalışma: tüm işler yeşil — Android derleme dahil):
 - **Android:** `:core:domain:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`
 - **Backend:** Functions TypeScript + birim testleri, Emulator entegrasyon testleri, Firestore kural testleri
 

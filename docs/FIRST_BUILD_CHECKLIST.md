@@ -1,5 +1,11 @@
 # İlk Derleme Kontrol Listesi (Android Studio)
 
+> **Durum (2026-11-17):** GitHub Actions'ta `:core:domain:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`
+> **BUILD SUCCESSFUL** (katalogdaki sürümlerle). Derleyici yalnızca uyarı verdi: `androidx.hilt.navigation.compose.hiltViewModel`
+> kullanımdan kaldırılıyor (ileride `androidx.hilt:hilt-lifecycle-viewmodel-compose` paketindeki `hiltViewModel`e geçilebilir) ve
+> `Icons.Outlined.EventNote` yerine `Icons.AutoMirrored.Outlined.EventNote` önerisi. Aşağıdaki tablo, sürüm yükseltmelerinde
+> veya farklı bir ortamda sorun çıkarsa başvuru içindir.
+
 Bu proje geliştirme ortamında Android SDK/Google Maven erişimi olmadan yazıldı. Saf Kotlin domain modülü,
 Cloud Functions ve Firestore kuralları otomatik testlerle doğrulandı; **Android modülü ise GitHub Actions
 CI'da (`.github/workflows/ci.yml`) derlenir**. CI kırmızıysa veya Android Studio'da hata görürseniz en olası
