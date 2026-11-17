@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -99,6 +100,25 @@ class SessionRepository @Inject constructor(
     }
 
     suspend fun selectActiveSalon(salonId: String) = preferences.setActiveBusinessSalon(salonId)
+
+    /** Platform yöneticisi (moderasyon) özel yetkisi; token'dan okunur. */
+    suspend fun isPlatformAdmin(forceRefresh: Boolean = false): Boolean =
+        runCatching { auth.get().currentUser?.getIdToken(forceRefresh)?.await()?.claims?.get("admin") == true }.getOrDefault(false)
+
+    suspend fun updateName(firstName: String, lastName: String) {
+        functions.call("updateMyName", mapOf("firstName" to firstName.trim(), "lastName" to lastName.trim()))
+        bootstrap()
+    }
+
+    /**
+     * Firebase Auth'ta yeni numara doğrulandıktan (updatePhoneNumber) sonra çağrılır: token yenilenir,
+     * sunucu yeni numarayı doğrulanmış token'dan profile ve aktif randevulara yazar.
+     */
+    suspend fun syncPhoneNumber() {
+        auth.get().currentUser?.getIdToken(true)?.await()
+        functions.call("syncPhoneNumber")
+        bootstrap()
+    }
 
     /** Hesabı kalıcı olarak siler (sunucu kişisel verileri anonimleştirir) ve yerel oturumu kapatır. */
     suspend fun deleteAccount() {

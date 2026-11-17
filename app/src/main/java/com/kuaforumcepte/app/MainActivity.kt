@@ -7,7 +7,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.kuaforumcepte.app.core.designsystem.theme.KuaforumTheme
 import com.kuaforumcepte.app.core.navigation.KcNavHost
 import com.kuaforumcepte.app.data.link.DeepLinkRepository

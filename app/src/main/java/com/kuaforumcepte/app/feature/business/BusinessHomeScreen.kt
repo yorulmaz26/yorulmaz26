@@ -11,7 +11,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.EditCalendar
-import androidx.compose.material.icons.outlined.EventNote
+import androidx.compose.material.icons.automirrored.outlined.EventNote
 import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.outlined.ManageAccounts
 import androidx.compose.material.icons.outlined.BeachAccess
@@ -45,7 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kuaforumcepte.app.core.designsystem.component.EmptyState
 import com.kuaforumcepte.app.core.designsystem.component.InfoBanner
@@ -62,7 +62,7 @@ import kotlinx.coroutines.launch
 private enum class BusinessTab(val label: String, val icon: ImageVector) {
     STATS("İstatistikler", Icons.Outlined.BarChart),
     MANAGE("Bilgileri Yönet", Icons.Outlined.Tune),
-    APPOINTMENTS("Randevular", Icons.Outlined.EventNote),
+    APPOINTMENTS("Randevular", Icons.AutoMirrored.Outlined.EventNote),
 }
 
 @Composable

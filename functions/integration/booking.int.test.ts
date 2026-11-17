@@ -123,7 +123,7 @@ test("süresi dolan PENDING slotu serbest bırakır ve müşteri yeniden randevu
   const a = await book(req(), "c1", "+905320000001");
   const past = Timestamp.fromMillis(Date.now() - 1000);
   await db.doc(`appointments/${a.appointmentId}`).update({ pendingExpiresAt: past });
-  const lockId = `${salonId}_staff_${TUESDAY}`;
+  const lockId = `staff_${TUESDAY}`;
   const lock = await db.doc(`staffDayLocks/${lockId}`).get();
   await lock.ref.update({ intervals: lock.get("intervals").map((i: object) => ({ ...i, expiresAtMs: past.toMillis() })) });
 
@@ -140,12 +140,12 @@ test("onay, iptal sonrası slot açılır; yetkiler ve 2 saat kuralı", async ()
   await expectReason(transition({ appointmentId: a.appointmentId, action: "CONFIRM" }, "c2", "+905320000002"), "PERMISSION_DENIED");
   await expectReason(transition({ appointmentId: a.appointmentId, action: "CANCEL_BY_CUSTOMER" }, "c2", "+905320000002"), "PERMISSION_DENIED");
   expect((await transition({ appointmentId: a.appointmentId, action: "CONFIRM" }, "staff", STAFF_PHONE)).status).toBe("CONFIRMED");
-  const lock = await db.doc(`staffDayLocks/${salonId}_staff_${TUESDAY}`).get();
+  const lock = await db.doc(`staffDayLocks/staff_${TUESDAY}`).get();
   expect(lock.get("intervals")[0].expiresAtMs).toBeNull();
   expect((await db.collection("users/c1/notifications").where("type", "==", "APPOINTMENT_CONFIRMED").get()).size).toBe(1);
 
   expect((await transition({ appointmentId: a.appointmentId, action: "CANCEL_BY_CUSTOMER", reason: "Planım değişti" }, "c1", "+905320000001")).status).toBe("CANCELLED_BY_CUSTOMER");
-  expect((await db.doc(`staffDayLocks/${salonId}_staff_${TUESDAY}`).get()).get("intervals")).toEqual([]);
+  expect((await db.doc(`staffDayLocks/staff_${TUESDAY}`).get()).get("intervals")).toEqual([]);
   // Slot ve müşteri kilidi serbest: aynı müşteri aynı slotu tekrar alabilir.
   await book(req(), "c1", "+905320000001");
 

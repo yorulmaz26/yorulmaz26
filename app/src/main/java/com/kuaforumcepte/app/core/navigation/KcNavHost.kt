@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -42,6 +42,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.kuaforumcepte.app.data.registration.LegalDocument
 import com.kuaforumcepte.app.feature.account.AccountScreen
+import com.kuaforumcepte.app.feature.account.ChangePhoneScreen
+import com.kuaforumcepte.app.feature.moderation.ModerationScreen
 import com.kuaforumcepte.app.feature.auth.OtpScreen
 import com.kuaforumcepte.app.feature.auth.PhoneEntryScreen
 import com.kuaforumcepte.app.feature.auth.SessionGateScreen
@@ -217,7 +219,15 @@ fun KcNavHost(
         }
         composable<StaffManagementRoute> { StaffManagementScreen(onBack = back) }
         composable<ShopSettingsRoute> {
-            ShopSettingsScreen(onBack = back, onOpenMedia = { navController.navigate(MediaManagerRoute) { single() } })
+            ShopSettingsScreen(
+                onBack = back,
+                onOpenMedia = { navController.navigate(MediaManagerRoute) { single() } },
+                onSalonLeft = { message, closed ->
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                    // Devirde rol yeniden belirlenir (uzman paneli); kapatmada işletme üyeliği kalmaz.
+                    navController.navigateAsRoot(if (closed) RoleSelectionRoute else SessionGateRoute(EntryRole.BUSINESS.name))
+                },
+            )
         }
         composable<MediaManagerRoute> { MediaManagerScreen(onBack = back) }
         composable<ShareSalonRoute> { ShareSalonScreen(onBack = back) }
@@ -268,6 +278,8 @@ fun KcNavHost(
             CustomerAppointmentDetailScreen(onBack = back, onReview = { id -> navController.navigate(ReviewRoute(id)) { single() } })
         }
         composable<ReviewRoute> { ReviewScreen(onBack = back) }
+        composable<ChangePhoneRoute> { ChangePhoneScreen(onBack = back) }
+        composable<ModerationRoute> { ModerationScreen(onBack = back) }
 
         // ---- Müşteri ----
         composable<CustomerHomeRoute> {
@@ -300,6 +312,8 @@ fun KcNavHost(
                 onSwitchRole = { role -> navController.navigateAsRoot(SessionGateRoute(role.name)) },
                 onSignedOut = toRoleSelection,
                 onOpenLegal = openLegal,
+                onChangePhone = { navController.navigate(ChangePhoneRoute) { single() } },
+                onOpenModeration = { navController.navigate(ModerationRoute) { single() } },
             )
         }
     }

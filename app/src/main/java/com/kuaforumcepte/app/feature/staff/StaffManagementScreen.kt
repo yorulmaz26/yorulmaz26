@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.PersonAdd
+import androidx.compose.material.icons.outlined.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -50,7 +51,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kuaforumcepte.app.core.designsystem.component.ConfirmDialog
 import com.kuaforumcepte.app.core.designsystem.component.EmptyState
@@ -83,6 +84,7 @@ fun StaffManagementScreen(onBack: () -> Unit, viewModel: StaffManagementViewMode
     val msgText = message?.asString()
     var confirmDeactivate by remember { mutableStateOf<StaffMember?>(null) }
     var confirmRevoke by remember { mutableStateOf<StaffInvitation?>(null) }
+    var viewingSchedule by remember { mutableStateOf<StaffMember?>(null) }
 
     LaunchedEffect(msgText) { if (msgText != null) { snackbar.showSnackbar(msgText); viewModel.consumeMessage() } }
 
@@ -121,6 +123,7 @@ fun StaffManagementScreen(onBack: () -> Unit, viewModel: StaffManagementViewMode
                         member = m,
                         busy = m.uid in busy,
                         onEdit = { viewModel.openEdit(m) },
+                        onSchedule = { viewingSchedule = m },
                         onToggle = { active -> if (active) viewModel.setActive(m, true) else confirmDeactivate = m },
                     )
                 }
@@ -159,6 +162,21 @@ fun StaffManagementScreen(onBack: () -> Unit, viewModel: StaffManagementViewMode
         )
     }
 
+    viewingSchedule?.let { m ->
+        val week by remember(m.uid) { viewModel.scheduleOf(m.uid) }.collectAsStateWithLifecycle(initialValue = null)
+        AlertDialog(
+            onDismissRequest = { viewingSchedule = null },
+            title = { Text("${m.fullName} · çalışma saatleri") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    val w = week
+                    if (w == null) Text("Yükleniyor…") else com.kuaforumcepte.domain.schedule.ScheduleSummary.lines(w).forEach { Text(it, style = MaterialTheme.typography.bodyMedium) }
+                    Text("Program uzmanın kendisi tarafından “Çalışma Saatleri” bölümünden düzenlenir.", style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = { TextButton(onClick = { viewingSchedule = null }) { Text("Kapat") } },
+        )
+    }
     confirmDeactivate?.let { m ->
         ConfirmDialog(
             title = "${m.fullName} pasife alınsın mı?",
@@ -194,7 +212,7 @@ private fun StatusPill(text: String, color: Color, container: Color) {
 }
 
 @Composable
-private fun MemberCard(member: StaffMember, busy: Boolean, onEdit: () -> Unit, onToggle: (Boolean) -> Unit) {
+private fun MemberCard(member: StaffMember, busy: Boolean, onEdit: () -> Unit, onSchedule: () -> Unit, onToggle: (Boolean) -> Unit) {
     Surface(shape = MaterialTheme.shapes.large, color = MaterialTheme.colorScheme.surfaceContainer, tonalElevation = 1.dp) {
         Row(Modifier.fillMaxWidth().padding(Spacing.l), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
@@ -210,6 +228,7 @@ private fun MemberCard(member: StaffMember, busy: Boolean, onEdit: () -> Unit, o
                 }
             }
             if (member.status != MemberStatus.LEFT) {
+                IconButton(onClick = onSchedule) { Icon(Icons.Outlined.Schedule, contentDescription = "${member.fullName} çalışma saatleri") }
                 IconButton(onClick = onEdit) { Icon(Icons.Outlined.Edit, contentDescription = "${member.fullName} düzenle") }
             }
             if (busy) {

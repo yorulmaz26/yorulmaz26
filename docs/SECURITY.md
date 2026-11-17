@@ -32,8 +32,23 @@
 - Yedekleme: `android:allowBackup=false`, veri çıkarma kuralları oturum/tercih verisini dışarıda tutar.
 - Hesap silme: uygulama içinden (Hesap → Hesabımı Sil). Kişisel veriler silinir/anonimleştirilir; mali kayıtlar kişisel veri olmadan korunur.
 
+## Moderasyon
+- Oturumlu herkes bir yorumu bir kez şikâyet edebilir (hakaret, spam, yanıltıcı, kişisel veri, diğer; günde 20 şikâyet sınırı).
+- 3 farklı şikâyet veya bir "kişisel veri" şikâyeti yorumu inceleme kuyruğuna alır (yayında kalır).
+- **Platform yöneticisi** (`admin` özel yetkisi) Hesap → Yorum Moderasyonu ekranından yorumu yayından kaldırır (puan
+  salon/uzman ortalamasından çıkarılır), geri yayınlar (puan geri eklenir) veya şikâyeti reddeder. Tüm kararlar denetim kaydına yazılır.
+- Gizlenen yorumlar ve şikâyet ayrıntıları Firestore kurallarıyla yalnızca yöneticiye açıktır.
+- Yönetici atama: `functions/scripts/setAdmin.js` (servis hesabı anahtarıyla, yalnızca proje sahibi).
+
+## Salon yaşam döngüsü
+- **Devir:** Sahip, salonu aktif bir uzmanına devreder; eski sahip uzman olarak kalır.
+- **Kapatma:** "KAPAT" onayı + gerekçe; işlemdeki randevu varsa engellenir; gelecekteki randevular gerekçeyle iptal edilir ve
+  müşterilere bildirilir; üyelikler sona erer; finans kayıtları korunur. Ardından sahip hesabını silebilir.
+
+## Uzman çakışması
+Uzman kilidi kişi bazlıdır (`staffDayLocks/{uzman}_{gün}`): aynı uzman birden çok salonda çalışsa bile hiçbir salonda
+aynı saate ikinci randevu alınamaz.
+
 ## Bilinen açık noktalar (yayın öncesi karar gerektirir)
-- Yorum moderasyonu (hakaret/spam bildirme ve kaldırma) için yönetici aracı yok.
-- Salon sahibinin hesap silmesi ve salon devri destek süreciyle yapılır.
-- Aynı kişinin farklı salonlarda aynı saate randevusu engellenmez (uzman kilidi salon bazlı).
 - Yasal metinler TASLAK; hukuki inceleme ve veri sorumlusu bilgisi gerekli. Yurt dışı aktarım dayanağı netleştirilmeli.
+- Müşterinin, kendisinin uzman olarak çalıştığı bir saatte başka salondan müşteri olarak randevu alması engellenmez.

@@ -72,6 +72,9 @@ export const submitReview = authedCallable<Req, { reviewId: string; salonRatingA
         serviceRating,
         comment,
         authorDisplay: authorDisplay(user.get("firstName") ?? "Müşteri", user.get("lastName") ?? ""),
+        hidden: false,
+        flagged: false,
+        reportCount: 0,
         createdAt: FieldValue.serverTimestamp(),
       });
       tx.create(db.collection("reviewsPrivate").doc(appointmentId), { customerUid: caller.uid, salonId, createdAt: FieldValue.serverTimestamp() });

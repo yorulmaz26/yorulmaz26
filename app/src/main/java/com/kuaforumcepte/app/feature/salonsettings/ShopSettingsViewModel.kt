@@ -49,6 +49,13 @@ data class ShopSettingsUi(
     val locating: Boolean = false,
     val message: UiText? = null,
     val loadError: UiText? = null,
+    /** Sahipliğin devredilebileceği aktif uzmanlar. */
+    val transferTargets: List<com.kuaforumcepte.app.data.staff.StaffMember> = emptyList(),
+    val lifecycleBusy: Boolean = false,
+    /** Kapatma/devir tamamlandı → ekran kapanır. */
+    val finished: Boolean = false,
+    /** true: salon kapatıldı; false: sahiplik devredildi. */
+    val closed: Boolean = false,
 ) {
     val dirty: Boolean get() = original != null && original != form
     val districts: List<String> get() = cities.firstOrNull { it.name == form.city }?.districts.orEmpty()
@@ -65,6 +72,7 @@ class ShopSettingsViewModel @Inject constructor(
     private val salons: SalonRepository,
     private val locations: LocationRepository,
     private val locationHelper: LocationHelper,
+    private val staffRepo: com.kuaforumcepte.app.data.staff.StaffRepository,
 ) : ViewModel() {
 
     private val _ui = MutableStateFlow(ShopSettingsUi())
@@ -84,7 +92,9 @@ class ShopSettingsViewModel @Inject constructor(
                 val cities = locations.cities()
                 val salon = salons.observe(active.membership.salonId).first() ?: throw AppException("SALON_NOT_FOUND")
                 val form = salon.toForm()
-                _ui.update { it.copy(loading = false, salonId = salon.id, salonCode = salon.code, original = form, form = form, cities = cities) }
+                val targets = runCatching { staffRepo.members(salon.id).first() }.getOrDefault(emptyList())
+                    .filter { it.role == MemberRole.STAFF && it.status == com.kuaforumcepte.domain.model.MemberStatus.ACTIVE }
+                _ui.update { it.copy(loading = false, salonId = salon.id, salonCode = salon.code, original = form, form = form, cities = cities, transferTargets = targets) }
             } catch (t: Throwable) {
                 _ui.update { it.copy(loading = false, loadError = ErrorMessages.of(t)) }
             }
@@ -127,6 +137,26 @@ class ShopSettingsViewModel @Inject constructor(
                     _ui.update { it.copy(locating = false, message = UiText.Plain("Konum bulundu. Lütfen “Haritada kontrol et” ile doğruluğunu onaylayın.")) }
                 }
                 .onFailure { e -> _ui.update { it.copy(locating = false, message = ErrorMessages.of(e)) } }
+        }
+    }
+
+    fun transferTo(m: com.kuaforumcepte.app.data.staff.StaffMember) = lifecycle("Sahiplik ${m.fullName} kişisine devredildi. Salonda uzman olarak devam ediyorsunuz.") {
+        salons.transferOwnership(it, m.uid)
+    }
+
+    fun closeSalon(reason: String) = lifecycle(null) { id ->
+        val n = salons.closeSalon(id, reason)
+        _ui.update { s -> s.copy(closed = true, message = UiText.Plain("Salon kapatıldı. $n gelecek randevu iptal edildi ve müşteriler bilgilendirildi.")) }
+    }
+
+    private fun lifecycle(success: String?, block: suspend (String) -> Unit) {
+        val id = _ui.value.salonId ?: return
+        if (_ui.value.lifecycleBusy) return
+        _ui.update { it.copy(lifecycleBusy = true) }
+        viewModelScope.launch {
+            runCatching { block(id) }
+                .onSuccess { _ui.update { s -> s.copy(lifecycleBusy = false, finished = true, message = success?.let { UiText.Plain(it) } ?: s.message) } }
+                .onFailure { e -> _ui.update { it.copy(lifecycleBusy = false, message = ErrorMessages.of(e)) } }
         }
     }
 

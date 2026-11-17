@@ -98,6 +98,15 @@ class SalonRepository @Inject constructor(
         )
     }
 
+    /** Salonu kalıcı olarak kapatır (gelecek randevular gerekçeyle iptal edilir). @return iptal edilen randevu sayısı */
+    suspend fun closeSalon(salonId: String, reason: String): Int =
+        ((functions.call("closeSalon", mapOf("salonId" to salonId, "confirm" to "KAPAT", "reason" to reason.trim()))["cancelledAppointments"] as? Number)?.toInt()) ?: 0
+
+    /** Sahipliği salonun aktif bir uzmanına devreder; eski sahip uzman olarak kalır. */
+    suspend fun transferOwnership(salonId: String, newOwnerUid: String) {
+        functions.call("transferSalonOwnership", mapOf("salonId" to salonId, "newOwnerUid" to newOwnerUid, "confirm" to "DEVRET"))
+    }
+
     /**
      * Yeni görselleri geçici alana yükler, ardından updateSalonMedia ile tek seferde uygular.
      * @param newLogoLocalPath null ise logo değişmez.

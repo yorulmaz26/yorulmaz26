@@ -62,8 +62,8 @@ export const reassignAppointment = authedCallable<{ appointmentId?: unknown; new
       const mine = ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).find((i) => i.appointmentId === appointmentId);
       tx.set(oldLock.ref, { intervals: ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).filter((i) => i.appointmentId !== appointmentId), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
       tx.set(newLock.ref, {
-        salonId, staffUid: newStaffUid, localDate,
-        intervals: [...newLive, { appointmentId, startMin: start, endMin: end, expiresAtMs: mine?.expiresAtMs ?? null }],
+        staffUid: newStaffUid, localDate,
+        intervals: [...newLive, { appointmentId, salonId, startMin: start, endMin: end, expiresAtMs: mine?.expiresAtMs ?? null }],
         updatedAt: FieldValue.serverTimestamp(),
       });
       const newName = `${member.get("firstName")} ${member.get("lastName")}`;
@@ -119,12 +119,12 @@ export const rescheduleAppointment = authedCallable<{ appointmentId?: unknown; n
       if (!slots.some((s) => s.startAt.getTime() === start.toMillis())) fail("failed-precondition", "SLOT_UNAVAILABLE");
 
       const mine = ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).find((i) => i.appointmentId === appointmentId);
-      const moved: LockInterval = { appointmentId, startMin: newStart, endMin: newStart + minutes, expiresAtMs: mine?.expiresAtMs ?? null };
+      const moved: LockInterval = { appointmentId, salonId, startMin: newStart, endMin: newStart + minutes, expiresAtMs: mine?.expiresAtMs ?? null };
       if (oldDate === newDate) {
-        tx.set(newLock.ref, { salonId, staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
+        tx.set(newLock.ref, { staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
       } else {
         tx.set(oldLock.ref, { intervals: ((oldLock.get("intervals") as LockInterval[] | undefined) ?? []).filter((i) => i.appointmentId !== appointmentId), updatedAt: FieldValue.serverTimestamp() }, { merge: true });
-        tx.set(newLock.ref, { salonId, staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
+        tx.set(newLock.ref, { staffUid, localDate: newDate, intervals: [...others, moved], updatedAt: FieldValue.serverTimestamp() });
       }
       const startAt = start.toJSDate();
       const pendingExp = (appt.get("pendingExpiresAt") as Timestamp).toMillis();

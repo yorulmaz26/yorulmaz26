@@ -14,6 +14,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Logout
 import androidx.compose.material.icons.outlined.ContentCut
 import androidx.compose.material.icons.outlined.Description
+import androidx.compose.material.icons.outlined.Gavel
 import androidx.compose.material.icons.outlined.Policy
 import androidx.compose.material3.TextButton
 import com.kuaforumcepte.app.data.registration.LegalDocument
@@ -35,7 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kuaforumcepte.app.core.datastore.ThemeMode
 import com.kuaforumcepte.app.core.designsystem.component.ConfirmDialog
@@ -55,6 +56,8 @@ fun AccountScreen(
     onSwitchRole: (EntryRole) -> Unit,
     onSignedOut: () -> Unit,
     onOpenLegal: (LegalDocument) -> Unit,
+    onChangePhone: () -> Unit,
+    onOpenModeration: () -> Unit,
     viewModel: AccountViewModel = hiltViewModel(),
 ) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
@@ -66,6 +69,9 @@ fun AccountScreen(
     var confirmSignOut by remember { mutableStateOf(false) }
     var confirmDelete by remember { mutableStateOf(false) }
     val deleting by viewModel.deleting.collectAsStateWithLifecycle()
+    val isAdmin by viewModel.isAdmin.collectAsStateWithLifecycle()
+    val savingName by viewModel.savingName.collectAsStateWithLifecycle()
+    var editingName by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) { viewModel.signedOut.collect { onSignedOut() } }
     LaunchedEffect(msg) { if (msg != null) { snackbar.showSnackbar(msg); viewModel.consumeMessage() } }
@@ -77,6 +83,11 @@ fun AccountScreen(
         ) {
             Text(ui.name.ifBlank { "Profil" }, style = MaterialTheme.typography.headlineSmall)
             Text(PhoneNumbers.formatForDisplay(ui.phone), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Row {
+                TextButton(onClick = { editingName = true }) { Text("Adımı düzenle") }
+                TextButton(onClick = onChangePhone) { Text("Telefonu değiştir") }
+            }
+            if (isAdmin) MenuRow(Icons.Outlined.Gavel, "Yorum Moderasyonu", "Şikâyet edilen değerlendirmeleri incele", onOpenModeration)
 
             if (ui.memberships.isNotEmpty()) {
                 Text("Salon üyelikleri", style = MaterialTheme.typography.titleMedium)
@@ -143,12 +154,31 @@ fun AccountScreen(
             onDismiss = { confirmLeave = false },
         )
     }
+    if (editingName) {
+        val parts = ui.name.split(" ")
+        var first by remember { mutableStateOf(parts.dropLast(1).joinToString(" ").ifBlank { ui.name }) }
+        var last by remember { mutableStateOf(if (parts.size > 1) parts.last() else "") }
+        val valid = Regex("^[\\p{L}][\\p{L} .'-]{0,48}[\\p{L}.]$").let { r -> r.matches(first.trim()) && r.matches(last.trim()) }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { if (!savingName) editingName = false },
+            title = { Text("Adınızı düzenleyin") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                    com.kuaforumcepte.app.core.designsystem.component.KcTextField(first, { first = it }, "Ad", maxLength = 50)
+                    com.kuaforumcepte.app.core.designsystem.component.KcTextField(last, { last = it }, "Soyad", maxLength = 50)
+                    Text("Geçmiş randevu kayıtları değişmez; aktif randevular ve uzman kartlarınız güncellenir.", style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = { TextButton(onClick = { viewModel.updateName(first, last) { editingName = false } }, enabled = valid && !savingName) { Text(if (savingName) "Kaydediliyor…" else "Kaydet") } },
+            dismissButton = { TextButton(onClick = { editingName = false }, enabled = !savingName) { Text("Vazgeç") } },
+        )
+    }
     if (confirmDelete) {
         ConfirmDialog(
             title = "Hesabınız kalıcı olarak silinsin mi?",
             message = "Profiliniz, cihaz kayıtlarınız ve bildirimleriniz silinir; geçmiş randevu ve değerlendirmelerinizdeki adınız ve telefonunuz anonimleştirilir. " +
                 "Salonların yasal olarak saklaması gereken işlem kayıtları kişisel veri içermeden korunur. Aktif randevunuz varsa önce iptal etmeniz gerekir. " +
-                "Salon sahibiyseniz salonun kapatılması/devri için destekle iletişime geçin. Bu işlem geri alınamaz.",
+                "Salon sahibiyseniz önce Dükkan Ayarları'ndan salonu devredin veya kapatın. Bu işlem geri alınamaz.",
             confirmLabel = "Kalıcı Olarak Sil",
             destructive = true,
             onConfirm = { confirmDelete = false; viewModel.deleteAccount() },

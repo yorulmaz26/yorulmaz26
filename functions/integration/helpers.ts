@@ -9,9 +9,9 @@ export const fft = functionsTest({ projectId: "demo-kuaforum", storageBucket: "d
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function caller(fn: any) {
   const wrapped = fft.wrap(fn);
-  return (data: unknown, uid: string, phone?: string) =>
+  return (data: unknown, uid: string, phone?: string, claims: Record<string, unknown> = {}) =>
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (wrapped as any)({ data, auth: { uid, token: phone ? { phone_number: phone } : {} }, rawRequest: {} });
+    (wrapped as any)({ data, auth: { uid, token: { ...(phone ? { phone_number: phone } : {}), ...claims } }, rawRequest: {} });
 }
 
 export async function expectReason(p: Promise<unknown>, reason: string) {

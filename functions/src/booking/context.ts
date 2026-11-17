@@ -12,15 +12,20 @@ export interface BookingSettings {
   minLeadMinutes: number;
 }
 
-/** Uzman × yerel gün kilidi. expiresAtMs doluysa PENDING'dir ve o andan sonra slotu tutmaz. */
+/**
+ * Uzman × yerel gün kilidi — salondan bağımsız, KİŞİ bazlıdır: aynı uzman birden çok salonda çalışıyorsa
+ * hiçbir salonda çakışan randevu alamaz. expiresAtMs doluysa PENDING'dir ve o andan sonra slotu tutmaz.
+ */
 export interface LockInterval {
   appointmentId: string;
+  /** Aralığın ait olduğu salon (bilgi amaçlı; çakışma kontrolü salondan bağımsızdır). */
+  salonId?: string;
   startMin: number;
   endMin: number;
   expiresAtMs: number | null;
 }
 
-export const lockId = (salonId: string, staffUid: string, localDate: string) => `${salonId}_${staffUid}_${localDate}`;
+export const lockId = (_salonId: string, staffUid: string, localDate: string) => `${staffUid}_${localDate}`;
 export const lockRef = (salonId: string, staffUid: string, localDate: string) => db.collection("staffDayLocks").doc(lockId(salonId, staffUid, localDate));
 
 export function liveIntervals(snap: DocumentSnapshot | undefined, nowMs: number): LockInterval[] {

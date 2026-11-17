@@ -104,6 +104,7 @@ Komut satırı:
 
 `.github/workflows/ci.yml` her push'ta çalışır (son çalışma: tüm işler yeşil — Android derleme dahil):
 - **Android:** `:core:domain:test :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`
+- **Android UI:** API 34 emülatörde `connectedDebugAndroidTest` (Compose UI testleri)
 - **Backend:** Functions TypeScript + birim testleri, Emulator entegrasyon testleri, Firestore kural testleri
 
 ## Testler
@@ -153,6 +154,15 @@ ekleyin. Bu numaralara gerçek SMS gitmez; kod sabittir. Auth Emulator kullanıy
 7. C'ye değerlendirme daveti → puanlama → salon listesinde puan güncellenir.
 8. A çalışma saatini daraltır → çakışma önizlemesi → uygular → randevu "İlgilenilmeli" → Saati Değiştir.
 9. C: Randevularım → geçmişi gizle; Hesap → Hesabımı Sil (aktif randevu yokken).
+
+## Platform yöneticisi (yorum moderasyonu)
+
+```bash
+cd functions
+GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/setAdmin.js +905XXXXXXXXX   # yetki ver
+GOOGLE_APPLICATION_CREDENTIALS=./service-account.json node scripts/setAdmin.js <uid> --revoke   # geri al
+```
+Servis hesabı anahtarını repoya eklemeyin. Kullanıcı çıkış yapıp tekrar girince Hesap ekranında "Yorum Moderasyonu" görünür.
 
 ## Lisanslar
 

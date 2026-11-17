@@ -58,7 +58,24 @@ class AccountViewModel @Inject constructor(
     private val _signedOut = Channel<Unit>(Channel.BUFFERED)
     val signedOut = _signedOut.receiveAsFlow()
 
+    private val _isAdmin = MutableStateFlow(false)
+    val isAdmin: StateFlow<Boolean> = _isAdmin.asStateFlow()
+    private val _savingName = MutableStateFlow(false)
+    val savingName: StateFlow<Boolean> = _savingName.asStateFlow()
+
+    fun updateName(first: String, last: String, onDone: () -> Unit) {
+        if (_savingName.value) return
+        _savingName.value = true
+        viewModelScope.launch {
+            runCatching { session.updateName(first, last) }
+                .onSuccess { _message.value = UiText.Plain("Adınız güncellendi; aktif randevularınıza ve uzman kartlarınıza yansıtıldı."); onDone() }
+                .onFailure { _message.value = ErrorMessages.of(it) }
+            _savingName.value = false
+        }
+    }
+
     init {
+        viewModelScope.launch { _isAdmin.value = session.isPlatformAdmin() }
         // Ad/soyad bilgisi yoksa (ör. Splash → doğrudan panel) bir kez yüklenir.
         if (session.snapshot.value == null) viewModelScope.launch { runCatching { session.bootstrap() } }
     }

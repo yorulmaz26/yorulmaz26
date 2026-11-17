@@ -179,8 +179,16 @@ service cloud.firestore {
     }
 
     // ---------- Değerlendirmeler ----------
+    // Moderasyonla gizlenen yorumlar yalnızca platform yöneticisine görünür.
+    function isPlatformAdmin() {
+      return signedIn() && request.auth.token.admin == true;
+    }
     match /reviews/{appointmentId} {
-      allow read: if signedIn();
+      allow read: if signedIn() && (resource.data.get('hidden', false) != true || isPlatformAdmin());
+      allow write: if false;
+    }
+    match /reviewReports/{reportId} {
+      allow read: if isPlatformAdmin();
       allow write: if false;
     }
 

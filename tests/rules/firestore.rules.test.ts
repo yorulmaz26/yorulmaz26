@@ -196,6 +196,19 @@ describe("finans ve kullanıcı", () => {
     await assertFails(setDoc(doc(db(CUSTOMER), "reviews", "ap2"), { salonId: SALON, salonRating: 5 }));
     await assertFails(getDoc(doc(db(OWNER), "reviewsPrivate", "ap1")));
   });
+  test("gizlenmiş yorum ve şikâyet ayrıntıları yalnızca platform yöneticisine açık", async () => {
+    await env.withSecurityRulesDisabled(async (ctx) => {
+      await setDoc(doc(ctx.firestore(), "reviews", "gizli"), { salonId: SALON, hidden: true, salonRating: 1 });
+      await setDoc(doc(ctx.firestore(), "reviewReports", "gizli_x"), { reviewId: "gizli", reason: "SPAM" });
+    });
+    const admin = env.authenticatedContext("admin", { admin: true }).firestore();
+    await assertFails(getDoc(doc(db(STRANGER), "reviews", "gizli")));
+    await assertFails(getDoc(doc(db(OWNER), "reviews", "gizli")));
+    await assertSucceeds(getDoc(doc(admin, "reviews", "gizli")));
+    await assertFails(getDoc(doc(db(OWNER), "reviewReports", "gizli_x")));
+    await assertSucceeds(getDoc(doc(admin, "reviewReports", "gizli_x")));
+    await assertFails(setDoc(doc(admin, "reviews", "gizli"), { hidden: false }));
+  });
   test("kilit koleksiyonları istemciye kapalı", async () => {
     await assertFails(getDoc(doc(db(OWNER), "salonOwners", OWNER)));
     await assertFails(getDoc(doc(db(CUSTOMER), "customerLocks", CUSTOMER)));

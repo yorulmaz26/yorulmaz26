@@ -58,6 +58,7 @@ class AppException(
             is FirebaseAuthException -> when (t.errorCode) {
                 "ERROR_TOO_MANY_REQUESTS", "ERROR_QUOTA_EXCEEDED" -> AppException(RATE_LIMITED, cause = t)
                 "ERROR_SESSION_EXPIRED" -> AppException(CODE_EXPIRED, cause = t)
+                "ERROR_CREDENTIAL_ALREADY_IN_USE", "ERROR_PROVIDER_ALREADY_LINKED" -> AppException("ERROR_CREDENTIAL_ALREADY_IN_USE", cause = t)
                 else -> AppException(UNKNOWN, cause = t)
             }
             is FirebaseFirestoreException -> when (t.code) {

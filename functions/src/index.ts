@@ -48,7 +48,10 @@ export { adjustAppointmentPrice, getReports, rebuildReportAggregates } from "./f
 
 // Aşama 8 — değerlendirmeler
 export { submitReview } from "./reviews/submitReview";
+export { reportReview, moderateReview } from "./reviews/moderation";
 
 // Aşama 9 — hesap silme ve bakım
 export { deleteAccount } from "./account/deleteAccount";
 export { dailyCleanup } from "./scheduled/cleanup";
+export { closeSalon, transferSalonOwnership } from "./salon/lifecycle";
+export { updateMyName, syncPhoneNumber } from "./account/profile";

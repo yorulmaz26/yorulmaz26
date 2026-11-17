@@ -60,7 +60,15 @@ data class EditForm(val member: StaffMember, val firstName: String, val lastName
 class StaffManagementViewModel @Inject constructor(
     session: SessionRepository,
     private val repo: StaffRepository,
+    private val schedules: com.kuaforumcepte.app.data.schedule.ScheduleRepository,
 ) : ViewModel() {
+
+    /** Sahip, uzmanların programını görüntüler (düzenleme yalnızca uzmanın kendisinde). */
+    fun scheduleOf(memberUid: String): kotlinx.coroutines.flow.Flow<com.kuaforumcepte.domain.schedule.WeeklySchedule?> {
+        val sid = (state.value as? StaffListState.Ready)?.salonId ?: return flowOf(null)
+        return schedules.observeWeekly(sid, memberUid).map<com.kuaforumcepte.domain.schedule.WeeklySchedule, com.kuaforumcepte.domain.schedule.WeeklySchedule?> { it }.catch { emit(null) }
+    }
+
 
     private val retry = MutableStateFlow(0)
 

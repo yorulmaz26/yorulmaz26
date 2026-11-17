@@ -24,33 +24,67 @@ data class Review(
     val comment: String,
     val author: String,
     val createdAt: Instant?,
+    val salonId: String = "",
+    val reportCount: Int = 0,
+    val flagged: Boolean = false,
+    val hidden: Boolean = false,
 )
+
+enum class ReportReason(val label: String) {
+    OFFENSIVE("Hakaret / uygunsuz dil"),
+    SPAM("Spam veya reklam"),
+    FALSE_INFO("Yanıltıcı / gerçek dışı"),
+    PERSONAL_DATA("Kişisel veri içeriyor"),
+    OTHER("Diğer"),
+}
+
+data class ReviewReport(val reason: ReportReason?, val note: String, val createdAt: Instant?)
 
 @Singleton
 class ReviewRepository @Inject constructor(
     private val firestore: Lazy<FirebaseFirestore>,
     private val functions: FunctionsClient,
 ) {
+    private fun reviews() = firestore.get().collection("reviews")
+
+    /** Yalnızca yayındaki (gizlenmemiş) yorumlar; Firestore kuralı da gizlenenleri yöneticiye kısıtlar. */
     fun observeSalon(salonId: String, limit: Long = 10): Flow<List<Review>> =
-        firestore.get().collection("reviews").whereEqualTo("salonId", salonId)
+        reviews().whereEqualTo("salonId", salonId).whereEqualTo("hidden", false)
             .orderBy("createdAt", Query.Direction.DESCENDING).limit(limit).snapshots()
+            .map { qs -> qs.documents.map { it.toReview() } }
+            .catch { throw AppException.from(it) }
+
+    /** Yönetici: şikâyet eşiğini aşan, yayındaki yorumlar. */
+    fun observeFlagged(): Flow<List<Review>> =
+        reviews().whereEqualTo("flagged", true).whereEqualTo("hidden", false)
+            .orderBy("reportCount", Query.Direction.DESCENDING).limit(100).snapshots()
+            .map { qs -> qs.documents.map { it.toReview() } }
+            .catch { throw AppException.from(it) }
+
+    /** Yönetici: moderasyonla gizlenmiş yorumlar. */
+    fun observeHidden(): Flow<List<Review>> =
+        reviews().whereEqualTo("hidden", true).orderBy("moderatedAt", Query.Direction.DESCENDING).limit(100).snapshots()
+            .map { qs -> qs.documents.map { it.toReview() } }
+            .catch { throw AppException.from(it) }
+
+    fun observeReports(reviewId: String): Flow<List<ReviewReport>> =
+        firestore.get().collection("reviewReports").whereEqualTo("reviewId", reviewId)
+            .orderBy("createdAt", Query.Direction.DESCENDING).limit(20).snapshots()
             .map { qs ->
                 qs.documents.map { d ->
-                    @Suppress("UNCHECKED_CAST")
-                    Review(
-                        id = d.id,
-                        staffName = d.getString("staffName").orEmpty(),
-                        serviceNames = (d.get("serviceNames") as? List<String>).orEmpty(),
-                        salonRating = (d.getLong("salonRating") ?: 0).toInt(),
-                        staffRating = (d.getLong("staffRating") ?: 0).toInt(),
-                        serviceRating = d.getLong("serviceRating")?.toInt(),
-                        comment = d.getString("comment").orEmpty(),
-                        author = d.getString("authorDisplay").orEmpty(),
-                        createdAt = d.getTimestamp("createdAt")?.toInstant(),
-                    )
+                    ReviewReport(ReportReason.entries.firstOrNull { it.name == d.getString("reason") }, d.getString("note").orEmpty(), d.getTimestamp("createdAt")?.toInstant())
                 }
             }
-            .catch { throw AppException.from(it) }
+            .catch { emit(emptyList()) }
+
+    suspend fun report(reviewId: String, reason: ReportReason, note: String) {
+        functions.call("reportReview", mapOf("reviewId" to reviewId, "reason" to reason.name, "note" to note.trim()))
+    }
+
+    /** action: HIDE | RESTORE | DISMISS (yalnızca platform yöneticisi). */
+    suspend fun moderate(reviewId: String, action: String, note: String) {
+        functions.call("moderateReview", mapOf("reviewId" to reviewId, "action" to action, "note" to note.trim()))
+    }
 
     suspend fun submit(appointmentId: String, salonRating: Int, staffRating: Int, serviceRating: Int?, comment: String) {
         functions.call(
@@ -62,3 +96,20 @@ class ReviewRepository @Inject constructor(
         )
     }
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun com.google.firebase.firestore.DocumentSnapshot.toReview() = Review(
+    id = id,
+    staffName = getString("staffName").orEmpty(),
+    serviceNames = (get("serviceNames") as? List<String>).orEmpty(),
+    salonRating = (getLong("salonRating") ?: 0).toInt(),
+    staffRating = (getLong("staffRating") ?: 0).toInt(),
+    serviceRating = getLong("serviceRating")?.toInt(),
+    comment = getString("comment").orEmpty(),
+    author = getString("authorDisplay").orEmpty(),
+    createdAt = getTimestamp("createdAt")?.toInstant(),
+    salonId = getString("salonId").orEmpty(),
+    reportCount = (getLong("reportCount") ?: 0).toInt(),
+    flagged = getBoolean("flagged") == true,
+    hidden = getBoolean("hidden") == true,
+)

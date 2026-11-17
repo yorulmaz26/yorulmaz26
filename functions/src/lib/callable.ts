@@ -7,6 +7,8 @@ export interface Caller {
   uid: string;
   /** Firebase Auth'un doğruladığı telefon (E.164) — yalnızca telefonla giriş yapılmışsa. */
   phone: string | null;
+  /** Platform yöneticisi (moderasyon). Yalnızca scripts/setAdmin.js ile atanan özel yetki. */
+  isAdmin: boolean;
 }
 
 /**
@@ -18,7 +20,7 @@ export function authedCallable<Req, Res>(name: string, handler: (data: Req, call
     if (!req.auth) fail("unauthenticated", "UNAUTHENTICATED");
     const phone = (req.auth.token.phone_number as string | undefined) ?? null;
     try {
-      return await handler((req.data ?? {}) as Req, { uid: req.auth.uid, phone }, req);
+      return await handler((req.data ?? {}) as Req, { uid: req.auth.uid, phone, isAdmin: req.auth.token.admin === true }, req);
     } catch (e) {
       if (e instanceof HttpsError) throw e;
       logger.error(`${name} failed`, e);

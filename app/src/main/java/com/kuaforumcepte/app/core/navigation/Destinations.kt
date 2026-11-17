@@ -55,3 +55,5 @@ import kotlinx.serialization.Serializable
 
 // Ortak
 @Serializable data class AccountRoute(val role: String)
+@Serializable data object ChangePhoneRoute
+@Serializable data object ModerationRoute

@@ -46,7 +46,7 @@ beforeEach(async () => {
 });
 
 const bookKesim = (start = 600) => book({ salonId, staffUid: "staff", serviceIds: ["kesim"], startAt: at(start), expectedTotalKurus: 40000, idempotencyKey: uuid() }, "c1", C1);
-const lockOf = async (staff: string, date = TUE) => (await db.doc(`staffDayLocks/${salonId}_${staff}_${date}`).get()).get("intervals") ?? [];
+const lockOf = async (staff: string, date = TUE) => (await db.doc(`staffDayLocks/${staff}_${date}`).get()).get("intervals") ?? [];
 
 test("sahip uzmanı değiştirir: kilit taşınır, snapshot korunur, taraflara bildirim", async () => {
   const a = await bookKesim();
@@ -63,7 +63,7 @@ test("sahip uzmanı değiştirir: kilit taşınır, snapshot korunur, taraflara 
 
 test("dolu veya çalışmayan uzmana atama reddedilir", async () => {
   const a = await bookKesim();
-  await db.doc(`staffDayLocks/${salonId}_owner_${TUE}`).set({ intervals: [{ appointmentId: "x", startMin: 590, endMin: 620, expiresAtMs: null }] });
+  await db.doc(`staffDayLocks/owner_${TUE}`).set({ intervals: [{ appointmentId: "x", startMin: 590, endMin: 620, expiresAtMs: null }] });
   await expectReason(reassign({ appointmentId: a.appointmentId, newStaffUid: "owner" }, "owner", OWNER), "SLOT_TAKEN");
   await db.doc(`salons/${salonId}/members/owner/schedule/weekly`).update({ weeklyDaysOff: [2, 7] });
   await expectReason(reassign({ appointmentId: a.appointmentId, newStaffUid: "owner" }, "owner", OWNER), "STAFF_NOT_AVAILABLE");

@@ -85,8 +85,16 @@ object ErrorMessages {
         "NO_CHANGE" to "Yeni tutar mevcut tutarla aynı.",
         "LEDGER_MISSING" to "Bu randevunun finans kaydı bulunamadı.",
         "CONFIRMATION_REQUIRED" to "Silme işlemi onaylanmadı.",
-        "OWNER_MUST_CLOSE_SALON" to "Salon sahibi hesabı doğrudan silinemez. Salonun kapatılması veya devri için destekle iletişime geçin.",
+        "OWNER_MUST_CLOSE_SALON" to "Salon sahibi hesabı doğrudan silinemez. Önce Dükkan Ayarları'ndan salonu bir uzmana devredin veya kapatın.",
         "STAFF_HAS_ACTIVE_APPOINTMENTS" to "Size atanmış aktif randevular var. Önce salon sahibinizle bu randevuları devredin veya iptal edin.",
+        "REVIEW_NOT_FOUND" to "Değerlendirme bulunamadı veya yayından kaldırılmış.",
+        "ALREADY_REPORTED" to "Bu değerlendirmeyi zaten şikâyet ettiniz.",
+        "SALON_CLOSED" to "Bu salon kapatılmış.",
+        "IN_PROGRESS_APPOINTMENTS" to "İşlemi süren randevular var. Önce bunları tamamlayın veya iptal edin.",
+        "SAME_OWNER" to "Salon zaten sizin adınıza kayıtlı.",
+        "NEW_OWNER_NOT_ACTIVE_STAFF" to "Sahiplik yalnızca salonun aktif bir uzmanına devredilebilir.",
+        "NEW_OWNER_ALREADY_OWNS_SALON" to "Seçilen kişi zaten başka bir salonun sahibi.",
+        "ERROR_CREDENTIAL_ALREADY_IN_USE" to "Bu telefon numarası başka bir hesapta kullanılıyor.",
         "QR_VERIFY_FAILED" to "QR kod doğrulanamadı. Lütfen tekrar oluşturun.",
     )
 

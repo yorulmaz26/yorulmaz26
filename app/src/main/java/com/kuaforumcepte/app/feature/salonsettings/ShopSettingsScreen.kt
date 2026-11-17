@@ -36,13 +36,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kuaforumcepte.app.core.designsystem.component.ConfirmDialog
 import com.kuaforumcepte.app.core.designsystem.component.EmptyState
@@ -62,8 +63,12 @@ import com.kuaforumcepte.domain.model.SalonType
 import java.util.Locale
 
 @Composable
-fun ShopSettingsScreen(onBack: () -> Unit, onOpenMedia: () -> Unit, viewModel: ShopSettingsViewModel = hiltViewModel()) {
+fun ShopSettingsScreen(onBack: () -> Unit, onOpenMedia: () -> Unit, onSalonLeft: (message: String, closed: Boolean) -> Unit, viewModel: ShopSettingsViewModel = hiltViewModel()) {
     val ui by viewModel.ui.collectAsStateWithLifecycle()
+    var transferring by remember { mutableStateOf(false) }
+    var closing by remember { mutableStateOf(false) }
+    val finishedMsg = ui.message?.asString()
+    LaunchedEffect(ui.finished) { if (ui.finished) onSalonLeft(finishedMsg ?: "İşlem tamamlandı.", ui.closed) }
     val context = LocalContext.current
     val snackbar = remember { SnackbarHostState() }
     val msg = ui.message?.asString()
@@ -137,11 +142,65 @@ fun ShopSettingsScreen(onBack: () -> Unit, onOpenMedia: () -> Unit, viewModel: S
                 }
                 InfoBanner("“Bulunduğum yer” için salondayken kullanın. Konum yalnızca salon sayfasındaki “Haritada Göster” için kullanılır; kişisel konumunuz saklanmaz.")
                 Text("Salon kodu: ${ui.salonCode} (değiştirilemez)", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                HorizontalDivider(Modifier.padding(vertical = Spacing.s))
+                Text("Sahiplik ve kapatma", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    "Salonu aktif bir uzmanınıza devredebilir veya kalıcı olarak kapatabilirsiniz. Salon sahibi hesabını silmek için önce bunlardan birini yapmanız gerekir.",
+                    style = MaterialTheme.typography.bodySmall,
+                )
+                KcSecondaryButton("Salonu Devret", { transferring = true }, enabled = ui.transferTargets.isNotEmpty() && !ui.lifecycleBusy)
+                if (ui.transferTargets.isEmpty()) Text("Devretmek için salonda en az bir aktif uzman olmalı.", style = MaterialTheme.typography.bodySmall)
+                TextButton(onClick = { closing = true }, enabled = !ui.lifecycleBusy) { Text("Salonu Kalıcı Olarak Kapat", color = MaterialTheme.colorScheme.error) }
                 Spacer(Modifier.height(Spacing.l))
             }
         }
     }
 
+    if (transferring) {
+        var target by remember { mutableStateOf<com.kuaforumcepte.app.data.staff.StaffMember?>(null) }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { transferring = false },
+            title = { Text("Sahipliği devret") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
+                    Text("Yeni sahip salon ayarlarını, personeli ve tüm raporları yönetir. Siz aynı salonda uzman olarak devam edersiniz. Bu işlemi yalnızca yeni sahip geri devredebilir.", style = MaterialTheme.typography.bodySmall)
+                    ui.transferTargets.forEach { m ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            androidx.compose.material3.RadioButton(selected = target?.uid == m.uid, onClick = { target = m })
+                            Text("${m.fullName} · ${m.specialty}")
+                        }
+                    }
+                }
+            },
+            confirmButton = { TextButton(onClick = { target?.let { viewModel.transferTo(it) }; transferring = false }, enabled = target != null) { Text("Devret", color = MaterialTheme.colorScheme.error) } },
+            dismissButton = { TextButton(onClick = { transferring = false }) { Text("Vazgeç") } },
+        )
+    }
+    if (closing) {
+        var typed by remember { mutableStateOf("") }
+        var reason by remember { mutableStateOf("") }
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { closing = false },
+            title = { Text("Salon kalıcı olarak kapatılsın mı?") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(Spacing.s)) {
+                    Text(
+                        "Gelecekteki tüm bekleyen ve onaylı randevular gerekçenizle iptal edilir ve müşterilere bildirilir. Personel üyelikleri sona erer, salon listeden kalkar. " +
+                            "Geçmiş işlem ve finans kayıtları yasal saklama için korunur. Bu işlem geri alınamaz.",
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    KcTextField(reason, { reason = it }, "Gerekçe (müşterilere gösterilir)", maxLength = 300)
+                    KcTextField(typed, { typed = it }, "Onaylamak için KAPAT yazın", capitalization = KeyboardCapitalization.Characters)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { closing = false; viewModel.closeSalon(reason) }, enabled = typed.trim() == "KAPAT" && reason.trim().length >= 3) {
+                    Text("Kapat", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = { TextButton(onClick = { closing = false }) { Text("Vazgeç") } },
+        )
+    }
     if (confirmDiscard) {
         ConfirmDialog(
             title = "Kaydedilmemiş değişiklikler",

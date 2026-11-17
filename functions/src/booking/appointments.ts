@@ -117,7 +117,10 @@ export const createAppointment = authedCallable<CreateReq, CreateRes>("createApp
     const live = liveIntervals(lock, nowMs);
     const endMinute = startMinute + ctx.totalMinutes;
     const requested = { start: startMinute, end: endMinute };
-    if (live.some((i) => overlaps({ start: i.startMin, end: i.endMin }, requested))) fail("aborted", "SLOT_TAKEN");
+    if (live.some((i) => overlaps({ start: i.startMin, end: i.endMin }, requested))) {
+      // Uzmanın başka bir salondaki randevusu da bu aralığı dolduruyor olabilir.
+      fail("aborted", "SLOT_TAKEN");
+    }
     const slots = computeSlots({
       localDate, now, totalMinutes: ctx.totalMinutes, slotMinutes: ctx.settings.slotMinutes,
       minLeadMinutes: ctx.settings.minLeadMinutes, horizonDays: ctx.settings.horizonDays,
@@ -165,8 +168,8 @@ export const createAppointment = authedCallable<CreateReq, CreateRes>("createApp
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
-    const intervals: LockInterval[] = [...live, { appointmentId: ref.id, startMin: startMinute, endMin: endMinute, expiresAtMs: pendingExpiresAt.getTime() }];
-    tx.set(lock.ref, { salonId, staffUid, localDate, intervals, updatedAt: FieldValue.serverTimestamp() });
+    const intervals: LockInterval[] = [...live, { appointmentId: ref.id, salonId, startMin: startMinute, endMin: endMinute, expiresAtMs: pendingExpiresAt.getTime() }];
+    tx.set(lock.ref, { staffUid, localDate, intervals, updatedAt: FieldValue.serverTimestamp() });
     tx.set(custLock.ref, { activeAppointmentId: ref.id, expiresAtMs: pendingExpiresAt.getTime(), updatedAt: FieldValue.serverTimestamp() });
     addEvent(tx, ref.id, null, "PENDING", caller.uid, "CUSTOMER");
 

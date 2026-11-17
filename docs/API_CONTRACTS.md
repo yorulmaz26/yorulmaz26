@@ -62,3 +62,18 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 ## Zamanlanmış
 | `scanAppointments` (her 1 dk, Europe/Istanbul) | PENDING süre aşımı → EXPIRED (kilitler serbest, müşteri + uzmana bildirim); CONFIRMED ve başlangıca ≤2 saat → müşteriye hatırlatma (`flags.reminder2hSentAt`); başlangıç geldi → uzmana "Müşteri geldi mi?" (`flags.arrivalPromptSentAt`, 6 saate kadar). Her biri transaction + bayrakla tek sefer. |
 | `pushOnNotification` (Firestore `users/{uid}/notifications/{id}` oluşturma) | Kullanıcının cihazlarına FCM **data** mesajı (`type, title, body, notificationId, appointmentId, salonId`). `push.claimedAt` ile tek gönderim; geçersiz token'lar silinir; `push.result` = SENT/FAILED/NO_DEVICE. İçerikte müşteri adı/telefonu yok; Android kilit ekranında genel metin gösterir. |
+
+
+## Sonradan eklenenler
+| Fonksiyon | Girdi | Çıktı | Notlar |
+|---|---|---|---|
+| `reportReview` | `{reviewId, reason: OFFENSIVE\|SPAM\|FALSE_INFO\|PERSONAL_DATA\|OTHER, note?}` | `{reportCount, flagged}` | Kullanıcı başına yorum başına bir şikâyet (`reviewReports/{reviewId}_{uid}`); 20/gün. 3 şikâyet veya PERSONAL_DATA → `flagged`. `ALREADY_REPORTED`, `REVIEW_NOT_FOUND`. |
+| `moderateReview` | `{reviewId, action: HIDE\|RESTORE\|DISMISS, note?}` | `{hidden, flagged}` | Yalnızca `admin` özel yetkisi. HIDE/RESTORE salon ve uzman puan toplamlarını transaction içinde düzeltir. |
+| `closeSalon` | `{salonId, confirm: "KAPAT", reason}` | `{cancelledAppointments}` | OWNER. `IN_PROGRESS_APPOINTMENTS` varsa reddedilir. Salon `CLOSED`, üyelikler `LEFT`, `salonOwners` kilidi silinir. |
+| `transferSalonOwnership` | `{salonId, newOwnerUid, confirm: "DEVRET"}` | `{ownerUid}` | OWNER → aktif STAFF. `NEW_OWNER_NOT_ACTIVE_STAFF`, `NEW_OWNER_ALREADY_OWNS_SALON`. |
+| `updateMyName` | `{firstName, lastName}` | `{ok}` | Profil + tüm uzman kartları + sahip adı + aktif randevulardaki müşteri/uzman adı. |
+| `syncPhoneNumber` | `{}` | `{phoneE164}` | İstemci `updatePhoneNumber` + token yenileme sonrası; numara yalnızca doğrulanmış token'dan alınır. |
+| `deleteAccount` | `{confirm: "SIL"}` | `{deleted}` | Bkz. docs/SECURITY.md. |
+| `dailyCleanup` (zamanlanmış, 04:17) | — | — | 24 saati geçen geçici yüklemeler ve süresi dolmuş idempotency/hız limiti kayıtları. |
+
+`staffDayLocks` belge kimliği artık `{staffUid}_{YYYY-MM-DD}` (kişi bazlı); aralıklar `salonId` alanını taşır.
