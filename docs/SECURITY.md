@@ -71,7 +71,15 @@ Takvim aboneliği adresi tahmin edilemez bir anahtar içerir (24 bayt); uzman/sa
 uyarılır ve "Adresi yenile" eski adresi geçersiz kılar. Elden randevularda müşterinin hesabı yoktur; bildirim gönderilmez.
 Salon onayı: yeni salon `verified:false` ile oluşur; platform yöneticisi onaylayana kadar aramada ve konum aramasında görünmez.
 
+## Değerlendirme onayı
+Müşteri yorumu ve puanı salon sahibi onaylayana kadar yayınlanmaz ve ortalamalara girmez (ürün sahibinin kararı).
+Yayında olmayan yorumları Firestore kuralları gereği yalnızca ilgili salonun sahibi ve platform yöneticisi okuyabilir.
+Ret gerekçesi zorunludur, müşteriye iletilir ve reddedilen yorumlar yönetici denetimi için saklanır.
+
 ## Bilinen açık noktalar (yayın öncesi karar gerektirir)
+- **Yorum onayı ve tüketici mevzuatı:** Salonun olumsuz yorumları yayınlamaması, puanları yanıltıcı biçimde yüksek gösterebilir.
+  Türkiye'de Ticaret Bakanlığı'nın tüketici yorumlarına ilişkin düzenlemeleri bu konuda hükümler içerir; yayın öncesi hukuki
+  görüş alınmalı. Uygulamada ret gerekçesi zorunlu tutulur ve kayıt altına alınır.
 - Yasal metinler TASLAK; hukuki inceleme ve veri sorumlusu bilgisi gerekli. Yurt dışı aktarım dayanağı netleştirilmeli.
 - Kişi çakışması randevular üzerinden denetlenir; uzmanın mesai saatinde (randevusu olmayan boş saatinde) kendisi için başka salondan randevu alması bilinçli olarak serbesttir.
 - Takvim aboneliği adresi paylaşılırsa randevu bilgileri görülebilir; kullanıcı adresi yenileyerek eskisini iptal edebilir.

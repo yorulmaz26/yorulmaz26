@@ -76,7 +76,8 @@ export const moderateReview = authedCallable<{ reviewId?: unknown; action?: unkn
         next = { hidden: true, flagged: false };
         notifyInTx(tx, salon.get("ownerUid"), { type: "REVIEW_HIDDEN", title: "Bir değerlendirme kaldırıldı", body: "Topluluk kurallarına aykırı bulunan bir değerlendirme yayından kaldırıldı ve puanınızdan çıkarıldı.", salonId: salon.id });
       } else if (action === "RESTORE") {
-        if (!hidden) fail("failed-precondition", "STATE_CHANGED");
+        // Salon sahibinin onayını bekleyen/reddettiği yorum moderasyonla yayınlanamaz.
+        if (!hidden || ["PENDING", "REJECTED"].includes(review.get("approval"))) fail("failed-precondition", "STATE_CHANGED");
         apply(1);
         next = { hidden: false, flagged: false };
       }

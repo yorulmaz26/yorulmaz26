@@ -98,3 +98,10 @@ Hizmetler (`salons/{id}/services`) istemciden doğrudan yazılır; Firestore kur
 | `getCalendarFeed` | `{rotate?}` | `{token, path}` | Kişiye özel iCalendar aboneliği; `calendarFeed` HTTP: `GET /cal/{token}.ics` (Hosting yönlendirmesi). |
 | `scanAppointments` (genişletildi) | — | — | 24 saat (son 2 saat iptal kuralı hatırlatmasıyla) ve 2 saat hatırlatma. |
 
+
+## Değerlendirme onayı (salon sahibi)
+| Fonksiyon | Girdi | Çıktı | Notlar |
+|---|---|---|---|
+| `submitReview` (değişti) | aynı | `{reviewId, approval: "PENDING"}` | Yorum `hidden:true, approval:PENDING` oluşur; puanlara girmez. Sahibe `REVIEW_PENDING` bildirimi; randevuda `reviewStatus`. |
+| `decideReview` | `{reviewId, action: APPROVE\|REJECT, note?}` | `{approval}` | Yalnızca salon sahibi, yalnızca PENDING. APPROVE: yayınlanır + salon/uzman ortalamalarına eklenir; müşteriye `REVIEW_APPROVED`, uzmana `REVIEW_RECEIVED`. REJECT: gerekçe zorunlu (`REASON_REQUIRED`), müşteriye `REVIEW_REJECTED`. |
+| `moderateReview` (değişti) | — | — | RESTORE, onay bekleyen/reddedilmiş yorumu yayınlayamaz. |

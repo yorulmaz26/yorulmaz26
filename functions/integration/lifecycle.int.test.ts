@@ -6,6 +6,7 @@ import { createAppointment, transitionAppointment } from "../src/booking/appoint
 import { getAvailability } from "../src/booking/availabilityFn";
 import { submitReview } from "../src/reviews/submitReview";
 import { moderateReview, reportReview } from "../src/reviews/moderation";
+import { decideReview } from "../src/reviews/approval";
 import { closeSalon, transferSalonOwnership } from "../src/salon/lifecycle";
 import { syncPhoneNumber, updateMyName } from "../src/account/profile";
 import { deleteAccount } from "../src/account/deleteAccount";
@@ -62,6 +63,8 @@ async function completedReview(uid: string, phone: string, min: number, salonRat
   await transition({ appointmentId: a.appointmentId, action: "MARK_ARRIVED" }, "staff", STAFF);
   await transition({ appointmentId: a.appointmentId, action: "COMPLETE" }, "staff", STAFF);
   await caller(submitReview)({ appointmentId: a.appointmentId, salonRating, staffRating }, uid, phone);
+  // Salon sahibi onaylayınca yayınlanır ve puanlara girer.
+  await caller(decideReview)({ reviewId: a.appointmentId, action: "APPROVE" }, "owner", OWNER);
   return a.appointmentId as string;
 }
 

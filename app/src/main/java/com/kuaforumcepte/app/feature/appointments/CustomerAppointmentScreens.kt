@@ -212,7 +212,13 @@ fun CustomerAppointmentDetailScreen(
                     }
                     if (status == AppointmentStatus.COMPLETED) {
                         if (a.reviewId == null) KcPrimaryButton("Hizmeti / Kuaförü Puanla", { onReview(a.id) }, leadingIcon = Icons.Outlined.StarRate)
-                        else InfoBanner("Bu randevuyu değerlendirdiniz. Teşekkürler!")
+                        else InfoBanner(
+                            when (a.reviewStatus) {
+                                "PENDING" -> "Değerlendirmeniz salon sahibinin onayını bekliyor. Onaylanınca yayınlanır ve size bildirim gelir."
+                                "REJECTED" -> "Değerlendirmeniz salon tarafından yayınlanmadı. Gerekçe bildiriminizde yer alıyor."
+                                else -> "Değerlendirmeniz yayında. Teşekkürler!"
+                            },
+                        )
                     }
                     if (status.isTerminal) {
                         KcPrimaryButton("Tekrar Randevu Al", { onRebook(a) }, leadingIcon = Icons.Outlined.Replay)

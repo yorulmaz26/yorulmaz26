@@ -4,7 +4,6 @@ import { fail } from "../lib/errors";
 import { docId, optString } from "../lib/validation";
 import { auditInTx } from "../lib/audit";
 import { notifyInTx } from "../lib/notify";
-import { ratingAverage } from "../domain";
 
 interface Req {
   appointmentId?: unknown;
@@ -27,12 +26,13 @@ export function authorDisplay(first: string, last: string): string {
 }
 
 /**
- * Değerlendirme (randevu başına bir set, düzenlenemez):
+ * Değerlendirme (randevu başına bir set, düzenlenemez). Salon sahibi onaylayana kadar YAYINLANMAZ
+ * (hidden:true, approval:PENDING) ve puanlar ortalamalara eklenmez; onayda (decideReview) eklenir.
  *  - salonRating → salonun ortalamasına, staffRating → uzmanın ortalamasına girer,
  *  - serviceRating isteğe bağlıdır, ayrı gösterilir ve hiçbir ortalamaya girmez.
  * Belge kimliği = randevu kimliği; transaction içinde yoksa oluşturulur → tekrar/eşzamanlı puanlama imkânsız.
  */
-export const submitReview = authedCallable<Req, { reviewId: string; salonRatingAvg: number | null; staffRatingAvg: number | null }>(
+export const submitReview = authedCallable<Req, { reviewId: string; approval: "PENDING" }>(
   "submitReview",
   async (data, caller) => {
     const appointmentId = docId(data.appointmentId, "appointmentId");
@@ -51,16 +51,8 @@ export const submitReview = authedCallable<Req, { reviewId: string; salonRatingA
       const salonId = appt.get("salonId") as string;
       const staffUid = appt.get("staffUid") as string;
       const salonRef = db.collection("salons").doc(salonId);
-      const memberRef = salonRef.collection("members").doc(staffUid);
-      const [existing, salon, member, user] = await Promise.all([tx.get(reviewRef), tx.get(salonRef), tx.get(memberRef), tx.get(db.collection("users").doc(caller.uid))]);
+      const [existing, salon, user] = await Promise.all([tx.get(reviewRef), tx.get(salonRef), tx.get(db.collection("users").doc(caller.uid))]);
       if (existing.exists) fail("already-exists", "ALREADY_REVIEWED");
-
-      const sSum = ((salon.get("ratingSum") as number | undefined) ?? 0) + salonRating;
-      const sCount = ((salon.get("ratingCount") as number | undefined) ?? 0) + 1;
-      const mSum = ((member.get("ratingSum") as number | undefined) ?? 0) + staffRating;
-      const mCount = ((member.get("ratingCount") as number | undefined) ?? 0) + 1;
-      const salonAvg = ratingAverage(sSum, sCount);
-      const staffAvg = ratingAverage(mSum, mCount);
 
       tx.create(reviewRef, {
         salonId,
@@ -72,18 +64,21 @@ export const submitReview = authedCallable<Req, { reviewId: string; salonRatingA
         serviceRating,
         comment,
         authorDisplay: authorDisplay(user.get("firstName") ?? "Müşteri", user.get("lastName") ?? ""),
-        hidden: false,
+        // Salon sahibi onayına kadar kamuya kapalı; ortalamalara henüz girmez.
+        hidden: true,
+        approval: "PENDING",
         flagged: false,
         reportCount: 0,
         createdAt: FieldValue.serverTimestamp(),
       });
       tx.create(db.collection("reviewsPrivate").doc(appointmentId), { customerUid: caller.uid, salonId, createdAt: FieldValue.serverTimestamp() });
-      tx.update(salonRef, { ratingSum: sSum, ratingCount: sCount, ratingAvg: salonAvg });
-      if (member.exists) tx.update(memberRef, { ratingSum: mSum, ratingCount: mCount, ratingAvg: staffAvg });
-      tx.update(apptRef, { reviewId: appointmentId, updatedAt: FieldValue.serverTimestamp() });
-      notifyInTx(tx, staffUid, { type: "REVIEW_RECEIVED", title: "Yeni değerlendirme", body: `Bir müşteriniz ${staffRating} yıldız verdi.`, salonId, appointmentId });
+      tx.update(apptRef, { reviewId: appointmentId, reviewStatus: "PENDING", updatedAt: FieldValue.serverTimestamp() });
+      notifyInTx(tx, salon.get("ownerUid"), {
+        type: "REVIEW_PENDING", title: "Onay bekleyen değerlendirme",
+        body: "Bir müşteriniz değerlendirme yaptı. Yayınlanması için onayınız gerekiyor.", salonId, appointmentId,
+      });
       auditInTx(tx, { action: "REVIEW_SUBMITTED", actorUid: caller.uid, salonId, targetId: appointmentId });
-      return { reviewId: appointmentId, salonRatingAvg: salonAvg, staffRatingAvg: staffAvg };
+      return { reviewId: appointmentId, approval: "PENDING" as const };
     });
   },
 );

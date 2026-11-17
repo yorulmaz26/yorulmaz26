@@ -20,6 +20,7 @@ import com.kuaforumcepte.app.feature.bizappointments.BusinessAppointmentScreen
 import com.kuaforumcepte.app.feature.bizappointments.RescheduleScreen
 import com.kuaforumcepte.app.feature.inbox.InboxScreen
 import com.kuaforumcepte.app.feature.reviews.ReviewScreen
+import com.kuaforumcepte.app.feature.reviews.ReviewApprovalScreen
 import com.kuaforumcepte.app.feature.appointments.BookingSuccessScreen
 import com.kuaforumcepte.app.feature.appointments.CustomerAppointmentDetailScreen
 import com.kuaforumcepte.app.feature.booking.BookingSummaryScreen
@@ -223,6 +224,7 @@ fun KcNavHost(
                 onAddWalkIn = { navController.navigate(WalkInRoute()) { single() } },
                 onOpenPromotions = { navController.navigate(PromotionsRoute) { single() } },
                 onOpenSalonPage = { sid -> navController.navigate(SalonDetailRoute(sid)) { single() } },
+                onOpenReviewApproval = { navController.navigate(ReviewApprovalRoute) { single() } },
             )
         }
         composable<WalkInRoute> {
@@ -232,6 +234,7 @@ fun KcNavHost(
             })
         }
         composable<PromotionsRoute> { PromotionsScreen(onBack = back) }
+        composable<ReviewApprovalRoute> { ReviewApprovalScreen(onBack = back) }
         composable<StaffManagementRoute> { StaffManagementScreen(onBack = back) }
         composable<ShopSettingsRoute> {
             ShopSettingsScreen(
@@ -325,6 +328,7 @@ fun KcNavHost(
             val role = roleOf(entry.toRoute<InboxRoute>().role)
             InboxScreen(
                 onBack = back,
+                onOpenReviewApproval = { navController.navigate(ReviewApprovalRoute) { single() } },
                 onOpenAppointment = { id ->
                     navController.navigate(if (role == EntryRole.CUSTOMER) AppointmentDetailRoute(id) else BusinessAppointmentRoute(id)) { single() }
                 },

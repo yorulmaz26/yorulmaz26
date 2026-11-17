@@ -196,14 +196,16 @@ describe("finans ve kullanıcı", () => {
     await assertFails(setDoc(doc(db(CUSTOMER), "reviews", "ap2"), { salonId: SALON, salonRating: 5 }));
     await assertFails(getDoc(doc(db(OWNER), "reviewsPrivate", "ap1")));
   });
-  test("gizlenmiş yorum ve şikâyet ayrıntıları yalnızca platform yöneticisine açık", async () => {
+  test("yayında olmayan yorum yalnızca salon sahibine ve yöneticiye; şikâyet ayrıntıları yalnızca yöneticiye açık", async () => {
     await env.withSecurityRulesDisabled(async (ctx) => {
       await setDoc(doc(ctx.firestore(), "reviews", "gizli"), { salonId: SALON, hidden: true, salonRating: 1 });
       await setDoc(doc(ctx.firestore(), "reviewReports", "gizli_x"), { reviewId: "gizli", reason: "SPAM" });
     });
     const admin = env.authenticatedContext("admin", { admin: true }).firestore();
     await assertFails(getDoc(doc(db(STRANGER), "reviews", "gizli")));
-    await assertFails(getDoc(doc(db(OWNER), "reviews", "gizli")));
+    // Yayında olmayan (onay bekleyen/reddedilen/gizlenen) yorumu salonun sahibi görür; uzman ve diğerleri göremez.
+    await assertSucceeds(getDoc(doc(db(OWNER), "reviews", "gizli")));
+    await assertFails(getDoc(doc(db(STAFF), "reviews", "gizli")));
     await assertSucceeds(getDoc(doc(admin, "reviews", "gizli")));
     await assertFails(getDoc(doc(db(OWNER), "reviewReports", "gizli_x")));
     await assertSucceeds(getDoc(doc(admin, "reviewReports", "gizli_x")));
