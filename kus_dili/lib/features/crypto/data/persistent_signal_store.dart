@@ -12,7 +12,8 @@ import '../domain/secure_kv.dart';
 /// kimlik anahtarı değişirse yeni anahtar kabul edilir ama "değişti"
 /// işareti konur; arayüz kullanıcıyı uyarır ve güvenlik numarasını yeniden
 /// doğrulamaya yönlendirir.
-final class PersistentSignalStore implements SignalProtocolStore {
+final class PersistentSignalStore
+    implements SignalProtocolStore, SenderKeyStore {
   PersistentSignalStore(this._kv, this._owner);
 
   final SecureKv _kv;
@@ -193,4 +194,23 @@ final class PersistentSignalStore implements SignalProtocolStore {
   @override
   Future<void> deleteAllSessions(String name) =>
       deleteSession(SignalProtocolAddress(name, 1));
+
+  // ---- Grup gönderici anahtarları (Sender Keys) -----------------------------
+
+  @override
+  Future<void> storeSenderKey(SenderKeyName name, SenderKeyRecord record) =>
+      _put('sk.${name.serialize()}', record.serialize());
+
+  @override
+  Future<SenderKeyRecord> loadSenderKey(SenderKeyName name) async {
+    final b = await _bytes('sk.${name.serialize()}');
+    return b == null ? SenderKeyRecord() : SenderKeyRecord.fromSerialized(b);
+  }
+
+  // ---- Küçük durum değerleri -----------------------------------------------
+
+  Future<String?> readMeta(String key) => _kv.read(_k('meta.$key'));
+
+  Future<void> writeMeta(String key, String value) =>
+      _kv.write(_k('meta.$key'), value);
 }

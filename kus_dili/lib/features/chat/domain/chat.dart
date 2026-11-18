@@ -13,10 +13,28 @@ final class Chat {
     this.lastActivityAt,
     this.lastSenderId,
     this.readAt = const {},
+    this.type = 'direct',
+    this.name,
+    this.admins = const [],
   });
+
+  static const maxGroupMembers = 64;
 
   final String id;
   final List<String> members;
+
+  /// 'direct' veya 'group'.
+  final String type;
+
+  /// Grup adı (yalnızca grup).
+  final String? name;
+
+  /// Grup yöneticileri (yalnızca grup).
+  final List<String> admins;
+
+  bool get isGroup => type == 'group';
+
+  bool isAdmin(String uid) => admins.contains(uid);
   final DateTime? lastActivityAt;
   final String? lastSenderId;
 
@@ -73,6 +91,10 @@ final class ChatMessage {
 
   bool isExpired(DateTime now) => expireAt != null && !now.isBefore(expireAt!);
 
+  /// Gönderen dışındaki tüm üyeler okudu mu?
+  bool isReadByAll(Chat chat) =>
+      chat.members.where((m) => m != senderId).every((m) => isReadBy(m, chat));
+
   /// Karşı taraf okudu mu?
   bool isReadBy(String uid, Chat chat) {
     final read = chat.readAt[uid];
@@ -125,4 +147,36 @@ abstract interface class ChatRepository {
   });
 
   Future<void> markRead({required String chatId, required String uid});
+
+  // ---- Gruplar -------------------------------------------------------------
+
+  /// Yeni grup; kurucu tek yöneticidir. Kimliği döner.
+  Future<String> createGroup({
+    required String creator,
+    required String name,
+    required List<String> members,
+  });
+
+  Future<void> renameGroup({required String chatId, required String name});
+
+  Future<void> addGroupMembers({
+    required String chatId,
+    required List<String> uids,
+  });
+
+  /// Yönetici bir üyeyi çıkarır.
+  Future<void> removeGroupMember({required String chatId, required String uid});
+
+  Future<void> setGroupAdmin({
+    required String chatId,
+    required String uid,
+    required bool admin,
+  });
+
+  /// Gruptan ayrıl. Son yöneticiysen [promote] yeni yönetici olur.
+  Future<void> leaveGroup({
+    required String chatId,
+    required String uid,
+    String? promote,
+  });
 }

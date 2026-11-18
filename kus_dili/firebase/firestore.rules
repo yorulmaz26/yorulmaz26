@@ -27,6 +27,10 @@ service cloud.firestore {
                    'undefined']);
     }
 
+    function validGroupName(n) {
+      return n is string && n.size() >= 1 && n.size() <= 50;
+    }
+
     function validDisplayName(n) {
       return n is string && n.size() >= 1 && n.size() <= 40;
     }
@@ -141,7 +145,71 @@ service cloud.firestore {
               .affectedKeys().hasAny([request.auth.uid])
             || request.resource.data.readAt[request.auth.uid] == request.time);
 
+      // ---- Grup ----
+      allow create: if verified()
+        && chatId.matches('^g_[A-Za-z0-9]{10,40}$')
+        && request.resource.data.keys().hasOnly(['type', 'name', 'members',
+             'admins', 'createdBy', 'createdAt', 'lastActivityAt', 'readAt'])
+        && request.resource.data.type == 'group'
+        && validGroupName(request.resource.data.name)
+        && request.resource.data.members is list
+        && request.resource.data.members.size() >= 2
+        && request.resource.data.members.size() <= 64
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.admins == [request.auth.uid]
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.lastActivityAt == request.time
+        && request.resource.data.readAt == {};
+
+      // Yönetici: ad, üyeler ve yöneticiler.
+      allow update: if verified()
+        && resource.data.type == 'group'
+        && request.auth.uid in resource.data.admins
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['name', 'members', 'admins'])
+        && validGroupName(request.resource.data.name)
+        && request.resource.data.members is list
+        && request.resource.data.members.size() >= 1
+        && request.resource.data.members.size() <= 64
+        && request.resource.data.admins.size() >= 1
+        && request.resource.data.members.hasAll(request.resource.data.admins);
+
+      // Herhangi bir üye ayrılabilir; son yöneticiyse yerine bir üye geçer.
+      allow update: if verified()
+        && resource.data.type == 'group'
+        && request.auth.uid in resource.data.members
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['members', 'admins'])
+        && request.resource.data.members
+             == resource.data.members.removeAll([request.auth.uid])
+        && !(request.auth.uid in request.resource.data.admins)
+        && request.resource.data.members.hasAll(request.resource.data.admins)
+        && (request.resource.data.admins
+              == resource.data.admins.removeAll([request.auth.uid])
+            || resource.data.admins.removeAll([request.auth.uid]).size() == 0)
+        && (request.resource.data.admins.size() >= 1
+            || request.resource.data.members.size() == 0);
+
       allow delete: if false;
+
+      // Grup gönderici anahtarı paylaşımları: her üye için birebir şifreli.
+      // Değiştirilemez; kimlik 'gönderen_dönem'.
+      match /senderKeys/{keyId} {
+        allow read: if isMember(chatId);
+        allow create: if isMember(chatId)
+          && request.resource.data.keys().hasOnly(
+               ['sender', 'epoch', 'shares', 'createdAt'])
+          && request.resource.data.sender == request.auth.uid
+          && request.resource.data.epoch is int
+          && keyId == request.auth.uid + '_' + string(request.resource.data.epoch)
+          && request.resource.data.shares is map
+          && request.resource.data.shares.size() <= 64
+          && request.resource.data.shares.keys().hasOnly(chatData(chatId).members)
+          && !(request.auth.uid in request.resource.data.shares)
+          && request.resource.data.createdAt == request.time;
+        allow update, delete: if false;
+      }
 
       // Mesajlar: gövde mühürlüdür (Aşama 7'den itibaren şifreli).
       match /messages/{messageId} {

@@ -4,9 +4,11 @@ import 'package:path_provider/path_provider.dart';
 import '../../../core/firebase/firebase_providers.dart';
 import '../../chat/application/chat_providers.dart';
 import '../data/encrypted_file_payload_cache.dart';
+import '../data/firestore_group_directory.dart';
 import '../data/firestore_key_directory.dart';
 import '../data/flutter_secure_kv.dart';
 import '../data/persistent_signal_store.dart';
+import '../domain/group_directory.dart';
 import '../domain/key_directory.dart';
 import '../domain/key_manager.dart';
 import '../domain/payload_cache.dart';
@@ -16,6 +18,10 @@ final secureKvProvider = Provider<SecureKv>((ref) => FlutterSecureKv());
 
 final keyDirectoryProvider = Provider<KeyDirectory>(
   (ref) => FirestoreKeyDirectory(ref.watch(firestoreProvider)),
+);
+
+final groupDirectoryProvider = Provider<GroupDirectory>(
+  (ref) => FirestoreGroupDirectory(ref.watch(firestoreProvider)),
 );
 
 final signalStoreProvider = Provider<PersistentSignalStore?>((ref) {

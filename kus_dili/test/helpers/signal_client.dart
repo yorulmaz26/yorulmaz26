@@ -1,4 +1,5 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:kus_dili/features/crypto/data/firestore_group_directory.dart';
 import 'package:kus_dili/features/crypto/data/firestore_key_directory.dart';
 import 'package:kus_dili/features/crypto/data/persistent_signal_store.dart';
 import 'package:kus_dili/features/crypto/domain/key_manager.dart';
@@ -20,6 +21,7 @@ class SignalClient {
       directory: dir,
       cache: cache,
       ensureKeys: keys.ensureKeys,
+      groups: FirestoreGroupDirectory(db),
     );
   }
 

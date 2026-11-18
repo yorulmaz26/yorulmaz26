@@ -85,7 +85,9 @@ class ChatTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final other = ref.watch(profileByUidProvider(chat.otherMember(me))).value;
+    final other = chat.isGroup
+        ? null
+        : ref.watch(profileByUidProvider(chat.otherMember(me))).value;
     final unread = chat.isUnreadFor(me);
     final t = chat.lastActivityAt?.toLocal();
     final now = DateTime.now();
@@ -96,15 +98,22 @@ class ChatTile extends ConsumerWidget {
               '${t.minute.toString().padLeft(2, '0')}'
         : '${t.day.toString().padLeft(2, '0')}.'
               '${t.month.toString().padLeft(2, '0')}';
-    final name = other?.displayName ?? '…';
+    final name = chat.isGroup
+        ? (chat.name ?? 'Grup')
+        : (other?.displayName ?? '…');
     final locked =
         ref.watch(privacyPrefsProvider).value?.isLocked(chat.id) ?? false;
     return ListTile(
       key: ValueKey('chat-${chat.id}'),
-      leading: CircleAvatar(
-        backgroundColor: AppColors.violet,
-        child: Text(name.characters.first.toUpperCase()),
-      ),
+      leading: chat.isGroup
+          ? const CircleAvatar(
+              backgroundColor: AppColors.turquoise,
+              child: Icon(Icons.groups, color: AppColors.night),
+            )
+          : CircleAvatar(
+              backgroundColor: AppColors.violet,
+              child: Text(name.characters.first.toUpperCase()),
+            ),
       title: Text(
         name,
         style: unread ? const TextStyle(fontWeight: FontWeight.w700) : null,
@@ -115,7 +124,11 @@ class ChatTile extends ConsumerWidget {
             const Icon(Icons.lock, size: 13, color: AppColors.gold),
             const SizedBox(width: 4),
           ],
-          Text(other == null ? '' : '@${other.username}'),
+          Text(
+            chat.isGroup
+                ? '${chat.members.length} üye'
+                : (other == null ? '' : '@${other.username}'),
+          ),
         ],
       ),
       trailing: Column(

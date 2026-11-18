@@ -25,6 +25,8 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
 * **Uçtan uca şifreleme (Aşama 7a)**: Signal Protokolü (X3DH + Double
   Ratchet), özel anahtarlar cihazın Keystore/Keychain'inde, sunucuda yalnızca
   şifreli metin, cihazda AES-GCM ile şifreli önbellek, güvenlik numarası.
+* **Grup sohbeti (Aşama 8)**: en fazla 64 üye, Signal Sender Keys ile uçtan
+  uca şifreli; üyelik değişince anahtar yenilenir; yönetici işlemleri, ayrılma.
 * **Gizli sohbet (Aşama 7b)**: PIN (PBKDF2, deneme sınırı) ve biyometri ile
   kilitli sohbet, listeden gizlenen sohbetler, uygulama kilidi, süreli ve tek
   görüntülük mesajlar. Gizli/kilitli bilgisi yalnızca cihazda.

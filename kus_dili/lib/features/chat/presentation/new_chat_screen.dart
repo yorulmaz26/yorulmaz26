@@ -88,6 +88,15 @@ class _NewChatScreenState extends ConsumerState<NewChatScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          Card(
+            child: ListTile(
+              key: const Key('newGroupEntry'),
+              leading: const Icon(Icons.group_add_outlined),
+              title: const Text('Yeni grup'),
+              onTap: () => context.pushReplacement(Routes.newGroup),
+            ),
+          ),
+          const SizedBox(height: 12),
           TextField(
             key: const Key('searchUsername'),
             controller: _query,

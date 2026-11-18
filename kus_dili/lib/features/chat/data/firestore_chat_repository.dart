@@ -36,6 +36,11 @@ final class FirestoreChatRepository implements ChatRepository {
       lastActivityAt: _ts(d['lastActivityAt']),
       lastSenderId: d['lastSenderId'] as String?,
       readAt: read,
+      type: d['type'] as String? ?? 'direct',
+      name: d['name'] as String?,
+      admins: d['admins'] is List
+          ? List<String>.from(d['admins'] as List)
+          : const [],
     );
   }
 
@@ -153,4 +158,70 @@ final class FirestoreChatRepository implements ChatRepository {
   @override
   Future<void> markRead({required String chatId, required String uid}) =>
       _chats.doc(chatId).update({'readAt.$uid': FieldValue.serverTimestamp()});
+
+  // ---- Gruplar ---------------------------------------------------------------
+
+  @override
+  Future<String> createGroup({
+    required String creator,
+    required String name,
+    required List<String> members,
+  }) async {
+    final all = {creator, ...members}.toList()..sort();
+    if (all.length < 2 || all.length > Chat.maxGroupMembers) {
+      throw ArgumentError('Grup 2-${Chat.maxGroupMembers} üyeli olmalı.');
+    }
+    final id = 'g_${_chats.doc().id}';
+    await _chats.doc(id).set({
+      'type': 'group',
+      'name': name.trim(),
+      'members': all,
+      'admins': [creator],
+      'createdBy': creator,
+      'createdAt': FieldValue.serverTimestamp(),
+      'lastActivityAt': FieldValue.serverTimestamp(),
+      'readAt': <String, Object?>{},
+    });
+    return id;
+  }
+
+  @override
+  Future<void> renameGroup({required String chatId, required String name}) =>
+      _chats.doc(chatId).update({'name': name.trim()});
+
+  @override
+  Future<void> addGroupMembers({
+    required String chatId,
+    required List<String> uids,
+  }) => _chats.doc(chatId).update({'members': FieldValue.arrayUnion(uids)});
+
+  @override
+  Future<void> removeGroupMember({
+    required String chatId,
+    required String uid,
+  }) => _chats.doc(chatId).update({
+    'members': FieldValue.arrayRemove([uid]),
+    'admins': FieldValue.arrayRemove([uid]),
+  });
+
+  @override
+  Future<void> setGroupAdmin({
+    required String chatId,
+    required String uid,
+    required bool admin,
+  }) => _chats.doc(chatId).update({
+    'admins': admin
+        ? FieldValue.arrayUnion([uid])
+        : FieldValue.arrayRemove([uid]),
+  });
+
+  @override
+  Future<void> leaveGroup({
+    required String chatId,
+    required String uid,
+    String? promote,
+  }) => _chats.doc(chatId).update({
+    'members': FieldValue.arrayRemove([uid]),
+    'admins': promote != null ? [promote] : FieldValue.arrayRemove([uid]),
+  });
 }

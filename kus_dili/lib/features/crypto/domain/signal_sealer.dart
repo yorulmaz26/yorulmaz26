@@ -7,6 +7,7 @@ import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import '../../chat/domain/message_payload.dart';
 import '../../chat/domain/message_sealer.dart';
 import '../data/persistent_signal_store.dart';
+import 'group_directory.dart';
 import 'key_directory.dart';
 import 'payload_cache.dart';
 
@@ -40,10 +41,15 @@ final class SignalSealer implements MessageSealer {
     required KeyDirectory directory,
     required PayloadCache cache,
     required Future<void> Function() ensureKeys,
+    GroupDirectory? groups,
+    int Function()? epochClock,
   }) : _store = store,
        _dir = directory,
        _cache = cache,
-       _ensureKeys = ensureKeys;
+       _ensureKeys = ensureKeys,
+       _groups = groups,
+       _epochClock =
+           epochClock ?? (() => DateTime.now().microsecondsSinceEpoch);
 
   static const int version = 1;
   static const int deviceId = 1;
@@ -53,6 +59,12 @@ final class SignalSealer implements MessageSealer {
   final KeyDirectory _dir;
   final PayloadCache _cache;
   final Future<void> Function() _ensureKeys;
+  final GroupDirectory? _groups;
+
+  /// Grup anahtarı dönemi (epoch) için tekil artan sayı.
+  final int Function() _epochClock;
+
+  static bool isGroup(String chatId) => chatId.startsWith('g_');
 
   Future<void> _queue = Future.value();
   final Map<String, Future<MessagePayload>> _inFlight = {};
@@ -133,14 +145,15 @@ final class SignalSealer implements MessageSealer {
   @override
   Future<String> seal(String chatId, MessagePayload payload) async {
     await _ensureKeys();
-    final peer = _peerOf(chatId);
     final json = payload.encode();
-    final body = await _serial(() async {
-      await _ensureSession(peer);
-      final ct = await _cipher(SignalProtocolAddress(peer, deviceId))
-          .encrypt(Uint8List.fromList(utf8.encode(json)));
-      return jsonEncode({'t': ct.getType(), 'c': base64Encode(ct.serialize())});
-    });
+    final bytes = Uint8List.fromList(utf8.encode(json));
+    final body = isGroup(chatId)
+        ? await _sealGroup(chatId, bytes)
+        : await _serial(() async {
+            final peer = _peerOf(chatId);
+            await _ensureSession(peer);
+            return _pairwiseEncrypt(peer, bytes);
+          });
     // Kendi mesajımızı Signal ile geri çözemeyiz; cihazda saklarız.
     await _cache.put(chatId, await bodyHash(body), json);
     return body;
@@ -170,7 +183,9 @@ final class SignalSealer implements MessageSealer {
           // Sıra beklerken başka bir çağrı çözmüş olabilir.
           final again = await _cache.get(chatId, hash);
           if (again != null) return again;
-          final clear = await _decrypt(senderId, body);
+          final clear = isGroup(chatId)
+              ? await _openGroup(chatId, senderId, body)
+              : utf8.decode(await _pairwiseDecrypt(senderId, body));
           await _cache.put(chatId, hash, clear);
           return clear;
         });
@@ -187,7 +202,17 @@ final class SignalSealer implements MessageSealer {
   Future<void> forget(String chatId, String body) async =>
       _cache.remove(chatId, await bodyHash(body));
 
-  Future<String> _decrypt(String sender, String body) async {
+  // ---- Birebir (pairwise) -------------------------------------------------
+
+  /// Sıra (`_serial`) içinde çağrılmalı.
+  Future<String> _pairwiseEncrypt(String peer, Uint8List bytes) async {
+    final ct = await _cipher(SignalProtocolAddress(peer, deviceId))
+        .encrypt(bytes);
+    return jsonEncode({'t': ct.getType(), 'c': base64Encode(ct.serialize())});
+  }
+
+  /// Sıra (`_serial`) içinde çağrılmalı.
+  Future<Uint8List> _pairwiseDecrypt(String sender, String body) async {
     final Map<String, Object?> env;
     try {
       env = jsonDecode(body) as Map<String, Object?>;
@@ -212,9 +237,116 @@ final class SignalSealer implements MessageSealer {
       } else {
         throw const MessageUnavailableException('Bilinmeyen mesaj türü.');
       }
-      return utf8.decode(clear);
+      return clear;
     } on MessageUnavailableException {
       rethrow;
+    } catch (e) {
+      throw MessageUnavailableException('Çözülemedi: $e');
+    }
+  }
+
+  // ---- Grup (Sender Keys) ----------------------------------------------------
+
+  GroupDirectory get _g {
+    final g = _groups;
+    if (g == null) throw StateError('Grup dizini yapılandırılmadı.');
+    return g;
+  }
+
+  SenderKeyName _skName(String chatId, int epoch, String sender) =>
+      SenderKeyName('$chatId#$epoch', SignalProtocolAddress(sender, deviceId));
+
+  /// Üyelik, anahtarımı son paylaştığım kümeden farklıysa yeni dönem açar:
+  /// yeni gönderici anahtarı üretir ve her üyeye birebir şifreli dağıtır.
+  /// Böylece çıkarılan üye yeni mesajları, yeni üye eski mesajları okuyamaz.
+  Future<int> _ensureMyGroupKey(String chatId) async {
+    final members = [...await _g.members(chatId)]..sort();
+    if (!members.contains(myUid)) {
+      throw const MessageUnavailableException('Bu grubun üyesi değilsin.');
+    }
+    final others = members.where((m) => m != myUid).toList();
+    final epochStr = await _store.readMeta('grp.$chatId.epoch');
+    final sharedTo = await _store.readMeta('grp.$chatId.sharedTo');
+    if (epochStr != null && sharedTo == others.join(',')) {
+      return int.parse(epochStr);
+    }
+    final epoch = _epochClock();
+    final name = _skName(chatId, epoch, myUid);
+    final skdm = await GroupSessionBuilder(_store).create(name);
+    final shares = <String, String>{};
+    final reached = <String>[];
+    for (final m in others) {
+      try {
+        await _ensureSession(m);
+        shares[m] = await _pairwiseEncrypt(m, skdm.serialize());
+        reached.add(m);
+      } on RecipientHasNoKeysException {
+        // Anahtarı olmayan üye bu dönemi okuyamaz; bir sonraki gönderimde
+        // yeniden denenir (sharedTo farklı kalacağı için).
+      }
+    }
+    await _g.publishSenderKey(
+      chatId: chatId,
+      sender: myUid,
+      epoch: epoch,
+      shares: shares,
+    );
+    await _store.writeMeta('grp.$chatId.epoch', '$epoch');
+    await _store.writeMeta('grp.$chatId.sharedTo', reached.join(','));
+    return epoch;
+  }
+
+  Future<String> _sealGroup(String chatId, Uint8List bytes) =>
+      _serial(() async {
+        final epoch = await _ensureMyGroupKey(chatId);
+        final ct = await GroupCipher(
+          _store,
+          _skName(chatId, epoch, myUid),
+        ).encrypt(bytes);
+        return jsonEncode({'t': 'sk', 'e': epoch, 'c': base64Encode(ct)});
+      });
+
+  /// Sıra (`_serial`) içinde çağrılır.
+  Future<String> _openGroup(String chatId, String sender, String body) async {
+    final Map<String, Object?> env;
+    try {
+      env = jsonDecode(body) as Map<String, Object?>;
+    } catch (_) {
+      throw const MessageUnavailableException('Şifreli mesaj biçimi bozuk.');
+    }
+    final epoch = env['e'];
+    final c = env['c'];
+    if (env['t'] != 'sk' || epoch is! int || c is! String) {
+      throw const MessageUnavailableException('Grup mesajı biçimi bozuk.');
+    }
+    final name = _skName(chatId, epoch, sender);
+    final gotKey = 'grp.$chatId.got.$sender.$epoch';
+    if (await _store.readMeta(gotKey) == null) {
+      final share = await _g.fetchShare(
+        chatId: chatId,
+        sender: sender,
+        epoch: epoch,
+        me: myUid,
+      );
+      if (share == null) {
+        throw const MessageUnavailableException(
+          'Bu mesajın grup anahtarı sana paylaşılmamış.',
+        );
+      }
+      final skdm = await _pairwiseDecrypt(sender, share);
+      try {
+        await GroupSessionBuilder(_store).process(
+          name,
+          SenderKeyDistributionMessageWrapper.fromSerialized(skdm),
+        );
+      } catch (e) {
+        throw MessageUnavailableException('Grup anahtarı işlenemedi: $e');
+      }
+      await _store.writeMeta(gotKey, '1');
+    }
+    try {
+      final clear = await GroupCipher(_store, name).decrypt(base64Decode(c));
+      return utf8.decode(clear);
     } catch (e) {
       throw MessageUnavailableException('Çözülemedi: $e');
     }

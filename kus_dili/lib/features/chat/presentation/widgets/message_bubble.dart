@@ -20,7 +20,11 @@ class MessageBubble extends ConsumerStatefulWidget {
     required this.chat,
     required this.onLongPress,
     required this.onOpenViewOnce,
+    this.showSender = false,
   });
+
+  /// Grupta başkasının mesajı: üstte gönderen adı.
+  final bool showSender;
 
   final String chatId;
   final ChatMessage message;
@@ -136,6 +140,22 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (widget.showSender)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: Text(
+                      ref
+                              .watch(profileByUidProvider(m.senderId))
+                              .value
+                              ?.displayName ??
+                          '…',
+                      key: ValueKey('sender-${m.id}'),
+                      style: text.labelMedium?.copyWith(
+                        color: AppColors.turquoise,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
                 if (payload.replyQuote != null)
                   Container(
                     margin: const EdgeInsets.only(bottom: 6),
@@ -265,12 +285,9 @@ class _Meta extends StatelessWidget {
               '${t.minute.toString().padLeft(2, '0')}';
     Widget? status;
     if (isMine) {
-      final other = chat?.otherMember(message.senderId);
       if (message.pending || message.sentAt == null) {
         status = const Icon(Icons.schedule, size: 13, key: Key('pending'));
-      } else if (chat != null &&
-          other != null &&
-          message.isReadBy(other, chat!)) {
+      } else if (chat != null && message.isReadByAll(chat!)) {
         status = const Icon(
           Icons.done_all,
           size: 14,

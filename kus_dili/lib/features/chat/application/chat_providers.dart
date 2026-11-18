@@ -38,6 +38,7 @@ final messageSealerProvider = Provider<MessageSealer>((ref) {
       directory: ref.watch(keyDirectoryProvider),
       cache: cache,
       ensureKeys: keys.ensureKeys,
+      groups: ref.watch(groupDirectoryProvider),
     ),
   );
 });

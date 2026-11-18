@@ -199,23 +199,37 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         const ChatSettings();
     final composer = ref.watch(chatControllerProvider(widget.chatId));
     final controller = ref.read(chatControllerProvider(widget.chatId).notifier);
-    final otherUid = (chat != null && me != null) ? chat.otherMember(me) : null;
+    final isGroup = chat?.isGroup ?? widget.chatId.startsWith('g_');
+    final otherUid = (chat != null && me != null && !isGroup)
+        ? chat.otherMember(me)
+        : null;
     final other = otherUid == null
         ? null
         : ref.watch(profileByUidProvider(otherUid)).value;
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(other?.displayName ?? ''),
-            if (other != null)
-              Text(
-                '@${other.username}',
-                style: Theme.of(context).textTheme.labelSmall,
-              ),
-          ],
+        title: InkWell(
+          key: const Key('chatTitle'),
+          onTap: isGroup
+              ? () => context.push(Routes.groupInfo(widget.chatId))
+              : null,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(isGroup ? (chat?.name ?? '') : (other?.displayName ?? '')),
+              if (isGroup && chat != null)
+                Text(
+                  '${chat.members.length} üye · bilgi için dokun',
+                  style: Theme.of(context).textTheme.labelSmall,
+                )
+              else if (other != null)
+                Text(
+                  '@${other.username}',
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+            ],
+          ),
         ),
         actions: [
           IconButton(
@@ -236,7 +250,19 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       body: Column(
         children: [
-          _E2eeBanner(chatId: widget.chatId, otherUid: otherUid),
+          _E2eeBanner(
+            chatId: widget.chatId,
+            otherUid: otherUid,
+            isGroup: isGroup,
+          ),
+          if (isGroup &&
+              chat != null &&
+              me != null &&
+              !chat.members.contains(me))
+            const Padding(
+              padding: EdgeInsets.all(8),
+              child: Text('Artık bu grubun üyesi değilsin.'),
+            ),
           Expanded(
             child: messages.when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -258,6 +284,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     final mine = m.senderId == me;
                     return MessageBubble(
                       key: ValueKey(m.id),
+                      showSender: isGroup && !mine,
                       chatId: widget.chatId,
                       message: m,
                       isMine: mine,
@@ -294,10 +321,15 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 }
 
 class _E2eeBanner extends ConsumerWidget {
-  const _E2eeBanner({required this.chatId, required this.otherUid});
+  const _E2eeBanner({
+    required this.chatId,
+    required this.otherUid,
+    required this.isGroup,
+  });
 
   final String chatId;
   final String? otherUid;
+  final bool isGroup;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -307,7 +339,9 @@ class _E2eeBanner extends ConsumerWidget {
     final color = changed ? AppColors.gold : AppColors.turquoise;
     return InkWell(
       key: const Key('e2eeBanner'),
-      onTap: uid == null
+      onTap: isGroup
+          ? () => context.push(Routes.groupInfo(chatId))
+          : uid == null
           ? null
           : () => context.push(Routes.safetyNumber(chatId, uid)),
       child: Container(
@@ -326,6 +360,8 @@ class _E2eeBanner extends ConsumerWidget {
               child: Text(
                 changed
                     ? 'Karşı tarafın güvenlik numarası değişti. Doğrulamak için dokun.'
+                    : isGroup
+                    ? 'Grup mesajları uçtan uca şifreli. Üyeler için dokun.'
                     : 'Mesajlar uçtan uca şifreli. Güvenlik numarası için dokun.',
                 style: Theme.of(context).textTheme.labelSmall
                     ?.copyWith(color: color),

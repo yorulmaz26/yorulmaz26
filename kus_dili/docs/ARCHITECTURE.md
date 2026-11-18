@@ -155,6 +155,16 @@ edilebilen tek seçenek buydu.
 6. Tüm Signal durum değişiklikleri sıraya alınır; aynı mesajın eşzamanlı
    açılması tekilleştirilir.
 
+**Gruplar (Aşama 8) — Signal "Sender Keys":** Her üye kendi gönderici
+anahtarını üretir ve diğer üyelere birebir Signal oturumlarıyla şifreleyerek
+dağıtır (`chats/{g_…}/senderKeys/{gönderen}_{dönem}`, değiştirilemez; her
+üyenin payı yalnızca ona açılır). Grup mesajı bir kez şifrelenir. Üyelik,
+anahtarın son paylaşıldığı kümeden farklıysa gönderen yeni dönem başlatır:
+çıkarılan üye sonraki mesajları, yeni üye önceki mesajları okuyamaz. Anahtarı
+henüz olmayan üye atlanır ve bir sonraki gönderimde yeniden denenir. En fazla
+64 üye; kurucu ilk yönetici; yöneticiler ad/üye/yönetici değiştirir; herkes
+ayrılabilir (son yönetici ayrılırken yerine bir üye geçer).
+
 **Bilinen sınırlar (henüz yapılmadı):**
 
 * Kullanıcı başına **tek cihaz**. İkinci cihaz/yeniden kurulumda eski mesajlar
@@ -268,7 +278,7 @@ içerik gizleme Aşama 10'da (bildirimler) yapılacak.
 | 5 | Otomatik kuş dili mesajlaşma | ✅ sohbet başına gönderim modu ve varyant (özel kural dahil), yazarken canlı önizleme |
 | 6 | Mesaj çözme ve dil değiştirme | ✅ dokununca animasyonlu çözme, görünüm tercihi (kuş dili / ikisi / Türkçe) |
 | 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b: PIN/biyometri, kilitli ve gizli sohbet, uygulama kilidi, süreli ve tek görüntülük mesaj |
-| 8 | Grup mesajlaşması | — |
+| 8 | Grup mesajlaşması | ✅ Sender Keys ile E2EE, üyelik değişince anahtar yenileme, yönetici işlemleri, ayrılma |
 | 9 | Medya ve sesli mesaj | — |
 | 10 | Bildirimler ve aramalar | — |
 | 11 | Öğrenme modülü | Çevirici ekranı hazır; alıştırmalar/testler sonra |

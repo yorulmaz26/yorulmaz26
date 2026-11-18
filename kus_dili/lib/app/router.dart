@@ -8,7 +8,9 @@ import '../features/crypto/presentation/safety_number_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
+import '../features/chat/presentation/group_info_screen.dart';
 import '../features/chat/presentation/new_chat_screen.dart';
+import '../features/chat/presentation/new_group_screen.dart';
 import '../features/privacy/presentation/hidden_chats_screen.dart';
 import '../features/privacy/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
@@ -26,6 +28,8 @@ abstract final class Routes {
   static const profile = '/profile';
   static const newChat = '/chats/new';
   static const hiddenChats = '/chats/hidden';
+  static const newGroup = '/groups/new';
+  static String groupInfo(String chatId) => '/chats/$chatId/info';
   static const privacy = '/settings/privacy';
   static String chat(String id) => '/chats/$id';
   static String safetyNumber(String chatId, String uid) =>
@@ -94,6 +98,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const NewChatScreen(),
       ),
       GoRoute(
+        path: Routes.newGroup,
+        builder: (context, state) => const NewGroupScreen(),
+      ),
+      GoRoute(
         path: Routes.hiddenChats,
         builder: (context, state) => const HiddenChatsScreen(),
       ),
@@ -106,6 +114,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) =>
             ChatScreen(chatId: state.pathParameters['id']!),
         routes: [
+          GoRoute(
+            path: 'info',
+            builder: (context, state) =>
+                GroupInfoScreen(chatId: state.pathParameters['id']!),
+          ),
           GoRoute(
             path: 'safety/:uid',
             builder: (context, state) =>
