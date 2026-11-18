@@ -101,19 +101,6 @@ veya konsolda **Firestore → TTL → Politika oluştur** (koleksiyon grubu
 `messages`, alan `expireAt`). Firestore süresi dolan belgeleri genellikle
 24 saat içinde siler; uygulama bu sırada süresi dolan mesajları zaten göstermez.
 
-## 5b. Storage (fotoğraf, video, ses, belge)
-
-1. **Storage → Başlayın** → üretim modu, Firestore ile aynı bölge.
-2. Kuralları yükleyin (kurallar Firestore'dan üyeliği okur; CLI ilk seferde
-   bunun için gerekli izni vermeyi sorar, **Evet** deyin):
-
-```bash
-firebase deploy --only storage
-```
-
-3. Önerilen: sahipsiz/eskimiş şifreli dosyalar için Google Cloud Console →
-   Cloud Storage → kova → **Yaşam döngüsü** → "30 günden eski nesneleri sil".
-
 ## 5c. Bildirimler (Cloud Functions + FCM)
 
 1. Blaze planı gerekli (Aşama 3'te açıldı).
@@ -126,36 +113,25 @@ cd kus_dili/functions && npm ci && cd ..
 firebase deploy --only functions:kusdili,firestore:rules
 ```
 
+Fonksiyonlar: `notifyNewMessage` (içeriksiz bildirim; göndereni engelleyen
+alıcıya gitmez) ve `deleteAccount` (uygulama içinden hesap silme).
+
 Fonksiyon `europe-west1` bölgesinde çalışır; isterseniz `functions/src/index.ts`
 içindeki `REGION` değerini Firestore bölgenize yakın bir bölgeyle değiştirin.
 
-## 5d. Aramalar için TURN sunucusu (önerilir)
+## 5d. Şikâyetleri inceleme
 
-STUN tek başına mobil ağlarda çoğu zaman yetmez. Kendi coturn sunucunuzu
-kurun (ör. küçük bir VPS, 3478/UDP+TCP ve 5349/TLS açık) ve
-`/etc/turnserver.conf` içinde:
-
-```
-use-auth-secret
-static-auth-secret=<uzun-rastgele-gizli>
-realm=kusdili
-```
-
-Ardından gizli anahtarı ve adresleri Firebase'e verin (gizli anahtar Secret
-Manager'da durur, uygulamaya gömülmez):
-
-```bash
-firebase functions:secrets:set TURN_SECRET          # coturn'deki değer
-# functions/.env.<proje-id> dosyasına:
-# TURN_URLS=turn:turn.alanadiniz.com:3478,turns:turn.alanadiniz.com:5349
-firebase deploy --only functions:kusdili
-```
+Şikâyetler `reports` koleksiyonuna düşer ve uygulamadan okunamaz. Konsolda
+**Firestore → reports** altından inceleyin; kuralı çiğneyen hesabı
+**Authentication → Kullanıcılar → Hesabı devre dışı bırak** ile kapatın.
+Şikâyette yalnızca kullanıcının onay verdiği (en fazla 5) mesajın metni
+bulunur; diğer mesajlar şifrelidir.
 
 ## 6. Yerel emülatörle geliştirme (isteğe bağlı)
 
 ```bash
 cd kus_dili
-firebase emulators:start --only auth,firestore,storage --project demo-kusdili
+firebase emulators:start --only auth,firestore --project demo-kusdili
 flutter run --dart-define=USE_FIREBASE_EMULATOR=true
 # Gerçek cihazda: --dart-define=FIREBASE_EMULATOR_HOST=<bilgisayarın-IP'si>
 ```

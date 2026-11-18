@@ -9,9 +9,9 @@
 
 ## 1. Kısaca
 
-Kuş Dili'nde mesajlarınız, fotoğraflarınız, sesli mesajlarınız ve
-aramalarınız **uçtan uca şifrelidir**: içerik telefonunuzda şifrelenir ve
-yalnızca konuştuğunuz kişinin telefonunda çözülür. Biz (ve sunucularımızı
+Kuş Dili'nde mesajlarınız **uçtan uca şifrelidir**: içerik telefonunuzda
+şifrelenir ve yalnızca konuştuğunuz kişinin (ve sizin) bağlı cihazlarınızda
+çözülür. Biz (ve sunucularımızı
 barındıran Google Firebase) bu içerikleri **okuyamayız**. Kuş dili
 dönüşümü yalnızca telefonunuzda yapılır.
 
@@ -21,13 +21,16 @@ dönüşümü yalnızca telefonunuzda yapılır.
 |---|---|---|
 | Telefon numarası | Hesap doğrulama (SMS) | Firebase Authentication; profilde **görünmez** |
 | Kullanıcı adı, görünen ad | Arkadaşlarınızın sizi bulması | Firestore (diğer kullanıcılar görebilir) |
-| Açık şifreleme anahtarları | Uçtan uca şifreleme | Firestore (gizli anahtarlar yalnızca telefonunuzda) |
-| Şifreli mesaj/dosya içerikleri | Mesajın iletilmesi | Firestore / Storage — okunamaz |
-| Üst veri: kiminle, ne zaman yazıştığınız; grup üyelikleri; arama kayıtları (kim, kimi, ne zaman, görüntülü mü) | Hizmetin çalışması | Firestore |
+| Açık şifreleme anahtarları, bağlı cihazların adı ("iPhone", "Android telefon") ve son etkinlik zamanı | Uçtan uca şifreleme, Bağlı cihazlar ekranı | Firestore (gizli anahtarlar yalnızca telefonunuzda) |
+| Şifreli mesaj içerikleri | Mesajın iletilmesi | Firestore — okunamaz |
+| Üst veri: kiminle, ne zaman yazıştığınız; grup üyelikleri | Hizmetin çalışması | Firestore |
+| Engellediğiniz kişiler | Engelleme | Firestore (yalnızca siz görürsünüz) |
+| Şikâyetler: kim, kimi, hangi sohbet, neden, açıklama; **onay verirseniz** son en fazla 5 mesajın açık metni | Kötüye kullanımla mücadele | Firestore (yalnızca moderasyon ekibi) |
 | Bildirim belirteci, sessize alınan sohbetler | Bildirim göndermek | Firestore |
 | Öğrenme ilerlemesi, gizli/kilitli sohbet listesi, PIN özeti | Uygulama özellikleri | **Yalnızca telefonunuzda** |
 
-Konum, rehber, reklam kimliği **toplanmaz**. Reklam ve üçüncü taraf analiz
+Fotoğraf, ses, konum, rehber, reklam kimliği **toplanmaz**; uygulama kamera
+ve mikrofon izni istemez. Reklam ve üçüncü taraf analiz
 araçları **kullanılmaz**.
 
 ## 3. Saklama süresi
@@ -37,8 +40,9 @@ araçları **kullanılmaz**.
 - Tek görüntülük mesajın içeriği açıldığında silinir.
 - Diğer şifreli içerikler, siz veya karşı taraf silene ya da hesap silinene
   kadar saklanır. Hesabınızı uygulama içinden (Profil → Hesabı kalıcı olarak
-  sil) anında silebilirsiniz: profil, kullanıcı adı, anahtarlar ve bildirim
-  bilgileri silinir, gruplardan çıkarılırsınız. Karşı tarafın cihazındaki
+  sil) anında silebilirsiniz: profil, kullanıcı adı, anahtarlar, engel listesi
+  ve bildirim bilgileri silinir, gruplardan çıkarılırsınız.
+- Şikâyetler inceleme ve yasal yükümlülükler için [süre] saklanır. Karşı tarafın cihazındaki
   kopyalar onların kontrolündedir.
 
 ## 4. Aktarım

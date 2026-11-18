@@ -11,9 +11,10 @@ yazarsınız, mesaj karşı tarafa kuş dilinde gider ("Seni seviyorum" →
 "Segenigi segevigiyogorugum"). Dokunun, Türkçesi görünsün.
 
 • G'li, F'li, C'li kuş dili ya da kendi kuralınız
-• Mesajlar, fotoğraflar, sesli mesajlar ve aramalar uçtan uca şifreli
+• Mesajlar uçtan uca şifreli; aynı hesabı 5 cihaza kadar kullanın
 • Gizli sohbetler, PIN ve parmak izi kilidi, süreli ve tek görüntülük mesajlar
-• Gruplar, sesli ve görüntülü arama
+• Gruplar (64 kişiye kadar)
+• Rahatsız eden kişiyi engelleyin ya da şikâyet edin
 • Kuş dilini öğrenin: dersler, alıştırmalar, mini testler ve sesli telaffuz
 
 Sadece anlayan anlasın.
@@ -31,14 +32,16 @@ Sadece anlayan anlasın.
 | Kişisel bilgiler → Telefon numarası | Toplanıyor · Hesap yönetimi · Paylaşılmıyor |
 | Kişisel bilgiler → Kullanıcı kimlikleri (kullanıcı adı) | Toplanıyor · Uygulama işlevi |
 | Mesajlar → Diğer uygulama içi mesajlar | Toplanıyor (uçtan uca şifreli; geliştirici okuyamaz) · Uygulama işlevi |
-| Fotoğraflar ve videolar, Ses dosyaları | Toplanıyor (uçtan uca şifreli) · Uygulama işlevi |
+| Fotoğraflar ve videolar, Ses dosyaları | Toplanmıyor |
 | Uygulama etkinliği, konum, rehber, finans, sağlık | Toplanmıyor |
 | Cihaz kimlikleri | Bildirim belirteci · Uygulama işlevi |
 
 ## App Store — App Privacy
 
 - **Contact Info → Phone Number:** App Functionality, kimliğe bağlı, izleme yok.
-- **User Content → Emails or Text Messages / Photos or Videos / Audio Data:**
-  App Functionality, kimliğe bağlı, izleme yok (uçtan uca şifreli).
+- **User Content → Emails or Text Messages:** App Functionality, kimliğe
+  bağlı, izleme yok (uçtan uca şifreli).
+- **User Content → Other User Content:** şikâyetler (kullanıcı onayıyla
+  eklenen mesajlar) — App Functionality / güvenlik.
 - **Identifiers → User ID:** App Functionality.
 - **Tracking:** Hayır.

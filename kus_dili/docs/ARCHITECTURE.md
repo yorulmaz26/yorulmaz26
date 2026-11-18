@@ -55,8 +55,14 @@ Bağımlılık yönü: `presentation → application → domain ← data`. `doma
 bilmez; böylece iş kuralları sahte depolarla test edilebilir. (Sahte depolar
 **yalnızca testlerde** kullanılır; uygulama gerçek Firebase'e bağlanır.)
 
-Planlanan özellik modülleri: `auth`, `profile`, `contacts`, `chat`, `secret_chat`,
-`groups`, `media`, `voice`, `calls`, `notifications`, `privacy`, `learn`, `translator`.
+Özellik modülleri: `auth`, `profile`, `account`, `chat` (birebir ve grup),
+`crypto` (Signal, cihazlar, güvenlik numarası), `privacy` (PIN, kilit, gizli
+sohbet), `safety` (engelleme, şikâyet), `notifications`, `learn`, `translator`,
+`legal` (kullanım koşulları).
+
+**Kapsam dışı (bilinçli olarak kaldırıldı):** fotoğraf, video, belge, sesli
+mesaj ve sesli/görüntülü arama. Uygulama yalnızca metin mesajlaşmasıdır; bu
+yüzden kamera, mikrofon, galeri izni ve Firebase Storage kullanılmaz.
 
 ## 2. Teknoloji seçimleri
 
@@ -67,11 +73,9 @@ Planlanan özellik modülleri: `auth`, `profile`, `contacts`, `chat`, `secret_ch
 | Yönlendirme | GoRouter | Oturum durumuna göre `redirect` (Aşama 3) |
 | Kimlik | Firebase Auth — telefon (SMS) | App Check (Play Integrity / App Attest) zorunlu |
 | Veri | Cloud Firestore | Yalnızca şifreli mesaj gövdesi + asgari üst veri |
-| Dosya | Firebase Storage | Medya istemcide şifrelenir, şifreli blob yüklenir |
 | Bildirim | FCM | **Yalnızca veri bildirimi**, içerik yok (bkz. §5) |
-| Arama | `flutter_webrtc` | Sinyalleşme Firestore, TURN sunucusu gerekli (coturn) |
 | Yerel güvenli depo | `flutter_secure_storage` (Keychain / Android Keystore) | Anahtarlar ve PIN özeti |
-| Yerel veritabanı | SQLite + SQLCipher (ör. `drift` + `sqlcipher_flutter_libs`) | Çözülmüş mesaj önbelleği şifreli tutulur |
+| Yerel önbellek | `EncryptedFilePayloadCache` | Çözülmüş mesajlar cihazda AES-256-GCM ile şifreli dosyada; anahtar Keystore/Keychain'de |
 | Biyometri | `local_auth` | |
 | E2EE | Signal Protokolü (bkz. §4) | |
 
@@ -137,64 +141,78 @@ edilebilen tek seçenek buydu.
    ve 100 tek kullanımlık ön-anahtar üretir. Özel anahtarlar ve oturum
    durumları yalnızca cihazın güvenli deposunda (Android Keystore / iOS
    Keychain, `flutter_secure_storage`) tutulur. Sunucuya yalnızca **açık**
-   anahtarlar yazılır: `keyBundles/{uid}` ve `keyBundles/{uid}/prekeys/{id}`.
-   Ön-anahtarlar 25'in altına düşünce 100 yenisi eklenir.
+   anahtarlar yazılır: `keyBundles/{uid}/devices/{cihaz}` ve
+   `…/devices/{cihaz}/prekeys/{id}`. Ön-anahtarlar 25'in altına düşünce 100
+   yenisi eklenir.
 2. Gönderen, alıcıyla oturumu yoksa bir ön-anahtarı atomik olarak tüketip
    (Firestore işlemi) oturum kurar. Mesaj paketi (orijinal metin + gösterim
    modu + kuş dili kuralı + yanıt bilgisi) **gönderen cihazda** şifrelenir.
-   Firestore'a yalnızca `{t: tür, c: şifreli metin}` ve yönlendirme üst verisi
-   yazılır; kurallar şifresiz gövdeyi (`encVersion` 0) artık reddeder.
+   Firestore'a yalnızca şifreli zarf ve yönlendirme üst verisi yazılır;
+   kurallar şifresiz gövdeyi (`encVersion` 0) reddeder.
 3. Alıcı cihaz şifreyi çözer ve kuş dili dönüşümünü **kendi cihazında** yapar.
 4. Signal bir mesajı yalnızca bir kez çözebilir (ileriye dönük gizlilik).
    Çözülen ve gönderilen içerik bu yüzden cihazda, anahtarı Keystore/Keychain'de
    duran **AES-256-GCM** ile şifreli bir önbellekte tutulur
    (`EncryptedFilePayloadCache`).
 5. **Güvenlik numarası:** 60 haneli sayısal parmak izi; iki taraf karşılaştırır.
-   Karşı tarafın kimlik anahtarı değişirse (ör. telefonu sıfırladı) oturum
-   yenilenir ve sohbette sarı uyarı bandı çıkar (ilk kullanımda güven + uyarı).
+   Her iki tarafın **tüm cihazlarının** kimlik anahtarları hesaba katılır.
+   Karşı taraf cihaz eklerse ya da bir cihazının anahtarı değişirse oturum
+   yenilenir, numara değişir ve sohbette sarı uyarı bandı çıkar (ilk
+   kullanımda güven + uyarı).
 6. Tüm Signal durum değişiklikleri sıraya alınır; aynı mesajın eşzamanlı
    açılması tekilleştirilir.
 
-**Gruplar (Aşama 8) — Signal "Sender Keys":** Her üye kendi gönderici
-anahtarını üretir ve diğer üyelere birebir Signal oturumlarıyla şifreleyerek
-dağıtır (`chats/{g_…}/senderKeys/{gönderen}_{dönem}`, değiştirilemez; her
-üyenin payı yalnızca ona açılır). Grup mesajı bir kez şifrelenir. Üyelik,
-anahtarın son paylaşıldığı kümeden farklıysa gönderen yeni dönem başlatır:
+**Çoklu cihaz:** Her kurulum ayrı bir Signal cihazıdır (rastgele cihaz
+kimliği, kendi kimlik anahtarı ve oturumları). Hesaba en fazla **5 cihaz**
+bağlanabilir (`keyBundles/{uid}.devices`, kurallarla zorunlu). Telefon
+numarasıyla giriş yapılan yeni cihaz otomatik eklenir; hesabın diğer
+cihazlarında "Hesabına yeni bir cihaz bağlandı" uyarısı ve karşı taraflarda
+güvenlik numarası uyarısı çıkar. Birebir mesajda paket rastgele bir anahtarla
+**AES-256-GCM** ile bir kez şifrelenir (ek doğrulama verisi: sohbet, gönderen,
+gönderen cihaz); bu anahtar alıcının her cihazına ve gönderenin diğer
+cihazlarına ayrı Signal oturumlarıyla iletilir (`{t:'md', sd, n, c, m, k:{'uid:cihaz': …}}`).
+Yeni cihaz yalnızca bağlandıktan sonraki mesajları okur; geçmiş aktarılmaz.
+**Bağlı cihazlar** ekranından cihaz kaldırılır: önce listeden çıkar, sonra
+açık anahtarları silinir; kaldırılan cihaz bunu fark edince anahtarlarını ve
+şifreli önbelleğini silip çıkış yapar.
+
+**Gruplar (Aşama 8) — Signal "Sender Keys":** Her cihaz kendi gönderici
+anahtarını üretir ve diğer üyelerin tüm cihazlarına ve kendi diğer cihazlarına
+birebir Signal oturumlarıyla şifreleyerek dağıtır
+(`chats/{g_…}/senderKeys/{gönderen}_{cihaz}_{dönem}`, değiştirilemez; her
+cihazın payı yalnızca ona açılır). Grup mesajı bir kez şifrelenir. Grubun
+cihaz kümesi (üyelik ya da bir üyenin cihazları), anahtarın son paylaşıldığı
+kümeden farklıysa gönderen yeni dönem başlatır:
 çıkarılan üye sonraki mesajları, yeni üye önceki mesajları okuyamaz. Anahtarı
 henüz olmayan üye atlanır ve bir sonraki gönderimde yeniden denenir. En fazla
 64 üye; kurucu ilk yönetici; yöneticiler ad/üye/yönetici değiştirir; herkes
 ayrılabilir (son yönetici ayrılırken yerine bir üye geçer).
 
-**Ek dosyalar (Aşama 9):** Fotoğraf / video / belge / sesli mesaj cihazda
-dosya başına rastgele 256 bit anahtarla AES-GCM ile şifrelenir ve Storage'a
-`attachments/{chatId}/{rastgele}` yoluna opak ikili veri olarak yüklenir.
-Anahtar, şifreli dosyanın SHA-256 özeti, tür, boyut ve ad yalnızca Signal ile
-şifreli mesaj paketindedir (sunucu dosya yolunu bile mesajdan göremez).
-İndirilen dosya önce özetle, sonra GCM etiketiyle doğrulanır. Sınırlar:
-fotoğraf/ses 15 MB, video/belge 50 MB. Storage kuralları: yalnızca sohbet
-üyeleri okur/yükler, üzerine yazılamaz, yalnızca yükleyen siler, listeleme kapalı.
-Fotoğraflar bellekte çözülür; video/ses/belge oynatıcılar dosya istediği için
-geçici dosyaya yazılır ve ekran kapanınca silinir.
-
 **Bilinen sınırlar (henüz yapılmadı):**
 
-* Kullanıcı başına **tek cihaz**. İkinci cihaz/yeniden kurulumda eski mesajlar
-  o cihazda açılamaz ("Bu mesaj bu cihazda açılamıyor"); yedekleme yok.
+* Geçmiş mesajlar yeni cihaza aktarılmaz; yeniden kurulumda eski mesajlar o
+  cihazda açılamaz ("bu cihaz bağlanmadan önce gönderildi"); yedekleme yok.
+* Yeni cihaz eklemek için yalnızca SMS kodu yeterli (Signal'deki gibi mevcut
+  cihazdan QR onayı yok). Bunun yerine diğer cihazlar ve karşı taraflar
+  uyarılır; kullanıcı yabancı cihazı kaldırabilir. Cihaz listesi kimlik
+  anahtarıyla imzalanmadığı için sunucu sahte cihaz ekleyebilir; bu da aynı
+  uyarılarla ve güvenlik numarasıyla fark edilir, engellenmez.
+* Kullanılmayan eski cihazlar (ör. sıfırlanan telefon) elle kaldırılana kadar
+  listede kalır ve 5 cihaz sınırına sayılır.
 * İmzalı ön-anahtar periyodik olarak döndürülmüyor.
 * Kimlik değişince mesaj gönderimi engellenmiyor, yalnızca uyarı veriliyor.
 * Üst veri (kim, kiminle, ne zaman) sunucuda görünür. Kayıp cihaz, ekran
   görüntüsü ve kötü amaçlı yazılım E2EE'nin kapsamı dışındadır.
 * Mesaj araması cihazdaki şifreli önbellekte yapılacak; henüz arayüzü yok.
-* Tek görüntülük/süreli mesajın **ek dosyası** Storage'dan otomatik silinmez
-  (alıcı silemez, Storage'da TTL yok). İçerik şifreli olduğundan okunamaz ama
-  yer kaplar; bir Cloud Storage yaşam döngüsü kuralı (ör. 30 gün) önerilir.
-* Gönderimi yarıda kalan yüklemeler sahipsiz şifreli dosya bırakabilir.
 
 **Testler:** iki gerçek Signal istemcisi aynı sahte Firestore üzerinden
 konuşur (`test/features/crypto/e2ee_test.dart`): sunucuda açık metin olmaması,
 karşılıklı yazışma, sıra dışı ve eşzamanlı çözme, ileriye dönük gizlilik,
 bozulmuş şifreli metnin reddi, yeniden başlatma, karşı tarafın yeniden
 kurulumu, güvenlik numarasının iki tarafta eşitliği, ön-anahtar yenileme.
+`multi_device_test.dart`: iki cihaza teslim, kendi diğer cihazında görme,
+sonradan bağlanan cihazın eski mesajı okuyamaması, grupta cihaz başına
+anahtar, cihaz ekleyince uyarı, kaldırılan cihaza gönderilmemesi, 5 sınırı.
 Uçtan uca arayüz testleri de gerçek şifrelemeyle çalışır.
 
 ## 5. Firestore veri modeli
@@ -228,24 +246,17 @@ Aşama 4–6'da uygulananlar (kurallar emülatörde 31 testle doğrulanır):
 * Mesaj araması sunucuda yapılamaz (gövde şifreli olacak); Aşama 7'deki şifreli
   yerel veritabanında cihaz üzerinde yapılacak.
 
-Sonraki aşamalar için taslak:
+Sonradan eklenenler:
 
-```
-users/{uid}                 username, displayName, photoPath, createdAt
-  devices/{deviceId}        identityKey, signedPreKey, oneTimePreKeys[], fcmToken
-usernames/{username}        uid                       (benzersizlik için)
-chats/{chatId}              type: direct|group, members[], createdAt,
-                            lastActivityAt  (ÖNİZLEME METNİ YOK)
-  messages/{msgId}          senderId, senderDevice, sentAt, encVersion,
-                            ciphertexts: {deviceId: base64}, expireAt?
-  typing/{uid}              until (TTL)
-userChatSettings/{uid}/chats/{chatId}
-                            displayMode, variant, hidden, locked, muted
-                            (yalnızca sahibi okur; hassas olanlar cihazda tutulur)
-```
-
-* **Güvenlik kuralları:** yalnızca sohbet üyeleri okur/yazar; mesaj
-  oluşturulduktan sonra değiştirilemez (düzenleme = yeni şifreli sürüm).
+* `keyBundles/{uid}`: `{devices: [cihaz], updatedAt}` (en fazla 5);
+  `keyBundles/{uid}/devices/{cihaz}`: açık anahtarlar + cihaz adı + son
+  etkinlik; altında `prekeys/{id}`.
+* `blocks/{uid}`: `{uids: […], updatedAt}` — engel listesi; yalnızca sahibi
+  okur (kurallar `get()` ile okur). Birebir sohbette taraflardan biri
+  diğerini engellediyse mesaj yazılamaz, sohbet açılamaz.
+* `reports/{id}`: şikâyet; uygulamadan kimse okuyamaz (bkz. §6c).
+* **Güvenlik kuralları:** yalnızca sohbet üyeleri okur/yazar; mesaj yalnızca
+  göndereni tarafından düzenlenir (yeni şifreli sürüm) veya silinir.
 * **Süreli mesaj:** `expireAt` + Firestore **TTL politikası** sunucudan siler;
   istemci süresi dolanı hemen gizler. Alıcının ekran görüntüsü alması
   engellenemez (Android'de `FLAG_SECURE` yardımcı olur, iOS'ta tam engel yok).
@@ -276,11 +287,12 @@ userChatSettings/{uid}/chats/{chatId}
   silinir. Signal anahtarları tek kullanımlık olduğu için yeniden çözülemez.
 * Mesaj önizlemesi hiçbir yerde tutulmaz (sohbet listesi önizlemesizdir).
 
-**Bilinen sınırlar:** Ekran görüntüsü engellenmiyor (Android `FLAG_SECURE`
-henüz eklenmedi; iOS'ta tam engel yok). Alıcı, süreli/tek görüntülük mesajı
+**Bilinen sınırlar:** Ekran görüntüsü engeli Android'de `FLAG_SECURE` ile
+çalışır (gizli sohbetlerde ve tek görüntülük mesajda; Gizlilik ayarından tüm
+uygulamaya açılabilir); iOS'ta tam engel mümkün değildir. Alıcı, süreli/tek görüntülük mesajı
 başka bir cihazla fotoğraflayabilir. Biyometri şu an kullanıcı arayüzü kilidi
-olarak çalışır; önbellek anahtarı biyometriye bağlı değildir. Bildirimlerde
-içerik gizleme Aşama 10'da (bildirimler) yapılacak.
+olarak çalışır; önbellek anahtarı biyometriye bağlı değildir. Bildirimler
+hiçbir zaman içerik göstermez (§6b).
 
 ## 6b. Bildirimler (Aşama 10a) ✅
 
@@ -296,28 +308,27 @@ içerik gizleme Aşama 10'da (bildirimler) yapılacak.
   ve Android arka plan işleyicisi gerektirir; henüz yapılmadı. FCM'in yeni FID
   tabanlı kaydına geçiş, Admin SDK desteği olgunlaşınca yapılacak.
 
-## 6c. Sesli ve görüntülü arama (Aşama 10b) ✅
+## 6c. Engelleme, şikâyet ve kullanım koşulları ✅
 
-* **Medya:** WebRTC; ses ve görüntü DTLS-SRTP ile uçtan uca şifrelidir. Doğrudan
-  (P2P) ya da TURN sunucusu üzerinden akar; TURN içeriği çözemez.
-* **Kurulum (SDP / ICE):** `calls/{id}/signals` altında, her biri Signal ile
-  birebir şifreli. Sunucu SDP'deki DTLS parmak izlerini göremez ve
-  değiştiremez; böylece araya girme (MITM) için sunucuya güvenmek gerekmez.
-  Güvenlik numarası doğrulaması aramalar için de geçerlidir.
-* **Durum:** `calls/{id}` (arayan, aranan, görüntülü mü, ringing → accepted /
-  declined / busy / missed / ended). Kurallar yalnızca iki tarafın okumasına ve
-  izinli geçişlere izin verir (kabul yalnızca aranan, cevapsız yalnızca arayan).
-  Arama yalnızca iki kişilik sohbette; 45 sn cevap yoksa cevapsız.
-* **TURN:** Kimlik bilgileri uygulamaya gömülmez; `turnCredentials` Cloud
-  Function'ı coturn `use-auth-secret` biçiminde 1 saatlik kimlik üretir.
-  Yapılandırılmamışsa yalnızca STUN kullanılır (mobil ağlarda bağlantı kurulamayabilir).
-* **Gelen arama:** uygulama açıkken tam ekran; kapalıyken içeriksiz bildirim
-  ("Gelen sesli arama"). Başka aramadayken gelen arama "meşgul" olur.
+Mağaza kuralları (Google Play kullanıcı içeriği, App Store 1.2) gereği:
 
-**Sınırlar:** Grup araması yok. Telefon kilitliyken / uygulama kapalıyken
-sistem arama ekranı (iOS CallKit + PushKit, Android ConnectionService) yok;
-yalnızca bildirim gelir. Gerçek cihaz/ağ testi yapılmadı (bu ortamda WebRTC
-çalıştırılamıyor; mantık sahte motorla test edildi).
+* **Engelleme:** sohbet menüsünden veya grupta mesajın uzun basma menüsünden.
+  Birebir sohbette engel iki yönlüdür ve **sunucu kurallarıyla** zorunludur
+  (mesaj ve yeni sohbet reddedilir). Grupta engellenen kişinin mesajları
+  istemcide gizlenir ve ondan gelen grup mesajı için bildirim gitmez. Engellenen
+  kişi listeyi göremez, bildirim almaz. Profil → Engellenen kişiler.
+* **Şikâyet:** neden (spam, taciz, uygunsuz içerik, kimliğe bürünme, diğer),
+  isteğe bağlı açıklama, isteğe bağlı "ayrıca engelle". Mesajlar uçtan uca
+  şifreli olduğu için sunucu içeriği göremez; kullanıcı **onay verirse** son 5
+  mesaj kendi cihazında çözülüp şikâyete eklenir (yalnızca o mesajlar).
+  `reports/` uygulamadan okunamaz; moderasyon Firebase konsolundan yapılır.
+* **Kullanım koşulları:** profil oluştururken bağlantı ve kabul metni; Profil
+  ekranından ve oturum açmadan da açılır. Metin: `docs/KULLANIM_KOSULLARI.md`.
+
+**Sınırlar:** Gruplarda engel sunucuda zorunlu değil (kurallar üye listesinde
+döngü kuramaz); engellenen kişi aynı gruba eklenebilir, engelleyen gruptan
+ayrılabilir. Moderasyon ekibi ve süreci (24 saat içinde inceleme sözü) yayın
+öncesi kurulmalı.
 
 ## 6d. Kuş dili öğrenme modülü (Aşama 11) ✅
 
@@ -347,7 +358,10 @@ içinde Türkçe yazılır; kuş dili karşılıkları motorla üretildiği içi
 | 6 | Mesaj çözme ve dil değiştirme | ✅ dokununca animasyonlu çözme, görünüm tercihi (kuş dili / ikisi / Türkçe) |
 | 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b: PIN/biyometri, kilitli ve gizli sohbet, uygulama kilidi, süreli ve tek görüntülük mesaj |
 | 8 | Grup mesajlaşması | ✅ Sender Keys ile E2EE, üyelik değişince anahtar yenileme, yönetici işlemleri, ayrılma |
-| 9 | Medya ve sesli mesaj | — |
-| 10 | Bildirimler ve aramalar | ✅ içeriksiz bildirimler; uçtan uca şifreli birebir sesli/görüntülü arama (WebRTC) |
+| 9 | Medya ve sesli mesaj | Kapsam dışı (kaldırıldı) |
+| 10 | Bildirimler ve aramalar | ✅ içeriksiz bildirimler · aramalar kapsam dışı (kaldırıldı) |
 | 11 | Öğrenme modülü | ✅ 6 ders, 4 alıştırma türü, mini test, telaffuz (TTS), ilerleme/seri; hesapsız ve çevrimdışı |
 | 12 | Test, optimizasyon, yayın | ✅ yayın yapılandırması, ekran görüntüsü engeli, sayfalama, CI derlemeleri, yayın/gizlilik/mağaza belgeleri — yayın öncesi açık maddeler: docs/RELEASE.md |
+
+Sonradan eklenenler: engelleme ve şikâyet (§6c), kullanım koşulları, çoklu
+cihaz (§4), uygulama simgesi ve açılış ekranı (`assets/icon`).

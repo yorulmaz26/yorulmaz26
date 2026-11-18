@@ -28,17 +28,21 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   şifreli metin, cihazda AES-GCM ile şifreli önbellek, güvenlik numarası.
 * **Grup sohbeti (Aşama 8)**: en fazla 64 üye, Signal Sender Keys ile uçtan
   uca şifreli; üyelik değişince anahtar yenilenir; yönetici işlemleri, ayrılma.
-* **Medya (Aşama 9)**: fotoğraf, video, belge ve sesli mesaj; dosyalar cihazda
-  AES-256-GCM ile şifrelenir, Storage'a yalnızca şifreli hâli yüklenir.
 * **Bildirimler (Aşama 10a)**: içeriksiz ("Yeni bir mesajın var") FCM
   bildirimleri, sohbet başına sessize alma; Cloud Function `functions/` altında.
-* **Aramalar (Aşama 10b)**: birebir sesli ve görüntülü arama (WebRTC,
-  DTLS-SRTP); kurulum bilgileri Signal ile şifreli; kısa ömürlü TURN kimliği.
+* **Çoklu cihaz**: hesap başına en fazla 5 cihaz; her cihazın kendi Signal
+  anahtarı; yeni cihaz bağlanınca uyarı; Bağlı cihazlar ekranından kaldırma.
+* **Engelleme ve şikâyet**: birebir sohbette sunucu kurallarıyla zorunlu
+  engel; onaylı (en fazla 5 mesajlı) şikâyet; kullanım koşulları.
+* **Uygulama simgesi** ve marka renkli açılış ekranı (`assets/icon`).
 * **Öğrenme modülü (Aşama 11)**: dersler, 4 alıştırma türü, mini test,
   sesli telaffuz, ilerleme ve günlük seri; hesapsız ve çevrimdışı.
 * **Gizli sohbet (Aşama 7b)**: PIN (PBKDF2, deneme sınırı) ve biyometri ile
   kilitli sohbet, listeden gizlenen sohbetler, uygulama kilidi, süreli ve tek
   görüntülük mesajlar. Gizli/kilitli bilgisi yalnızca cihazda.
+
+Kapsam dışı (bilinçli olarak kaldırıldı): fotoğraf, video, belge, sesli
+mesaj, sesli/görüntülü arama. Uygulama kamera/mikrofon izni istemez.
 
 ⚠️ Kullanılan Signal kütüphanesi (`libsignal_protocol_dart`) bağımsız olarak
 denetlenmiş değildir. Yayından önce resmî libsignal'e geçiş veya bağımsız
