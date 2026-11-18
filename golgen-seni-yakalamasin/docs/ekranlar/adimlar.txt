@@ -1,0 +1,5 @@
+ADIM: harita-goruntuleri
+ADIM: bolum 3
+ADIM: bolum 18
+ADIM: bolum 28
+ADIM: bolum 38

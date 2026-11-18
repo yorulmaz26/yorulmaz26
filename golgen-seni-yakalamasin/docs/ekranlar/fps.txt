@@ -1,5 +1,0 @@
-11-18 14:33:28.288  3154  3154 I GolgenFPS: fps=21.1 ekran=PlayScreen
-11-18 14:33:35.032  3154  3154 I GolgenFPS: fps=20.7 ekran=RecordsScreen
-11-18 14:33:41.752  3154  3154 I GolgenFPS: fps=20.7 ekran=SettingsScreen
-11-18 14:33:48.642  3154  3154 I GolgenFPS: fps=20.7 ekran=SettingsScreen
-11-18 14:33:54.949  3154  3154 I GolgenFPS: fps=21.3 ekran=MenuScreen
