@@ -20,7 +20,7 @@ public class Overlay extends FrameLayout {
 
     public Overlay(Context c) {
         super(c);
-        setBackgroundColor(0xB3050A14);
+        setBackgroundColor(0x99161E40);
         setClickable(true);
         ScrollView sv = new ScrollView(c);
         sv.setFillViewport(true);

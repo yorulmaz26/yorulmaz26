@@ -25,7 +25,8 @@ public final class GenerateLevels {
         File out = new File(args[0]);
         int from = args.length > 1 ? Integer.parseInt(args[1]) : 1;
         int to = args.length > 2 ? Integer.parseInt(args[2]) : com.isikyolu.engine.Progress.LEVEL_COUNT;
-        LevelPack old = out.exists() ? LevelPack.parse(new String(Files.readAllBytes(out.toPath()), StandardCharsets.UTF_8)) : new LevelPack();
+        File base = args.length > 3 ? new File(args[3]) : out;
+        LevelPack old = base.exists() ? LevelPack.parse(new String(Files.readAllBytes(base.toPath()), StandardCharsets.UTF_8)) : new LevelPack();
         LevelPack pack = new LevelPack();
         Set<String> sigs = new HashSet<>();
         for (int id = 1; id <= com.isikyolu.engine.Progress.LEVEL_COUNT; id++) {
@@ -40,11 +41,12 @@ public final class GenerateLevels {
             Level l = null;
             int seed = 0;
             // istenen zorlukta üretilemezse aralık adım adım gevşetilir (deterministik)
-            for (int relax = 0; relax <= 4 && l == null; relax++) {
+            for (int relax = 0; relax <= 6 && l == null; relax++) {
                 for (seed = 0; seed < (relax == 0 ? 400 : 120) && l == null; seed++) {
                     LevelGenerator.Config cfg = Chapters.configFor(id);
                     cfg.minOpt = Math.max(1, cfg.minOpt - relax);
                     cfg.maxOpt = cfg.maxOpt + relax;
+                    cfg.minEffort = (int) (cfg.minEffort * Math.pow(0.8, relax));
                     Level cand = new LevelGenerator(cfg, new Random(id * 100_003L + seed * 7_919L + relax * 31L)).generate(400);
                     if (cand == null || sigs.contains(cand.signature())) continue;
                     l = cand;
@@ -61,6 +63,10 @@ public final class GenerateLevels {
                 throw new IllegalStateException("Doğrulama başarısız: " + id);
             sigs.add(l.signature());
             pack.levels.add(l);
+            if (id % 5 == 0) { // ara kayıt: uzun üretimde iş kaybolmasın
+                out.getParentFile().mkdirs();
+                Files.write(out.toPath(), pack.toJson().getBytes(StandardCharsets.UTF_8));
+            }
             System.out.printf("Bölüm %3d  %dx%d  optimum=%d  nesne=%d  durum=%d  (%d ms, tohum %d)%n",
                     id, l.width, l.height, l.optimal, l.pieces.size(), Solver.countReachable(new Board(l), 200_000),
                     System.currentTimeMillis() - t0, seed - 1);

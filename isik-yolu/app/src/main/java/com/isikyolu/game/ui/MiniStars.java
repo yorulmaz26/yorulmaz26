@@ -9,7 +9,7 @@ import android.view.View;
 /** Küçük statik üç yıldız göstergesi. */
 public final class MiniStars extends View {
     private int stars;
-    private int empty = 0xFF33405E;
+    private int empty = 0xFF576A94;
     private final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
 

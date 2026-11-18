@@ -63,7 +63,7 @@ public final class SettingsScreen extends Screen {
         about.setGravity(Gravity.CENTER_HORIZONTAL);
         about.setPadding(Ui.dp(c, 18), Ui.dp(c, 18), Ui.dp(c, 18), Ui.dp(c, 18));
         about.addView(Ui.text(c, "Işık Yolu", 20, Palette.WHITE, Ui.BOLD));
-        about.addView(Ui.text(c, "Sürüm 1.1.0", 13, Palette.TURQUOISE, Ui.MEDIUM));
+        about.addView(Ui.text(c, "Sürüm 1.2.0", 13, Palette.TURQUOISE, Ui.MEDIUM));
         TextView info = Ui.text(c, Progress.LEVEL_COUNT + " bölüm · 5 dünya · " + Achievements.ALL.size() + " başarı · günlük bulmaca\n"
                 + "Tamamen çevrimdışı çalışır. Reklam yok, veri toplanmaz.\nİlerlemen cihazına otomatik kaydedilir.", 13, Palette.TEXT_DIM, Ui.REGULAR);
         info.setGravity(Gravity.CENTER);
@@ -90,7 +90,7 @@ public final class SettingsScreen extends Screen {
         sw.setChecked(f.get());
         int[][] states = {{android.R.attr.state_checked}, {}};
         sw.setThumbTintList(new ColorStateList(states, new int[]{Palette.TURQUOISE, 0xFF8792A8}));
-        sw.setTrackTintList(new ColorStateList(states, new int[]{0x8820B8A6, 0xFF33405E}));
+        sw.setTrackTintList(new ColorStateList(states, new int[]{0x8820B8A6, 0xFF576A94}));
         sw.setOnCheckedChangeListener((b, v) -> { f.set(v); Game.save(); Game.haptics().tick(); });
         r.addView(sw);
         r.setOnClickListener(v -> sw.toggle());

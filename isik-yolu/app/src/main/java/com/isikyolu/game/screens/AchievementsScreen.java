@@ -45,7 +45,7 @@ public final class AchievementsScreen extends Screen {
         row.setPadding(pad, pad, pad, pad);
         if (!got) row.setAlpha(0.8f);
         FrameLayout ic = new FrameLayout(c);
-        ic.setBackground(Ui.round(got ? 0x33F5C542 : 0xFF222D47, Ui.dp(c, 24)));
+        ic.setBackground(Ui.round(got ? 0x33F5C542 : 0xFF3F4F75, Ui.dp(c, 24)));
         ic.addView(Ui.icon(c, got ? Icon.TROPHY : Icon.LOCK, got ? Palette.GOLD : Palette.TEXT_FAINT, 24),
                 new FrameLayout.LayoutParams(Ui.dp(c, 24), Ui.dp(c, 24), Gravity.CENTER));
         row.addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 48), Ui.dp(c, 48)));
@@ -55,7 +55,7 @@ public final class AchievementsScreen extends Screen {
         col.addView(Ui.text(c, d.description, 13, Palette.TEXT_DIM, Ui.REGULAR));
         int cur = Math.min(d.current(p), d.target()), tgt = d.target();
         FrameLayout bar = new FrameLayout(c);
-        bar.setBackground(Ui.round(0xFF26324D, Ui.dp(c, 4)));
+        bar.setBackground(Ui.round(0xFF45567D, Ui.dp(c, 4)));
         View fillV = new View(c);
         fillV.setBackground(Ui.round(got ? Palette.GOLD : Palette.TURQUOISE, Ui.dp(c, 4)));
         bar.addView(fillV, new FrameLayout.LayoutParams(0, -1));

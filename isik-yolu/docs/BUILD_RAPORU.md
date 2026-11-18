@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.1.0
+# Build Raporu — Işık Yolu 1.2.0
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -17,6 +17,15 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
 
+## 1.2.0 değişiklikleri
+
+- Mantık bölümleri: 11–500 yeniden üretildi; 454 bölüm "MANTIK" bölümü. Bu bölümlerde ışını takip eden oyuncunun
+  karar ağacı için en az yaprak şartı var, aynalar ışınlar arasında paylaşılıyor, daha çok yanıltıcı ayna bulunuyor.
+- Aydınlık tema: daha açık indigo arka plan, açık lacivert kareler, kartlar ve butonlar; belirgin kabarık duvarlar;
+  durum ve gezinme çubukları arka planla uyumlu; metin kontrastı artırıldı.
+- Not: Eski kayıtlardaki yıldızlar bölüm numarasına bağlı kalır. 11–500 arası bölümlerin düzeni değiştiği için
+  bu bölümleri yeniden oynamak gerekebilir; kilitler ve yıldızlar korunur.
+
 ## 1.1.0 değişiklikleri
 
 - 500 bölüm (5 dünya). İlk 100 bölüm değişmedi.
@@ -29,10 +38,10 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.1.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 756 176 bayt | `a8411f87d3c367744daee7de8213fc3af6799789242979f0fe3c7c9cefce0347` |
-| `teslimat/IsikYolu-1.1.0-debug.apk` | 1 846 963 bayt | `9c93fe621da4ef48e751e78b34e31977de65c9e7f46648ab442f074b262cadb1` |
+| `teslimat/IsikYolu-1.2.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 759 844 bayt | `499425bc8419e6784733cf0f0da69300212cc4fe10c87362699d1a9bcb0af447` |
+| `teslimat/IsikYolu-1.2.0-debug.apk` | 1 854 679 bayt | `cef7f8ad610e5434f26ad878b20e2eb9c2bea0d028d35f9b352f91edf8b13ce3` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 2, sürüm adı 1.1.0 (1.0.0'ın üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 3, sürüm adı 1.2.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.

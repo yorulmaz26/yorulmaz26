@@ -77,12 +77,38 @@ public final class Chapters {
         int k = worldOf(levelId) - 1;
         LevelGenerator.Config c = baseConfig(local);
         if (k > 0) harden(c, k, (local - 1) / 10 + 1, (local - 1) % 10);
+        c.minEffort = minEffort(levelId, c);
+        if (c.minEffort > 0) { c.decoyRot += 1; c.decoyFixed += 1; }
+        c.shareMirrors = levelId > 100 || (levelId > 10 && (levelId - 1) % 10 >= 3);
         // Tek kaynaklı ayna bölümlerinde optimum, yoldaki ayna sayısını aşamaz.
         if (c.sourceColors.length == 1 && c.prismSources == 0 && c.blocks == 0 && c.doors == 0) {
             c.turnsMax = Math.max(c.turnsMax, c.minOpt + 1);
             c.turnsMin = Math.max(c.turnsMin, Math.min(c.minOpt, c.turnsMax));
         }
         return c;
+    }
+
+    /**
+     * Bu bölüm "mantık bölümü" mü? Bu bölümlerde ışını takip eden oyuncunun karar ağacı büyüktür:
+     * yanlış ayna seçimleri uzun, inandırıcı çıkmazlara götürür; önceden plan yapmak gerekir.
+     * İlk grup öğretici olduğu için hariçtir.
+     */
+    public static boolean requiresLogic(int levelId) {
+        if (levelId <= 10) return false;
+        if (levelId > 100) return true;
+        return (levelId - 1) % 10 >= 4;
+    }
+
+    /** Mantık bölümleri için en az ışın takip zahmeti (karar ağacı yaprak sayısı). */
+    public static int minEffort(int levelId, LevelGenerator.Config c) {
+        if (!requiresLogic(levelId)) return 0;
+        int w = worldOf(levelId), i = (levelId - 1) % 10;
+        int[] base = {14, 20, 26, 30, 34};
+        int[] step = {2, 2, 2, 2, 2};
+        int e = base[w - 1] + step[w - 1] * Math.max(0, i - (w == 1 ? 4 : 0));
+        // bloklar ve kapılar ayrıca düşünme gerektirir; ayna ağacı şartı yarıya iner
+        if (c.blocks > 0 || c.doors > 0 || c.prismSources > 0) e /= 2;
+        return e;
     }
 
     /** Sonraki dünyalar için zorlaştırma: k = 1..4. */
@@ -117,7 +143,8 @@ public final class Chapters {
         c.minOpt = base + k + (k >= 3 ? 1 : 0);
         c.maxOpt = c.minOpt + 3;
         c.maxRot = c.blocks > 0 ? Math.min(11, c.maxRot + 2) : 16;
-        if (c.blocks > 1) c.maxRot = 8;
+        if (c.blocks > 1 && k >= 4) c.blocks = 1; // 8×11 tahtada iki blok durum uzayını ipucu sınırının üstüne çıkarır
+        if (c.blocks > 0) c.maxRot = c.blocks > 1 ? 8 : Math.min(11, c.maxRot);
         c.stateCap = 80000;
     }
 

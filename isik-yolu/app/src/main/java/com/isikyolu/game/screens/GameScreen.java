@@ -63,7 +63,18 @@ public final class GameScreen extends Screen implements BoardView.Host {
         tc.setPadding(Ui.dp(c, 14), 0, Ui.dp(c, 8), 0);
         String t = daily ? "Günlük Bulmaca" : "Bölüm " + lvl.id;
         String sub = daily ? DailyScreen.prettyDate(epochDay) : Chapters.NAMES[lvl.chapter - 1] + " · " + Chapters.topic(lvl.chapter);
-        tc.addView(Ui.text(c, t, 21, Palette.WHITE, Ui.BOLD));
+        LinearLayout titleRow = Ui.horizontal(c);
+        titleRow.addView(Ui.text(c, t, 21, Palette.WHITE, Ui.BOLD));
+        if (!daily && Chapters.requiresLogic(lvl.id)) {
+            TextView tag = Ui.text(c, "MANTIK", 10, Palette.WHITE, Ui.BOLD);
+            tag.setLetterSpacing(0.08f);
+            tag.setBackground(Ui.round(Palette.PURPLE, Ui.dp(c, 8)));
+            tag.setPadding(Ui.dp(c, 7), Ui.dp(c, 2), Ui.dp(c, 7), Ui.dp(c, 2));
+            LinearLayout.LayoutParams tl = new LinearLayout.LayoutParams(-2, -2);
+            tl.leftMargin = Ui.dp(c, 8);
+            titleRow.addView(tag, tl);
+        }
+        tc.addView(titleRow);
         TextView st = Ui.text(c, sub, 13, Palette.TEXT_DIM, Ui.REGULAR);
         st.setSingleLine(true);
         st.setEllipsize(android.text.TextUtils.TruncateAt.END);
@@ -71,7 +82,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         top.addView(tc, new LinearLayout.LayoutParams(0, -2, 1f));
         LinearLayout movesBox = Ui.vertical(c);
         movesBox.setGravity(Gravity.CENTER);
-        movesBox.setBackground(Ui.round(0xFF1B2741, Ui.dp(c, 14)));
+        movesBox.setBackground(Ui.round(0xFF35466D, Ui.dp(c, 14)));
         movesBox.setPadding(Ui.dp(c, 12), Ui.dp(c, 6), Ui.dp(c, 12), Ui.dp(c, 6));
         movesText = Ui.text(c, "0", 20, Palette.WHITE, Ui.BOLD);
         movesText.setGravity(Gravity.CENTER);
@@ -155,6 +166,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
             }).show(act.overlayLayer());
         } else if (level.id == 1 && p.stars[1] == 0) {
             pointFirstMove();
+        } else if (level.id == 15 && p.stars[15] == 0) {
+            act.banner(Icon.HELP, "İlk mantık bölümü!", "Bariz hamle seni çıkmaza sokabilir. Önce düşün, sonra dokun.");
         } else if (level.id <= 100 && level.id % 10 == 1 && p.stars[level.id] == 0) {
             TutorialOverlay.chapter(act, level.chapter).show(act.overlayLayer());
         } else if (level.id > 100 && level.id % 100 == 1 && p.stars[level.id] == 0) {

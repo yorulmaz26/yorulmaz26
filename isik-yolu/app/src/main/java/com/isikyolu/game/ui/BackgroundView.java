@@ -39,14 +39,14 @@ public final class BackgroundView extends View {
     }
 
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
-        bg.setShader(new LinearGradient(0, 0, 0, h, new int[]{0xFF1A1D3F, 0xFF131B33, Palette.NIGHT, Palette.NIGHT_DEEP},
+        bg.setShader(new LinearGradient(0, 0, 0, h, new int[]{0xFF3D4D92, 0xFF30427E, 0xFF283A70, 0xFF213062},
                 new float[]{0f, 0.3f, 0.65f, 1f}, Shader.TileMode.CLAMP));
-        auroraA = new LinearGradient(0, 0, 0, h * 0.35f, new int[]{0x0020B8A6, 0x2620B8A6, 0x0020B8A6}, null, Shader.TileMode.CLAMP);
-        auroraB = new LinearGradient(0, 0, 0, h * 0.35f, new int[]{0x006D5DFB, 0x246D5DFB, 0x006D5DFB}, null, Shader.TileMode.CLAMP);
+        auroraA = new LinearGradient(0, 0, 0, h * 0.35f, new int[]{0x0020B8A6, 0x4020B8A6, 0x0020B8A6}, null, Shader.TileMode.CLAMP);
+        auroraB = new LinearGradient(0, 0, 0, h * 0.35f, new int[]{0x006D5DFB, 0x449A8CFF, 0x006D5DFB}, null, Shader.TileMode.CLAMP);
         float r = Math.max(w, h) * 0.55f;
         glows = new RadialGradient[]{
                 new RadialGradient(0, 0, r, 0x336D5DFB, 0x006D5DFB, Shader.TileMode.CLAMP),
-                new RadialGradient(0, 0, r * 0.8f, 0x2620B8A6, 0x0020B8A6, Shader.TileMode.CLAMP),
+                new RadialGradient(0, 0, r * 0.8f, 0x4020B8A6, 0x0020B8A6, Shader.TileMode.CLAMP),
                 new RadialGradient(0, 0, r * 0.6f, 0x1CF5C542, 0x00F5C542, Shader.TileMode.CLAMP)};
     }
 

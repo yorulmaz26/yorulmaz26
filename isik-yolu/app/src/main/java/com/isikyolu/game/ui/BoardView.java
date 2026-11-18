@@ -245,9 +245,9 @@ public final class BoardView extends View {
                 new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
         glassFixedShader = new LinearGradient(0, -T, 0, T, new int[]{0xFFF2F0EA, 0xFFC9CCD6, 0xFF8E95A8, 0xFF656C80},
                 new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
-        plateShader = new RadialGradient(-cell * 0.1f, -cell * 0.12f, cell * 0.5f, new int[]{0xFF34466E, 0xFF1E2A46, 0xFF141C31},
+        plateShader = new RadialGradient(-cell * 0.1f, -cell * 0.12f, cell * 0.5f, new int[]{0xFF34466E, 0xFF394A74, 0xFF2B3658},
                 new float[]{0f, 0.6f, 1f}, Shader.TileMode.CLAMP);
-        mountShader = new LinearGradient(0, -cell * 0.4f, 0, cell * 0.4f, 0xFF46526F, 0xFF262F47, Shader.TileMode.CLAMP);
+        mountShader = new LinearGradient(0, -cell * 0.4f, 0, cell * 0.4f, 0xFF46526F, 0xFF455275, Shader.TileMode.CLAMP);
         frameShader = new LinearGradient(ox, oy, ox + gw * cell, oy + gh * cell,
                 new int[]{0xFF20B8A6, 0xFF6D5DFB, 0xFFF5C542}, null, Shader.TileMode.CLAMP);
     }
@@ -313,7 +313,7 @@ public final class BoardView extends View {
         stroke.setStrokeWidth(cell * 0.22f);
         stroke.setColor(0x1420B8A6);
         c.drawRoundRect(rect, r, r, stroke);
-        fill.setColor(0xE60B1222);
+        fill.setColor(0xE61D2843);
         c.drawRoundRect(rect, r, r, fill);
         // renk geçişli çerçeve
         if (frameShader != null) {
@@ -329,7 +329,7 @@ public final class BoardView extends View {
         for (int y = 0; y < gh; y++) {
             for (int x = 0; x < gw; x++) {
                 rect.set(ox + x * cell + g, oy + y * cell + g, ox + (x + 1) * cell - g, oy + (y + 1) * cell - g);
-                fill.setColor(((x + y) & 1) == 0 ? 0xFF1C2944 : 0xFF19243D);
+                fill.setColor(((x + y) & 1) == 0 ? 0xFF364971 : 0xFF324268);
                 c.drawRoundRect(rect, cell * 0.16f, cell * 0.16f, fill);
                 // üst kenar ışığı
                 stroke.setStrokeWidth(cell * 0.015f);
@@ -409,14 +409,14 @@ public final class BoardView extends View {
         fill.setColor(0xFF070B14);
         c.drawRoundRect(rect, rr, rr, fill);
         rect.set(cx - h, cy - h, cx + h, cy + h);
-        fill.setColor(0xFF2A3554);
+        fill.setColor(0xFF4F5F8E);
         c.drawRoundRect(rect, rr, rr, fill);
         rect.set(cx - h, cy - h, cx + h, cy + h - cell * 0.1f);
-        fill.setColor(0xFF46557A);
+        fill.setColor(0xFF8392C2);
         c.drawRoundRect(rect, rr, rr, fill);
         // tuğla deseni
         stroke.setStrokeWidth(cell * 0.03f);
-        stroke.setColor(0xFF2E3A5A);
+        stroke.setColor(0xFF6474A6);
         float top = cy - h, bot = cy + h - cell * 0.1f, mid = (top + bot) / 2f;
         c.drawLine(cx - h * 0.85f, mid, cx + h * 0.85f, mid, stroke);
         c.drawLine(cx, top + cell * 0.06f, cx, mid, stroke);
@@ -433,7 +433,7 @@ public final class BoardView extends View {
         fill.setColor(Palette.withAlpha(col, 40));
         c.drawCircle(cx, cy, cell * 0.5f, fill);
         rect.set(cx - h, cy - h, cx + h, cy + h);
-        fill.setColor(0xFF26304A);
+        fill.setColor(0xFF455379);
         c.drawRoundRect(rect, rr, rr, fill);
         stroke.setStrokeWidth(cell * 0.04f);
         stroke.setColor(Palette.withAlpha(col, 220));
@@ -463,7 +463,7 @@ public final class BoardView extends View {
             fill.setColor(Palette.withAlpha(col, (int) (70 * g)));
             c.drawCircle(cx, cy, cell * 0.5f * pul, fill);
         }
-        fill.setColor(0xFF121A2C);
+        fill.setColor(0xFF283351);
         c.drawCircle(cx, cy, cell * 0.36f, fill);
         stroke.setStrokeWidth(cell * 0.07f);
         stroke.setColor(col);
@@ -536,7 +536,7 @@ public final class BoardView extends View {
             float q = h * 0.74f;
             for (int k = 0; k < 4; k++) {
                 float bx = (k & 1) == 0 ? -q : q, by = k < 2 ? -q : q;
-                fill.setColor(0xFF1E2538);
+                fill.setColor(0xFF394361);
                 c.drawCircle(bx, by + cell * 0.008f, cell * 0.038f, fill);
                 fill.setColor(0xFF8D98B3);
                 c.drawCircle(bx, by, cell * 0.032f, fill);
@@ -574,7 +574,7 @@ public final class BoardView extends View {
         c.rotate(-mirrorAngle[i]);
         // merkez mil
         if (rot) {
-            fill.setColor(0xFF0F1A2C);
+            fill.setColor(0xFF233351);
             c.drawCircle(0, 0, cell * 0.07f, fill);
             fill.setColor(Palette.TURQUOISE);
             c.drawCircle(0, 0, cell * 0.052f, fill);
@@ -646,7 +646,7 @@ public final class BoardView extends View {
         float h = cell * 0.42f * s, rr = cell * 0.13f;
         cx += offX; cy += offY;
         rect.set(cx - h, cy - h + cell * 0.06f, cx + h, cy + h + cell * 0.06f);
-        fill.setColor(0x66000000);
+        fill.setColor(0x660E0E16);
         c.drawRoundRect(rect, rr, rr, fill);
         rect.set(cx - h, cy - h, cx + h, cy + h);
         fill.setColor(0xFFC9952A);
@@ -692,7 +692,7 @@ public final class BoardView extends View {
         stroke.setColor(Palette.withAlpha(col, (int) (255 - 150 * o)));
         c.drawRoundRect(rect, cell * 0.1f, cell * 0.1f, stroke);
         if (o < 0.98f) {
-            fill.setColor(Palette.withAlpha(0xFF1B2236, (int) (230 * (1 - o))));
+            fill.setColor(Palette.withAlpha(0xFF353F5E, (int) (230 * (1 - o))));
             c.drawRoundRect(rect, cell * 0.1f, cell * 0.1f, fill);
             stroke.setStrokeWidth(cell * 0.07f);
             stroke.setColor(Palette.withAlpha(col, (int) (255 * (1 - o))));

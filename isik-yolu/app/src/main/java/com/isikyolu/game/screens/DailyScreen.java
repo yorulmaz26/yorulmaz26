@@ -73,7 +73,7 @@ public final class DailyScreen extends Screen {
             dc.setGravity(Gravity.CENTER);
             boolean ok = p.dailyDone.contains(DailyPuzzle.keyFor(d));
             FrameLayout dot = new FrameLayout(c);
-            dot.setBackground(Ui.round(ok ? Palette.TURQUOISE : (d == today ? 0x5520B8A6 : 0xFF2A3654), Ui.dp(c, 15)));
+            dot.setBackground(Ui.round(ok ? Palette.TURQUOISE : (d == today ? 0x5520B8A6 : 0xFF4A5C87), Ui.dp(c, 15)));
             if (ok) dot.addView(Ui.icon(c, Icon.CHECK, Palette.NIGHT, 16), new FrameLayout.LayoutParams(Ui.dp(c, 16), Ui.dp(c, 16), Gravity.CENTER));
             dc.addView(dot, new LinearLayout.LayoutParams(Ui.dp(c, 30), Ui.dp(c, 30)));
             String dn = LocalDate.ofEpochDay(d).format(DateTimeFormatter.ofPattern("EEE", TR));

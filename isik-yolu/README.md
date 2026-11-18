@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.1.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.1.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.2.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.2.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -40,6 +40,16 @@ Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` 
   Optimum, her bölüm için BFS çözücüyle hesaplanmıştır. Geri Al hamle sayısını da geri alır.
 - **İpucu:** 3 ipucuyla başlanır; **her 10 bölüm tamamlandığında +1 ipucu** kazanılır (aynı bölümü tekrar
   oynamak sayılmaz). İpucu, mevcut durumdan en kısa çözümün ilk hamlesini tahtada altın halkayla gösterir.
+
+## Mantık bölümleri
+
+Oyun ekranında **MANTIK** etiketiyle gösterilir: 1. dünyada her grubun son 6 bölümü (1. grup hariç) ve
+101–500 arasının tamamı, toplam 454 bölüm. Bu bölümlerde bariz hamle genellikle çıkmaza götürür:
+- yanıltıcı döner aynalar ışını uzun ve inandırıcı yollara saptırır,
+- bazı aynaları iki ayrı ışın kullanır; birini düzeltmek ötekini bozabilir.
+
+Üretici, ışını takip eden bir oyuncunun karar ağacını (`BeamFollower`) ölçer; ağacı küçük kalan adaylar
+reddedilir. Ayrıntılar ve ölçümler: `docs/TEST_RAPORU.md`.
 
 ## Dünyalar
 

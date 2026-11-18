@@ -39,7 +39,7 @@ public final class StarsView extends View {
             float cy = h / 2f + (i == 1 ? -size * 0.08f : size * 0.04f);
             float r = size * (i == 1 ? 0.5f : 0.43f);
             Icon.star(p, cx, cy, r, r * 0.45f);
-            fill.setColor(0xFF2A3654);
+            fill.setColor(0xFF4A5C87);
             c.drawPath(p, fill);
             if (i < earned) {
                 float local = animate ? (t - 0.35f - i * 0.32f) / 0.35f : 1f;

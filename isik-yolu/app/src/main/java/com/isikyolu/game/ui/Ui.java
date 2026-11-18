@@ -56,7 +56,7 @@ public final class Ui {
     public static Drawable card(Context c) {
         float r = dp(c, 22);
         GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{0xF21E2D4D, 0xF2172340, 0xF2121B31});
+                new int[]{0xF2394F7D, 0xF22F406C, 0xF2283558});
         g.setCornerRadius(r);
         g.setStroke(dp(c, 1), 0x33A9C1FF);
         GradientDrawable shine = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
@@ -94,8 +94,8 @@ public final class Ui {
                 g.setStroke(dp(c, 1.5f), 0x55FFFFFF);
                 break;
             default:
-                g = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{0xFF22304D, 0xFF1B2741});
-                g.setStroke(dp(c, 1), 0xFF2E3D5C);
+                g = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{0xFF3F537D, 0xFF35466D});
+                g.setStroke(dp(c, 1), 0xFF506692);
         }
         g.setCornerRadius(radius);
         Drawable content = g;

@@ -94,7 +94,7 @@ public final class MainActivity extends Activity {
 
     public void toast(String msg) {
         TextView t = Ui.text(this, msg, 14, Palette.WHITE, Ui.MEDIUM);
-        t.setBackground(Ui.round(0xEE1B2843, Ui.dp(this, 18)));
+        t.setBackground(Ui.round(0xEE354870, Ui.dp(this, 18)));
         int p = Ui.dp(this, 12);
         t.setPadding(p * 2, p, p * 2, p);
         t.setGravity(Gravity.CENTER);

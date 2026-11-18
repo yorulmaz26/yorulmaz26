@@ -33,6 +33,12 @@ public final class LevelGenerator {
         public int minOpt = 1, maxOpt = 3;
         public int stateCap = 80000;
         public int maxRot = 16;
+        /** En az ışın takip zahmeti (BeamFollower yaprak sayısı); 0 = şart yok. */
+        public int minEffort;
+        /** Işınlar aynı aynayı paylaşabilir (bir aynayı çevirmek iki ışını etkiler). */
+        public boolean shareMirrors;
+        /** Paylaşılan ayna olasılığı (her düğümde). */
+        public double shareChance = 0.45;
 
         public Config copy() {
             Config c = new Config();
@@ -42,6 +48,7 @@ public final class LevelGenerator {
             c.merge = merge; c.blocks = blocks; c.doors = doors; c.decoyRot = decoyRot; c.decoyFixed = decoyFixed;
             c.walls = walls; c.decoyFilters = decoyFilters; c.fixedFrac = fixedFrac; c.minOpt = minOpt;
             c.maxOpt = maxOpt; c.stateCap = stateCap; c.maxRot = maxRot;
+            c.minEffort = minEffort; c.shareMirrors = shareMirrors; c.shareChance = shareChance;
             return c;
         }
     }
@@ -56,6 +63,7 @@ public final class LevelGenerator {
     /** Her kaynağın yolundaki tek işaretli düz hücreler (kapı/anahtar/blok adayları). */
     private List<List<Integer>> straight;
     private List<Piece> pathMirrors;
+    private java.util.Set<Piece> sharedUsed;
 
     public LevelGenerator(Config cfg, Random rnd) { this.cfg = cfg; this.rnd = rnd; }
 
@@ -74,6 +82,7 @@ public final class LevelGenerator {
         mark = new int[w * h];
         straight = new ArrayList<>();
         pathMirrors = new ArrayList<>();
+        sharedUsed = new java.util.HashSet<>();
         int ns = cfg.sourceColors.length;
         Piece firstTarget = null;
         for (int s = 0; s < ns; s++) {
@@ -133,6 +142,7 @@ public final class LevelGenerator {
         if (initial.solved) return null;
         // kapı mekaniği anlamlı olsun: başlangıçta bütün kapılar kapalı olmalı
         for (boolean open : initial.doorOpen) if (open) return null;
+        if (cfg.minEffort > 0 && BeamFollower.measure(board, cfg.minEffort).leaves < cfg.minEffort) return null;
         Solver.Solution sol = Solver.solve(board, cfg.stateCap);
         if (!sol.solvable || sol.capped) return null;
         if (sol.optimal < cfg.minOpt || sol.optimal > cfg.maxOpt) return null;
@@ -205,6 +215,21 @@ public final class LevelGenerator {
         return out;
     }
 
+    /** d yönünde ilerlerken ilk karşılaşılan, başka bir ışının kullandığı ayna (yoksa -1 ve adım). */
+    private int[] sharedMirrorAhead(int start, int d) {
+        int c = start;
+        for (int s = 1; ; s++) {
+            c = next(c, d);
+            if (c < 0) return null;
+            Piece p = grid[c];
+            if (p != null) {
+                if (p.type == Cell.MIRROR && pathMirrors.contains(p) && !sharedUsed.contains(p)) return new int[]{s, c};
+                return null;
+            }
+            if (!crossable(c, d)) return null;
+        }
+    }
+
     private int stepCell(int start, int d, int s) {
         int c = start;
         for (int i = 0; i < s; i++) c = next(c, d);
@@ -260,6 +285,21 @@ public final class LevelGenerator {
                 put(Piece.filter(c % w, c / w, cfg.prismFilter));
                 color &= cfg.prismFilter;
                 cur = c;
+            }
+            // başka bir ışının aynasını paylaş: bu ayna artık iki ışını birden yönlendirir
+            if (!last && cfg.shareMirrors && rnd.nextDouble() < cfg.shareChance) {
+                int[] sh = sharedMirrorAhead(cur, d);
+                if (sh != null) {
+                    Piece m = grid[sh[1]];
+                    int nd = Dir.reflect(d, m.orient);
+                    int after = next(sh[1], nd);
+                    if (after >= 0 && (free(after) || crossable(after, nd))) {
+                        markStraight(cur, d, sh[0], src);
+                        sharedUsed.add(m);
+                        cur = sh[1]; d = nd;
+                        continue;
+                    }
+                }
             }
             List<Integer> steps = nodeSteps(cur, d);
             Collections.shuffle(steps, rnd);

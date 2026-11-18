@@ -7,19 +7,19 @@ import com.isikyolu.engine.LightColor;
 /** Oyunun renk paleti. */
 public final class Palette {
     public static final int NIGHT = 0xFF101827;
-    public static final int NIGHT_DEEP = 0xFF0A101C;
-    public static final int NIGHT_LIGHT = 0xFF18233A;
-    public static final int CARD = 0xFF172238;
-    public static final int CARD_BORDER = 0xFF26344F;
-    public static final int TILE = 0xFF1B2741;
-    public static final int TILE_ALT = 0xFF19243C;
+    public static final int NIGHT_DEEP = 0xFF1C253B;
+    public static final int NIGHT_LIGHT = 0xFF304064;
+    public static final int CARD = 0xFF2F3F61;
+    public static final int CARD_BORDER = 0xFF455980;
+    public static final int TILE = 0xFF35466D;
+    public static final int TILE_ALT = 0xFF324267;
     public static final int TURQUOISE = 0xFF20B8A6;
     public static final int GOLD = 0xFFF5C542;
     public static final int PURPLE = 0xFF6D5DFB;
     public static final int WHITE = 0xFFFFFFFF;
-    public static final int TEXT_DIM = 0xFF9AA6BF;
-    public static final int TEXT_FAINT = 0xFF5E6B85;
-    public static final int WALL = 0xFF2B3753;
+    public static final int TEXT_DIM = 0xFFC6D1E8;
+    public static final int TEXT_FAINT = 0xFF94A2C2;
+    public static final int WALL = 0xFF4C5D86;
     public static final int MIRROR = 0xFFE3EAF6;
     public static final int MIRROR_FIXED = 0xFF8792A8;
 

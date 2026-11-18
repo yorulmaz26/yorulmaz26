@@ -72,7 +72,7 @@ public final class LevelSelectScreen extends Screen {
             t.setPadding(Ui.dp(c, 14), Ui.dp(c, 8), Ui.dp(c, 14), Ui.dp(c, 8));
             GradientDrawable bg;
             if (sel) bg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF22C7B2, 0xFF3D8CE8});
-            else bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{0xFF1E2C4A, 0xFF172238});
+            else bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{0xFF394D79, 0xFF2F3F61});
             bg.setCornerRadius(Ui.dp(c, 16));
             if (!sel) bg.setStroke(Ui.dp(c, 1), 0x33A9C1FF);
             t.setBackground(bg);
@@ -124,7 +124,7 @@ public final class LevelSelectScreen extends Screen {
         LinearLayout head = Ui.horizontal(c);
         TextView num = Ui.text(c, String.valueOf(ch), 18, open ? Palette.NIGHT : Palette.TEXT_DIM, Ui.BOLD);
         num.setGravity(Gravity.CENTER);
-        num.setBackground(Ui.round(open ? chapterColor(ch) : 0xFF2A3654, Ui.dp(c, 18)));
+        num.setBackground(Ui.round(open ? chapterColor(ch) : 0xFF4A5C87, Ui.dp(c, 18)));
         head.addView(num, new LinearLayout.LayoutParams(Ui.dp(c, 36), Ui.dp(c, 36)));
         LinearLayout tc = Ui.vertical(c);
         tc.setPadding(Ui.dp(c, 12), 0, 0, 0);
@@ -161,9 +161,9 @@ public final class LevelSelectScreen extends Screen {
         SquareFrame f = new SquareFrame(c);
         boolean open = p.isUnlocked(id);
         int stars = p.stars[id];
-        GradientDrawable bg = Ui.round(open ? (stars > 0 ? 0xFF22304D : 0xFF1E2A45) : 0xFF141C2E, Ui.dp(c, 14));
+        GradientDrawable bg = Ui.round(open ? (stars > 0 ? 0xFF3F537D : 0xFF394A73) : 0xFF2B3654, Ui.dp(c, 14));
         if (isNext) bg.setStroke(Ui.dp(c, 2), Palette.TURQUOISE);
-        else if (open) bg.setStroke(Ui.dp(c, 1), 0xFF2E3D5C);
+        else if (open) bg.setStroke(Ui.dp(c, 1), 0xFF506692);
         f.setBackground(bg);
         if (open) {
             TextView t = Ui.text(c, String.valueOf(id), 17, Palette.WHITE, Ui.BOLD);

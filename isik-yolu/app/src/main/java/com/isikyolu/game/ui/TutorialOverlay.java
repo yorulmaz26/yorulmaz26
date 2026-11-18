@@ -89,7 +89,7 @@ public final class TutorialOverlay extends Overlay {
         Context c = getContext();
         for (int i = 0; i < pages.size(); i++) {
             android.view.View d = new android.view.View(c);
-            d.setBackground(Ui.round(i == index ? Palette.TURQUOISE : 0xFF33405E, Ui.dp(c, 4)));
+            d.setBackground(Ui.round(i == index ? Palette.TURQUOISE : 0xFF576A94, Ui.dp(c, 4)));
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(Ui.dp(c, i == index ? 18 : 8), Ui.dp(c, 8));
             lp.setMargins(Ui.dp(c, 3), 0, Ui.dp(c, 3), 0);
             dots.addView(d, lp);
