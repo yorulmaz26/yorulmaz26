@@ -20,7 +20,7 @@ import 'reminder_logic.dart';
 class NotificationService {
   NotificationService();
 
-  final _plugin = FlutterLocalNotificationsPlugin();
+  late final _plugin = FlutterLocalNotificationsPlugin();
   bool _ready = false;
 
   static const focusNotificationId = 2000000001;
