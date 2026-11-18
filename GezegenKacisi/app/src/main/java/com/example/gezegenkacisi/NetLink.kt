@@ -15,33 +15,43 @@ import java.net.NetworkInterface
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
 
 /**
- * İki telefon arasında yerel ağ (Wi-Fi ya da hotspot) bağlantısı. İnternet ya da sunucu gerekmez.
+ * 2-4 telefon arasında yerel ağ (Wi-Fi ya da hotspot) bağlantısı. İnternet ya da sunucu gerekmez.
  *
- *  - Oda kuran telefon bir TCP portu açar ve "buradayım" mesajını UDP ile ağa yayınlar.
- *  - Katılan telefon bu yayını dinler, gelen adrese TCP ile bağlanır.
- *  - Mesajlar tek satırlık metinlerdir ("S|450|12|0|3|1" gibi). Oyun döngüsü [events] kuyruğunu her karede okur.
+ *  - Oda kuran telefon (oyuncu 0) bir TCP portu açar ve "buradayım" mesajını UDP ile ağa yayınlar.
+ *  - Katılan telefonlar bu yayını dinler, gelen adrese TCP ile bağlanır. En fazla 3 kişi katılabilir.
+ *  - Bağlantı yıldız biçimindedir: katılanlar yalnızca kurucuyla konuşur, kurucu mesajları diğerlerine iletir.
+ *  - Mesajlar tek satırlık metinlerdir ("S|2|450|12|0|3" gibi). Oyun döngüsü [events] kuyruğunu her karede okur.
  *
  * Tüm ağ işleri arka plan iş parçacıklarında yapılır; oyun döngüsü hiçbir zaman beklemez.
  */
 class NetLink(context: Context) {
 
     sealed class Event {
+        /** Katılan telefon kurucuya bağlandı. */
         object Connected : Event()
-        class Message(val parts: List<String>) : Event()
+        /** (Kurucu) [id] numaralı oyuncu odaya girdi. */
+        class Joined(val id: Int) : Event()
+        /** (Kurucu) [id] numaralı oyuncunun bağlantısı koptu. */
+        class Left(val id: Int) : Event()
+        /** [from]: mesajın geldiği bağlantı (katılanlar için her zaman 0, yani kurucu). */
+        class Message(val from: Int, val parts: List<String>) : Event()
         class Failed(val reason: String) : Event()
-        object Disconnected : Event()
+        /** (Katılan) kurucuyla bağlantı koptu. */
+        object Lost : Event()
     }
 
     companion object {
         private const val DISCOVERY_PORT = 47011
         private const val MAGIC = "GKACIS"
-        const val PROTOCOL = 1
+        const val PROTOCOL = 2
+        const val MAX_PLAYERS = 4
         private const val READ_TIMEOUT_MS = 6000
         private const val HEARTBEAT_MS = 1000L
     }
@@ -50,20 +60,68 @@ class NetLink(context: Context) {
 
     @Volatile var isHost = false
         private set
+    /** Katılan için: kurucuya bağlı mı. Kurucu için: oda açık mı. */
     @Volatile var connected = false
         private set
-    /** Oda kuran telefonun yerel IP adresi (ekranda gösterilir). */
+    /** Kurucu yeni oyuncu kabul ediyor mu (maç başlayınca kapatılır). */
+    @Volatile var open = true
+    /** Bu telefonun yerel IP adresi (ekranda gösterilir). */
     @Volatile var localAddress: String = ""
         private set
 
     @Volatile private var closed = false
     @Volatile private var server: ServerSocket? = null
-    @Volatile private var socket: Socket? = null
     @Volatile private var udp: DatagramSocket? = null
-    private val outQueue = LinkedBlockingQueue<String>()
+    private val conns = ConcurrentHashMap<Int, Conn>()
 
     private val wifi = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager?
     private val multicastLock = wifi?.createMulticastLock("gezegen-kacisi")?.apply { setReferenceCounted(false) }
+
+    /** Tek bir TCP bağlantısı: kendi yazma kuyruğu ve okuma/yazma iş parçacıkları. */
+    private inner class Conn(val id: Int, val socket: Socket) {
+        val out = LinkedBlockingQueue<String>()
+        @Volatile var alive = true
+
+        fun start() {
+            socket.tcpNoDelay = true
+            socket.soTimeout = READ_TIMEOUT_MS
+            thread(name = "gk-w$id", isDaemon = true) {
+                try {
+                    val w = BufferedWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8))
+                    while (alive && !closed) {
+                        val line = out.poll(HEARTBEAT_MS, TimeUnit.MILLISECONDS) ?: "P"
+                        w.write(line)
+                        w.write('\n'.code)
+                        while (true) {
+                            val more = out.poll() ?: break
+                            w.write(more)
+                            w.write('\n'.code)
+                        }
+                        w.flush()
+                    }
+                } catch (_: Exception) {
+                }
+                lost(this)
+            }
+            thread(name = "gk-r$id", isDaemon = true) {
+                try {
+                    val r = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
+                    while (alive && !closed) {
+                        val line = r.readLine() ?: break
+                        if (line == "P" || line.isEmpty()) continue
+                        events.add(Event.Message(id, line.split('|')))
+                    }
+                } catch (_: Exception) {
+                }
+                lost(this)
+            }
+        }
+
+        fun close() {
+            alive = false
+            runCatching { socket.close() }
+        }
+    }
 
     // ---------------------------------------------------------------------
     // Oda kurma / katılma
@@ -71,6 +129,7 @@ class NetLink(context: Context) {
 
     fun host() {
         isHost = true
+        connected = true
         localAddress = findLocalAddress()
         thread(name = "gk-host", isDaemon = true) {
             try {
@@ -78,10 +137,19 @@ class NetLink(context: Context) {
                 server = ss
                 val port = ss.localPort
                 thread(name = "gk-beacon", isDaemon = true) { beacon(port) }
-                val s = ss.accept()
-                runCatching { ss.close() }
-                server = null
-                onSocket(s)
+                while (!closed) {
+                    val s = ss.accept()
+                    val id = (1 until MAX_PLAYERS).firstOrNull { it !in conns.keys }
+                    if (!open || id == null || closed) {
+                        runCatching { s.close() }
+                        continue
+                    }
+                    val c = Conn(id, s)
+                    conns[id] = c
+                    c.start()
+                    c.out.offer("W|$id") // oyuncu numarası
+                    events.add(Event.Joined(id))
+                }
             } catch (e: Exception) {
                 if (!closed) events.add(Event.Failed("Oda kurulamadı"))
             }
@@ -117,10 +185,18 @@ class NetLink(context: Context) {
                         s.connect(InetSocketAddress(pkt.address, port), 4000)
                         runCatching { ds.close() }
                         udp = null
-                        onSocket(s)
+                        if (closed) {
+                            runCatching { s.close() }
+                            return@thread
+                        }
+                        val c = Conn(0, s)
+                        conns[0] = c
+                        connected = true
+                        c.start()
+                        events.add(Event.Connected)
                         return@thread
                     } catch (_: Exception) {
-                        // Başka bir yayın gelirse yeniden denenir
+                        // Oda dolu ya da ulaşılamıyor; başka bir yayın gelirse yeniden denenir
                     }
                 }
             } catch (e: Exception) {
@@ -131,7 +207,7 @@ class NetLink(context: Context) {
         }
     }
 
-    /** Oda kuran telefon, katılan bağlanana kadar her 0,6 saniyede bir kendini duyurur. */
+    /** Oda açık ve dolu değilken her 0,6 saniyede bir kendini duyurur. */
     private fun beacon(port: Int) {
         val ds = try {
             DatagramSocket().apply { broadcast = true }
@@ -140,9 +216,11 @@ class NetLink(context: Context) {
         }
         val msg = "$MAGIC|$PROTOCOL|$port".toByteArray()
         try {
-            while (!closed && !connected) {
-                for (addr in broadcastAddresses()) {
-                    runCatching { ds.send(DatagramPacket(msg, msg.size, addr, DISCOVERY_PORT)) }
+            while (!closed) {
+                if (open && conns.size < MAX_PLAYERS - 1) {
+                    for (addr in broadcastAddresses()) {
+                        runCatching { ds.send(DatagramPacket(msg, msg.size, addr, DISCOVERY_PORT)) }
+                    }
                 }
                 Thread.sleep(600)
             }
@@ -179,78 +257,47 @@ class NetLink(context: Context) {
     }
 
     // ---------------------------------------------------------------------
-    // Bağlantı
+    // Mesajlaşma
     // ---------------------------------------------------------------------
 
-    private fun onSocket(s: Socket) {
-        if (closed) {
-            runCatching { s.close() }
-            return
-        }
-        s.tcpNoDelay = true
-        s.soTimeout = READ_TIMEOUT_MS
-        socket = s
-        connected = true
-        events.add(Event.Connected)
-
-        thread(name = "gk-writer", isDaemon = true) {
-            try {
-                val w = BufferedWriter(OutputStreamWriter(s.getOutputStream(), Charsets.UTF_8))
-                while (!closed) {
-                    val line = outQueue.poll(HEARTBEAT_MS, TimeUnit.MILLISECONDS) ?: "P"
-                    w.write(line)
-                    w.write('\n'.code)
-                    // Kuyrukta bekleyenleri de aynı paketle gönder
-                    while (true) {
-                        val more = outQueue.poll() ?: break
-                        w.write(more)
-                        w.write('\n'.code)
-                    }
-                    w.flush()
-                }
-            } catch (_: Exception) {
-                lost()
+    private fun lost(c: Conn) {
+        if (conns.remove(c.id, c)) {
+            c.close()
+            if (closed) return
+            if (isHost) {
+                events.add(Event.Left(c.id))
+            } else {
+                connected = false
+                events.add(Event.Lost)
             }
-        }
-        thread(name = "gk-reader", isDaemon = true) {
-            try {
-                val r = BufferedReader(InputStreamReader(s.getInputStream(), Charsets.UTF_8))
-                while (!closed) {
-                    val line = r.readLine() ?: break
-                    if (line == "P" || line.isEmpty()) continue
-                    events.add(Event.Message(line.split('|')))
-                }
-            } catch (_: Exception) {
-            }
-            lost()
         }
     }
 
-    private fun lost() {
-        if (closed) return
-        closed = true
-        connected = false
-        runCatching { socket?.close() }
-        events.add(Event.Disconnected)
-    }
-
+    /** Kurucu: herkese gönderir. Katılan: kurucuya gönderir. */
     fun send(vararg parts: Any) {
-        if (!connected) return
-        outQueue.offer(parts.joinToString("|"))
+        val line = parts.joinToString("|")
+        for (c in conns.values) c.out.offer(line)
+    }
+
+    /** Kurucu: [except] dışındaki herkese hazır bir satırı iletir (katılanlar arası aktarma). */
+    fun relay(except: Int, parts: List<String>) {
+        if (!isHost) return
+        val line = parts.joinToString("|")
+        for (c in conns.values) if (c.id != except) c.out.offer(line)
     }
 
     /** Bağlantıyı kapatır. Bundan sonra olay üretilmez. */
     fun close() {
-        if (connected) {
-            // Karşı tarafa nazikçe haber ver; ulaşmazsa zaman aşımıyla anlar
-            outQueue.offer("BYE")
-            Thread.sleep(30)
-        }
+        if (closed) return
+        val hadPeers = conns.isNotEmpty()
+        for (c in conns.values) c.out.offer("BYE")
+        if (hadPeers) Thread.sleep(30)
         closed = true
         connected = false
         runCatching { server?.close() }
-        runCatching { socket?.close() }
         runCatching { udp?.close() }
+        for (c in conns.values) c.close()
+        conns.clear()
         runCatching { multicastLock?.release() }
         events.clear()
     }

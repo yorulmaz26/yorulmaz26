@@ -29,22 +29,23 @@ uzanan gezegen kulelerinin arasındaki boşluktan geçtikçe puan kazanırsın.
   (ateş topu sıklığı, rüzgâr gücü, salınım) seviyeye göre değişir.
 - Her harita ve seviye için ayrı rekor tutulur. Oyun sonunda **Tekrar** ya da **Menü** seçilir, geri tuşu menüye döner.
 
-### 2 oyuncu (iki telefon, bölünmüş ekran)
+### 2-4 oyuncu (her oyuncu kendi telefonunda)
 
-Oyundaki **2 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adımları gösterir (ilk girişte kendiliğinden açılır).
+Oyundaki **2-4 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adımları gösterir (ilk girişte kendiliğinden açılır).
 
-1. Oyunu iki telefona da kur.
-2. İki telefonu **aynı Wi-Fi ağına** bağla. Wi-Fi yoksa biri **hotspot** açsın, diğeri ona bağlansın. İnternet gerekmez.
-3. 1. telefon: **2 OYUNCU** › haritayı ve seviyeyi seç › **ODA KUR**.
-4. 2. telefon: **2 OYUNCU** › **ODAYA KATIL**. Telefonlar birbirini kendiliğinden bulur.
-5. Bağlandıktan sonra haritayı ve seviyeyi **iki oyuncu da** değiştirebilir; seçim iki telefonda aynı anda güncellenir.
-   Hazır olunca odayı kuran **BAŞLAT**'a basar; 3-2-1 sayımından sonra iki telefonda aynı parkur başlar.
-6. **Ekran seçimi** (lobinin altında, her oyuncu kendi telefonu için seçer):
-   - **BÖLÜNMÜŞ EKRAN:** üstte sen (kırmızı roket), altta rakibin (mavi roket) canlı görünür.
-   - **TAM EKRAN:** kendi oyunun bütün ekranda büyük görünür; rakibin puanı ve durumu (oynuyor / YANDI) sağ üst köşede yazar.
-   Yanan oyuncu, rakibi de yanana kadar **izlemeye devam eder**: bölünmüş ekranda alt yarıdan,
-   tam ekranda ise oyun otomatik olarak rakibin görüntüsüne geçer. Daha çok puan alan kazanır.
-7. Odayı kuran **TEKRAR** ile yeni parkur başlatabilir. **MENÜ** ya da geri tuşu bağlantıyı kapatır.
+1. Oyunu bütün telefonlara kur.
+2. Telefonları **aynı Wi-Fi ağına** bağla. Wi-Fi yoksa biri **hotspot** açsın, diğerleri ona bağlansın. İnternet gerekmez.
+3. 1. telefon: **2-4 OYUNCU** › haritayı ve seviyeyi seç › **ODA KUR**.
+4. Diğer telefonlar (en fazla 3): **2-4 OYUNCU** › **ODAYA KATIL**. Telefonlar birbirini kendiliğinden bulur.
+   Lobide odadaki oyuncular renkleriyle görünür: 1 kırmızı, 2 mavi, 3 yeşil, 4 sarı.
+5. Haritayı ve seviyeyi herkes değiştirebilir. Herkes gelince odayı kuran **BAŞLAT**'a basar;
+   3-2-1 sayımından sonra bütün telefonlarda aynı parkur aynı anda başlar.
+6. **Ekran seçimi** (lobinin altında, herkes kendi telefonu için seçer):
+   - **BÖLÜNMÜŞ EKRAN:** herkesin oyunu ekranda görünür. 2 kişi: üst/alt; 3 kişi: üstte sen, altta iki rakip; 4 kişi: 2×2.
+   - **TAM EKRAN:** kendi oyunun bütün ekranda büyük; diğerlerinin puanı ve durumu sağ üst köşede yazar.
+7. Yanan oyuncu, diğerleri de yanana kadar **izlemeye devam eder**. Tam ekranda yanınca hâlâ oynayan biri
+   gösterilir; ekrana dokunarak başka oyuncuya geçilir. Sonunda sıralama tablosu çıkar, en çok puan alan kazanır.
+8. Odayı kuran **TEKRAR** ile aynı oyuncularla yeni parkur başlatabilir. **MENÜ** ya da geri tuşu odadan çıkarır.
 
 Notlar: Maç sırasında uygulamadan çıkan oyuncu yanmış sayılır. Bazı misafir/okul Wi-Fi ağları cihazların birbirini
 görmesini engeller; öyle bir ağda hotspot kullanın. Ağ kodu [`NetLink.kt`](app/src/main/java/com/example/gezegenkacisi/NetLink.kt) içinde.
@@ -81,7 +82,7 @@ app/src/main/
 │   ├── GameView.kt       menü, oyun döngüsü, fizik, çarpışma ve tüm çizimler
 │   ├── GameConfig.kt     haritalar ve seviyeler
 │   ├── SoundManager.kt   kodla üretilen ses efektleri ve müzik
-│   └── NetLink.kt        2 oyuncu: yerel ağda oda kurma, bulma ve mesajlaşma
+│   └── NetLink.kt        2-4 oyuncu: yerel ağda oda kurma, bulma ve mesajlaşma
 └── res/
     ├── drawable/          uygulama ikonu (roket ve gezegen)
     ├── mipmap-anydpi-v26/
