@@ -83,7 +83,11 @@ void main() {
     expect(sent['body'] as String, isNot(contains('Selam')));
     final shares =
         (await db.collection('chats/$groupId/senderKeys').get()).docs;
-    expect((shares.single['shares'] as Map).keys.toSet(), {b, c});
+    // Her üyenin (tek) cihazına ayrı paylaşım; anahtarlar 'uid:cihaz'.
+    expect(
+      (shares.single['shares'] as Map).keys.map((k) => '$k'.split(':').first),
+      unorderedEquals([b, c]),
+    );
     expect(
       (await bora.sealer.open(groupId, a, 1, sent['body'] as String)).text,
       'Selam grup',

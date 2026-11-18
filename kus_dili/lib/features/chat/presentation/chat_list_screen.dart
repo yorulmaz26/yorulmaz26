@@ -4,7 +4,9 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../account/application/account_providers.dart';
 import '../../crypto/application/crypto_providers.dart';
+import '../../crypto/domain/key_directory.dart';
 import '../../notifications/application/push_providers.dart';
 import '../../privacy/application/privacy_providers.dart';
 import '../application/chat_providers.dart';
@@ -19,7 +21,12 @@ class ChatListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final chats = ref.watch(chatsProvider);
     // Anahtarlar yayımlansın ki başkaları bize şifreli yazabilsin.
-    ref.watch(e2eeBootstrapProvider);
+    final boot = ref.watch(e2eeBootstrapProvider);
+    ref.listen(deviceRemovedProvider, (_, next) {
+      if (next.value == true) wipeUnlinkedDevice(ref);
+    });
+    final newDevice = ref.watch(newOwnDeviceProvider).value ?? false;
+    final tooMany = boot.error is TooManyDevicesException;
     ref.watch(pushRegistrationProvider);
     final me = ref.watch(myUidProvider);
     return Scaffold(
@@ -48,33 +55,59 @@ class ChatListScreen extends ConsumerWidget {
         onPressed: () => context.push(Routes.newChat),
         child: const Icon(Icons.edit_outlined),
       ),
-      body: chats.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => const Center(child: Text('Sohbetler yüklenemedi.')),
-        data: (list) {
-          final hidden = ref.watch(privacyPrefsProvider).value?.hiddenChats;
-          final visible = [
-            for (final c in list)
-              if (!(hidden?.contains(c.id) ?? false)) c,
-          ];
-          if (visible.isEmpty || me == null) {
-            return const Center(
-              child: Padding(
-                padding: EdgeInsets.all(32),
-                child: Text(
-                  'Henüz sohbetin yok.\nKullanıcı adıyla birini bulup '
-                  'kuş dilinde yazışmaya başla.',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            );
-          }
-          return ListView.separated(
-            itemCount: visible.length,
-            separatorBuilder: (_, _) => const Divider(height: 1, indent: 72),
-            itemBuilder: (context, i) => ChatTile(chat: visible[i], me: me),
-          );
-        },
+      body: Column(
+        children: [
+          if (tooMany)
+            _Banner(
+              key: const Key('tooManyDevices'),
+              text: const TooManyDevicesException().message,
+              action: 'Cihazlar',
+              onTap: () => context.push(Routes.devices),
+            ),
+          if (newDevice)
+            _Banner(
+              key: const Key('newDeviceBanner'),
+              text: 'Hesabına yeni bir cihaz bağlandı. Sen değilsen hemen kaldır.',
+              action: 'Kontrol et',
+              onTap: () => context.push(Routes.devices),
+            ),
+          Expanded(
+            child: chats.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (e, _) =>
+                  const Center(child: Text('Sohbetler yüklenemedi.')),
+              data: (list) {
+                final hidden = ref
+                    .watch(privacyPrefsProvider)
+                    .value
+                    ?.hiddenChats;
+                final visible = [
+                  for (final c in list)
+                    if (!(hidden?.contains(c.id) ?? false)) c,
+                ];
+                if (visible.isEmpty || me == null) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(32),
+                      child: Text(
+                        'Henüz sohbetin yok.\nKullanıcı adıyla birini bulup '
+                        'kuş dilinde yazışmaya başla.',
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
+                return ListView.separated(
+                  itemCount: visible.length,
+                  separatorBuilder: (_, _) =>
+                      const Divider(height: 1, indent: 72),
+                  itemBuilder: (context, i) =>
+                      ChatTile(chat: visible[i], me: me),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -152,4 +185,32 @@ class ChatTile extends ConsumerWidget {
       onTap: () => context.push(Routes.chat(chat.id)),
     );
   }
+}
+
+class _Banner extends StatelessWidget {
+  const _Banner({
+    super.key,
+    required this.text,
+    required this.action,
+    required this.onTap,
+  });
+
+  final String text;
+  final String action;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    color: AppColors.gold.withValues(alpha: 0.15),
+    padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+    child: Row(
+      children: [
+        const Icon(Icons.devices_outlined, color: AppColors.gold, size: 20),
+        const SizedBox(width: 8),
+        Expanded(child: Text(text)),
+        TextButton(onPressed: onTap, child: Text(action)),
+      ],
+    ),
+  );
 }

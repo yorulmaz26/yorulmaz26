@@ -24,3 +24,32 @@ Future<void> deleteAccountEverywhere(WidgetRef ref) async {
   await ref.read(secureKvProvider).clearAll();
   await ref.read(authRepositoryProvider).signOut();
 }
+
+/// Bu cihaz hesaptan kaldırıldı: anahtarlar ve şifreli önbellek silinir,
+/// bildirim anahtarı kaldırılır ve çıkış yapılır. Yeniden giriş yapılırsa
+/// cihaz yeni bir cihaz olarak eklenir.
+Future<void> wipeUnlinkedDevice(WidgetRef ref) async {
+  ref
+      .read(signOutNoticeProvider.notifier)
+      .set(
+        'Bu cihazın bağlantısı hesabının başka bir cihazından kaldırıldı. '
+        'Bu cihazdaki mesajlar ve anahtarlar silindi.',
+      );
+  try {
+    await ref.read(payloadCacheProvider)?.clearAll();
+  } catch (_) {}
+  await ref.read(secureKvProvider).clearAll();
+  await signOutWithPushCleanup(ref);
+}
+
+/// Çıkış nedenini giriş ekranında bir kez göstermek için.
+class SignOutNotice extends Notifier<String?> {
+  @override
+  String? build() => null;
+
+  void set(String? v) => state = v;
+}
+
+final signOutNoticeProvider = NotifierProvider<SignOutNotice, String?>(
+  SignOutNotice.new,
+);

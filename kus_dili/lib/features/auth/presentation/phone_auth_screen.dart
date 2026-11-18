@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../account/application/account_providers.dart';
 import '../application/phone_auth_controller.dart';
 
 /// Telefon numarasıyla kayıt / giriş (aynı akış).
@@ -43,6 +44,7 @@ class _PhoneAuthScreenState extends ConsumerState<PhoneAuthScreen> {
     final c = ref.read(phoneAuthControllerProvider.notifier);
     final text = Theme.of(context).textTheme;
     final codeStep = s.step == PhoneAuthStep.enterCode;
+    final notice = ref.watch(signOutNoticeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -64,6 +66,23 @@ class _PhoneAuthScreenState extends ConsumerState<PhoneAuthScreen> {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
+            if (notice != null)
+              Card(
+                key: const Key('signOutNotice'),
+                color: AppColors.gold.withValues(alpha: 0.15),
+                child: ListTile(
+                  leading: const Icon(
+                    Icons.info_outline,
+                    color: AppColors.gold,
+                  ),
+                  title: Text(notice),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () =>
+                        ref.read(signOutNoticeProvider.notifier).set(null),
+                  ),
+                ),
+              ),
             if (!codeStep) ...[
               Text(
                 'Telefon numaranı gir',

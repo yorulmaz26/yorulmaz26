@@ -251,20 +251,21 @@ service cloud.firestore {
 
       allow delete: if false;
 
-      // Grup gönderici anahtarı paylaşımları: her üye için birebir şifreli.
-      // Değiştirilemez; kimlik 'gönderen_dönem'.
+      // Grup gönderici anahtarı paylaşımları: her cihaz için birebir şifreli
+      // (anahtarlar 'uid:cihaz'). Değiştirilemez; kimlik 'gönderen_cihaz_dönem'.
       match /senderKeys/{keyId} {
         allow read: if isMember(chatId);
         allow create: if isMember(chatId)
           && request.resource.data.keys().hasOnly(
-               ['sender', 'epoch', 'shares', 'createdAt'])
+               ['sender', 'device', 'epoch', 'shares', 'createdAt'])
           && request.resource.data.sender == request.auth.uid
+          && request.resource.data.device is int
           && request.resource.data.epoch is int
-          && keyId == request.auth.uid + '_' + string(request.resource.data.epoch)
+          && keyId == request.auth.uid + '_' + string(request.resource.data.device)
+                      + '_' + string(request.resource.data.epoch)
           && request.resource.data.shares is map
-          && request.resource.data.shares.size() <= 64
-          && request.resource.data.shares.keys().hasOnly(chatData(chatId).members)
-          && !(request.auth.uid in request.resource.data.shares)
+          // 64 üye x 5 cihaz
+          && request.resource.data.shares.size() <= 320
           && request.resource.data.createdAt == request.time;
         allow update, delete: if false;
       }
@@ -348,36 +349,61 @@ service cloud.firestore {
     }
 
     // ------------------------------------------------- Açık anahtar dizini
-    // Yalnızca AÇIK anahtarlar. Özel anahtarlar cihazdan çıkmaz.
+    // keyBundles/{uid}: hesabın etkin cihazları (en fazla 5).
+    // keyBundles/{uid}/devices/{id}: cihazın AÇIK Signal anahtarları.
+    // Özel anahtarlar cihazdan hiç çıkmaz.
+    function accountPath(uid) {
+      return /databases/$(database)/documents/keyBundles/$(uid);
+    }
+
     match /keyBundles/{uid} {
       allow read: if verified();
       allow create, update: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['registrationId', 'identityKey',
-             'signedPreKeyId', 'signedPreKey', 'signedPreKeySignature', 'updatedAt'])
-        && request.resource.data.keys().hasAll(['registrationId', 'identityKey',
-             'signedPreKeyId', 'signedPreKey', 'signedPreKeySignature', 'updatedAt'])
-        && request.resource.data.registrationId is int
-        && request.resource.data.signedPreKeyId is int
-        && request.resource.data.identityKey is string
-        && request.resource.data.identityKey.size() <= 64
-        && request.resource.data.signedPreKey is string
-        && request.resource.data.signedPreKey.size() <= 64
-        && request.resource.data.signedPreKeySignature is string
-        && request.resource.data.signedPreKeySignature.size() <= 128
+        && request.resource.data.keys().hasOnly(['devices', 'updatedAt'])
+        && request.resource.data.devices is list
+        && request.resource.data.devices.size() <= 5
         && request.resource.data.updatedAt == request.time;
       allow delete: if false;
 
-      // Tek kullanımlık ön-anahtarlar: sahibi ekler; oturum kurmak isteyen
-      // herhangi bir doğrulanmış kullanıcı bir tanesini tüketir (siler).
-      match /prekeys/{keyId} {
+      match /devices/{deviceId} {
         allow read: if verified();
-        allow create: if isSelf(uid)
-          && keyId.matches('^[0-9]{1,8}$')
-          && request.resource.data.keys().hasOnly(['key'])
-          && request.resource.data.key is string
-          && request.resource.data.key.size() <= 64;
-        allow delete: if verified();
-        allow update: if false;
+        // Cihaz, hesabın cihaz listesinde olmalı (aynı işlemde eklenebilir).
+        allow create, update: if isSelf(uid)
+          && deviceId.matches('^[0-9]{1,10}$')
+          && int(deviceId) in getAfter(accountPath(uid)).data.devices
+          && request.resource.data.keys().hasOnly(['registrationId', 'identityKey',
+               'signedPreKeyId', 'signedPreKey', 'signedPreKeySignature', 'name',
+               'updatedAt'])
+          && request.resource.data.keys().hasAll(['registrationId', 'identityKey',
+               'signedPreKeyId', 'signedPreKey', 'signedPreKeySignature', 'name',
+               'updatedAt'])
+          && request.resource.data.registrationId is int
+          && request.resource.data.signedPreKeyId is int
+          && request.resource.data.identityKey is string
+          && request.resource.data.identityKey.size() <= 64
+          && request.resource.data.signedPreKey is string
+          && request.resource.data.signedPreKey.size() <= 64
+          && request.resource.data.signedPreKeySignature is string
+          && request.resource.data.signedPreKeySignature.size() <= 128
+          && request.resource.data.name is string
+          && request.resource.data.name.size() <= 40
+          && request.resource.data.updatedAt == request.time;
+        // Kaldırma: önce listeden çıkarılır, sonra anahtarlar silinir.
+        allow delete: if isSelf(uid)
+          && !(int(deviceId) in get(accountPath(uid)).data.devices);
+
+        // Tek kullanımlık ön-anahtarlar: sahibi ekler; oturum kurmak isteyen
+        // herhangi bir doğrulanmış kullanıcı bir tanesini tüketir (siler).
+        match /prekeys/{keyId} {
+          allow read: if verified();
+          allow create: if isSelf(uid)
+            && keyId.matches('^[0-9]{1,8}$')
+            && request.resource.data.keys().hasOnly(['key'])
+            && request.resource.data.key is string
+            && request.resource.data.key.size() <= 64;
+          allow delete: if verified();
+          allow update: if false;
+        }
       }
     }
 

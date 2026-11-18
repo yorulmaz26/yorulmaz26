@@ -6,18 +6,26 @@ import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 /// İki kullanıcının karşılıklı karşılaştırabileceği 60 haneli güvenlik
 /// numarası (Signal'in sayısal parmak izi). Her iki tarafta aynı çıkıyorsa
 /// araya kimse girmemiştir.
+///
+/// Çoklu cihaz: her tarafın TÜM cihazlarının kimlik anahtarları hesaba
+/// katılır (sıra önemsiz). Taraflardan biri cihaz ekler ya da kaldırırsa
+/// numara değişir.
 String safetyNumber({
   required String myUid,
-  required List<int> myIdentityKey,
+  required List<List<int>> myIdentityKeys,
   required String otherUid,
-  required List<int> otherIdentityKey,
+  required List<List<int>> otherIdentityKeys,
 }) {
-  final fp = NumericFingerprintGenerator(5200).createFor(
-    1,
+  if (myIdentityKeys.isEmpty || otherIdentityKeys.isEmpty) {
+    throw ArgumentError('Kimlik anahtarı yok.');
+  }
+  IdentityKey k(List<int> b) => IdentityKey.fromBytes(Uint8List.fromList(b), 0);
+  final fp = NumericFingerprintGenerator(5200).createListFor(
+    2,
     Uint8List.fromList(utf8.encode(myUid)),
-    IdentityKey.fromBytes(Uint8List.fromList(myIdentityKey), 0),
+    [for (final b in myIdentityKeys) k(b)],
     Uint8List.fromList(utf8.encode(otherUid)),
-    IdentityKey.fromBytes(Uint8List.fromList(otherIdentityKey), 0),
+    [for (final b in otherIdentityKeys) k(b)],
   );
   final digits = fp.displayableFingerprint.getDisplayText();
   return [for (var i = 0; i < digits.length; i += 5) digits.substring(i, i + 5)]

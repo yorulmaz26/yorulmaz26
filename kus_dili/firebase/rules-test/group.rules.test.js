@@ -131,19 +131,22 @@ describe('Grup mesajları ve anahtar paylaşımları', () => {
     await assertFails(getDocs(collection(db('z'), 'chats', G, 'messages')));
   });
 
-  test('paylaşım: yalnızca kendi adına, üyelere, değiştirilemez', async () => {
-    const ok = { sender: 'a', epoch: 42, shares: { b: 'x', c: 'y' }, createdAt: serverTimestamp() };
-    await assertSucceeds(setDoc(doc(db('a'), 'chats', G, 'senderKeys', 'a_42'), ok));
-    await assertFails(setDoc(doc(db('a'), 'chats', G, 'senderKeys', 'a_42'), ok), 'değiştirilemez');
-    await assertFails(setDoc(doc(db('a'), 'chats', G, 'senderKeys', 'b_43'),
-      { ...ok, sender: 'b', epoch: 43 }));
-    await assertFails(setDoc(doc(db('a'), 'chats', G, 'senderKeys', 'a_44'),
-      { ...ok, epoch: 44, shares: { z: 'x' } }), 'üye olmayana paylaşım');
-    await assertFails(setDoc(doc(db('a'), 'chats', G, 'senderKeys', 'a_99'),
-      { ...ok, epoch: 45 }), 'kimlik dönemle uyuşmalı');
-    await assertFails(setDoc(doc(db('z'), 'chats', G, 'senderKeys', 'z_1'),
-      { ...ok, sender: 'z', epoch: 1 }));
-    await assertSucceeds(getDoc(doc(db('c'), 'chats', G, 'senderKeys', 'a_42')));
-    await assertFails(getDoc(doc(db('z'), 'chats', G, 'senderKeys', 'a_42')));
+  test('paylaşım: yalnızca kendi adına, cihaz ve dönemle, değiştirilemez', async () => {
+    const ok = {
+      sender: 'a', device: 7, epoch: 42,
+      shares: { 'b:3': 'x', 'c:9': 'y', 'a:8': 'z' }, createdAt: serverTimestamp(),
+    };
+    const sk = (u, id) => doc(db(u), 'chats', G, 'senderKeys', id);
+    await assertSucceeds(setDoc(sk('a', 'a_7_42'), ok));
+    await assertFails(setDoc(sk('a', 'a_7_42'), ok), 'değiştirilemez');
+    await assertFails(setDoc(sk('a', 'b_7_43'), { ...ok, sender: 'b', epoch: 43 }));
+    await assertFails(setDoc(sk('a', 'a_7_99'), { ...ok, epoch: 45 }), 'kimlik dönemle uyuşmalı');
+    await assertFails(setDoc(sk('a', 'a_8_46'), { ...ok, epoch: 46 }), 'kimlik cihazla uyuşmalı');
+    await assertFails(setDoc(sk('a', 'a_7_47'), { ...ok, epoch: 47, device: '7' }));
+    const many = Object.fromEntries(Array.from({ length: 321 }, (_, i) => [`b:${i}`, 'x']));
+    await assertFails(setDoc(sk('a', 'a_7_48'), { ...ok, epoch: 48, shares: many }), 'en fazla 320');
+    await assertFails(setDoc(sk('z', 'z_1_1'), { ...ok, sender: 'z', device: 1, epoch: 1 }));
+    await assertSucceeds(getDoc(sk('c', 'a_7_42')));
+    await assertFails(getDoc(sk('z', 'a_7_42')));
   });
 });

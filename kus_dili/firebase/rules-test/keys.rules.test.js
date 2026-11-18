@@ -17,6 +17,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  writeBatch,
 } from 'firebase/firestore';
 
 let env;
@@ -42,51 +43,94 @@ const bundle = (extra = {}) => ({
   signedPreKeyId: 1,
   signedPreKey: key,
   signedPreKeySignature: 'S'.repeat(88),
+  name: 'Android telefon',
   updatedAt: serverTimestamp(),
   ...extra,
 });
+const account = (devices) => ({ devices, updatedAt: serverTimestamp() });
 
-describe('Açık anahtar dizini', () => {
-  test('sahibi kendi paketini yayımlar ve günceller', async () => {
-    await assertSucceeds(setDoc(doc(db('a'), 'keyBundles', 'a'), bundle()));
-    await assertSucceeds(setDoc(doc(db('a'), 'keyBundles', 'a'), bundle({ registrationId: 99 })));
+/** Cihazı hesaba ekleyip anahtarlarını aynı işlemde yayımlar. */
+function register(d, uid, devices, id, extra = {}) {
+  const b = writeBatch(d);
+  b.set(doc(d, 'keyBundles', uid), account(devices));
+  b.set(doc(d, `keyBundles/${uid}/devices`, `${id}`), bundle(extra));
+  return b.commit();
+}
+
+const seed = (fn) => env.withSecurityRulesDisabled((ctx) => fn(ctx.firestore()));
+
+describe('Cihaz listesi', () => {
+  test('sahibi cihazını ekler ve yayımlar; yeniden yayımlar', async () => {
+    await assertSucceeds(register(db('a'), 'a', [11], 11));
+    await assertSucceeds(setDoc(doc(db('a'), 'keyBundles/a/devices', '11'), bundle({ registrationId: 9 })));
+    await assertSucceeds(register(db('a'), 'a', [11, 22], 22));
   });
 
-  test('başkası adına yayımlanamaz, silinemez', async () => {
-    await assertFails(setDoc(doc(db('b'), 'keyBundles', 'a'), bundle()));
-    await setDoc(doc(db('a'), 'keyBundles', 'a'), bundle());
-    await assertFails(updateDoc(doc(db('b'), 'keyBundles', 'a'), { identityKey: key }));
+  test('en fazla 5 cihaz', async () => {
+    await assertSucceeds(register(db('a'), 'a', [1, 2, 3, 4, 5], 5));
+    await assertFails(register(db('a'), 'a', [1, 2, 3, 4, 5, 6], 6));
+  });
+
+  test('listede olmayan cihaz yayımlanamaz', async () => {
+    await assertSucceeds(register(db('a'), 'a', [11], 11));
+    await assertFails(setDoc(doc(db('a'), 'keyBundles/a/devices', '99'), bundle()));
+    await assertFails(setDoc(doc(db('a'), 'keyBundles/a/devices', 'abc'), bundle()));
+  });
+
+  test('başkası adına eklenemez, liste değiştirilemez', async () => {
+    await assertFails(register(db('b'), 'a', [11], 11));
+    await register(db('a'), 'a', [11], 11);
+    await assertFails(setDoc(doc(db('b'), 'keyBundles', 'a'), account([11, 66])));
+    await assertFails(updateDoc(doc(db('b'), 'keyBundles/a/devices', '11'), { identityKey: key }));
     await assertFails(deleteDoc(doc(db('a'), 'keyBundles', 'a')));
   });
 
-  test('özel anahtar gibi ek alanlar ve aşırı uzun değerler reddedilir', async () => {
-    await assertFails(setDoc(doc(db('a'), 'keyBundles', 'a'), bundle({ privateKey: key })));
-    await assertFails(setDoc(doc(db('a'), 'keyBundles', 'a'), bundle({ identityKey: 'x'.repeat(65) })));
-    await assertFails(setDoc(doc(db('a'), 'keyBundles', 'a'), bundle({ updatedAt: new Date(0) })));
+  test('özel anahtar gibi ek alanlar, uzun değerler ve sahte zaman reddedilir', async () => {
+    await assertFails(register(db('a'), 'a', [1], 1, { privateKey: key }));
+    await assertFails(register(db('a'), 'a', [1], 1, { identityKey: 'x'.repeat(65) }));
+    await assertFails(register(db('a'), 'a', [1], 1, { name: 'x'.repeat(41) }));
+    await assertFails(register(db('a'), 'a', [1], 1, { updatedAt: new Date(0) }));
+    await assertFails(setDoc(doc(db('a'), 'keyBundles', 'a'), { devices: [1], updatedAt: serverTimestamp(), x: 1 }));
+  });
+
+  test('cihaz kaldırma: önce listeden çıkar, sonra anahtarları sil', async () => {
+    await register(db('a'), 'a', [11, 22], 22);
+    await seed((s) => setDoc(doc(s, 'keyBundles/a/devices', '11'), { identityKey: key }));
+    // Listede iken silinemez.
+    await assertFails(deleteDoc(doc(db('a'), 'keyBundles/a/devices', '11')));
+    await assertSucceeds(setDoc(doc(db('a'), 'keyBundles', 'a'), account([22])));
+    await assertSucceeds(deleteDoc(doc(db('a'), 'keyBundles/a/devices', '11')));
+    // Başkası silemez.
+    await seed((s) => setDoc(doc(s, 'keyBundles/a/devices', '33'), { identityKey: key }));
+    await assertFails(deleteDoc(doc(db('b'), 'keyBundles/a/devices', '33')));
   });
 
   test('doğrulanmış kullanıcılar okur, oturumsuz okuyamaz', async () => {
-    await setDoc(doc(db('a'), 'keyBundles', 'a'), bundle());
+    await register(db('a'), 'a', [11], 11);
     await assertSucceeds(getDoc(doc(db('b'), 'keyBundles', 'a')));
+    await assertSucceeds(getDoc(doc(db('b'), 'keyBundles/a/devices', '11')));
     await assertFails(getDoc(doc(guest(), 'keyBundles', 'a')));
+    await assertFails(getDoc(doc(guest(), 'keyBundles/a/devices', '11')));
   });
 });
 
 describe('Tek kullanımlık ön-anahtarlar', () => {
+  const pre = 'keyBundles/a/devices/11/prekeys';
+
   test('sahibi ekler; başkası ekleyemez; geçersiz kimlik/alan reddedilir', async () => {
-    await assertSucceeds(setDoc(doc(db('a'), 'keyBundles/a/prekeys', '1'), { key }));
-    await assertFails(setDoc(doc(db('b'), 'keyBundles/a/prekeys', '2'), { key }));
-    await assertFails(setDoc(doc(db('a'), 'keyBundles/a/prekeys', 'abc'), { key }));
-    await assertFails(setDoc(doc(db('a'), 'keyBundles/a/prekeys', '3'), { key, priv: key }));
+    await assertSucceeds(setDoc(doc(db('a'), pre, '1'), { key }));
+    await assertFails(setDoc(doc(db('b'), pre, '2'), { key }));
+    await assertFails(setDoc(doc(db('a'), pre, 'abc'), { key }));
+    await assertFails(setDoc(doc(db('a'), pre, '3'), { key, priv: key }));
   });
 
   test('başkası bir anahtarı tüketebilir (oturum kurmak için) ama değiştiremez', async () => {
-    await setDoc(doc(db('a'), 'keyBundles/a/prekeys', '1'), { key });
-    const q = query(collection(db('b'), 'keyBundles/a/prekeys'), limit(1));
+    await setDoc(doc(db('a'), pre, '1'), { key });
+    const q = query(collection(db('b'), pre), limit(1));
     await assertSucceeds(getDocs(q));
-    await assertSucceeds(getCountFromServer(collection(db('b'), 'keyBundles/a/prekeys')));
-    await assertFails(updateDoc(doc(db('b'), 'keyBundles/a/prekeys', '1'), { key: 'X' }));
-    await assertSucceeds(deleteDoc(doc(db('b'), 'keyBundles/a/prekeys', '1')));
-    await assertFails(deleteDoc(doc(guest(), 'keyBundles/a/prekeys', '1')));
+    await assertSucceeds(getCountFromServer(collection(db('b'), pre)));
+    await assertFails(updateDoc(doc(db('b'), pre, '1'), { key: 'X' }));
+    await assertSucceeds(deleteDoc(doc(db('b'), pre, '1')));
+    await assertFails(deleteDoc(doc(guest(), pre, '1')));
   });
 });

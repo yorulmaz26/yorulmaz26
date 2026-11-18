@@ -37,7 +37,10 @@ void main() {
     final shares = await db.collection('chats/$g/senderKeys').get();
     expect(shares.size, 1);
     final s = shares.docs.single.data()['shares'] as Map;
-    expect(s.keys.toSet(), {'bob', 'carol'});
+    expect(s.keys.toSet(), {
+      'bob:${await bob.deviceId}',
+      'carol:${await carol.deviceId}',
+    });
     expect(jsonEncode(s), isNot(contains('selam')));
 
     expect((await bob.sealer.open(g, 'alice', 1, body)).text, 'Herkese selam');

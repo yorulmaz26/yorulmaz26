@@ -21,25 +21,31 @@ final class FirestoreGroupDirectory implements GroupDirectory {
   Future<void> publishSenderKey({
     required String chatId,
     required String sender,
+    required int device,
     required int epoch,
     required Map<String, String> shares,
-  }) => _chat(chatId).collection('senderKeys').doc('${sender}_$epoch').set({
-    'sender': sender,
-    'epoch': epoch,
-    'shares': shares,
-    'createdAt': FieldValue.serverTimestamp(),
-  });
+  }) => _chat(chatId)
+      .collection('senderKeys')
+      .doc('${sender}_${device}_$epoch')
+      .set({
+        'sender': sender,
+        'device': device,
+        'epoch': epoch,
+        'shares': shares,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
 
   @override
   Future<String?> fetchShare({
     required String chatId,
     required String sender,
+    required int device,
     required int epoch,
     required String me,
   }) async {
     final s = await _chat(chatId)
         .collection('senderKeys')
-        .doc('${sender}_$epoch')
+        .doc('${sender}_${device}_$epoch')
         .get();
     final shares = s.data()?['shares'];
     final v = shares is Map ? shares[me] : null;

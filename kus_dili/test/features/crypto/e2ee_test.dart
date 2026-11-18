@@ -26,16 +26,20 @@ void main() {
       MessagePayload(text: t, mode: DisplayMode.kusDili);
 
   test('Sunucuya yalnızca açık anahtarlar yayımlanır', () async {
-    final bundle = (await db.doc('keyBundles/alice').get()).data()!;
+    final dev = await alice.deviceId;
+    expect((await db.doc('keyBundles/alice').get())['devices'], [dev]);
+    final bundle = (await db.doc('keyBundles/alice/devices/$dev').get())
+        .data()!;
     expect(bundle.keys.toSet(), {
       'registrationId',
       'identityKey',
       'signedPreKeyId',
       'signedPreKey',
       'signedPreKeySignature',
+      'name',
       'updatedAt',
     });
-    expect((await db.collection('keyBundles/alice/prekeys').get()).size, 100);
+    expect((await db.collection(await alice.preKeysPath).get()).size, 100);
     // Özel kimlik anahtarı yalnızca cihaz deposunda.
     expect(alice.kv.data.keys.any((k) => k.endsWith('.identity')), isTrue);
   });
@@ -44,7 +48,13 @@ void main() {
     final body = await alice.sealer.seal(chat, p('Seni seviyorum'));
     expect(body, isNot(contains('Seni')));
     expect(body, isNot(contains('seviyorum')));
-    expect(jsonDecode(body)['t'], 3, reason: 'ilk mesaj PreKey mesajı');
+    final env = jsonDecode(body) as Map<String, dynamic>;
+    expect(env['t'], 'md');
+    expect(env['sd'], await alice.deviceId);
+    // Anahtar Bob'un tek cihazına sarılı; ilk mesaj PreKey mesajı.
+    final wraps = env['k'] as Map<String, dynamic>;
+    expect(wraps.keys, ['bob:${await bob.deviceId}']);
+    expect(wraps.values.single['t'], 3);
 
     final got = await bob.sealer.open(chat, 'alice', 1, body);
     expect(got.text, 'Seni seviyorum');
@@ -61,7 +71,7 @@ void main() {
     );
 
     // Bir tek kullanımlık ön-anahtar tüketildi.
-    expect((await db.collection('keyBundles/bob/prekeys').get()).size, 99);
+    expect((await db.collection(await bob.preKeysPath).get()).size, 99);
   });
 
   test(
@@ -81,13 +91,13 @@ void main() {
     final a1 = await alice.sealer.seal(chat, p('Selam'));
     expect((await bob.sealer.open(chat, 'alice', 1, a1)).text, 'Selam');
     final b1 = await bob.sealer.seal(chat, p('Merhaba'));
-    expect(jsonDecode(b1)['t'], 2, reason: 'Bob oturumu almış durumda');
+    expect(_wrapType(b1), 2, reason: 'Bob oturumu almış durumda');
     expect((await alice.sealer.open(chat, 'bob', 1, b1)).text, 'Merhaba');
 
     final bodies = [
       for (var i = 0; i < 6; i++) await alice.sealer.seal(chat, p('m$i')),
     ];
-    expect(jsonDecode(bodies.last)['t'], 2, reason: 'oturum kuruldu');
+    expect(_wrapType(bodies.last), 2, reason: 'oturum kuruldu');
     // Ters sırada ve aynı mesajı aynı anda iki kez açmak.
     for (final i in [5, 2, 0, 4, 1, 3]) {
       final r = await Future.wait([
@@ -102,7 +112,7 @@ void main() {
     final body = await alice.sealer.seal(chat, p('Gizli'));
     final env = jsonDecode(body) as Map<String, dynamic>;
     final bytes = base64Decode(env['c'] as String);
-    bytes[bytes.length - 5] ^= 0x01;
+    bytes[bytes.length - 1] ^= 0x01;
     env['c'] = base64Encode(bytes);
     await expectLater(
       bob.sealer.open(chat, 'alice', 1, jsonEncode(env)),
@@ -131,13 +141,14 @@ void main() {
     final a2 = alice.restart();
     final b2 = bob.restart();
     await a2.keys.ensureKeys();
+    expect(await a2.deviceId, await alice.deviceId);
     expect(
-      (await db.collection('keyBundles/alice/prekeys').get()).size,
+      (await db.collection(await alice.preKeysPath).get()).size,
       100,
       reason: 'yeniden başlatma anahtarları yeniden üretmez',
     );
     final body = await a2.sealer.seal(chat, p('2'));
-    expect(jsonDecode(body)['t'], 3, reason: 'Bob henüz yanıt vermedi');
+    expect(_wrapType(body), 3, reason: 'Bob henüz yanıt vermedi');
     expect((await b2.sealer.open(chat, 'alice', 1, body)).text, '2');
   });
 
@@ -152,9 +163,11 @@ void main() {
       );
       final oldNumber = await _number(alice, 'bob');
 
-      // Bob telefonu sıfırladı: yeni depo, yeni kimlik.
+      // Bob telefonu sıfırladı: yeni depo, yeni cihaz. Eski cihaz
+      // Cihazlar ekranından kaldırılır.
       final newBob = SignalClient('bob', db);
       await newBob.keys.ensureKeys();
+      await newBob.dir.removeDevice('bob', await bob.deviceId);
 
       final a2 = alice.restart(); // Alice uygulamayı yeniden açtı
       final body = await a2.sealer.seal(chat, p('sonra'));
@@ -179,24 +192,24 @@ void main() {
       await o.keys.ensureKeys();
       await o.sealer.seal('d_alice_${o.uid}', p('x'));
     }
-    expect((await db.collection('keyBundles/alice/prekeys').get()).size, 20);
+    final pre = await alice.preKeysPath;
+    expect((await db.collection(pre).get()).size, 20);
     await alice.restart().keys.ensureKeys();
-    expect((await db.collection('keyBundles/alice/prekeys').get()).size, 120);
+    expect((await db.collection(pre).get()).size, 120);
   });
 }
 
 Future<String> _number(SignalClient me, String other) async {
-  final otherKey = (await db0(me)
-      .doc('keyBundles/$other')
-      .get())['identityKey'];
+  final mine = await me.dir.listDevices(me.uid);
+  final theirs = await me.dir.listDevices(other);
   return safetyNumber(
     myUid: me.uid,
-    myIdentityKey: (await me.store.getIdentityKeyPair())
-        .getPublicKey()
-        .serialize(),
+    myIdentityKeys: [for (final d in mine) d.identity.identityKey],
     otherUid: other,
-    otherIdentityKey: base64Decode(otherKey as String),
+    otherIdentityKeys: [for (final d in theirs) d.identity.identityKey],
   );
 }
 
-FakeFirebaseFirestore db0(SignalClient c) => c.db;
+/// Tek alıcı cihazlı birebir mesajda anahtar sarmalayıcısının Signal türü.
+int _wrapType(String body) =>
+    ((jsonDecode(body)['k'] as Map).values.single as Map)['t'] as int;

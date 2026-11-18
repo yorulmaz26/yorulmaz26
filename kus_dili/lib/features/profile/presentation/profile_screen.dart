@@ -63,6 +63,14 @@ class ProfileScreen extends ConsumerWidget {
             onTap: () => context.push(Routes.notifications),
           ),
           ListTile(
+            key: const Key('openDevices'),
+            leading: const Icon(Icons.devices_outlined),
+            title: const Text('Bağlı cihazlar'),
+            subtitle: const Text('En fazla 5 cihaz'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.devices),
+          ),
+          ListTile(
             key: const Key('openBlocked'),
             leading: const Icon(Icons.block),
             title: const Text('Engellenen kişiler'),

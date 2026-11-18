@@ -93,6 +93,22 @@ final class PersistentSignalStore
   Future<void> acknowledgeIdentity(String uid) =>
       _kv.delete(_k('changed.$uid'));
 
+  /// Kişinin bilinen cihaz listesini günceller. Daha önce görülmemiş bir
+  /// cihaz eklendiyse (ilk görüşte değil) "değişti" işareti konur: yeni
+  /// cihaz da konuşmayı okuyabilecek, kullanıcı haberdar olmalı.
+  Future<bool> updateKnownDevices(String uid, List<int> devices) async {
+    final key = _k('devs.$uid');
+    final prev = await _kv.read(key);
+    final now = ([...devices]..sort()).join(',');
+    if (prev == now) return false;
+    await _kv.write(key, now);
+    if (prev == null) return false;
+    final old = prev.split(',').where((e) => e.isNotEmpty).toSet();
+    final added = devices.any((d) => !old.contains('$d'));
+    if (added) await _kv.write(_k('changed.$uid'), '1');
+    return added;
+  }
+
   static bool _same(List<int> a, List<int> b) {
     if (a.length != b.length) return false;
     var d = 0;
@@ -191,9 +207,14 @@ final class PersistentSignalStore
   Future<void> deleteSession(SignalProtocolAddress address) =>
       _kv.delete(_k('session.${_addr(address)}'));
 
+  /// Uygulama kullanmaz (oturumlar cihaz bazında silinir).
   @override
-  Future<void> deleteAllSessions(String name) =>
-      deleteSession(SignalProtocolAddress(name, 1));
+  Future<void> deleteAllSessions(String name) async {
+    final devices = (await _kv.read(_k('devs.$name')))?.split(',') ?? [];
+    for (final d in devices.where((e) => e.isNotEmpty)) {
+      await deleteSession(SignalProtocolAddress(name, int.parse(d)));
+    }
+  }
 
   // ---- Grup gönderici anahtarları (Sender Keys) -----------------------------
 

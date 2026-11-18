@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../features/auth/application/auth_providers.dart';
 import '../features/auth/presentation/phone_auth_screen.dart';
+import '../features/crypto/presentation/devices_screen.dart';
 import '../features/crypto/presentation/safety_number_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
 import '../features/learn/presentation/learn_screens.dart';
@@ -37,6 +38,7 @@ abstract final class Routes {
   static const privacy = '/settings/privacy';
   static const notifications = '/settings/notifications';
   static const blocked = '/settings/blocked';
+  static const devices = '/settings/devices';
   static const terms = '/terms';
   static const learn = '/learn';
   static const learnQuiz = '/learn/quiz';
@@ -143,6 +145,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.notifications,
         builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: Routes.devices,
+        builder: (context, state) => const DevicesScreen(),
       ),
       GoRoute(
         path: Routes.blocked,

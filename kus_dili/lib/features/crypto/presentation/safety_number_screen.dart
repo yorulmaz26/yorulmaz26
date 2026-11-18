@@ -6,22 +6,28 @@ import '../../chat/application/chat_providers.dart';
 import '../application/crypto_providers.dart';
 import '../domain/safety_number.dart';
 
-final _safetyNumberProvider = FutureProvider.family<String?, String>((
+typedef _Safety = ({String number, int myDevices, int otherDevices});
+
+final _safetyNumberProvider = FutureProvider.family<_Safety?, String>((
   ref,
   otherUid,
 ) async {
   final me = ref.watch(myUidProvider);
-  final store = ref.watch(signalStoreProvider);
-  if (me == null || store == null) return null;
+  if (me == null) return null;
   await ref.watch(keyManagerProvider)?.ensureKeys();
-  final other = await ref.watch(keyDirectoryProvider).fetchIdentity(otherUid);
-  if (other == null) return null;
-  final mine = await store.getIdentityKeyPair();
-  return safetyNumber(
-    myUid: me,
-    myIdentityKey: mine.getPublicKey().serialize(),
-    otherUid: otherUid,
-    otherIdentityKey: other.identityKey,
+  final dir = ref.watch(keyDirectoryProvider);
+  final mine = await dir.listDevices(me);
+  final theirs = await dir.listDevices(otherUid);
+  if (mine.isEmpty || theirs.isEmpty) return null;
+  return (
+    number: safetyNumber(
+      myUid: me,
+      myIdentityKeys: [for (final d in mine) d.identity.identityKey],
+      otherUid: otherUid,
+      otherIdentityKeys: [for (final d in theirs) d.identity.identityKey],
+    ),
+    myDevices: mine.length,
+    otherDevices: theirs.length,
   );
 });
 
@@ -54,16 +60,30 @@ class SafetyNumberScreen extends ConsumerWidget {
             error: (e, _) => const Text('Güvenlik numarası hesaplanamadı.'),
             data: (n) => n == null
                 ? const Text('Karşı tarafın şifreleme anahtarı henüz yok.')
-                : SelectableText(
-                    n,
-                    key: const Key('safetyNumber'),
-                    textAlign: TextAlign.center,
-                    style: text.headlineSmall?.copyWith(
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                      letterSpacing: 2,
-                      height: 1.6,
-                      color: AppColors.snow,
-                    ),
+                : Column(
+                    children: [
+                      SelectableText(
+                        n.number,
+                        key: const Key('safetyNumber'),
+                        textAlign: TextAlign.center,
+                        style: text.headlineSmall?.copyWith(
+                          fontFeatures: const [FontFeature.tabularFigures()],
+                          letterSpacing: 2,
+                          height: 1.6,
+                          color: AppColors.snow,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Senin ${n.myDevices} cihazın, '
+                        '${other?.displayName ?? 'karşı tarafın'} '
+                        '${n.otherDevices} cihazı hesaba katıldı. Biriniz cihaz '
+                        'ekler ya da kaldırırsa numara değişir.',
+                        key: const Key('deviceCounts'),
+                        textAlign: TextAlign.center,
+                        style: text.bodySmall,
+                      ),
+                    ],
                   ),
           ),
           const SizedBox(height: 24),
