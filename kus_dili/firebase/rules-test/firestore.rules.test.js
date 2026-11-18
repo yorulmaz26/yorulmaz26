@@ -19,7 +19,7 @@ let env;
 
 before(async () => {
   env = await initializeTestEnvironment({
-    projectId: 'demo-kusdili',
+    projectId: 'demo-kusdili-profile',
     firestore: {
       rules: readFileSync(new URL('../firestore.rules', import.meta.url), 'utf8'),
     },

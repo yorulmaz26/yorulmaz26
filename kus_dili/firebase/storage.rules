@@ -1,0 +1,47 @@
+rules_version = '2';
+
+// Kuş Dili — Storage güvenlik kuralları.
+// Ek dosyalar cihazda AES-256-GCM ile şifrelenir; buraya yalnızca opak
+// şifreli veri yüklenir. Anahtar, Signal ile şifreli mesajın içindedir.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function verified() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'phone';
+    }
+
+    function chatPath(chatId) {
+      return /databases/(default)/documents/chats/$(chatId);
+    }
+
+    function isMember(chatId) {
+      return verified()
+        && firestore.exists(chatPath(chatId))
+        && request.auth.uid in firestore.get(chatPath(chatId)).data.members;
+    }
+
+    match /attachments/{chatId}/{fileId} {
+      allow get: if isMember(chatId);
+      allow list: if false;
+
+      // resource == null: var olan dosyanın üzerine yeniden yükleme de
+      // "create" sayılır; bunu engeller.
+      allow create: if isMember(chatId)
+        && resource == null
+        && fileId.matches('^[a-f0-9]{32}$')
+        && request.resource.size <= 50 * 1024 * 1024 + 28
+        && request.resource.contentType == 'application/octet-stream'
+        && request.resource.metadata.uploader == request.auth.uid;
+
+      // Üzerine yazılamaz; yalnızca yükleyen silebilir.
+      allow update: if false;
+      allow delete: if verified()
+        && resource.metadata.uploader == request.auth.uid;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

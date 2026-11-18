@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:kus_dili_engine/kus_dili_engine.dart';
 
+import '../../media/domain/attachment.dart';
+
 /// Gönderenin seçtiği gösterim biçimi. Alıcı cihaz metni bu bilgiye göre
 /// kuş diline çevirip gösterir. Sunucuda dönüşüm YAPILMAZ.
 enum DisplayMode {
@@ -37,8 +39,9 @@ final class MessagePayload {
     this.replyQuote,
     this.expiresInSeconds,
     this.viewOnce = false,
+    this.attachment,
   }) {
-    if (text.trim().isEmpty) {
+    if (text.trim().isEmpty && attachment == null) {
       throw const PayloadFormatException('Boş mesaj gönderilemez.');
     }
     if (text.length > maxTextLength) {
@@ -52,8 +55,14 @@ final class MessagePayload {
   static const int maxTextLength = 4000;
   static const int maxQuoteLength = 120;
 
-  /// Orijinal Türkçe metin (her zaman orijinal saklanır).
+  /// Orijinal Türkçe metin (her zaman orijinal saklanır). Ekli mesajda
+  /// açıklama; boş olabilir.
   final String text;
+
+  /// Fotoğraf / video / ses / belge (anahtarı ile birlikte, şifreli pakette).
+  final Attachment? attachment;
+
+  bool get hasText => text.trim().isNotEmpty;
   final DisplayMode mode;
   final KusDiliVariant variant;
   final String? replyToId;
@@ -69,7 +78,7 @@ final class MessagePayload {
 
   Map<String, Object?> toJson() => {
     'v': version,
-    't': 'text',
+    't': attachment == null ? 'text' : 'att',
     'text': text,
     'm': mode.code,
     if (mode == DisplayMode.kusDili) 'var': variant.toJson(),
@@ -77,6 +86,7 @@ final class MessagePayload {
     if (replyQuote != null) 'rq': replyQuote,
     if (expiresInSeconds != null) 'exp': expiresInSeconds,
     if (viewOnce) 'vo': true,
+    if (attachment != null) 'a': attachment!.toJson(),
   };
 
   String encode() => jsonEncode(toJson());
@@ -114,6 +124,15 @@ final class MessagePayload {
     final r = json['r'];
     final rq = json['rq'];
     final exp = json['exp'];
+    Attachment? attachment;
+    final rawAtt = json['a'];
+    if (rawAtt is Map<String, Object?>) {
+      try {
+        attachment = Attachment.fromJson(rawAtt);
+      } on FormatException {
+        throw const PayloadFormatException('Ek dosya bilgisi bozuk.');
+      }
+    }
     return MessagePayload(
       text: text,
       mode: mode,
@@ -122,7 +141,20 @@ final class MessagePayload {
       replyQuote: rq is String ? rq : null,
       expiresInSeconds: exp is int ? exp : null,
       viewOnce: json['vo'] == true,
+      attachment: attachment,
     );
+  }
+
+  /// Listede / alıntıda gösterilecek kısa özet.
+  String get summary {
+    if (hasText) return text;
+    return switch (attachment?.kind) {
+      AttachmentKind.image => '📷 Fotoğraf',
+      AttachmentKind.video => '🎬 Video',
+      AttachmentKind.audio => '🎤 Sesli mesaj',
+      AttachmentKind.file => '📄 ${attachment?.name ?? 'Belge'}',
+      null => '',
+    };
   }
 
   /// Yanıt alıntısı için kısaltılmış metin.

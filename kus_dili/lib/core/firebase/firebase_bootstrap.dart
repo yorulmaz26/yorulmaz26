@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 
 /// Firebase başlatma sonucu.
@@ -39,6 +40,7 @@ Future<FirebaseStatus> initFirebase() async {
     if (_useEmulator) {
       await FirebaseAuth.instance.useAuthEmulator(_emulatorHost, 9099);
       FirebaseFirestore.instance.useFirestoreEmulator(_emulatorHost, 8080);
+      await FirebaseStorage.instance.useStorageEmulator(_emulatorHost, 9199);
     }
     return const FirebaseStatus.ready();
   } catch (e, st) {

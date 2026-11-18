@@ -17,6 +17,10 @@ import '../domain/chat.dart';
 import '../domain/chat_settings.dart';
 import '../domain/message_payload.dart';
 import '../domain/message_view.dart';
+import '../../media/application/media_providers.dart';
+import '../../media/domain/attachment.dart';
+import '../../media/presentation/attachment_view.dart';
+import '../../media/presentation/voice_record_button.dart';
 import 'chat_settings_sheet.dart';
 import 'widgets/message_bubble.dart';
 
@@ -80,7 +84,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(view.primary, style: Theme.of(ctx).textTheme.titleMedium),
+            if (p.attachment != null) AttachmentView(attachment: p.attachment!),
+            if (p.hasText)
+              Text(view.primary, style: Theme.of(ctx).textTheme.titleMedium),
             if (view.isEncodedNow) ...[
               const SizedBox(height: 8),
               Text(view.original, style: Theme.of(ctx).textTheme.bodySmall),
@@ -169,7 +175,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 title: const Text('Herkesten sil'),
                 onTap: () {
                   Navigator.pop(ctx);
-                  c.delete(m);
+                  c.delete(m, payload: p);
                 },
               ),
             ],
@@ -177,6 +183,52 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> _pickAttachment() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (final (key, icon, label) in [
+              ('gallery', Icons.photo_outlined, 'Galeriden fotoğraf'),
+              ('camera', Icons.photo_camera_outlined, 'Fotoğraf çek'),
+              ('video', Icons.videocam_outlined, 'Video'),
+              ('file', Icons.description_outlined, 'Belge'),
+            ])
+              ListTile(
+                key: Key('pick-$key'),
+                leading: Icon(icon),
+                title: Text(label),
+                onTap: () => Navigator.pop(ctx, key),
+              ),
+          ],
+        ),
+      ),
+    );
+    if (choice == null || !mounted) return;
+    final source = ref.read(mediaSourceProvider);
+    try {
+      final media = switch (choice) {
+        'gallery' => await source.pickImage(camera: false),
+        'camera' => await source.pickImage(camera: true),
+        'video' => await source.pickVideo(camera: false),
+        _ => await source.pickFile(),
+      };
+      if (media == null || !mounted) return;
+      final caption = _input.text;
+      final ok = await ref
+          .read(chatControllerProvider(widget.chatId).notifier)
+          .sendMedia(media, caption: caption);
+      if (ok && _input.text == caption) _input.clear();
+    } on AttachmentTooLargeException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
   }
 
   @override
@@ -308,6 +360,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               controller.cancel();
             },
             onToggleViewOnce: controller.toggleViewOnce,
+            onAttach: _pickAttachment,
+            onVoice: (media) async {
+              await controller.sendMedia(media);
+            },
             onSend: () async {
               final text = _input.text;
               final ok = await controller.submit(text);
@@ -382,8 +438,12 @@ class _Composer extends StatefulWidget {
     required this.onSend,
     required this.onCancel,
     required this.onToggleViewOnce,
+    required this.onAttach,
+    required this.onVoice,
   });
 
+  final VoidCallback onAttach;
+  final Future<void> Function(PickedMedia) onVoice;
   final TextEditingController input;
   final ComposerState state;
   final ChatSettings settings;
@@ -467,6 +527,11 @@ class _ComposerState extends State<_Composer> {
                   style: text.bodySmall?.copyWith(color: AppColors.gold),
                 ),
               ),
+            if (s.busy)
+              const Padding(
+                padding: EdgeInsets.fromLTRB(8, 0, 8, 4),
+                child: LinearProgressIndicator(key: Key('sending')),
+              ),
             if (s.error != null)
               Padding(
                 padding: const EdgeInsets.fromLTRB(8, 0, 8, 4),
@@ -486,6 +551,13 @@ class _ComposerState extends State<_Composer> {
                     size: 22,
                   ),
                 ),
+                if (editing == null)
+                  IconButton(
+                    key: const Key('attach'),
+                    tooltip: 'Fotoğraf, video, belge',
+                    icon: const Icon(Icons.attach_file),
+                    onPressed: s.busy ? null : widget.onAttach,
+                  ),
                 if (editing == null)
                   IconButton(
                     key: const Key('viewOnceToggle'),
@@ -525,13 +597,19 @@ class _ComposerState extends State<_Composer> {
                   ),
                 ),
                 const SizedBox(width: 6),
-                IconButton.filled(
-                  key: const Key('send'),
-                  onPressed: s.busy || typed.trim().isEmpty
-                      ? null
-                      : widget.onSend,
-                  icon: Icon(editing != null ? Icons.check : Icons.send),
-                ),
+                if (editing == null && typed.trim().isEmpty)
+                  VoiceRecordButton(
+                    enabled: !s.busy,
+                    onRecorded: widget.onVoice,
+                  )
+                else
+                  IconButton.filled(
+                    key: const Key('send'),
+                    onPressed: s.busy || typed.trim().isEmpty
+                        ? null
+                        : widget.onSend,
+                    icon: Icon(editing != null ? Icons.check : Icons.send),
+                  ),
               ],
             ),
           ],

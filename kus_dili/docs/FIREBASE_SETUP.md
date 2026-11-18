@@ -101,11 +101,24 @@ veya konsolda **Firestore → TTL → Politika oluştur** (koleksiyon grubu
 `messages`, alan `expireAt`). Firestore süresi dolan belgeleri genellikle
 24 saat içinde siler; uygulama bu sırada süresi dolan mesajları zaten göstermez.
 
+## 5b. Storage (fotoğraf, video, ses, belge)
+
+1. **Storage → Başlayın** → üretim modu, Firestore ile aynı bölge.
+2. Kuralları yükleyin (kurallar Firestore'dan üyeliği okur; CLI ilk seferde
+   bunun için gerekli izni vermeyi sorar, **Evet** deyin):
+
+```bash
+firebase deploy --only storage
+```
+
+3. Önerilen: sahipsiz/eskimiş şifreli dosyalar için Google Cloud Console →
+   Cloud Storage → kova → **Yaşam döngüsü** → "30 günden eski nesneleri sil".
+
 ## 6. Yerel emülatörle geliştirme (isteğe bağlı)
 
 ```bash
 cd kus_dili
-firebase emulators:start --only auth,firestore --project demo-kusdili
+firebase emulators:start --only auth,firestore,storage --project demo-kusdili
 flutter run --dart-define=USE_FIREBASE_EMULATOR=true
 # Gerçek cihazda: --dart-define=FIREBASE_EMULATOR_HOST=<bilgisayarın-IP'si>
 ```

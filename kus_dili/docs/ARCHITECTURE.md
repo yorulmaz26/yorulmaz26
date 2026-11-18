@@ -165,6 +165,17 @@ henüz olmayan üye atlanır ve bir sonraki gönderimde yeniden denenir. En fazl
 64 üye; kurucu ilk yönetici; yöneticiler ad/üye/yönetici değiştirir; herkes
 ayrılabilir (son yönetici ayrılırken yerine bir üye geçer).
 
+**Ek dosyalar (Aşama 9):** Fotoğraf / video / belge / sesli mesaj cihazda
+dosya başına rastgele 256 bit anahtarla AES-GCM ile şifrelenir ve Storage'a
+`attachments/{chatId}/{rastgele}` yoluna opak ikili veri olarak yüklenir.
+Anahtar, şifreli dosyanın SHA-256 özeti, tür, boyut ve ad yalnızca Signal ile
+şifreli mesaj paketindedir (sunucu dosya yolunu bile mesajdan göremez).
+İndirilen dosya önce özetle, sonra GCM etiketiyle doğrulanır. Sınırlar:
+fotoğraf/ses 15 MB, video/belge 50 MB. Storage kuralları: yalnızca sohbet
+üyeleri okur/yükler, üzerine yazılamaz, yalnızca yükleyen siler, listeleme kapalı.
+Fotoğraflar bellekte çözülür; video/ses/belge oynatıcılar dosya istediği için
+geçici dosyaya yazılır ve ekran kapanınca silinir.
+
 **Bilinen sınırlar (henüz yapılmadı):**
 
 * Kullanıcı başına **tek cihaz**. İkinci cihaz/yeniden kurulumda eski mesajlar
@@ -174,6 +185,10 @@ ayrılabilir (son yönetici ayrılırken yerine bir üye geçer).
 * Üst veri (kim, kiminle, ne zaman) sunucuda görünür. Kayıp cihaz, ekran
   görüntüsü ve kötü amaçlı yazılım E2EE'nin kapsamı dışındadır.
 * Mesaj araması cihazdaki şifreli önbellekte yapılacak; henüz arayüzü yok.
+* Tek görüntülük/süreli mesajın **ek dosyası** Storage'dan otomatik silinmez
+  (alıcı silemez, Storage'da TTL yok). İçerik şifreli olduğundan okunamaz ama
+  yer kaplar; bir Cloud Storage yaşam döngüsü kuralı (ör. 30 gün) önerilir.
+* Gönderimi yarıda kalan yüklemeler sahipsiz şifreli dosya bırakabilir.
 
 **Testler:** iki gerçek Signal istemcisi aynı sahte Firestore üzerinden
 konuşur (`test/features/crypto/e2ee_test.dart`): sunucuda açık metin olmaması,

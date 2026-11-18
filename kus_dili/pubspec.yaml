@@ -48,6 +48,13 @@ dependencies:
   cryptography: ^2.9.0
   path_provider: ^2.1.6
   local_auth: ^3.0.2
+  firebase_storage: ^14.1.0
+  image_picker: ^1.2.4
+  file_picker: ^13.4.0
+  record: ^7.2.0
+  just_audio: ^0.10.6
+  video_player: ^2.14.1
+  share_plus: ^13.3.1
 
 dev_dependencies:
   flutter_test:

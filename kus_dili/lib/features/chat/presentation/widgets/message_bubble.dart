@@ -7,6 +7,7 @@ import '../../domain/chat.dart';
 import '../../domain/chat_settings.dart';
 import '../../domain/message_payload.dart';
 import '../../domain/message_view.dart';
+import '../../../media/presentation/attachment_view.dart';
 
 /// Tek mesaj balonu. Kuş dili mesajları altın çerçeveli özel balonda,
 /// kuş simgesiyle gösterilir; dokunulunca zarif bir geçişle çözülür.
@@ -177,32 +178,38 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
                       style: text.bodySmall,
                     ),
                   ),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 280),
-                  curve: Curves.easeOutCubic,
-                  alignment: Alignment.topLeft,
-                  child: AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 380),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeInCubic,
-                    transitionBuilder: (child, anim) => FadeTransition(
-                      opacity: anim,
-                      child: SlideTransition(
-                        position: Tween(
-                          begin: const Offset(0, 0.25),
-                          end: Offset.zero,
-                        ).animate(anim),
-                        child: child,
+                if (payload.attachment != null)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: payload.hasText ? 6 : 0),
+                    child: AttachmentView(attachment: payload.attachment!),
+                  ),
+                if (payload.hasText)
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 280),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topLeft,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 380),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, anim) => FadeTransition(
+                        opacity: anim,
+                        child: SlideTransition(
+                          position: Tween(
+                            begin: const Offset(0, 0.25),
+                            end: Offset.zero,
+                          ).animate(anim),
+                          child: child,
+                        ),
+                      ),
+                      child: Text(
+                        view.primary,
+                        key: ValueKey(view.primary),
+                        style: text.bodyLarge?.copyWith(color: AppColors.snow),
                       ),
                     ),
-                    child: Text(
-                      view.primary,
-                      key: ValueKey(view.primary),
-                      style: text.bodyLarge?.copyWith(color: AppColors.snow),
-                    ),
                   ),
-                ),
-                if (view.secondary != null) ...[
+                if (payload.hasText && view.secondary != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     view.secondary!,

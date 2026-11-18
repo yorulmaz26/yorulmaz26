@@ -7,12 +7,14 @@ import 'package:kus_dili/core/firebase/firebase_providers.dart';
 import 'package:kus_dili/features/auth/application/auth_providers.dart';
 import 'package:kus_dili/features/chat/application/chat_providers.dart';
 import 'package:kus_dili/features/crypto/application/crypto_providers.dart';
+import 'package:kus_dili/features/media/application/media_providers.dart';
 import 'package:kus_dili/features/privacy/application/privacy_providers.dart';
 import 'package:kus_dili/features/privacy/domain/biometric_auth.dart';
 import 'package:kus_dili/features/privacy/domain/pin_vault.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_media.dart';
 import 'in_memory.dart';
 
 /// Tüm uygulama; yalnızca SMS doğrulaması ve Firestore sunucusu test
@@ -24,8 +26,16 @@ Widget testApp({
   InMemorySecureKv? kv,
   InMemoryPayloadCache? cache,
   bool biometrics = false,
+  InMemoryAttachmentStorage? storage,
+  FakeMediaSource? media,
+  FakeVoiceRecorder? recorder,
 }) => ProviderScope(
   overrides: [
+    attachmentStorageProvider.overrideWithValue(
+      storage ?? InMemoryAttachmentStorage(),
+    ),
+    mediaSourceProvider.overrideWithValue(media ?? FakeMediaSource()),
+    voiceRecorderProvider.overrideWithValue(recorder ?? FakeVoiceRecorder()),
     // PBKDF2 tur sayısı testte düşük; uygulamada 210.000.
     pinVaultProvider.overrideWith((ref) {
       final uid = ref.watch(myUidProvider);
