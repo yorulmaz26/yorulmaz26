@@ -82,13 +82,20 @@ for i in $(seq 1 3); do
   adb shell input swipe 300 1900 300 1500 220
 done
 shot 05_oyun_ortasi
-if [ "$(current_screen)" != "PlayScreen" ]; then
-  echo "Not: oyun hareket sırasında bitti (engel/gölge); yeniden başlatılıyor"
-  wait_screen GameOverScreen 5; sleep 1; tap_target GameOverScreen "TEKRAR OYNA"; wait_screen PlayScreen 5
-fi
-tap_target PlayScreen ikon-1
-sleep 0.6; shot 06_duraklatma
-if log | grep -q "hedef ekran=PlayScreen ad=DEVAM ET"; then ok "Duraklatma menüsü açıldı"; else bad "Duraklatma menüsü"; fi
+count_pause() { log | grep -c "hedef ekran=PlayScreen ad=DEVAM ET"; }
+PAUSED=0
+for attempt in 1 2 3; do
+  if [ "$(current_screen)" != "PlayScreen" ]; then
+    echo "Not: oyun hareket sırasında bitti; yeniden başlatılıyor"
+    wait_screen GameOverScreen 5; sleep 1.5; tap_target GameOverScreen "TEKRAR OYNA"; wait_screen PlayScreen 5; sleep 0.5
+  fi
+  BEFORE=$(count_pause)
+  tap_target PlayScreen ikon-1
+  sleep 0.6
+  if [ "$(count_pause)" -gt "$BEFORE" ] && [ "$(current_screen)" = "PlayScreen" ]; then PAUSED=1; break; fi
+done
+shot 06_duraklatma
+if [ "$PAUSED" = "1" ]; then ok "Duraklatma menüsü açıldı"; else bad "Duraklatma menüsü"; fi
 # Duraklatılmışken bekle: oyun sonu gelmemeli (gölge zamanı ilerlememeli)
 sleep 6
 if [ "$(current_screen)" = "PlayScreen" ]; then ok "Duraklatmada oyun ilerlemiyor (6 sn)"; else bad "Duraklatmada oyun bitti"; fi
