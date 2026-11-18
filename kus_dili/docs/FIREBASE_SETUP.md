@@ -22,7 +22,7 @@ konsolunda tıklarsınız.
    **Kurallar** sekmesi → içeriği silip `kus_dili/firebase/firestore.rules`
    dosyasının tamamını yapıştırın → **Yayınla**.
 5. GitHub deposu → **Settings → Secrets and variables → Actions → New
-   repository secret**: ad `GOOGLE_SERVICES_JSON`, değer olarak indirdiğiniz
+   repository secret**: ad `KUSDILI_GOOGLE_SERVICES_JSON` (depodaki diğer uygulamanın `GOOGLE_SERVICES_JSON` gizlisine dokunmayın), değer olarak indirdiğiniz
    dosyanın **içeriğini** yapıştırın.
 6. **Actions** sekmesinde son "Kuş Dili" çalışmasını **Re-run all jobs** ile
    yeniden çalıştırın; bitince `kus-dili-apk` dosyasını indirip kurun.

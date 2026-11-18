@@ -81,16 +81,20 @@ jobs:
           channel: stable
           flutter-version: 3.50.0
           cache: true
-      - name: Firebase yapılandırması (GOOGLE_SERVICES_JSON gizlisi varsa)
+      - name: Firebase yapılandırması (KUSDILI_GOOGLE_SERVICES_JSON gizlisi varsa)
+        # Depodaki başka uygulamanın GOOGLE_SERVICES_JSON gizlisiyle karışmasın
+        # diye ayrı ad kullanılır; dosyada bu uygulamanın paketi yoksa atlanır.
         working-directory: kus_dili
         env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          GS: ${{ secrets.KUSDILI_GOOGLE_SERVICES_JSON }}
         run: |
-          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
-            printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          if [ -z "$GS" ]; then
+            echo "::warning::KUSDILI_GOOGLE_SERVICES_JSON yok; APK çevrimdışı açılır."
+          elif printf '%s' "$GS" | jq -e '[.client[].client_info.android_client_info.package_name] | index("com.kusdili.kus_dili")' >/dev/null; then
+            printf '%s' "$GS" > android/app/google-services.json
             echo "Firebase'e bağlı APK derleniyor."
           else
-            echo "::warning::GOOGLE_SERVICES_JSON yok; APK çevrimdışı açılır."
+            echo "::warning::KUSDILI_GOOGLE_SERVICES_JSON içinde com.kusdili.kus_dili yok; APK çevrimdışı açılır."
           fi
       - name: APK (debug + küçültülmüş release)
         working-directory: kus_dili
