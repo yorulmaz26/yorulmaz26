@@ -282,6 +282,20 @@ başka bir cihazla fotoğraflayabilir. Biyometri şu an kullanıcı arayüzü ki
 olarak çalışır; önbellek anahtarı biyometriye bağlı değildir. Bildirimlerde
 içerik gizleme Aşama 10'da (bildirimler) yapılacak.
 
+## 6b. Bildirimler (Aşama 10a) ✅
+
+* Cihaz FCM belirteci `pushTokens/{uid}` belgesinde (yalnızca sahibi ve Cloud
+  Function okur; cihaz başına en fazla 10). Çıkışta bu cihazın belirteci silinir.
+* `notifyNewMessage` (Cloud Function, `functions/`): yeni mesajda diğer
+  üyelere bildirim gönderir. Sunucu içeriği bilmediği için bildirimde mesaj,
+  gönderen veya grup adı **yoktur**: yalnızca "Yeni bir mesajın var" ve
+  dokununca açılacak sohbet kimliği. Aynı sohbetin bildirimleri birleşir.
+* Genel kapatma ve sohbet başına sessize alma; geçersiz belirteçler otomatik
+  temizlenir. İzin verilmezse uygulama bildirimsiz çalışır.
+* Sınır: içerikli bildirim (cihazda çözerek) iOS Notification Service Extension
+  ve Android arka plan işleyicisi gerektirir; henüz yapılmadı. FCM'in yeni FID
+  tabanlı kaydına geçiş, Admin SDK desteği olgunlaşınca yapılacak.
+
 ## 7. Aşama durumu
 
 | # | Aşama | Durum |
@@ -295,6 +309,6 @@ içerik gizleme Aşama 10'da (bildirimler) yapılacak.
 | 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b: PIN/biyometri, kilitli ve gizli sohbet, uygulama kilidi, süreli ve tek görüntülük mesaj |
 | 8 | Grup mesajlaşması | ✅ Sender Keys ile E2EE, üyelik değişince anahtar yenileme, yönetici işlemleri, ayrılma |
 | 9 | Medya ve sesli mesaj | — |
-| 10 | Bildirimler ve aramalar | — |
+| 10 | Bildirimler ve aramalar | ✅ 10a: içeriksiz bildirimler (FCM + Cloud Function) · 10b aramalar: sırada |
 | 11 | Öğrenme modülü | Çevirici ekranı hazır; alıştırmalar/testler sonra |
 | 12 | Test, optimizasyon, yayın | — |

@@ -3,7 +3,9 @@ import 'package:kus_dili_engine/kus_dili_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../notifications/application/push_providers.dart';
 import '../../privacy/application/privacy_providers.dart';
+import '../application/chat_providers.dart';
 import '../domain/chat_settings.dart';
 import '../domain/message_payload.dart';
 
@@ -219,8 +221,21 @@ class _PrivacyToggles extends ConsumerWidget {
     final hasPin = ref.watch(hasPinProvider).value ?? false;
     final prefs = ref.watch(privacyPrefsProvider).value;
     final c = ref.read(privacyPrefsProvider.notifier);
+    final push = ref.watch(pushPrefsProvider).value;
+    final uid = ref.watch(myUidProvider);
     return Column(
       children: [
+        SwitchListTile(
+          key: const Key('muteChatSwitch'),
+          contentPadding: EdgeInsets.zero,
+          secondary: const Icon(Icons.notifications_off_outlined),
+          title: const Text('Bildirimleri sessize al'),
+          value: push?.isMuted(chatId) ?? false,
+          onChanged: uid == null
+              ? null
+              : (v) =>
+                    ref.read(pushRepositoryProvider).setMuted(uid, chatId, v),
+        ),
         SwitchListTile(
           key: const Key('lockChatSwitch'),
           contentPadding: EdgeInsets.zero,

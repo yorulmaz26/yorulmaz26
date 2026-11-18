@@ -114,6 +114,21 @@ firebase deploy --only storage
 3. Önerilen: sahipsiz/eskimiş şifreli dosyalar için Google Cloud Console →
    Cloud Storage → kova → **Yaşam döngüsü** → "30 günden eski nesneleri sil".
 
+## 5c. Bildirimler (Cloud Functions + FCM)
+
+1. Blaze planı gerekli (Aşama 3'te açıldı).
+2. iOS için APNs anahtarı Firebase'e yüklenmiş olmalı (§3 iOS). Xcode'da
+   **Push Notifications** ve **Background Modes → Remote notifications** açık.
+3. Fonksiyonu yükleyin:
+
+```bash
+cd kus_dili/functions && npm ci && cd ..
+firebase deploy --only functions:kusdili,firestore:rules
+```
+
+Fonksiyon `europe-west1` bölgesinde çalışır; isterseniz `functions/src/index.ts`
+içindeki `REGION` değerini Firestore bölgenize yakın bir bölgeyle değiştirin.
+
 ## 6. Yerel emülatörle geliştirme (isteğe bağlı)
 
 ```bash

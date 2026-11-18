@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../app/theme/app_colors.dart';
-import '../../auth/application/auth_providers.dart';
+import '../../notifications/application/push_providers.dart';
 import '../application/profile_providers.dart';
 import '../domain/username.dart';
 
@@ -38,7 +38,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
         title: const Text('Profil oluştur'),
         actions: [
           TextButton(
-            onPressed: () => ref.read(authRepositoryProvider).signOut(),
+            onPressed: () => signOutWithPushCleanup(ref),
             child: const Text('Çıkış'),
           ),
         ],

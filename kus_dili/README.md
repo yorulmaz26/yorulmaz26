@@ -29,6 +29,8 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   uca şifreli; üyelik değişince anahtar yenilenir; yönetici işlemleri, ayrılma.
 * **Medya (Aşama 9)**: fotoğraf, video, belge ve sesli mesaj; dosyalar cihazda
   AES-256-GCM ile şifrelenir, Storage'a yalnızca şifreli hâli yüklenir.
+* **Bildirimler (Aşama 10a)**: içeriksiz ("Yeni bir mesajın var") FCM
+  bildirimleri, sohbet başına sessize alma; Cloud Function `functions/` altında.
 * **Gizli sohbet (Aşama 7b)**: PIN (PBKDF2, deneme sınırı) ve biyometri ile
   kilitli sohbet, listeden gizlenen sohbetler, uygulama kilidi, süreli ve tek
   görüntülük mesajlar. Gizli/kilitli bilgisi yalnızca cihazda.

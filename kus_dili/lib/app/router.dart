@@ -11,6 +11,7 @@ import '../features/chat/presentation/chat_screen.dart';
 import '../features/chat/presentation/group_info_screen.dart';
 import '../features/chat/presentation/new_chat_screen.dart';
 import '../features/chat/presentation/new_group_screen.dart';
+import '../features/notifications/presentation/notification_settings_screen.dart';
 import '../features/privacy/presentation/hidden_chats_screen.dart';
 import '../features/privacy/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
@@ -31,6 +32,7 @@ abstract final class Routes {
   static const newGroup = '/groups/new';
   static String groupInfo(String chatId) => '/chats/$chatId/info';
   static const privacy = '/settings/privacy';
+  static const notifications = '/settings/notifications';
   static String chat(String id) => '/chats/$id';
   static String safetyNumber(String chatId, String uid) =>
       '/chats/$chatId/safety/$uid';
@@ -104,6 +106,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.hiddenChats,
         builder: (context, state) => const HiddenChatsScreen(),
+      ),
+      GoRoute(
+        path: Routes.notifications,
+        builder: (context, state) => const NotificationSettingsScreen(),
       ),
       GoRoute(
         path: Routes.privacy,

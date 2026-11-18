@@ -50,3 +50,18 @@ jobs:
         run: |
           npm ci
           npm test
+
+  functions:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: kus_dili/functions/package-lock.json
+      - name: Cloud Functions — derleme ve birim testleri
+        working-directory: kus_dili/functions
+        run: |
+          npm ci
+          npm test

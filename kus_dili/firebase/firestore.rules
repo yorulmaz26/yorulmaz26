@@ -270,6 +270,23 @@ service cloud.firestore {
       }
     }
 
+    // ------------------------------------------------- Bildirim belirteçleri
+    // Yalnızca sahibi (ve yönetici yetkili Cloud Function) okur/yazar.
+    match /pushTokens/{uid} {
+      allow read, delete: if isSelf(uid);
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['tokens', 'enabled', 'muted', 'updatedAt'])
+        && (!('tokens' in request.resource.data)
+            || (request.resource.data.tokens is list
+                && request.resource.data.tokens.size() <= 10))
+        && (!('enabled' in request.resource.data)
+            || request.resource.data.enabled is bool)
+        && (!('muted' in request.resource.data)
+            || (request.resource.data.muted is list
+                && request.resource.data.muted.size() <= 500))
+        && request.resource.data.updatedAt == request.time;
+    }
+
     // ------------------------------------------------- Açık anahtar dizini
     // Yalnızca AÇIK anahtarlar. Özel anahtarlar cihazdan çıkmaz.
     match /keyBundles/{uid} {

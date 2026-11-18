@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../features/auth/application/auth_providers.dart';
+import '../features/notifications/application/push_providers.dart';
 import '../features/privacy/application/privacy_providers.dart';
 import '../features/privacy/presentation/unlock_gate.dart';
 import 'router.dart';
@@ -17,6 +20,7 @@ class KusDiliApp extends ConsumerStatefulWidget {
 
 class _KusDiliAppState extends ConsumerState<KusDiliApp> {
   late final AppLifecycleListener _lifecycle;
+  StreamSubscription<String>? _opened;
 
   /// Uygulama değiştiricide (son uygulamalar) içerik görünmesin.
   bool _obscured = false;
@@ -30,11 +34,39 @@ class _KusDiliAppState extends ConsumerState<KusDiliApp> {
       // Arka plana geçince açılmış tüm kilitler yeniden kapanır.
       onHide: () => ref.read(unlockProvider.notifier).lockAll(),
     );
+    _listenNotificationTaps();
+  }
+
+  /// Bildirime dokunulunca ilgili sohbeti aç (kilitliyse kilit ekranı gelir).
+  Future<void> _listenNotificationTaps() async {
+    final messaging = ref.read(pushMessagingProvider);
+    void open(String chatId) {
+      if (ref.read(sessionStatusProvider) != SessionStatus.ready) return;
+      ref.read(routerProvider).push(Routes.chat(chatId));
+    }
+
+    try {
+      _opened = messaging.openedChatIds.listen(open);
+      final initial = await messaging.initialChatId();
+      if (initial != null) {
+        // Oturum hazır olana kadar bekle.
+        var done = false;
+        ref.listenManual(sessionStatusProvider, (_, s) {
+          if (!done && s == SessionStatus.ready) {
+            done = true;
+            open(initial);
+          }
+        }, fireImmediately: true);
+      }
+    } catch (_) {
+      // Firebase yapılandırılmamışsa bildirim yok.
+    }
   }
 
   @override
   void dispose() {
     _lifecycle.dispose();
+    _opened?.cancel();
     super.dispose();
   }
 

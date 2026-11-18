@@ -7,6 +7,7 @@ import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/domain/phone_number.dart';
+import '../../notifications/application/push_providers.dart';
 import '../application/profile_providers.dart';
 
 /// Kullanıcı profili.
@@ -53,12 +54,19 @@ class ProfileScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(Routes.privacy),
           ),
+          ListTile(
+            key: const Key('openNotifications'),
+            leading: const Icon(Icons.notifications_outlined),
+            title: const Text('Bildirimler'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.notifications),
+          ),
           const SizedBox(height: 24),
           OutlinedButton.icon(
             key: const Key('signOut'),
             icon: const Icon(Icons.logout),
             label: const Text('Çıkış yap'),
-            onPressed: () => ref.read(authRepositoryProvider).signOut(),
+            onPressed: () => signOutWithPushCleanup(ref),
           ),
         ],
       ),
