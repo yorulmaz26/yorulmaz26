@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <!-- Gölge: koyu dolgu, neon mor çerçeve -->
+    <path android:fillColor="#336D5DFB" android:pathData="M30,46h26v26h-26z" />
+    <path android:fillColor="#05070D" android:strokeColor="#6D5DFB" android:strokeWidth="2.4"
+        android:pathData="M33,49h20a2,2 0 0 1 2,2v18a2,2 0 0 1 -2,2h-20a2,2 0 0 1 -2,-2v-18a2,2 0 0 1 2,-2z" />
+    <path android:fillColor="#9488FF" android:pathData="M38,56m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0M47,56m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0" />
+    <!-- Oyuncu: beyaz kare, turkuaz ışıma -->
+    <path android:fillColor="#4420B8A6" android:pathData="M50,32h30v30h-30z" />
+    <path android:fillColor="#FFFFFF" android:strokeColor="#20B8A6" android:strokeWidth="2.4"
+        android:pathData="M56,36h18a3,3 0 0 1 3,3v18a3,3 0 0 1 -3,3h-18a3,3 0 0 1 -3,-3v-18a3,3 0 0 1 3,-3z" />
+    <!-- Altın elmas -->
+    <path android:fillColor="#D6AD60" android:pathData="M70,70l4,-4h8l4,4l-8,10z" />
+</vector>
