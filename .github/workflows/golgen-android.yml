@@ -105,22 +105,32 @@ jobs:
           echo "----- SONUÇLAR -----"
           cat ui-test-out/test_sonuclari.txt || true
       - name: Ekran görüntülerini ve sonuçları depoya kaydet
-        if: always() && github.event_name == 'push'
+        # İptal edilen çalışmalar yarım sonuç yazmasın
+        if: (success() || failure()) && github.event_name == 'push'
         working-directory: .
         run: |
-          D=golgen-seni-yakalamasin/docs/ekranlar
-          rm -rf "$D" && mkdir -p "$D"
-          for f in ui-test-out/ekranlar/*.png; do
-            [ -f "$f" ] || continue
-            convert "$f" -resize 540x "$D/$(basename "$f")" || cp "$f" "$D/"
-          done
-          cp ui-test-out/test_sonuclari.txt ui-test-out/fps.txt ui-test-out/cihaz.txt "$D/" 2>/dev/null || true
-          grep GolgenUI ui-test-out/logcat.txt > "$D/ui_olaylari.txt" 2>/dev/null || true
+          command -v convert >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick >/dev/null) || true
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add "$D"
-          git commit -m "CI: emülatör ekran görüntüleri ve test sonuçları [skip ci]" || exit 0
-          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
+          D=golgen-seni-yakalamasin/docs/ekranlar
+          for i in 1 2 3; do
+            # Her denemede uzak dalın son hâlinden başla: çakışma olmaz
+            git fetch -q origin "${GITHUB_REF_NAME}"
+            git checkout -q -B sonuc FETCH_HEAD
+            rm -rf "$D" && mkdir -p "$D"
+            for f in ui-test-out/ekranlar/*.png; do
+              [ -f "$f" ] || continue
+              convert "$f" -resize 540x "$D/$(basename "$f")" 2>/dev/null || cp "$f" "$D/"
+            done
+            cp ui-test-out/test_sonuclari.txt ui-test-out/fps.txt ui-test-out/cihaz.txt "$D/" 2>/dev/null || true
+            grep GolgenUI ui-test-out/logcat.txt > "$D/ui_olaylari.txt" 2>/dev/null || true
+            git add -A "$D"
+            git diff --cached --quiet && exit 0
+            git commit -q -m "CI: emülatör ekran görüntüleri ve test sonuçları [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            sleep 5
+          done
+          exit 1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
