@@ -12,6 +12,15 @@ Hem neon engellerden hem de kendi geçmişinden kaçmalısın.
 > Unity bulunmadığı için proje Android Studio + Java ile geliştirildi. Unity'deki ScriptableObject, prefab ve
 > object pooling kavramlarının karşılıkları aşağıda belirtilmiştir.
 
+## Ekran görüntüleri
+Android 14 emülatöründe (Pixel 6) otomatik testler sırasında çekildi; her CI çalışmasında yenilenir.
+
+| Ana menü | Oynanış | Duraklatma | Oyun sonu |
+|---|---|---|---|
+| <img src="docs/ekranlar/03_ana_menu.png" width="200"> | <img src="docs/ekranlar/05_oyun_ortasi.png" width="200"> | <img src="docs/ekranlar/06_duraklatma.png" width="200"> | <img src="docs/ekranlar/07_oyun_sonu.png" width="200"> |
+| **Karakterler** | **Günlük görevler** | **Görev modu** | **Ayarlar** |
+| <img src="docs/ekranlar/08_karakterler.png" width="200"> | <img src="docs/ekranlar/10_gunluk_gorevler.png" width="200"> | <img src="docs/ekranlar/11_gorev_modu.png" width="200"> | <img src="docs/ekranlar/15_ayarlar.png" width="200"> |
+
 ## Açma ve derleme
 
 1. Android Studio'da **File › Open** ile `golgen-seni-yakalamasin/` klasörünü açın (depo kökünü değil).
@@ -93,7 +102,7 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 33 JUnit testi: gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 34 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
   kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı.
 - `tools/smoke_test.sh` — emülatörde uçtan uca test (CI): kurulum, öğretici, tüm menü butonları ve ekran geçişleri,

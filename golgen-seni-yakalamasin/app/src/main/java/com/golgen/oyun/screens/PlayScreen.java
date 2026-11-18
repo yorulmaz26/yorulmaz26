@@ -27,6 +27,7 @@ public final class PlayScreen extends Screen implements GameEvents {
 
     private final GameWorld world = new GameWorld(1);
     private final WorldRenderer renderer = new WorldRenderer();
+    private final com.golgen.oyun.ui.FloatingTexts popups = new com.golgen.oyun.ui.FloatingTexts();
     private final RunResult result = new RunResult();
     private final Progress.Report report = new Progress.Report();
     private int mode;
@@ -115,6 +116,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         world.setArenaHeight(worldH > 0 ? worldH : 1778f);
         world.start(p, mission, System.nanoTime());
         renderer.particles.clear();
+        popups.clear();
         phase = READY;
         phaseTime = 0f;
         pointerId = -1;
@@ -217,7 +219,10 @@ public final class PlayScreen extends Screen implements GameEvents {
                 pauseBtn.visible = false;
             }
         }
-        if (phase != PAUSED) renderer.update(dt, phase == PLAYING ? world.scroll : 0f);
+        if (phase != PAUSED) {
+            renderer.update(dt, phase == PLAYING ? world.scroll : 0f);
+            popups.update(dt);
+        }
         if (shake > 0f) shake = Math.max(0f, shake - dt * 3f);
         if (flash > 0f) flash = Math.max(0f, flash - dt * 2.5f);
         if (phase == ENDING && phaseTime > 1.15f) finishRun();
@@ -265,6 +270,7 @@ public final class PlayScreen extends Screen implements GameEvents {
                 g.sound.play(Synth.DIAMOND);
                 g.haptics.light();
                 renderer.particles.burst(x, y, 14, Theme.GOLD, 420f, 7f, 0.6f);
+                popups.add("+25", x, y - 40f, Theme.GOLD);
                 break;
             case HIT:
                 g.sound.play(Synth.HIT);
@@ -272,6 +278,7 @@ public final class PlayScreen extends Screen implements GameEvents {
                 renderer.particles.burst(x, y, 22, Theme.PURPLE_LIGHT, 600f, 8f, 0.6f);
                 shake = 1f;
                 flash = 0.35f;
+                popups.add("-1 can", x, y - 60f, Theme.PURPLE_LIGHT);
                 break;
             case SHADOW_SPAWN:
                 g.sound.play(Synth.SHADOW, 0.9f, 1f);
@@ -280,6 +287,7 @@ public final class PlayScreen extends Screen implements GameEvents {
             case DODGE:
                 g.sound.play(Synth.DODGE, 0.8f, 1f);
                 renderer.particles.burst(world.px, world.py, 8, Theme.TEAL, 300f, 5f, 0.5f);
+                popups.add("Kıl payı! +15", world.px, world.py - 70f, Theme.TEAL);
                 break;
             case DEATH:
                 g.sound.play(Synth.GAME_OVER);
@@ -311,6 +319,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         renderer.drawBackground(c, w, h, world.scrollDistance);
         boolean playerVisible = !(phase == ENDING && world.state == GameWorld.DEAD);
         renderer.drawWorld(c, world, g.skin(), playerVisible);
+        popups.draw(c, renderer.s, u);
         c.restore();
         if (flash > 0f) c.drawColor(Theme.alpha(Theme.WHITE, flash * 0.35f));
 

@@ -2,7 +2,7 @@
 
 Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalıştırma çıktılarıdır.
 
-## 1. Birim testleri (JUnit, 33 test) — ✅ 33/33 geçti
+## 1. Birim testleri (JUnit, 34 test) — ✅ 34/34 geçti
 Çalıştırıldığı yerler: geliştirme konteynerinde (`javac` + JUnit 4.13.2) ve GitHub Actions'ta `./gradlew testDebugUnitTest`.
 
 | Sınıf | Test | Doğrulanan |
@@ -12,6 +12,7 @@ Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalı�
 | GameWorldTest | 13 | Gölgenin tam olarak *t − gecikme* konumunda olması (120 kare boyunca), hareketsiz kalınca ~4. sn'de yakalanma, daire çizerek kaçabilme, **duraklatmada zaman/gölgenin donması** ve devamda sıçrama olmaması, aynı tohumla determinizm, engel çarpması → can kaybı + dokunulmazlık, boşluktan geçiş, elmas toplama, gölge sayısı sınırı (5), 20 tohumla bot üzerinden adil engel üretimi, duvar boşluk genişliği/erişilebilirliği (300 sn), görev kazanma, engelsiz görevde ilk çarpmada başarısızlık, kıl payı kaçış sayımı |
 | ProgressTest | 8 | Kayıt/okuma gidiş-dönüş (tüm alanlar), kilitli karakter seçiminin reddi, rekor ve ilk 10 listesi, satın alma/seçme, görev açılması ve tek seferlik ödül, günlük görev üretimi (400 gün, tekrarsız) ve ödülün bir kez alınması, oyunlardan günlük ilerleme, sıfırlama |
 | SynthTest | 3 | 8 ses efektinin duyulabilir ve kırpılmamış olması, müzik döngüsü, WAV başlığı |
+| AllocationTest | 1 | 100 sn ısınmadan sonra 30 sn'lik simülasyonda (5 gölge, engeller, elmaslar) iş parçacığı bellek tahsisi < 8 bayt/kare — pratikte sıfır; GC kaynaklı takılma olmaz |
 | MissionsAndSkinsTest | 3 | ≥8 karakter ve artan fiyatlar, 12 görevin 4 türü de kapsaması, başarı tabloları |
 
 ## 2. Derleme kontrolleri — ✅
