@@ -28,7 +28,7 @@ import kotlin.random.Random
  */
 class SoundManager(context: Context) {
 
-    enum class Sfx { FLAP, SCORE, CRASH, CLICK, SWIPE, START, RECORD, GAME_OVER, FIRE }
+    enum class Sfx { FLAP, SCORE, CRASH, CLICK, SWIPE, START, RECORD, GAME_OVER, FIRE, COIN }
 
     private companion object {
         const val RATE = 22050
@@ -52,7 +52,7 @@ class SoundManager(context: Context) {
         .build()
     private val sampleIds = IntArray(Sfx.entries.size)
     private val loadedIds: MutableSet<Int> = ConcurrentHashMap.newKeySet()
-    private val volumes = floatArrayOf(0.55f, 0.7f, 1f, 0.6f, 0.5f, 0.8f, 0.9f, 0.85f, 0.6f)
+    private val volumes = floatArrayOf(0.55f, 0.7f, 1f, 0.6f, 0.5f, 0.8f, 0.9f, 0.85f, 0.6f, 0.65f)
 
     private var music: AudioTrack? = null
     private var musicTheme = -1
@@ -153,6 +153,7 @@ class SoundManager(context: Context) {
                 Sfx.RECORD -> synthArp(intArrayOf(72, 76, 79, 84, 88, 91), 0.09f, 0.6f, 0.55f)
                 Sfx.GAME_OVER -> synthArp(intArrayOf(67, 63, 60, 55), 0.13f, 0.45f, 0.5f)
                 Sfx.FIRE -> synthFire()
+                Sfx.COIN -> synthCoin()
             }
             val file = File(dir, "${sfx.name.lowercase()}.wav")
             runCatching {
@@ -206,6 +207,14 @@ class SoundManager(context: Context) {
             val boom = sin(phase) * exp(-t * 5f)
             out[i] = (lp2 * 2.2f + boom * 0.9f) * env
         }
+        return out
+    }
+
+    /** Para: kısa, parlak iki nota. */
+    private fun synthCoin(): FloatArray {
+        val out = buf(0.3f)
+        addBell(out, 0f, midiHz(88), 0.45f, 16f, triangle = true)
+        addBell(out, 0.06f, midiHz(95), 0.5f, 11f, triangle = true)
         return out
     }
 
@@ -324,6 +333,31 @@ class SoundManager(context: Context) {
         Theme(
             112f, arrayOf(intArrayOf(50, 53, 57), intArrayOf(46, 50, 53), intArrayOf(53, 57, 60), intArrayOf(48, 52, 55)),
             intArrayOf(0, 1, 2, 0, 1, 2, 1, 2), 0.14f, 12, 1, 9f, 8, 0.05f, 0f, 3, 2
+        ),
+        // Kara Delik: Cm - Ab - Fm - G, ağır ve derin, yavaş vuruşlu
+        Theme(
+            70f, arrayOf(intArrayOf(48, 51, 55), intArrayOf(44, 48, 51), intArrayOf(41, 44, 48), intArrayOf(43, 47, 50)),
+            intArrayOf(0, 2, 1, 2, 0, 2, 1, 2), 0.1f, 12, 1, 4f, 4, 0.12f, 2f, 1, 2
+        ),
+        // Elektrik Fırtınası: Am - G - F - E, hızlı, sert sentez, tam davul
+        Theme(
+            144f, arrayOf(intArrayOf(57, 60, 64), intArrayOf(55, 59, 62), intArrayOf(53, 57, 60), intArrayOf(52, 56, 59)),
+            intArrayOf(0, 2, 1, 2, 0, 2, 1, 0), 0.11f, 12, 2, 14f, 8, 0.03f, 0f, 2, 3
+        ),
+        // Meteor Yağmuru: Gm - Eb - Bb - F, orta tempo, üçgen dalga
+        Theme(
+            120f, arrayOf(intArrayOf(55, 58, 62), intArrayOf(51, 55, 58), intArrayOf(46, 50, 53), intArrayOf(53, 57, 60)),
+            intArrayOf(2, 1, 0, 1, 2, 1, 0, 2), 0.13f, 12, 1, 10f, 8, 0.05f, 0f, 3, 3
+        ),
+        // Zehirli Bulutsu: Em(add9) - F#dim - Em - D#aug, tuhaf ve dalgalı
+        Theme(
+            92f, arrayOf(intArrayOf(52, 55, 59, 66), intArrayOf(54, 57, 60), intArrayOf(52, 55, 59), intArrayOf(51, 55, 59)),
+            intArrayOf(0, 3, 1, 2, 3, 0, 2, 1), 0.12f, 12, 0, 6f, 8, 0.08f, 6f, 3, 1
+        ),
+        // Galaksi Merkezi: C - G - Am - F, destansı final, geniş pad ve davul
+        Theme(
+            100f, arrayOf(intArrayOf(48, 55, 60, 64), intArrayOf(43, 55, 59, 62), intArrayOf(45, 52, 57, 60), intArrayOf(41, 53, 57, 60)),
+            intArrayOf(0, 1, 2, 3, 2, 1, 2, 3), 0.13f, 24, 1, 5f, 8, 0.1f, 0f, 1, 2
         )
     )
 

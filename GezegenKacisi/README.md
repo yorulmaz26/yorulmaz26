@@ -50,6 +50,31 @@ Oyundaki **2-4 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adım
 Notlar: Maç sırasında uygulamadan çıkan oyuncu yanmış sayılır. Bazı misafir/okul Wi-Fi ağları cihazların birbirini
 görmesini engeller; öyle bir ağda hotspot kullanın. Ağ kodu [`NetLink.kt`](app/src/main/java/com/example/gezegenkacisi/NetLink.kt) içinde.
 
+### 2.0: Bölümler, para, market ve canlar
+
+Ana ekranda **BÖLÜMLER**, **SONSUZ MOD**, **2-4 OYUNCU** ve **MARKET** var.
+
+**500 bölüm.** 10 haritanın her birinde 5 bölüm vardır; 50 bölümlük tur 10 kez tekrarlanır ve her turda zorlaşır.
+- 1. bölümü geçmek için **15 puan** yeter. Her yeni 5'li harita grubunda hedef **2 puan artar** (15, 17, 19 …), 120'de sabitlenir.
+- Her bölümün kendi özellikleri vardır: Hızlı akış, Dar geçitler, Sık kuleler, Ağır/Hafif yer çekimi, Altın yağmuru,
+  Rüzgâr, Ateş topları, Meteor yağmuru, Salınan kuleler, Kara delik çekimi, Yıldırım. 1. bölüm özelliksizdir;
+  her haritanın 5. bölümü "HARİTA FİNALİ"dir ve daha zordur.
+- Bölümler sırayla açılır, ilerleme kaydedilir. Bölüm üretimi [`Progress.kt`](app/src/main/java/com/example/gezegenkacisi/Progress.kt) içindedir.
+
+**Canlar (yalnızca bölüm modu).** En fazla 4 can; oyun ilk yüklendiğinde canlar doludur.
+- Bölüm başlarken 1 can harcanır, bölüm geçilirse geri verilir. Yanmak, bölümden çıkmak ya da uygulamayı kapatmak canı götürür.
+- Eksik canlar **15 dakikada bir** dolar; kalan süre kalp kutusunda görünür.
+- **Saat hilesine karşı:** süre, telefonun saatinden değil, değiştirilemeyen açılıştan beri geçen süre sayacından ölçülür.
+  Telefon yeniden başlatılırsa kapalı kalınan süre ancak internetten alınan gerçek saatle doğrulanınca sayılır.
+  Telefonun saatini ileri/geri almak can kazandırmaz. Ayrıntılar: [`Lives.kt`](app/src/main/java/com/example/gezegenkacisi/Lives.kt).
+
+**Para ve market.** Uçarken boşluklardaki paraları topla; bölüm geçince ödül parası (ilk kez geçince daha fazla) kazanılır.
+Marketten 10 uçan araç alınır: Klasik, Gece ve Zümrüt roketleri, Uzay Mekiği, Kuyruklu Yıldız, UFO, Altın Roket,
+Halkalı Gezegen, Lav Gezegeni ve Kristal Gemi. Para, satın alınanlar ve seçili araç kalıcıdır.
+
+**10 harita.** Yeni haritalar: Kara Delik (ortaya çekim), Elektrik Fırtınası (yıldırım), Meteor Yağmuru,
+Zehirli Bulutsu (rüzgâr + salınım) ve Galaksi Merkezi (final). Her haritanın kendi dekoru ve müziği vardır.
+
 ## Çalıştırma
 
 1. **Android Studio**'yu aç ve **File › Open** ile bu `GezegenKacisi` klasörünü seç.
@@ -80,7 +105,9 @@ app/src/main/
 ├── java/com/example/gezegenkacisi/
 │   ├── MainActivity.kt   tam ekran ayarı, yaşam döngüsü, geri tuşu
 │   ├── GameView.kt       menü, oyun döngüsü, fizik, çarpışma ve tüm çizimler
-│   ├── GameConfig.kt     haritalar ve seviyeler
+│   ├── GameConfig.kt     haritalar, mekanikler ve seviyeler
+│   ├── Progress.kt       500 bölüm, bölüm özellikleri ve marketteki araçlar
+│   ├── Lives.kt          canlar ve saat hilesine karşı süre ölçümü
 │   ├── SoundManager.kt   kodla üretilen ses efektleri ve müzik
 │   └── NetLink.kt        2-4 oyuncu: yerel ağda oda kurma, bulma ve mesajlaşma
 └── res/

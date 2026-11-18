@@ -17,6 +17,8 @@ import android.graphics.RadialGradient
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
+import android.os.SystemClock
+import android.provider.Settings
 import android.view.Choreographer
 import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
@@ -33,6 +35,9 @@ import kotlin.math.pow
 import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.random.Random
+import java.net.HttpURLConnection
+import java.net.URL
+import kotlin.concurrent.thread
 
 /**
  * Gezegen Kaçışı: dokununca roket itiş yapar, yer çekimi aşağı çeker.
@@ -45,7 +50,7 @@ import kotlin.random.Random
  */
 class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
-    private enum class State { MENU, READY, PLAYING, DYING, OVER, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
+    private enum class State { HUB, MENU, LEVELS, MARKET, READY, PLAYING, DYING, OVER, LEVEL_DONE, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
 
     /** 2 oyuncu lobisinin aşamaları. */
     private enum class Lobby { CHOOSE, HOSTING, JOINING, CONNECTED }
@@ -68,12 +73,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     /** Lav Denizi'nde yerden fırlayan ateş topu. Önce [warn] süresi boyunca zemin kızarır. */
-    private class Fireball(var x: Float, var y: Float, var vy: Float, var warn: Float)
+    private class Fireball(var x: Float, var y: Float, var vy: Float, var warn: Float, val fromTop: Boolean = false)
+
+    /** Yıldırım: önce [warn] süresince kesik çizgiyle uyarır, sonra [life] süresince yukarıdan [len] kadar iner. */
+    private class Bolt(var x: Float, val len: Float, var warn: Float, var life: Float)
 
     /** Bir engel kulesi. Asteroit Kuşağı'nda tüm kule [swayAmp] kadar yukarı aşağı salınır. */
     private class Column(var x: Float, val planets: List<Planet>, val swayAmp: Float, val swayPhase: Float) {
         var scored = false
         var offset = 0f
+        var coinY = Float.NaN   // boşluktaki para (yoksa NaN)
+        var coinTaken = false
         val halfWidth: Float = planets.maxOf { abs(it.dx) + it.art.padX * it.r / it.art.baseR }
     }
 
@@ -101,6 +111,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val WIND_BASE = 430f       // gaz devlerinde rüzgârın en büyük kuvveti (Orta)
         private const val FIRE_GRAVITY = 1150f   // ateş topunun yer çekimi
         private const val FIRE_R = 15f           // ateş topunun çarpışma yarıçapı
+        private const val PULL_K = 2.4f          // kara delik çekiminin gücü
+        private const val BOLT_W = 13f           // yıldırımın yarı genişliği
+        private const val COIN_R = 15f           // paranın yarıçapı
+        private const val LEVEL_LIST_TOP = 140f  // bölüm listesinin başladığı yer
+        private const val LEVEL_ROW_H = 150f     // listede bir harita satırının yüksekliği
 
         // --- 2 oyuncu ---
         private const val MP_STEP = 1f / 120f     // iki telefonda aynı sabit adımla simülasyon
@@ -120,6 +135,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val KEY_SOUND = "sound"
         private const val KEY_MP_HELP_SEEN = "mp_help_seen"
         private const val KEY_MP_FULL = "mp_full"
+        private const val KEY_COINS = "coins"
+        private const val KEY_LEVEL_MAX = "level_max"   // geçilen en yüksek bölüm
+        private const val KEY_SKINS = "skins"           // satın alınan araçlar
+        private const val KEY_SKIN = "skin"             // seçili araç
 
         private val DEG = (PI / 180.0).toFloat()
         private val TWO_PI = (PI * 2.0).toFloat()
@@ -149,7 +168,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var artMap = -1
 
     // --- Oyun durumu ---
-    private var state = State.MENU
+    private var state = State.HUB
     private var paused = false
     private var running = false
     private var lastFrameNs = 0L
@@ -163,7 +182,63 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var boost = 0f
     private var emitAcc = 0f
 
-    private var speed = difficulty.baseSpeed
+    // --- Bu oyunun kuralları (sonsuz modda seviyeden, bölüm modunda bölümden) ---
+    private var cfg: DiffParams = difficulty.params
+    private var mechs: Set<Mech> = emptySet()
+    private var gravMul = 1f
+    private var flapMul = 1f
+    private var coinChance = 0f
+    private var coinValue = 1
+
+    // --- Bölümler, para ve market (kalıcı) ---
+    private var levelMode = false
+    private var level: LevelInfo? = null
+    private var levelMax = prefs.getInt(KEY_LEVEL_MAX, 0)
+    private var coins = prefs.getInt(KEY_COINS, 0)
+    private var runCoins = 0
+    private var levelBonus = 0
+    private var coinRng = Random(1)
+    private val ownedSkins = HashSet<Skin>().apply {
+        add(Skin.CLASSIC)
+        prefs.getString(KEY_SKINS, "").orEmpty().split(',').forEach { n ->
+            Skin.entries.firstOrNull { it.name == n }?.let { add(it) }
+        }
+    }
+    private var skin: Skin = Skin.entries.firstOrNull { it.name == prefs.getString(KEY_SKIN, "") }
+        ?.takeIf { it in ownedSkins } ?: Skin.CLASSIC
+    // --- Canlar (bölüm modu): 4 can, her biri 15 dakikada dolar, saat hilesine karşı korumalı ---
+    @Volatile private var netBaseMs = -1L       // internetten alınan gerçek saat
+    @Volatile private var netBaseElapsed = 0L   // o andaki değiştirilemeyen sayaç
+    private var netRetry = 0f
+    private val lives = Lives(
+        object : Lives.Store {
+            override fun getLong(key: String, def: Long) = prefs.getLong(key, def)
+            override fun putLong(key: String, value: Long) { prefs.edit().putLong(key, value).apply() }
+        },
+        object : Lives.Clock {
+            override fun elapsed() = SystemClock.elapsedRealtime()
+            override fun bootCount() =
+                runCatching { Settings.Global.getInt(context.contentResolver, Settings.Global.BOOT_COUNT) }.getOrDefault(-1)
+            override fun trustedNow(): Long {
+                val b = netBaseMs
+                return if (b < 0L) -1L else b + (SystemClock.elapsedRealtime() - netBaseElapsed)
+            }
+        }
+    )
+    private var livesTick = 0f
+    private var lifeSpent = false               // bu bölüm denemesi için can harcandı mı
+
+    private val bolts = ArrayList<Bolt>()
+    private var boltTimer = 0f
+    private var meteorTimer = 0f
+    private var levelScroll = 0f
+    private var scrollVel = 0f
+    private var dragging = false
+    private var lastMoveY = 0f
+    private var marketMsg = ""
+    private var marketMsgT = 0f
+
+    private var speed = difficulty.params.baseSpeed
     private var score = 0
     private var best = 0
     private var newBest = false
@@ -297,6 +372,36 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strNobodyLeft = context.getString(R.string.mp_nobody_left)
     private val strPlayersCount = context.getString(R.string.mp_players_count)
     private val strWatchingMany = context.getString(R.string.mp_watching_many)
+    private val strLevels = context.getString(R.string.hub_levels)
+    private val strEndless = context.getString(R.string.hub_endless)
+    private val strMarket = context.getString(R.string.hub_market)
+    private val strHubHint = context.getString(R.string.hub_hint)
+    private val strLevelProgress = context.getString(R.string.level_progress)
+    private val strLevelTitle = context.getString(R.string.level_title)
+    private val strRound = context.getString(R.string.level_round)
+    private val strTarget = context.getString(R.string.level_target)
+    private val strPractice = context.getString(R.string.level_practice)
+    private val strMapFinal = context.getString(R.string.level_final)
+    private val strReward = context.getString(R.string.level_reward)
+    private val strReplay = context.getString(R.string.level_replay)
+    private val strLevelFailed = context.getString(R.string.level_failed)
+    private val strLevelDone = context.getString(R.string.level_done)
+    private val strAllDone = context.getString(R.string.level_all_done)
+    private val strAllDoneDesc = context.getString(R.string.level_all_done_desc)
+    private val strNext = context.getString(R.string.next)
+    private val strLevelsPassed = context.getString(R.string.levels_passed)
+    private val strTargetLabel = context.getString(R.string.target_label)
+    private val strRewardLabel = context.getString(R.string.reward_label)
+    private val strCoinsCollected = context.getString(R.string.coins_collected)
+    private val strSelected = context.getString(R.string.market_selected)
+    private val strSelect = context.getString(R.string.market_select)
+    private val strNoMoney = context.getString(R.string.market_no_money)
+    private val strBought = context.getString(R.string.market_bought)
+    private val strLevelLocked = context.getString(R.string.level_locked)
+    private val strNoLives = context.getString(R.string.lives_empty)
+    private val strLifeRule = context.getString(R.string.lives_rule)
+    private val modNames = Mod.entries.map { context.getString(it.nameRes) }
+    private val skinNames = Skin.entries.map { context.getString(it.nameRes) }
     private val strBothCanPick = context.getString(R.string.mp_both_pick)
     private val strHelpTitle = context.getString(R.string.mp_help_title)
     private val strHelpClose = context.getString(R.string.mp_help_close)
@@ -452,6 +557,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             Palette(hex(0xFF7A7C86), hex(0xFF2E3038), hex(0xFFB8BCC8), hex(0xFF50525C), hex(0xFF7A7C86)),
             Palette(hex(0xFF9A7350), hex(0xFF3E2A1A), hex(0xFFD8B088), hex(0xFF6A4A30), hex(0xFF9A7350))
         ),
+        PlanetType.DARK to listOf(
+            Palette(hex(0xFF3A2A4A), hex(0xFF120A1A), hex(0xFF6A5A8A), hex(0xFF2A1A3A), hex(0xFF8A5BFF)),
+            Palette(hex(0xFF4A3028), hex(0xFF160C08), hex(0xFF8A6A50), hex(0xFF2A1A10), hex(0xFFFF9A3B))
+        ),
+        PlanetType.TOXIC to listOf(
+            Palette(hex(0xFF5FBF3B), hex(0xFF1F5A12), hex(0xFFD8FF8A), hex(0xFFC8FF3B), hex(0xFF9BFF5B)),
+            Palette(hex(0xFF3BBF8A), hex(0xFF0F5A3A), hex(0xFFA8FFD8), hex(0xFF7BFF3B), hex(0xFF5BFFB8))
+        ),
         PlanetType.MOON to listOf(
             Palette(hex(0xFFA3A3AE), hex(0xFF4E4F5E), hex(0xFFDADBE3), hex(0xFF6E6F7E), hex(0xFFDADBE3)),
             Palette(hex(0xFFB5A58C), hex(0xFF5A4E3E), hex(0xFFE6DAC3), hex(0xFF7A6B55), hex(0xFFE6DAC3)),
@@ -463,6 +576,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         isFocusable = true
         isFocusableInTouchMode = true
         sound.enabled = prefs.getBoolean(KEY_SOUND, true)
+        fetchNetTime()
         sound.setMusicTheme(map.musicTheme)
         refreshBestTexts()
     }
@@ -483,6 +597,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (state == State.PLAYING) paused = true
         // 2 oyuncuda oyun bekletilemez: uygulamadan çıkan oyuncu yanmış sayılır
         if (state == State.MP_PLAYING && myAlive) mpCrash()
+        saveCoins()
         running = false
         Choreographer.getInstance().removeFrameCallback(this)
         sound.onPause()
@@ -497,10 +612,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     /** Geri tuşu. true dönerse olay tüketildi; false ise uygulama kapanabilir. */
     fun onBack(): Boolean {
         when (state) {
-            State.MENU -> return false
-            State.PLAYING -> if (!paused) paused = true else toMenu()
+            State.HUB -> return false
+            State.MENU, State.LEVELS, State.MARKET -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
+            State.PLAYING -> if (!paused) paused = true else leaveRun()
             State.MP_LOBBY, State.MP_COUNTDOWN, State.MP_PLAYING, State.MP_OVER -> leaveMp()
-            else -> toMenu()
+            else -> leaveRun()
         }
         return true
     }
@@ -599,7 +715,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 downX = wx
                 downY = wy
                 downTime = time
+                lastMoveY = wy
+                dragging = false
+                scrollVel = 0f
                 onPress()
+            }
+            MotionEvent.ACTION_MOVE -> if (state == State.LEVELS) {
+                val dy = wy - lastMoveY
+                if (abs(wy - downY) > 14f) dragging = true
+                if (dragging) {
+                    levelScroll = (levelScroll - dy).coerceIn(0f, maxLevelScroll())
+                    scrollVel = -dy * 60f
+                }
+                lastMoveY = wy
             }
             // İkinci parmakla da itiş yapılabilsin
             MotionEvent.ACTION_POINTER_DOWN -> if (state == State.PLAYING || state == State.MP_PLAYING) onPress()
@@ -635,6 +763,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
         when (state) {
             State.READY -> {
+                if (levelMode && !lifeSpent) {
+                    if (!lives.spend()) {
+                        marketMsg = String.format(strNoLives, lives.nextText())
+                        marketMsgT = 2f
+                        sound.play(SoundManager.Sfx.GAME_OVER)
+                        return
+                    }
+                    lifeSpent = true
+                }
                 state = State.PLAYING
                 stateTimer = 0f
                 flap()
@@ -651,6 +788,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val dy = y - downY
         val moved = abs(dx) > 28f || abs(dy) > 28f
         when (state) {
+            State.HUB -> if (!moved) hubTap(downX, downY)
+            State.LEVELS -> if (!dragging) levelsTap(downX, downY)
+            State.MARKET -> if (!moved) marketTap(downX, downY)
+            State.LEVEL_DONE -> if (!moved && stateTimer > 0.6f) levelDoneTap(downX, downY)
             State.MENU -> {
                 val swipe = abs(dx) > 60f && abs(dx) > abs(dy) * 1.3f &&
                     downY > mapCard.top - 40f && downY < mapCard.bottom + 40f
@@ -669,9 +810,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             }
             State.MP_OVER -> if (!moved && stateTimer > 0.6f) mpOverTap(downX, downY)
             State.OVER -> if (!moved && stateTimer > 0.6f) {
+                val lv = level
                 when {
                     hit(soundBtn, downX, downY) -> toggleSound()
-                    hit(menuBtn, downX, downY) -> { sound.play(SoundManager.Sfx.CLICK); toMenu() }
+                    hit(menuBtn, downX, downY) -> { sound.play(SoundManager.Sfx.CLICK); leaveRun() }
+                    levelMode && lv != null -> openLevel(lv.number)
                     else -> startReady() // "Tekrar" ya da ekranın herhangi bir yeri
                 }
             }
@@ -685,7 +828,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             hit(arrowLeft, x, y, 18f) -> changeMap(-1)
             hit(arrowRight, x, y, 18f) -> changeMap(1)
             hit(startBtn, x, y) -> startReady()
-            hit(multiBtn, x, y, 6f) -> enterLobby()
+            hit(backCircle, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
             else -> {
                 for (i in diffBtns.indices) {
                     if (hit(diffBtns[i], x, y, 6f)) {
@@ -701,7 +844,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         x >= r.left - pad && x <= r.right + pad && y >= r.top - pad && y <= r.bottom + pad
 
     private fun flap() {
-        rocketVy = FLAP_V * map.flapMul
+        rocketVy = FLAP_V * flapMul
         boost = 1f
         repeat(8) { emitExhaust(1.3f) }
         sound.play(SoundManager.Sfx.FLAP)
@@ -712,20 +855,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     // =====================================================================
 
     private fun changeMap(dir: Int) {
-        val n = Maps.ALL.size
-        mapIndex = ((mapIndex + dir) % n + n) % n
-        map = Maps.ALL[mapIndex]
-        prefs.edit().putInt(KEY_MAP, mapIndex).apply()
-        if (width > 0 && height > 0) {
-            buildBackground(width, height)
-            buildPlanetArts()
-            buildStars()
-            buildMotes()
-        }
+        setMap(mapIndex + dir, save = true)
         cardAnim = dir.toFloat()
-        sound.setMusicTheme(map.musicTheme)
         sound.play(SoundManager.Sfx.SWIPE)
-        refreshBestTexts()
         sendSelection()
     }
 
@@ -745,12 +877,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         sound.play(SoundManager.Sfx.CLICK)
     }
 
+    /** Sonsuz mod ayar ekranı (harita + seviye seçimi). */
     private fun toMenu() {
+        levelMode = false
         resetGame()
         state = State.MENU
     }
 
+    /** Oyundan çıkış: bölüm modunda bölüm listesine, sonsuz modda ayar ekranına. */
+    private fun leaveRun() {
+        saveCoins()
+        if (levelMode) enterLevels() else toMenu()
+    }
+
     private fun startReady() {
+        levelMode = false
         resetGame()
         state = State.READY
         sound.play(SoundManager.Sfx.START)
@@ -772,19 +913,68 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         score = 0
         scoreText = "0"
         newBest = false
-        speed = difficulty.baseSpeed * map.speedMul
+        applyRunConfig()
+        speed = cfg.baseSpeed * map.speedMul
         lastGapY = WORLD_H / 2f
         paused = false
         fireballs.clear()
+        bolts.clear()
         fireTimer = 2.2f
+        meteorTimer = 2.6f
+        boltTimer = 2.4f
         windPhase = wr(0f, TWO_PI)
+        runCoins = 0
+        coinRng = Random(seed xor 0x5EED)
     }
+
+    /**
+     * Gerçek saati internetten (sunucunun "Date" başlığı) alır. Telefonun saati değiştirilse de etkilenmez;
+     * yalnızca telefon kapalıyken geçen sürenin can dolumuna sayılmasını doğrulamak için kullanılır.
+     */
+    private fun fetchNetTime() {
+        if (netBaseMs >= 0L) return
+        thread(name = "gk-time", isDaemon = true) {
+            runCatching {
+                val t0 = SystemClock.elapsedRealtime()
+                val c = URL("https://www.google.com/generate_204").openConnection() as HttpURLConnection
+                c.requestMethod = "HEAD"
+                c.connectTimeout = 5000
+                c.readTimeout = 5000
+                c.useCaches = false
+                c.connect()
+                val date = c.date
+                c.disconnect()
+                val t1 = SystemClock.elapsedRealtime()
+                if (date > 0L) {
+                    netBaseElapsed = (t0 + t1) / 2
+                    netBaseMs = date + 500L // Date başlığı saniye hassasiyetinde
+                }
+            }
+        }
+    }
+
+    /** Oyunun kurallarını belirler: harita + (bölüm modunda) bölüm özellikleri. */
+    private fun applyRunConfig() {
+        val lv = if (levelMode) level else null
+        cfg = lv?.params ?: difficulty.params
+        mechs = if (lv != null) map.mechs + lv.mechs else map.mechs
+        gravMul = map.gravityMul
+        flapMul = map.flapMul
+        if (lv != null && lv.has(Mod.HEAVY)) { gravMul *= 1.18f; flapMul *= 1.06f }
+        if (lv != null && lv.has(Mod.LIGHT)) { gravMul *= 0.8f; flapMul *= 0.88f }
+        // Çok oyunculuda para yok (herkes aynı parkuru oynar, para tek kişilik ilerlemedir)
+        val mp = isMpView() || state == State.MP_LOBBY
+        coinChance = if (mp) 0f else if (lv != null && lv.has(Mod.GOLD)) 1f else 0.45f
+        coinValue = if (lv != null && lv.has(Mod.GOLD)) 2 else 1
+    }
+
+    private fun hazard() = cfg.hazard * map.hazardMul
 
     /** Dünya üretimi için tohumlu rastgele sayı: iki telefonda aynı sonucu verir. */
     private fun wr(a: Float, b: Float): Float = a + worldRng.nextFloat() * (b - a)
 
-    private fun computeWind(): Float = if (map.kind == MapKind.GAS) {
-        WIND_BASE * difficulty.hazard * sin(worldTime * 0.62f + windPhase) *
+    private fun computeWind(): Float = if (Mech.WIND in mechs) {
+        WIND_BASE * hazard() * sin(worldTime * 0.62f + windPhase) *
             (0.75f + 0.25f * sin(worldTime * 1.7f))
     } else 0f
 
@@ -795,8 +985,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Roketin bir adımlık fiziği: yer çekimi, rüzgâr, tavan ve eğim. */
     private fun stepRocket(dt: Float) {
-        val maxFall = MAX_FALL * min(1f, map.gravityMul)
-        rocketVy = min(rocketVy + (GRAVITY * map.gravityMul + wind) * dt, maxFall)
+        val maxFall = MAX_FALL * min(1f, gravMul)
+        var force = GRAVITY * gravMul + wind
+        // Kara delik: roket ekranın ortasına doğru çekilir
+        if (Mech.PULL in mechs) force += (WORLD_H * 0.5f - rocketY) * PULL_K * hazard()
+        rocketVy = min(rocketVy + force * dt, maxFall)
         rocketY += rocketVy * dt
         if (rocketY < 22f) {
             rocketY = 22f
@@ -807,7 +1000,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun currentSpeed(): Float =
-        (difficulty.baseSpeed + min(progress, difficulty.speedCapScore) * difficulty.speedPerScore) * map.speedMul
+        (cfg.baseSpeed + min(progress, cfg.speedCapScore) * cfg.speedPerScore) * map.speedMul
 
     private fun update(dt: Float) {
         time += dt
@@ -820,8 +1013,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         cardAnim *= exp(-dt * 12f)
         if (abs(cardAnim) < 0.002f) cardAnim = 0f
 
-        val base = difficulty.baseSpeed * map.speedMul
+        val base = cfg.baseSpeed * map.speedMul
+        if (marketMsgT > 0f) marketMsgT -= dt
+        livesTick -= dt
+        if (livesTick <= 0f) {
+            livesTick = 1f
+            lives.update()
+            if (netBaseMs < 0L) {
+                netRetry -= 1f
+                if (netRetry <= 0f) { netRetry = 60f; fetchNetTime() }
+            }
+        }
         val worldSpeed = when (state) {
+            State.HUB, State.LEVELS, State.MARKET -> base * 0.45f
+            State.LEVEL_DONE -> base * 0.25f
             State.MENU -> base * 0.5f
             State.READY -> base * 0.7f
             State.PLAYING, State.MP_PLAYING -> speed
@@ -840,7 +1045,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         updateMotes(dt, worldSpeed)
 
         when (state) {
-            State.MENU -> Unit
+            State.MENU, State.HUB, State.MARKET -> Unit
+            State.LEVELS -> if (!dragging && abs(scrollVel) > 1f) {
+                levelScroll = (levelScroll + scrollVel * dt).coerceIn(0f, maxLevelScroll())
+                scrollVel *= exp(-dt * 4f)
+            }
+            State.LEVEL_DONE -> {
+                rocketY += (WORLD_H * 0.42f - rocketY) * min(1f, dt * 2.5f)
+                rocketAngle += (-8f - rocketAngle) * min(1f, dt * 4f)
+                emit(dt, 45f, 1.2f)
+            }
             State.READY -> {
                 // Başlamadan önce roket hafifçe süzülür
                 rocketY = WORLD_H * 0.45f + sin(time * 2.6f) * 14f
@@ -851,9 +1065,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 stepRocket(dt)
                 speed = currentSpeed()
                 updateColumns(dt)
-                updateFireballs(dt)
-                emit(dt, 55f, 1f + boost * 0.6f)
-                if (rocketHits()) crash()
+                // Hedefe ulaşıldıysa bu karede artık çarpışma sayılmaz
+                if (state == State.PLAYING) {
+                    updateFireballs(dt)
+                    emit(dt, 55f, 1f + boost * 0.6f)
+                    if (rocketHits()) crash()
+                }
             }
             State.DYING -> {
                 updateFireballs(dt)
@@ -902,8 +1119,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val last = columns.lastOrNull()
         if (last == null) {
             columns.add(makeColumn(if (mp) MP_FIRST_X else spawnX))
-        } else if (last.x + difficulty.spacing <= spawnX) {
-            columns.add(makeColumn(last.x + difficulty.spacing))
+        } else if (last.x + cfg.spacing <= spawnX) {
+            columns.add(makeColumn(last.x + cfg.spacing))
         }
 
         val iter = columns.iterator()
@@ -921,6 +1138,24 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                     scoreText = score.toString()
                     scorePulse = 1f
                     sound.play(SoundManager.Sfx.SCORE)
+                    val lv = level
+                    if (state == State.PLAYING && levelMode && lv != null && score >= lv.target) {
+                        levelComplete()
+                        return
+                    }
+                }
+            }
+            // Para toplama
+            if (state == State.PLAYING && !col.coinY.isNaN() && !col.coinTaken && abs(col.x - rocketX) < 60f) {
+                if (rocketTouches(col.x, col.coinY + col.offset, COIN_R)) {
+                    col.coinTaken = true
+                    runCoins += coinValue
+                    coins += coinValue
+                    sound.play(SoundManager.Sfx.COIN)
+                    repeat(10) {
+                        val a = rnd(0f, TWO_PI)
+                        spawn(col.x, col.coinY + col.offset, cos(a) * 140f, sin(a) * 140f, 0.4f, rnd(2f, 3.5f), colGold, 3f)
+                    }
                 }
             }
         }
@@ -928,9 +1163,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Ortada bir geçiş boşluğu bırakan, üstte ve altta gezegen kulesi olan bir engel üretir. */
     private fun makeColumn(x: Float): Column {
-        val d = difficulty
+        val d = cfg
         val gapH = max(d.minGap, d.startGap - progress * d.gapShrink)
-        val amp = if (map.kind == MapKind.ASTEROID) d.swayAmp else 0f
+        val amp = if (Mech.SWAY in mechs) d.swayAmp * map.hazardMul.coerceAtLeast(0.8f) else 0f
         val minY = 110f + gapH / 2f + amp
         val maxY = WORLD_H - 110f - gapH / 2f - amp
         val gapY = (lastGapY + wr(-d.gapJump, d.gapJump)).coerceIn(minY, maxY)
@@ -941,6 +1176,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         buildStack(planets, gapY + gapH / 2f, 1f, amp)  // alt kule
         val col = Column(x, planets, amp, wr(0f, TWO_PI))
         if (amp > 0f) col.offset = amp * sin(worldTime * SWAY_SPEED + col.swayPhase)
+        // Para: boşluğun içinde, ayrı rastgele sayı üreticisiyle (parkuru değiştirmez)
+        if (coinChance > 0f && coinRng.nextFloat() < coinChance) {
+            col.coinY = gapY + (coinRng.nextFloat() - 0.5f) * gapH * 0.45f
+        }
         return col
     }
 
@@ -952,7 +1191,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val stack = ArrayList<Planet>()
         val mainR = wr(60f, MAIN_R) * map.planetMul
         var cy = gapEdge + dir * mainR
-        val spinning = map.kind == MapKind.ASTEROID
+        val spinning = Mech.SPIN in mechs
         stack.add(
             Planet(
                 0f, cy, mainR, mainArts[worldRng.nextInt(mainArts.size)],
@@ -982,6 +1221,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         for (i in stack.indices.reversed()) out.add(stack[i])
     }
 
+    /** Roketin çarpışma dairelerinden biri (x, y, r) dairesine değiyor mu. */
+    private fun rocketTouches(x: Float, y: Float, r: Float): Boolean {
+        val rad = rocketAngle * DEG
+        val cs = cos(rad)
+        val sn = sin(rad)
+        for (i in hitX.indices) {
+            val dx = x - (rocketX + hitX[i] * cs)
+            val dy = y - (rocketY + hitX[i] * sn)
+            val rr = r + hitR[i]
+            if (dx * dx + dy * dy < rr * rr) return true
+        }
+        return false
+    }
+
     private fun rocketHits(): Boolean {
         val rad = rocketAngle * DEG
         val cs = cos(rad)
@@ -991,6 +1244,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val hy = rocketY + hitX[i] * sn
             val hr = hitR[i]
             if (hy + hr > WORLD_H) return true // uzayın derinliklerine düştü
+            for (b in bolts) {
+                if (b.warn > 0f || b.life <= 0f) continue
+                if (abs(b.x - hx) < BOLT_W + hr && hy - hr < b.len) return true
+            }
             for (fb in fireballs) {
                 if (fb.warn > 0f) continue
                 val dx = fb.x - hx
@@ -1019,11 +1276,45 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         flash = 0.2f
         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         sound.play(SoundManager.Sfx.CRASH)
-        if (score > best) {
+        saveCoins()
+        if (!levelMode && score > best) {
             best = score
             newBest = true
             prefs.edit().putInt(bestKey(), best).apply()
             refreshBestTexts()
+        }
+    }
+
+    private fun saveCoins() {
+        prefs.edit().putInt(KEY_COINS, coins).apply()
+    }
+
+    /** Bölüm hedefine ulaşıldı. İlk kez geçilen bölüm ödül parası verir ve sonrakini açar. */
+    private fun levelComplete() {
+        val lv = level ?: return
+        state = State.LEVEL_DONE
+        stateTimer = 0f
+        // Bölüm geçilince harcanan can geri verilir
+        if (lifeSpent) {
+            lives.refund()
+            lifeSpent = false
+        }
+        val first = lv.number > levelMax
+        levelBonus = if (first) lv.reward else 3
+        coins += levelBonus
+        if (first) {
+            levelMax = lv.number
+            prefs.edit().putInt(KEY_LEVEL_MAX, levelMax).apply()
+        }
+        saveCoins()
+        sound.play(SoundManager.Sfx.RECORD)
+        performHapticFeedback(HapticFeedbackConstants.CONFIRM)
+        // Konfeti
+        val colors = intArrayOf(colGold, colAccent, colBlue, colGreen, hex(0xFFFF8FD8), Color.WHITE)
+        repeat(90) {
+            val a = rnd(0f, TWO_PI)
+            val sp = rnd(120f, 520f)
+            spawn(rocketX, rocketY, cos(a) * sp, sin(a) * sp - 120f, rnd(0.8f, 1.8f), rnd(2.5f, 5f), colors[Random.nextInt(colors.size)], 1.4f)
         }
     }
 
@@ -1094,7 +1385,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         closeNet()
         val wasMpView = isMpView()
         sound.play(SoundManager.Sfx.CLICK)
-        toMenu()
+        toHub()
         myId = 0
         roster.clear()
         if (wasMpView) {
@@ -1115,7 +1406,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             Lobby.CHOOSE -> when {
                 hit(viewBtns[0], x, y, 4f) -> setMpFull(false)
                 hit(viewBtns[1], x, y, 4f) -> setMpFull(true)
-                hit(backCircle, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toMenu() }
+                hit(backCircle, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
                 hit(startBtn, x, y) -> startHost()
                 hit(multiBtn, x, y, 6f) -> startJoin()
                 else -> pickTap(x, y)
@@ -1553,6 +1844,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             MapKind.LAVA -> 55
             MapKind.GAS -> 30
             MapKind.ASTEROID -> 22
+            MapKind.BLACKHOLE -> 45
+            MapKind.STORM -> 80
+            MapKind.METEOR -> 24
+            MapKind.TOXIC -> 36
+            MapKind.CORE -> 50
         }
         repeat(count) { motes.add(Mote().also { resetMote(it, true) }) }
     }
@@ -1593,6 +1889,37 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 m.size = rnd(2.5f, 7f)
                 m.len = rnd(-120f, 120f) // dönüş hızı
             }
+            MapKind.BLACKHOLE -> { // kara deliğe sürüklenen toz
+                m.x = if (anywhere) rnd(0f, worldW) else worldW + rnd(10f, 80f)
+                m.y = rnd(0f, WORLD_H)
+                m.vx = -rnd(20f, 60f); m.vy = 0f
+                m.size = rnd(1.2f, 2.6f)
+            }
+            MapKind.STORM -> { // yağmur
+                m.x = rnd(0f, worldW + 200f)
+                m.y = if (anywhere) rnd(0f, WORLD_H) else -rnd(10f, 60f)
+                m.vx = -rnd(140f, 200f); m.vy = rnd(620f, 820f)
+                m.size = rnd(1f, 2f)
+                m.len = rnd(14f, 26f)
+            }
+            MapKind.METEOR -> { // uzaktan geçen küçük kuyruklu taşlar
+                m.x = rnd(worldW * 0.2f, worldW + 260f)
+                m.y = if (anywhere) rnd(0f, WORLD_H) else -rnd(10f, 120f)
+                m.vx = -rnd(200f, 320f); m.vy = rnd(140f, 230f)
+                m.size = rnd(1.2f, 2.4f)
+            }
+            MapKind.TOXIC -> { // yükselen zehirli kabarcıklar
+                m.x = rnd(0f, worldW + 40f)
+                m.y = if (anywhere) rnd(0f, WORLD_H) else WORLD_H + 12f
+                m.vx = rnd(-10f, 10f); m.vy = -rnd(20f, 55f)
+                m.size = rnd(3f, 9f)
+            }
+            MapKind.CORE -> { // parıltılar
+                m.x = if (anywhere) rnd(0f, worldW) else worldW + rnd(5f, 60f)
+                m.y = rnd(0f, WORLD_H)
+                m.vx = -rnd(10f, 40f); m.vy = 0f
+                m.size = rnd(2f, 5f)
+            }
         }
     }
 
@@ -1617,6 +1944,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                     m.y += m.vy * dt
                     m.phase += m.len * DEG * dt
                 }
+                MapKind.BLACKHOLE -> {
+                    m.x += (m.vx - worldSpeed * 0.2f) * dt
+                    m.y += (WORLD_H * 0.5f - m.y) * 0.25f * dt + sin(time * 1.5f + m.phase) * 14f * dt
+                }
+                MapKind.STORM, MapKind.METEOR -> {
+                    m.x += (m.vx - worldSpeed * 0.3f) * dt
+                    m.y += m.vy * dt
+                }
+                MapKind.TOXIC -> {
+                    m.x += (m.vx - worldSpeed * 0.15f + sin(time * 2f + m.phase) * 10f) * dt
+                    m.y += m.vy * dt
+                }
+                MapKind.CORE -> m.x += (m.vx - worldSpeed * 0.15f) * dt
             }
             val out = m.x < -130f || m.y > WORLD_H + 20f || m.y < -30f
             if (out) resetMote(m, false)
@@ -1670,34 +2010,108 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 cv.drawOval(tmpRect, paint)
                 cv.restore()
             }
+            MapKind.BLACKHOLE -> for (m in motes) {
+                val f = 0.6f + 0.4f * sin(time * 3f + m.phase)
+                paint.color = withAlpha(if (m.phase > 3f) hex(0xFFFFB86B) else hex(0xFFB08AFF), (180 * f).toInt())
+                cv.drawCircle(m.x, m.y, m.size, paint)
+            }
+            MapKind.STORM -> {
+                paint.style = Paint.Style.STROKE
+                paint.strokeCap = Paint.Cap.ROUND
+                for (m in motes) {
+                    paint.strokeWidth = m.size
+                    paint.color = withAlpha(hex(0xFFBFD4FF), 90)
+                    val k = m.len / m.vy
+                    cv.drawLine(m.x, m.y, m.x - m.vx * k, m.y - m.len, paint)
+                }
+                paint.style = Paint.Style.FILL
+            }
+            MapKind.METEOR -> {
+                paint.style = Paint.Style.STROKE
+                paint.strokeCap = Paint.Cap.ROUND
+                for (m in motes) {
+                    paint.strokeWidth = m.size
+                    paint.color = withAlpha(hex(0xFFFFB86B), 90)
+                    cv.drawLine(m.x, m.y, m.x - m.vx * 0.12f, m.y - m.vy * 0.12f, paint)
+                }
+                paint.style = Paint.Style.FILL
+                for (m in motes) {
+                    paint.color = withAlpha(hex(0xFFFFE6C2), 200)
+                    cv.drawCircle(m.x, m.y, m.size * 1.2f, paint)
+                }
+            }
+            MapKind.TOXIC -> {
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 1.6f
+                for (m in motes) {
+                    paint.color = withAlpha(hex(0xFF9BFF5B), 110)
+                    cv.drawCircle(m.x, m.y, m.size, paint)
+                }
+                paint.style = Paint.Style.FILL
+                for (m in motes) {
+                    paint.color = withAlpha(Color.WHITE, 90)
+                    cv.drawCircle(m.x - m.size * 0.35f, m.y - m.size * 0.35f, m.size * 0.25f, paint)
+                }
+            }
+            MapKind.CORE -> for (m in motes) {
+                val f = (0.5f + 0.5f * sin(time * 3f + m.phase)).coerceIn(0f, 1f)
+                paint.color = withAlpha(hex(0xFFFFE6A0), (230 * f).toInt())
+                val r = m.size * (0.5f + 0.5f * f)
+                cv.drawRect(m.x - r, m.y - 0.8f, m.x + r, m.y + 0.8f, paint)
+                cv.drawRect(m.x - 0.8f, m.y - r, m.x + 0.8f, m.y + r, paint)
+            }
         }
     }
 
     // --- Lav Denizi: ateş topları ---
 
     private fun updateFireballs(dt: Float) {
-        if (map.kind != MapKind.LAVA) return
-        if (worldRunning()) {
+        val running = worldRunning()
+        val maxX = if (isMpView()) 420f else worldW - 30f
+        if (running && Mech.FIRE in mechs) {
             fireTimer -= dt
             if (fireTimer <= 0f) {
-                fireTimer = wr(2.3f, 3.6f) / difficulty.hazard
+                fireTimer = wr(2.3f, 3.6f) / hazard()
                 // Topu, roketin hizasına tepeye yakınken varacak şekilde ileriye koy
                 val warn = 0.8f
-                val maxX = if (isMpView()) 420f else worldW - 30f
                 val x = min(maxX, rocketX + speed * (warn + wr(0.35f, 0.85f)))
                 fireballs.add(Fireball(x, WORLD_H + 40f, -wr(980f, 1200f), warn))
             }
         }
+        if (running && Mech.METEOR in mechs) {
+            meteorTimer -= dt
+            if (meteorTimer <= 0f) {
+                meteorTimer = wr(2.0f, 3.2f) / hazard()
+                val warn = 0.8f
+                val x = min(maxX, rocketX + speed * (warn + wr(0.7f, 1.3f)))
+                fireballs.add(Fireball(x, -40f, wr(120f, 240f), warn, fromTop = true))
+            }
+        }
+        if (running && Mech.LIGHTNING in mechs) {
+            boltTimer -= dt
+            if (boltTimer <= 0f) {
+                boltTimer = wr(2.1f, 3.3f) / hazard()
+                val warn = 0.95f
+                val x = min(maxX, rocketX + speed * (warn + wr(0.1f, 0.5f)))
+                bolts.add(Bolt(x, wr(360f, 700f), warn, 0.4f))
+            }
+        }
+
         val iter = fireballs.iterator()
         while (iter.hasNext()) {
             val fb = iter.next()
-            if (worldRunning()) fb.x -= speed * dt
+            if (running) fb.x -= speed * dt
             if (fb.warn > 0f) {
                 fb.warn -= dt
                 if (fb.warn <= 0f) sound.play(SoundManager.Sfx.FIRE)
                 continue
             }
-            fb.vy += FIRE_GRAVITY * dt
+            if (fb.fromTop) {
+                fb.vy += FIRE_GRAVITY * 0.45f * dt
+                fb.x -= 90f * dt // çapraz düşüş
+            } else {
+                fb.vy += FIRE_GRAVITY * dt
+            }
             fb.y += fb.vy * dt
             if (Random.nextFloat() < 0.7f) {
                 spawnOwner = -1
@@ -1706,14 +2120,45 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                     rnd(0.25f, 0.5f), rnd(2f, 4.5f),
                     if (Random.nextBoolean()) hex(0xFFFFB347) else hex(0xFFFF5A1F), 2f
                 )
-                spawnOwner = 0
+                spawnOwner = myId
             }
-            if (fb.vy > 0f && fb.y > WORLD_H + 60f || fb.x < -60f) iter.remove()
+            val gone = if (fb.fromTop) fb.y > WORLD_H + 60f else (fb.vy > 0f && fb.y > WORLD_H + 60f)
+            if (gone || fb.x < -60f) iter.remove()
+        }
+
+        val bi = bolts.iterator()
+        while (bi.hasNext()) {
+            val b = bi.next()
+            if (running) b.x -= speed * dt
+            if (b.warn > 0f) {
+                b.warn -= dt
+                if (b.warn <= 0f) {
+                    sound.play(SoundManager.Sfx.FIRE)
+                    if (!isMpView()) flash = max(flash, 0.06f)
+                }
+            } else {
+                b.life -= dt
+                if (b.life <= 0f) bi.remove()
+            }
         }
     }
 
     private fun drawFireballs(cv: Canvas) {
+        drawBolts(cv)
         for (fb in fireballs) {
+            if (fb.warn > 0f && fb.fromTop) {
+                // Meteor uyarısı: ekranın üstünde kırmızı işaret
+                val k = 1f - fb.warn / 0.8f
+                val pulse = 0.6f + 0.4f * sin(time * 30f)
+                paint.color = withAlpha(hex(0xFFFF5A1F), (k * 170 * pulse).toInt())
+                iconPath.reset()
+                iconPath.moveTo(fb.x - 16f, 8f)
+                iconPath.lineTo(fb.x + 16f, 8f)
+                iconPath.lineTo(fb.x, 34f)
+                iconPath.close()
+                cv.drawPath(iconPath, paint)
+                continue
+            }
             if (fb.warn > 0f) {
                 // Uyarı: zemin kızarır ve titreşir
                 val k = 1f - fb.warn / 0.8f
@@ -1850,7 +2295,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawColumns(canvas)
         drawFireballs(canvas)
         drawParticles(canvas)
-        if (state == State.READY || state == State.PLAYING) drawRocket(canvas)
+        if (state == State.READY || state == State.PLAYING || state == State.LEVEL_DONE) drawRocket(canvas)
         drawShockwave(canvas)
         canvas.restore()
 
@@ -1887,6 +2332,72 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun drawColumns(cv: Canvas) {
+        drawColumnPlanets(cv)
+        // Paralar boşluğun içinde, kendi ekseninde döner
+        for (col in columns) {
+            if (col.coinY.isNaN() || col.coinTaken) continue
+            if (col.x < -30f || col.x > worldW + 30f) continue
+            drawCoin(cv, col.x, col.coinY + col.offset, COIN_R, time * 3f + col.swayPhase)
+        }
+    }
+
+    /** Dönen para: genişliği cos ile daralıp genişler. */
+    private fun drawCoin(cv: Canvas, x: Float, y: Float, r: Float, phase: Float) {
+        val k = 0.25f + 0.75f * abs(cos(phase))
+        paint.color = withAlpha(colGold, 70)
+        cv.drawCircle(x, y, r * 1.6f, paint)
+        tmpRect.set(x - r * k, y - r, x + r * k, y + r)
+        paint.color = hex(0xFFC8901F)
+        cv.drawOval(tmpRect, paint)
+        tmpRect.set(x - r * k * 0.82f, y - r * 0.82f, x + r * k * 0.82f, y + r * 0.82f)
+        paint.color = colGold
+        cv.drawOval(tmpRect, paint)
+        paint.color = hex(0xFFFFF4C2)
+        tmpRect.set(x - r * k * 0.3f, y - r * 0.55f, x + r * k * 0.1f, y + r * 0.1f)
+        cv.drawOval(tmpRect, paint)
+    }
+
+    /** Yukarıdan inen yıldırımlar: önce kesik çizgi uyarısı, sonra parlak zikzak. */
+    private fun drawBolts(cv: Canvas) {
+        for (b in bolts) {
+            if (b.warn > 0f) {
+                val k = 1f - b.warn / 0.95f
+                val pulse = 0.55f + 0.45f * sin(time * 26f)
+                paint.color = withAlpha(hex(0xFF9BC8FF), (60 + 150 * k * pulse).toInt())
+                var y = 0f
+                while (y < b.len) {
+                    cv.drawRect(b.x - 2f, y, b.x + 2f, min(b.len, y + 22f), paint)
+                    y += 38f
+                }
+                // Ucunda: yıldırımın ineceği son nokta
+                paint.color = withAlpha(hex(0xFFFFFFFF), (120 + 120 * k).toInt())
+                cv.drawCircle(b.x, b.len, 6f, paint)
+                continue
+            }
+            val a = (b.life / 0.4f).coerceIn(0f, 1f)
+            iconPath.reset()
+            iconPath.moveTo(b.x, 0f)
+            var y = 0f
+            while (y < b.len) {
+                y = min(b.len, y + rnd(30f, 60f))
+                iconPath.lineTo(b.x + rnd(-BOLT_W, BOLT_W), y)
+            }
+            paint.style = Paint.Style.STROKE
+            paint.strokeJoin = Paint.Join.ROUND
+            paint.strokeCap = Paint.Cap.ROUND
+            paint.strokeWidth = 16f
+            paint.color = withAlpha(hex(0xFF5B7BFF), (a * 110).toInt())
+            cv.drawPath(iconPath, paint)
+            paint.strokeWidth = 5f
+            paint.color = withAlpha(Color.WHITE, (a * 255).toInt())
+            cv.drawPath(iconPath, paint)
+            paint.style = Paint.Style.FILL
+            paint.color = withAlpha(hex(0xFFBFD4FF), (a * 200).toInt())
+            cv.drawCircle(b.x, b.len, 14f, paint)
+        }
+    }
+
+    private fun drawColumnPlanets(cv: Canvas) {
         for (col in columns) {
             if (col.x - col.halfWidth > worldW || col.x + col.halfWidth < 0f) continue
             for (pl in col.planets) {
@@ -1934,6 +2445,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         cv.save()
         cv.translate(x, y)
         cv.rotate(angle)
+        // Tek kişilik oyunda marketten seçilen araç; çok oyunculuda oyuncu renkli klasik roket
+        if (!isMpView()) {
+            drawSkinBody(cv, skin, boostV)
+            cv.restore()
+            return
+        }
 
         // Alev: dokununca bir anlığına uzar
         val flicker = 0.85f + 0.15f * sin(time * 47f) + rnd(-0.06f, 0.06f)
@@ -1997,13 +2514,892 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         cv.restore()
     }
 
+    // --- Marketteki uçan araçlar ---
+
+    private val skinShaders = HashMap<Skin, Shader>()
+    private val skinPath = Path()
+    private val cometShader = LinearGradient(
+        0f, 0f, -1f, 0f,
+        intArrayOf(hex(0xEEFFFFFF), hex(0xAA9BE0FF), hex(0x445FB8FF), hex(0x005FB8FF)),
+        floatArrayOf(0f, 0.25f, 0.6f, 1f), Shader.TileMode.CLAMP
+    )
+
+    private fun mixColor(c: Int, to: Int, t: Float): Int {
+        fun ch(v: Int, s: Int) = ((v shr s) and 0xFF)
+        val r = (ch(c, 16) + (ch(to, 16) - ch(c, 16)) * t).toInt()
+        val g = (ch(c, 8) + (ch(to, 8) - ch(c, 8)) * t).toInt()
+        val b = (ch(c, 0) + (ch(to, 0) - ch(c, 0)) * t).toInt()
+        return (0xFF shl 24) or (r shl 16) or (g shl 8) or b
+    }
+
+    /** Menüde ve markette önizleme: aracı (x, y) noktasına [s] ölçeğinde çizer. */
+    private fun drawSkinPreview(cv: Canvas, sk: Skin, x: Float, y: Float, s: Float, boostV: Float) {
+        cv.save()
+        cv.translate(x, y)
+        cv.scale(s, s)
+        drawSkinBody(cv, sk, boostV)
+        cv.restore()
+    }
+
+    /** Alev: dokununca bir anlığına uzar. [ox] alevin başladığı x, [w] yarı kalınlık. */
+    private fun drawFlame(cv: Canvas, boostV: Float, ox: Float, w: Float) {
+        val flicker = 0.85f + 0.15f * sin(time * 47f) + rnd(-0.06f, 0.06f)
+        val len = (13f + boostV * 24f) * flicker * (w / 7f)
+        cv.save()
+        cv.translate(ox, 0f)
+        flamePath.reset()
+        flamePath.moveTo(0f, -w)
+        flamePath.quadTo(-0.55f * len, -w * 0.86f, -len, 0f)
+        flamePath.quadTo(-0.55f * len, w * 0.86f, 0f, w)
+        flamePath.close()
+        flameMatrix.setScale(len, 1f)
+        flameShader.setLocalMatrix(flameMatrix)
+        paint.color = Color.WHITE
+        paint.shader = flameShader
+        cv.drawPath(flamePath, paint)
+        paint.shader = null
+        val inner = len * 0.55f
+        flamePath.reset()
+        flamePath.moveTo(0f, -w * 0.57f)
+        flamePath.quadTo(-0.55f * inner, -w * 0.5f, -inner, 0f)
+        flamePath.quadTo(-0.55f * inner, w * 0.5f, 0f, w * 0.57f)
+        flamePath.close()
+        paint.color = hex(0xEEFFFBE6)
+        cv.drawPath(flamePath, paint)
+        cv.restore()
+    }
+
+    private fun drawWindow(cv: Canvas, x: Float, r: Float) {
+        paint.color = hex(0xFF3B4266)
+        cv.drawCircle(x, 0f, r * 1.29f, paint)
+        paint.color = Color.WHITE
+        paint.shader = windowShader
+        cv.save()
+        cv.translate(x - 4f, 0f)
+        cv.drawCircle(4f, 0f, r, paint)
+        cv.restore()
+        paint.shader = null
+        paint.color = hex(0xDDFFFFFF)
+        cv.drawCircle(x - r * 0.33f, -r * 0.39f, r * 0.29f, paint)
+    }
+
+    /** Aracı merkez (0, 0), sağa bakacak şekilde çizer. Çarpışma alanı bütün araçlarda aynıdır. */
+    private fun drawSkinBody(cv: Canvas, sk: Skin, boostV: Float) {
+        when (sk.shape) {
+            SkinShape.ROCKET -> {
+                drawFlame(cv, boostV, -19f, 7f)
+                paint.color = hex(0xFF4A4F6E)
+                cv.drawRect(-23f, -6.5f, -18f, 6.5f, paint)
+                paint.color = sk.trim
+                cv.drawPath(finTop, paint)
+                cv.drawPath(finBottom, paint)
+                paint.color = Color.WHITE
+                paint.shader = if (sk == Skin.CLASSIC) bodyShader else skinShaders.getOrPut(sk) {
+                    LinearGradient(
+                        0f, -10f, 0f, 10f,
+                        intArrayOf(mixColor(sk.body, Color.WHITE, 0.55f), sk.body, mixColor(sk.body, Color.BLACK, 0.4f)),
+                        floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP
+                    )
+                }
+                cv.drawPath(bodyPath, paint)
+                paint.shader = null
+                paint.color = sk.accent
+                cv.drawPath(noseAccent, paint)
+                cv.drawPath(stripeAccent, paint)
+                drawWindow(cv, 4f, 4.9f)
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 1.1f
+                paint.color = hex(0x40000000)
+                cv.drawPath(bodyPath, paint)
+                paint.style = Paint.Style.FILL
+            }
+            SkinShape.SHUTTLE -> {
+                drawFlame(cv, boostV, -26f, 6f)
+                // Kanatlar
+                paint.color = mixColor(sk.body, Color.BLACK, 0.25f)
+                skinPath.reset()
+                skinPath.moveTo(-2f, 5f); skinPath.lineTo(-20f, 21f); skinPath.lineTo(-27f, 21f); skinPath.lineTo(-24f, 5f); skinPath.close()
+                cv.drawPath(skinPath, paint)
+                skinPath.reset()
+                skinPath.moveTo(-12f, -6f); skinPath.lineTo(-24f, -19f); skinPath.lineTo(-28f, -19f); skinPath.lineTo(-26f, -6f); skinPath.close()
+                cv.drawPath(skinPath, paint)
+                // Gövde
+                skinPath.reset()
+                skinPath.moveTo(-27f, -7f)
+                skinPath.lineTo(16f, -7f)
+                skinPath.cubicTo(27f, -7f, 33f, -3f, 36f, 0f)
+                skinPath.cubicTo(33f, 3f, 27f, 7f, 16f, 7f)
+                skinPath.lineTo(-27f, 7f)
+                skinPath.close()
+                paint.color = Color.WHITE
+                paint.shader = skinShaders.getOrPut(sk) {
+                    LinearGradient(
+                        0f, -7f, 0f, 7f,
+                        intArrayOf(Color.WHITE, sk.body, mixColor(sk.body, Color.BLACK, 0.3f)),
+                        floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP
+                    )
+                }
+                cv.drawPath(skinPath, paint)
+                paint.shader = null
+                // Siyah burun ve turuncu şerit
+                paint.color = sk.accent
+                cv.save()
+                cv.clipRect(24f, -8f, 37f, 8f)
+                cv.drawPath(skinPath, paint)
+                cv.restore()
+                paint.color = sk.trim
+                cv.drawRect(-24f, 1.5f, 18f, 3.5f, paint)
+                paint.color = hex(0xFF2A3050)
+                for (i in 0 until 3) cv.drawRect(14f + i * 4f, -4f, 16.5f + i * 4f, -1.5f, paint)
+            }
+            SkinShape.UFO -> {
+                // Alt ışık huzmesi: dokununca parlar
+                paint.color = withAlpha(sk.accent, (50 + 120 * boostV).toInt())
+                skinPath.reset()
+                skinPath.moveTo(-9f, 5f); skinPath.lineTo(9f, 5f); skinPath.lineTo(16f, 26f); skinPath.lineTo(-16f, 26f); skinPath.close()
+                cv.drawPath(skinPath, paint)
+                // Kubbe
+                tmpRect.set(-12f, -17f, 12f, 3f)
+                paint.color = withAlpha(sk.accent, 170)
+                cv.drawOval(tmpRect, paint)
+                paint.color = withAlpha(Color.WHITE, 140)
+                tmpRect.set(-7f, -14f, -1f, -9f)
+                cv.drawOval(tmpRect, paint)
+                // Daire gövde
+                tmpRect.set(-27f, -7f, 27f, 8f)
+                paint.color = Color.WHITE
+                paint.shader = skinShaders.getOrPut(sk) {
+                    LinearGradient(
+                        0f, -7f, 0f, 8f,
+                        intArrayOf(mixColor(sk.body, Color.WHITE, 0.5f), sk.body, sk.trim),
+                        floatArrayOf(0f, 0.5f, 1f), Shader.TileMode.CLAMP
+                    )
+                }
+                cv.drawOval(tmpRect, paint)
+                paint.shader = null
+                paint.color = sk.trim
+                cv.drawRect(-24f, 1f, 24f, 3f, paint)
+                // Yanıp sönen ışıklar
+                for (i in 0 until 5) {
+                    val on = ((time * 6f).toInt() + i) % 5 < 2
+                    paint.color = if (on) sk.accent else withAlpha(sk.accent, 70)
+                    cv.drawCircle(-18f + i * 9f, 4.5f, 2.2f, paint)
+                }
+            }
+            SkinShape.PLANET -> {
+                drawFlame(cv, boostV, -12f, 6f)
+                val ringed = Color.alpha(sk.trim) > 0
+                tmpRect.set(-27f, -8f, 27f, 8f)
+                if (ringed) {
+                    cv.save()
+                    cv.rotate(-18f)
+                    paint.style = Paint.Style.STROKE
+                    paint.strokeWidth = 3.5f
+                    paint.color = withAlpha(sk.trim, 220)
+                    cv.drawArc(tmpRect, 180f, 180f, false, paint) // arka yarı
+                    paint.style = Paint.Style.FILL
+                    cv.restore()
+                }
+                paint.color = Color.WHITE
+                paint.shader = skinShaders.getOrPut(sk) {
+                    RadialGradient(
+                        -5f, -6f, 22f,
+                        intArrayOf(mixColor(sk.body, Color.WHITE, 0.45f), sk.body, mixColor(sk.body, Color.BLACK, 0.55f)),
+                        floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP
+                    )
+                }
+                cv.drawCircle(0f, 0f, 15f, paint)
+                paint.shader = null
+                cv.save()
+                cv.clipPath(skinPath.apply { reset(); addCircle(0f, 0f, 15f, Path.Direction.CW) })
+                if (ringed) {
+                    paint.color = withAlpha(sk.accent, 120)
+                    cv.drawRect(-16f, -6f, 16f, -3f, paint)
+                    cv.drawRect(-16f, 3f, 16f, 6f, paint)
+                } else {
+                    // Lav çatlakları parlar
+                    paint.style = Paint.Style.STROKE
+                    paint.strokeWidth = 2f
+                    paint.color = withAlpha(sk.accent, (170 + 80 * sin(time * 5f)).toInt().coerceIn(0, 255))
+                    cv.drawLine(-12f, -4f, -2f, 2f, paint)
+                    cv.drawLine(-2f, 2f, 6f, -5f, paint)
+                    cv.drawLine(2f, 9f, 10f, 4f, paint)
+                    paint.style = Paint.Style.FILL
+                }
+                cv.restore()
+                if (ringed) {
+                    cv.save()
+                    cv.rotate(-18f)
+                    paint.style = Paint.Style.STROKE
+                    paint.strokeWidth = 3.5f
+                    paint.color = withAlpha(sk.trim, 240)
+                    cv.drawArc(tmpRect, 0f, 180f, false, paint) // ön yarı
+                    paint.style = Paint.Style.FILL
+                    cv.restore()
+                } else {
+                    paint.color = withAlpha(sk.accent, 60)
+                    cv.drawCircle(0f, 0f, 19f, paint)
+                }
+            }
+            SkinShape.COMET -> {
+                val len = 46f + boostV * 34f + 4f * sin(time * 20f)
+                flamePath.reset()
+                flamePath.moveTo(4f, -11f)
+                flamePath.quadTo(-0.5f * len, -7f, -len, 0f)
+                flamePath.quadTo(-0.5f * len, 7f, 4f, 11f)
+                flamePath.close()
+                flameMatrix.setScale(len, 1f)
+                cometShader.setLocalMatrix(flameMatrix)
+                paint.color = Color.WHITE
+                paint.shader = cometShader
+                cv.drawPath(flamePath, paint)
+                paint.shader = null
+                paint.color = withAlpha(sk.accent, 90)
+                cv.drawCircle(4f, 0f, 21f, paint)
+                paint.color = sk.body
+                cv.drawCircle(4f, 0f, 12f, paint)
+                paint.color = Color.WHITE
+                cv.drawCircle(6f, -1f, 6.5f, paint)
+            }
+            SkinShape.CRYSTAL -> {
+                drawFlame(cv, boostV, -20f, 6f)
+                paint.color = withAlpha(sk.trim, 80)
+                cv.drawCircle(4f, 0f, 24f, paint)
+                skinPath.reset()
+                skinPath.moveTo(33f, 0f); skinPath.lineTo(4f, -15f); skinPath.lineTo(-22f, 0f); skinPath.close()
+                paint.color = mixColor(sk.body, Color.WHITE, 0.4f)
+                cv.drawPath(skinPath, paint)
+                skinPath.reset()
+                skinPath.moveTo(33f, 0f); skinPath.lineTo(4f, 15f); skinPath.lineTo(-22f, 0f); skinPath.close()
+                paint.color = mixColor(sk.body, sk.trim, 0.45f)
+                cv.drawPath(skinPath, paint)
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 1.5f
+                paint.color = withAlpha(sk.accent, 220)
+                cv.drawLine(-22f, 0f, 33f, 0f, paint)
+                cv.drawLine(4f, -15f, 4f, 15f, paint)
+                skinPath.reset()
+                skinPath.moveTo(33f, 0f); skinPath.lineTo(4f, -15f); skinPath.lineTo(-22f, 0f); skinPath.lineTo(4f, 15f); skinPath.close()
+                cv.drawPath(skinPath, paint)
+                paint.style = Paint.Style.FILL
+                paint.color = withAlpha(Color.WHITE, (150 + 100 * sin(time * 4f)).toInt().coerceIn(0, 255))
+                cv.drawCircle(12f, -5f, 2.2f, paint)
+            }
+        }
+    }
+
+    // =====================================================================
+    // Ana menü, bölümler, market
+    // =====================================================================
+
+    private val hubLevelsBtn = RectF()
+    private val hubEndlessBtn = RectF()
+    private val hubMultiBtn = RectF()
+    private val hubMarketBtn = RectF()
+    private val coinPillRect = RectF()
+    private val marketCards = Array(Skin.entries.size) { RectF() }
+
+    private fun layoutHub() {
+        val cx = uiW / 2f
+        val bw = min(uiW - 80f, 320f) / 2f
+        hubLevelsBtn.set(cx - bw, 476f, cx + bw, 556f)
+        hubEndlessBtn.set(cx - bw, 578f, cx + bw, 640f)
+        hubMultiBtn.set(cx - bw, 658f, cx + bw, 720f)
+        hubMarketBtn.set(cx - bw, 738f, cx + bw, 800f)
+        val cw = (uiW - 32f - 12f) / 2f
+        for (i in marketCards.indices) {
+            val col = i % 2
+            val row = i / 2
+            val x0 = 16f + col * (cw + 12f)
+            val y0 = 148f + row * 166f
+            marketCards[i].set(x0, y0, x0 + cw, y0 + 158f)
+        }
+    }
+
+    private fun toHub() {
+        closeNet()
+        levelMode = false
+        resetGame()
+        state = State.HUB
+    }
+
+    private fun enterLevels() {
+        sound.play(SoundManager.Sfx.CLICK)
+        levelMode = false
+        resetGame()
+        state = State.LEVELS
+        val currentBlock = (levelMax.coerceAtMost(Levels.COUNT - 1)) / Levels.PER_MAP
+        levelScroll = (currentBlock * LEVEL_ROW_H - 260f).coerceIn(0f, maxLevelScroll())
+        scrollVel = 0f
+    }
+
+    private fun maxLevelScroll() =
+        max(0f, (Levels.COUNT / Levels.PER_MAP) * LEVEL_ROW_H - (WORLD_H - LEVEL_LIST_TOP) + 30f)
+
+    /** Haritayı değiştirir (görseller ve müzik dahil). [save] ise menüdeki seçim olarak da hatırlanır. */
+    private fun setMap(index: Int, save: Boolean) {
+        val n = Maps.ALL.size
+        mapIndex = ((index % n) + n) % n
+        map = Maps.ALL[mapIndex]
+        if (save) prefs.edit().putInt(KEY_MAP, mapIndex).apply()
+        if (width > 0 && height > 0) {
+            buildBackground(width, height)
+            buildPlanetArts()
+            buildStars()
+            buildMotes()
+        }
+        sound.setMusicTheme(map.musicTheme)
+        refreshBestTexts()
+    }
+
+    private fun openLevel(n: Int) {
+        val lv = Levels.info(n)
+        lifeSpent = false
+        levelMode = true
+        level = lv
+        if (lv.mapIndex != mapIndex) setMap(lv.mapIndex, save = false)
+        state = State.READY
+        resetGame()
+        sound.play(SoundManager.Sfx.START)
+    }
+
+    private fun hubTap(x: Float, y: Float) {
+        when {
+            hit(soundBtn, x, y) -> toggleSound()
+            hit(coinPillRect, x, y) || hit(hubMarketBtn, x, y) -> { sound.play(SoundManager.Sfx.CLICK); state = State.MARKET }
+            hit(hubLevelsBtn, x, y) -> enterLevels()
+            hit(hubEndlessBtn, x, y) -> {
+                sound.play(SoundManager.Sfx.CLICK)
+                setMap(prefs.getInt(KEY_MAP, mapIndex), save = false)
+                toMenu()
+            }
+            hit(hubMultiBtn, x, y) -> enterLobby()
+        }
+    }
+
+    private fun levelsTap(x: Float, y: Float) {
+        if (hit(backCircle, x, y)) {
+            sound.play(SoundManager.Sfx.CLICK)
+            toHub()
+            return
+        }
+        if (y < LEVEL_LIST_TOP) return
+        val b = ((y - LEVEL_LIST_TOP + levelScroll) / LEVEL_ROW_H).toInt()
+        if (b < 0 || b >= Levels.COUNT / Levels.PER_MAP) return
+        val y0 = LEVEL_LIST_TOP + b * LEVEL_ROW_H - levelScroll
+        val sp = (uiW - 100f) / Levels.PER_MAP
+        for (i in 0 until Levels.PER_MAP) {
+            val cx = 50f + sp * (i + 0.5f)
+            val cy = y0 + 100f
+            if (abs(x - cx) < sp / 2f && abs(y - cy) < 40f) {
+                val n = b * Levels.PER_MAP + i + 1
+                if (n <= levelMax + 1) openLevel(n)
+                else {
+                    marketMsg = strLevelLocked
+                    marketMsgT = 1.6f
+                    sound.play(SoundManager.Sfx.CLICK)
+                }
+                return
+            }
+        }
+    }
+
+    private fun marketTap(x: Float, y: Float) {
+        if (hit(backCircle, x, y)) {
+            sound.play(SoundManager.Sfx.CLICK)
+            state = State.HUB
+            return
+        }
+        for (i in marketCards.indices) {
+            if (!hit(marketCards[i], x, y, 0f)) continue
+            val sk = Skin.entries[i]
+            when {
+                sk in ownedSkins -> {
+                    skin = sk
+                    prefs.edit().putString(KEY_SKIN, sk.name).apply()
+                    sound.play(SoundManager.Sfx.CLICK)
+                }
+                coins >= sk.price -> {
+                    coins -= sk.price
+                    ownedSkins.add(sk)
+                    skin = sk
+                    prefs.edit()
+                        .putInt(KEY_COINS, coins)
+                        .putString(KEY_SKINS, ownedSkins.joinToString(",") { it.name })
+                        .putString(KEY_SKIN, sk.name)
+                        .apply()
+                    marketMsg = strBought
+                    marketMsgT = 1.6f
+                    sound.play(SoundManager.Sfx.RECORD)
+                }
+                else -> {
+                    marketMsg = String.format(strNoMoney, sk.price - coins)
+                    marketMsgT = 1.8f
+                    sound.play(SoundManager.Sfx.GAME_OVER)
+                }
+            }
+            return
+        }
+    }
+
+    private fun levelDoneTap(x: Float, y: Float) {
+        val lv = level ?: return
+        when {
+            hit(retryBtn, x, y) && lv.number < Levels.COUNT -> openLevel(lv.number + 1)
+            hit(menuBtn, x, y) -> enterLevels()
+        }
+    }
+
+    // --- Çizim ---
+
+    private val heartPath = Path().apply {
+        // Birim kalp: merkez (0, 0), genişlik ~2
+        moveTo(0f, 0.85f)
+        cubicTo(-1.3f, -0.05f, -1.05f, -1.1f, -0.5f, -1.05f)
+        cubicTo(-0.2f, -1.02f, -0.05f, -0.8f, 0f, -0.6f)
+        cubicTo(0.05f, -0.8f, 0.2f, -1.02f, 0.5f, -1.05f)
+        cubicTo(1.05f, -1.1f, 1.3f, -0.05f, 0f, 0.85f)
+        close()
+    }
+
+    private fun drawHeart(cv: Canvas, x: Float, y: Float, r: Float, filled: Boolean) {
+        cv.save()
+        cv.translate(x, y + r * 0.1f)
+        cv.scale(r, r)
+        if (filled) {
+            paint.color = hex(0xFFFF4D6D)
+            cv.drawPath(heartPath, paint)
+            paint.color = withAlpha(Color.WHITE, 150)
+            cv.drawCircle(-0.45f, -0.5f, 0.2f, paint)
+        } else {
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = 0.16f
+            paint.color = withAlpha(colDim, 170)
+            cv.drawPath(heartPath, paint)
+            paint.style = Paint.Style.FILL
+        }
+        cv.restore()
+    }
+
+    /**
+     * Can kutucuğu: 4 kalp, dolmuyorsa sıradaki cana kalan süre.
+     * [anchor] -1 sol kenar, 0 orta, 1 sağ kenar hizası.
+     */
+    private fun drawLivesPill(cv: Canvas, x: Float, y: Float, anchor: Int) {
+        val r = 10f
+        val full = lives.count >= Lives.MAX
+        rightPaint.textSize = 17f
+        val timer = if (full) "" else lives.nextText()
+        val tw = if (full) 0f else rightPaint.measureText(timer) + 10f
+        val w = 18f + Lives.MAX * 24f + tw + 4f
+        val left = when (anchor) { -1 -> x; 0 -> x - w / 2f; else -> x - w }
+        tmpRect.set(left, y, left + w, y + 40f)
+        paint.color = withAlpha(colPanel, 220)
+        cv.drawRoundRect(tmpRect, 20f, 20f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(hex(0xFFFF4D6D), 150)
+        cv.drawRoundRect(tmpRect, 20f, 20f, paint)
+        paint.style = Paint.Style.FILL
+        for (i in 0 until Lives.MAX) drawHeart(cv, left + 21f + i * 24f, y + 20f, r, i < lives.count)
+        if (!full) {
+            rightPaint.color = colText
+            cv.drawText(timer, left + w - 12f, y + 26f, rightPaint)
+        }
+    }
+
+    private fun drawCoinIcon(cv: Canvas, x: Float, y: Float, r: Float) {
+        paint.color = hex(0xFFC8901F)
+        cv.drawCircle(x, y, r, paint)
+        paint.color = colGold
+        cv.drawCircle(x, y, r * 0.8f, paint)
+        paint.color = hex(0xFFFFF4C2)
+        cv.drawCircle(x - r * 0.25f, y - r * 0.25f, r * 0.25f, paint)
+    }
+
+    /** Para kutucuğu. [right] ise sağ kenarı x'e hizalanır. Dokunma alanı [coinPillRect]'e yazılır. */
+    private fun drawCoinPill(cv: Canvas, x: Float, y: Float, amount: Int, right: Boolean) {
+        rightPaint.textSize = 22f
+        val txt = amount.toString()
+        val w = rightPaint.measureText(txt) + 62f
+        val left = if (right) x - w else x
+        coinPillRect.set(left, y, left + w, y + 46f)
+        paint.color = withAlpha(colPanel, 220)
+        cv.drawRoundRect(coinPillRect, 23f, 23f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(colGold, 170)
+        cv.drawRoundRect(coinPillRect, 23f, 23f, paint)
+        paint.style = Paint.Style.FILL
+        drawCoinIcon(cv, left + 24f, y + 23f, 12f)
+        rightPaint.color = colText
+        cv.drawText(txt, left + w - 16f, y + 31f, rightPaint)
+    }
+
+    private fun drawHub(cv: Canvas, cx: Float) {
+        layoutHub()
+        val bob = sin(time * 1.6f) * 3f
+        drawCoinPill(cv, 22f, 28f, coins, right = false)
+        drawLivesPill(cv, 22f, 84f, -1)
+        drawSoundButton(cv, 255)
+        titlePaint.textSize = 58f
+        drawShadowText(cv, strTitle1, cx, 176f + bob, titlePaint, colText)
+        drawShadowText(cv, strTitle2, cx, 234f + bob, titlePaint, colWarm)
+
+        // Seçili araç süzülür
+        val boostV = (0.5f + 0.5f * sin(time * 3f)).pow(3)
+        drawSkinPreview(cv, skin, cx, 345f + sin(time * 2f) * 8f, 2.4f, boostV)
+
+        labelPaint.textSize = 19f
+        labelPaint.color = colGold
+        val next = (levelMax + 1).coerceAtMost(Levels.COUNT)
+        drawFit(cv, String.format(strLevelProgress, next, Levels.COUNT), cx, 446f, labelPaint)
+
+        drawPulseButton(cv, hubLevelsBtn, strLevels)
+        drawButton(cv, hubEndlessBtn, strEndless, colWarm, colText, false, 255, 20f)
+        drawButton(cv, hubMultiBtn, strTwoPlayers, colBlue, colText, false, 255, 20f)
+        drawButton(cv, hubMarketBtn, strMarket, colGold, colText, false, 255, 20f)
+
+        textPaint.textSize = 19f
+        textPaint.color = colDim
+        drawFit(cv, strHubHint, cx, 870f, textPaint)
+    }
+
+    private fun drawScreenHeader(cv: Canvas, cx: Float, title: String) {
+        paint.color = withAlpha(hex(0xFF05071A), 200)
+        cv.drawRect(0f, 0f, uiW, LEVEL_LIST_TOP, paint)
+        drawCircleIcon(cv, backCircle, "‹")
+        drawCoinPill(cv, uiW - 22f, 28f, coins, right = true)
+        titlePaint.textSize = 36f
+        titlePaint.color = colWarm
+        // Başlık, soldaki geri düğmesiyle sağdaki para kutusunun arasına sığsın
+        val room = 2f * min(cx - backCircle.right - 10f, coinPillRect.left - 10f - cx)
+        drawFitW(cv, title, cx, 66f, titlePaint, max(80f, room))
+    }
+
+    private fun drawLevels(cv: Canvas, cx: Float) {
+        val sp = (uiW - 100f) / Levels.PER_MAP
+        val r = min(28f, sp * 0.38f)
+        val blocks = Levels.COUNT / Levels.PER_MAP
+        cv.save()
+        cv.clipRect(0f, LEVEL_LIST_TOP, uiW, WORLD_H)
+        val first = (levelScroll / LEVEL_ROW_H).toInt().coerceAtLeast(0)
+        val last = ((levelScroll + WORLD_H) / LEVEL_ROW_H).toInt().coerceAtMost(blocks - 1)
+        for (b in first..last) {
+            val y0 = LEVEL_LIST_TOP + b * LEVEL_ROW_H - levelScroll
+            val m = Maps.ALL[b % Levels.MAPS]
+            val round = b / Levels.MAPS
+            tmpRect.set(16f, y0 + 6f, uiW - 16f, y0 + LEVEL_ROW_H - 6f)
+            paint.color = withAlpha(colPanel, 215)
+            cv.drawRoundRect(tmpRect, 22f, 22f, paint)
+            paint.color = m.accent
+            cv.drawRoundRect(16f, y0 + 6f, 24f, y0 + LEVEL_ROW_H - 6f, 4f, 4f, paint)
+
+            helpPaint.textSize = 21f
+            helpPaint.color = colText
+            cv.drawText(mapNames[b % Levels.MAPS], 38f, y0 + 42f, helpPaint)
+            rightPaint.textSize = 15f
+            rightPaint.color = colDim
+            cv.drawText(String.format(strRound, round + 1), uiW - 34f, y0 + 40f, rightPaint)
+
+            for (i in 0 until Levels.PER_MAP) {
+                val n = b * Levels.PER_MAP + i + 1
+                val ccx = 50f + sp * (i + 0.5f)
+                val ccy = y0 + 100f
+                val passed = n <= levelMax
+                val current = n == levelMax + 1
+                when {
+                    passed -> {
+                        paint.color = colGold
+                        cv.drawCircle(ccx, ccy, r, paint)
+                    }
+                    current -> {
+                        val pr = r * (1f + 0.07f * sin(time * 5f))
+                        paint.color = withAlpha(m.accent, 90)
+                        cv.drawCircle(ccx, ccy, pr * 1.3f, paint)
+                        paint.color = m.accent
+                        cv.drawCircle(ccx, ccy, pr, paint)
+                    }
+                    else -> {
+                        paint.color = hex(0xFF0C1030)
+                        cv.drawCircle(ccx, ccy, r, paint)
+                        paint.style = Paint.Style.STROKE
+                        paint.strokeWidth = 2f
+                        paint.color = withAlpha(colDim, 90)
+                        cv.drawCircle(ccx, ccy, r, paint)
+                        paint.style = Paint.Style.FILL
+                    }
+                }
+                if (i == Levels.PER_MAP - 1) {
+                    // Haritanın finali: çift halka
+                    paint.style = Paint.Style.STROKE
+                    paint.strokeWidth = 2.5f
+                    paint.color = if (passed) colGold else withAlpha(colAccent, 200)
+                    cv.drawCircle(ccx, ccy, r + 6f, paint)
+                    paint.style = Paint.Style.FILL
+                }
+                labelPaint.textSize = 17f
+                labelPaint.color = when {
+                    passed -> colDarkText
+                    current -> Color.WHITE
+                    else -> withAlpha(colDim, 150)
+                }
+                drawFitW(cv, n.toString(), ccx, ccy + 6f, labelPaint, r * 1.8f)
+            }
+        }
+        cv.restore()
+
+        drawScreenHeader(cv, cx, strLevels)
+        drawLivesPill(cv, cx, 92f, 0)
+        drawToast(cv, cx)
+    }
+
+    private fun drawToast(cv: Canvas, cx: Float) {
+        if (marketMsgT <= 0f || marketMsg.isEmpty()) return
+        val a = (marketMsgT / 0.3f).coerceIn(0f, 1f)
+        textPaint.textSize = 20f
+        val tw = min(textPaint.measureText(marketMsg) + 48f, uiW - 24f)
+        tmpRect.set(cx - tw / 2f, 470f, cx + tw / 2f, 524f)
+        paint.color = withAlpha(hex(0xFF05071A), (235 * a).toInt())
+        cv.drawRoundRect(tmpRect, 27f, 27f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(colGold, (200 * a).toInt())
+        cv.drawRoundRect(tmpRect, 27f, 27f, paint)
+        paint.style = Paint.Style.FILL
+        textPaint.color = withAlpha(colText, (255 * a).toInt())
+        drawFitW(cv, marketMsg, cx, 504f, textPaint, tw - 24f)
+    }
+
+    private fun drawMarket(cv: Canvas, cx: Float) {
+        layoutHub()
+        for (i in marketCards.indices) {
+            val sk = Skin.entries[i]
+            val r = marketCards[i]
+            val owned = sk in ownedSkins
+            val selected = sk == skin
+            paint.color = withAlpha(colPanel, 225)
+            cv.drawRoundRect(r, 20f, 20f, paint)
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = if (selected) 3.5f else 2f
+            paint.color = when {
+                selected -> colGreen
+                owned -> withAlpha(colPanelEdge, 150)
+                else -> withAlpha(colGold, 110)
+            }
+            cv.drawRoundRect(r, 20f, 20f, paint)
+            paint.style = Paint.Style.FILL
+
+            val boostV = (0.5f + 0.5f * sin(time * 3f + i)).pow(3)
+            cv.save()
+            cv.clipRect(r)
+            drawSkinPreview(cv, sk, r.centerX() + 6f, r.top + 62f + sin(time * 2f + i) * 3f, 1.75f, boostV)
+            cv.restore()
+
+            labelPaint.textSize = 15f
+            labelPaint.color = colText
+            drawFitW(cv, skinNames[i], r.centerX(), r.top + 116f, labelPaint, r.width() - 16f)
+            when {
+                selected -> {
+                    labelPaint.textSize = 15f
+                    labelPaint.color = colGreen
+                    cv.drawText(strSelected, r.centerX(), r.top + 144f, labelPaint)
+                }
+                owned -> {
+                    labelPaint.textSize = 15f
+                    labelPaint.color = colDim
+                    cv.drawText(strSelect, r.centerX(), r.top + 144f, labelPaint)
+                }
+                else -> {
+                    rightPaint.textSize = 19f
+                    val txt = sk.price.toString()
+                    val tw = rightPaint.measureText(txt) + 26f
+                    val x0 = r.centerX() - tw / 2f
+                    drawCoinIcon(cv, x0 + 9f, r.top + 138f, 9f)
+                    rightPaint.color = if (coins >= sk.price) colGold else colDim
+                    cv.drawText(txt, x0 + tw, r.top + 145f, rightPaint)
+                }
+            }
+        }
+        drawScreenHeader(cv, cx, strMarket)
+        drawToast(cv, cx)
+    }
+
+    /** Bölüm başlamadan önce: numara, hedef ve bu bölümün özellikleri. */
+    private fun drawLevelIntro(cv: Canvas, cx: Float) {
+        val lv = level ?: return
+        val bob = sin(time * 1.6f) * 3f
+        if (lv.isFinalOfMap) {
+            labelPaint.textSize = 16f
+            val t = strMapFinal
+            val tw = labelPaint.measureText(t) + 36f
+            tmpRect.set(cx - tw / 2f, 82f, cx + tw / 2f, 114f)
+            drawButton(cv, tmpRect, t, colAccent, Color.WHITE, true, 255, 16f)
+        }
+        titlePaint.textSize = 54f
+        drawShadowText(cv, String.format(strLevelTitle, lv.number), cx, 168f + bob, titlePaint, colText)
+        labelPaint.textSize = 18f
+        labelPaint.color = map.accent
+        drawFit(cv, mapNames[mapIndex] + "  ·  " + String.format(strRound, lv.round + 1), cx, 206f, labelPaint)
+
+        val tt = String.format(strTarget, lv.target)
+        labelPaint.textSize = 20f
+        val tw = labelPaint.measureText(tt) + 48f
+        tmpRect.set(cx - tw / 2f, 224f, cx + tw / 2f, 268f)
+        drawButton(cv, tmpRect, tt, colGold, colDarkText, true, 255, 20f)
+
+        var y = 312f
+        if (lv.mods.isEmpty()) {
+            textPaint.textSize = 19f
+            textPaint.color = colDim
+            drawFit(cv, strPractice, cx, y, textPaint)
+            y += 40f
+        } else {
+            for (m in lv.mods) {
+                val name = modNames[m.ordinal]
+                textPaint.textSize = 19f
+                val w = min(textPaint.measureText(name) + 44f, uiW - 40f)
+                tmpRect.set(cx - w / 2f, y - 26f, cx + w / 2f, y + 10f)
+                paint.color = withAlpha(colPanel, 220)
+                cv.drawRoundRect(tmpRect, 18f, 18f, paint)
+                paint.style = Paint.Style.STROKE
+                paint.strokeWidth = 2f
+                paint.color = m.color
+                cv.drawRoundRect(tmpRect, 18f, 18f, paint)
+                paint.style = Paint.Style.FILL
+                textPaint.color = m.color
+                drawFitW(cv, name, cx, y - 1f, textPaint, w - 20f)
+                y += 46f
+            }
+        }
+
+        val pulse = 0.5f + 0.5f * sin(time * 4f)
+        textPaint.textSize = 30f
+        textPaint.color = withAlpha(colText, (140 + 115 * pulse).toInt())
+        if (lives.count > 0) {
+            drawFit(cv, strTapToStart, cx, 690f, textPaint)
+        } else {
+            textPaint.textSize = 24f
+            textPaint.color = hex(0xFFFF4D6D)
+            drawFit(cv, String.format(strNoLives, lives.nextText()), cx, 690f, textPaint)
+        }
+        textPaint.textSize = 20f
+        textPaint.color = map.accent
+        drawFit(cv, mapTips[mapIndex], cx, 732f, textPaint)
+        labelPaint.textSize = 18f
+        labelPaint.color = colGold
+        val first = lv.number > levelMax
+        drawFit(cv, if (first) String.format(strReward, lv.reward) else strReplay, cx, 800f, labelPaint)
+        labelPaint.textSize = 15f
+        labelPaint.color = colDim
+        drawFit(cv, strLifeRule, cx, 836f, labelPaint)
+        drawLivesPill(cv, uiW - 16f, 24f, 1)
+        if (Mech.WIND in mechs) drawWindGauge(cv)
+        drawToast(cv, cx)
+    }
+
+    /** Bölüm sırasında: puan / hedef ve ilerleme çubuğu. */
+    private fun drawLevelHud(cv: Canvas, cx: Float) {
+        val lv = level ?: return
+        titlePaint.textSize = 76f * (1f + 0.15f * scorePulse)
+        drawShadowText(cv, "$score/${lv.target}", cx, 132f, titlePaint, colText)
+        val bw = min(uiW - 150f, 300f)
+        val k = (score / lv.target.toFloat()).coerceIn(0f, 1f)
+        tmpRect.set(cx - bw / 2f, 152f, cx + bw / 2f, 164f)
+        paint.color = withAlpha(colPanel, 220)
+        cv.drawRoundRect(tmpRect, 6f, 6f, paint)
+        tmpRect.set(cx - bw / 2f, 152f, cx - bw / 2f + bw * k, 164f)
+        paint.color = map.accent
+        cv.drawRoundRect(tmpRect, 6f, 6f, paint)
+        labelPaint.textSize = 15f
+        labelPaint.color = colDim
+        drawFit(cv, String.format(strLevelTitle, lv.number), cx, 192f, labelPaint)
+    }
+
+    /** Toplanan para: sağ üstte küçük kutu. */
+    private fun drawRunCoins(cv: Canvas) {
+        if (coinChance <= 0f) return
+        rightPaint.textSize = 20f
+        val txt = runCoins.toString()
+        val w = rightPaint.measureText(txt) + 54f
+        tmpRect.set(uiW - 18f - w, 30f, uiW - 18f, 72f)
+        paint.color = withAlpha(colPanel, 200)
+        cv.drawRoundRect(tmpRect, 21f, 21f, paint)
+        drawCoinIcon(cv, tmpRect.left + 21f, 51f, 11f)
+        rightPaint.color = colText
+        cv.drawText(txt, tmpRect.right - 14f, 58f, rightPaint)
+    }
+
+    private fun drawLevelDone(cv: Canvas, cx: Float) {
+        val lv = level ?: return
+        val t = (stateTimer / 0.35f).coerceIn(0f, 1f)
+        val ease = 1f - (1f - t).pow(3)
+        val a = (ease * 255).toInt()
+        val top = 330f + (1f - ease) * 70f
+        val panelW = min(uiW - 48f, 360f)
+        val panelH = 280f
+        val all = lv.number >= Levels.COUNT
+
+        val title = if (all) strAllDone else strLevelDone
+        titlePaint.textSize = 52f
+        titlePaint.color = withAlpha(Color.BLACK, (a * 0.4f).toInt())
+        drawFit(cv, title, cx, top - 29f, titlePaint)
+        titlePaint.color = withAlpha(colGold, a)
+        drawFit(cv, title, cx, top - 34f, titlePaint)
+
+        tmpRect.set(cx - panelW / 2f, top, cx + panelW / 2f, top + panelH)
+        paint.color = withAlpha(colPanel, (a * 0.9f).toInt())
+        cv.drawRoundRect(tmpRect, 28f, 28f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2.5f
+        paint.color = withAlpha(colGold, (a * 0.6f).toInt())
+        cv.drawRoundRect(tmpRect, 28f, 28f, paint)
+        paint.style = Paint.Style.FILL
+
+        labelPaint.textSize = 19f
+        labelPaint.color = withAlpha(colDim, a)
+        cv.drawText(String.format(strLevelTitle, lv.number), cx, top + 48f, labelPaint)
+        titlePaint.textSize = 76f
+        titlePaint.color = withAlpha(colText, a)
+        cv.drawText("$score/${lv.target}", cx, top + 128f, titlePaint)
+        paint.color = withAlpha(colPanelEdge, (a * 0.25f).toInt())
+        cv.drawRect(cx - panelW / 2f + 32f, top + 156f, cx + panelW / 2f - 32f, top + 158f, paint)
+
+        labelPaint.color = withAlpha(colDim, a)
+        cv.drawText(strRewardLabel, cx, top + 192f, labelPaint)
+        rightPaint.textSize = 40f
+        val txt = "+$levelBonus"
+        val tw = rightPaint.measureText(txt) + 40f
+        drawCoinIcon(cv, cx - tw / 2f + 14f, top + 228f, 14f)
+        rightPaint.color = withAlpha(colGold, a)
+        cv.drawText(txt, cx + tw / 2f, top + 242f, rightPaint)
+        labelPaint.textSize = 15f
+        labelPaint.color = withAlpha(colDim, a)
+        cv.drawText(String.format(strCoinsCollected, runCoins), cx, top + 270f, labelPaint)
+
+        val ba = (((stateTimer - 0.45f) / 0.25f).coerceIn(0f, 1f) * 255).toInt()
+        if (ba > 0) {
+            if (!all) drawButton(cv, retryBtn, strNext, colGold, colDarkText, true, ba, 22f)
+            drawButton(cv, menuBtn, strLevels, colPanelEdge, colText, false, ba, 20f)
+            if (all) {
+                textPaint.textSize = 20f
+                textPaint.color = withAlpha(colGold, ba)
+                drawFit(cv, strAllDoneDesc, cx, top + panelH + 40f, textPaint)
+            }
+        }
+    }
+
     // --- Arayüz ---
 
     private fun drawHud(cv: Canvas) {
         val cx = uiW / 2f
         when (state) {
+            State.HUB -> drawHub(cv, cx)
+            State.LEVELS -> drawLevels(cv, cx)
+            State.MARKET -> drawMarket(cv, cx)
+            State.LEVEL_DONE -> drawLevelDone(cv, cx)
             State.MENU -> drawMenu(cv, cx)
-            State.READY -> drawReady(cv, cx)
+            State.READY -> if (levelMode) drawLevelIntro(cv, cx) else drawReady(cv, cx)
             State.PLAYING, State.DYING -> drawScore(cv, cx)
             State.OVER -> drawGameOver(cv, cx)
             State.MP_LOBBY -> drawLobby(cv, cx)
@@ -2114,11 +3510,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
         // --- Başla ---
         drawPulseButton(cv, startBtn, strStart)
-        drawButton(cv, multiBtn, strTwoPlayers, colBlue, colText, false, 255, 19f)
+        drawCircleIcon(cv, backCircle, "‹")
 
         labelPaint.textSize = 19f
         labelPaint.color = colGold
-        drawFit(cv, bestText, cx, multiBtn.bottom + 44f, labelPaint)
+        drawFit(cv, bestText, cx, multiBtn.centerY() + 8f, labelPaint)
     }
 
     /** Lobinin altında: bölünmüş ekran / tam ekran seçimi. */
@@ -2247,7 +3643,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         textPaint.textSize = 21f
         textPaint.color = map.accent
         drawFit(cv, mapTips[mapIndex], cx, 330f, textPaint)
-        if (map.kind == MapKind.GAS) drawWindGauge(cv)
+        if (Mech.WIND in mechs) drawWindGauge(cv)
 
         val pulse = 0.5f + 0.5f * sin(time * 4f)
         textPaint.textSize = 30f
@@ -2265,14 +3661,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun drawScore(cv: Canvas, cx: Float) {
-        titlePaint.textSize = 92f * (1f + 0.18f * scorePulse)
-        drawShadowText(cv, scoreText, cx, 150f, titlePaint, colText)
-        if (map.kind == MapKind.GAS) drawWindGauge(cv)
+        if (levelMode) {
+            drawLevelHud(cv, cx)
+        } else {
+            titlePaint.textSize = 92f * (1f + 0.18f * scorePulse)
+            drawShadowText(cv, scoreText, cx, 150f, titlePaint, colText)
+        }
+        if (Mech.WIND in mechs) drawWindGauge(cv)
+        drawRunCoins(cv)
     }
 
     /** Sol üstte rüzgârın yönünü ve gücünü gösteren ok. */
     private fun drawWindGauge(cv: Canvas, gx: Float = 52f, gy: Float = 74f) {
-        val maxW = WIND_BASE * difficulty.hazard
+        val maxW = WIND_BASE * hazard()
         val k = (wind / maxW).coerceIn(-1f, 1f)
         paint.color = withAlpha(colPanel, 190)
         cv.drawCircle(gx, gy, 32f, paint)
@@ -2309,11 +3710,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val panelW = min(uiW - 48f, 360f)
         val panelH = 290f
 
+        val lv = if (levelMode) level else null
+        val title = if (lv != null) strLevelFailed else strGameOver
         titlePaint.textSize = 56f
         titlePaint.color = withAlpha(Color.BLACK, (a * 0.4f).toInt())
-        drawFit(cv, strGameOver, cx, top - 29f, titlePaint)
-        titlePaint.color = withAlpha(colWarm, a)
-        drawFit(cv, strGameOver, cx, top - 34f, titlePaint)
+        drawFit(cv, title, cx, top - 29f, titlePaint)
+        titlePaint.color = withAlpha(if (lv != null) colAccent else colWarm, a)
+        drawFit(cv, title, cx, top - 34f, titlePaint)
 
         tmpRect.set(cx - panelW / 2f, top, cx + panelW / 2f, top + panelH)
         paint.color = withAlpha(colPanel, (a * 0.88f).toInt())
@@ -2334,10 +3737,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         paint.color = withAlpha(colPanelEdge, (a * 0.25f).toInt())
         cv.drawRect(cx - panelW / 2f + 32f, top + 172f, cx + panelW / 2f - 32f, top + 174f, paint)
 
-        cv.drawText(strBestLabel, cx, top + 212f, labelPaint)
+        cv.drawText(if (lv != null) strTargetLabel else strBestLabel, cx, top + 212f, labelPaint)
         titlePaint.textSize = 44f
         titlePaint.color = withAlpha(colGold, a)
-        cv.drawText(bestValueText, cx, top + 262f, titlePaint)
+        cv.drawText(if (lv != null) lv.target.toString() else bestValueText, cx, top + 262f, titlePaint)
 
         if (newBest) {
             val pw = 210f
@@ -2355,12 +3758,23 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val ba = (((stateTimer - 0.45f) / 0.25f).coerceIn(0f, 1f) * 255).toInt()
         if (ba > 0) {
             drawButton(cv, retryBtn, strRetry, colWarm, colDarkText, true, ba, 22f)
-            drawButton(cv, menuBtn, strMenu, colPanelEdge, colText, false, ba, 22f)
+            drawButton(cv, menuBtn, if (lv != null) strLevels else strMenu, colPanelEdge, colText, false, ba, if (lv != null) 19f else 22f)
             drawSoundButton(cv, ba)
 
             labelPaint.textSize = 18f
             labelPaint.color = withAlpha(colDim, ba)
-            drawFit(cv, mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal], cx, retryBtn.bottom + 56f, labelPaint)
+            val info = if (lv != null) String.format(strLevelTitle, lv.number) + "  ·  " + mapNames[mapIndex]
+                else mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal]
+            drawFit(cv, info, cx, retryBtn.bottom + 56f, labelPaint)
+            if (lv != null) drawLivesPill(cv, cx, retryBtn.bottom + 122f, 0)
+            if (runCoins > 0) {
+                rightPaint.textSize = 22f
+                val txt = "+$runCoins"
+                val tw = rightPaint.measureText(txt) + 32f
+                drawCoinIcon(cv, cx - tw / 2f + 11f, retryBtn.bottom + 92f, 11f)
+                rightPaint.color = withAlpha(colGold, ba)
+                cv.drawText(txt, cx + tw / 2f, retryBtn.bottom + 100f, rightPaint)
+            }
         }
     }
 
@@ -2461,7 +3875,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         titlePaint.textSize = 130f * (if (me) 1f + 0.18f * scorePulse else 1f)
         drawShadowText(cv, scoreOf(id).toString(), cx, 175f, titlePaint, colText)
 
-        if (map.kind == MapKind.GAS && alive) drawWindGauge(cv, cw - 70f, 70f)
+        if (Mech.WIND in mechs && alive) drawWindGauge(cv, cw - 70f, 70f)
 
         if (state == State.MP_COUNTDOWN && me) {
             textPaint.textSize = 42f
@@ -2526,7 +3940,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 drawFit(cv, strTapToSwitch, cx, 246f, textPaint)
             }
         }
-        if (map.kind == MapKind.GAS && state != State.MP_OVER) drawWindGauge(cv)
+        if (Mech.WIND in mechs && state != State.MP_OVER) drawWindGauge(cv)
         if (state != State.MP_OVER) drawScoreBoard(cv, players.filter { it != id })
 
         if (state == State.MP_COUNTDOWN) {
@@ -3197,6 +4611,149 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 cv.drawCircle(w * 0.8f, h * 0.15f, w * 0.1f, p)
                 p.shader = null
             }
+            MapKind.BLACKHOLE -> {
+                val cx = w * 0.72f
+                val cy = h * 0.28f
+                val r = w * 0.2f
+                p.shader = RadialGradient(
+                    cx, cy, r * 2.6f,
+                    intArrayOf(hex(0x88FF9A3B), hex(0x228A3BFF), 0), floatArrayOf(0.2f, 0.55f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r * 2.6f, p)
+                p.shader = null
+                p.style = Paint.Style.STROKE
+                cv.save()
+                cv.rotate(-14f, cx, cy)
+                for (k in 0 until 9) {
+                    val rr = r * (1.05f + k * 0.12f)
+                    p.strokeWidth = r * 0.09f
+                    p.color = withAlpha(mixColor(hex(0xFFFFE0A0), hex(0xFF8A3BFF), k / 8f), 150 - k * 12)
+                    tmpArtRect.set(cx - rr, cy - rr * 0.28f, cx + rr, cy + rr * 0.28f)
+                    cv.drawArc(tmpArtRect, 180f, 180f, false, p) // arka yarı
+                }
+                cv.restore()
+                p.style = Paint.Style.FILL
+                p.color = Color.BLACK
+                cv.drawCircle(cx, cy, r * 0.62f, p)
+                p.style = Paint.Style.STROKE
+                p.strokeWidth = r * 0.05f
+                p.color = hex(0xFFFFD9A0)
+                cv.drawCircle(cx, cy, r * 0.65f, p)
+                cv.save()
+                cv.rotate(-14f, cx, cy)
+                for (k in 0 until 9) {
+                    val rr = r * (1.05f + k * 0.12f)
+                    p.strokeWidth = r * 0.09f
+                    p.color = withAlpha(mixColor(hex(0xFFFFE0A0), hex(0xFF8A3BFF), k / 8f), 170 - k * 12)
+                    tmpArtRect.set(cx - rr, cy - rr * 0.28f, cx + rr, cy + rr * 0.28f)
+                    cv.drawArc(tmpArtRect, 0f, 180f, false, p) // ön yarı
+                }
+                cv.restore()
+                p.style = Paint.Style.FILL
+                p.color = hex(0x44000000)
+                cv.drawRect(0f, 0f, w, h, p)
+            }
+            MapKind.STORM -> {
+                // Üstte ağır bulutlar
+                p.maskFilter = BlurMaskFilter(h * 0.03f, BlurMaskFilter.Blur.NORMAL)
+                repeat(26) {
+                    p.color = withAlpha(if (Random.nextBoolean()) hex(0xFF2A3560) else hex(0xFF3A4A80), Random.nextInt(90, 170))
+                    cv.drawCircle(rnd(-0.1f, 1.1f) * w, rnd(-0.05f, 0.2f) * h, rnd(0.08f, 0.18f) * w, p)
+                }
+                p.maskFilter = null
+                // Uzakta donmuş bir şimşek izi
+                p.style = Paint.Style.STROKE
+                p.strokeWidth = w * 0.006f
+                p.color = withAlpha(hex(0xFFBFD4FF), 70)
+                val path = Path()
+                var x = w * 0.3f
+                var y = h * 0.18f
+                path.moveTo(x, y)
+                while (y < h * 0.55f) {
+                    x += rnd(-0.04f, 0.04f) * w
+                    y += rnd(0.03f, 0.06f) * h
+                    path.lineTo(x, y)
+                }
+                cv.drawPath(path, p)
+                p.style = Paint.Style.FILL
+                p.shader = LinearGradient(0f, h * 0.75f, 0f, h, 0, hex(0x553A4A80), Shader.TileMode.CLAMP)
+                cv.drawRect(0f, h * 0.75f, w, h, p)
+                p.shader = null
+            }
+            MapKind.METEOR -> {
+                // Sol altta kraterli dev ay
+                val r = h * 0.36f
+                val cx = w * 0.05f
+                val cy = h + r * 0.35f
+                p.shader = RadialGradient(
+                    cx + r * 0.3f, cy - r * 0.4f, r * 1.4f,
+                    intArrayOf(hex(0xFF9A7B62), hex(0xFF5A4232), hex(0xFF1A120C)), floatArrayOf(0f, 0.5f, 1f),
+                    Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r, p)
+                p.shader = null
+                val save = cv.save()
+                cv.clipPath(Path().apply { addCircle(cx, cy, r, Path.Direction.CW) })
+                repeat(16) {
+                    val a = rnd(-1.6f, 0.2f)
+                    val d = rnd(0.2f, 0.95f) * r
+                    val cr = rnd(0.03f, 0.09f) * r
+                    p.color = hex(0x553A2A1E)
+                    cv.drawCircle(cx + cos(a) * d, cy + sin(a) * d, cr, p)
+                }
+                cv.restoreToCount(save)
+                p.color = hex(0x55000000)
+                cv.drawCircle(cx, cy, r, p)
+                // Gökyüzünde donmuş meteor izleri
+                p.style = Paint.Style.STROKE
+                p.strokeCap = Paint.Cap.ROUND
+                repeat(7) {
+                    val x0 = rnd(0.2f, 1f) * w
+                    val y0 = rnd(0f, 0.5f) * h
+                    val l = rnd(0.05f, 0.12f) * w
+                    p.strokeWidth = rnd(1f, 2.5f) * scale
+                    p.color = withAlpha(hex(0xFFFFB86B), Random.nextInt(30, 80))
+                    cv.drawLine(x0, y0, x0 + l, y0 - l * 0.6f, p)
+                }
+                p.style = Paint.Style.FILL
+            }
+            MapKind.TOXIC -> {
+                p.maskFilter = BlurMaskFilter(h * 0.04f, BlurMaskFilter.Blur.NORMAL)
+                repeat(14) {
+                    p.color = withAlpha(if (Random.nextBoolean()) hex(0xFF3BFF6B) else hex(0xFFC8FF3B), Random.nextInt(25, 60))
+                    cv.drawCircle(rnd(-0.1f, 1.1f) * w, rnd(0f, 1f) * h, rnd(0.1f, 0.25f) * w, p)
+                }
+                p.maskFilter = null
+                p.shader = LinearGradient(0f, h * 0.6f, 0f, h, 0, hex(0x667BFF3B), Shader.TileMode.CLAMP)
+                cv.drawRect(0f, h * 0.6f, w, h, p)
+                p.shader = null
+            }
+            MapKind.CORE -> {
+                // Sarmal galaksi
+                val cx = w * 0.62f
+                val cy = h * 0.32f
+                val R = w * 0.55f
+                repeat(1800) {
+                    val arm = Random.nextInt(2)
+                    val t = sqrt(Random.nextFloat())
+                    val a = arm * PI.toFloat() + t * 5.2f + rnd(-0.25f, 0.25f)
+                    val d = t * R
+                    val x = cx + cos(a) * d
+                    val y = cy + sin(a) * d * 0.42f
+                    p.color = withAlpha(
+                        if (t < 0.35f || Random.nextInt(3) == 0) hex(0xFFFFE6A0) else hex(0xFF8FA8FF), Random.nextInt(30, 150)
+                    )
+                    cv.drawCircle(x, y, rnd(0.5f, 2.2f) * scale, p)
+                }
+                p.shader = RadialGradient(
+                    cx, cy, R * 0.35f,
+                    intArrayOf(hex(0xCCFFF4D0), hex(0x44FFD66B), 0), floatArrayOf(0f, 0.35f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, R * 0.35f, p)
+                p.shader = null
+                p.color = hex(0x33000000)
+                cv.drawRect(0f, 0f, w, h, p)
+            }
         }
     }
 
@@ -3351,6 +4908,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             PlanetType.OCEAN -> paintOcean(cv, p, path, r, pal)
             PlanetType.CRYSTAL -> paintCrystal(cv, p, r, pal)
             PlanetType.ASTEROID -> paintRocky(cv, p, r, pal, 10)
+            PlanetType.DARK -> paintRocky(cv, p, r, pal, 9)
+            PlanetType.TOXIC -> paintGas(cv, p, path, r, pal)
         }
         // Gece tarafı gölgesi (ışık sol üstten)
         p.style = Paint.Style.FILL

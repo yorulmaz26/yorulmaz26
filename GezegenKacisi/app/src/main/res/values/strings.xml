@@ -94,4 +94,81 @@
     <string name="mp_nobody_left">Odada başka oyuncu kalmadı</string>
     <string name="mp_players_count">%1$d/%2$d</string>
     <string name="mp_watching_many">Diğerlerini izliyorsun</string>
+
+    <!-- Yeni haritalar -->
+    <string name="map_blackhole">Kara Delik</string>
+    <string name="map_blackhole_desc">Roketi ortaya çeken çekim</string>
+    <string name="map_blackhole_tip">Kara delik seni ekranın ortasına çeker</string>
+    <string name="map_storm">Elektrik Fırtınası</string>
+    <string name="map_storm_desc">Yukarıdan inen yıldırımlar</string>
+    <string name="map_storm_tip">Kesik çizginin ucunun altında kal!</string>
+    <string name="map_meteor">Meteor Yağmuru</string>
+    <string name="map_meteor_desc">Gökten düşen meteorlar</string>
+    <string name="map_meteor_tip">Üstte kırmızı işaret: meteor geliyor!</string>
+    <string name="map_toxic">Zehirli Bulutsu</string>
+    <string name="map_toxic_desc">Rüzgâr ve salınan kuleler</string>
+    <string name="map_toxic_tip">Rüzgârı ve kuleleri birlikte izle</string>
+    <string name="map_core">Galaksi Merkezi</string>
+    <string name="map_core_desc">Final: salınım ve ateş bir arada</string>
+    <string name="map_core_tip">Her şey bir arada, dikkatli uç!</string>
+
+    <!-- Ana menü -->
+    <string name="hub_levels">BÖLÜMLER</string>
+    <string name="hub_endless">SONSUZ MOD</string>
+    <string name="hub_market">MARKET</string>
+    <string name="hub_hint">Uçarken para topla, marketten yeni araç al</string>
+
+    <!-- Bölümler -->
+    <string name="level_progress">BÖLÜM %1$d / %2$d</string>
+    <string name="level_title">BÖLÜM %1$d</string>
+    <string name="level_round">Tur %1$d</string>
+    <string name="level_target">HEDEF: %1$d PUAN</string>
+    <string name="level_practice">Alıştırma bölümü: özel kural yok</string>
+    <string name="level_final">HARİTA FİNALİ</string>
+    <string name="level_reward">Ödül: +%1$d para</string>
+    <string name="level_replay">Tekrar oynanıyor: +3 para</string>
+    <string name="level_failed">BÖLÜM BAŞARISIZ</string>
+    <string name="level_done">BÖLÜM GEÇİLDİ!</string>
+    <string name="level_all_done">TEBRİKLER!</string>
+    <string name="level_all_done_desc">500 bölümün hepsini bitirdin!</string>
+    <string name="level_locked">Önce önceki bölümleri geç</string>
+    <string name="levels_passed">Geçilen: %1$d / %2$d</string>
+    <string name="next">SONRAKİ</string>
+    <string name="target_label">HEDEF</string>
+    <string name="reward_label">ÖDÜL</string>
+    <string name="coins_collected">Toplanan para: %1$d</string>
+
+    <!-- Bölüm özellikleri -->
+    <string name="mod_fast">⚡ Hızlı akış</string>
+    <string name="mod_narrow">↕ Dar geçitler</string>
+    <string name="mod_dense">▮▮ Sık kuleler</string>
+    <string name="mod_heavy">⬇ Ağır yer çekimi</string>
+    <string name="mod_light">⬆ Hafif yer çekimi</string>
+    <string name="mod_gold">● Altın yağmuru: her geçitte 2 para</string>
+    <string name="mod_wind">≋ Değişken rüzgâr</string>
+    <string name="mod_fire">▲ Yerden ateş topları</string>
+    <string name="mod_meteor">▼ Meteor yağmuru</string>
+    <string name="mod_sway">⇅ Salınan kuleler</string>
+    <string name="mod_pull">◎ Kara delik çekimi</string>
+    <string name="mod_lightning">ϟ Yıldırım</string>
+
+    <!-- Market -->
+    <string name="market_selected">SEÇİLİ</string>
+    <string name="market_select">SEÇ</string>
+    <string name="market_no_money">Yetersiz para! %1$d para daha gerekli</string>
+    <string name="market_bought">Satın alındı ve seçildi!</string>
+    <string name="skin_classic">Klasik Roket</string>
+    <string name="skin_night">Gece Roketi</string>
+    <string name="skin_emerald">Zümrüt Roket</string>
+    <string name="skin_shuttle">Uzay Mekiği</string>
+    <string name="skin_comet">Kuyruklu Yıldız</string>
+    <string name="skin_ufo">UFO</string>
+    <string name="skin_gold">Altın Roket</string>
+    <string name="skin_ring_planet">Halkalı Gezegen</string>
+    <string name="skin_lava_planet">Lav Gezegeni</string>
+    <string name="skin_crystal">Kristal Gemi</string>
+
+    <!-- Canlar -->
+    <string name="lives_empty">Canın kalmadı! Sonraki can: %1$s</string>
+    <string name="lives_rule">Başlarken 1 can gider, geçersen geri gelir · 15 dk’da 1 can dolar</string>
 </resources>
