@@ -13,7 +13,7 @@
 | İmza | Release APK doğrudan kurulabilsin diye debug anahtarıyla imzalıdır. Play Store için kendi keystore'unuzla imzalayın. |
 | CI | `.github/workflows/golgen-android.yml`: birim testleri + lint + debug/release APK → emülatör UI testi → GitHub Releases |
 | Lint | 0 hata. İlk ölçümde 13 uyarı vardı; kullanılmayan kaynaklar (3), eski `-v26` klasör eki ve dokunma erişilebilirliği giderildi. Kalanlar bilinçli tercihler: dikey yön kilidi (LockedOrientation/DiscouragedApi), oyun görünümünün yalnızca kodla oluşturulması (ViewConstructor), API 33 altı cihazlar için geri tuşu uyumluluğu (GestureBackNavigation/UnusedAttribute) ve daha yeni AGP/SDK sürümü önerileri |
-| Sonuç | BUILD SUCCESSFUL (≈50 sn), UI testi 28/28, release `golgen-v1.0.0-b<N>` olarak yayınlandı |
+| Sonuç | BUILD SUCCESSFUL (≈50 sn), UI testi 29/29, release `golgen-v1.0.0-b<N>` olarak yayınlandı |
 
 ## APK'yı edinme
 - GitHub deposunda **Releases** › `golgen-v1.0.0-b…` › `GolgenSeniYakalamasin.apk`

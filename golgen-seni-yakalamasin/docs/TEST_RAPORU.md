@@ -20,7 +20,7 @@ Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalı�
 - Android 15 API'sine (android-all) karşı tüm kaynakların yerel `javac` derlemesi: hatasız.
 - GitHub Actions: `testDebugUnitTest lintDebug assembleDebug assembleRelease` → **BUILD SUCCESSFUL**.
 
-## 3. Emülatörde uçtan uca UI testi — ✅ 28/28 geçti
+## 3. Emülatörde uçtan uca UI testi — ✅ 29/29 geçti
 Ortam: GitHub Actions, Android 14 (API 34) emülatörü, Pixel 6 profili (1080×2400), betik: `tools/smoke_test.sh`.
 Butonlara gerçek dokunma olaylarıyla (`adb input tap/swipe`) basılır; ekran geçişleri uygulama günlüğünden doğrulanır.
 
@@ -28,7 +28,7 @@ Sonuçların tamamı: [`ekranlar/test_sonuclari.txt`](ekranlar/test_sonuclari.tx
 
 | Alan | Kontrol |
 |---|---|
-| Kurulum / açılış | APK kurulumu, Açılış ekranı, ilk açılışta öğretici |
+| Kurulum / açılış | APK kurulumu, Açılış ekranı, ilk açılışta öğretici, günlük giriş ödülü penceresi ve ödülün kaydı |
 | Sahne geçişleri | Öğretici→Menü, Menü→Oyun, Oyun→Duraklatma→Menü, Oyun sonu→Tekrar, Karakter, Görevler, Görev 1, Rekorlar, Ayarlar, Ayarlar→Öğretici→Menü, geri tuşu |
 | Oynanış | Sürükleyerek oynama, duraklatmada 6 sn beklenince oyunun bitmemesi, devam edip hareketsiz kalınca gölgenin yakalaması |
 | Kayıt sistemi | Oyun sayısı ve rekor kaydı, satın alma sonrası elmas/karakter kaydı, ses ve titreşim ayarlarının kaydı, uygulama kapatılıp açılınca öğreticinin atlanması ve seçili karakterin korunması |
