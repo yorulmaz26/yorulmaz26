@@ -5,7 +5,10 @@ import 'package:material_ui/material_ui.dart';
 import '../features/auth/application/auth_providers.dart';
 import '../features/auth/presentation/phone_auth_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
-import '../features/home/presentation/home_screen.dart';
+import '../features/chat/presentation/chat_list_screen.dart';
+import '../features/chat/presentation/chat_screen.dart';
+import '../features/chat/presentation/new_chat_screen.dart';
+import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/profile_setup_screen.dart';
 import '../features/translator/presentation/splash_screen.dart';
 import '../features/translator/presentation/translator_screen.dart';
@@ -17,6 +20,9 @@ abstract final class Routes {
   static const profileSetup = '/profile/setup';
   static const home = '/home';
   static const firebaseSetup = '/setup';
+  static const profile = '/profile';
+  static const newChat = '/chats/new';
+  static String chat(String id) => '/chats/$id';
 }
 
 /// Oturum durumuna göre yönlendirme. Saf fonksiyon; birim testi vardır.
@@ -70,7 +76,20 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.home,
-        builder: (context, state) => const HomeScreen(),
+        builder: (context, state) => const ChatListScreen(),
+      ),
+      GoRoute(
+        path: Routes.profile,
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: Routes.newChat,
+        builder: (context, state) => const NewChatScreen(),
+      ),
+      GoRoute(
+        path: '/chats/:id',
+        builder: (context, state) =>
+            ChatScreen(chatId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: Routes.firebaseSetup,

@@ -1,36 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
-import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../auth/application/auth_providers.dart';
 import '../../auth/domain/phone_number.dart';
-import '../../profile/application/profile_providers.dart';
+import '../application/profile_providers.dart';
 
-/// Oturum açmış kullanıcının ana ekranı. Sohbet listesi Aşama 4'te
-/// gerçek Firestore verisiyle buraya eklenecek.
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+/// Kullanıcı profili.
+class ProfileScreen extends ConsumerWidget {
+  const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(currentProfileProvider).value;
     final user = ref.watch(authStateProvider).value;
     final phone = PhoneNumber.tryParse(user?.phoneNumber ?? '');
-    final text = Theme.of(context).textTheme;
-
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Kuş Dili'),
-        actions: [
-          IconButton(
-            tooltip: 'Çevirici',
-            icon: const Icon(Icons.translate),
-            onPressed: () => context.push(Routes.translator),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('Profil')),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -50,10 +36,10 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
-          const SizedBox(height: 24),
-          Text(
-            'Mesajlaşma bir sonraki geliştirme aşamasında etkinleşecek.',
-            style: text.bodyMedium?.copyWith(color: AppColors.snow),
+          const SizedBox(height: 8),
+          const Text(
+            'Telefon numaran yalnızca sende görünür; diğer kullanıcılar seni '
+            'kullanıcı adınla bulur.',
           ),
           const SizedBox(height: 24),
           OutlinedButton.icon(

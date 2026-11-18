@@ -165,6 +165,22 @@ Aşama 3'te uygulananlar (`firebase/firestore.rules`, emülatörde 15 test):
   telefonla arkadaş bulma, gizlilik nedeniyle ayrı ve hız sınırlı bir sunucu
   fonksiyonu olarak sonraki aşamalarda tasarlanacak.
 
+Aşama 4–6'da uygulananlar (kurallar emülatörde 31 testle doğrulanır):
+
+* `chats/{d_<uid1>_<uid2>}`: `type`, `members` (sıralı 2 üye), `createdAt`,
+  `lastActivityAt`, `lastSenderId`, `readAt{uid: zaman}`. **Önizleme metni yok.**
+  Kimlik üyelerden türetilir; aynı iki kişi için tek sohbet olur.
+* `chats/{id}/messages/{id}`: `senderId`, `sentAt` (sunucu zamanı), `encVersion`,
+  `body` (mühürlü paket, ≤64 KB), `deleted`, `editedAt`. Mesaj kimliği istemcide
+  üretilir (tekrar denemede çift mesaj olmaz). Silme = içeriği boşaltma.
+* `users/{uid}/chatSettings/{chatId}`: gönderim modu, varyant, görünüm; yalnızca sahibi.
+* Mesaj gövdesi `MessageSealer` arayüzünden geçer. Şu an `PlaintextDevSealer`
+  (`encVersion` 0, **şifresiz**) kullanılıyor ve sohbet ekranında bunu söyleyen
+  bir uyarı bandı var. Aşama 7'de yerine E2EE uygulaması gelecek; kurallar
+  yayından önce yalnızca `encVersion` 1'i kabul edecek şekilde daraltılacak.
+* Mesaj araması sunucuda yapılamaz (gövde şifreli olacak); Aşama 7'deki şifreli
+  yerel veritabanında cihaz üzerinde yapılacak.
+
 Sonraki aşamalar için taslak:
 
 ```
@@ -208,9 +224,9 @@ userChatSettings/{uid}/chats/{chatId}
 | 1 | Proje kurulumu ve mimari | ✅ iskelet, tema, yönlendirme, Riverpod |
 | 2 | Kuş dili motoru ve testleri | ✅ 81 birim testi |
 | 3 | Kayıt / giriş (telefon) | ✅ kod + testler; gerçek projede deneme kullanıcıda (bkz. FIREBASE_SETUP.md) |
-| 4 | Gerçek zamanlı bireysel mesajlaşma | — |
-| 5 | Otomatik kuş dili mesajlaşma | — |
-| 6 | Mesaj çözme ve dil değiştirme | — |
+| 4 | Gerçek zamanlı bireysel mesajlaşma | ✅ metin, yanıtlama, düzenleme, herkesten silme, okundu bilgisi (yazıyor/çevrimiçi göstergesi henüz yok) |
+| 5 | Otomatik kuş dili mesajlaşma | ✅ sohbet başına gönderim modu ve varyant (özel kural dahil), yazarken canlı önizleme |
+| 6 | Mesaj çözme ve dil değiştirme | ✅ dokununca animasyonlu çözme, görünüm tercihi (kuş dili / ikisi / Türkçe) |
 | 7 | Gizli sohbet + E2EE | — |
 | 8 | Grup mesajlaşması | — |
 | 9 | Medya ve sesli mesaj | — |

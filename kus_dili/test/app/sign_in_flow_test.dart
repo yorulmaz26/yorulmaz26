@@ -1,40 +1,20 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kus_dili/app/app.dart';
 import 'package:kus_dili/core/firebase/firebase_bootstrap.dart';
-import 'package:kus_dili/core/firebase/firebase_providers.dart';
-import 'package:kus_dili/features/auth/application/auth_providers.dart';
-import 'package:kus_dili/features/profile/application/profile_providers.dart';
-import 'package:kus_dili/features/profile/data/firestore_profile_repository.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../helpers/fake_auth_repository.dart';
+import '../helpers/test_app.dart';
 
 /// Yönlendirici + ekranlar + denetleyiciler + Firestore deposu birlikte.
 /// Yalnızca Firebase Auth (SMS) ve Firestore sunucusu test sahtesiyle
 /// değiştirilir.
 void main() {
-  Future<void> settle(WidgetTester t) async {
-    for (var i = 0; i < 10; i++) {
-      await t.pump(const Duration(milliseconds: 100));
-    }
-  }
-
   Widget app({
     required FakeAuthRepository auth,
     required FakeFirebaseFirestore db,
     FirebaseStatus firebase = const FirebaseStatus.ready(),
-  }) => ProviderScope(
-    overrides: [
-      firebaseStatusProvider.overrideWithValue(firebase),
-      authRepositoryProvider.overrideWithValue(auth),
-      profileRepositoryProvider.overrideWithValue(
-        FirestoreProfileRepository(db),
-      ),
-    ],
-    child: const KusDiliApp(),
-  );
+  }) => testApp(auth: auth, db: db, firebase: firebase);
 
   testWidgets('Kayıt: telefon → kod → profil → ana ekran → çıkış', (t) async {
     final auth = FakeAuthRepository();
@@ -63,7 +43,10 @@ void main() {
     await t.tap(find.byKey(const Key('saveProfile')));
     await settle(t);
 
-    // Profil oluştu → ana ekran.
+    // Profil oluştu → sohbet listesi; profil ekranında bilgiler.
+    expect(find.textContaining('Henüz sohbetin yok'), findsOneWidget);
+    await t.tap(find.byKey(const Key('openProfile')));
+    await settle(t);
     expect(find.text('@ayse.k  ·  +90 532 123 45 67'), findsOneWidget);
     expect((await db.doc('usernames/ayse.k').get()).data(), {
       'uid': 'uid-905321234567',

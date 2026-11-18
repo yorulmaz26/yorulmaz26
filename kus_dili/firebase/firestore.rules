@@ -75,6 +75,110 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Sohbet ayarları: yalnızca sahibi (karşı taraf göremez).
+    match /users/{uid}/chatSettings/{chatId} {
+      allow read, delete: if isSelf(uid);
+      allow write: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['sendMode', 'variant', 'viewMode'])
+        && request.resource.data.sendMode in ['p', 'k']
+        && request.resource.data.viewMode in ['asSent', 'original', 'both']
+        && request.resource.data.variant is map
+        && request.resource.data.variant.size() <= 4;
+    }
+
+    // ---------------------------------------------------------------- Sohbet
+    // chats/{chatId}: iki kişilik sohbet, kimlik 'd_<küçük uid>_<büyük uid>'.
+    // Önizleme metni TUTULMAZ.
+    function chatData(chatId) {
+      return get(/databases/$(database)/documents/chats/$(chatId)).data;
+    }
+
+    function isMember(chatId) {
+      return verified() && request.auth.uid in chatData(chatId).members;
+    }
+
+    match /chats/{chatId} {
+      // Var olmayan kendi sohbet kimliğini okumaya izin ver (oluşturmadan
+      // önce varlık kontrolü); başkalarının sohbetinin varlığı sızmaz.
+      allow get: if verified() && (
+        (resource == null && request.auth.uid in chatId.split('_'))
+        || (resource != null && request.auth.uid in resource.data.members));
+
+      // Liste sorgusu: where('members', arrayContains: uid).
+      allow list: if verified() && request.auth.uid in resource.data.members;
+
+      allow create: if verified()
+        && request.resource.data.keys().hasOnly(
+             ['type', 'members', 'createdAt', 'lastActivityAt', 'readAt'])
+        && request.resource.data.type == 'direct'
+        && request.resource.data.members is list
+        && request.resource.data.members.size() == 2
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members[0] < request.resource.data.members[1]
+        && chatId == 'd_' + request.resource.data.members[0]
+                     + '_' + request.resource.data.members[1]
+        && exists(userPath(request.resource.data.members[0]))
+        && exists(userPath(request.resource.data.members[1]))
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.lastActivityAt == request.time
+        && request.resource.data.readAt == {};
+
+      // Üyeler yalnızca: son etkinlik (kendi gönderdiği mesajla) ve kendi
+      // okuma zamanını değiştirebilir.
+      allow update: if verified()
+        && request.auth.uid in resource.data.members
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['lastActivityAt', 'lastSenderId', 'readAt'])
+        && (!request.resource.data.diff(resource.data).affectedKeys()
+              .hasAny(['lastActivityAt', 'lastSenderId'])
+            || (request.resource.data.lastActivityAt == request.time
+                && request.resource.data.lastSenderId == request.auth.uid))
+        && request.resource.data.readAt.diff(resource.data.readAt)
+             .affectedKeys().hasOnly([request.auth.uid])
+        && (!request.resource.data.readAt.diff(resource.data.readAt)
+              .affectedKeys().hasAny([request.auth.uid])
+            || request.resource.data.readAt[request.auth.uid] == request.time);
+
+      allow delete: if false;
+
+      // Mesajlar: gövde mühürlüdür (Aşama 7'den itibaren şifreli).
+      match /messages/{messageId} {
+        allow read: if isMember(chatId);
+
+        allow create: if isMember(chatId)
+          && request.resource.data.keys().hasOnly(
+               ['senderId', 'sentAt', 'encVersion', 'body', 'deleted'])
+          && request.resource.data.senderId == request.auth.uid
+          && request.resource.data.sentAt == request.time
+          // 0 = geliştirme (şifresiz). Yayından önce yalnızca 1 kabul edilecek.
+          && request.resource.data.encVersion in [0, 1]
+          && request.resource.data.body is string
+          && request.resource.data.body.size() > 0
+          && request.resource.data.body.size() <= 65536
+          && request.resource.data.deleted == false;
+
+        // Gönderen düzenleyebilir veya herkesten silebilir.
+        allow update: if isMember(chatId)
+          && resource.data.senderId == request.auth.uid
+          && resource.data.deleted == false
+          && (
+            (request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['deleted', 'body'])
+             && request.resource.data.deleted == true
+             && request.resource.data.body == '')
+            ||
+            (request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['body', 'editedAt'])
+             && request.resource.data.editedAt == request.time
+             && request.resource.data.body is string
+             && request.resource.data.body.size() > 0
+             && request.resource.data.body.size() <= 65536)
+          );
+
+        allow delete: if false;
+      }
+    }
+
     // Tanımlanmayan her şey kapalı.
     match /{document=**} {
       allow read, write: if false;

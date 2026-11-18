@@ -17,7 +17,13 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   yönlendirme, Firestore güvenlik kuralları. Kurulum:
   [`docs/FIREBASE_SETUP.md`](docs/FIREBASE_SETUP.md).
 
-Mesajlaşma ve uçtan uca şifreleme henüz yok (Aşama 4+).
+* **Mesajlaşma (Aşama 4–6)**: kullanıcı adıyla sohbet başlatma, gerçek zamanlı
+  metin mesajlaşma, yanıtlama, düzenleme, herkesten silme, okundu bilgisi;
+  sohbet başına otomatik kuş dili (G/F/C/özel kural), yazarken önizleme,
+  dokununca animasyonlu çözme, görünüm tercihi.
+
+⚠️ Mesajlar henüz **uçtan uca şifreli değil** (Aşama 7). Bu sürüm gerçek
+kullanıcılara yayınlanmamalıdır.
 
 ## Kurulum
 
