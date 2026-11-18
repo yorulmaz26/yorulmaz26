@@ -1,5 +1,5 @@
 name: kus_dili
-description: "A new Flutter project."
+description: "Kuş Dili — uçtan uca şifreli, kuş dilli mesajlaşma."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -48,15 +48,7 @@ dependencies:
   cryptography: ^2.9.0
   path_provider: ^2.1.6
   local_auth: ^3.0.2
-  firebase_storage: ^14.1.0
-  image_picker: ^1.2.4
-  file_picker: ^13.4.0
-  record: ^7.2.0
-  just_audio: ^0.10.6
-  video_player: ^2.14.1
-  share_plus: ^13.3.1
   firebase_messaging: ^17.1.0
-  flutter_webrtc: ^1.6.3
   cloud_functions: ^7.1.0
   flutter_tts: ^4.2.5
   shared_preferences: ^2.5.6

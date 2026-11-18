@@ -6,12 +6,6 @@
 	     uyumluluk beyanı gerekir, bkz. docs/RELEASE.md. -->
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Sohbete fotoğraf ve video göndermek için.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Galeriden fotoğraf ve video seçmek için.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Sesli mesaj kaydetmek ve video çekmek için.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Kilitli sohbetleri ve uygulamayı Face ID ile açmak için.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>

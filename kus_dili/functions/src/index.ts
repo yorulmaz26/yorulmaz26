@@ -2,18 +2,14 @@ import { initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
-import { defineSecret, defineString } from 'firebase-functions/params';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 
 import { leaveGroup, ownedDocPaths } from './account';
-import { parseUrls, turnCredentials as makeTurnCredentials } from './turn';
 import {
-  callContent,
   isDeadTokenError,
   messageContent,
-  planCallPush,
   planMessagePush,
   PushContent,
   PushPrefs,
@@ -80,45 +76,6 @@ export const notifyNewMessage = onDocumentCreated(
     if (targets.length === 0) return;
     await deliver(targets, messageContent(chatId, chat.type === 'group'));
     logger.info('bildirim', { chatId, recipients: targets.length });
-  },
-);
-
-/** Gelen arama → arayana değil arananın cihazlarına içeriksiz bildirim. */
-export const notifyIncomingCall = onDocumentCreated(
-  { document: 'calls/{callId}', region: REGION },
-  async (event) => {
-    const c = event.data?.data();
-    if (!c || c.state !== 'ringing' || typeof c.callee !== 'string') return;
-    const prefs = await prefsOf([c.callee]);
-    const targets = planCallPush(c.callee, prefs[c.callee]);
-    if (targets.length === 0) return;
-    await deliver(targets, callContent(event.params.callId, String(c.chatId), c.video === true));
-  },
-);
-
-const TURN_SECRET = defineSecret('TURN_SECRET');
-const TURN_URLS = defineString('TURN_URLS', { default: '' });
-
-/**
- * Arama için kısa ömürlü TURN kimlik bilgisi. TURN yapılandırılmamışsa boş
- * döner; uygulama yalnızca STUN ile dener.
- */
-export const turnCredentials = onCall(
-  { region: REGION, secrets: [TURN_SECRET] },
-  (req) => {
-    const auth = req.auth;
-    if (!auth || auth.token.firebase?.sign_in_provider !== 'phone') {
-      throw new HttpsError('unauthenticated', 'Giriş gerekli.');
-    }
-    const urls = parseUrls(TURN_URLS.value());
-    const secret = TURN_SECRET.value();
-    if (urls.length === 0 || !secret) return { urls: [] };
-    return makeTurnCredentials({
-      uid: auth.uid,
-      secret,
-      urls,
-      nowSeconds: Math.floor(Date.now() / 1000),
-    });
   },
 );
 

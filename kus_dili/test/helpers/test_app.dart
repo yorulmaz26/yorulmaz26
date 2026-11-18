@@ -9,11 +9,9 @@ import 'package:kus_dili/features/account/domain/account_service.dart';
 import 'package:kus_dili/core/firebase/firebase_bootstrap.dart';
 import 'package:kus_dili/core/firebase/firebase_providers.dart';
 import 'package:kus_dili/features/auth/application/auth_providers.dart';
-import 'package:kus_dili/features/calls/application/call_controller.dart';
 import 'package:kus_dili/features/chat/application/chat_providers.dart';
 import 'package:kus_dili/features/crypto/application/crypto_providers.dart';
 import 'package:kus_dili/features/learn/application/learn_providers.dart';
-import 'package:kus_dili/features/media/application/media_providers.dart';
 import 'package:kus_dili/features/notifications/application/push_providers.dart';
 import 'package:kus_dili/features/privacy/application/privacy_providers.dart';
 import 'package:kus_dili/features/privacy/data/secure_screen.dart';
@@ -23,8 +21,6 @@ import 'package:material_ui/material_ui.dart';
 
 import 'fake_auth_repository.dart';
 import 'fake_learn.dart';
-import 'fake_call.dart';
-import 'fake_media.dart';
 import 'fake_push.dart';
 import 'in_memory.dart';
 
@@ -37,9 +33,6 @@ Widget testApp({
   InMemorySecureKv? kv,
   InMemoryPayloadCache? cache,
   bool biometrics = false,
-  InMemoryAttachmentStorage? storage,
-  FakeMediaSource? media,
-  FakeVoiceRecorder? recorder,
   FakePushMessaging? push,
   FakeSpeaker? speaker,
   InMemoryProgressStore? progress,
@@ -54,14 +47,7 @@ Widget testApp({
       progress ?? InMemoryProgressStore(),
     ),
     learnRandomProvider.overrideWithValue(Random(3)),
-    callEngineFactoryProvider.overrideWithValue(() => FakeCallEngine('app')),
-    iceServerSourceProvider.overrideWithValue(FakeIceServers()),
     pushMessagingProvider.overrideWithValue(push ?? FakePushMessaging()),
-    attachmentStorageProvider.overrideWithValue(
-      storage ?? InMemoryAttachmentStorage(),
-    ),
-    mediaSourceProvider.overrideWithValue(media ?? FakeMediaSource()),
-    voiceRecorderProvider.overrideWithValue(recorder ?? FakeVoiceRecorder()),
     // PBKDF2 tur sayısı testte düşük; uygulamada 210.000.
     pinVaultProvider.overrideWith((ref) {
       final uid = ref.watch(myUidProvider);

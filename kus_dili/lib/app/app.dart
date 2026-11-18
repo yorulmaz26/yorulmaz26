@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../features/auth/application/auth_providers.dart';
-import '../features/calls/application/call_controller.dart';
-import '../features/calls/presentation/incoming_call_overlay.dart';
 import '../features/notifications/application/push_providers.dart';
 import '../features/privacy/application/privacy_providers.dart';
 import '../features/privacy/presentation/unlock_gate.dart';
@@ -93,36 +91,9 @@ class _KusDiliAppState extends ConsumerState<KusDiliApp> {
             (prefs?.appLock ?? false) ||
             (prefs?.lockedChats.isNotEmpty ?? false) ||
             (prefs?.hiddenChats.isNotEmpty ?? false);
-        final incoming = ready ? ref.watch(incomingCallProvider).value : null;
-        final call = ref.watch(callControllerProvider);
-        if (incoming != null && call.active && call.callId != incoming.id) {
-          // Başka bir aramadayken gelen arama: meşgul.
-          Future.microtask(
-            () => ref
-                .read(callControllerProvider.notifier)
-                .decline(incoming, busy: true),
-          );
-        }
-        final showIncoming = incoming != null && !call.active && !appLocked;
         return Stack(
           children: [
             child ?? const SizedBox.shrink(),
-            if (showIncoming)
-              Positioned.fill(
-                child: IncomingCallOverlay(
-                  call: incoming,
-                  onAccept: () async {
-                    final router = ref.read(routerProvider);
-                    await ref
-                        .read(callControllerProvider.notifier)
-                        .accept(incoming);
-                    router.push(Routes.call);
-                  },
-                  onDecline: () => ref
-                      .read(callControllerProvider.notifier)
-                      .decline(incoming),
-                ),
-              ),
             if (appLocked)
               // Kendi Navigator'ı: metin alanı için Overlay gerekir.
               Positioned.fill(

@@ -7,7 +7,6 @@ import '../../domain/chat.dart';
 import '../../domain/chat_settings.dart';
 import '../../domain/message_payload.dart';
 import '../../domain/message_view.dart';
-import '../../../media/presentation/attachment_view.dart';
 
 /// Tek mesaj balonu. Kuş dili mesajları altın çerçeveli özel balonda,
 /// kuş simgesiyle gösterilir; dokunulunca zarif bir geçişle çözülür.
@@ -178,13 +177,7 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
                       style: text.bodySmall,
                     ),
                   ),
-                if (payload.attachment != null)
-                  Padding(
-                    padding: EdgeInsets.only(bottom: payload.hasText ? 6 : 0),
-                    child: AttachmentView(attachment: payload.attachment!),
-                  ),
-                if (payload.hasText)
-                  AnimatedSize(
+                AnimatedSize(
                     duration: const Duration(milliseconds: 280),
                     curve: Curves.easeOutCubic,
                     alignment: Alignment.topLeft,
@@ -209,7 +202,7 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
                       ),
                     ),
                   ),
-                if (payload.hasText && view.secondary != null) ...[
+                if (view.secondary != null) ...[
                   const SizedBox(height: 4),
                   Text(
                     view.secondary!,

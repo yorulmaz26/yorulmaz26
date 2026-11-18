@@ -1,7 +1,7 @@
 {
   "name": "kus-dili-functions",
   "private": true,
-  "description": "Kuş Dili Cloud Functions: içeriksiz bildirim (mesaj, arama)",
+  "description": "Kuş Dili Cloud Functions: içeriksiz bildirim ve hesap silme",
   "main": "lib/index.js",
   "engines": { "node": "22" },
   "scripts": {

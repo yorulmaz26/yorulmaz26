@@ -1,8 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../crypto/domain/signal_sealer.dart';
-import '../../media/application/media_providers.dart';
-import '../../media/domain/attachment.dart';
 import '../domain/chat.dart';
 import '../domain/chat_settings.dart';
 import '../domain/message_payload.dart';
@@ -58,44 +56,10 @@ class ChatController extends Notifier<ComposerState> {
       state = ComposerState(replyTo: state.replyTo, viewOnce: !state.viewOnce);
 
   /// Gönderir veya düzenlemeyi kaydeder. Başarılıysa `true`.
-  /// Fotoğraf/video/ses/belge gönderir: dosya cihazda şifrelenip yüklenir,
-  /// anahtarı şifreli mesaj paketinde gider. [caption] kuş diline çevrilir.
-  Future<bool> sendMedia(PickedMedia media, {String caption = ''}) async {
+  Future<bool> submit(String text) async {
     final uid = ref.read(myUidProvider);
     if (uid == null || state.busy) return false;
-    final reply = state.replyTo;
-    final viewOnce = state.viewOnce;
-    state = ComposerState(replyTo: reply, viewOnce: viewOnce, busy: true);
-    try {
-      final att = await ref
-          .read(attachmentServiceProvider)
-          .upload(chatId: chatId, uploader: uid, media: media);
-      state = ComposerState(replyTo: reply, viewOnce: viewOnce);
-      return await submit(caption, attachment: att);
-    } on AttachmentTooLargeException catch (e) {
-      if (ref.mounted) {
-        state = ComposerState(
-          replyTo: reply,
-          viewOnce: viewOnce,
-          error: e.message,
-        );
-      }
-    } catch (_) {
-      if (ref.mounted) {
-        state = ComposerState(
-          replyTo: reply,
-          viewOnce: viewOnce,
-          error: 'Dosya yüklenemedi. Bağlantını kontrol et.',
-        );
-      }
-    }
-    return false;
-  }
-
-  Future<bool> submit(String text, {Attachment? attachment}) async {
-    final uid = ref.read(myUidProvider);
-    if (uid == null || state.busy) return false;
-    if (text.trim().isEmpty && attachment == null) return false;
+    if (text.trim().isEmpty) return false;
     final repo = ref.read(chatRepositoryProvider);
     final sealer = ref.read(messageSealerProvider);
     final editing = state.editing;
@@ -111,7 +75,6 @@ class ChatController extends Notifier<ComposerState> {
               variant: editing.payload.variant,
               replyToId: editing.payload.replyToId,
               replyQuote: editing.payload.replyQuote,
-              attachment: editing.payload.attachment,
             )
           : MessagePayload(
               text: text,
@@ -121,7 +84,6 @@ class ChatController extends Notifier<ComposerState> {
               replyQuote: reply?.quote,
               expiresInSeconds: disappear > 0 ? disappear : null,
               viewOnce: viewOnce,
-              attachment: attachment,
             );
     } on PayloadFormatException catch (e) {
       state = ComposerState(replyTo: reply, editing: editing, error: e.message);
@@ -177,20 +139,12 @@ class ChatController extends Notifier<ComposerState> {
     }
   }
 
-  /// Herkesten sil: mesaj içeriği ve (varsa) şifreli ek dosya kaldırılır.
-  Future<void> delete(ChatMessage m, {MessagePayload? payload}) async {
+  /// Herkesten sil: mesaj içeriği sunucudan kaldırılır.
+  Future<void> delete(ChatMessage m) async {
     try {
       await ref
           .read(chatRepositoryProvider)
           .deleteMessage(chatId: chatId, messageId: m.id);
-      final att = payload?.attachment;
-      if (att != null) {
-        try {
-          await ref.read(attachmentServiceProvider).delete(att);
-        } catch (_) {
-          // Dosya zaten silinmiş olabilir; mesaj silindiği için sorun değil.
-        }
-      }
     } catch (_) {
       if (ref.mounted) {
         state = const ComposerState(error: 'Mesaj silinemedi.');

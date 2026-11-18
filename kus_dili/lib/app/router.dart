@@ -7,7 +7,6 @@ import '../features/auth/presentation/phone_auth_screen.dart';
 import '../features/crypto/presentation/safety_number_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
 import '../features/learn/presentation/learn_screens.dart';
-import '../features/calls/presentation/call_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
 import '../features/chat/presentation/group_info_screen.dart';
@@ -35,7 +34,6 @@ abstract final class Routes {
   static String groupInfo(String chatId) => '/chats/$chatId/info';
   static const privacy = '/settings/privacy';
   static const notifications = '/settings/notifications';
-  static const call = '/call';
   static const learn = '/learn';
   static const learnQuiz = '/learn/quiz';
   static const learnPronounce = '/learn/pronounce';
@@ -135,10 +133,6 @@ final routerProvider = Provider<GoRouter>((ref) {
                 LessonScreen(lessonId: state.pathParameters['id']!),
           ),
         ],
-      ),
-      GoRoute(
-        path: Routes.call,
-        builder: (context, state) => const CallScreen(),
       ),
       GoRoute(
         path: Routes.notifications,

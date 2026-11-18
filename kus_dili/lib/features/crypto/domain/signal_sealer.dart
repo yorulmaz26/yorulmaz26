@@ -202,27 +202,6 @@ final class SignalSealer implements MessageSealer {
   Future<void> forget(String chatId, String body) async =>
       _cache.remove(chatId, await bodyHash(body));
 
-  // ---- Arama sinyalleri ------------------------------------------------------
-
-  /// Arama kurulum bilgisini (SDP / ICE) karşı tarafa birebir şifreler.
-  /// Sunucu bu bilgileri göremez ve DTLS parmak izlerini değiştirip araya
-  /// giremez.
-  Future<String> sealDirect(String peer, String clear) async {
-    await _ensureKeys();
-    return _serial(() async {
-      await _ensureSession(peer);
-      return _pairwiseEncrypt(peer, Uint8List.fromList(utf8.encode(clear)));
-    });
-  }
-
-  /// [sealDirect] ile şifrelenmiş bilgiyi çözer (her biri yalnızca bir kez).
-  Future<String> openDirect(String sender, String body) async {
-    await _ensureKeys();
-    return _serial(
-      () async => utf8.decode(await _pairwiseDecrypt(sender, body)),
-    );
-  }
-
   // ---- Birebir (pairwise) -------------------------------------------------
 
   /// Sıra (`_serial`) içinde çağrılmalı.

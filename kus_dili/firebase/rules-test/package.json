@@ -4,7 +4,7 @@
   "type": "module",
   "description": "Ku\u015f Dili Firestore g\u00fcvenlik kural\u0131 testleri (Firebase Emulator Suite)",
   "scripts": {
-    "test": "cd ../.. && firebase/rules-test/node_modules/.bin/firebase emulators:exec --only firestore,storage --project demo-kusdili \"node --test firebase/rules-test/*.test.js\""
+    "test": "cd ../.. && firebase/rules-test/node_modules/.bin/firebase emulators:exec --only firestore --project demo-kusdili \"node --test firebase/rules-test/*.test.js\""
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^4.0.1",
