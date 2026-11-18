@@ -17,6 +17,9 @@ abstract interface class MessageSealer {
     int encVersion,
     String body,
   );
+
+  /// Bu cihazdaki çözülmüş kopyayı siler (tek görüntülük mesajlar).
+  Future<void> forget(String chatId, String body);
 }
 
 final class UnsupportedEncryptionException implements Exception {
@@ -47,4 +50,7 @@ final class PlaintextDevSealer implements MessageSealer {
     if (encVersion != 0) throw UnsupportedEncryptionException(encVersion);
     return MessagePayload.decode(body);
   }
+
+  @override
+  Future<void> forget(String chatId, String body) async {}
 }

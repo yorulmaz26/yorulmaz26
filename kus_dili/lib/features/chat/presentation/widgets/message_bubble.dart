@@ -19,6 +19,7 @@ class MessageBubble extends ConsumerStatefulWidget {
     required this.viewMode,
     required this.chat,
     required this.onLongPress,
+    required this.onOpenViewOnce,
   });
 
   final String chatId;
@@ -27,6 +28,7 @@ class MessageBubble extends ConsumerStatefulWidget {
   final ViewMode viewMode;
   final Chat? chat;
   final void Function(MessagePayload payload) onLongPress;
+  final void Function(MessagePayload payload) onOpenViewOnce;
 
   @override
   ConsumerState<MessageBubble> createState() => _MessageBubbleState();
@@ -47,7 +49,7 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
         color: AppColors.nightRaised,
         border: null,
         child: Text(
-          'Bu mesaj silindi',
+          m.viewOnce ? 'Tek görüntülük mesaj açıldı' : 'Bu mesaj silindi',
           style: text.bodyMedium?.copyWith(
             fontStyle: FontStyle.italic,
             color: AppColors.snow.withValues(alpha: 0.6),
@@ -82,6 +84,36 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
         ),
       ),
       data: (payload) {
+        if (m.viewOnce) {
+          return GestureDetector(
+            key: ValueKey('msg-${m.id}'),
+            onTap: widget.isMine ? null : () => widget.onOpenViewOnce(payload),
+            child: _frame(
+              align: align,
+              color: widget.isMine ? AppColors.violet : AppColors.nightRaised,
+              border: Border.all(color: AppColors.turquoise, width: 1.2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.looks_one_outlined,
+                    size: 18,
+                    color: AppColors.turquoise,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      widget.isMine
+                          ? 'Tek görüntülük mesaj gönderildi'
+                          : 'Tek görüntülük mesaj · açmak için dokun',
+                      style: text.bodyMedium?.copyWith(color: AppColors.snow),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         final view = MessageView.of(
           payload,
           viewMode: widget.viewMode,
@@ -259,6 +291,10 @@ class _Meta extends StatelessWidget {
             color: AppColors.gold,
           ),
           const SizedBox(width: 4),
+        ],
+        if (message.expireAt != null) ...[
+          Icon(Icons.timer_outlined, size: 12, color: small?.color),
+          const SizedBox(width: 3),
         ],
         if (message.editedAt != null) Text('düzenlendi · ', style: small),
         Text(time, style: small),

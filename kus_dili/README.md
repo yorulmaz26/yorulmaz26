@@ -25,6 +25,9 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
 * **Uçtan uca şifreleme (Aşama 7a)**: Signal Protokolü (X3DH + Double
   Ratchet), özel anahtarlar cihazın Keystore/Keychain'inde, sunucuda yalnızca
   şifreli metin, cihazda AES-GCM ile şifreli önbellek, güvenlik numarası.
+* **Gizli sohbet (Aşama 7b)**: PIN (PBKDF2, deneme sınırı) ve biyometri ile
+  kilitli sohbet, listeden gizlenen sohbetler, uygulama kilidi, süreli ve tek
+  görüntülük mesajlar. Gizli/kilitli bilgisi yalnızca cihazda.
 
 ⚠️ Kullanılan Signal kütüphanesi (`libsignal_protocol_dart`) bağımsız olarak
 denetlenmiş değildir. Yayından önce resmî libsignal'e geçiş veya bağımsız

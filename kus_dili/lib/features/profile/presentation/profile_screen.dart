@@ -1,5 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
+
+import '../../../app/router.dart';
 
 import '../../../app/theme/app_colors.dart';
 import '../../auth/application/auth_providers.dart';
@@ -40,6 +43,15 @@ class ProfileScreen extends ConsumerWidget {
           const Text(
             'Telefon numaran yalnızca sende görünür; diğer kullanıcılar seni '
             'kullanıcı adınla bulur.',
+          ),
+          const SizedBox(height: 16),
+          ListTile(
+            key: const Key('openPrivacy'),
+            leading: const Icon(Icons.shield_outlined),
+            title: const Text('Gizlilik ve güvenlik'),
+            subtitle: const Text('PIN, uygulama kilidi, gizli sohbetler'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.privacy),
           ),
           const SizedBox(height: 24),
           OutlinedButton.icon(

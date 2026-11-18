@@ -84,15 +84,26 @@ final class EncryptedFilePayloadCache implements PayloadCache {
       _serial(() async {
         final map = await _load(chatId);
         map[bodyHash] = payloadJson;
-        final box = await _algo.encrypt(
-          utf8.encode(jsonEncode(map)),
-          secretKey: await _secret(),
-        );
-        final f = await _file(chatId);
-        final tmp = File('${f.path}.tmp');
-        await tmp.writeAsBytes(box.concatenation(), flush: true);
-        await tmp.rename(f.path);
+        await _write(chatId, map);
       });
+
+  Future<void> _write(String chatId, Map<String, String> map) async {
+    final box = await _algo.encrypt(
+      utf8.encode(jsonEncode(map)),
+      secretKey: await _secret(),
+    );
+    final f = await _file(chatId);
+    final tmp = File('${f.path}.tmp');
+    await tmp.writeAsBytes(box.concatenation(), flush: true);
+    await tmp.rename(f.path);
+  }
+
+  @override
+  Future<void> remove(String chatId, String bodyHash) => _serial(() async {
+    final map = await _load(chatId);
+    if (map.remove(bodyHash) == null) return;
+    await _write(chatId, map);
+  });
 
   @override
   Future<void> removeChat(String chatId) => _serial(() async {

@@ -28,6 +28,10 @@ class InMemoryPayloadCache implements PayloadCache {
       data['$chatId/$bodyHash'] = payloadJson;
 
   @override
+  Future<void> remove(String chatId, String bodyHash) async =>
+      data.remove('$chatId/$bodyHash');
+
+  @override
   Future<void> removeChat(String chatId) async =>
       data.removeWhere((k, _) => k.startsWith('$chatId/'));
 }

@@ -5,6 +5,7 @@ import 'package:material_ui/material_ui.dart';
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../crypto/application/crypto_providers.dart';
+import '../../privacy/application/privacy_providers.dart';
 import '../application/chat_providers.dart';
 import '../domain/chat.dart';
 
@@ -48,7 +49,12 @@ class ChatListScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => const Center(child: Text('Sohbetler yüklenemedi.')),
         data: (list) {
-          if (list.isEmpty || me == null) {
+          final hidden = ref.watch(privacyPrefsProvider).value?.hiddenChats;
+          final visible = [
+            for (final c in list)
+              if (!(hidden?.contains(c.id) ?? false)) c,
+          ];
+          if (visible.isEmpty || me == null) {
             return const Center(
               child: Padding(
                 padding: EdgeInsets.all(32),
@@ -61,9 +67,9 @@ class ChatListScreen extends ConsumerWidget {
             );
           }
           return ListView.separated(
-            itemCount: list.length,
+            itemCount: visible.length,
             separatorBuilder: (_, _) => const Divider(height: 1, indent: 72),
-            itemBuilder: (context, i) => _ChatTile(chat: list[i], me: me),
+            itemBuilder: (context, i) => ChatTile(chat: visible[i], me: me),
           );
         },
       ),
@@ -71,8 +77,8 @@ class ChatListScreen extends ConsumerWidget {
   }
 }
 
-class _ChatTile extends ConsumerWidget {
-  const _ChatTile({required this.chat, required this.me});
+class ChatTile extends ConsumerWidget {
+  const ChatTile({super.key, required this.chat, required this.me});
 
   final Chat chat;
   final String me;
@@ -91,6 +97,8 @@ class _ChatTile extends ConsumerWidget {
         : '${t.day.toString().padLeft(2, '0')}.'
               '${t.month.toString().padLeft(2, '0')}';
     final name = other?.displayName ?? '…';
+    final locked =
+        ref.watch(privacyPrefsProvider).value?.isLocked(chat.id) ?? false;
     return ListTile(
       key: ValueKey('chat-${chat.id}'),
       leading: CircleAvatar(
@@ -101,7 +109,15 @@ class _ChatTile extends ConsumerWidget {
         name,
         style: unread ? const TextStyle(fontWeight: FontWeight.w700) : null,
       ),
-      subtitle: Text(other == null ? '' : '@${other.username}'),
+      subtitle: Row(
+        children: [
+          if (locked) ...[
+            const Icon(Icons.lock, size: 13, color: AppColors.gold),
+            const SizedBox(width: 4),
+          ],
+          Text(other == null ? '' : '@${other.username}'),
+        ],
+      ),
       trailing: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.end,

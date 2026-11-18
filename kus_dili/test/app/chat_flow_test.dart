@@ -37,6 +37,7 @@ void main() {
   testWidgets(
     'Kuş dilinde yazışma: gönder, al, çöz, yanıtla, sil, mod değiştir',
     (t) async {
+      tallScreen(t);
       final db = await seeded();
       final bora = SignalClient(b, db);
       await bora.keys.ensureKeys();
@@ -174,6 +175,7 @@ void main() {
   );
 
   testWidgets('Düzenleme ve "her zaman Türkçe" görünümü', (t) async {
+    tallScreen(t);
     final db = await seeded();
     const chatId = 'd_${a}_$b';
     final repo = FirestoreChatRepository(db);

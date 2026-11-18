@@ -181,6 +181,12 @@ final class SignalSealer implements MessageSealer {
     }();
   }
 
+  /// Tek görüntülük mesaj açıldıktan sonra cihazdaki kopyayı siler. Signal
+  /// mesajı tekrar çözemeyeceği için içerik bu cihazdan da tamamen gider.
+  @override
+  Future<void> forget(String chatId, String body) async =>
+      _cache.remove(chatId, await bodyHash(body));
+
   Future<String> _decrypt(String sender, String body) async {
     final Map<String, Object?> env;
     try {
@@ -228,6 +234,10 @@ final class CompositeSealer implements MessageSealer {
 
   @override
   int get encVersion => primary.encVersion;
+
+  @override
+  Future<void> forget(String chatId, String body) =>
+      primary.forget(chatId, body);
 
   @override
   Future<String> seal(String chatId, MessagePayload payload) =>

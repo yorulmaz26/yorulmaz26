@@ -79,7 +79,9 @@ service cloud.firestore {
     match /users/{uid}/chatSettings/{chatId} {
       allow read, delete: if isSelf(uid);
       allow write: if isSelf(uid)
-        && request.resource.data.keys().hasOnly(['sendMode', 'variant', 'viewMode'])
+        && request.resource.data.keys().hasOnly(['sendMode', 'variant', 'viewMode', 'disappear'])
+        && (!('disappear' in request.resource.data)
+            || request.resource.data.disappear in [0, 30, 300, 3600, 86400, 604800])
         && request.resource.data.sendMode in ['p', 'k']
         && request.resource.data.viewMode in ['asSent', 'original', 'both']
         && request.resource.data.variant is map
@@ -147,7 +149,16 @@ service cloud.firestore {
 
         allow create: if isMember(chatId)
           && request.resource.data.keys().hasOnly(
-               ['senderId', 'sentAt', 'encVersion', 'body', 'deleted'])
+               ['senderId', 'sentAt', 'encVersion', 'body', 'deleted',
+                'expireAt', 'viewOnce'])
+          // Süreli mesaj: en geç 8 gün sonra silinir (sunucu TTL'i).
+          && (!('expireAt' in request.resource.data)
+              || (request.resource.data.expireAt is timestamp
+                  && request.resource.data.expireAt > request.time
+                  && request.resource.data.expireAt
+                       <= request.time + duration.value(8, 'd')))
+          && (!('viewOnce' in request.resource.data)
+              || request.resource.data.viewOnce == true)
           && request.resource.data.senderId == request.auth.uid
           && request.resource.data.sentAt == request.time
           // Yalnızca uçtan uca şifreli (Signal) gövde kabul edilir.
@@ -157,7 +168,18 @@ service cloud.firestore {
           && request.resource.data.body.size() <= 65536
           && request.resource.data.deleted == false;
 
-        // Gönderen düzenleyebilir veya herkesten silebilir.
+        // Alıcı tek görüntülük mesajı açınca içeriği kaldırır.
+        allow update: if isMember(chatId)
+          && resource.data.get('viewOnce', false) == true
+          && resource.data.senderId != request.auth.uid
+          && resource.data.deleted == false
+          && request.resource.data.diff(resource.data).affectedKeys()
+               .hasOnly(['deleted', 'body'])
+          && request.resource.data.deleted == true
+          && request.resource.data.body == '';
+
+        // Gönderen düzenleyebilir veya herkesten silebilir (tek görüntülük
+        // mesaj düzenlenemez).
         allow update: if isMember(chatId)
           && resource.data.senderId == request.auth.uid
           && resource.data.deleted == false
@@ -167,7 +189,8 @@ service cloud.firestore {
              && request.resource.data.deleted == true
              && request.resource.data.body == '')
             ||
-            (request.resource.data.diff(resource.data).affectedKeys()
+            (resource.data.get('viewOnce', false) == false
+             && request.resource.data.diff(resource.data).affectedKeys()
                .hasOnly(['body', 'editedAt'])
              && request.resource.data.editedAt == request.time
              && request.resource.data.body is string

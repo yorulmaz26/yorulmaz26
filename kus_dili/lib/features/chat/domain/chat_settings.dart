@@ -26,7 +26,18 @@ final class ChatSettings {
     this.sendMode = DisplayMode.kusDili,
     this.variant = KusDiliVariant.g,
     this.viewMode = ViewMode.asSent,
+    this.disappearSeconds = 0,
   });
+
+  /// Süreli mesaj seçenekleri (saniye). 0 = kapalı.
+  static const disappearOptions = <int, String>{
+    0: 'Kapalı',
+    30: '30 saniye',
+    300: '5 dakika',
+    3600: '1 saat',
+    86400: '1 gün',
+    604800: '1 hafta',
+  };
 
   factory ChatSettings.fromJson(Map<String, Object?> j) {
     var variant = KusDiliVariant.g;
@@ -44,6 +55,9 @@ final class ChatSettings {
           : DisplayMode.fromCode(j['sendMode']),
       variant: variant,
       viewMode: ViewMode.fromCode(j['viewMode']),
+      disappearSeconds: disappearOptions.containsKey(j['disappear'])
+          ? j['disappear']! as int
+          : 0,
     );
   }
 
@@ -52,20 +66,26 @@ final class ChatSettings {
   final KusDiliVariant variant;
   final ViewMode viewMode;
 
+  /// Gönderdiğim mesajlar bu süre sonra silinir (0 = kapalı).
+  final int disappearSeconds;
+
   ChatSettings copyWith({
     DisplayMode? sendMode,
     KusDiliVariant? variant,
     ViewMode? viewMode,
+    int? disappearSeconds,
   }) => ChatSettings(
     sendMode: sendMode ?? this.sendMode,
     variant: variant ?? this.variant,
     viewMode: viewMode ?? this.viewMode,
+    disappearSeconds: disappearSeconds ?? this.disappearSeconds,
   );
 
   Map<String, Object?> toJson() => {
     'sendMode': sendMode.code,
     'variant': variant.toJson(),
     'viewMode': viewMode.code,
+    'disappear': disappearSeconds,
   };
 }
 

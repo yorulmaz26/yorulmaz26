@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,11 +9,14 @@ import 'package:material_ui/material_ui.dart';
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../crypto/application/crypto_providers.dart';
+import '../../privacy/application/privacy_providers.dart';
+import '../../privacy/presentation/unlock_gate.dart';
 import '../application/chat_controller.dart';
 import '../application/chat_providers.dart';
 import '../domain/chat.dart';
 import '../domain/chat_settings.dart';
 import '../domain/message_payload.dart';
+import '../domain/message_view.dart';
 import 'chat_settings_sheet.dart';
 import 'widgets/message_bubble.dart';
 
@@ -27,11 +32,75 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
   DateTime? _lastMarked;
+  Timer? _expiry;
 
   @override
   void dispose() {
+    _expiry?.cancel();
     _input.dispose();
     super.dispose();
+  }
+
+  /// Süresi dolan mesajlar ekrandan anında kalksın.
+  List<ChatMessage> _alive(List<ChatMessage> list) {
+    final now = DateTime.now();
+    final alive = [
+      for (final m in list)
+        if (!m.isExpired(now)) m,
+    ];
+    DateTime? next;
+    for (final m in alive) {
+      final e = m.expireAt;
+      if (e != null && (next == null || e.isBefore(next))) next = e;
+    }
+    _expiry?.cancel();
+    if (next != null) {
+      _expiry = Timer(
+        next.difference(now) + const Duration(milliseconds: 50),
+        () {
+          if (mounted) setState(() {});
+        },
+      );
+    }
+    return alive;
+  }
+
+  Future<void> _openViewOnce(
+    ChatMessage m,
+    MessagePayload p,
+    ViewMode mode,
+  ) async {
+    final view = MessageView.of(p, viewMode: mode);
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        key: const Key('viewOnceDialog'),
+        title: const Text('Tek görüntülük mesaj'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(view.primary, style: Theme.of(ctx).textTheme.titleMedium),
+            if (view.isEncodedNow) ...[
+              const SizedBox(height: 8),
+              Text(view.original, style: Theme.of(ctx).textTheme.bodySmall),
+            ],
+            const SizedBox(height: 12),
+            const Text('Kapattığında bu mesaj silinecek.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            key: const Key('closeViewOnce'),
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Kapat'),
+          ),
+        ],
+      ),
+    );
+    await ref
+        .read(chatControllerProvider(widget.chatId).notifier)
+        .consumeViewOnce(m);
   }
 
   void _maybeMarkRead(List<ChatMessage> messages, Chat? chat, String me) {
@@ -112,6 +181,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final prefs = ref.watch(privacyPrefsProvider).value;
+    final locked = prefs?.isLocked(widget.chatId) ?? false;
+    if (locked && !ref.watch(unlockProvider).chats.contains(widget.chatId)) {
+      return UnlockGate(
+        key: const Key('chatLock'),
+        title: 'Bu sohbet kilitli',
+        onUnlocked: () =>
+            ref.read(unlockProvider.notifier).unlockChat(widget.chatId),
+      );
+    }
     final me = ref.watch(myUidProvider);
     final chat = ref.watch(chatProvider(widget.chatId)).value;
     final messages = ref.watch(messagesProvider(widget.chatId));
@@ -147,6 +226,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               context: context,
               isScrollControlled: true,
               builder: (_) => ChatSettingsSheet(
+                chatId: widget.chatId,
                 initial: settings,
                 onSave: controller.saveSettings,
               ),
@@ -162,7 +242,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) =>
                   const Center(child: Text('Mesajlar yüklenemedi.')),
-              data: (list) {
+              data: (all) {
+                final list = _alive(all);
                 if (me != null) {
                   WidgetsBinding.instance.addPostFrameCallback(
                     (_) => _maybeMarkRead(list, chat, me),
@@ -183,6 +264,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       viewMode: mine ? ViewMode.asSent : settings.viewMode,
                       chat: chat,
                       onLongPress: (p) => _actions(m, p, mine),
+                      onOpenViewOnce: (p) =>
+                          _openViewOnce(m, p, settings.viewMode),
                     );
                   },
                 );
@@ -197,6 +280,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               if (composer.editing != null) _input.clear();
               controller.cancel();
             },
+            onToggleViewOnce: controller.toggleViewOnce,
             onSend: () async {
               final text = _input.text;
               final ok = await controller.submit(text);
@@ -261,6 +345,7 @@ class _Composer extends StatefulWidget {
     required this.settings,
     required this.onSend,
     required this.onCancel,
+    required this.onToggleViewOnce,
   });
 
   final TextEditingController input;
@@ -268,6 +353,7 @@ class _Composer extends StatefulWidget {
   final ChatSettings settings;
   final VoidCallback onSend;
   final VoidCallback onCancel;
+  final VoidCallback onToggleViewOnce;
 
   @override
   State<_Composer> createState() => _ComposerState();
@@ -364,7 +450,27 @@ class _ComposerState extends State<_Composer> {
                     size: 22,
                   ),
                 ),
-                const SizedBox(width: 8),
+                if (editing == null)
+                  IconButton(
+                    key: const Key('viewOnceToggle'),
+                    tooltip: 'Tek görüntülük',
+                    icon: Icon(
+                      Icons.looks_one_outlined,
+                      color: s.viewOnce ? AppColors.turquoise : AppColors.snow,
+                    ),
+                    onPressed: widget.onToggleViewOnce,
+                  ),
+                if (widget.settings.disappearSeconds > 0)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: Icon(
+                      Icons.timer_outlined,
+                      key: Key('disappearOn'),
+                      size: 18,
+                      color: AppColors.gold,
+                    ),
+                  ),
+                const SizedBox(width: 4),
                 Expanded(
                   child: TextField(
                     key: const Key('messageInput'),

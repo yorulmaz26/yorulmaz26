@@ -7,5 +7,6 @@
 abstract interface class PayloadCache {
   Future<String?> get(String chatId, String bodyHash);
   Future<void> put(String chatId, String bodyHash, String payloadJson);
+  Future<void> remove(String chatId, String bodyHash);
   Future<void> removeChat(String chatId);
 }

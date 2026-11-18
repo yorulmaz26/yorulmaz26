@@ -90,6 +90,17 @@ firebase deploy --only firestore:rules,firestore:indexes
 Kurallar `firebase/firestore.rules` dosyasındadır; değiştirmeden önce testleri
 çalıştırın (aşağıda).
 
+3. **Süreli mesajlar için TTL politikası** (bir kez):
+
+```bash
+gcloud firestore fields ttls update expireAt \
+  --collection-group=messages --enable-ttl --project=<proje-id>
+```
+
+veya konsolda **Firestore → TTL → Politika oluştur** (koleksiyon grubu
+`messages`, alan `expireAt`). Firestore süresi dolan belgeleri genellikle
+24 saat içinde siler; uygulama bu sırada süresi dolan mesajları zaten göstermez.
+
 ## 6. Yerel emülatörle geliştirme (isteğe bağlı)
 
 ```bash

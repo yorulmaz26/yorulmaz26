@@ -47,6 +47,7 @@ dependencies:
   flutter_secure_storage: ^11.2.0
   cryptography: ^2.9.0
   path_provider: ^2.1.6
+  local_auth: ^3.0.2
 
 dev_dependencies:
   flutter_test:

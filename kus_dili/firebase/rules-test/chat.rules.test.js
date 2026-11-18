@@ -164,6 +164,34 @@ describe('Mesajlar', () => {
   });
 });
 
+describe('Süreli ve tek görüntülük mesajlar', () => {
+  beforeEach(seedChat);
+  const inMs = (ms) => new Date(Date.now() + ms);
+
+  test('makul süreli mesaj kabul, geçmiş/çok uzak reddedilir', async () => {
+    await assertSucceeds(send(db(A), A, 'e1', { expireAt: inMs(60_000) }));
+    await assertFails(send(db(A), A, 'e2', { expireAt: inMs(-60_000) }));
+    await assertFails(send(db(A), A, 'e3', { expireAt: inMs(9 * 86400_000) }));
+    await assertFails(send(db(A), A, 'e4', { expireAt: 'yarın' }));
+  });
+
+  test('tek görüntülük: yalnızca alıcı açıp içeriği kaldırabilir', async () => {
+    await assertFails(send(db(A), A, 'v0', { viewOnce: false }));
+    await send(db(A), A, 'v1', { viewOnce: true });
+    const m = (d) => doc(d, 'chats', CHAT, 'messages', 'v1');
+    await assertFails(updateDoc(m(db(A)), { body: 'yeni', editedAt: serverTimestamp() }),
+      'tek görüntülük düzenlenemez');
+    await assertFails(updateDoc(m(db(C)), { deleted: true, body: '' }));
+    await assertFails(updateDoc(m(db(B)), { deleted: true, body: 'x' }));
+    await assertSucceeds(updateDoc(m(db(B)), { deleted: true, body: '' }));
+  });
+
+  test('normal mesajı alıcı silemez', async () => {
+    await send(db(A), A, 'n1');
+    await assertFails(updateDoc(doc(db(B), 'chats', CHAT, 'messages', 'n1'), { deleted: true, body: '' }));
+  });
+});
+
 describe('Okundu bilgisi ve sohbet güncelleme', () => {
   beforeEach(seedChat);
 
@@ -200,5 +228,7 @@ describe('Sohbet ayarları', () => {
     await assertFails(setDoc(s(db(A), A), { ...ok, sendMode: 'x' }));
     await assertFails(setDoc(s(db(A), A), { ...ok, viewMode: 'x' }));
     await assertFails(setDoc(s(db(A), A), { ...ok, extra: 1 }));
+    await assertSucceeds(setDoc(s(db(A), A), { ...ok, disappear: 3600 }));
+    await assertFails(setDoc(s(db(A), A), { ...ok, disappear: 5 }));
   });
 });

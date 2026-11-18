@@ -9,6 +9,8 @@ import '../features/home/presentation/firebase_setup_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
 import '../features/chat/presentation/new_chat_screen.dart';
+import '../features/privacy/presentation/hidden_chats_screen.dart';
+import '../features/privacy/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/profile_setup_screen.dart';
 import '../features/translator/presentation/splash_screen.dart';
@@ -23,6 +25,8 @@ abstract final class Routes {
   static const firebaseSetup = '/setup';
   static const profile = '/profile';
   static const newChat = '/chats/new';
+  static const hiddenChats = '/chats/hidden';
+  static const privacy = '/settings/privacy';
   static String chat(String id) => '/chats/$id';
   static String safetyNumber(String chatId, String uid) =>
       '/chats/$chatId/safety/$uid';
@@ -88,6 +92,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.newChat,
         builder: (context, state) => const NewChatScreen(),
+      ),
+      GoRoute(
+        path: Routes.hiddenChats,
+        builder: (context, state) => const HiddenChatsScreen(),
+      ),
+      GoRoute(
+        path: Routes.privacy,
+        builder: (context, state) => const PrivacySettingsScreen(),
       ),
       GoRoute(
         path: '/chats/:id',

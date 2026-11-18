@@ -1,27 +1,31 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kus_dili_engine/kus_dili_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../privacy/application/privacy_providers.dart';
 import '../domain/chat_settings.dart';
 import '../domain/message_payload.dart';
 
 /// Sohbete özel dil ayarları: gönderim biçimi, kuş dili türü (özel kural
 /// dahil) ve gelen mesajların görünümü.
-class ChatSettingsSheet extends StatefulWidget {
+class ChatSettingsSheet extends ConsumerStatefulWidget {
   const ChatSettingsSheet({
     super.key,
+    required this.chatId,
     required this.initial,
     required this.onSave,
   });
 
+  final String chatId;
   final ChatSettings initial;
   final Future<void> Function(ChatSettings) onSave;
 
   @override
-  State<ChatSettingsSheet> createState() => _ChatSettingsSheetState();
+  ConsumerState<ChatSettingsSheet> createState() => _ChatSettingsSheetState();
 }
 
-class _ChatSettingsSheetState extends State<ChatSettingsSheet> {
+class _ChatSettingsSheetState extends ConsumerState<ChatSettingsSheet> {
   late ChatSettings _s = widget.initial;
   late final _template = TextEditingController(
     text: widget.initial.variant.isPreset
@@ -161,6 +165,24 @@ class _ChatSettingsSheetState extends State<ChatSettingsSheet> {
                 ),
               ),
               const SizedBox(height: 12),
+              Text('Gizlilik', style: text.titleSmall),
+              const SizedBox(height: 4),
+              DropdownButtonFormField<int>(
+                key: const Key('disappearPicker'),
+                initialValue: _s.disappearSeconds,
+                decoration: const InputDecoration(
+                  labelText: 'Süreli mesajlar (gönderdiklerim)',
+                  prefixIcon: Icon(Icons.timer_outlined),
+                ),
+                items: [
+                  for (final e in ChatSettings.disappearOptions.entries)
+                    DropdownMenuItem(value: e.key, child: Text(e.value)),
+                ],
+                onChanged: (v) =>
+                    setState(() => _s = _s.copyWith(disappearSeconds: v ?? 0)),
+              ),
+              _PrivacyToggles(chatId: widget.chatId),
+              const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
                 child: FilledButton(
@@ -182,6 +204,52 @@ class _ChatSettingsSheetState extends State<ChatSettingsSheet> {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Kilit ve gizleme anında uygulanır; yalnızca bu cihazda saklanır.
+class _PrivacyToggles extends ConsumerWidget {
+  const _PrivacyToggles({required this.chatId});
+
+  final String chatId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasPin = ref.watch(hasPinProvider).value ?? false;
+    final prefs = ref.watch(privacyPrefsProvider).value;
+    final c = ref.read(privacyPrefsProvider.notifier);
+    return Column(
+      children: [
+        SwitchListTile(
+          key: const Key('lockChatSwitch'),
+          contentPadding: EdgeInsets.zero,
+          secondary: const Icon(Icons.lock_outline),
+          title: const Text('Sohbeti kilitle'),
+          subtitle: const Text('Açmak için PIN / biyometri gerekir.'),
+          value: prefs?.isLocked(chatId) ?? false,
+          onChanged: hasPin ? (v) => c.setLocked(chatId, v) : null,
+        ),
+        SwitchListTile(
+          key: const Key('hideChatSwitch'),
+          contentPadding: EdgeInsets.zero,
+          secondary: const Icon(Icons.visibility_off_outlined),
+          title: const Text('Ana listeden gizle'),
+          subtitle: const Text(
+            'Profil → Gizlilik → Gizli sohbetler bölümünde görünür.',
+          ),
+          value: prefs?.isHidden(chatId) ?? false,
+          onChanged: hasPin ? (v) => c.setHidden(chatId, v) : null,
+        ),
+        if (!hasPin)
+          const Padding(
+            padding: EdgeInsets.only(bottom: 8),
+            child: Text(
+              'Kilit ve gizleme için önce Profil → Gizlilik bölümünden PIN '
+              'oluştur.',
+            ),
+          ),
+      ],
     );
   }
 }

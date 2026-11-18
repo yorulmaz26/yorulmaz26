@@ -50,6 +50,8 @@ final class FirestoreChatRepository implements ChatRepository {
       editedAt: _ts(d['editedAt']),
       deleted: d['deleted'] == true,
       pending: s.metadata.hasPendingWrites,
+      expireAt: _ts(d['expireAt']),
+      viewOnce: d['viewOnce'] == true,
     );
   }
 
@@ -104,6 +106,8 @@ final class FirestoreChatRepository implements ChatRepository {
     required String senderId,
     required int encVersion,
     required String body,
+    DateTime? expireAt,
+    bool viewOnce = false,
   }) {
     final batch = _db.batch()
       ..set(_messages(chatId).doc(messageId), {
@@ -112,6 +116,8 @@ final class FirestoreChatRepository implements ChatRepository {
         'encVersion': encVersion,
         'body': body,
         'deleted': false,
+        if (expireAt != null) 'expireAt': Timestamp.fromDate(expireAt),
+        if (viewOnce) 'viewOnce': true,
       })
       ..update(_chats.doc(chatId), {
         'lastActivityAt': FieldValue.serverTimestamp(),
@@ -121,6 +127,12 @@ final class FirestoreChatRepository implements ChatRepository {
       });
     return batch.commit();
   }
+
+  @override
+  Future<void> consumeViewOnce({
+    required String chatId,
+    required String messageId,
+  }) => _messages(chatId).doc(messageId).update({'deleted': true, 'body': ''});
 
   @override
   Future<void> editMessage({

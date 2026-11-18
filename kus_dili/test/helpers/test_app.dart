@@ -5,7 +5,11 @@ import 'package:kus_dili/app/app.dart';
 import 'package:kus_dili/core/firebase/firebase_bootstrap.dart';
 import 'package:kus_dili/core/firebase/firebase_providers.dart';
 import 'package:kus_dili/features/auth/application/auth_providers.dart';
+import 'package:kus_dili/features/chat/application/chat_providers.dart';
 import 'package:kus_dili/features/crypto/application/crypto_providers.dart';
+import 'package:kus_dili/features/privacy/application/privacy_providers.dart';
+import 'package:kus_dili/features/privacy/domain/biometric_auth.dart';
+import 'package:kus_dili/features/privacy/domain/pin_vault.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'fake_auth_repository.dart';
@@ -19,8 +23,17 @@ Widget testApp({
   FirebaseStatus firebase = const FirebaseStatus.ready(),
   InMemorySecureKv? kv,
   InMemoryPayloadCache? cache,
+  bool biometrics = false,
 }) => ProviderScope(
   overrides: [
+    // PBKDF2 tur sayısı testte düşük; uygulamada 210.000.
+    pinVaultProvider.overrideWith((ref) {
+      final uid = ref.watch(myUidProvider);
+      return uid == null
+          ? null
+          : PinVault(ref.watch(secureKvProvider), uid, iterations: 1000);
+    }),
+    biometricAuthProvider.overrideWithValue(FakeBiometric(biometrics)),
     firebaseStatusProvider.overrideWithValue(firebase),
     authRepositoryProvider.overrideWithValue(auth),
     firestoreProvider.overrideWithValue(db),
@@ -34,4 +47,29 @@ Future<void> settle(WidgetTester t, [int frames = 10]) async {
   for (var i = 0; i < frames; i++) {
     await t.pump(const Duration(milliseconds: 100));
   }
+}
+
+/// YALNIZCA TESTLER: biyometri sahtesi.
+class FakeBiometric implements BiometricAuth {
+  FakeBiometric(this.available, {this.succeed = true});
+
+  final bool available;
+  bool succeed;
+  int calls = 0;
+
+  @override
+  Future<bool> isAvailable() async => available;
+
+  @override
+  Future<bool> authenticate(String reason) async {
+    calls++;
+    return available && succeed;
+  }
+}
+
+/// Telefon oranında uzun test ekranı (ayar sayfaları kaydırmasız sığsın).
+void tallScreen(WidgetTester t) {
+  t.view.physicalSize = const Size(1080, 2340);
+  t.view.devicePixelRatio = 2.25;
+  addTearDown(t.view.reset);
 }

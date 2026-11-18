@@ -12,6 +12,7 @@ final class ComposerState {
     this.editing,
     this.busy = false,
     this.error,
+    this.viewOnce = false,
   });
 
   /// Yanıtlanan mesaj (kimlik + alıntı).
@@ -21,6 +22,9 @@ final class ComposerState {
   final ({String id, MessagePayload payload})? editing;
   final bool busy;
   final String? error;
+
+  /// Bir sonraki mesaj tek görüntülük olsun.
+  final bool viewOnce;
 }
 
 /// Bir sohbetin mesaj yazma alanı ve mesaj işlemleri.
@@ -45,6 +49,9 @@ class ChatController extends Notifier<ComposerState> {
 
   void cancel() => state = const ComposerState();
 
+  void toggleViewOnce() =>
+      state = ComposerState(replyTo: state.replyTo, viewOnce: !state.viewOnce);
+
   /// Gönderir veya düzenlemeyi kaydeder. Başarılıysa `true`.
   Future<bool> submit(String text) async {
     final uid = ref.read(myUidProvider);
@@ -54,6 +61,8 @@ class ChatController extends Notifier<ComposerState> {
     final sealer = ref.read(messageSealerProvider);
     final editing = state.editing;
     final reply = state.replyTo;
+    final viewOnce = editing == null && state.viewOnce;
+    final disappear = _settings.disappearSeconds;
     final MessagePayload payload;
     try {
       payload = editing != null
@@ -70,6 +79,8 @@ class ChatController extends Notifier<ComposerState> {
               variant: _settings.variant,
               replyToId: reply?.id,
               replyQuote: reply?.quote,
+              expiresInSeconds: disappear > 0 ? disappear : null,
+              viewOnce: viewOnce,
             );
     } on PayloadFormatException catch (e) {
       state = ComposerState(replyTo: reply, editing: editing, error: e.message);
@@ -94,6 +105,10 @@ class ChatController extends Notifier<ComposerState> {
           senderId: uid,
           encVersion: sealer.encVersion,
           body: body,
+          expireAt: disappear > 0
+              ? DateTime.now().add(Duration(seconds: disappear))
+              : null,
+          viewOnce: viewOnce,
         );
       }
       if (ref.mounted) state = const ComposerState();
@@ -130,6 +145,18 @@ class ChatController extends Notifier<ComposerState> {
       if (ref.mounted) {
         state = const ComposerState(error: 'Mesaj silinemedi.');
       }
+    }
+  }
+
+  /// Tek görüntülük mesaj okundu: sunucudan ve bu cihazdan silinir.
+  Future<void> consumeViewOnce(ChatMessage m) async {
+    try {
+      await ref
+          .read(chatRepositoryProvider)
+          .consumeViewOnce(chatId: chatId, messageId: m.id);
+      await ref.read(messageSealerProvider).forget(chatId, m.body);
+    } catch (_) {
+      if (ref.mounted) state = const ComposerState(error: 'Mesaj silinemedi.');
     }
   }
 

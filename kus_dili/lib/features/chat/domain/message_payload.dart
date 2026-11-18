@@ -35,6 +35,8 @@ final class MessagePayload {
     this.variant = KusDiliVariant.g,
     this.replyToId,
     this.replyQuote,
+    this.expiresInSeconds,
+    this.viewOnce = false,
   }) {
     if (text.trim().isEmpty) {
       throw const PayloadFormatException('Boş mesaj gönderilemez.');
@@ -59,6 +61,12 @@ final class MessagePayload {
   /// Yanıtlanan mesajın kısa alıntısı (o da şifreli paketin içinde).
   final String? replyQuote;
 
+  /// Süreli mesaj: gönderimden kaç saniye sonra silinecek.
+  final int? expiresInSeconds;
+
+  /// Tek görüntülük: alıcı bir kez açtıktan sonra silinir.
+  final bool viewOnce;
+
   Map<String, Object?> toJson() => {
     'v': version,
     't': 'text',
@@ -67,6 +75,8 @@ final class MessagePayload {
     if (mode == DisplayMode.kusDili) 'var': variant.toJson(),
     if (replyToId != null) 'r': replyToId,
     if (replyQuote != null) 'rq': replyQuote,
+    if (expiresInSeconds != null) 'exp': expiresInSeconds,
+    if (viewOnce) 'vo': true,
   };
 
   String encode() => jsonEncode(toJson());
@@ -103,12 +113,15 @@ final class MessagePayload {
     }
     final r = json['r'];
     final rq = json['rq'];
+    final exp = json['exp'];
     return MessagePayload(
       text: text,
       mode: mode,
       variant: variant,
       replyToId: r is String ? r : null,
       replyQuote: rq is String ? rq : null,
+      expiresInSeconds: exp is int ? exp : null,
+      viewOnce: json['vo'] == true,
     );
   }
 

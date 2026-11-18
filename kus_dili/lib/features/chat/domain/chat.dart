@@ -48,6 +48,8 @@ final class ChatMessage {
     this.editedAt,
     this.deleted = false,
     this.pending = false,
+    this.expireAt,
+    this.viewOnce = false,
   });
 
   final String id;
@@ -62,6 +64,14 @@ final class ChatMessage {
 
   /// Yerel yazma henüz sunucuya ulaşmadı.
   final bool pending;
+
+  /// Süreli mesajın silineceği zaman (sunucu TTL'i de bunu kullanır).
+  final DateTime? expireAt;
+
+  /// Tek görüntülük mesaj (içerik türü değil, yalnızca bu bayrak sunucuda).
+  final bool viewOnce;
+
+  bool isExpired(DateTime now) => expireAt != null && !now.isBefore(expireAt!);
 
   /// Karşı taraf okudu mu?
   bool isReadBy(String uid, Chat chat) {
@@ -92,6 +102,14 @@ abstract interface class ChatRepository {
     required String senderId,
     required int encVersion,
     required String body,
+    DateTime? expireAt,
+    bool viewOnce = false,
+  });
+
+  /// Alıcı tek görüntülük mesajı açtı: içerik sunucudan kaldırılır.
+  Future<void> consumeViewOnce({
+    required String chatId,
+    required String messageId,
   });
 
   Future<void> editMessage({

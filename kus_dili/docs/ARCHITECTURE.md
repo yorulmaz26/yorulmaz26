@@ -229,15 +229,33 @@ userChatSettings/{uid}/chats/{chatId}
   "Yeni mesaj" ya da içerikli yerel bildirim gösterir. Gizli sohbetlerde
   içerik asla gösterilmez.
 
-## 6. Gizli sohbet ve uygulama kilidi (Aşama 7)
+## 6. Gizli sohbet ve uygulama kilidi (Aşama 7b) ✅
 
-* PIN: düz metin saklanmaz; Argon2id/PBKDF2 özeti + tuz Keystore/Keychain'de.
-  Deneme sınırı ve artan bekleme süresi.
-* Biyometri: `local_auth`; başarıda Keystore'daki "sohbet kilidi" anahtarının
-  kilidi açılır (biyometriye bağlı anahtar), yalnızca UI'da bayrak tutulmaz.
-* Gizli sohbetler ana listeden çıkarılır; listeleme bilgisi şifreli yerel
-  veritabanında tutulur.
-* Uygulama arka plana geçince önizleme bulanıklaştırılır.
+* **PIN:** 4-8 rakam. Düz metin saklanmaz: PBKDF2-HMAC-SHA256 (210.000 tur,
+  16 bayt rastgele tuz) özeti Keystore/Keychain'de; sabit süreli karşılaştırma.
+  5 hatalı denemeden sonra 30 sn bekleme, her hatada iki katı (en fazla 1 saat);
+  sayaç da güvenli depoda, uygulamayı kapatıp açmak sıfırlamaz.
+* **Biyometri:** `local_auth` (parmak izi / Face ID), PIN'in yanında isteğe bağlı.
+* **Kilitli sohbet:** açmak için PIN/biyometri. **Gizli sohbet:** ana listeden
+  çıkar, Profil → Gizlilik → Gizli sohbetler (PIN ile) altında görünür.
+  **Uygulama kilidi:** açılışta ve arka plandan dönüşte.
+* Hangi sohbetin kilitli/gizli olduğu **yalnızca cihazda** (güvenli depoda)
+  tutulur; sunucuya yazılmaz. Uygulama arka plana geçince açılmış tüm kilitler
+  kapanır; uygulama değiştiricide içerik örtülür.
+* **Süreli mesaj:** sohbet başına (Kapalı / 30 sn / 5 dk / 1 sa / 1 gün / 1 hafta).
+  Süre şifreli pakette ve sunucuda `expireAt` alanında; istemci süresi dolanı
+  anında gizler, sunucudan silme **Firestore TTL politikası** ile olur
+  (kurulum: FIREBASE_SETUP.md §5). Kurallar en fazla 8 gün sonrasını kabul eder.
+* **Tek görüntülük mesaj:** alıcı açıp kapatınca içerik sunucudan (kurallar
+  yalnızca alıcıya bu silmeye izin verir) ve cihazdaki şifreli önbellekten
+  silinir. Signal anahtarları tek kullanımlık olduğu için yeniden çözülemez.
+* Mesaj önizlemesi hiçbir yerde tutulmaz (sohbet listesi önizlemesizdir).
+
+**Bilinen sınırlar:** Ekran görüntüsü engellenmiyor (Android `FLAG_SECURE`
+henüz eklenmedi; iOS'ta tam engel yok). Alıcı, süreli/tek görüntülük mesajı
+başka bir cihazla fotoğraflayabilir. Biyometri şu an kullanıcı arayüzü kilidi
+olarak çalışır; önbellek anahtarı biyometriye bağlı değildir. Bildirimlerde
+içerik gizleme Aşama 10'da (bildirimler) yapılacak.
 
 ## 7. Aşama durumu
 
@@ -249,7 +267,7 @@ userChatSettings/{uid}/chats/{chatId}
 | 4 | Gerçek zamanlı bireysel mesajlaşma | ✅ metin, yanıtlama, düzenleme, herkesten silme, okundu bilgisi (yazıyor/çevrimiçi göstergesi henüz yok) |
 | 5 | Otomatik kuş dili mesajlaşma | ✅ sohbet başına gönderim modu ve varyant (özel kural dahil), yazarken canlı önizleme |
 | 6 | Mesaj çözme ve dil değiştirme | ✅ dokununca animasyonlu çözme, görünüm tercihi (kuş dili / ikisi / Türkçe) |
-| 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b gizli sohbet özellikleri: sırada |
+| 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b: PIN/biyometri, kilitli ve gizli sohbet, uygulama kilidi, süreli ve tek görüntülük mesaj |
 | 8 | Grup mesajlaşması | — |
 | 9 | Medya ve sesli mesaj | — |
 | 10 | Bildirimler ve aramalar | — |
