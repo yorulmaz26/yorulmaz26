@@ -12,6 +12,10 @@ import '../../crypto/application/crypto_providers.dart';
 import '../../privacy/application/privacy_providers.dart';
 import '../../privacy/presentation/secure_scope.dart';
 import '../../privacy/presentation/unlock_gate.dart';
+import '../../safety/application/safety_actions.dart';
+import '../../safety/application/safety_providers.dart';
+import '../../safety/presentation/block_dialogs.dart';
+import '../../safety/presentation/report_sheet.dart';
 import '../application/chat_controller.dart';
 import '../application/chat_providers.dart';
 import '../domain/chat.dart';
@@ -34,6 +38,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _input = TextEditingController();
   DateTime? _lastMarked;
   Timer? _expiry;
+
+  /// Ekranda son görülen mesajlar (şikâyete eklemek için).
+  List<ChatMessage> _shown = const [];
 
   @override
   void dispose() {
@@ -156,6 +163,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   );
                 },
               ),
+            if (!mine) ...[
+              ListTile(
+                key: const Key('reportMessage'),
+                leading: const Icon(Icons.flag_outlined),
+                title: const Text('Şikâyet et'),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _report(reported: m.senderId);
+                },
+              ),
+              if (widget.chatId.startsWith('g_'))
+                ListTile(
+                  key: const Key('blockSender'),
+                  leading: const Icon(Icons.block),
+                  title: const Text('Göndereni engelle'),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    _block(m.senderId);
+                  },
+                ),
+            ],
             if (mine) ...[
               ListTile(
                 key: const Key('editMessage'),
@@ -180,6 +208,28 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Future<void> _report({String? reported, String? title}) async {
+    final me = ref.read(myUidProvider);
+    if (me == null) return;
+    await showReportSheet(
+      context,
+      chatId: widget.chatId,
+      reported: reported,
+      title: title,
+      messages: reportableMessages(_shown, me: me, from: reported),
+    );
+  }
+
+  Future<void> _block(String uid) async {
+    final p = ref.read(profileByUidProvider(uid)).value;
+    await confirmBlock(
+      context,
+      ref,
+      uid: uid,
+      name: p?.displayName ?? 'Bu kişi',
     );
   }
 
@@ -210,6 +260,8 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final other = otherUid == null
         ? null
         : ref.watch(profileByUidProvider(otherUid)).value;
+    final blocked = ref.watch(blockedProvider).value ?? const <String>{};
+    final iBlocked = otherUid != null && blocked.contains(otherUid);
 
     final secret =
         (prefs?.isLocked(widget.chatId) ?? false) ||
@@ -255,6 +307,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 ),
               ),
             ),
+            PopupMenuButton<String>(
+              key: const Key('chatMenu'),
+              onSelected: (v) => switch (v) {
+                'block' => _block(otherUid!),
+                'unblock' => unblockWithFeedback(context, ref, otherUid!),
+                'reportGroup' => _report(title: 'Grubu şikâyet et'),
+                _ => _report(reported: otherUid),
+              },
+              itemBuilder: (_) => [
+                if (!isGroup && otherUid != null)
+                  PopupMenuItem(
+                    key: Key(iBlocked ? 'menuUnblock' : 'menuBlock'),
+                    value: iBlocked ? 'unblock' : 'block',
+                    child: Text(iBlocked ? 'Engeli kaldır' : 'Engelle'),
+                  ),
+                if (!isGroup && otherUid != null)
+                  const PopupMenuItem(
+                    key: Key('menuReport'),
+                    value: 'report',
+                    child: Text('Şikâyet et'),
+                  ),
+                if (isGroup)
+                  const PopupMenuItem(
+                    key: Key('menuReportGroup'),
+                    value: 'reportGroup',
+                    child: Text('Grubu şikâyet et'),
+                  ),
+              ],
+            ),
           ],
         ),
         body: Column(
@@ -279,6 +360,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     const Center(child: Text('Mesajlar yüklenemedi.')),
                 data: (all) {
                   final list = _alive(all);
+                  _shown = list;
                   if (me != null) {
                     WidgetsBinding.instance.addPostFrameCallback(
                       (_) => _maybeMarkRead(list, chat, me),
@@ -309,6 +391,18 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       }
                       final m = list[list.length - 1 - i];
                       final mine = m.senderId == me;
+                      if (isGroup && !mine && blocked.contains(m.senderId)) {
+                        return Padding(
+                          key: ValueKey(m.id),
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(
+                            'Engellediğin kişiden bir mesaj gizlendi.',
+                            key: const Key('hiddenBlocked'),
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.labelSmall,
+                          ),
+                        );
+                      }
                       return MessageBubble(
                         key: ValueKey(m.id),
                         showSender: isGroup && !mine,
@@ -326,21 +420,48 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                 },
               ),
             ),
-            _Composer(
-              input: _input,
-              state: composer,
-              settings: settings,
-              onCancel: () {
-                if (composer.editing != null) _input.clear();
-                controller.cancel();
-              },
-              onToggleViewOnce: controller.toggleViewOnce,
-              onSend: () async {
-                final text = _input.text;
-                final ok = await controller.submit(text);
-                if (ok && _input.text == text) _input.clear();
-              },
-            ),
+            if (iBlocked)
+              SafeArea(
+                top: false,
+                child: Container(
+                  key: const Key('blockedBar'),
+                  width: double.infinity,
+                  color: AppColors.nightRaised,
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      const Expanded(
+                        child: Text(
+                          'Bu kişiyi engelledin. Mesaj gönderemezsin, '
+                          'o da sana gönderemez.',
+                        ),
+                      ),
+                      TextButton(
+                        key: const Key('unblockBar'),
+                        onPressed: () =>
+                            unblockWithFeedback(context, ref, otherUid),
+                        child: const Text('Engeli kaldır'),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              _Composer(
+                input: _input,
+                state: composer,
+                settings: settings,
+                onCancel: () {
+                  if (composer.editing != null) _input.clear();
+                  controller.cancel();
+                },
+                onToggleViewOnce: controller.toggleViewOnce,
+                onSend: () async {
+                  final text = _input.text;
+                  final ok = await controller.submit(text);
+                  if (ok && _input.text == text) _input.clear();
+                },
+              ),
           ],
         ),
       ),
@@ -559,12 +680,12 @@ class _ComposerState extends State<_Composer> {
                 ),
                 const SizedBox(width: 6),
                 IconButton.filled(
-                    key: const Key('send'),
-                    onPressed: s.busy || typed.trim().isEmpty
-                        ? null
-                        : widget.onSend,
-                    icon: Icon(editing != null ? Icons.check : Icons.send),
-                  ),
+                  key: const Key('send'),
+                  onPressed: s.busy || typed.trim().isEmpty
+                      ? null
+                      : widget.onSend,
+                  icon: Icon(editing != null ? Icons.check : Icons.send),
+                ),
               ],
             ),
           ],

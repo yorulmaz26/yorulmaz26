@@ -28,6 +28,17 @@ test('başka sohbeti sessize almış kullanıcı yine bildirim alır', () => {
   assert.equal(targets.length, 1);
 });
 
+test('göndereni engelleyen üye bildirim almaz', () => {
+  const targets = planMessagePush({
+    chatId: 'g1',
+    senderId: 'a',
+    members: ['a', 'b', 'c'],
+    prefs: { b: { tokens: ['tb'] }, c: { tokens: ['tc'] } },
+    blocked: { b: ['a'], c: ['z'] },
+  });
+  assert.deepEqual(targets.map((t) => t.uid), ['c']);
+});
+
 test('kullanıcı başına en fazla 10 cihaz (en yeniler)', () => {
   const tokens = Array.from({ length: 15 }, (_, i) => `t${i}`);
   const [t] = planMessagePush({

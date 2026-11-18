@@ -178,30 +178,30 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
                     ),
                   ),
                 AnimatedSize(
-                    duration: const Duration(milliseconds: 280),
-                    curve: Curves.easeOutCubic,
-                    alignment: Alignment.topLeft,
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 380),
-                      switchInCurve: Curves.easeOutCubic,
-                      switchOutCurve: Curves.easeInCubic,
-                      transitionBuilder: (child, anim) => FadeTransition(
-                        opacity: anim,
-                        child: SlideTransition(
-                          position: Tween(
-                            begin: const Offset(0, 0.25),
-                            end: Offset.zero,
-                          ).animate(anim),
-                          child: child,
-                        ),
-                      ),
-                      child: Text(
-                        view.primary,
-                        key: ValueKey(view.primary),
-                        style: text.bodyLarge?.copyWith(color: AppColors.snow),
+                  duration: const Duration(milliseconds: 280),
+                  curve: Curves.easeOutCubic,
+                  alignment: Alignment.topLeft,
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 380),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeInCubic,
+                    transitionBuilder: (child, anim) => FadeTransition(
+                      opacity: anim,
+                      child: SlideTransition(
+                        position: Tween(
+                          begin: const Offset(0, 0.25),
+                          end: Offset.zero,
+                        ).animate(anim),
+                        child: child,
                       ),
                     ),
+                    child: Text(
+                      view.primary,
+                      key: ValueKey(view.primary),
+                      style: text.bodyLarge?.copyWith(color: AppColors.snow),
+                    ),
                   ),
+                ),
                 if (view.secondary != null) ...[
                   const SizedBox(height: 4),
                   Text(

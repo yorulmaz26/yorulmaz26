@@ -7,6 +7,7 @@ import '../features/auth/presentation/phone_auth_screen.dart';
 import '../features/crypto/presentation/safety_number_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
 import '../features/learn/presentation/learn_screens.dart';
+import '../features/legal/terms_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
 import '../features/chat/presentation/group_info_screen.dart';
@@ -17,6 +18,7 @@ import '../features/privacy/presentation/hidden_chats_screen.dart';
 import '../features/privacy/presentation/privacy_settings_screen.dart';
 import '../features/profile/presentation/profile_screen.dart';
 import '../features/profile/presentation/profile_setup_screen.dart';
+import '../features/safety/presentation/blocked_users_screen.dart';
 import '../features/translator/presentation/splash_screen.dart';
 import '../features/translator/presentation/translator_screen.dart';
 
@@ -34,6 +36,8 @@ abstract final class Routes {
   static String groupInfo(String chatId) => '/chats/$chatId/info';
   static const privacy = '/settings/privacy';
   static const notifications = '/settings/notifications';
+  static const blocked = '/settings/blocked';
+  static const terms = '/terms';
   static const learn = '/learn';
   static const learnQuiz = '/learn/quiz';
   static const learnPronounce = '/learn/pronounce';
@@ -47,8 +51,10 @@ abstract final class Routes {
 ///
 /// Çevirici her durumda açıktır (öğrenme modülü mesajlaşmadan bağımsızdır).
 String? redirectFor(SessionStatus status, String location) {
-  // Çevirici ve öğrenme modülü hesapsız, çevrimdışı da kullanılabilir.
-  if (location == Routes.translator || location.startsWith(Routes.learn)) {
+  // Çevirici, öğrenme modülü ve kullanım koşulları hesapsız da açılır.
+  if (location == Routes.translator ||
+      location == Routes.terms ||
+      location.startsWith(Routes.learn)) {
     return null;
   }
   String? onlyAt(String target) => location == target ? null : target;
@@ -137,6 +143,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.notifications,
         builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: Routes.blocked,
+        builder: (context, state) => const BlockedUsersScreen(),
+      ),
+      GoRoute(
+        path: Routes.terms,
+        builder: (context, state) => const TermsScreen(),
       ),
       GoRoute(
         path: Routes.privacy,

@@ -50,6 +50,18 @@ export async function deliver(targets: PushTarget[], content: PushContent): Prom
   }
 }
 
+async function blockedOf(uids: string[]): Promise<Record<string, string[] | undefined>> {
+  if (uids.length === 0) return {};
+  const db = getFirestore();
+  const snaps = await db.getAll(...uids.map((u) => db.doc(`blocks/${u}`)));
+  return Object.fromEntries(
+    snaps.map((s) => {
+      const l = s.data()?.uids;
+      return [s.id, Array.isArray(l) ? (l as string[]) : undefined];
+    }),
+  );
+}
+
 async function prefsOf(uids: string[]): Promise<Record<string, PushPrefs | undefined>> {
   if (uids.length === 0) return {};
   const db = getFirestore();
@@ -67,11 +79,14 @@ export const notifyNewMessage = onDocumentCreated(
     const chat = (await getFirestore().doc(`chats/${chatId}`).get()).data();
     if (!chat || !Array.isArray(chat.members)) return;
     const members = chat.members as string[];
+    const others = members.filter((m) => m !== msg.senderId);
+    const [prefs, blocked] = await Promise.all([prefsOf(others), blockedOf(others)]);
     const targets = planMessagePush({
       chatId,
       senderId: msg.senderId,
       members,
-      prefs: await prefsOf(members.filter((m) => m !== msg.senderId)),
+      prefs,
+      blocked,
     });
     if (targets.length === 0) return;
     await deliver(targets, messageContent(chatId, chat.type === 'group'));

@@ -25,5 +25,6 @@ export function ownedDocPaths(uid: string, username: string | undefined): string
     ...(username ? [`usernames/${username}`] : []),
     `pushTokens/${uid}`,
     `keyBundles/${uid}`,
+    `blocks/${uid}`,
   ];
 }

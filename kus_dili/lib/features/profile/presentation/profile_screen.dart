@@ -62,6 +62,20 @@ class ProfileScreen extends ConsumerWidget {
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(Routes.notifications),
           ),
+          ListTile(
+            key: const Key('openBlocked'),
+            leading: const Icon(Icons.block),
+            title: const Text('Engellenen kişiler'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.blocked),
+          ),
+          ListTile(
+            key: const Key('openTermsFromProfile'),
+            leading: const Icon(Icons.gavel_outlined),
+            title: const Text('Kullanım koşulları'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.terms),
+          ),
           const SizedBox(height: 24),
           OutlinedButton.icon(
             key: const Key('signOut'),

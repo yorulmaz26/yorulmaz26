@@ -36,6 +36,8 @@ export function planMessagePush(args: {
   senderId: string;
   members: string[];
   prefs: Record<string, PushPrefs | undefined>;
+  /** Alıcının engel listesi; göndereni engelleyen bildirim almaz. */
+  blocked?: Record<string, string[] | undefined>;
 }): PushTarget[] {
   const out: PushTarget[] = [];
   for (const uid of new Set(args.members)) {
@@ -43,6 +45,7 @@ export function planMessagePush(args: {
     const p = args.prefs[uid];
     if (!p || p.enabled === false) continue;
     if ((p.muted ?? []).includes(args.chatId)) continue;
+    if ((args.blocked?.[uid] ?? []).includes(args.senderId)) continue;
     const tokens = [...new Set((p.tokens ?? []).filter((t) => typeof t === 'string' && t.length > 0))]
       .slice(-MAX_TOKENS_PER_USER);
     if (tokens.length > 0) out.push({ uid, tokens });

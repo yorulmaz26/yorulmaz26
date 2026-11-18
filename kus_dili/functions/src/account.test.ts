@@ -30,6 +30,7 @@ test('silinecek belgeler', () => {
     'usernames/ayse',
     'pushTokens/u1',
     'keyBundles/u1',
+    'blocks/u1',
   ]);
-  assert.deepEqual(ownedDocPaths('u1', undefined).length, 3);
+  assert.deepEqual(ownedDocPaths('u1', undefined).length, 4);
 });

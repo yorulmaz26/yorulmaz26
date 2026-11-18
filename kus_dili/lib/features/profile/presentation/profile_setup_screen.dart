@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
 import '../../notifications/application/push_providers.dart';
 import '../application/profile_providers.dart';
@@ -105,6 +107,16 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2),
                     )
                   : const Text('Devam et'),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              key: const Key('openTerms'),
+              onPressed: () => context.push(Routes.terms),
+              child: const Text(
+                'Devam ederek Kullanım Koşulları\'nı kabul edersin. '
+                'Taciz, spam ve yasa dışı içeriğe izin verilmez.',
+                textAlign: TextAlign.center,
+              ),
             ),
           ],
         ),

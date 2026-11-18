@@ -92,6 +92,62 @@ service cloud.firestore {
         && request.resource.data.variant.size() <= 4;
     }
 
+    // ---------------------------------------------------------- Engelleme
+    // blocks/{uid}: { uids: [...], updatedAt }. Yalnızca sahibi okur/yazar;
+    // engellenen kişi listeyi göremez. Kurallar get() ile okur.
+    function blockPath(uid) {
+      return /databases/$(database)/documents/blocks/$(uid);
+    }
+
+    // [a], [b]'yi engellemiş mi?
+    function hasBlocked(a, b) {
+      return exists(blockPath(a)) && b in get(blockPath(a)).data.uids;
+    }
+
+    // İki kişilik sohbette taraflardan biri diğerini engellemiş mi?
+    function directBlocked(chatId) {
+      return chatId.matches('^d_.*')
+        && (hasBlocked(chatId.split('_')[1], chatId.split('_')[2])
+            || hasBlocked(chatId.split('_')[2], chatId.split('_')[1]));
+    }
+
+    match /blocks/{uid} {
+      allow read, delete: if isSelf(uid);
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['uids', 'updatedAt'])
+        && request.resource.data.uids is list
+        && request.resource.data.uids.size() <= 1000
+        && !(uid in request.resource.data.uids)
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    // ------------------------------------------------------------ Şikâyet
+    // Uygulamadan kimse okuyamaz; moderasyon Firebase konsolundan yapılır.
+    // Mesaj metinleri yalnızca şikâyet edenin onayıyla, onun cihazında
+    // çözülüp eklenir (en fazla 5).
+    match /reports/{reportId} {
+      allow read, update, delete: if false;
+      allow create: if verified()
+        && request.resource.data.keys().hasOnly(['reporter', 'reported',
+             'chatId', 'reason', 'note', 'messages', 'createdAt'])
+        && request.resource.data.reporter == request.auth.uid
+        && request.resource.data.chatId is string
+        && isMember(request.resource.data.chatId)
+        && (!('reported' in request.resource.data)
+            || (request.resource.data.reported is string
+                && request.resource.data.reported != request.auth.uid
+                && request.resource.data.reported
+                     in chatData(request.resource.data.chatId).members))
+        && request.resource.data.reason in
+             ['spam', 'harassment', 'inappropriate', 'impersonation', 'other']
+        && (!('note' in request.resource.data)
+            || (request.resource.data.note is string
+                && request.resource.data.note.size() <= 500))
+        && request.resource.data.messages is list
+        && request.resource.data.messages.size() <= 5
+        && request.resource.data.createdAt == request.time;
+    }
+
     // ---------------------------------------------------------------- Sohbet
     // chats/{chatId}: iki kişilik sohbet, kimlik 'd_<küçük uid>_<büyük uid>'.
     // Önizleme metni TUTULMAZ.
@@ -125,6 +181,7 @@ service cloud.firestore {
                      + '_' + request.resource.data.members[1]
         && exists(userPath(request.resource.data.members[0]))
         && exists(userPath(request.resource.data.members[1]))
+        && !directBlocked(chatId)
         && request.resource.data.createdAt == request.time
         && request.resource.data.lastActivityAt == request.time
         && request.resource.data.readAt == {};
@@ -138,7 +195,8 @@ service cloud.firestore {
         && (!request.resource.data.diff(resource.data).affectedKeys()
               .hasAny(['lastActivityAt', 'lastSenderId'])
             || (request.resource.data.lastActivityAt == request.time
-                && request.resource.data.lastSenderId == request.auth.uid))
+                && request.resource.data.lastSenderId == request.auth.uid
+                && !directBlocked(chatId)))
         && request.resource.data.readAt.diff(resource.data.readAt)
              .affectedKeys().hasOnly([request.auth.uid])
         && (!request.resource.data.readAt.diff(resource.data.readAt)
@@ -229,6 +287,8 @@ service cloud.firestore {
               || request.resource.data.viewOnce == true)
           && request.resource.data.senderId == request.auth.uid
           && request.resource.data.sentAt == request.time
+          // Engellenen / engelleyen birebir mesaj gönderemez.
+          && !directBlocked(chatId)
           // Yalnızca uçtan uca şifreli (Signal) gövde kabul edilir.
           && request.resource.data.encVersion == 1
           && request.resource.data.body is string
