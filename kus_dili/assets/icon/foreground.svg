@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Kuş Dili simgesi: konuşma balonu içinde kuş. Ön plan (arka plansız). -->
+  <!-- Konuşma balonu -->
+  <path d="M512 250c-160 0-290 104-290 240 0 70 35 133 92 177l-30 107c-4 14 11 25 23 17l118-74c28 6 57 9 87 9 160 0 290-104 290-236S672 250 512 250z" fill="#6D5DFB"/>
+  <!-- Kuş gövdesi -->
+  <ellipse cx="500" cy="510" rx="140" ry="105" fill="#F8FAFC"/>
+  <!-- Kuyruk -->
+  <path d="M368 500l-78-52c-8-5-17 3-13 12l34 78z" fill="#F8FAFC"/>
+  <!-- Baş -->
+  <circle cx="610" cy="425" r="72" fill="#F8FAFC"/>
+  <!-- Gaga -->
+  <path d="M676 410l70 22-70 26z" fill="#D6AD60"/>
+  <!-- Göz -->
+  <circle cx="628" cy="412" r="13" fill="#101827"/>
+  <!-- Kanat -->
+  <path d="M420 500c40-50 130-60 175-20-30 60-110 95-175 20z" fill="#20B8A6"/>
+</svg>
