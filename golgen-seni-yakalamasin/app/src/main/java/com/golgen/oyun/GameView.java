@@ -104,6 +104,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         tutorial = new TutorialScreen(this);
         current = splash;
         current.enter();
+        android.util.Log.i("GolgenUI", "ekran=SplashScreen");
     }
 
     public void applySettings() {
