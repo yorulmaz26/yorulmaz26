@@ -237,6 +237,14 @@ final class SignalSealer implements MessageSealer {
     throw const MessageUnavailableException('Şifreli mesaj biçimi bozuk.');
   }
 
+  /// Gönderen cihaz henüz bilinmiyorsa kişinin cihaz listesi tazelenir; yeni
+  /// cihazsa "güvenlik numarası değişti" uyarısı konur.
+  Future<void> _noteSenderDevice(String sender, int sd) async {
+    if ((await _devicesOf(sender)).contains(sd)) return;
+    _devices.remove(sender);
+    await _devicesOf(sender);
+  }
+
   /// Gönderen bu cihazsa ve önbellekte yoksa açılamaz.
   void _rejectOwnDevice(String sender, int sd, int myDev) {
     if (sender == myUid && sd == myDev) {
@@ -314,6 +322,7 @@ final class SignalSealer implements MessageSealer {
       throw const MessageUnavailableException('Şifreli mesaj biçimi bozuk.');
     }
     _rejectOwnDevice(sender, sd, myDev);
+    await _noteSenderDevice(sender, sd);
     final wrap = k[addressKey(myUid, myDev)];
     if (wrap == null) {
       throw const MessageUnavailableException(
@@ -470,6 +479,7 @@ final class SignalSealer implements MessageSealer {
       throw const MessageUnavailableException('Grup mesajı biçimi bozuk.');
     }
     _rejectOwnDevice(sender, sd, myDev);
+    await _noteSenderDevice(sender, sd);
     final name = _skName(chatId, epoch, sender, sd);
     final gotKey = 'grp.$chatId.got.$sender.$sd.$epoch';
     if (await _store.readMeta(gotKey) == null) {

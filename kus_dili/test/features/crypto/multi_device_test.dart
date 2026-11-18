@@ -157,6 +157,24 @@ void main() {
     expect(await _number(phone, 'bob'), await _number(bob, 'alice'));
   });
 
+  test('Yeni cihazdan gelen ilk mesaj da uyarı verir', () async {
+    await bob.sealer.open(
+      chat,
+      'alice',
+      1,
+      await phone.sealer.seal(chat, p('a')),
+    );
+    expect(await phone.store.identityChanged('bob'), isFalse);
+    final bobTablet = SignalClient('bob', db);
+    await bobTablet.keys.ensureKeys();
+    final body = await bobTablet.sealer.seal(chat, p('yeni cihazdan'));
+    expect(
+      (await phone.sealer.open(chat, 'bob', 1, body)).text,
+      'yeni cihazdan',
+    );
+    expect(await phone.store.identityChanged('bob'), isTrue);
+  });
+
   test(
     'Cihaz kaldırılınca yeni mesajlar ona gitmez, kendisi kapanır',
     () async {
