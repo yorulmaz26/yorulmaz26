@@ -1,5 +1,5 @@
-11-18 20:58:18.384  3509  3509 I GolgenFPS: fps=20.8 ekran=PlayScreen
-11-18 20:58:24.176  3509  3509 I GolgenFPS: fps=20.9 ekran=PlayScreen
-11-18 20:58:30.906  3509  3509 I GolgenFPS: fps=20.7 ekran=PlayScreen
-11-18 20:58:37.328  3509  3509 I GolgenFPS: fps=20.9 ekran=PlayScreen
-11-18 20:58:44.510  3509  3509 I GolgenFPS: fps=20.5 ekran=PlayScreen
+11-18 23:16:28.487  3414  3414 I GolgenFPS: fps=21.1 ekran=PlayScreen
+11-18 23:16:35.538  3414  3414 I GolgenFPS: fps=21.0 ekran=PlayScreen
+11-18 23:16:42.956  3414  3414 I GolgenFPS: fps=20.5 ekran=PlayScreen
+11-18 23:16:50.471  3414  3414 I GolgenFPS: fps=20.2 ekran=PlayScreen
+11-18 23:16:58.699  3414  3414 I GolgenFPS: fps=20.1 ekran=PlayScreen
