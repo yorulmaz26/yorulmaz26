@@ -14,7 +14,8 @@ val keystoreProperties = Properties().apply {
 
 android {
     namespace = "com.hayallerimcepte.hayallerim_cepte"
-    compileSdk = flutter.compileSdkVersion
+    // flutter_local_notifications 23 ve androidx.core 1.19 en az API 37 ile derlenmeyi ister
+    compileSdk = maxOf(37, flutter.compileSdkVersion)
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
