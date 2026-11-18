@@ -83,7 +83,9 @@ void main() {
     await t.pumpWidget(const SizedBox());
   });
 
-  testWidgets('Firebase yoksa kurulum ekranı, çevirici yine açılır', (t) async {
+  testWidgets('Firebase yoksa kurulum ekranı, öğrenme modülü yine açılır', (
+    t,
+  ) async {
     await t.pumpWidget(
       app(
         auth: FakeAuthRepository(),
@@ -93,7 +95,10 @@ void main() {
     );
     await settle(t);
     expect(find.text('Bağlantı kurulamadı'), findsOneWidget);
-    await t.tap(find.text('Çevrimdışı çeviriciyi aç'));
+    await t.tap(find.text('Kuş dilini öğren (çevrimdışı)'));
+    await settle(t);
+    expect(find.text('Kuş dilini öğren'), findsOneWidget);
+    await t.tap(find.byKey(const Key('openTranslator')));
     await settle(t);
     expect(find.text('Kuş Dili Çevirici'), findsOneWidget);
   });
