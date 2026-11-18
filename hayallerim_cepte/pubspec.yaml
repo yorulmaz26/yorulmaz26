@@ -1,0 +1,64 @@
+name: hayallerim_cepte
+description: "Hayallerim Cepte — Hayal Et, Planla, Gerçekleştir. Tamamen çevrimdışı kişisel yaşam planlayıcısı."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # Durum yönetimi ve yönlendirme
+  flutter_riverpod: ^3.5.0
+  go_router: ^18.1.4
+
+  # Yerel veritabanı
+  drift: ^2.35.4
+  drift_flutter: ^0.3.1
+  path_provider: ^2.1.6
+  path: ^1.9.1
+
+  # Ayarlar, güvenlik
+  shared_preferences: ^2.5.6
+  flutter_secure_storage: ^11.2.0
+  local_auth: ^3.0.2
+  cryptography: ^2.9.0
+
+  # Bildirimler
+  flutter_local_notifications: ^23.0.2
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
+
+  # Grafik
+  fl_chart: ^1.3.1
+
+  # Medya ve dosya
+  image_picker: ^1.2.4
+  file_picker: ^13.4.0
+  share_plus: ^13.3.1
+  record: ^7.2.0
+  audioplayers: ^6.8.1
+  archive: ^4.7.1
+
+  # Yardımcılar
+  intl: ^0.20.3
+  uuid: ^4.6.0
+  decimal: ^3.2.6
+  gal: ^3.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  drift_dev: ^2.35.3
+  build_runner: ^2.17.1
+
+flutter:
+  uses-material-design: true
+  generate: false

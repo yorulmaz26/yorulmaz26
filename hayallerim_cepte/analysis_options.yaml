@@ -1,0 +1,20 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - build/**
+    - android/**
+    - ios/**
+  errors:
+    # Flutter 3.47+ `package:flutter/material.dart` yerine ayrı `material_ui`
+    # paketini öneriyor. Eski içe aktarma tamamen çalışır ve fl_chart gibi
+    # bağımlılıklar hâlâ onu kullanır; geçiş, ekosistem hazır olduğunda
+    # tek seferde yapılacak (bkz. docs/ARCHITECTURE.md › Yol haritası).
+    deprecated_member_use: ignore
+
+linter:
+  rules:
+    prefer_single_quotes: true
+    always_declare_return_types: true
+    avoid_print: true
