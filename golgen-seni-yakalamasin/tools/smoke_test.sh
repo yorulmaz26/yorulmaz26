@@ -68,7 +68,16 @@ for i in 1 2 3 4; do adb shell input swipe 300 1700 800 1500 250; adb shell inpu
 sleep 0.8; shot 02_ogretici_golge
 tap_target TutorialScreen Atla
 expect_screen MenuScreen "Öğretici → Ana menü"
-sleep 1.2; shot 03_ana_menu
+sleep 1.0
+if log | grep -q "hedef ekran=MenuScreen ad=gunluk-odul"; then
+  shot 03a_gunluk_odul
+  tap_target MenuScreen gunluk-odul
+  sleep 0.6
+  if [ -n "$(pref_int lastLoginClaimDay)" ] && [ "$(pref_int loginStreak)" = "1" ] && [ "$(pref_int diamonds)" -ge 10 ]; then ok "Günlük giriş ödülü alındı ve kaydedildi"; else bad "Günlük giriş ödülü: seri=$(pref_int loginStreak) elmas=$(pref_int diamonds)"; fi
+else
+  bad "Günlük giriş ödülü penceresi açılmadı"
+fi
+sleep 0.6; shot 03_ana_menu
 
 # 2) Sonsuz mod
 tap_target MenuScreen OYNA

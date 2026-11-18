@@ -30,6 +30,10 @@ public final class GameOverScreen extends Screen {
     private int titleColor = Theme.WHITE;
     private final Button againBtn, nextBtn, menuBtn;
     private float shownScore;
+    private int stars;
+    private String xpText = "", levelText = "";
+    private float xpFrac;
+    private boolean levelUp;
 
     public GameOverScreen(GameView g) {
         super(g);
@@ -48,7 +52,7 @@ public final class GameOverScreen extends Screen {
         if (res.mode == RunResult.MODE_MISSION) {
             MissionDef m = Missions.ALL[res.missionIndex];
             title = won ? "GÖREV TAMAMLANDI" : "GÖREV BAŞARISIZ";
-            subtitle = (res.missionIndex + 1) + ". " + m.title + " — " + m.description();
+            subtitle = m.title + " — " + m.description();
             titleColor = won ? Theme.GOLD : Theme.PURPLE_LIGHT;
         } else {
             title = res.cause == GameWorld.CAUSE_SHADOW ? "GÖLGEN SENİ YAKALADI" : "ENGELLER SENİ DURDURDU";
@@ -62,7 +66,15 @@ public final class GameOverScreen extends Screen {
         statValues = new String[]{(sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60),
                 Integer.toString(res.diamonds), Integer.toString(res.dodges), Integer.toString(res.hits)};
         int total = rep.diamondsEarned + rep.missionReward + rep.achievementReward;
+        total += rep.levelReward;
         rewardText = "+" + total + " elmas kazandın";
+        stars = res.mode == RunResult.MODE_MISSION ? res.stars : 0;
+        levelUp = rep.levelUps > 0;
+        levelText = "Seviye " + g.progress.level;
+        xpText = "+" + rep.xpGained + " XP";
+        xpFrac = g.progress.xp / (float) Progress.xpForLevel(g.progress.level);
+        if (levelUp) g.toast("Seviye atladın! Seviye " + g.progress.level + "  +" + rep.levelReward, Icons.STAR);
+        if (rep.newStars > 0) g.toast("+" + rep.newStars + " yeni yıldız", Icons.STAR);
         nextBtn.visible = res.mode == RunResult.MODE_MISSION && won && res.missionIndex + 1 < Missions.ALL.length;
         againBtn.label = res.mode == RunResult.MODE_MISSION && won ? "TEKRAR" : "TEKRAR OYNA";
 
@@ -125,7 +137,16 @@ public final class GameOverScreen extends Screen {
         Ui.panel(c, cx - cw / 2f, cardT, cx + cw / 2f, cardB, 48f * u, Theme.alpha(Theme.PANEL, 0.95f), Theme.alpha(Theme.PURPLE, 0.6f), 3f * u);
         Ui.text(c, "SKOR", cx, cardT + 80f * u, 34f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
         Ui.text(c, Integer.toString((int) shownScore), cx, cardT + 230f * u, 150f * u, Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
-        if (newRecord) {
+        if (stars > 0) {
+            for (int k = 0; k < 3; k++) {
+                float sx = cx + (k - 1) * 90f * u, sy = cardT + 300f * u - (k == 1 ? 14f * u : 0f);
+                float appear = Math.max(0f, Math.min(1f, (time - 0.3f - k * 0.25f) / 0.25f));
+                boolean on = k < stars;
+                if (on && appear > 0f) Ui.glow(c, sx, sy, 70f * u * appear, Theme.GOLD, 0.5f * appear);
+                Icons.draw(c, Icons.STAR, sx, sy, (k == 1 ? 40f : 34f) * u * (on ? (0.6f + 0.4f * appear) : 1f),
+                        on && appear > 0f ? Theme.GOLD : Theme.LINE);
+            }
+        } else if (newRecord) {
             float pulse = 0.75f + 0.25f * (float) Math.sin(time * 6f);
             float bw2 = 330f * u, by = cardT + 280f * u;
             Ui.panel(c, cx - bw2 / 2f, by, cx + bw2 / 2f, by + 64f * u, 32f * u, Theme.alpha(Theme.GOLD, pulse), 0, 0);
@@ -148,6 +169,15 @@ public final class GameOverScreen extends Screen {
         Ui.diamond(c, cx - rw / 2f + 50f * u, ry, 20f * u, 1f);
         Ui.text(c, rewardText, cx + 25f * u, Ui.centerY(ry, 38f * u), 38f * u, Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
 
+        // Seviye / XP
+        float ly = ry + 100f * u;
+        float bw3 = Math.min(cw, 620f * u);
+        Ui.text(c, levelText, cx - bw3 / 2f, ly, 32f * u, levelUp ? Theme.GOLD : Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
+        Ui.text(c, xpText, cx + bw3 / 2f, ly, 30f * u, Theme.TEAL, Paint.Align.RIGHT, Ui.NUMBERS);
+        Ui.panel(c, cx - bw3 / 2f, ly + 18f * u, cx + bw3 / 2f, ly + 34f * u, 8f * u, Theme.alpha(Theme.NAVY_DEEP, 0.9f), Theme.LINE, 2f * u);
+        float xk = Math.min(1f, xpFrac * Math.min(1f, time / 0.8f));
+        if (xk > 0f) Ui.panel(c, cx - bw3 / 2f, ly + 18f * u, cx - bw3 / 2f + bw3 * xk, ly + 34f * u, 8f * u, Theme.TEAL, 0, 0);
+        ry = ly + 40f * u;
         // Karakter + gölge süsü
         float dy = (againBtn.rect.top + ry + 46f * u) / 2f;
         if (againBtn.rect.top - (ry + 46f * u) > 160f * u) {

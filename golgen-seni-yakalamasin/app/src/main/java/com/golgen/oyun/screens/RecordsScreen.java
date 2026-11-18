@@ -18,8 +18,9 @@ public final class RecordsScreen extends Screen {
     private final WorldRenderer bg = new WorldRenderer();
     private final Button back;
     private String best = "0";
-    private final String[] labels = {"En uzun süre", "Toplam elmas", "Oynanan oyun", "Gölgeden kaçış", "Tamamlanan görev", "Başarılar"};
-    private final String[] values = new String[6];
+    private final String[] labels = {"En uzun süre", "Toplam elmas", "Oynanan oyun", "Gölgeden kaçış", "Tamamlanan görev", "Başarılar",
+            "Oyuncu seviyesi", "Yıldızlar", "En yüksek kombo", "Güçlendirme", "Giriş serisi", "Karakterler"};
+    private final String[] values = new String[12];
     private final String[] top = new String[Progress.TOP_N];
     private float scroll, contentH;
 
@@ -41,6 +42,12 @@ public final class RecordsScreen extends Screen {
         values[3] = Integer.toString(p.totalDodges);
         values[4] = p.missionsCompleted + " / " + Missions.ALL.length;
         values[5] = Integer.bitCount(p.achievements) + " / " + com.golgen.oyun.core.Achievements.COUNT;
+        values[6] = Integer.toString(p.level);
+        values[7] = p.totalStars() + " / " + (Missions.ALL.length * 3);
+        values[8] = Integer.toString(p.maxCombo);
+        values[9] = Integer.toString(p.totalPowerups);
+        values[10] = p.loginStreak + " gün";
+        values[11] = Integer.bitCount(p.unlockedSkins) + " / " + com.golgen.oyun.core.Skins.ALL.length;
         for (int i = 0; i < Progress.TOP_N; i++) top[i] = p.topScores[i] > 0 ? Integer.toString(p.topScores[i]) : "—";
     }
 
@@ -48,7 +55,7 @@ public final class RecordsScreen extends Screen {
     protected void layout() {
         layoutBack(back);
         bg.s = w / 1000f;
-        contentH = 340f * u + 3 * 190f * u + 110f * u + Progress.TOP_N * 86f * u + 40f * u;
+        contentH = 340f * u + 6 * 190f * u + 110f * u + Progress.TOP_N * 86f * u + 40f * u;
     }
 
     @Override
@@ -88,14 +95,14 @@ public final class RecordsScreen extends Screen {
         y += 340f * u;
         // İstatistik ızgarası 2x3
         float gw = (cw - 24f * u) / 2f;
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < values.length; i++) {
             int col = i % 2, row = i / 2;
             float cl = l + col * (gw + 24f * u), ct = y + row * 190f * u;
             Ui.panel(c, cl, ct, cl + gw, ct + 166f * u, 32f * u, Theme.alpha(Theme.CARD, 0.95f), Theme.LINE, 2f * u);
             Ui.text(c, values[i], cl + 40f * u, ct + 85f * u, 56f * u, i == 1 ? Theme.GOLD : Theme.WHITE, Paint.Align.LEFT, Ui.NUMBERS);
             Ui.text(c, labels[i], cl + 40f * u, ct + 132f * u, 30f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
         }
-        y += 3 * 190f * u + 20f * u;
+        y += 6 * 190f * u + 20f * u;
         Ui.text(c, "EN İYİ 10 SKOR", l + 10f * u, y + 50f * u, 36f * u, Theme.TEAL, Paint.Align.LEFT, Ui.BOLD);
         y += 90f * u;
         for (int i = 0; i < Progress.TOP_N; i++) {

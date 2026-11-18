@@ -88,7 +88,7 @@ public final class SkinsScreen extends Screen {
         gridTop = btnTop + bh + 60f * u;
         cellW = cw / 4f;
         float avail = h - safeB - 40f * u - gridTop;
-        cellH = Math.min(300f * u, avail / 2f);
+        cellH = Math.min(270f * u, avail / 3f);
     }
 
     @Override
@@ -103,7 +103,8 @@ public final class SkinsScreen extends Screen {
         if (y < gridTop || x < gridL || x > gridL + cellW * 4f) return;
         int col = (int) ((x - gridL) / cellW);
         int row = (int) ((y - gridTop) / cellH);
-        if (row < 0 || row > 1 || col < 0 || col > 3) return;
+        if (row < 0 || row > 2 || col < 0 || col > 3) return;
+        if (row * 4 + col >= Skins.ALL.length) return;
         focus = row * 4 + col;
         g.sound.play(Synth.TAP, 0.6f, 1.1f);
         refresh();

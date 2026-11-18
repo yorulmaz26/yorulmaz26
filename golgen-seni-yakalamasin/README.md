@@ -58,14 +58,31 @@ Hazır APK: GitHub Actions her push'ta APK'yı derler, emülatörde test eder ve
 | Kıl payı kaçış | Katı gölge çok yaklaşıp temas etmeden uzaklaşınca sayılır. |
 
 ### Modlar
-- **Sonsuz Mod:** mümkün olduğunca uzun hayatta kal; rekor ve ilk 10 skor cihazda saklanır.
-- **Görev Modu:** 12 seviye, dört görev türü: belirli süre hayatta kal, belirli sayıda gölgeden kaç,
-  elmas topla, **engellere çarpmadan** tamamla (tek çarpma = başarısız). Her seviye sonrakini açar ve elmas ödülü verir.
+- **Sonsuz Mod:** mümkün olduğunca uzun hayatta kal. Her 30 sn'de yeni **aşama**; zorluk tavana ulaştıktan sonra da
+  akış hızlanmaya devam eder (hiç bitmeyen artış). Rekor ve ilk 10 skor cihazda saklanır.
+- **Görev Modu:** **5 bölüm × 12 = 60 seviye**. Beş görev türü: hayatta kal, gölgeden kıl payı kaç, elmas topla,
+  **engellere çarpmadan** tamamla, **puan hedefi**. Her bölüm yeni zorlaştırıcılar getirir ve bir **bölüm finali** ile biter:
+  | Bölüm | Zorlaştırıcı |
+  |---|---|
+  | 1 · Alacakaranlık | Yok (temel) |
+  | 2 · Neon Sokaklar | Hızlı Akış (%25 hızlı) |
+  | 3 · Karanlık Labirent | Karanlık: görüş oyuncunun çevresiyle sınırlı |
+  | 4 · Gölge Fırtınası | Hızlı Gölgeler (kısa gecikme) + Gölge Akını (erken ve sık gölge) |
+  | 5 · Sonsuz Gece | Hepsinin karışımı; final tüm zorlaştırıcılarla |
+- **Yıldızlar (180 adet):** ★ tamamla · ★ hiç çarpmadan bitir · ★ kombo hedefine ulaş. Yeni yıldız başına +10 elmas;
+  seviyeleri tekrar oynamak için sebep.
+
+### Uzun süreli oynanış
+- **Güçlendirmeler:** Kalkan (bir engel veya gölge temasını emer), Yavaş Zaman (dünya %55 hızda akar; gölge geçmişi bozulmaz),
+  Mıknatıs (yakındaki elmasları çeker).
+- **Kombo çarpanı:** ardışık elmas/kıl payı kaçışlar çarpanı x5'e kadar yükseltir; çarpma veya 4 sn boşluk sıfırlar.
+- **Oyuncu seviyesi ve XP:** her oyun XP kazandırır, her seviye elmas ödülü verir.
+- **7 günlük giriş serisi:** her gün artan ödül, 7. gün büyük ödül; gün kaçırılırsa seri sıfırlanır.
+- **Günlük görevler:** 8 türden her gün 3 farklı görev (güçlendirme topla, görev bitir, kombo yap vb.), üç zorluk kademesi.
+- **21 başarı** (20–400 elmas ödül), **12 karakter** (en pahalısı 2500 elmas).
 
 ### Ek özellikler
-- Elmas toplama ve **8 karakter görünümü** (Işık Kare, Ok Ucu, Elmas Göz, Petek, Kutup Yıldızı, Halka, Pusula, Kristal) — gölge de seçili şekli alır.
-- **Günlük görevler:** her gün tarih tohumuyla 3 farklı görev (sunucu gerekmez), ödül toplama.
-- **10 başarı** (her biri +20 elmas), oyun içi bildirimler.
+- Elmas toplama ve **12 karakter görünümü** — gölge de seçili şekli alır.
 - Programatik **ses efektleri** (8 adet) ve döngüsel synthwave **arka plan müziği**.
 - Ses / müzik / titreşim açma-kapama, ilerlemeyi sıfırlama (onaylı).
 - İnteraktif **ilk açılış öğreticisi** (3 adım), Ayarlar'dan tekrar oynanabilir.
@@ -102,7 +119,7 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 34 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 47 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
   kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı.
 - `tools/smoke_test.sh` — emülatörde uçtan uca test (CI): kurulum, öğretici, tüm menü butonları ve ekran geçişleri,
