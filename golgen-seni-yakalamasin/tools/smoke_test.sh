@@ -9,7 +9,7 @@ ACT=$PKG/.MainActivity
 mkdir -p "$OUT/ekranlar"
 PASS=0; FAIL=0
 RESULTS="$OUT/test_sonuclari.txt"
-: > "$RESULTS"
+: > "$RESULTS"; : > "$OUT/logcat.txt"
 
 ok()   { echo "GEÇTİ  | $1" | tee -a "$RESULTS"; PASS=$((PASS+1)); }
 bad()  { echo "KALDI  | $1" | tee -a "$RESULTS"; FAIL=$((FAIL+1)); }
@@ -41,6 +41,8 @@ tap_target() { # $1 ekran, $2 hedef adı
   sleep 0.9
 }
 
+clear_log() { adb logcat -d >> "$OUT/logcat.txt" 2>/dev/null; adb logcat -c; }
+
 prefs() { adb shell run-as $PKG cat shared_prefs/golgen_kayit.xml 2>/dev/null; }
 pref_int() { prefs | grep "name=\"$1\"" | sed -E 's/.*value="(-?[0-9]+)".*/\1/'; }
 
@@ -52,7 +54,7 @@ adb shell getprop ro.build.version.release | sed 's/^/Android /' | tee -a "$OUT/
 # 1) Kurulum ve temiz başlangıç
 adb uninstall $PKG >/dev/null 2>&1 || true
 if adb install -r "$APK" >/dev/null; then ok "APK kurulumu"; else bad "APK kurulumu"; fi
-adb logcat -c
+clear_log
 adb shell am start -W -n $ACT >/dev/null
 sleep 1.0; shot 01_acilis
 expect_screen SplashScreen "Uygulama açılışı"
@@ -98,7 +100,7 @@ BS=$(pref_int bestScore)
 if [ "${BS:-0}" -gt 0 ]; then ok "Kayıt: rekor kaydedildi ($BS)"; else bad "Kayıt: bestScore=$BS"; fi
 tap_target GameOverScreen "TEKRAR OYNA"
 expect_screen PlayScreen "Tekrar oyna"
-adb logcat -c
+clear_log
 adb shell input keyevent KEYCODE_BACK; sleep 0.8
 if log | grep -q "hedef ekran=PlayScreen ad=ANA MENÜ"; then ok "Geri tuşu oyunu duraklatır"; else bad "Geri tuşu duraklatma"; fi
 tap_target PlayScreen "ANA MENÜ"
@@ -159,14 +161,14 @@ expect_screen MenuScreen "Öğretici kapat"
 
 # 7) Kalıcılık: uygulamayı öldür ve yeniden aç → öğretici tekrar gelmemeli, veriler korunmalı
 adb shell am force-stop $PKG
-adb logcat -c
+clear_log
 adb shell am start -W -n $ACT >/dev/null
 expect_screen MenuScreen "Yeniden açılış (öğretici atlanır, kayıt yüklenir)" 10
 if [ "$(pref_int selectedSkin)" = "2" ]; then ok "Kalıcılık: seçili karakter korundu"; else bad "Kalıcılık: selectedSkin=$(pref_int selectedSkin)"; fi
 sleep 1; shot 18_yeniden_acilis
 
 # 8) Çökme / ANR kontrolü
-adb logcat -d > "$OUT/logcat.txt"
+adb logcat -d >> "$OUT/logcat.txt"
 if grep -q "FATAL EXCEPTION" "$OUT/logcat.txt" || grep -q "ANR in $PKG" "$OUT/logcat.txt"; then
   bad "Çökme/ANR bulundu"; grep -A 25 "FATAL EXCEPTION" "$OUT/logcat.txt" | head -60
 else ok "Çökme veya ANR yok"; fi

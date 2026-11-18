@@ -80,17 +80,24 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           script: bash golgen-seni-yakalamasin/tools/smoke_test.sh dist/GolgenSeniYakalamasin-debug.apk ui-test-out
+      - name: Ekran görüntülerini günlüğe yaz
+        if: always()
+        working-directory: .
+        run: bash golgen-seni-yakalamasin/tools/print_screens.sh ui-test-out/ekranlar
       - name: Test sonuçları
         if: always()
         working-directory: .
         run: |
           echo "### UI test sonuçları" >> $GITHUB_STEP_SUMMARY
           cat ui-test-out/test_sonuclari.txt >> $GITHUB_STEP_SUMMARY || true
+          echo "----- logcat hataları -----"
+          grep -E "AndroidRuntime|FATAL|golgen" ui-test-out/logcat.txt | grep -v GolgenUI | tail -40 || true
+          echo "----- son ekran olayları -----"
+          grep "GolgenUI" ui-test-out/logcat.txt | grep -v hedef | tail -15 || true
+          echo "----- FPS -----"
+          cat ui-test-out/fps.txt || true
+          echo "----- SONUÇLAR -----"
           cat ui-test-out/test_sonuclari.txt || true
-      - name: Ekran görüntülerini günlüğe yaz
-        if: always()
-        working-directory: .
-        run: bash golgen-seni-yakalamasin/tools/print_screens.sh ui-test-out/ekranlar
       - uses: actions/upload-artifact@v4
         if: always()
         with:
