@@ -218,7 +218,7 @@ struct SessionGateView: View {
             if !skipAdmin, await SessionRepo.isPlatformAdmin() { app.go(.adminComingSoon); return }
             switch role {
             case .customer: app.go(snap.profileExists ? .customerHome : .customerRegister)
-            case .business: app.go(.businessComingSoon)
+            case .business: app.routeBusiness(snap)
             }
         } catch {
             let e = AppError.from(error)

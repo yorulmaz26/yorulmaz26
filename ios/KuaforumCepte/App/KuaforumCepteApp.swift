@@ -29,7 +29,10 @@ final class AppState: ObservableObject {
         case gate(EntryRole, skipAdmin: Bool)
         case customerRegister
         case customerHome
-        case businessComingSoon
+        case invitations
+        case salonPicker
+        case businessNoSalon
+        case business(Membership)
         case adminComingSoon
     }
 
@@ -53,6 +56,23 @@ final class AppState: ObservableObject {
 
     func remember(role: EntryRole) { UserDefaults.standard.set(role.rawValue, forKey: lastRoleKey) }
 
+    /// Birden çok salonda çalışan uzman için son seçilen salon
+    var lastSalonId: String? {
+        get { UserDefaults.standard.string(forKey: "lastBusinessSalon") }
+        set { UserDefaults.standard.set(newValue, forKey: "lastBusinessSalon") }
+    }
+
+    /// İşletme girişi yönlendirmesi (Android SessionRouting ile aynı): davet → davetler; üyelik yok → bilgi;
+    /// tek salon → panel; birden çok → son seçilen veya seçim ekranı.
+    func routeBusiness(_ snap: SessionSnapshot) {
+        let active = snap.memberships.filter(\.isActive)
+        if snap.pendingInvitationCount > 0 { go(.invitations); return }
+        if active.isEmpty { go(.businessNoSalon); return }
+        if active.count == 1 { go(.business(active[0])); return }
+        if let last = lastSalonId, let m = active.first(where: { $0.salonId == last }) { go(.business(m)); return }
+        go(.salonPicker)
+    }
+
     func signOut() {
         SessionRepo.signOut()
         session = nil
@@ -74,10 +94,13 @@ struct RootView: View {
             case .gate(let role, let skip): SessionGateView(role: role, skipAdmin: skip)
             case .customerRegister: CustomerRegisterView()
             case .customerHome: CustomerHomeView()
-            case .businessComingSoon: ComingSoonView(
-                title: "Kuaför paneli iPhone'a geliyor",
-                message: "Randevu yönetimi, hizmetler ve raporlar iPhone uygulamasının bir sonraki sürümünde. Şimdilik kuaför işlemleri için Android uygulamasını kullanabilirsiniz."
+            case .invitations: InvitationsView()
+            case .salonPicker: SalonPickerView()
+            case .businessNoSalon: ComingSoonView(
+                title: "Henüz bir salona bağlı değilsiniz",
+                message: "Bir salonun sahibi sizi uzman olarak davet ettiğinde davet burada görünür. Kendi salonunuzu kaydetmek şimdilik Android uygulamasından yapılıyor; kayıttan sonra iPhone'dan yönetebilirsiniz."
             )
+            case .business(let m): BusinessHomeView(membership: m)
             case .adminComingSoon: ComingSoonView(
                 title: "Moderatör paneli iPhone'a geliyor",
                 message: "Salon onayı, salon kaldırma ve yorum moderasyonu şimdilik Android uygulamasında."

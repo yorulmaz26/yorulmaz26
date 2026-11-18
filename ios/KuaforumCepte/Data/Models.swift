@@ -19,7 +19,7 @@ enum SalonType: String, CaseIterable {
 
 enum EntryRole: String { case customer = "CUSTOMER", business = "BUSINESS" }
 
-struct Membership: Identifiable {
+struct Membership: Identifiable, Equatable {
     let salonId: String
     let salonName: String
     let role: String
@@ -146,6 +146,8 @@ struct Appointment: Identifiable, Hashable {
     let staffUid: String
     let staffName: String
     let customerName: String
+    let customerPhoneE164: String
+    let walkIn: Bool
     let guestName: String?
     let items: [AppointmentItem]
     let total: Kurus
@@ -191,6 +193,8 @@ struct Appointment: Identifiable, Hashable {
         staffUid = x["staffUid"] as? String ?? ""
         staffName = x["staffName"] as? String ?? ""
         customerName = x["customerName"] as? String ?? ""
+        customerPhoneE164 = x["customerPhoneE164"] as? String ?? ""
+        walkIn = x["walkIn"] as? Bool ?? false
         guestName = x["guestName"] as? String
         items = (x["items"] as? [[String: Any]] ?? []).map {
             AppointmentItem(
