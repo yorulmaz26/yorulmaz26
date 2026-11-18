@@ -476,25 +476,51 @@ public final class WorldRenderer {
         }
     }
 
-    // ---------------- Karanlık zorlaştırıcısı ----------------
-    private android.graphics.RadialGradient darkShader;
-    private final android.graphics.Matrix darkMatrix = new android.graphics.Matrix();
-    private float darkR = -1f;
+    // ---------------- Karanlık özelliği ----------------
+    // Gradyan gölgelendirici yerine önceden üretilmiş "delik" dokusu + 4 dikdörtgen:
+    // her cihaz ve yazılımsal GPU'da aynı, ucuz çizim yolu (ışıma dokusuyla aynı yöntem).
+    private static android.graphics.Bitmap darkHole;
+    private static final android.graphics.Paint darkPaint = new android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG);
+    private static final android.graphics.Rect darkSrc = new android.graphics.Rect();
+    private static final int DARK_COLOR = 0xF70A101C; // NAVY_DEEP, %97
+
+    private static void ensureDarkHole() {
+        if (darkHole != null) return;
+        int n = 256;
+        darkHole = android.graphics.Bitmap.createBitmap(n, n, android.graphics.Bitmap.Config.ARGB_8888);
+        int[] px = new int[n * n];
+        float c = (n - 1) / 2f;
+        for (int y = 0; y < n; y++) {
+            for (int x = 0; x < n; x++) {
+                float d = (float) Math.sqrt((x - c) * (x - c) + (y - c) * (y - c)) / c; // 0 merkez, 1 kenar
+                float a;
+                if (d <= 0.45f) a = 0f;
+                else if (d >= 1f) a = 0.97f;
+                else {
+                    float k = (d - 0.45f) / 0.55f;
+                    a = 0.97f * k * k * (3f - 2f * k); // yumuşak geçiş
+                }
+                px[y * n + x] = ((int) (a * 255f) << 24) | 0x0A101C;
+            }
+        }
+        darkHole.setPixels(px, 0, n, 0, 0, n, n);
+        darkSrc.set(0, 0, n, n);
+    }
 
     /** Oyuncu çevresi dışını karartır (yalnızca çizim; oyun mantığını değiştirmez). */
     public void drawDarkness(Canvas c, GameWorld w, float width, float height) {
+        ensureDarkHole();
         float r = 330f * s;
-        if (darkShader == null || darkR != r) {
-            darkShader = new android.graphics.RadialGradient(0f, 0f, r,
-                    new int[]{0x00000000, 0x00000000, Theme.alpha(Theme.NAVY_DEEP, 0.75f), Theme.alpha(Theme.NAVY_DEEP, 0.97f)},
-                    new float[]{0f, 0.45f, 0.8f, 1f}, android.graphics.Shader.TileMode.CLAMP);
-            darkR = r;
-        }
-        darkMatrix.setTranslate(w.px * s, w.py * s);
-        darkShader.setLocalMatrix(darkMatrix);
-        Ui.shaderPaint.setShader(darkShader);
-        c.drawRect(0, 0, width, height, Ui.shaderPaint);
-        Ui.shaderPaint.setShader(null);
+        float cx = w.px * s, cy = w.py * s;
+        float l = cx - r, t0 = cy - r, rr = cx + r, b = cy + r;
+        Ui.rf.set(l, t0, rr, b);
+        c.drawBitmap(darkHole, darkSrc, Ui.rf, darkPaint);
+        Ui.fill.setShader(null);
+        Ui.fill.setColor(DARK_COLOR);
+        if (t0 > 0) c.drawRect(0, 0, width, t0, Ui.fill);
+        if (b < height) c.drawRect(0, b, width, height, Ui.fill);
+        if (l > 0) c.drawRect(0, Math.max(0, t0), l, Math.min(height, b), Ui.fill);
+        if (rr < width) c.drawRect(rr, Math.max(0, t0), width, Math.min(height, b), Ui.fill);
     }
 
     /** Menü ve önizlemeler için bağımsız karakter çizimi. */

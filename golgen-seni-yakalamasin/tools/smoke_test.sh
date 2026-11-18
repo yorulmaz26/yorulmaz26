@@ -185,23 +185,27 @@ expect_screen MenuScreen "Öğretici kapat"
 
 step harita-goruntuleri
 # 6b) Farklı haritalardan oynanış görüntüleri (debug ekstrasıyla bölüm aç)
-for lv in 2 17 27 37 72 99; do
+touch_count() { log | grep -c "dokunma a=0"; }
+for lv in 2 17 27 37 57 72 77 92 99; do
   step "bolum $((lv+1))"
   adbt shell am start -n $ACT --es ekran gorev:$lv >/dev/null
-  if wait_screen PlayScreen 6; then
+  if wait_screen PlayScreen 10; then
     sleep 0.8
+    T0=$(touch_count)
     for i in 1 2 3; do
       adbt shell input swipe 300 1600 800 1450 260
       adbt shell input swipe 800 1450 650 1900 260
       adbt shell input swipe 650 1900 300 1600 260
     done
     shot "19_harita_bolum_$((lv+1))"
+    T1=$(touch_count)
+    if [ "$T1" -ge $((T0 + 6)) ]; then ok "Bölüm $((lv+1)) oynanabilir (girdi işlendi, donma yok)"; else bad "Bölüm $((lv+1)) yanıt vermiyor (dokunma $T0 → $T1)"; fi
   else
     bad "Bölüm $((lv+1)) açılamadı"
   fi
 done
 adbt shell am start -n $ACT --es ekran menu >/dev/null
-if wait_screen MenuScreen 8; then ok "Harita bölümleri açılıp oynandı (6 harita)"; else bad "Harita bölümlerinden menüye dönüş"; fi
+if wait_screen MenuScreen 8; then ok "Harita bölümlerinden ana menüye dönüş"; else bad "Harita bölümlerinden menüye dönüş"; fi
 
 # 7) Kalıcılık: uygulamayı öldür ve yeniden aç → öğretici tekrar gelmemeli, veriler korunmalı
 adb shell am force-stop $PKG
