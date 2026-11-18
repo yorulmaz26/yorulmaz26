@@ -68,4 +68,15 @@
     <string name="mp_disconnected">BAĞLANTI KOPTU</string>
     <string name="mp_retry_wait">Tekrar için oda kurucusunu bekle</string>
     <string name="mp_failed">Ağa bağlanılamadı. Wi-Fi açık mı?</string>
+    <string name="mp_pick">Haritayı ve seviyeyi seç, sonra odayı kur</string>
+    <string name="mp_both_pick">ikiniz de seçebilirsiniz</string>
+    <string name="mp_help_title">NASIL KURULUR?</string>
+    <string name="mp_help_1">Oyunu iki telefona da kur.</string>
+    <string name="mp_help_2">İki telefonu aynı Wi-Fi ağına bağla. Wi-Fi yoksa biri hotspot açsın, diğeri ona bağlansın. İnternet gerekmez.</string>
+    <string name="mp_help_3">1. telefon: 2 OYUNCU › ODA KUR</string>
+    <string name="mp_help_4">2. telefon: 2 OYUNCU › ODAYA KATIL. Telefonlar birbirini kendiliğinden bulur.</string>
+    <string name="mp_help_5">Haritayı ve seviyeyi ikiniz de değiştirebilirsiniz. Hazır olunca odayı kuran BAŞLAT’a basar.</string>
+    <string name="mp_help_6">Üst yarıda sen, alt yarıda rakibin oynar. Yanan, rakibini izlemeye devam eder; çok puan alan kazanır.</string>
+    <string name="mp_help_tip">Bulamıyorsa: İkisi de aynı ağda mı? Misafir/okul ağları cihazları birbirinden gizleyebilir; o zaman hotspot kullanın.</string>
+    <string name="mp_help_close">Kapatmak için dokun</string>
 </resources>

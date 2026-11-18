@@ -29,14 +29,19 @@ uzanan gezegen kulelerinin arasındaki boşluktan geçtikçe puan kazanırsın.
   (ateş topu sıklığı, rüzgâr gücü, salınım) seviyeye göre değişir.
 - Her harita ve seviye için ayrı rekor tutulur. Oyun sonunda **Tekrar** ya da **Menü** seçilir, geri tuşu menüye döner.
 
-### 1.3: 2 oyuncu (iki telefon, bölünmüş ekran)
+### 2 oyuncu (iki telefon, bölünmüş ekran)
 
-1. İki telefon **aynı Wi-Fi ağına** bağlansın. Wi-Fi yoksa biri **hotspot** açsın, diğeri ona bağlansın. İnternet gerekmez.
-2. Birinci telefonda **2 OYUNCU › ODA KUR**, ikincide **2 OYUNCU › ODAYA KATIL**. Telefonlar birbirini kendiliğinden bulur.
-3. Haritayı ve seviyeyi oda kurucusu seçer, **BAŞLAT**'a basar. 3-2-1 sayımından sonra iki telefonda aynı parkur aynı anda başlar.
-4. Ekran ikiye bölünür: **üstte sen** (kırmızı roket), **altta rakibin** (mavi roket) canlı olarak görünür.
-5. Yanan oyuncu, rakibi de yanana kadar **izlemeye devam eder**. Sonunda daha çok puan alan kazanır.
-6. Oda kurucusu **TEKRAR** ile yeni bir parkur başlatabilir. **MENÜ** ya da geri tuşu bağlantıyı kapatır.
+Oyundaki **2 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adımları gösterir (ilk girişte kendiliğinden açılır).
+
+1. Oyunu iki telefona da kur.
+2. İki telefonu **aynı Wi-Fi ağına** bağla. Wi-Fi yoksa biri **hotspot** açsın, diğeri ona bağlansın. İnternet gerekmez.
+3. 1. telefon: **2 OYUNCU** › haritayı ve seviyeyi seç › **ODA KUR**.
+4. 2. telefon: **2 OYUNCU** › **ODAYA KATIL**. Telefonlar birbirini kendiliğinden bulur.
+5. Bağlandıktan sonra haritayı ve seviyeyi **iki oyuncu da** değiştirebilir; seçim iki telefonda aynı anda güncellenir.
+   Hazır olunca odayı kuran **BAŞLAT**'a basar; 3-2-1 sayımından sonra iki telefonda aynı parkur başlar.
+6. Ekran ikiye bölünür: **üstte sen** (kırmızı roket), **altta rakibin** (mavi roket) canlı görünür.
+   Yanan oyuncu, rakibi de yanana kadar **izlemeye devam eder**. Daha çok puan alan kazanır.
+7. Odayı kuran **TEKRAR** ile yeni parkur başlatabilir. **MENÜ** ya da geri tuşu bağlantıyı kapatır.
 
 Notlar: Maç sırasında uygulamadan çıkan oyuncu yanmış sayılır. Bazı misafir/okul Wi-Fi ağları cihazların birbirini
 görmesini engeller; öyle bir ağda hotspot kullanın. Ağ kodu [`NetLink.kt`](app/src/main/java/com/example/gezegenkacisi/NetLink.kt) içinde.

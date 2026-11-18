@@ -114,6 +114,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val KEY_MAP = "map"
         private const val KEY_DIFF = "difficulty"
         private const val KEY_SOUND = "sound"
+        private const val KEY_MP_HELP_SEEN = "mp_help_seen"
 
         private val DEG = (PI / 180.0).toFloat()
         private val TWO_PI = (PI * 2.0).toFloat()
@@ -205,6 +206,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var endTimer = 0f
     private var mpResult = 0          // 1 kazandın, -1 kaybettin, 0 berabere
     private var mpDisconnected = false
+    private var lobbyHelp = false      // "Nasıl kurulur?" penceresi açık mı
     private val emitAccs = FloatArray(2)
     private var spawnOwner = 0
 
@@ -265,6 +267,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strDisconnected = context.getString(R.string.mp_disconnected)
     private val strRetryWait = context.getString(R.string.mp_retry_wait)
     private val strNoNetwork = context.getString(R.string.mp_failed)
+    private val strMpPick = context.getString(R.string.mp_pick)
+    private val strBothCanPick = context.getString(R.string.mp_both_pick)
+    private val strHelpTitle = context.getString(R.string.mp_help_title)
+    private val strHelpClose = context.getString(R.string.mp_help_close)
+    private val strHelpTip = context.getString(R.string.mp_help_tip)
+    private val helpSteps = listOf(
+        context.getString(R.string.mp_help_1),
+        context.getString(R.string.mp_help_2),
+        context.getString(R.string.mp_help_3),
+        context.getString(R.string.mp_help_4),
+        context.getString(R.string.mp_help_5),
+        context.getString(R.string.mp_help_6)
+    )
     private val mapNames = Maps.ALL.map { context.getString(it.nameRes) }
     private val mapDescs = Maps.ALL.map { context.getString(it.descRes) }
     private val diffNames = Difficulty.entries.map { context.getString(it.nameRes) }
@@ -298,6 +313,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
     }
+    private val helpPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        textAlign = Paint.Align.LEFT
+        typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+    }
     private val labelPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         textAlign = Paint.Align.CENTER
         typeface = Typeface.create("sans-serif-condensed", Typeface.BOLD)
@@ -321,6 +340,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val hostBtn = RectF()
     private val joinBtn = RectF()
     private val backBtn = RectF()
+    private val backCircle = RectF()   // lobide sol üstteki geri düğmesi
+    private val helpBtn = RectF()      // lobide sağ üstteki "?" düğmesi
 
     // --- Roket geometrisi (sağa bakar, merkez 0,0) ---
     private val bodyPath = Path().apply {
@@ -521,6 +542,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         hostBtn.set(cx - lw, 470f, cx + lw, 540f)
         joinBtn.set(cx - lw, 562f, cx + lw, 632f)
         backBtn.set(cx - 110f, 870f, cx + 110f, 928f)
+        backCircle.set(22f, 24f, 78f, 80f)
+        helpBtn.set(uiW - 78f, 24f, uiW - 22f, 80f)
 
         val half = min(uiW / 2f - 28f, 180f)
         retryBtn.set(cx - half, 684f, cx - 7f, 748f)
@@ -601,8 +624,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             State.MP_LOBBY -> {
                 val swipe = abs(dx) > 60f && abs(dx) > abs(dy) * 1.3f &&
                     downY > mapCard.top - 40f && downY < mapCard.bottom + 40f
-                if (lobby == Lobby.CONNECTED && net?.isHost == true && swipe) changeMap(if (dx < 0f) 1 else -1)
-                else if (!moved) lobbyTap(downX, downY)
+                val pickable = lobby == Lobby.CHOOSE || lobby == Lobby.CONNECTED
+                if (lobbyHelp) {
+                    if (!moved) { lobbyHelp = false; sound.play(SoundManager.Sfx.CLICK) }
+                } else if (pickable && swipe) {
+                    pickMap(if (dx < 0f) 1 else -1)
+                } else if (!moved) lobbyTap(downX, downY)
             }
             State.MP_OVER -> if (!moved && stateTimer > 0.6f) mpOverTap(downX, downY)
             State.OVER -> if (!moved && stateTimer > 0.6f) {
@@ -985,6 +1012,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         state = State.MP_LOBBY
         lobby = Lobby.CHOOSE
         netMessage = ""
+        // İlk kez 2 oyuncuya girilince "Nasıl kurulur?" kendiliğinden açılır
+        lobbyHelp = !prefs.getBoolean(KEY_MP_HELP_SEEN, false)
+        if (lobbyHelp) prefs.edit().putBoolean(KEY_MP_HELP_SEEN, true).apply()
     }
 
     private fun closeNet() {
@@ -1023,35 +1053,67 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun lobbyTap(x: Float, y: Float) {
+        if (hit(helpBtn, x, y)) {
+            lobbyHelp = true
+            sound.play(SoundManager.Sfx.CLICK)
+            return
+        }
         when (lobby) {
             Lobby.CHOOSE -> when {
-                hit(hostBtn, x, y) -> startHost()
-                hit(joinBtn, x, y) -> startJoin()
-                hit(backBtn, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toMenu() }
+                hit(backCircle, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toMenu() }
+                hit(startBtn, x, y) -> startHost()
+                hit(multiBtn, x, y, 6f) -> startJoin()
+                else -> pickTap(x, y)
             }
-            Lobby.HOSTING, Lobby.JOINING -> if (hit(backBtn, x, y)) {
+            Lobby.HOSTING, Lobby.JOINING -> if (hit(backBtn, x, y) || hit(backCircle, x, y)) {
                 closeNet()
                 lobby = Lobby.CHOOSE
                 sound.play(SoundManager.Sfx.CLICK)
             }
-            Lobby.CONNECTED -> {
-                if (hit(multiBtn, x, y, 6f)) {
-                    leaveMp()
+            Lobby.CONNECTED -> when {
+                hit(backCircle, x, y) || hit(multiBtn, x, y, 6f) -> leaveMp()
+                hit(startBtn, x, y) && net?.isHost == true -> hostStart()
+                else -> pickTap(x, y)
+            }
+        }
+    }
+
+    /** Harita okları ve seviye düğmeleri (lobide). */
+    private fun pickTap(x: Float, y: Float) {
+        when {
+            hit(arrowLeft, x, y, 18f) -> pickMap(-1)
+            hit(arrowRight, x, y, 18f) -> pickMap(1)
+            else -> for (i in diffBtns.indices) {
+                if (hit(diffBtns[i], x, y, 6f)) {
+                    pickDifficulty(Difficulty.entries[i])
                     return
                 }
-                if (net?.isHost != true) return // seçimleri oda kurucusu yapar
-                when {
-                    hit(arrowLeft, x, y, 18f) -> changeMap(-1)
-                    hit(arrowRight, x, y, 18f) -> changeMap(1)
-                    hit(startBtn, x, y) -> hostStart()
-                    else -> for (i in diffBtns.indices) {
-                        if (hit(diffBtns[i], x, y, 6f)) {
-                            selectDifficulty(Difficulty.entries[i])
-                            return
-                        }
-                    }
-                }
             }
+        }
+    }
+
+    /**
+     * Lobide harita değiştirme. Oda kurucusu doğrudan değiştirir ve karşıya bildirir;
+     * katılan oyuncu istek gönderir, kurucu onaylayıp iki telefona da uygular.
+     */
+    private fun pickMap(dir: Int) {
+        val n = net
+        if (n != null && n.connected && !n.isHost) {
+            val count = Maps.ALL.size
+            n.send("R", ((mapIndex + dir) % count + count) % count, difficulty.ordinal)
+            sound.play(SoundManager.Sfx.CLICK)
+        } else {
+            changeMap(dir)
+        }
+    }
+
+    private fun pickDifficulty(d: Difficulty) {
+        val n = net
+        if (n != null && n.connected && !n.isHost) {
+            n.send("R", mapIndex, d.ordinal)
+            sound.play(SoundManager.Sfx.CLICK)
+        } else {
+            selectDifficulty(d)
         }
     }
 
@@ -1111,6 +1173,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (p[0]) {
             "C" -> if (!host && p.size >= 3) {
                 applySelection(p[1].toIntOrNull() ?: return, p[2].toIntOrNull() ?: return)
+            }
+            "R" -> if (host && p.size >= 3 && state == State.MP_LOBBY) {
+                applySelection(p[1].toIntOrNull() ?: return, p[2].toIntOrNull() ?: return)
+                sendSelection()
             }
             "G" -> if (!host && p.size >= 2) beginMatch(p[1].toLongOrNull() ?: return)
             "S" -> if (p.size >= 5) {
@@ -1770,16 +1836,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (paused) drawPaused(cv, cx)
     }
 
-    /** Ana menü. [mp] ise aynı ekran 2 oyuncu lobisinde (bağlandıktan sonra) kullanılır. */
-    private fun drawMenu(cv: Canvas, cx: Float, mp: Boolean = false) {
+    /**
+     * Ana menü. Aynı ekran 2 oyuncu lobisinde de kullanılır:
+     * [mp] = 1 oda kurmadan önce harita/seviye seçimi, 2 bağlandıktan sonra.
+     */
+    private fun drawMenu(cv: Canvas, cx: Float, mp: Int = 0) {
         val bob = sin(time * 1.6f) * 3f
         val host = net?.isHost == true
-        if (mp) {
+        if (mp > 0) {
             titlePaint.textSize = 54f
             drawShadowText(cv, strTwoPlayers, cx, 132f + bob, titlePaint, colWarm)
-            textPaint.textSize = 23f
-            textPaint.color = colGreen
-            drawFit(cv, strConnected, cx, 186f, textPaint)
+            textPaint.textSize = 22f
+            textPaint.color = if (mp == 2) colGreen else colDim
+            drawFit(cv, if (mp == 2) "$strConnected  ·  $strBothCanPick" else strMpPick, cx, 186f, textPaint)
+            drawCircleIcon(cv, backCircle, "‹")
+            drawCircleIcon(cv, helpBtn, "?")
         } else {
             titlePaint.textSize = 60f
             drawShadowText(cv, strTitle1, cx, 122f + bob, titlePaint, colText)
@@ -1819,10 +1890,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawFitW(cv, mapDescs[mapIndex], pcx, mapCard.bottom - 32f, textPaint, mapCard.width() - 28f)
         cv.restore()
 
-        if (!mp || host) {
-            drawArrow(cv, arrowLeft, -1f)
-            drawArrow(cv, arrowRight, 1f)
-        }
+        drawArrow(cv, arrowLeft, -1f)
+        drawArrow(cv, arrowRight, 1f)
 
         // Sayfa noktaları
         val n = Maps.ALL.size
@@ -1842,7 +1911,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             drawButton(cv, diffBtns[i], diffNames[i], d.color, if (sel) colDarkText else d.color, sel, 255)
         }
 
-        if (mp) {
+        if (mp == 1) {
+            drawPulseButton(cv, startBtn, strHost)
+            drawButton(cv, multiBtn, strJoin, colBlue, colText, false, 255, 19f)
+            if (netMessage.isNotEmpty()) {
+                textPaint.textSize = 20f
+                textPaint.color = colAccent
+                drawFit(cv, netMessage, cx, multiBtn.bottom + 44f, textPaint)
+            }
+            return
+        }
+        if (mp == 2) {
             if (host) {
                 drawPulseButton(cv, startBtn, strMpStart)
             } else {
@@ -2281,33 +2360,28 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun drawLobby(cv: Canvas, cx: Float) {
-        if (lobby == Lobby.CONNECTED) {
-            drawMenu(cv, cx, mp = true)
-            return
+        when (lobby) {
+            Lobby.CHOOSE -> drawMenu(cv, cx, mp = 1)
+            Lobby.CONNECTED -> drawMenu(cv, cx, mp = 2)
+            else -> drawWaiting(cv, cx)
         }
+        if (lobbyHelp) drawHelp(cv, cx)
+    }
+
+    /** Oda kurulmuş ya da aranıyorken gösterilen bekleme ekranı. */
+    private fun drawWaiting(cv: Canvas, cx: Float) {
+        drawCircleIcon(cv, backCircle, "‹")
+        drawCircleIcon(cv, helpBtn, "?")
         val bob = sin(time * 1.6f) * 3f
         titlePaint.textSize = 56f
         drawShadowText(cv, strTwoPlayers, cx, 170f + bob, titlePaint, colWarm)
         val dots = ".".repeat(1 + (time * 2f).toInt() % 3)
 
         when (lobby) {
-            Lobby.CHOOSE -> {
-                textPaint.textSize = 21f
-                textPaint.color = colDim
-                drawFit(cv, strMpInfo1, cx, 250f, textPaint)
-                drawFit(cv, strMpInfo2, cx, 282f, textPaint)
+            Lobby.HOSTING -> {
                 labelPaint.textSize = 20f
                 labelPaint.color = map.accent
-                drawFit(cv, mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal], cx, 372f, labelPaint)
-                drawButton(cv, hostBtn, strHost, colWarm, colDarkText, true, 255, 24f)
-                drawButton(cv, joinBtn, strJoin, colBlue, colText, false, 255, 24f)
-                if (netMessage.isNotEmpty()) {
-                    textPaint.textSize = 21f
-                    textPaint.color = colAccent
-                    drawFit(cv, netMessage, cx, 700f, textPaint)
-                }
-            }
-            Lobby.HOSTING -> {
+                drawFit(cv, mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal], cx, 236f, labelPaint)
                 textPaint.textSize = 26f
                 textPaint.color = colText
                 drawFit(cv, strRoomOpen, cx, 290f, textPaint)
@@ -2336,9 +2410,87 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 drawFit(cv, strMpInfo2, cx, 472f, textPaint)
                 drawSpinner(cv, cx, 680f)
             }
-            Lobby.CONNECTED -> Unit
+            else -> Unit
         }
         drawButton(cv, backBtn, strBack, colPanelEdge, colText, false, 255, 20f)
+    }
+
+    /** Lobideki küçük yuvarlak düğme ("‹" geri, "?" yardım). */
+    private fun drawCircleIcon(cv: Canvas, r: RectF, icon: String) {
+        val x = r.centerX()
+        val y = r.centerY()
+        paint.color = withAlpha(colPanel, 210)
+        cv.drawCircle(x, y, 26f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(colPanelEdge, 130)
+        cv.drawCircle(x, y, 26f, paint)
+        paint.style = Paint.Style.FILL
+        titlePaint.textSize = 32f
+        titlePaint.color = colText
+        cv.drawText(icon, x, y + 11f, titlePaint)
+    }
+
+    /** "Nasıl kurulur?" penceresi: numaralı adımlar. Herhangi bir yere dokununca kapanır. */
+    private fun drawHelp(cv: Canvas, cx: Float) {
+        paint.color = hex(0xDD05071A)
+        cv.drawRect(0f, 0f, uiW, WORLD_H, paint)
+        val pw = min(uiW - 28f, 470f)
+        val left = cx - pw / 2f
+        tmpRect.set(left, 70f, left + pw, 930f)
+        paint.color = colPanel
+        cv.drawRoundRect(tmpRect, 28f, 28f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(map.accent, 200)
+        cv.drawRoundRect(tmpRect, 28f, 28f, paint)
+        paint.style = Paint.Style.FILL
+
+        titlePaint.textSize = 34f
+        titlePaint.color = colWarm
+        drawFit(cv, strHelpTitle, cx, 128f, titlePaint)
+
+        val textX = left + 64f
+        val textW = pw - 84f
+        var y = 182f
+        helpPaint.textSize = 19f
+        helpSteps.forEachIndexed { i, step ->
+            // Numara rozeti
+            paint.color = map.accent
+            cv.drawCircle(left + 36f, y - 7f, 15f, paint)
+            labelPaint.textSize = 17f
+            labelPaint.color = colDarkText
+            cv.drawText((i + 1).toString(), left + 36f, y - 1f, labelPaint)
+            helpPaint.color = colText
+            y = drawWrapped(cv, step, textX, y, textW, helpPaint, 26f) + 20f
+        }
+        helpPaint.textSize = 17f
+        helpPaint.color = colGold
+        drawWrapped(cv, strHelpTip, left + 24f, max(y + 6f, 800f), pw - 48f, helpPaint, 23f)
+
+        labelPaint.textSize = 18f
+        labelPaint.color = colDim
+        cv.drawText(strHelpClose, cx, 905f, labelPaint)
+    }
+
+    /** Metni kelime kelime satırlara böler; son satırın altındaki y'yi döndürür. */
+    private fun drawWrapped(cv: Canvas, text: String, x: Float, y0: Float, maxW: Float, p: Paint, lineH: Float): Float {
+        var y = y0
+        val line = StringBuilder()
+        for (word in text.split(' ')) {
+            val trial = if (line.isEmpty()) word else "$line $word"
+            if (p.measureText(trial) > maxW && line.isNotEmpty()) {
+                cv.drawText(line.toString(), x, y, p)
+                y += lineH
+                line.setLength(0)
+                line.append(word)
+            } else {
+                line.setLength(0)
+                line.append(trial)
+            }
+        }
+        if (line.isNotEmpty()) cv.drawText(line.toString(), x, y, p)
+        return y
     }
 
     /** Dönen nokta halkası: bekleniyor göstergesi. */
