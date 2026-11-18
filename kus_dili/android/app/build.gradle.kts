@@ -6,6 +6,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase: android/app/google-services.json varsa bağlanır. Yoksa uygulama
+// çevrimdışı açılır (yalnızca çevirici ve öğrenme modülü).
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 // Yayın imzası: android/key.properties (depoya EKLENMEZ, bkz. docs/RELEASE.md).
 val keyProps = Properties().apply {
     val f = rootProject.file("key.properties")
@@ -24,7 +30,7 @@ android {
 
     defaultConfig {
         applicationId = "com.kusdili.kus_dili"
-        // Biyometri, ses kaydı ve WebRTC eklentileri en az Android 7.0 ister.
+        // Biyometri ve güvenli depo eklentileri en az Android 7.0 ister.
         minSdk = maxOf(24, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
@@ -36,6 +42,16 @@ android {
     }
 
     signingConfigs {
+        // YALNIZCA TEST: depoda duran, herkesin bildiği test anahtarı. Parmak
+        // izi sabit olsun diye (Firebase telefonla giriş SHA-1/SHA-256 ister)
+        // test derlemeleri bununla imzalanır. Mağaza için KULLANILMAZ.
+        create("test") {
+            storeFile = file("test-signing.p12")
+            storePassword = "kusdili-test"
+            keyAlias = "test"
+            keyPassword = "kusdili-test"
+            storeType = "PKCS12"
+        }
         if (keyProps.isNotEmpty()) {
             create("release") {
                 storeFile = file(keyProps.getProperty("storeFile"))
@@ -47,13 +63,16 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.getByName("test")
+        }
         release {
-            // key.properties yoksa (ör. CI) hata ayıklama anahtarıyla imzalanır;
-            // böyle bir paket mağazaya YÜKLENEMEZ.
+            // key.properties yoksa (ör. CI) test anahtarıyla imzalanır;
+            // böyle bir paket mağazaya YÜKLENMEMELİ.
             signingConfig = if (keyProps.isNotEmpty()) {
                 signingConfigs.getByName("release")
             } else {
-                signingConfigs.getByName("debug")
+                signingConfigs.getByName("test")
             }
             isMinifyEnabled = true
             isShrinkResources = true

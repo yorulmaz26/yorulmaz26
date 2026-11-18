@@ -4,6 +4,34 @@ Bu adımları yalnızca bir kez, kendi bilgisayarınızda yapmanız gerekir. Kod
 Firebase'i platform yapılandırma dosyalarından okur; bu dosyalar depoya
 **eklenmez** (`.gitignore`).
 
+## Kolay yol: yalnızca tarayıcıyla (bilgisayar ve komut gerekmez)
+
+Android için test APK'sını GitHub kendisi derler; siz yalnızca Firebase
+konsolunda tıklarsınız.
+
+1. <https://console.firebase.google.com> → **Proje oluştur** → plan: **Blaze**.
+2. Proje ana sayfası → **Android** simgesi → paket adı `com.kusdili.kus_dili`.
+   Aynı ekranda **SHA-1** alanına (sonra Proje ayarları → Parmak izi ekle ile
+   **SHA-256** de) test anahtarının parmak izlerini girin:
+   * SHA-1: `53:47:F8:A7:1F:15:69:5C:03:1B:FE:58:2E:F8:37:27:7A:05:30:42`
+   * SHA-256: `67:53:1A:BA:38:6D:38:65:4D:26:60:4F:6F:89:94:91:B4:A1:8C:1F:13:F8:21:D5:24:BB:BF:66:19:71:89:E7`
+   **google-services.json** dosyasını indirin.
+3. **Authentication → Başlayın → Telefon → Etkinleştir.** Deneme için
+   "Test için telefon numaraları" bölümüne ör. `+90 555 000 00 01` / `123456`.
+4. **Firestore Database → Veritabanı oluştur** (bölge `eur3`, üretim modu) →
+   **Kurallar** sekmesi → içeriği silip `kus_dili/firebase/firestore.rules`
+   dosyasının tamamını yapıştırın → **Yayınla**.
+5. GitHub deposu → **Settings → Secrets and variables → Actions → New
+   repository secret**: ad `GOOGLE_SERVICES_JSON`, değer olarak indirdiğiniz
+   dosyanın **içeriğini** yapıştırın.
+6. **Actions** sekmesinde son "Kuş Dili" çalışmasını **Re-run all jobs** ile
+   yeniden çalıştırın; bitince `kus-dili-apk` dosyasını indirip kurun.
+
+Bu yolla giriş, mesajlaşma ve gruplar çalışır. **Bildirimler** ve **uygulama
+içinden hesap silme** için Cloud Functions'ın yüklenmesi gerekir (§5c, komut
+satırı ister). Test anahtarı herkese açıktır; mağaza sürümü kendi gizli
+anahtarınızla imzalanmalı (RELEASE.md §2).
+
 ## 1. Proje
 
 1. <https://console.firebase.google.com> → **Proje ekle** (ör. `kus-dili`).
