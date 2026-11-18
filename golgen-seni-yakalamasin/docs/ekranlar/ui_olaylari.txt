@@ -1,0 +1,52 @@
+11-18 08:20:49.028  3220  3220 I GolgenUI: ekran=SplashScreen
+11-18 08:20:54.765  3220  3220 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
+11-18 08:20:54.765  3220  3220 I GolgenUI: hedef ekran=TutorialScreen ad=OYNA x=540 y=1409
+11-18 08:20:54.765  3220  3220 I GolgenUI: hedef ekran=TutorialScreen ad=ANA MENÜ x=540 y=1569
+11-18 08:20:54.765  3220  3220 I GolgenUI: ekran=TutorialScreen
+11-18 08:20:54.765  3220  3220 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
+11-18 08:20:56.192  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:56.284  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:56.377  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:56.712  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:56.939  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:57.194  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:58.851  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:58.876  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:59.047  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:59.369  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:59.611  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:20:59.882  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-18 08:21:00.319  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-18 08:21:00.581  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:21:00.878  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:21:01.129  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:05.527  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:05.736  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:05.858  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:06.081  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:06.166  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:06.457  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:06.660  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:06.874  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:07.104  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:07.361  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:07.553  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:07.751  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:07.993  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:08.285  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:08.459  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:08.720  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:08.825  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:09.092  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:09.249  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:09.492  3220  3220 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:09.646  3220  3220 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:09.926  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:10.023  3220  3220 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=TutorialScreen
+11-18 08:22:10.276  3220  3220 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=TutorialScreen
+11-18 08:27:38.883  8586  8586 I GolgenUI: ekran=SplashScreen
+11-18 08:27:43.102  8586  8586 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
+11-18 08:27:43.102  8586  8586 I GolgenUI: hedef ekran=TutorialScreen ad=OYNA x=540 y=1409
+11-18 08:27:43.102  8586  8586 I GolgenUI: hedef ekran=TutorialScreen ad=ANA MENÜ x=540 y=1569
+11-18 08:27:43.102  8586  8586 I GolgenUI: ekran=TutorialScreen
+11-18 08:27:43.102  8586  8586 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208

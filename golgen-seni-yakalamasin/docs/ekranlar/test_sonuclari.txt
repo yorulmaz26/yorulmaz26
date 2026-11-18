@@ -1,0 +1,54 @@
+GEÇTİ  | APK kurulumu
+GEÇTİ  | Uygulama açılışı → SplashScreen
+GEÇTİ  | İlk açılış öğreticisi → TutorialScreen
+KALDI  | Öğretici → Ana menü → beklenen MenuScreen, bulunan TutorialScreen
+KALDI  | hedef bulunamadı: MenuScreen/OYNA
+KALDI  | OYNA butonu → beklenen PlayScreen, bulunan TutorialScreen
+KALDI  | hedef bulunamadı: GameOverScreen/TEKRAR OYNA
+KALDI  | hedef bulunamadı: PlayScreen/ikon-1
+KALDI  | Duraklatma menüsü
+KALDI  | Duraklatmada oyun bitti
+KALDI  | hedef bulunamadı: PlayScreen/DEVAM ET
+KALDI  | Hareketsiz kalınca gölge yakalar / oyun sonu → beklenen GameOverScreen, bulunan TutorialScreen
+KALDI  | Kayıt: gamesPlayed=
+KALDI  | Kayıt: bestScore=
+KALDI  | hedef bulunamadı: GameOverScreen/TEKRAR OYNA
+KALDI  | Tekrar oyna → beklenen PlayScreen, bulunan TutorialScreen
+KALDI  | Geri tuşu duraklatma
+KALDI  | hedef bulunamadı: PlayScreen/ANA MENÜ
+KALDI  | Duraklatma → Ana menü → beklenen MenuScreen, bulunan 
+KALDI  | hedef bulunamadı: MenuScreen/Karakter
+KALDI  | Karakter butonu → beklenen SkinsScreen, bulunan 
+KALDI  | hedef bulunamadı: SkinsScreen/kart-2
+KALDI  | hedef bulunamadı: SkinsScreen/SATIN AL  ·  120
+KALDI  | Satın alma: seçili=0 açık=1 elmas 500→500
+KALDI  | Geri tuşu → Ana menü → beklenen MenuScreen, bulunan 
+KALDI  | hedef bulunamadı: MenuScreen/Görevler
+KALDI  | Görevler butonu → beklenen MissionsScreen, bulunan 
+KALDI  | hedef bulunamadı: MissionsScreen/Görev Modu
+KALDI  | hedef bulunamadı: MissionsScreen/Başarılar
+KALDI  | hedef bulunamadı: MissionsScreen/Görev Modu
+KALDI  | hedef bulunamadı: MissionsScreen/seviye-0
+KALDI  | Görev 1 başlatma → beklenen PlayScreen, bulunan 
+KALDI  | hedef bulunamadı: PlayScreen/ANA MENÜ
+KALDI  | Görev → Ana menü → beklenen MenuScreen, bulunan 
+KALDI  | hedef bulunamadı: MenuScreen/Rekorlar
+KALDI  | Rekorlar butonu → beklenen RecordsScreen, bulunan 
+KALDI  | hedef bulunamadı: RecordsScreen/ikon-3
+KALDI  | Rekorlar geri butonu → beklenen MenuScreen, bulunan 
+KALDI  | hedef bulunamadı: MenuScreen/ikon-2
+KALDI  | Ayarlar butonu → beklenen SettingsScreen, bulunan 
+KALDI  | hedef bulunamadı: SettingsScreen/ayar-ses
+KALDI  | hedef bulunamadı: SettingsScreen/ayar-titresim
+KALDI  | Ayarlar kaydı: ses=1 titreşim=1
+KALDI  | hedef bulunamadı: SettingsScreen/ayar-ses
+KALDI  | hedef bulunamadı: SettingsScreen/İLERLEMEYİ SIFIRLA
+KALDI  | hedef bulunamadı: SettingsScreen/VAZGEÇ
+KALDI  | hedef bulunamadı: SettingsScreen/ÖĞRETİCİYİ OYNA
+KALDI  | Ayarlar → Öğretici → beklenen TutorialScreen, bulunan 
+KALDI  | hedef bulunamadı: TutorialScreen/Kapat
+KALDI  | Öğretici kapat → beklenen MenuScreen, bulunan 
+KALDI  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → beklenen MenuScreen, bulunan TutorialScreen
+KALDI  | Kalıcılık: selectedSkin=0
+GEÇTİ  | Çökme veya ANR yok
+TOPLAM: 4 geçti, 49 kaldı
