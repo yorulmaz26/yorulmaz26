@@ -48,6 +48,8 @@ pref_int() { prefs | grep "name=\"$1\"" | sed -E 's/.*value="(-?[0-9]+)".*/\1/';
 
 adb wait-for-device
 adb shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
+# Android'in ilk tam ekran açılışındaki "Viewing full screen" sistem uyarısı dokunuşları yutar; testte önceden onaylanır.
+adb shell settings put secure immersive_mode_confirmations confirmed >/dev/null 2>&1 || true
 adb shell wm size | tee "$OUT/cihaz.txt"
 adb shell getprop ro.build.version.release | sed 's/^/Android /' | tee -a "$OUT/cihaz.txt"
 
