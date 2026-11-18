@@ -13,4 +13,7 @@ public final class RunResult {
     public int hits;
     public boolean won;
     public int cause;
+    public int maxCombo;
+    public int powerups;
+    public int stars;          // görev modu: 0-3
 }

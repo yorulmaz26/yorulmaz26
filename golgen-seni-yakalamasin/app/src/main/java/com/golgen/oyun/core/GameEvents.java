@@ -8,6 +8,10 @@ public interface GameEvents {
     int DODGE = 4;
     int DEATH = 5;
     int WIN = 6;
+    int POWERUP = 7;       // GameWorld.lastPowerup türü
+    int SHIELD_BREAK = 8;
+    int STAGE = 9;         // GameWorld.stage yeni aşama
+    int COMBO = 10;        // çarpan arttı
 
     void onEvent(int type, float x, float y);
 }

@@ -16,6 +16,10 @@ public final class DifficultyProfile {
     public float[] shadowDelays = {3.0f, 4.6f, 2.3f, 6.0f, 3.7f};
     public int maxShadows = 5;
     public int lives = 3;
+    public float powerupIntervalMin = 12f, powerupIntervalMax = 19f;
+    /** Zorluk tavana ulaştıktan sonra kayma hızına saniye başına eklenen değer (sonsuz modun hiç bitmeyen artışı). */
+    public float overdrivePerSecond = 1.0f, overdriveMax = 260f;
+    public float scrollMul = 1f;
 
     public static DifficultyProfile endless() {
         return new DifficultyProfile();
@@ -39,7 +43,14 @@ public final class DifficultyProfile {
         return time + timeOffset;
     }
 
-    public float scroll(float d) { return scrollStart + (scrollMax - scrollStart) * d; }
+    public float scroll(float d) { return (scrollStart + (scrollMax - scrollStart) * d) * scrollMul; }
+
+    /** Tavandan sonraki ek hız. */
+    public float overdrive(float time) {
+        float over = time + timeOffset - rampSeconds;
+        if (over <= 0f) return 0f;
+        return Math.min(overdriveMax, over * overdrivePerSecond);
+    }
     public float interval(float d) { return intervalStart + (intervalMin - intervalStart) * d; }
     public float gap(float d) { return gapStart + (gapMin - gapStart) * d; }
 }

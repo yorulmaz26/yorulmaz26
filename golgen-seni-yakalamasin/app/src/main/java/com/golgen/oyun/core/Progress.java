@@ -30,6 +30,18 @@ public final class Progress {
     public final int[] dailyProgress = new int[DailyMissions.PER_DAY];
     public int dailyClaimed;        // bit maskesi
 
+    // Uzun süreli ilerleme
+    public final byte[] missionStars = new byte[Missions.ALL.length];
+    public int xp;
+    public int level = 1;
+    public int maxCombo;
+    public int totalPowerups;
+    public int loginStreak;
+    public int lastLoginClaimDay = -1;
+
+    /** Günlük giriş ödülleri (7 günlük döngü, 7. gün büyük ödül). */
+    public static final int[] LOGIN_REWARDS = {10, 15, 20, 25, 35, 45, 100};
+
     // ---------- Kayıt ----------
     public void load(KeyValueStore s) {
         diamonds = s.getInt("diamonds", 0);
@@ -61,6 +73,18 @@ public final class Progress {
             dailyProgress[i] = s.getInt("dailyProg" + i, 0);
         }
         dailyClaimed = s.getInt("dailyClaimed", 0);
+        String stars = s.getString("missionStars", "");
+        java.util.Arrays.fill(missionStars, (byte) 0);
+        for (int i = 0; i < stars.length() && i < missionStars.length; i++) {
+            int v = stars.charAt(i) - '0';
+            if (v >= 0 && v <= 3) missionStars[i] = (byte) v;
+        }
+        xp = Math.max(0, s.getInt("xp", 0));
+        level = Math.max(1, s.getInt("level", 1));
+        maxCombo = s.getInt("maxCombo", 0);
+        totalPowerups = s.getInt("totalPowerups", 0);
+        loginStreak = s.getInt("loginStreak", 0);
+        lastLoginClaimDay = s.getInt("lastLoginClaimDay", -1);
     }
 
     public void save(KeyValueStore s) {
@@ -91,6 +115,15 @@ public final class Progress {
             s.putInt("dailyProg" + i, dailyProgress[i]);
         }
         s.putInt("dailyClaimed", dailyClaimed);
+        StringBuilder st = new StringBuilder(missionStars.length);
+        for (byte b : missionStars) st.append((char) ('0' + b));
+        s.putString("missionStars", st.toString());
+        s.putInt("xp", xp);
+        s.putInt("level", level);
+        s.putInt("maxCombo", maxCombo);
+        s.putInt("totalPowerups", totalPowerups);
+        s.putInt("loginStreak", loginStreak);
+        s.putInt("lastLoginClaimDay", lastLoginClaimDay);
         s.apply();
     }
 
@@ -103,6 +136,8 @@ public final class Progress {
         tutorialDone = false;
         dailyDay = -1; dailyClaimed = 0;
         java.util.Arrays.fill(dailyProgress, 0);
+        java.util.Arrays.fill(missionStars, (byte) 0);
+        xp = 0; level = 1; maxCombo = 0; totalPowerups = 0; loginStreak = 0; lastLoginClaimDay = -1;
     }
 
     // ---------- Günlük ----------
@@ -137,6 +172,63 @@ public final class Progress {
         int n = 0;
         for (int i = 0; i < DailyMissions.PER_DAY; i++) if (dailyDone(i) && !dailyIsClaimed(i)) n++;
         return n;
+    }
+
+    // ---------- Seviye / XP ----------
+    public static int xpForLevel(int level) {
+        return 80 + 40 * level;
+    }
+
+    public static int levelReward(int newLevel) {
+        return 10 + 3 * newLevel;
+    }
+
+    /** XP ekler, atlanan seviye sayısını döndürür ve seviye ödüllerini verir. */
+    public int addXp(int amount, Report out) {
+        xp += Math.max(0, amount);
+        int ups = 0;
+        while (xp >= xpForLevel(level)) {
+            xp -= xpForLevel(level);
+            level++;
+            ups++;
+            int r = levelReward(level);
+            diamonds += r;
+            if (out != null) out.levelReward += r;
+        }
+        return ups;
+    }
+
+    // ---------- Günlük giriş ödülü ----------
+    public boolean loginAvailable(int epochDay) {
+        return lastLoginClaimDay != epochDay;
+    }
+
+    /** Bugün alınacak ödülün seri günü (1..7). */
+    public int nextLoginDay(int epochDay) {
+        int streak = lastLoginClaimDay == epochDay - 1 ? loginStreak + 1 : (lastLoginClaimDay == epochDay ? loginStreak : 1);
+        return (streak - 1) % LOGIN_REWARDS.length + 1;
+    }
+
+    public int claimLogin(int epochDay) {
+        if (!loginAvailable(epochDay)) return 0;
+        loginStreak = lastLoginClaimDay == epochDay - 1 ? loginStreak + 1 : 1;
+        lastLoginClaimDay = epochDay;
+        int r = LOGIN_REWARDS[(loginStreak - 1) % LOGIN_REWARDS.length];
+        diamonds += r;
+        return r;
+    }
+
+    // ---------- Yıldızlar ----------
+    public int totalStars() {
+        int t = 0;
+        for (byte b : missionStars) t += b;
+        return t;
+    }
+
+    public int chapterStars(int chapter) {
+        int t = 0;
+        for (int i = chapter * Missions.PER_CHAPTER; i < (chapter + 1) * Missions.PER_CHAPTER; i++) t += missionStars[i];
+        return t;
     }
 
     // ---------- Karakterler ----------
@@ -176,6 +268,11 @@ public final class Progress {
         public int newAchievements;  // bit maskesi
         public int achievementReward;
         public int dailyCompleted;   // bu oyunla tamamlanan günlükler (bit maskesi)
+        public int xpGained;
+        public int levelUps;
+        public int levelReward;
+        public int stars;            // bu görevde kazanılan yıldız
+        public int newStars;         // önceki rekorun üzerindeki yeni yıldız
     }
 
     public Report applyRun(RunResult r, int epochDay, Report out) {
@@ -184,7 +281,14 @@ public final class Progress {
         out.newAchievements = 0;
         out.achievementReward = 0;
         out.dailyCompleted = 0;
+        out.xpGained = 0;
+        out.levelUps = 0;
+        out.levelReward = 0;
+        out.stars = 0;
+        out.newStars = 0;
         out.diamondsEarned = r.diamonds;
+        totalPowerups += r.powerups;
+        if (r.maxCombo > maxCombo) maxCombo = r.maxCombo;
 
         gamesPlayed++;
         diamonds += r.diamonds;
@@ -203,8 +307,17 @@ public final class Progress {
             boolean first = r.missionIndex >= missionsCompleted;
             if (first) missionsCompleted = Math.min(Missions.ALL.length, r.missionIndex + 1);
             out.missionReward = first ? m.reward : Math.max(5, m.reward / 4);
+            out.stars = r.stars;
+            int old = missionStars[r.missionIndex];
+            if (r.stars > old) {
+                out.newStars = r.stars - old;
+                missionStars[r.missionIndex] = (byte) r.stars;
+                out.missionReward += out.newStars * 10; // yeni yıldız başına ödül
+            }
             diamonds += out.missionReward;
         }
+        out.xpGained = r.score / 10 + (r.won ? 25 : 0) + (int) r.time;
+        out.levelUps = addXp(out.xpGained, out);
 
         ensureDaily(epochDay);
         for (int i = 0; i < DailyMissions.PER_DAY; i++) {
@@ -223,8 +336,8 @@ public final class Progress {
             if (!hasAchievement(id) && Achievements.isMet(id, this, last)) {
                 achievements |= 1 << id;
                 gained |= 1 << id;
-                diamonds += Achievements.REWARD;
-                if (out != null) out.achievementReward += Achievements.REWARD;
+                diamonds += Achievements.REWARDS[id];
+                if (out != null) out.achievementReward += Achievements.REWARDS[id];
             }
         }
         if (out != null) out.newAchievements |= gained;

@@ -1,11 +1,12 @@
 package com.golgen.oyun.core;
 
 /**
- * Günlük görevler: her gün tarih tohumuyla 3 farklı görev seçilir (sunucu gerekmez).
+ * Günlük görevler: her gün tarih tohumuyla 8 türden 3 farklı görev seçilir (sunucu gerekmez).
  */
 public final class DailyMissions {
-    public static final int PLAY = 0, COLLECT = 1, SURVIVE_SINGLE = 2, DODGE = 3, SCORE_SINGLE = 4;
-    private static final int TYPE_COUNT = 5;
+    public static final int PLAY = 0, COLLECT = 1, SURVIVE_SINGLE = 2, DODGE = 3, SCORE_SINGLE = 4,
+            POWERUPS = 5, MISSION_WINS = 6, COMBO_SINGLE = 7;
+    public static final int TYPE_COUNT = 8;
     public static final int PER_DAY = 3;
 
     private DailyMissions() {}
@@ -13,7 +14,8 @@ public final class DailyMissions {
     /** Gün için seçilen görev türleri (birbirinden farklı). */
     public static void typesFor(int epochDay, int[] out) {
         long seed = epochDay * 2654435761L + 12345L;
-        int[] pool = {0, 1, 2, 3, 4};
+        int[] pool = new int[TYPE_COUNT];
+        for (int i = 0; i < TYPE_COUNT; i++) pool[i] = i;
         for (int i = TYPE_COUNT - 1; i > 0; i--) {
             seed = seed * 6364136223846793005L + 1442695040888963407L;
             int j = (int) ((seed >>> 33) % (i + 1));
@@ -22,29 +24,31 @@ public final class DailyMissions {
         for (int i = 0; i < PER_DAY; i++) out[i] = pool[i];
     }
 
-    /** Gün ilerledikçe hedef hafifçe değişir (iki kademe). */
+    /** Gün ilerledikçe hedef değişir (üç kademe). */
     public static int target(int type, int epochDay) {
-        boolean hard = (epochDay & 1) == 1;
+        int tier = Math.floorMod(epochDay, 3);
         switch (type) {
-            case PLAY: return hard ? 5 : 3;
-            case COLLECT: return hard ? 25 : 15;
-            case SURVIVE_SINGLE: return hard ? 60 : 40;
-            case DODGE: return hard ? 15 : 8;
-            default: return hard ? 1200 : 600;
+            case PLAY: return 3 + tier;
+            case COLLECT: return 15 + tier * 10;
+            case SURVIVE_SINGLE: return 40 + tier * 20;
+            case DODGE: return 8 + tier * 5;
+            case POWERUPS: return 3 + tier * 2;
+            case MISSION_WINS: return 1 + tier;
+            case COMBO_SINGLE: return 8 + tier * 4;
+            default: return 600 + tier * 500;
         }
     }
 
     public static int reward(int type, int epochDay) {
-        boolean hard = (epochDay & 1) == 1;
+        int tier = Math.floorMod(epochDay, 3);
         int base;
         switch (type) {
             case PLAY: base = 15; break;
-            case COLLECT: base = 25; break;
-            case SURVIVE_SINGLE: base = 30; break;
-            case DODGE: base = 25; break;
+            case COLLECT: case DODGE: case POWERUPS: base = 25; break;
+            case MISSION_WINS: base = 35; break;
             default: base = 30; break;
         }
-        return hard ? base + 15 : base;
+        return base + tier * 10;
     }
 
     public static String text(int type, int target) {
@@ -53,6 +57,9 @@ public final class DailyMissions {
             case COLLECT: return "Toplam " + target + " elmas topla";
             case SURVIVE_SINGLE: return "Tek oyunda " + target + " sn hayatta kal";
             case DODGE: return "Toplam " + target + " kez gölgeden kaç";
+            case POWERUPS: return target + " güçlendirme topla";
+            case MISSION_WINS: return target + " görev seviyesi tamamla";
+            case COMBO_SINGLE: return "Tek oyunda " + target + " kombo yap";
             default: return "Tek oyunda " + target + " puan yap";
         }
     }
@@ -64,6 +71,9 @@ public final class DailyMissions {
             case COLLECT: return current + r.diamonds;
             case SURVIVE_SINGLE: return Math.max(current, (int) r.time);
             case DODGE: return current + r.dodges;
+            case POWERUPS: return current + r.powerups;
+            case MISSION_WINS: return current + (r.mode == RunResult.MODE_MISSION && r.won ? 1 : 0);
+            case COMBO_SINGLE: return Math.max(current, r.maxCombo);
             default: return Math.max(current, r.score);
         }
     }

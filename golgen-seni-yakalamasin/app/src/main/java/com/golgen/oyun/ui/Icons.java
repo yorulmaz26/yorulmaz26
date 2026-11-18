@@ -11,7 +11,8 @@ public final class Icons {
 
     public static final int NONE = -1, PLAY = 0, PAUSE = 1, GEAR = 2, BACK = 3, TROPHY = 4, TARGET = 5, PERSON = 6,
             SOUND = 7, SOUND_OFF = 8, MUSIC = 9, VIBRATE = 10, HEART = 11, LOCK = 12, CHECK = 13, STAR = 14,
-            RESTART = 15, HOME = 16, BOOK = 17, TRASH = 18, CLOSE = 19, NEXT = 20, CALENDAR = 21;
+            RESTART = 15, HOME = 16, BOOK = 17, TRASH = 18, CLOSE = 19, NEXT = 20, CALENDAR = 21,
+            SHIELD = 22, CLOCK = 23, MAGNET = 24, GIFT = 25;
 
     private static final Path p = new Path();
     private static final RectF r = new RectF();
@@ -219,8 +220,45 @@ public final class Icons {
                 c.drawLine(cx - s * 0.35f, cy - s * 0.8f, cx - s * 0.35f, cy - s * 0.45f, st);
                 c.drawLine(cx + s * 0.35f, cy - s * 0.8f, cx + s * 0.35f, cy - s * 0.45f, st);
                 break;
+            case SHIELD:
+                p.moveTo(cx, cy - s * 0.8f);
+                p.lineTo(cx + s * 0.65f, cy - s * 0.5f);
+                p.quadTo(cx + s * 0.62f, cy + s * 0.45f, cx, cy + s * 0.85f);
+                p.quadTo(cx - s * 0.62f, cy + s * 0.45f, cx - s * 0.65f, cy - s * 0.5f);
+                p.close();
+                c.drawPath(p, fi);
+                break;
+            case CLOCK:
+                st.setStrokeWidth(s * 0.15f);
+                c.drawCircle(cx, cy, s * 0.72f, st);
+                c.drawLine(cx, cy, cx, cy - s * 0.45f, st);
+                c.drawLine(cx, cy, cx + s * 0.32f, cy + s * 0.15f, st);
+                break;
+            case MAGNET:
+                st.setStrokeWidth(s * 0.3f);
+                st.setStrokeCap(Paint.Cap.BUTT);
+                r.set(cx - s * 0.55f, cy - s * 0.55f, cx + s * 0.55f, cy + s * 0.55f);
+                c.drawArc(r, 0, 180, false, st);
+                c.drawLine(cx - s * 0.55f, cy, cx - s * 0.55f, cy - s * 0.7f, st);
+                c.drawLine(cx + s * 0.55f, cy, cx + s * 0.55f, cy - s * 0.7f, st);
+                st.setStrokeCap(Paint.Cap.ROUND);
+                break;
+            case GIFT:
+                r.set(cx - s * 0.7f, cy - s * 0.2f, cx + s * 0.7f, cy + s * 0.75f);
+                c.drawRoundRect(r, s * 0.08f, s * 0.08f, fi);
+                r.set(cx - s * 0.8f, cy - s * 0.5f, cx + s * 0.8f, cy - s * 0.2f);
+                c.drawRoundRect(r, s * 0.08f, s * 0.08f, fi);
+                st.setStrokeWidth(s * 0.14f);
+                c.drawCircle(cx - s * 0.25f, cy - s * 0.7f, s * 0.2f, st);
+                c.drawCircle(cx + s * 0.25f, cy - s * 0.7f, s * 0.2f, st);
+                break;
             default:
                 break;
         }
+    }
+
+    /** Güçlendirme türüne göre ikon. */
+    public static int forPowerup(int type) {
+        return type == 0 ? SHIELD : (type == 1 ? CLOCK : MAGNET);
     }
 }

@@ -9,6 +9,7 @@ import com.golgen.oyun.core.GameEvents;
 import com.golgen.oyun.core.GameWorld;
 import com.golgen.oyun.core.MissionDef;
 import com.golgen.oyun.core.Missions;
+import com.golgen.oyun.core.PowerUp;
 import com.golgen.oyun.core.Progress;
 import com.golgen.oyun.core.RunResult;
 import com.golgen.oyun.core.Synth;
@@ -39,6 +40,11 @@ public final class PlayScreen extends Screen implements GameEvents {
     private float lastX, lastY;
     private float shake, flash;
     private float worldH;
+    private float stageBanner;
+    private String stageText = "";
+    private int lastStage = -1, lastMult = -1;
+    private String multText = "";
+    private boolean dark;
 
     private final Button pauseBtn;
     private final Button resumeBtn, restartBtn, homeBtn, soundBtn, musicBtn, vibBtn;
@@ -122,6 +128,9 @@ public final class PlayScreen extends Screen implements GameEvents {
         pointerId = -1;
         shake = flash = 0f;
         lastScore = lastSec = lastDiamonds = lastProg = -1;
+        lastStage = lastMult = -1;
+        stageBanner = 0f;
+        dark = mission != null && mission.has(MissionDef.MOD_DARK);
         setPausedUi(false);
         syncToggles();
     }
@@ -225,6 +234,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         }
         if (shake > 0f) shake = Math.max(0f, shake - dt * 3f);
         if (flash > 0f) flash = Math.max(0f, flash - dt * 2.5f);
+        if (stageBanner > 0f && phase != PAUSED) stageBanner -= dt;
         if (phase == ENDING && phaseTime > 1.15f) finishRun();
         refreshHud();
     }
@@ -247,6 +257,9 @@ public final class PlayScreen extends Screen implements GameEvents {
             timeText = (sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60);
         }
         if (world.diamonds != lastDiamonds) { lastDiamonds = world.diamonds; diamondText = Integer.toString(lastDiamonds); }
+        if (world.stage != lastStage) { lastStage = world.stage; stageText = "AŞAMA " + lastStage; }
+        int m = world.multiplier();
+        if (m != lastMult) { lastMult = m; multText = "x" + m + " KOMBO"; }
         if (mission != null) {
             int pr = Math.min(mission.target, mission.progress(world));
             if (pr != lastProg) {
@@ -297,6 +310,29 @@ public final class PlayScreen extends Screen implements GameEvents {
                 shake = 1.4f;
                 flash = 0.8f;
                 break;
+            case POWERUP:
+                g.sound.play(Synth.PURCHASE);
+                g.haptics.light();
+                renderer.particles.burst(x, y, 18, com.golgen.oyun.ui.WorldRenderer.powerupColor(world.lastPowerup), 420f, 7f, 0.7f);
+                popups.add(PowerUp.NAMES[world.lastPowerup] + "!", x, y - 50f, com.golgen.oyun.ui.WorldRenderer.powerupColor(world.lastPowerup));
+                break;
+            case SHIELD_BREAK:
+                g.sound.play(Synth.HIT, 0.8f, 1.3f);
+                g.haptics.medium();
+                renderer.particles.burst(x, y, 26, Theme.TEAL, 650f, 7f, 0.7f);
+                popups.add("Kalkan kırıldı", x, y - 70f, Theme.TEAL);
+                shake = 0.6f;
+                break;
+            case STAGE:
+                if (mission == null) {
+                    g.sound.play(Synth.SUCCESS, 0.5f, 1.2f);
+                    stageBanner = 1.8f;
+                }
+                break;
+            case COMBO:
+                g.haptics.light();
+                popups.add("x" + world.multiplier() + " KOMBO!", x, y - 95f, Theme.GOLD);
+                break;
             case WIN:
                 g.sound.play(Synth.SUCCESS);
                 g.haptics.medium();
@@ -319,12 +355,17 @@ public final class PlayScreen extends Screen implements GameEvents {
         renderer.drawBackground(c, w, h, world.scrollDistance);
         boolean playerVisible = !(phase == ENDING && world.state == GameWorld.DEAD);
         renderer.drawWorld(c, world, g.skin(), playerVisible);
+        if (dark) {
+            renderer.drawDarkness(c, world, w, h);
+            renderer.drawShadowHints(c, world);
+        }
         popups.draw(c, renderer.s, u);
         c.restore();
         if (flash > 0f) c.drawColor(Theme.alpha(Theme.WHITE, flash * 0.35f));
 
         drawHud(c);
         if (phase == READY) drawReadyHint(c);
+        if (stageBanner > 0f && phase == PLAYING) drawStageBanner(c);
         if (phase == ENDING) drawEnding(c);
         if (phase == PAUSED && resumeBtn.visible) drawPause(c);
         drawButtons(c);
@@ -339,6 +380,21 @@ public final class PlayScreen extends Screen implements GameEvents {
         float cx = w / 2f;
         Ui.text(c, scoreText, cx, top + 92f * u, 96f * u, Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
         Ui.text(c, timeText, cx, top + 142f * u, 34f * u, Theme.MUTED, Paint.Align.CENTER, Ui.NUMBERS);
+        if (mission == null) {
+            Ui.text(c, stageText, cx + 120f * u, top + 142f * u, 26f * u, Theme.alpha(Theme.TEAL, 0.8f), Paint.Align.LEFT, Ui.BOLD);
+        }
+        if (lastMult > 1) {
+            float pulse = 1f + 0.06f * (float) Math.sin(time * 10f);
+            Ui.text(c, multText, cx - 120f * u, top + 142f * u, 28f * u * pulse, Theme.GOLD, Paint.Align.RIGHT, Ui.BOLD);
+            // kombo süresi çubuğu
+            float k = world.comboTimer / GameWorld.COMBO_WINDOW;
+            Ui.panel(c, cx - 110f * u, top + 154f * u, cx - 110f * u + 220f * u * k, top + 160f * u, 3f * u, Theme.alpha(Theme.GOLD, 0.7f), 0, 0);
+        }
+        // Etkin güçlendirmeler
+        float ex = w - safeR - 80f * u, ey = pauseBtn.rect.bottom + 120f * u;
+        if (world.shield) { drawEffect(c, ex, ey, Icons.SHIELD, Theme.TEAL, 1f); ey += 84f * u; }
+        if (world.slowTimer > 0f) { drawEffect(c, ex, ey, Icons.CLOCK, Theme.PURPLE_LIGHT, world.slowTimer / GameWorld.SLOW_TIME); ey += 84f * u; }
+        if (world.magnetTimer > 0f) { drawEffect(c, ex, ey, Icons.MAGNET, Theme.GOLD, world.magnetTimer / GameWorld.MAGNET_TIME); }
         // Sol: canlar + elmaslar
         float lx = safeL + 44f * u;
         for (int i = 0; i < world.profile().lives; i++) {
@@ -366,6 +422,28 @@ public final class PlayScreen extends Screen implements GameEvents {
                 c.drawCircle(rx - i * 34f * u - 10f * u, ry, 10f * u, Ui.fill);
             }
         }
+    }
+
+    private void drawEffect(Canvas c, float x, float y, int icon, int color, float k) {
+        Ui.fill.setShader(null);
+        Ui.fill.setColor(Theme.alpha(Theme.NAVY_DEEP, 0.85f));
+        c.drawCircle(x, y, 32f * u, Ui.fill);
+        Ui.stroke.setColor(Theme.alpha(color, 0.35f));
+        Ui.stroke.setStrokeWidth(5f * u);
+        c.drawCircle(x, y, 32f * u, Ui.stroke);
+        Ui.stroke.setColor(color);
+        Ui.rf.set(x - 32f * u, y - 32f * u, x + 32f * u, y + 32f * u);
+        c.drawArc(Ui.rf, -90f, 360f * Math.max(0f, Math.min(1f, k)), false, Ui.stroke);
+        Icons.draw(c, icon, x, y, 16f * u, color);
+    }
+
+    private void drawStageBanner(Canvas c) {
+        float t = stageBanner / 1.8f;
+        float a = t > 0.8f ? (1f - t) / 0.2f : Math.min(1f, t / 0.3f);
+        float cy = h * 0.42f;
+        Ui.glow(c, w / 2f, cy - 20f * u, 420f * u, Theme.TEAL, 0.3f * a);
+        Ui.text(c, stageText, w / 2f, cy, 84f * u, Theme.alpha(Theme.WHITE, a), Paint.Align.CENTER, Ui.DISPLAY);
+        Ui.text(c, "Akış hızlanıyor", w / 2f, cy + 60f * u, 34f * u, Theme.alpha(Theme.TEAL, a), Paint.Align.CENTER, Ui.MEDIUM);
     }
 
     private void drawReadyHint(Canvas c) {

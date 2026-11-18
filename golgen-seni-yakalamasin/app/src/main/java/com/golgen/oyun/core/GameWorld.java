@@ -15,6 +15,13 @@ public final class GameWorld {
     public static final float DIAMOND_R = 26f;
     public static final float HIT_SCALE = 0.78f;   // gölge çarpışmasında bağışlayıcı oran
     public static final float NEAR_MISS = 70f;
+    public static final float POWERUP_R = 30f;
+    public static final float SLOW_SCALE = 0.55f;
+    public static final float SLOW_TIME = 3.2f;     // oyun zamanı (≈5,8 gerçek sn)
+    public static final float MAGNET_TIME = 7f;
+    public static final float MAGNET_RANGE = 430f;
+    public static final float COMBO_WINDOW = 4f;
+    public static final float STAGE_SECONDS = 30f;
 
     public static final int RUNNING = 0, DEAD = 1, WON = 2;
     public static final int CAUSE_NONE = 0, CAUSE_SHADOW = 1, CAUSE_OBSTACLE = 2;
@@ -27,6 +34,7 @@ public final class GameWorld {
     public boolean spawnDiamonds = true;
     public boolean shadowsHarmless = false; // öğretici için
     public boolean obstaclesHarmless = false;
+    public boolean spawnPowerups = true;
 
     // --- Durum ---
     public float height = 1778f;
@@ -41,15 +49,23 @@ public final class GameWorld {
     public int diamonds, dodges, hits;
     public float scroll;          // anlık kayma hızı (arka plan için)
     public float scrollDistance;  // toplam kayma
+    // Güçlendirmeler, kombo, aşama
+    public boolean shield;
+    public float slowTimer, magnetTimer, shadowGrace;
+    public int combo, maxCombo, bonus, powerupsCollected, lastPowerup;
+    public float comboTimer;
+    public int stage;
 
     public final MotionRecorder recorder;
     public final Pool<Shadow> shadows;
     public final Pool<Obstacle> obstacles = new Pool<>(48, Obstacle::new);
     public final Pool<Diamond> diamondPool = new Pool<>(16, Diamond::new);
+    public final Pool<PowerUp> powerups = new Pool<>(4, PowerUp::new);
 
     private final Random rng;
     private float nextObstacleAt;
     private float nextDiamondAt;
+    private float nextPowerupAt;
     private float lastGapX = WIDTH / 2f;
     private int nextShadow;
     private final float[] tmp = new float[2];
@@ -92,6 +108,12 @@ public final class GameWorld {
         invuln = 0f;
         diamonds = dodges = hits = 0;
         scrollDistance = 0f;
+        shield = false;
+        slowTimer = magnetTimer = shadowGrace = comboTimer = 0f;
+        combo = maxCombo = bonus = powerupsCollected = 0;
+        stage = 1;
+        powerups.clear();
+        nextPowerupAt = 9f;
         recorder.clear();
         recorder.record(0f, px, py);
         shadows.clear();
@@ -119,7 +141,7 @@ public final class GameWorld {
     public void update(float frameDt) {
         if (state != RUNNING) return;
         if (frameDt > 0.1f) frameDt = 0.1f; // takılmalardan sonra spiral engelleme
-        accumulator += frameDt;
+        accumulator += slowTimer > 0f ? frameDt * SLOW_SCALE : frameDt;
         while (accumulator >= STEP && state == RUNNING) {
             accumulator -= STEP;
             step(STEP);
@@ -127,7 +149,21 @@ public final class GameWorld {
     }
 
     public int score() {
-        return (int) (time * 10f) + diamonds * 25 + dodges * 15;
+        return (int) (time * 10f) + bonus;
+    }
+
+    /** Kombo çarpanı: her 4 ardışık toplama/kaçışta +1, en fazla x5. */
+    public int multiplier() {
+        return 1 + Math.min(4, combo / 4);
+    }
+
+    private void addCombo(int basePoints) {
+        int before = multiplier();
+        combo++;
+        if (combo > maxCombo) maxCombo = combo;
+        comboTimer = COMBO_WINDOW;
+        bonus += basePoints * multiplier();
+        if (multiplier() > before && events != null) events.onEvent(GameEvents.COMBO, px, py);
     }
 
     public float difficulty() {
@@ -137,9 +173,18 @@ public final class GameWorld {
     void step(float dt) {
         time += dt;
         float d = profile.level(time);
-        scroll = profile.scroll(d);
+        scroll = profile.scroll(d) + profile.overdrive(time);
         scrollDistance += scroll * dt;
         if (invuln > 0f) invuln -= dt;
+        if (shadowGrace > 0f) shadowGrace -= dt;
+        if (slowTimer > 0f) slowTimer -= dt;
+        if (magnetTimer > 0f) magnetTimer -= dt;
+        if (comboTimer > 0f) { comboTimer -= dt; if (comboTimer <= 0f) combo = 0; }
+        int st = 1 + (int) (time / STAGE_SECONDS);
+        if (st > stage) {
+            stage = st;
+            if (events != null) events.onEvent(GameEvents.STAGE, px, py);
+        }
 
         // Oyuncu: hedefe en fazla MAX_SPEED ile ilerle
         float dx = tx - px, dy = ty - py;
@@ -163,9 +208,11 @@ public final class GameWorld {
 
         if (spawnObstacles && time >= nextObstacleAt) spawnObstacle(d);
         if (spawnDiamonds && time >= nextDiamondAt) spawnDiamond();
+        if (spawnPowerups && time >= nextPowerupAt) spawnPowerup();
         updateObstacles(dt);
         if (state != RUNNING) return;
         updateDiamonds(dt);
+        updatePowerups(dt);
         checkMission();
     }
 
@@ -204,11 +251,13 @@ public final class GameWorld {
             if (!s.isSolid(time)) continue;
             float d2 = Geometry.dist2(px, py, s.x, s.y);
             if (d2 < hitR * hitR) {
-                if (!shadowsHarmless) {
-                    die(CAUSE_SHADOW);
-                    return;
+                if (shadowsHarmless || shadowGrace > 0f) continue;
+                if (shield) {
+                    breakShield();
+                    continue;
                 }
-                continue;
+                die(CAUSE_SHADOW);
+                return;
             }
             if (d2 < nearR * nearR) {
                 s.wasClose = true;
@@ -217,6 +266,7 @@ public final class GameWorld {
                 if (s.dodgeCooldown <= 0f) {
                     s.dodgeCooldown = 1.5f;
                     dodges++;
+                    addCombo(15);
                     if (events != null) events.onEvent(GameEvents.DODGE, s.x, s.y);
                 }
             }
@@ -333,7 +383,11 @@ public final class GameWorld {
                     break;
                 }
             }
-            if (hit && invuln <= 0f && !obstaclesHarmless) {
+            if (hit && invuln <= 0f && !obstaclesHarmless && shield) {
+                breakShield();
+            } else if (hit && invuln <= 0f && !obstaclesHarmless) {
+                combo = 0;
+                comboTimer = 0f;
                 hits++;
                 lives--;
                 invuln = 1.5f;
@@ -352,13 +406,78 @@ public final class GameWorld {
         for (int i = diamondPool.size() - 1; i >= 0; i--) {
             Diamond dm = diamondPool.get(i);
             dm.y += scroll * dt;
+            if (magnetTimer > 0f) {
+                float mx = px - dm.x, my = py - dm.y;
+                float md2 = mx * mx + my * my;
+                if (md2 < MAGNET_RANGE * MAGNET_RANGE && md2 > 1f) {
+                    float ml = (float) Math.sqrt(md2);
+                    float pull = 950f * dt;
+                    dm.x += mx / ml * pull;
+                    dm.y += my / ml * pull;
+                }
+            }
             dm.phase += dt;
             if (Geometry.dist2(px, py, dm.x, dm.y) < cr * cr) {
                 diamonds++;
+                addCombo(25);
                 if (events != null) events.onEvent(GameEvents.DIAMOND, dm.x, dm.y);
                 diamondPool.free(i);
             } else if (dm.y > height + 60f) {
                 diamondPool.free(i);
+            }
+        }
+    }
+
+    private void breakShield() {
+        shield = false;
+        invuln = 1.5f;
+        shadowGrace = 1.5f;
+        if (events != null) events.onEvent(GameEvents.SHIELD_BREAK, px, py);
+    }
+
+    private void spawnPowerup() {
+        DifficultyProfile p = profile;
+        nextPowerupAt = time + p.powerupIntervalMin + rng.nextFloat() * (p.powerupIntervalMax - p.powerupIntervalMin);
+        float y = -POWERUP_R * 2f;
+        for (int i = 0; i < obstacles.size(); i++) {
+            Obstacle o = obstacles.get(i);
+            if (Math.abs(o.y - y) < o.halfExtent() + 100f) {
+                nextPowerupAt = time + 0.3f;
+                return;
+            }
+        }
+        PowerUp pu = powerups.obtain();
+        if (pu == null) return;
+        int type = rng.nextInt(PowerUp.COUNT);
+        if (type == PowerUp.SHIELD && shield) type = PowerUp.MAGNET;
+        pu.set(type, 80f + rng.nextFloat() * (WIDTH - 160f), y);
+    }
+
+    /** Test ve öğretici için güçlendirme ekleme. */
+    public PowerUp addPowerup(int type, float x, float y) {
+        PowerUp pu = powerups.obtain();
+        if (pu != null) pu.set(type, x, y);
+        return pu;
+    }
+
+    private void updatePowerups(float dt) {
+        float cr = PLAYER_R + POWERUP_R + 6f;
+        for (int i = powerups.size() - 1; i >= 0; i--) {
+            PowerUp pu = powerups.get(i);
+            pu.y += scroll * dt;
+            pu.phase += dt;
+            if (Geometry.dist2(px, py, pu.x, pu.y) < cr * cr) {
+                powerupsCollected++;
+                lastPowerup = pu.type;
+                switch (pu.type) {
+                    case PowerUp.SHIELD: shield = true; break;
+                    case PowerUp.SLOW: slowTimer = SLOW_TIME; break;
+                    default: magnetTimer = MAGNET_TIME; break;
+                }
+                if (events != null) events.onEvent(GameEvents.POWERUP, pu.x, pu.y);
+                powerups.free(i);
+            } else if (pu.y > height + 60f) {
+                powerups.free(i);
             }
         }
     }
@@ -406,6 +525,9 @@ public final class GameWorld {
         out.hits = hits;
         out.won = state == WON;
         out.cause = cause;
+        out.maxCombo = maxCombo;
+        out.powerups = powerupsCollected;
+        out.stars = (mission != null && out.won) ? mission.stars(out) : 0;
         return out;
     }
 }

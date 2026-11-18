@@ -1,19 +1,26 @@
 package com.golgen.oyun.core;
 
-/** Basit başarı sistemi. Her başarı tek seferlik elmas ödülü verir. */
+/** Başarı sistemi (21 başarı). Her başarı tek seferlik elmas ödülü verir. */
 public final class Achievements {
     private Achievements() {}
 
     public static final String[] TITLES = {
-            "İlk Adım", "Gölge Avcısı", "Hayatta Kalan", "Gece Bekçisi", "Koleksiyoncu",
-            "Gardırop", "Görev Adamı", "Efsane", "Kusursuz", "Puan Canavarı"
+            "İlk Adım", "Gölge Avcısı", "Hayatta Kalan", "Gece Bekçisi", "Maraton",
+            "Koleksiyoncu", "Hazine Dağı", "Gardırop", "Tam Koleksiyon", "Alacakaranlık",
+            "Neon Ustası", "Gecenin Efendisi", "Yıldız Avcısı", "Mükemmeliyetçi", "Kusursuz",
+            "Puan Canavarı", "Efsanevi Skor", "Kombo Kralı", "Güç Toplayıcı", "Sadık Oyuncu",
+            "Usta Oyuncu"
     };
     public static final String[] DESCS = {
             "İlk oyununu oyna", "Toplam 50 kez gölgeden kaç", "Tek oyunda 60 sn dayan", "Tek oyunda 180 sn dayan",
-            "Toplam 100 elmas topla", "4 karakter aç", "6 görev tamamla", "12 görevin hepsini tamamla",
-            "Engelsiz bir görevi tamamla", "Tek oyunda 2000 puan yap"
+            "Tek oyunda 300 sn dayan", "Toplam 100 elmas topla", "Toplam 1000 elmas topla", "4 karakter aç",
+            "Tüm karakterleri aç", "1. bölümü bitir (12 görev)", "3 bölümü bitir (36 görev)", "60 görevin hepsini bitir",
+            "Toplam 60 yıldız kazan", "180 yıldızın hepsini kazan", "Engelsiz bir görevi tamamla",
+            "Tek oyunda 2000 puan yap", "Tek oyunda 10000 puan yap", "Tek oyunda 20 kombo yap",
+            "Toplam 25 güçlendirme topla", "7 gün üst üste giriş yap", "10. seviyeye ulaş"
     };
-    public static final int REWARD = 20;
+    public static final int[] REWARDS = {20, 30, 30, 60, 100, 30, 120, 40, 300, 60, 120, 300, 80, 400, 40, 50, 200, 60, 50, 100, 80};
+    public static final int REWARD = 20; // en düşük ödül (eski arayüz metinleri için)
     public static final int COUNT = TITLES.length;
 
     public static boolean isMet(int id, Progress p, RunResult last) {
@@ -22,13 +29,24 @@ public final class Achievements {
             case 1: return p.totalDodges >= 50;
             case 2: return p.bestTime >= 60f;
             case 3: return p.bestTime >= 180f;
-            case 4: return p.totalDiamonds >= 100;
-            case 5: return Integer.bitCount(p.unlockedSkins) >= 4;
-            case 6: return p.missionsCompleted >= 6;
-            case 7: return p.missionsCompleted >= Missions.ALL.length;
-            case 8: return last != null && last.mode == RunResult.MODE_MISSION && last.won
+            case 4: return p.bestTime >= 300f;
+            case 5: return p.totalDiamonds >= 100;
+            case 6: return p.totalDiamonds >= 1000;
+            case 7: return Integer.bitCount(p.unlockedSkins) >= 4;
+            case 8: return Integer.bitCount(p.unlockedSkins) >= Skins.ALL.length;
+            case 9: return p.missionsCompleted >= 12;
+            case 10: return p.missionsCompleted >= 36;
+            case 11: return p.missionsCompleted >= Missions.ALL.length;
+            case 12: return p.totalStars() >= 60;
+            case 13: return p.totalStars() >= Missions.ALL.length * 3;
+            case 14: return last != null && last.mode == RunResult.MODE_MISSION && last.won
                     && Missions.ALL[last.missionIndex].type == MissionDef.NO_HIT;
-            default: return p.bestScore >= 2000;
+            case 15: return p.bestScore >= 2000;
+            case 16: return p.bestScore >= 10000;
+            case 17: return p.maxCombo >= 20;
+            case 18: return p.totalPowerups >= 25;
+            case 19: return p.loginStreak >= 7;
+            default: return p.level >= 10;
         }
     }
 }

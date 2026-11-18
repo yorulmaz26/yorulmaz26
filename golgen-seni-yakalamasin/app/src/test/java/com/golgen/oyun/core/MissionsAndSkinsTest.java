@@ -14,7 +14,7 @@ public class MissionsAndSkinsTest {
     }
 
     @Test public void missionsCoverAllTypes() {
-        boolean[] seen = new boolean[4];
+        boolean[] seen = new boolean[5];
         for (int i = 0; i < Missions.ALL.length; i++) {
             MissionDef m = Missions.ALL[i];
             assertEquals(i, m.index);

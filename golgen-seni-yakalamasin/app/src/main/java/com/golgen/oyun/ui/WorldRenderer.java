@@ -6,6 +6,7 @@ import android.graphics.Shader;
 import com.golgen.oyun.core.Diamond;
 import com.golgen.oyun.core.GameWorld;
 import com.golgen.oyun.core.Obstacle;
+import com.golgen.oyun.core.PowerUp;
 import com.golgen.oyun.core.Shadow;
 import com.golgen.oyun.core.SkinDef;
 
@@ -70,6 +71,7 @@ public final class WorldRenderer {
 
     public void drawWorld(Canvas c, GameWorld w, SkinDef skin, boolean playerVisible) {
         drawDiamonds(c, w);
+        drawPowerups(c, w);
         drawObstacles(c, w);
         drawShadows(c, w, skin);
         particles.draw(c, s);
@@ -83,6 +85,28 @@ public final class WorldRenderer {
             float x = d.x * s, y = (d.y + bob) * s;
             Ui.glow(c, x, y, GameWorld.DIAMOND_R * 3.2f * s, Theme.GOLD, 0.55f);
             Ui.diamond(c, x, y, GameWorld.DIAMOND_R * s, 1f);
+        }
+    }
+
+    public static int powerupColor(int type) {
+        return type == PowerUp.SHIELD ? Theme.TEAL : (type == PowerUp.SLOW ? Theme.PURPLE_LIGHT : Theme.GOLD);
+    }
+
+    private void drawPowerups(Canvas c, GameWorld w) {
+        float r = GameWorld.POWERUP_R * s;
+        for (int i = 0; i < w.powerups.size(); i++) {
+            PowerUp pu = w.powerups.get(i);
+            float x = pu.x * s, y = (pu.y + (float) Math.sin(pu.phase * 3.5f) * 6f) * s;
+            int col = powerupColor(pu.type);
+            float pulse = 0.85f + 0.15f * (float) Math.sin(pu.phase * 6f);
+            Ui.glow(c, x, y, r * 3.6f * pulse, col, 0.7f);
+            Ui.fill.setShader(null);
+            Ui.fill.setColor(Theme.alpha(Theme.NAVY_DEEP, 0.9f));
+            c.drawCircle(x, y, r, Ui.fill);
+            Ui.stroke.setColor(col);
+            Ui.stroke.setStrokeWidth(4f * s);
+            c.drawCircle(x, y, r, Ui.stroke);
+            Icons.draw(c, Icons.forPowerup(pu.type), x, y, r * 0.6f, col);
         }
     }
 
@@ -191,6 +215,52 @@ public final class WorldRenderer {
         Ui.stroke.setColor(Theme.alpha(skin.glowColor, alpha));
         Ui.stroke.setStrokeWidth(3f * s);
         Ui.shape(c, skin.shape, x, y, pr * 1.12f, rot, Ui.stroke);
+        if (w.shield) {
+            float sr = pr * (1.9f + 0.08f * (float) Math.sin(t * 6f));
+            Ui.glow(c, x, y, sr * 1.5f, Theme.TEAL, 0.35f);
+            Ui.stroke.setColor(Theme.alpha(Theme.TEAL, 0.85f));
+            Ui.stroke.setStrokeWidth(4f * s);
+            c.drawCircle(x, y, sr, Ui.stroke);
+        }
+        if (w.magnetTimer > 0f) {
+            Ui.stroke.setColor(Theme.alpha(Theme.GOLD, 0.25f));
+            Ui.stroke.setStrokeWidth(2f * s);
+            c.drawCircle(x, y, GameWorld.MAGNET_RANGE * s * (0.6f + 0.4f * ((t * 1.5f) % 1f)), Ui.stroke);
+        }
+    }
+
+    /** Karanlıkta gölgelerin gözleri görünmeye devam eder (adil uyarı). */
+    public void drawShadowHints(Canvas c, GameWorld w) {
+        float pr = GameWorld.PLAYER_R * s;
+        Ui.fill.setShader(null);
+        for (int i = 0; i < w.shadows.size(); i++) {
+            Shadow sh = w.shadows.get(i);
+            float a = 0.5f + 0.5f * (float) Math.abs(Math.sin(t * 4f + i));
+            Ui.fill.setColor(Theme.alpha(Theme.PURPLE_LIGHT, a));
+            c.drawCircle(sh.x * s - pr * 0.3f, sh.y * s - pr * 0.1f, pr * 0.14f, Ui.fill);
+            c.drawCircle(sh.x * s + pr * 0.3f, sh.y * s - pr * 0.1f, pr * 0.14f, Ui.fill);
+        }
+    }
+
+    // ---------------- Karanlık zorlaştırıcısı ----------------
+    private android.graphics.RadialGradient darkShader;
+    private final android.graphics.Matrix darkMatrix = new android.graphics.Matrix();
+    private float darkR = -1f;
+
+    /** Oyuncu çevresi dışını karartır (yalnızca çizim; oyun mantığını değiştirmez). */
+    public void drawDarkness(Canvas c, GameWorld w, float width, float height) {
+        float r = 330f * s;
+        if (darkShader == null || darkR != r) {
+            darkShader = new android.graphics.RadialGradient(0f, 0f, r,
+                    new int[]{0x00000000, 0x00000000, Theme.alpha(Theme.NAVY_DEEP, 0.75f), Theme.alpha(Theme.NAVY_DEEP, 0.97f)},
+                    new float[]{0f, 0.45f, 0.8f, 1f}, android.graphics.Shader.TileMode.CLAMP);
+            darkR = r;
+        }
+        darkMatrix.setTranslate(w.px * s, w.py * s);
+        darkShader.setLocalMatrix(darkMatrix);
+        Ui.shaderPaint.setShader(darkShader);
+        c.drawRect(0, 0, width, height, Ui.shaderPaint);
+        Ui.shaderPaint.setShader(null);
     }
 
     /** Menü ve önizlemeler için bağımsız karakter çizimi. */

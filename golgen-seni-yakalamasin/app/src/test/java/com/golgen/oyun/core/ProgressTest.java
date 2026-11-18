@@ -118,7 +118,15 @@ public class ProgressTest {
         Progress p = new Progress();
         p.ensureDaily(19000);
         Progress.Report rep = new Progress.Report();
-        for (int i = 0; i < 10; i++) p.applyRun(endless(1500, 70, 30, 20), 19000, rep);
+        for (int i = 0; i < 10; i++) {
+            RunResult r = endless(1500, 70, 30, 20);
+            r.powerups = 3;
+            r.maxCombo = 15;
+            p.applyRun(r, 19000, rep);
+            RunResult m = new RunResult();
+            m.mode = RunResult.MODE_MISSION; m.missionIndex = i; m.won = true; m.time = 30;
+            p.applyRun(m, 19000, rep);
+        }
         for (int i = 0; i < 3; i++) assertTrue("daily " + i, p.dailyDone(i));
     }
 

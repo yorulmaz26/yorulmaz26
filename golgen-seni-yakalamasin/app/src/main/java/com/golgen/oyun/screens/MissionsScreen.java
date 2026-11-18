@@ -29,9 +29,18 @@ public final class MissionsScreen extends Screen {
     private float listTop, listBottom, rowH, colL, colR;
     private final String[] levelDesc = new String[Missions.ALL.length];
     private final String[] levelReward = new String[Missions.ALL.length];
+    private final String[] levelNum = new String[Missions.ALL.length];
+    private final String[] levelGoal = new String[Missions.ALL.length];
+    private final String[] levelMods = new String[Missions.ALL.length];
     private final String[] dailyText = new String[DailyMissions.PER_DAY];
     private final String[] dailyProg = new String[DailyMissions.PER_DAY];
     private String resetText = "";
+    private final String[] achReward = new String[Achievements.COUNT];
+    private final String[] chapterTitle = new String[Missions.CHAPTERS];
+    private final float[] levelY = new float[Missions.ALL.length];
+    private final float[] chapterY = new float[Missions.CHAPTERS];
+    private float levelsHeight, headerH;
+    private final String[] chapterStarText = new String[Missions.CHAPTERS];
 
     public MissionsScreen(GameView g) {
         super(g);
@@ -55,15 +64,26 @@ public final class MissionsScreen extends Screen {
                 dumpTargets();
             }));
         }
+        for (int c = 0; c < Missions.CHAPTERS; c++) {
+            chapterTitle[c] = (c + 1) + ". BÖLÜM  ·  " + Missions.CHAPTER_NAMES[c].toUpperCase(new java.util.Locale("tr"));
+        }
+        for (int i = 0; i < Achievements.COUNT; i++) achReward[i] = "+" + Achievements.REWARDS[i];
         for (int i = 0; i < Missions.ALL.length; i++) {
             levelDesc[i] = Missions.ALL[i].description();
             levelReward[i] = Integer.toString(Missions.ALL[i].reward);
+            levelNum[i] = Integer.toString(i % Missions.PER_CHAPTER + 1);
+            levelGoal[i] = Missions.ALL[i].goal();
+            levelMods[i] = Missions.ALL[i].modsText();
         }
     }
 
     public void showTab(int t) {
         tab = t;
         scroll = 0f;
+        if (t == TAB_LEVELS && levelsHeight > 0f) {
+            int cur = Math.min(Missions.ALL.length - 1, g.progress.missionsCompleted);
+            scroll = clampScroll(levelY[cur] - (rowH + 16f * u) * 1.5f, levelsHeight, listBottom - listTop);
+        }
         scrollVel = 0f;
         for (int i = 0; i < 3; i++) tabs[i].style = i == t ? Button.PRIMARY : Button.GHOST;
         refresh();
@@ -90,6 +110,9 @@ public final class MissionsScreen extends Screen {
             claim[i].label = claimed ? "ALINDI" : (done ? "ÖDÜLÜ AL" : "+" + DailyMissions.reward(type, p.dailyDay));
             claim[i].style = claimed ? Button.GHOST : (done ? Button.GOLD : Button.SECONDARY);
         }
+        for (int c = 0; c < Missions.CHAPTERS; c++) {
+            chapterStarText[c] = p.chapterStars(c) + " / " + (Missions.PER_CHAPTER * 3);
+        }
         long m = g.minutesToMidnight();
         resetText = "Yeni görevler " + (m / 60) + " sa " + (m % 60) + " dk sonra";
         layoutClaims();
@@ -107,6 +130,18 @@ public final class MissionsScreen extends Screen {
         listTop = tt + th + 30f * u;
         listBottom = h - safeB - 30f * u;
         rowH = 180f * u;
+        headerH = 150f * u;
+        float y = 0f;
+        for (int c = 0; c < Missions.CHAPTERS; c++) {
+            chapterY[c] = y;
+            y += headerH;
+            for (int j = 0; j < Missions.PER_CHAPTER; j++) {
+                levelY[c * Missions.PER_CHAPTER + j] = y;
+                y += rowH + 16f * u;
+            }
+            y += 24f * u;
+        }
+        levelsHeight = y;
         layoutClaims();
     }
 
@@ -119,7 +154,7 @@ public final class MissionsScreen extends Screen {
 
     private float contentHeight() {
         switch (tab) {
-            case TAB_LEVELS: return Missions.ALL.length * (rowH + 20f * u);
+            case TAB_LEVELS: return levelsHeight;
             case TAB_ACH: return Achievements.COUNT * (150f * u + 16f * u);
             default: return 0f;
         }
@@ -134,16 +169,20 @@ public final class MissionsScreen extends Screen {
     protected void dumpExtraTargets(String screen) {
         if (tab != TAB_LEVELS) return;
         for (int i = 0; i < Missions.ALL.length; i++) {
-            float cy = listTop + i * (rowH + 20f * u) + rowH / 2f - scroll;
-            if (cy < listBottom) g.debugTarget(screen, "seviye-" + i, (colL + colR) / 2f, cy);
+            float cy = listTop + levelY[i] + rowH / 2f - scroll;
+            if (cy > listTop && cy < listBottom) g.debugTarget(screen, "seviye-" + i, (colL + colR) / 2f, cy);
         }
     }
 
     @Override
     protected void onTap(float x, float y) {
         if (tab != TAB_LEVELS || y < listTop || y > listBottom || x < colL || x > colR) return;
-        int idx = (int) ((y - listTop + scroll) / (rowH + 20f * u));
-        if (idx < 0 || idx >= Missions.ALL.length) return;
+        float yy = y - listTop + scroll;
+        int idx = -1;
+        for (int i = 0; i < Missions.ALL.length; i++) {
+            if (yy >= levelY[i] && yy <= levelY[i] + rowH) { idx = i; break; }
+        }
+        if (idx < 0) return;
         if (g.progress.missionUnlocked(idx)) {
             g.sound.play(Synth.TAP);
             g.startMission(idx);
@@ -185,34 +224,51 @@ public final class MissionsScreen extends Screen {
 
     private void drawLevels(Canvas c) {
         Progress p = g.progress;
+        for (int ch = 0; ch < Missions.CHAPTERS; ch++) {
+            float top = listTop + chapterY[ch] - scroll;
+            if (top > listBottom || top + headerH < listTop - 20f * u) continue;
+            boolean open = p.missionUnlocked(ch * Missions.PER_CHAPTER);
+            Ui.textFit(c, chapterTitle[ch], colL + 10f * u, top + 62f * u,
+                    40f * u, colR - colL - 260f * u, open ? Theme.TEAL : Theme.MUTED, Paint.Align.LEFT, Ui.DISPLAY);
+            Ui.text(c, Missions.CHAPTER_DESCS[ch], colL + 10f * u, top + 108f * u, 28f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
+            float tw = Ui.measure(chapterStarText[ch], 32f * u, Ui.NUMBERS);
+            Ui.text(c, chapterStarText[ch], colR - 10f * u, top + 74f * u, 32f * u, Theme.GOLD, Paint.Align.RIGHT, Ui.NUMBERS);
+            Icons.draw(c, Icons.STAR, colR - 34f * u - tw, top + 63f * u, 20f * u, Theme.GOLD);
+        }
         for (int i = 0; i < Missions.ALL.length; i++) {
-            float top = listTop + i * (rowH + 20f * u) - scroll;
+            float top = listTop + levelY[i] - scroll;
             if (top > listBottom || top + rowH < listTop - 20f * u) continue;
             MissionDef m = Missions.ALL[i];
             boolean unlocked = p.missionUnlocked(i);
             boolean done = i < p.missionsCompleted;
             boolean current = unlocked && !done;
-            int border = current ? Theme.PURPLE : (done ? Theme.alpha(Theme.TEAL, 0.6f) : Theme.LINE);
+            int border = current ? Theme.PURPLE : (m.boss ? Theme.alpha(Theme.GOLD, unlocked ? 0.7f : 0.3f) : (done ? Theme.alpha(Theme.TEAL, 0.5f) : Theme.LINE));
             Ui.panel(c, colL, top, colR, top + rowH, 36f * u, Theme.alpha(Theme.CARD, unlocked ? 0.95f : 0.6f), border, current ? 4f * u : 2f * u);
             float cy = top + rowH / 2f;
-            float nx = colL + 90f * u;
+            float nx = colL + 82f * u;
             Ui.fill.setShader(null);
             Ui.fill.setColor(done ? Theme.TEAL : (current ? Theme.PURPLE : Theme.LINE));
-            c.drawCircle(nx, cy, 48f * u, Ui.fill);
-            if (!unlocked) Icons.draw(c, Icons.LOCK, nx, cy, 24f * u, Theme.MUTED);
-            else if (done) Icons.draw(c, Icons.CHECK, nx, cy, 26f * u, Theme.NAVY);
-            else Ui.text(c, Integer.toString(i + 1), nx, Ui.centerY(cy, 44f * u), 44f * u, Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
+            c.drawCircle(nx, cy, 46f * u, Ui.fill);
+            if (!unlocked) Icons.draw(c, Icons.LOCK, nx, cy, 22f * u, Theme.MUTED);
+            else Ui.text(c, levelNum[i], nx, Ui.centerY(cy, 40f * u), 40f * u, done ? Theme.NAVY : Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
             int tc = unlocked ? Theme.WHITE : Theme.MUTED;
-            Ui.textFit(c, (i + 1) + ". " + m.title, colL + 170f * u, cy - 14f * u, 42f * u, colR - colL - 400f * u, tc, Paint.Align.LEFT, Ui.BOLD);
-            Ui.textFit(c, levelDesc[i], colL + 170f * u, cy + 42f * u, 30f * u, colR - colL - 400f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
-            // Ödül
-            float rx = colR - 60f * u;
-            Ui.text(c, levelReward[i], rx, Ui.centerY(cy, 40f * u), 40f * u, unlocked ? Theme.GOLD : Theme.MUTED, Paint.Align.RIGHT, Ui.NUMBERS);
-            float tw = Ui.measure(levelReward[i], 40f * u, Ui.NUMBERS);
-            Ui.diamond(c, rx - tw - 30f * u, cy, 18f * u, unlocked ? 1f : 0.4f);
-            if (current) {
-                Icons.draw(c, Icons.PLAY, rx - tw - 100f * u, cy, 22f * u, Theme.TEAL);
+            float textL = colL + 150f * u, textW = colR - colL - 360f * u;
+            Ui.textFit(c, m.title, textL, cy - 26f * u, 38f * u, textW, m.boss ? Theme.GOLD : tc, Paint.Align.LEFT, Ui.BOLD);
+            Ui.textFit(c, levelGoal[i], textL, cy + 16f * u, 29f * u, textW, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
+            if (!levelMods[i].isEmpty()) {
+                Ui.textFit(c, levelMods[i], textL, cy + 54f * u, 26f * u, textW, Theme.alpha(Theme.PURPLE_LIGHT, unlocked ? 1f : 0.5f), Paint.Align.LEFT, Ui.BOLD);
             }
+            // Yıldızlar
+            int stars = p.missionStars[i];
+            float sx = colR - 160f * u;
+            for (int k = 0; k < 3; k++) {
+                Icons.draw(c, Icons.STAR, sx + k * 46f * u, cy - 22f * u, 20f * u, k < stars ? Theme.GOLD : Theme.alpha(Theme.LINE, 1f));
+            }
+            // Ödül
+            float rx = colR - 40f * u;
+            Ui.text(c, levelReward[i], rx, Ui.centerY(cy + 34f * u, 34f * u), 34f * u, unlocked ? Theme.GOLD : Theme.MUTED, Paint.Align.RIGHT, Ui.NUMBERS);
+            float tw = Ui.measure(levelReward[i], 34f * u, Ui.NUMBERS);
+            Ui.diamond(c, rx - tw - 24f * u, cy + 34f * u, 15f * u, unlocked ? 1f : 0.4f);
         }
     }
 
@@ -253,7 +309,7 @@ public final class MissionsScreen extends Screen {
             }
             Ui.text(c, Achievements.TITLES[i], colL + 150f * u, cy - 10f * u, 40f * u, has ? Theme.WHITE : Theme.MUTED, Paint.Align.LEFT, Ui.BOLD);
             Ui.textFit(c, Achievements.DESCS[i], colL + 150f * u, cy + 40f * u, 30f * u, colR - colL - 330f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
-            Ui.text(c, has ? "Kazanıldı" : "+" + Achievements.REWARD, colR - 40f * u, Ui.centerY(cy, 34f * u), 34f * u, has ? Theme.TEAL : Theme.GOLD, Paint.Align.RIGHT, Ui.BOLD);
+            Ui.text(c, has ? "Kazanıldı" : achReward[i], colR - 40f * u, Ui.centerY(cy, 34f * u), 34f * u, has ? Theme.TEAL : Theme.GOLD, Paint.Align.RIGHT, Ui.BOLD);
         }
     }
 }

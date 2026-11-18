@@ -169,12 +169,13 @@ public class GameWorldTest {
         w.obstaclesHarmless = true;
         float lastGap = -1;
         int walls = 0;
-        java.util.IdentityHashMap<Obstacle, Boolean> seen = new java.util.IdentityHashMap<>();
+        java.util.IdentityHashMap<Obstacle, Float> seen = new java.util.IdentityHashMap<>();
         for (int f = 0; f < 60 * 300; f++) {
             w.update(1f / 60f);
             for (int i = 0; i < w.obstacles.size(); i++) {
                 Obstacle o = w.obstacles.get(i);
-                if (o.type == Obstacle.WALL && o.y < 0 && seen.put(o, true) == null) {
+                Float prev = o.type == Obstacle.WALL && o.y < 0 ? seen.put(o, o.gapX) : Float.valueOf(o.gapX);
+                if (o.type == Obstacle.WALL && o.y < 0 && (prev == null || prev != o.gapX)) {
                     assertTrue(o.gapW >= 4 * GameWorld.PLAYER_R * 1.9f);
                     assertTrue(o.gapX - o.gapW / 2 >= 0 && o.gapX + o.gapW / 2 <= GameWorld.WIDTH);
                     if (lastGap >= 0) assertTrue(Math.abs(o.gapX - lastGap) <= 560f + 1e-3);
@@ -182,8 +183,6 @@ public class GameWorldTest {
                     walls++;
                 }
             }
-            for (Obstacle o : seen.keySet()) { /* tekrar kullanılan nesneler */ }
-            if (f % 600 == 0) seen.clear();
         }
         assertTrue(walls > 50);
     }
