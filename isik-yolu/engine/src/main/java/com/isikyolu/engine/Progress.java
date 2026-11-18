@@ -1,0 +1,146 @@
+package com.isikyolu.engine;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/** Oyuncu ilerlemesi. Platformdan bağımsızdır; JSON metni olarak kaydedilir. */
+public final class Progress {
+    public static final int LEVEL_COUNT = 100;
+    public static final int START_HINTS = 5;
+
+    /** stars[1..100]; 0 = tamamlanmadı. */
+    public final int[] stars = new int[LEVEL_COUNT + 1];
+    /** En iyi hamle sayısı (0 = yok). */
+    public final int[] bestMoves = new int[LEVEL_COUNT + 1];
+    public int hints = START_HINTS;
+    public int hintsUsedTotal;
+    public int levelsWithoutHint;
+    public int undoCount;
+    public final Set<String> dailyDone = new LinkedHashSet<>();
+    public final Set<String> achievements = new LinkedHashSet<>();
+    public boolean sound = true, music = true, vibration = true;
+    public boolean tutorialSeen;
+    public int lastPlayed = 1;
+
+    public boolean isUnlocked(int level) {
+        return level == 1 || (level >= 2 && level <= LEVEL_COUNT && stars[level - 1] > 0);
+    }
+
+    public int completedCount() {
+        int n = 0;
+        for (int i = 1; i <= LEVEL_COUNT; i++) if (stars[i] > 0) n++;
+        return n;
+    }
+
+    public int totalStars() {
+        int n = 0;
+        for (int i = 1; i <= LEVEL_COUNT; i++) n += stars[i];
+        return n;
+    }
+
+    public int threeStarCount() {
+        int n = 0;
+        for (int i = 1; i <= LEVEL_COUNT; i++) if (stars[i] == 3) n++;
+        return n;
+    }
+
+    /** İlk tamamlanmamış açık bölüm. */
+    public int nextLevel() {
+        for (int i = 1; i <= LEVEL_COUNT; i++) if (stars[i] == 0) return i;
+        return LEVEL_COUNT;
+    }
+
+    /**
+     * Bölüm sonucunu kaydeder. Yıldız ve hamle rekoru yalnızca iyileşirse güncellenir.
+     * @return ilk kez tamamlandıysa true
+     */
+    public boolean recordLevel(int level, int stars, int moves, boolean usedHint) {
+        boolean first = this.stars[level] == 0;
+        if (stars > this.stars[level]) this.stars[level] = stars;
+        if (bestMoves[level] == 0 || moves < bestMoves[level]) bestMoves[level] = moves;
+        if (first) {
+            if (!usedHint) levelsWithoutHint++;
+            if (stars == 3) hints++; // ödül: ilk seferde 3 yıldız +1 ipucu
+        }
+        lastPlayed = Math.min(LEVEL_COUNT, level + 1);
+        return first;
+    }
+
+    public boolean useHint() {
+        if (hints <= 0) return false;
+        hints--;
+        hintsUsedTotal++;
+        return true;
+    }
+
+    /** Günlük bulmacada art arda gün sayısı (bugünden geriye). */
+    public int dailyStreak(int todayEpochDay) {
+        int s = 0;
+        while (dailyDone.contains(DailyPuzzle.keyFor(todayEpochDay - s))) s++;
+        return s;
+    }
+
+    public void resetAll() {
+        Progress fresh = new Progress();
+        System.arraycopy(fresh.stars, 0, stars, 0, stars.length);
+        System.arraycopy(fresh.bestMoves, 0, bestMoves, 0, bestMoves.length);
+        hints = START_HINTS; hintsUsedTotal = 0; levelsWithoutHint = 0; undoCount = 0;
+        dailyDone.clear(); achievements.clear(); tutorialSeen = false; lastPlayed = 1;
+    }
+
+    public String serialize() {
+        Map<String, Object> m = new LinkedHashMap<>();
+        m.put("v", 1);
+        List<Object> s = new ArrayList<>(), b = new ArrayList<>();
+        for (int i = 1; i <= LEVEL_COUNT; i++) { s.add(stars[i]); b.add(bestMoves[i]); }
+        m.put("stars", s);
+        m.put("best", b);
+        m.put("hints", hints);
+        m.put("hintsUsed", hintsUsedTotal);
+        m.put("noHint", levelsWithoutHint);
+        m.put("undo", undoCount);
+        m.put("daily", new ArrayList<Object>(dailyDone));
+        m.put("ach", new ArrayList<Object>(achievements));
+        m.put("sound", sound);
+        m.put("music", music);
+        m.put("vib", vibration);
+        m.put("tut", tutorialSeen);
+        m.put("last", lastPlayed);
+        return Json.write(m);
+    }
+
+    /** Bozuk veya boş kayıtta varsayılan ilerleme döner. */
+    @SuppressWarnings("unchecked")
+    public static Progress deserialize(String text) {
+        Progress p = new Progress();
+        if (text == null || text.isEmpty()) return p;
+        try {
+            Map<String, Object> m = (Map<String, Object>) Json.parse(text);
+            List<Object> s = (List<Object>) m.get("stars"), b = (List<Object>) m.get("best");
+            for (int i = 1; i <= LEVEL_COUNT; i++) {
+                if (s != null && i - 1 < s.size()) p.stars[i] = Math.max(0, Math.min(3, ((Number) s.get(i - 1)).intValue()));
+                if (b != null && i - 1 < b.size()) p.bestMoves[i] = ((Number) b.get(i - 1)).intValue();
+            }
+            p.hints = Json.getInt(m, "hints", START_HINTS);
+            p.hintsUsedTotal = Json.getInt(m, "hintsUsed", 0);
+            p.levelsWithoutHint = Json.getInt(m, "noHint", 0);
+            p.undoCount = Json.getInt(m, "undo", 0);
+            Object d = m.get("daily");
+            if (d instanceof List) for (Object o : (List<Object>) d) p.dailyDone.add(String.valueOf(o));
+            Object a = m.get("ach");
+            if (a instanceof List) for (Object o : (List<Object>) a) p.achievements.add(String.valueOf(o));
+            p.sound = Json.getBool(m, "sound", true);
+            p.music = Json.getBool(m, "music", true);
+            p.vibration = Json.getBool(m, "vib", true);
+            p.tutorialSeen = Json.getBool(m, "tut", false);
+            p.lastPlayed = Json.getInt(m, "last", 1);
+            return p;
+        } catch (RuntimeException e) {
+            return new Progress();
+        }
+    }
+}
