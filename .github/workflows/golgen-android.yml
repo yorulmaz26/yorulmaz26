@@ -85,7 +85,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash golgen-seni-yakalamasin/tools/smoke_test.sh dist/GolgenSeniYakalamasin-debug.apk ui-test-out
+          script: timeout 900 bash golgen-seni-yakalamasin/tools/smoke_test.sh dist/GolgenSeniYakalamasin-debug.apk ui-test-out
       - name: Ekran görüntülerini günlüğe yaz
         if: always()
         working-directory: .
@@ -98,6 +98,10 @@ jobs:
           cat ui-test-out/test_sonuclari.txt >> $GITHUB_STEP_SUMMARY || true
           echo "----- logcat hataları -----"
           grep -E "AndroidRuntime|FATAL|golgen" ui-test-out/logcat.txt | grep -v GolgenUI | tail -40 || true
+          echo "----- adımlar -----"
+          cat ui-test-out/adimlar.txt || true
+          echo "----- canlı logcat (son 40) -----"
+          tail -40 ui-test-out/canli_logcat.txt || true
           echo "----- son ekran olayları -----"
           grep "GolgenUI" ui-test-out/logcat.txt | grep -v hedef | tail -15 || true
           echo "----- FPS -----"
@@ -122,7 +126,8 @@ jobs:
               [ -f "$f" ] || continue
               convert "$f" -resize 540x "$D/$(basename "$f")" 2>/dev/null || cp "$f" "$D/"
             done
-            cp ui-test-out/test_sonuclari.txt ui-test-out/fps.txt ui-test-out/cihaz.txt "$D/" 2>/dev/null || true
+            cp ui-test-out/test_sonuclari.txt ui-test-out/fps.txt ui-test-out/cihaz.txt ui-test-out/adimlar.txt "$D/" 2>/dev/null || true
+          tail -300 ui-test-out/canli_logcat.txt > "$D/canli_logcat_son.txt" 2>/dev/null || true
             grep GolgenUI ui-test-out/logcat.txt > "$D/ui_olaylari.txt" 2>/dev/null || true
             git add -A "$D"
             git diff --cached --quiet && exit 0
