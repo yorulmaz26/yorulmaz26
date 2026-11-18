@@ -22,8 +22,13 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   sohbet başına otomatik kuş dili (G/F/C/özel kural), yazarken önizleme,
   dokununca animasyonlu çözme, görünüm tercihi.
 
-⚠️ Mesajlar henüz **uçtan uca şifreli değil** (Aşama 7). Bu sürüm gerçek
-kullanıcılara yayınlanmamalıdır.
+* **Uçtan uca şifreleme (Aşama 7a)**: Signal Protokolü (X3DH + Double
+  Ratchet), özel anahtarlar cihazın Keystore/Keychain'inde, sunucuda yalnızca
+  şifreli metin, cihazda AES-GCM ile şifreli önbellek, güvenlik numarası.
+
+⚠️ Kullanılan Signal kütüphanesi (`libsignal_protocol_dart`) bağımsız olarak
+denetlenmiş değildir. Yayından önce resmî libsignal'e geçiş veya bağımsız
+güvenlik incelemesi gerekir (bkz. `docs/ARCHITECTURE.md` §4).
 
 ## Kurulum
 

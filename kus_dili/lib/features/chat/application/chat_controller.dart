@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../crypto/domain/signal_sealer.dart';
 import '../domain/chat.dart';
 import '../domain/chat_settings.dart';
 import '../domain/message_payload.dart';
@@ -97,6 +98,17 @@ class ChatController extends Notifier<ComposerState> {
       }
       if (ref.mounted) state = const ComposerState();
       return true;
+    } on RecipientHasNoKeysException {
+      if (ref.mounted) {
+        state = ComposerState(
+          replyTo: reply,
+          editing: editing,
+          error:
+              'Karşı taraf henüz şifreli mesaj alamıyor; uygulamayı '
+              'güncelleyip bir kez açması gerekiyor.',
+        );
+      }
+      return false;
     } catch (_) {
       if (ref.mounted) {
         state = ComposerState(

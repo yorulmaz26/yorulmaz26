@@ -10,7 +10,13 @@ abstract interface class MessageSealer {
 
   Future<String> seal(String chatId, MessagePayload payload);
 
-  Future<MessagePayload> open(String chatId, int encVersion, String body);
+  /// [senderId]: mesajı gönderen (şifre çözmede karşı tarafın adresi).
+  Future<MessagePayload> open(
+    String chatId,
+    String senderId,
+    int encVersion,
+    String body,
+  );
 }
 
 final class UnsupportedEncryptionException implements Exception {
@@ -34,6 +40,7 @@ final class PlaintextDevSealer implements MessageSealer {
   @override
   Future<MessagePayload> open(
     String chatId,
+    String senderId,
     int encVersion,
     String body,
   ) async {

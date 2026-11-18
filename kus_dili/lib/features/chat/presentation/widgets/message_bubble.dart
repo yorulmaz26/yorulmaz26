@@ -59,6 +59,7 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
     final opened = ref.watch(
       openedPayloadProvider((
         chatId: widget.chatId,
+        senderId: m.senderId,
         encVersion: m.encVersion,
         body: m.body,
       )),
@@ -76,7 +77,7 @@ class _MessageBubbleState extends ConsumerState<MessageBubble> {
         color: AppColors.nightRaised,
         border: null,
         child: Text(
-          'Bu mesaj açılamadı.',
+          'Bu mesaj bu cihazda açılamıyor.',
           style: text.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
         ),
       ),

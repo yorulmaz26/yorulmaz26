@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../features/auth/application/auth_providers.dart';
 import '../features/auth/presentation/phone_auth_screen.dart';
+import '../features/crypto/presentation/safety_number_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
@@ -23,6 +24,8 @@ abstract final class Routes {
   static const profile = '/profile';
   static const newChat = '/chats/new';
   static String chat(String id) => '/chats/$id';
+  static String safetyNumber(String chatId, String uid) =>
+      '/chats/$chatId/safety/$uid';
 }
 
 /// Oturum durumuna göre yönlendirme. Saf fonksiyon; birim testi vardır.
@@ -90,6 +93,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/chats/:id',
         builder: (context, state) =>
             ChatScreen(chatId: state.pathParameters['id']!),
+        routes: [
+          GoRoute(
+            path: 'safety/:uid',
+            builder: (context, state) =>
+                SafetyNumberScreen(otherUid: state.pathParameters['uid']!),
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.firebaseSetup,

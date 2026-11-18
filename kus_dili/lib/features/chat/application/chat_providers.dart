@@ -2,6 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/firebase/firebase_providers.dart';
 import '../../auth/application/auth_providers.dart';
+import '../../crypto/application/crypto_providers.dart';
+import '../../crypto/domain/signal_sealer.dart';
 import '../../profile/application/profile_providers.dart';
 import '../../profile/domain/user_profile.dart';
 import '../data/firestore_chat_repository.dart';
@@ -19,10 +21,26 @@ final chatSettingsRepositoryProvider = Provider<ChatSettingsRepository>(
   (ref) => FirestoreChatSettingsRepository(ref.watch(firestoreProvider)),
 );
 
-/// Aşama 7'de uçtan uca şifreleyen uygulamayla değiştirilecek.
-final messageSealerProvider = Provider<MessageSealer>(
-  (ref) => const PlaintextDevSealer(),
-);
+/// Uçtan uca şifreleme (Signal). Geliştirme döneminde yazılmış şifresiz
+/// (encVersion 0) mesajlar yalnızca okunabilir.
+final messageSealerProvider = Provider<MessageSealer>((ref) {
+  final uid = ref.watch(myUidProvider);
+  final store = ref.watch(signalStoreProvider);
+  final cache = ref.watch(payloadCacheProvider);
+  final keys = ref.watch(keyManagerProvider);
+  if (uid == null || store == null || cache == null || keys == null) {
+    return const PlaintextDevSealer();
+  }
+  return CompositeSealer(
+    SignalSealer(
+      myUid: uid,
+      store: store,
+      directory: ref.watch(keyDirectoryProvider),
+      cache: cache,
+      ensureKeys: keys.ensureKeys,
+    ),
+  );
+});
 
 final myUidProvider = Provider<String?>(
   (ref) => ref.watch(authStateProvider.select((a) => a.value?.uid)),
@@ -59,9 +77,15 @@ final chatSettingsProvider = StreamProvider.family<ChatSettings, String>((
 
 /// Mühürlü mesajı açar. Anahtar gövdeyi de içerdiği için düzenlenen mesaj
 /// yeniden açılır.
-typedef SealedRef = ({String chatId, int encVersion, String body});
+typedef SealedRef = ({
+  String chatId,
+  String senderId,
+  int encVersion,
+  String body,
+});
 
 final openedPayloadProvider = FutureProvider.family<MessagePayload, SealedRef>(
-  (ref, s) =>
-      ref.watch(messageSealerProvider).open(s.chatId, s.encVersion, s.body),
+  (ref, s) => ref
+      .watch(messageSealerProvider)
+      .open(s.chatId, s.senderId, s.encVersion, s.body),
 );

@@ -150,8 +150,8 @@ service cloud.firestore {
                ['senderId', 'sentAt', 'encVersion', 'body', 'deleted'])
           && request.resource.data.senderId == request.auth.uid
           && request.resource.data.sentAt == request.time
-          // 0 = geliştirme (şifresiz). Yayından önce yalnızca 1 kabul edilecek.
-          && request.resource.data.encVersion in [0, 1]
+          // Yalnızca uçtan uca şifreli (Signal) gövde kabul edilir.
+          && request.resource.data.encVersion == 1
           && request.resource.data.body is string
           && request.resource.data.body.size() > 0
           && request.resource.data.body.size() <= 65536
@@ -176,6 +176,40 @@ service cloud.firestore {
           );
 
         allow delete: if false;
+      }
+    }
+
+    // ------------------------------------------------- Açık anahtar dizini
+    // Yalnızca AÇIK anahtarlar. Özel anahtarlar cihazdan çıkmaz.
+    match /keyBundles/{uid} {
+      allow read: if verified();
+      allow create, update: if isSelf(uid)
+        && request.resource.data.keys().hasOnly(['registrationId', 'identityKey',
+             'signedPreKeyId', 'signedPreKey', 'signedPreKeySignature', 'updatedAt'])
+        && request.resource.data.keys().hasAll(['registrationId', 'identityKey',
+             'signedPreKeyId', 'signedPreKey', 'signedPreKeySignature', 'updatedAt'])
+        && request.resource.data.registrationId is int
+        && request.resource.data.signedPreKeyId is int
+        && request.resource.data.identityKey is string
+        && request.resource.data.identityKey.size() <= 64
+        && request.resource.data.signedPreKey is string
+        && request.resource.data.signedPreKey.size() <= 64
+        && request.resource.data.signedPreKeySignature is string
+        && request.resource.data.signedPreKeySignature.size() <= 128
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if false;
+
+      // Tek kullanımlık ön-anahtarlar: sahibi ekler; oturum kurmak isteyen
+      // herhangi bir doğrulanmış kullanıcı bir tanesini tüketir (siler).
+      match /prekeys/{keyId} {
+        allow read: if verified();
+        allow create: if isSelf(uid)
+          && keyId.matches('^[0-9]{1,8}$')
+          && request.resource.data.keys().hasOnly(['key'])
+          && request.resource.data.key is string
+          && request.resource.data.key.size() <= 64;
+        allow delete: if verified();
+        allow update: if false;
       }
     }
 

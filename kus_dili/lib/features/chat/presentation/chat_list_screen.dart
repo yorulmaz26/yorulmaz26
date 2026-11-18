@@ -4,6 +4,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../crypto/application/crypto_providers.dart';
 import '../application/chat_providers.dart';
 import '../domain/chat.dart';
 
@@ -15,6 +16,8 @@ class ChatListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final chats = ref.watch(chatsProvider);
+    // Anahtarlar yayımlansın ki başkaları bize şifreli yazabilsin.
+    ref.watch(e2eeBootstrapProvider);
     final me = ref.watch(myUidProvider);
     return Scaffold(
       appBar: AppBar(

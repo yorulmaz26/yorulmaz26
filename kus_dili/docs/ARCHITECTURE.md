@@ -112,42 +112,65 @@ Kalan gerçek belirsizlikler açıkça raporlanır, sessizce tahmin edilmez:
 | Korunan bölüm aynı zamanda geçerli kodlama ("aga@x.ogo" ← "a@x.o") | Korunan yorum seçilir, `ambiguousProtectedSegment` uyarısı |
 | Kısa metnin varyantı ("gaga") | Tespit eşiği (≥2 sesli, ≥%90 uyum); mesajlaşmada tespit yerine varyant mesajla taşınır |
 
-## 4. Uçtan uca şifreleme (Aşama 7)
+## 4. Uçtan uca şifreleme (Aşama 7a) ✅
 
-**Hedef protokol:** Signal Protokolü (X3DH/PQXDH anahtar anlaşması + Double
-Ratchet; gruplar için Sender Keys).
+**Protokol:** Signal Protokolü — X3DH anahtar anlaşması + Double Ratchet
+(ileriye dönük gizlilik, ele geçirme sonrası kendini onarma). Kendi
+kriptografi protokolümüzü yazmadık.
 
-**Kütüphane kararı (Aşama 7'de kesinleşecek):**
+**Kütüphane:** [`libsignal_protocol_dart`](https://pub.dev/packages/libsignal_protocol_dart)
+(Signal'in Java uygulamasının saf Dart portu). Bu ortamda derlenip test
+edilebilen tek seçenek buydu.
 
-* Tercih: Signal'in resmî, denetlenmiş **libsignal** (Rust) kütüphanesi; Android'de
-  Java/Kotlin, iOS'ta Swift bağlamaları üzerinden platform kanalıyla.
-* Alternatif: `libsignal_protocol_dart` — saf Dart portu, kullanışlı ancak
-  **bağımsız güvenlik denetiminden geçtiğine dair bilgi yok**; bu yüzden
-  üretimde tercih edilmez.
-* Kendi kriptografi protokolümüzü **yazmayacağız**.
+> ⚠️ **Dürüst durum:** Bu port Signal'in resmî kütüphanesi değildir ve bağımsız
+> bir güvenlik denetiminden geçtiğine dair bilgi bulamadım. Protokol doğru,
+> uygulama testli; ama **denetlenmiş** değil. Yayından önce iki yoldan biri
+> gerekir: (1) Signal'in resmî `libsignal` (Rust) kütüphanesine Android/iOS
+> yerel bağlamalarıyla geçmek (arayüz `MessageSealer` olduğu için uygulamanın
+> geri kalanı değişmez) veya (2) mevcut uygulamanın bağımsız bir güvenlik
+> incelemesinden geçirilmesi. Bu yapılmadan uygulamada "güvenli/denetlenmiş"
+> iddiası kullanılmamalıdır.
 
-**Akış:**
+**Nasıl çalışır:**
 
-1. Kayıtta cihaz kimlik anahtarı, imzalı ön-anahtar ve tek kullanımlık
-   ön-anahtarlar üretilir. Özel anahtarlar `flutter_secure_storage`'da kalır;
-   yalnızca **açık** anahtar paketi `users/{uid}/devices/{deviceId}` altına yazılır.
-2. Gönderici, alıcının her cihazı için oturum kurar ve şu paketi şifreler:
-   ```json
-   { "v": 1, "type": "text", "text": "Seni seviyorum",
-     "display": { "mode": "kusDili", "variant": {"id": "g"} },
-     "replyTo": null, "expiresInSec": null, "viewOnce": false }
-   ```
-3. Firestore'a yalnızca şifreli metin ve yönlendirme için gereken asgari üst veri yazılır.
-4. Güvenlik numarası (safety number) karşılaştırma ekranı sunulur.
+1. İlk açılışta cihaz; kimlik anahtar çifti, kayıt kimliği, imzalı ön-anahtar
+   ve 100 tek kullanımlık ön-anahtar üretir. Özel anahtarlar ve oturum
+   durumları yalnızca cihazın güvenli deposunda (Android Keystore / iOS
+   Keychain, `flutter_secure_storage`) tutulur. Sunucuya yalnızca **açık**
+   anahtarlar yazılır: `keyBundles/{uid}` ve `keyBundles/{uid}/prekeys/{id}`.
+   Ön-anahtarlar 25'in altına düşünce 100 yenisi eklenir.
+2. Gönderen, alıcıyla oturumu yoksa bir ön-anahtarı atomik olarak tüketip
+   (Firestore işlemi) oturum kurar. Mesaj paketi (orijinal metin + gösterim
+   modu + kuş dili kuralı + yanıt bilgisi) **gönderen cihazda** şifrelenir.
+   Firestore'a yalnızca `{t: tür, c: şifreli metin}` ve yönlendirme üst verisi
+   yazılır; kurallar şifresiz gövdeyi (`encVersion` 0) artık reddeder.
+3. Alıcı cihaz şifreyi çözer ve kuş dili dönüşümünü **kendi cihazında** yapar.
+4. Signal bir mesajı yalnızca bir kez çözebilir (ileriye dönük gizlilik).
+   Çözülen ve gönderilen içerik bu yüzden cihazda, anahtarı Keystore/Keychain'de
+   duran **AES-256-GCM** ile şifreli bir önbellekte tutulur
+   (`EncryptedFilePayloadCache`).
+5. **Güvenlik numarası:** 60 haneli sayısal parmak izi; iki taraf karşılaştırır.
+   Karşı tarafın kimlik anahtarı değişirse (ör. telefonu sıfırladı) oturum
+   yenilenir ve sohbette sarı uyarı bandı çıkar (ilk kullanımda güven + uyarı).
+6. Tüm Signal durum değişiklikleri sıraya alınır; aynı mesajın eşzamanlı
+   açılması tekilleştirilir.
 
-**Dürüst sınırlar:** Üst veri (kim, kiminle, ne zaman) sunucuda görünür. Kayıp
-cihaz, ekran görüntüsü ve kötü amaçlı yazılım E2EE'nin kapsamı dışındadır.
-Bağımsız güvenlik incelemesi yapılmadan uygulamada "güvenli" iddiası
-**kullanılmayacak**.
+**Bilinen sınırlar (henüz yapılmadı):**
 
-> ⚠️ Aşama 4–6'daki mesajlaşma henüz E2EE içermez. Veri modeli baştan şifreli
-> gövdeye hazır tasarlanır (`ciphertext`, `encVersion`), ancak Aşama 7
-> tamamlanmadan uygulama gerçek kullanıcılara **yayınlanmamalıdır**.
+* Kullanıcı başına **tek cihaz**. İkinci cihaz/yeniden kurulumda eski mesajlar
+  o cihazda açılamaz ("Bu mesaj bu cihazda açılamıyor"); yedekleme yok.
+* İmzalı ön-anahtar periyodik olarak döndürülmüyor.
+* Kimlik değişince mesaj gönderimi engellenmiyor, yalnızca uyarı veriliyor.
+* Üst veri (kim, kiminle, ne zaman) sunucuda görünür. Kayıp cihaz, ekran
+  görüntüsü ve kötü amaçlı yazılım E2EE'nin kapsamı dışındadır.
+* Mesaj araması cihazdaki şifreli önbellekte yapılacak; henüz arayüzü yok.
+
+**Testler:** iki gerçek Signal istemcisi aynı sahte Firestore üzerinden
+konuşur (`test/features/crypto/e2ee_test.dart`): sunucuda açık metin olmaması,
+karşılıklı yazışma, sıra dışı ve eşzamanlı çözme, ileriye dönük gizlilik,
+bozulmuş şifreli metnin reddi, yeniden başlatma, karşı tarafın yeniden
+kurulumu, güvenlik numarasının iki tarafta eşitliği, ön-anahtar yenileme.
+Uçtan uca arayüz testleri de gerçek şifrelemeyle çalışır.
 
 ## 5. Firestore veri modeli
 
@@ -174,10 +197,9 @@ Aşama 4–6'da uygulananlar (kurallar emülatörde 31 testle doğrulanır):
   `body` (mühürlü paket, ≤64 KB), `deleted`, `editedAt`. Mesaj kimliği istemcide
   üretilir (tekrar denemede çift mesaj olmaz). Silme = içeriği boşaltma.
 * `users/{uid}/chatSettings/{chatId}`: gönderim modu, varyant, görünüm; yalnızca sahibi.
-* Mesaj gövdesi `MessageSealer` arayüzünden geçer. Şu an `PlaintextDevSealer`
-  (`encVersion` 0, **şifresiz**) kullanılıyor ve sohbet ekranında bunu söyleyen
-  bir uyarı bandı var. Aşama 7'de yerine E2EE uygulaması gelecek; kurallar
-  yayından önce yalnızca `encVersion` 1'i kabul edecek şekilde daraltılacak.
+* Mesaj gövdesi `MessageSealer` arayüzünden geçer: Aşama 7a'dan itibaren
+  `SignalSealer` (`encVersion` 1). Kurallar yalnızca `encVersion` 1'i kabul eder;
+  geliştirme döneminden kalan şifresiz mesajlar yalnızca okunabilir.
 * Mesaj araması sunucuda yapılamaz (gövde şifreli olacak); Aşama 7'deki şifreli
   yerel veritabanında cihaz üzerinde yapılacak.
 
@@ -227,7 +249,7 @@ userChatSettings/{uid}/chats/{chatId}
 | 4 | Gerçek zamanlı bireysel mesajlaşma | ✅ metin, yanıtlama, düzenleme, herkesten silme, okundu bilgisi (yazıyor/çevrimiçi göstergesi henüz yok) |
 | 5 | Otomatik kuş dili mesajlaşma | ✅ sohbet başına gönderim modu ve varyant (özel kural dahil), yazarken canlı önizleme |
 | 6 | Mesaj çözme ve dil değiştirme | ✅ dokununca animasyonlu çözme, görünüm tercihi (kuş dili / ikisi / Türkçe) |
-| 7 | Gizli sohbet + E2EE | — |
+| 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b gizli sohbet özellikleri: sırada |
 | 8 | Grup mesajlaşması | — |
 | 9 | Medya ve sesli mesaj | — |
 | 10 | Bildirimler ve aramalar | — |

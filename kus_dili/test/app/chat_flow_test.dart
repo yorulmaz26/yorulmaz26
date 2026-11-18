@@ -8,6 +8,8 @@ import 'package:kus_dili_engine/kus_dili_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../helpers/fake_auth_repository.dart';
+import '../helpers/in_memory.dart';
+import '../helpers/signal_client.dart';
 import '../helpers/test_app.dart';
 
 /// Ayşe (oturumdaki kullanıcı) ile Bora arasında gerçek Firestore deposu
@@ -36,6 +38,8 @@ void main() {
     'Kuş dilinde yazışma: gönder, al, çöz, yanıtla, sil, mod değiştir',
     (t) async {
       final db = await seeded();
+      final bora = SignalClient(b, db);
+      await bora.keys.ensureKeys();
       final auth = FakeAuthRepository(
         signedIn: const AuthUser(uid: a, phoneNumber: '+905321234567'),
       );
@@ -52,7 +56,7 @@ void main() {
       await t.tap(find.byKey(const Key('searchResult')));
       await settle(t);
       expect(find.text('@bora'), findsOneWidget);
-      expect(find.textContaining('uçtan uca şifreli değil'), findsOneWidget);
+      expect(find.textContaining('uçtan uca şifreli'), findsOneWidget);
 
       // Varsayılan mod: otomatik kuş dili, yazarken canlı önizleme.
       await t.enterText(
@@ -68,11 +72,20 @@ void main() {
       await settle(t);
       expect(find.text('Segenigi segevigiyogorugum'), findsOneWidget);
 
-      // Sunucuya kuş dili değil, orijinal metin + gösterim bilgisi gider
-      // (Aşama 7'de bu gövde şifrelenecek).
+      // Sunucuda yalnızca şifreli metin var; Bora kendi cihazında çözer ve
+      // orijinal metni + gösterim bilgisini alır.
       const chatId = 'd_${a}_$b';
       final msgs = await db.collection('chats/$chatId/messages').get();
-      final sent = MessagePayload.decode(msgs.docs.single['body'] as String);
+      final sentDoc = msgs.docs.single;
+      expect(sentDoc['encVersion'], 1);
+      expect(sentDoc['body'] as String, isNot(contains('Seni')));
+      expect(sentDoc['body'] as String, isNot(contains('Segenigi')));
+      final sent = await bora.sealer.open(
+        chatId,
+        a,
+        1,
+        sentDoc['body'] as String,
+      );
       expect(sent.text, 'Seni seviyorum');
       expect(sent.mode, DisplayMode.kusDili);
 
@@ -82,12 +95,15 @@ void main() {
         chatId: chatId,
         messageId: 'fromBora',
         senderId: b,
-        encVersion: 0,
-        body: MessagePayload(
-          text: 'Ben de seni',
-          mode: DisplayMode.kusDili,
-          variant: KusDiliVariant.f,
-        ).encode(),
+        encVersion: 1,
+        body: await bora.sealer.seal(
+          chatId,
+          MessagePayload(
+            text: 'Ben de seni',
+            mode: DisplayMode.kusDili,
+            variant: KusDiliVariant.f,
+          ),
+        ),
       );
       await settle(t);
       final encoded = KusDiliCodec(KusDiliVariant.f).encode('Ben de seni');
@@ -117,9 +133,13 @@ void main() {
       await t.pump();
       await t.tap(find.byKey(const Key('send')));
       await settle(t);
-      final reply = (await db.collection('chats/$chatId/messages').get()).docs
-          .map((d) => MessagePayload.decode(d['body'] as String))
-          .firstWhere((p) => p.text == 'Selam');
+      final mine = (await db.collection('chats/$chatId/messages').get()).docs
+          .where((d) => d['senderId'] == a && d['deleted'] == false);
+      final opened = [
+        for (final d in mine)
+          await bora.sealer.open(chatId, a, 1, d['body'] as String),
+      ];
+      final reply = opened.firstWhere((p) => p.text == 'Selam');
       expect(reply.replyToId, 'fromBora');
       expect(reply.replyQuote, 'Ben de seni');
 
@@ -158,12 +178,18 @@ void main() {
     const chatId = 'd_${a}_$b';
     final repo = FirestoreChatRepository(db);
     await repo.ensureDirectChat(me: a, other: b);
+    final ayseKv = InMemorySecureKv();
+    await SignalClient(a, db, kv: ayseKv).keys.ensureKeys();
+    final bora = SignalClient(b, db);
     await repo.sendMessage(
       chatId: chatId,
       messageId: 'x',
       senderId: b,
-      encVersion: 0,
-      body: MessagePayload(text: 'Gizli', mode: DisplayMode.kusDili).encode(),
+      encVersion: 1,
+      body: await bora.sealer.seal(
+        chatId,
+        MessagePayload(text: 'Gizli', mode: DisplayMode.kusDili),
+      ),
     );
     await db.doc('users/$a/chatSettings/$chatId').set({
       'sendMode': 'k',
@@ -171,7 +197,7 @@ void main() {
       'viewMode': 'original',
     });
     final auth = FakeAuthRepository(signedIn: const AuthUser(uid: a));
-    await t.pumpWidget(testApp(auth: auth, db: db));
+    await t.pumpWidget(testApp(auth: auth, db: db, kv: ayseKv));
     await settle(t);
 
     // Listede okunmamış işareti, sonra sohbet.

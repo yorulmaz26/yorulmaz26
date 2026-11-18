@@ -75,7 +75,7 @@ async function seedChat() {
 function send(d, sender, id = 'm1', extra = {}) {
   const b = writeBatch(d);
   b.set(doc(d, 'chats', CHAT, 'messages', id), {
-    senderId: sender, sentAt: serverTimestamp(), encVersion: 0, body: '{"v":1}', deleted: false, ...extra,
+    senderId: sender, sentAt: serverTimestamp(), encVersion: 1, body: '{"v":1}', deleted: false, ...extra,
   });
   b.update(doc(d, 'chats', CHAT), {
     lastActivityAt: serverTimestamp(), lastSenderId: sender, [`readAt.${sender}`]: serverTimestamp(),
@@ -145,6 +145,7 @@ describe('Mesajlar', () => {
     await assertFails(send(db(A), A, 'm3', { body: '' }));
     await assertFails(send(db(A), A, 'm4', { body: 'x'.repeat(65537) }));
     await assertFails(send(db(A), A, 'm5', { encVersion: 9 }));
+    await assertFails(send(db(A), A, 'm8', { encVersion: 0 }), 'şifresiz mesaj reddedilir');
     await assertFails(send(db(A), A, 'm6', { plaintext: 'selam' }));
     await assertFails(send(db(A), A, 'm7', { deleted: true }));
   });

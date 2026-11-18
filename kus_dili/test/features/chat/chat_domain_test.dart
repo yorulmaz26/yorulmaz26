@@ -65,9 +65,9 @@ void main() {
   test('Geliştirme mühürleyicisi yalnızca encVersion 0 açar', () async {
     const s = PlaintextDevSealer();
     final body = await s.seal('c', MessagePayload(text: 'Selam'));
-    expect((await s.open('c', 0, body)).text, 'Selam');
+    expect((await s.open('c', 'u', 0, body)).text, 'Selam');
     expect(
-      () => s.open('c', 1, body),
+      () => s.open('c', 'u', 1, body),
       throwsA(isA<UnsupportedEncryptionException>()),
     );
   });

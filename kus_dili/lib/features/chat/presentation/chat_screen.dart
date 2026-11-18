@@ -1,9 +1,12 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kus_dili_engine/kus_dili_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
+import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../crypto/application/crypto_providers.dart';
 import '../application/chat_controller.dart';
 import '../application/chat_providers.dart';
 import '../domain/chat.dart';
@@ -153,7 +156,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       ),
       body: Column(
         children: [
-          const _DevBanner(),
+          _E2eeBanner(chatId: widget.chatId, otherUid: otherUid),
           Expanded(
             child: messages.when(
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -206,20 +209,46 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 }
 
-class _DevBanner extends StatelessWidget {
-  const _DevBanner();
+class _E2eeBanner extends ConsumerWidget {
+  const _E2eeBanner({required this.chatId, required this.otherUid});
+
+  final String chatId;
+  final String? otherUid;
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      color: AppColors.gold.withValues(alpha: 0.15),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: Text(
-        'Geliştirme sürümü: mesajlar henüz uçtan uca şifreli değil. '
-        'Kuş dili bir şifreleme değildir.',
-        style: Theme.of(context).textTheme.labelSmall
-            ?.copyWith(color: AppColors.gold),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final uid = otherUid;
+    final changed =
+        uid != null && (ref.watch(identityChangedProvider(uid)).value ?? false);
+    final color = changed ? AppColors.gold : AppColors.turquoise;
+    return InkWell(
+      key: const Key('e2eeBanner'),
+      onTap: uid == null
+          ? null
+          : () => context.push(Routes.safetyNumber(chatId, uid)),
+      child: Container(
+        width: double.infinity,
+        color: color.withValues(alpha: 0.12),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        child: Row(
+          children: [
+            Icon(
+              changed ? Icons.warning_amber : Icons.lock,
+              size: 14,
+              color: color,
+            ),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                changed
+                    ? 'Karşı tarafın güvenlik numarası değişti. Doğrulamak için dokun.'
+                    : 'Mesajlar uçtan uca şifreli. Güvenlik numarası için dokun.',
+                style: Theme.of(context).textTheme.labelSmall
+                    ?.copyWith(color: color),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
