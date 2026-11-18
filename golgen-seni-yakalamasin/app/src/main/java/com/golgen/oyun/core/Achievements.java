@@ -14,8 +14,8 @@ public final class Achievements {
     public static final String[] DESCS = {
             "İlk oyununu oyna", "Toplam 50 kez gölgeden kaç", "Tek oyunda 60 sn dayan", "Tek oyunda 180 sn dayan",
             "Tek oyunda 300 sn dayan", "Toplam 100 elmas topla", "Toplam 1000 elmas topla", "4 karakter aç",
-            "Tüm karakterleri aç", "İlk haritayı bitir (5 bölüm)", "50 bölüm bitir", "100 bölümün hepsini bitir",
-            "Toplam 100 taç kazan", "300 tacın hepsini kazan", "Bir bölümü hiç çarpmadan bitir",
+            "Tüm karakterleri aç", "İlk haritayı bitir (5 bölüm)", "100 bölüm bitir", "500 bölümün hepsini bitir",
+            "Toplam 300 taç kazan", "1500 tacın hepsini kazan", "Bir bölümü hiç çarpmadan bitir",
             "Tek oyunda 2000 puan yap", "Tek oyunda 10000 puan yap", "Tek oyunda 20 kombo yap",
             "Toplam 25 güçlendirme topla", "7 gün üst üste giriş yap", "10. seviyeye ulaş"
     };
@@ -35,9 +35,9 @@ public final class Achievements {
             case 7: return Integer.bitCount(p.unlockedSkins) >= 4;
             case 8: return Integer.bitCount(p.unlockedSkins) >= Skins.ALL.length;
             case 9: return p.missionsCompleted >= 5;
-            case 10: return p.missionsCompleted >= 50;
+            case 10: return p.missionsCompleted >= 100;
             case 11: return p.missionsCompleted >= Missions.ALL.length;
-            case 12: return p.totalStars() >= 100;
+            case 12: return p.totalStars() >= 300;
             case 13: return p.totalStars() >= Missions.ALL.length * 3;
             case 14: return last != null && last.mode == RunResult.MODE_MISSION && last.won && last.hits == 0;
             case 15: return p.bestScore >= 2000;

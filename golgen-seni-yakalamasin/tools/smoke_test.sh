@@ -186,7 +186,7 @@ expect_screen MenuScreen "Öğretici kapat"
 step harita-goruntuleri
 # 6b) Farklı haritalardan oynanış görüntüleri (debug ekstrasıyla bölüm aç)
 touch_count() { log | grep -c "dokunma a=0"; }
-for lv in 2 17 27 37 57 72 77 92 99; do
+for lv in 2 17 27 37 57 72 77 92 99 149 249 349 449 499; do
   step "bolum $((lv+1))"
   adbt shell am start -n $ACT --es ekran gorev:$lv >/dev/null
   if wait_screen PlayScreen 10; then

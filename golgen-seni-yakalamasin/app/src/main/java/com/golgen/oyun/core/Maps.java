@@ -7,7 +7,8 @@ package com.golgen.oyun.core;
 public final class Maps {
     private Maps() {}
 
-    public static final MapTheme[] ALL = {
+    /** 20 temel harita (Klasik kademe). */
+    public static final MapTheme[] BASE = {
             new MapTheme(0, "Neon Kapı", "Her şeyin başladığı yer", 0xFF101827, 0xFF1A1640, 0xFF6D5DFB, 0xFF6D5DFB, 0xFF20B8A6,
                     MapTheme.DECO_STARS, 0, Obstacle.MINE, 3.0f, 4.4f, 5, 2, 0, 0, 0, 0, 0, 0, 0),
             new MapTheme(1, "Kristal Mağara", "Buz mavisi kristaller arasında", 0xFF0B1A2A, 0xFF10304A, 0xFF4FC3F7, 0xFF4FC3F7, 0xFFB3E5FC,
@@ -51,6 +52,72 @@ public final class Maps {
                     Obstacle.GATE, 2.2f, 3.1f, 2, 1, 1, 2, 2, 2, 2, 2, 2),
     };
 
+    public static final int TIERS = 5;
+    public static final String[] TIER_NAMES = {"", "Gece", "Fırtına", "Kabus", "Efsane"};
+    private static final String[] ROMAN = {"", "II", "III", "IV", "V"};
+    /** Kademe başına renk tonu (temel renklere karıştırılır). */
+    private static final int[] TIER_TINT = {0, 0xFF0A1A3A, 0xFF2A1A5A, 0xFF4A0A1A, 0xFF5A4A10};
+    private static final float[] TIER_TINT_K = {0f, 0.35f, 0.3f, 0.35f, 0.3f};
+    private static final int[] EXTRA_FEATURES = {MapTheme.F_WIND, MapTheme.F_DARK, MapTheme.F_STORM, MapTheme.F_ICE,
+            MapTheme.F_NARROW, MapTheme.F_FAST_SHADOWS};
+
+    /** 100 harita: 20 temel harita × 5 kademe. */
+    public static final MapTheme[] ALL = build();
+
     /** Sonsuz modun varsayılan teması. */
-    public static final MapTheme ENDLESS = ALL[0];
+    public static final MapTheme ENDLESS = BASE[0];
+
+    private static MapTheme[] build() {
+        MapTheme[] all = new MapTheme[BASE.length * TIERS];
+        for (int k = 0; k < TIERS; k++) {
+            for (int b = 0; b < BASE.length; b++) {
+                int id = k * BASE.length + b;
+                all[id] = k == 0 ? withId(BASE[b], id) : derive(BASE[b], k, id);
+            }
+        }
+        return all;
+    }
+
+    private static MapTheme withId(MapTheme m, int id) {
+        return new MapTheme(id, m.name, m.desc, m.bgTop, m.bgBottom, m.grid, m.obstacle, m.accent, m.deco, m.features,
+                m.signature, m.shadowDelay1, m.shadowDelay2, m.weights);
+    }
+
+    /** Haritada henüz olmayan bir özellik ekler (buz ile dar geçit birlikte seçilmez). */
+    private static int addNewFeature(int features, int start) {
+        for (int i = 0; i < EXTRA_FEATURES.length; i++) {
+            int f = EXTRA_FEATURES[(start + i) % EXTRA_FEATURES.length];
+            if ((features & f) != 0) continue;
+            if (f == MapTheme.F_NARROW && (features & MapTheme.F_ICE) != 0) continue;
+            if (f == MapTheme.F_ICE && (features & MapTheme.F_NARROW) != 0) continue;
+            return features | f;
+        }
+        return features;
+    }
+
+    /** Kademe türetme: renk tonu, ek özellik, yeni imza engeli, ek engel türü, daha yakın gölgeler. */
+    private static MapTheme derive(MapTheme m, int k, int id) {
+        int b = m.id;
+        int tint = TIER_TINT[k];
+        float tk = TIER_TINT_K[k];
+        int bgTop = MapTheme.mix(m.bgTop, tint, tk), bgBottom = MapTheme.mix(m.bgBottom, tint, tk + 0.1f);
+        int obstacle = MapTheme.rotateHue(m.obstacle, k * 47);
+        int accent = MapTheme.rotateHue(m.accent, k * 31);
+        int grid = MapTheme.rotateHue(m.grid, k * 47);
+        int features = addNewFeature(m.features, b + k);
+        if (k >= 3) features = addNewFeature(features, b + 2 * k + 1);
+        if (k >= 2 && (b % 3 == 0)) features |= MapTheme.F_RUSH;
+        float[] w = m.weights.clone();
+        int sigIdx = (b * 2 + k * 3) % Obstacle.TYPE_COUNT;
+        int extraIdx = (b + k * 5) % Obstacle.TYPE_COUNT;
+        w[sigIdx] += 2f;
+        w[extraIdx] += 1.5f;
+        int signature = Obstacle.WEIGHT_ORDER[sigIdx];
+        int deco = (k % 2 == 1) ? (m.deco + k * 2) % 9 : m.deco;
+        float shrink = 1f - 0.07f * k;
+        String name = m.name + " " + ROMAN[k] + " · " + TIER_NAMES[k];
+        String desc = m.desc + " — " + TIER_NAMES[k].toLowerCase(new java.util.Locale("tr")) + " hâli";
+        return new MapTheme(id, name, desc, bgTop, bgBottom, grid, obstacle, accent, deco, features, signature,
+                m.shadowDelay1 * shrink, m.shadowDelay2 * shrink, w);
+    }
 }

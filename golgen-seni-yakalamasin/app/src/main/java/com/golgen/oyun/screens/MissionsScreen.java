@@ -18,7 +18,7 @@ import com.golgen.oyun.ui.Theme;
 import com.golgen.oyun.ui.Ui;
 import com.golgen.oyun.ui.WorldRenderer;
 
-/** Görevler: Haritalar (100 bölüm), Günlük görevler ve Başarılar sekmeleri. */
+/** Görevler: Haritalar (500 bölüm), Günlük görevler ve Başarılar sekmeleri. */
 public final class MissionsScreen extends Screen {
     public static final int TAB_LEVELS = 0, TAB_DAILY = 1, TAB_ACH = 2;
     private final WorldRenderer bg = new WorldRenderer();

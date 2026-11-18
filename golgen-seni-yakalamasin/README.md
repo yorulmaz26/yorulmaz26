@@ -60,11 +60,17 @@ Hazır APK: GitHub Actions her push'ta APK'yı derler, emülatörde test eder ve
 ### Modlar
 - **Sonsuz Mod:** mümkün olduğunca uzun hayatta kal. Her 30 sn'de yeni **aşama**; zorluk tavana ulaştıktan sonra da
   akış hızlanmaya devam eder (hiç bitmeyen artış). Rekor ve ilk 10 skor cihazda saklanır.
-- **Görev Modu — 100 bölüm, 20 harita:** her harita 5 bölümden oluşur; her bölüm **2 aşamalıdır**:
+- **Görev Modu — 500 bölüm, 100 harita:** 20 temel harita 5 kademede yeniden ziyaret edilir:
+  **Klasik → II Gece → III Fırtına → IV Kabus → V Efsane**. Her kademede renkler kayar, haritaya yeni bir özellik eklenir
+  (Kabus ve Efsane'de iki), imza engel değişir ve yeni bir engel türü katılır, gölgeler daha yakından takip eder;
+  Efsane kademesinin harita sonlarında 2 can vardır. Zorluk 500 bölüm boyunca yavaş artar.
+- **Bölüm yapısı (önceki 100 bölümlük tasarımın devamı):** her harita 5 bölümden oluşur; her bölüm **2 aşamalıdır**:
   1. aşamada **1 gölge** vardır, **20 yıldız** toplanınca 2. aşama başlar; 2. aşamada **2 gölge** vardır,
   20 yıldız daha toplanınca bölüm biter. Aynı haritanın 5 bölümünde imza engel sıklaşır, özellik güçlenir,
   gölgeler yaklaşır, yıldızlar seyrekleşir; 5. bölüm harita sonudur.
-- **Taçlar (300 adet):** her bölümde ♛ tamamla · ♛ hiç çarpmadan bitir · ♛ kombo hedefine ulaş.
+- **Taçlar (1500 adet):** her bölümde ♛ tamamla · ♛ hiç çarpmadan bitir · ♛ kombo hedefine ulaş.
+
+Klasik kademedeki 20 temel harita:
 
 | # | Harita | Arka plan efekti | İmza engel | Özellik |
 |---|---|---|---|---|
@@ -139,7 +145,7 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 55 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 57 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
   kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı.
 - `tools/smoke_test.sh` — emülatörde uçtan uca test (CI): kurulum, öğretici, tüm menü butonları ve ekran geçişleri,

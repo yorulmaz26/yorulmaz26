@@ -51,6 +51,41 @@ public final class MapTheme {
         this.weights = w;
     }
 
+    /** İki rengi karıştırır (Android'den bağımsız). */
+    public static int mix(int c1, int c2, float t) {
+        t = Math.max(0f, Math.min(1f, t));
+        int r = (int) (((c1 >> 16) & 0xff) + ((((c2 >> 16) & 0xff) - ((c1 >> 16) & 0xff)) * t));
+        int g = (int) (((c1 >> 8) & 0xff) + ((((c2 >> 8) & 0xff) - ((c1 >> 8) & 0xff)) * t));
+        int b = (int) ((c1 & 0xff) + (((c2 & 0xff) - (c1 & 0xff)) * t));
+        return 0xFF000000 | (r << 16) | (g << 8) | b;
+    }
+
+    /** Rengin tonunu derece cinsinden döndürür (doygunluk/parlaklık korunur). */
+    public static int rotateHue(int c, float degrees) {
+        float r = ((c >> 16) & 0xff) / 255f, g = ((c >> 8) & 0xff) / 255f, b = (c & 0xff) / 255f;
+        float max = Math.max(r, Math.max(g, b)), min = Math.min(r, Math.min(g, b));
+        float h, s, v = max, d = max - min;
+        s = max == 0f ? 0f : d / max;
+        if (d == 0f) h = 0f;
+        else if (max == r) h = 60f * (((g - b) / d) % 6f);
+        else if (max == g) h = 60f * ((b - r) / d + 2f);
+        else h = 60f * ((r - g) / d + 4f);
+        h = ((h + degrees) % 360f + 360f) % 360f;
+        float cc = v * s, x = cc * (1f - Math.abs((h / 60f) % 2f - 1f)), m = v - cc;
+        float rr, gg, bb;
+        if (h < 60) { rr = cc; gg = x; bb = 0; }
+        else if (h < 120) { rr = x; gg = cc; bb = 0; }
+        else if (h < 180) { rr = 0; gg = cc; bb = x; }
+        else if (h < 240) { rr = 0; gg = x; bb = cc; }
+        else if (h < 300) { rr = x; gg = 0; bb = cc; }
+        else { rr = cc; gg = 0; bb = x; }
+        return 0xFF000000 | ((int) ((rr + m) * 255f) << 16) | ((int) ((gg + m) * 255f) << 8) | (int) ((bb + m) * 255f);
+    }
+
+    public int tier() {
+        return id / 20;
+    }
+
     public boolean has(int f) {
         return (features & f) != 0;
     }

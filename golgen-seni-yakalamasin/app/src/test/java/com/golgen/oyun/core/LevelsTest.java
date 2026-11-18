@@ -17,10 +17,10 @@ public class LevelsTest {
         for (int i = 0; i < Math.round(s * 60f) && w.state == GameWorld.RUNNING; i++) w.update(1f / 60f);
     }
 
-    @Test public void hundredLevelsTwentyMapsFiveEach() {
-        assertEquals(100, Missions.ALL.length);
-        assertEquals(20, Maps.ALL.length);
-        for (int i = 0; i < 100; i++) {
+    @Test public void fiveHundredLevelsHundredMapsFiveEach() {
+        assertEquals(500, Missions.ALL.length);
+        assertEquals(100, Maps.ALL.length);
+        for (int i = 0; i < 500; i++) {
             MissionDef m = Missions.ALL[i];
             assertEquals(i, m.index);
             assertEquals(i / 5, m.mapIndex);
@@ -31,7 +31,8 @@ public class LevelsTest {
             assertEquals(2, p.shadowDelays.length);
             assertTrue(p.maxDelay() <= 10f);
             assertNotNull(p.weights);
-            if (i > 0 && m.mapIndex == Missions.ALL[i - 1].mapIndex) assertTrue(m.timeOffset > Missions.ALL[i - 1].timeOffset);
+            if (i > 0 && m.mapIndex == Missions.ALL[i - 1].mapIndex && m.timeOffset < 150f) assertTrue(m.timeOffset > Missions.ALL[i - 1].timeOffset);
+            for (float d : p.shadowDelays) assertTrue("gölge gecikmesi " + i, d >= 1.7f);
         }
     }
 
@@ -48,7 +49,8 @@ public class LevelsTest {
             assertTrue(t.name, total > 0f);
             assertTrue(t.shadowDelay2 > t.shadowDelay1);
         }
-        assertEquals(20, looks.size());
+        assertEquals(100, names.size());
+        assertTrue("renk çeşitliliği " + looks.size(), looks.size() >= 95);
         for (int d = 0; d < decoUse.length; d++) assertTrue("efekt " + d, decoUse[d] > 0);
         // Tüm yeni engel türleri en az bir haritada kullanılıyor
         for (int type = 0; type < Obstacle.TYPE_COUNT; type++) {
@@ -110,7 +112,7 @@ public class LevelsTest {
     @Test public void botCanFinishEarlyLevelsByChasingStars() {
         // Basit bot: en yakın yıldıza gider; gölgeler ve engeller zararsız. Yıldız akışının bölümü
         // makul sürede (3 dk içinde) bitirmeye yettiğini doğrular.
-        for (int idx : new int[]{0, 4, 37, 99}) {
+        for (int idx : new int[]{0, 4, 37, 99, 250, 377, 499}) {
             GameWorld w = level(idx);
             w.shadowsHarmless = true;
             w.obstaclesHarmless = true;
@@ -165,7 +167,7 @@ public class LevelsTest {
 
     @Test public void newObstaclesSpawnAndCollide() {
         int[] seen = new int[Obstacle.TYPE_COUNT];
-        for (int idx = 0; idx < 100; idx += 3) {
+        for (int idx = 0; idx < 500; idx += 13) {
             GameWorld w = level(idx);
             w.shadowsHarmless = true;
             w.obstaclesHarmless = true;
@@ -175,6 +177,33 @@ public class LevelsTest {
             }
         }
         for (int t = 0; t < Obstacle.TYPE_COUNT; t++) assertTrue("tür " + t + " görülmedi", seen[t] > 0);
+    }
+
+    @Test public void tiersRevisitMapsWithChanges() {
+        for (int b = 0; b < 20; b++) {
+            MapTheme base = Maps.ALL[b];
+            for (int k = 1; k < Maps.TIERS; k++) {
+                MapTheme t = Maps.ALL[k * 20 + b];
+                assertEquals(k, t.tier());
+                assertTrue(t.name.startsWith(base.name));
+                assertTrue("kademe yeni özellik ekler", Integer.bitCount(t.features) > Integer.bitCount(base.features)
+                        || (t.features != base.features));
+                assertTrue(t.shadowDelay1 < base.shadowDelay1);
+                assertNotEquals(base.bgBottom, t.bgBottom);
+            }
+        }
+    }
+
+    @Test public void difficultyGrowsGraduallyOverFiveHundred() {
+        float prev = -1f;
+        for (int i = 0; i < 500; i += 5) {
+            float off = Missions.ALL[i].timeOffset;
+            assertTrue(off >= prev);
+            prev = off;
+        }
+        assertTrue(Missions.ALL[50].timeOffset < 100f);   // ilk 50 bölüm tavana yakın değil
+        assertTrue(Missions.ALL[499].timeOffset >= 140f);
+        assertTrue(Missions.ALL[499].profile().overdriveMax > Missions.ALL[10].profile().overdriveMax);
     }
 
     @Test public void gateOnlyHurtsWhenActive() {

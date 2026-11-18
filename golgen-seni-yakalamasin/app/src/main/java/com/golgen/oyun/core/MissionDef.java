@@ -32,10 +32,11 @@ public final class MissionDef {
         this.sub = sub;
         this.boss = sub == 4;
         this.title = "Bölüm " + (index + 1);
-        this.timeOffset = map.id * 7f + sub * 5f;
-        this.reward = 20 + map.id * 6 + sub * 4 + (boss ? 30 : 0);
-        this.starCombo = 6 + map.id / 2 + sub + (boss ? 2 : 0);
-        this.intensity = 0.6f + 0.12f * sub + 0.02f * map.id;
+        // 500 bölüm boyunca yavaş artan zorluk (erken tavana vurmaz)
+        this.timeOffset = Math.min(150f, map.id * 1.5f + sub * 4f);
+        this.reward = Math.min(150, 20 + map.id + sub * 4 + (boss ? 30 : 0));
+        this.starCombo = Math.min(30, 6 + map.id / 5 + sub + (boss ? 2 : 0));
+        this.intensity = Math.min(1.5f, 0.6f + 0.1f * sub + 0.006f * map.id);
     }
 
     /** Eski isim: bölümün haritası (0..19). */
@@ -82,6 +83,8 @@ public final class MissionDef {
         DifficultyProfile p = DifficultyProfile.endless();
         p.timeOffset = timeOffset;
         p.rampSeconds = 140f;
+        // Tavan sonrası ek hız da harita ilerledikçe açılır
+        p.overdriveMax = Math.min(220f, map.id * 2.2f);
         // Gölgeler bölüm mantığıyla doğar (aşamalar); otomatik takvim kapalı.
         float shrink = 1f - 0.03f * sub;
         float d1 = map.shadowDelay1 * shrink, d2 = map.shadowDelay2 * shrink;
@@ -103,10 +106,11 @@ public final class MissionDef {
         if (map.has(MapTheme.F_ICE)) p.iceGrip = 3.2f / k;
         if (map.has(MapTheme.F_NARROW)) p.narrow = 70f + 40f * sub;
         if (map.has(MapTheme.F_STORM)) p.meteorInterval = 2.6f / k;
-        if (map.has(MapTheme.F_RUSH)) p.scrollMul = 1.12f + 0.03f * sub;
+        if (map.has(MapTheme.F_RUSH)) p.scrollMul = 1.1f + 0.02f * sub + 0.0006f * map.id;
+        if (map.tier() >= 4 && boss) p.lives = 2; // Efsane kademe harita sonları: 2 can
         p.intervalStart = 1.9f - 0.04f * sub;
         // Yıldız sıklığı: harita ve bölüm ilerledikçe seyrekleşir (aşama başına ~40-70 sn)
-        p.starIntervalMin = Math.min(3.4f, 2.4f + 0.03f * map.id + 0.1f * sub);
+        p.starIntervalMin = Math.min(3.4f, 2.4f + 0.006f * map.id + 0.1f * sub);
         p.starIntervalMax = p.starIntervalMin + 1.2f;
         p.diamondIntervalMin = 3.5f;
         p.diamondIntervalMax = 6f;
