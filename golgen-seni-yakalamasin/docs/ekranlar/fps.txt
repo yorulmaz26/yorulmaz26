@@ -1,5 +1,5 @@
-11-18 08:35:55.936  2557  2557 I GolgenFPS: fps=20.4 ekran=MissionsScreen
-11-18 08:36:02.798  2557  2557 I GolgenFPS: fps=21.2 ekran=RecordsScreen
-11-18 08:36:09.613  2557  2557 I GolgenFPS: fps=21.2 ekran=SettingsScreen
-11-18 08:36:15.379  2557  2557 I GolgenFPS: fps=21.5 ekran=SettingsScreen
-11-18 08:36:21.470  2557  2557 I GolgenFPS: fps=21.6 ekran=TutorialScreen
+11-18 08:51:31.370  2388  2388 I GolgenFPS: fps=20.0 ekran=MenuScreen
+11-18 08:51:39.711  2388  2388 I GolgenFPS: fps=20.2 ekran=MenuScreen
+11-18 08:51:46.648  2388  2388 I GolgenFPS: fps=20.3 ekran=SettingsScreen
+11-18 08:51:53.391  2388  2388 I GolgenFPS: fps=20.3 ekran=SettingsScreen
+11-18 08:51:59.919  2388  2388 I GolgenFPS: fps=21.4 ekran=MenuScreen
