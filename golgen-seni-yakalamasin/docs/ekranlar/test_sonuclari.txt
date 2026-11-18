@@ -2,28 +2,3 @@ GEÇTİ  | APK kurulumu
 GEÇTİ  | Uygulama açılışı → SplashScreen gösterildi
 GEÇTİ  | İlk açılış öğreticisi → TutorialScreen
 GEÇTİ  | Öğretici → Ana menü → MenuScreen
-GEÇTİ  | OYNA butonu → PlayScreen
-GEÇTİ  | Duraklatma menüsü açıldı
-GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
-GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
-GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (1)
-GEÇTİ  | Kayıt: rekor kaydedildi (78)
-GEÇTİ  | Tekrar oyna → PlayScreen
-GEÇTİ  | Geri tuşu oyunu duraklatır
-GEÇTİ  | Duraklatma → Ana menü → MenuScreen
-GEÇTİ  | Karakter butonu → SkinsScreen
-GEÇTİ  | Karakter satın alındı ve seçildi (elmas 520 → 400)
-GEÇTİ  | Geri tuşu → Ana menü → MenuScreen
-GEÇTİ  | Görevler butonu → MissionsScreen
-GEÇTİ  | Görev 1 başlatma → PlayScreen
-GEÇTİ  | Görev → Ana menü → MenuScreen
-GEÇTİ  | Rekorlar butonu → RecordsScreen
-GEÇTİ  | Rekorlar geri butonu → MenuScreen
-GEÇTİ  | Ayarlar butonu → SettingsScreen
-GEÇTİ  | Ayarlar: ses ve titreşim kapatıldı ve kaydedildi
-GEÇTİ  | Ayarlar → Öğretici → TutorialScreen
-GEÇTİ  | Öğretici kapat → MenuScreen
-GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
-GEÇTİ  | Kalıcılık: seçili karakter korundu
-GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 28 geçti, 0 kaldı
