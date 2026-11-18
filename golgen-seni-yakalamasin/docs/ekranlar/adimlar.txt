@@ -3,3 +3,8 @@ ADIM: bolum 3
 ADIM: bolum 18
 ADIM: bolum 28
 ADIM: bolum 38
+ADIM: bolum 58
+ADIM: bolum 73
+ADIM: bolum 78
+ADIM: bolum 93
+ADIM: bolum 100

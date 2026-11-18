@@ -7,8 +7,8 @@ GEÇTİ  | OYNA butonu → PlayScreen
 GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
-GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (1)
-GEÇTİ  | Kayıt: rekor kaydedildi (91)
+GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (2)
+GEÇTİ  | Kayıt: rekor kaydedildi (70)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Duraklatma → Ana menü → MenuScreen
@@ -24,4 +24,17 @@ GEÇTİ  | Ayarlar butonu → SettingsScreen
 GEÇTİ  | Ayarlar: ses ve titreşim kapatıldı ve kaydedildi
 GEÇTİ  | Ayarlar → Öğretici → TutorialScreen
 GEÇTİ  | Öğretici kapat → MenuScreen
-KALDI  | Bölüm 28 açılamadı
+GEÇTİ  | Bölüm 3 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 18 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 28 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 38 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 58 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 73 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 78 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 93 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 100 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Harita bölümlerinden ana menüye dönüş
+GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
+GEÇTİ  | Kalıcılık: seçili karakter korundu
+GEÇTİ  | Çökme veya ANR yok
+TOPLAM: 39 geçti, 0 kaldı
