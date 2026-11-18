@@ -2437,7 +2437,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         cv.drawRect(0f, 0f, uiW, WORLD_H, paint)
         val pw = min(uiW - 28f, 470f)
         val left = cx - pw / 2f
-        tmpRect.set(left, 70f, left + pw, 930f)
+        val panelTop = 70f
+        val panelBottom = 930f
+        tmpRect.set(left, panelTop, left + pw, panelBottom)
         paint.color = colPanel
         cv.drawRoundRect(tmpRect, 28f, 28f, paint)
         paint.style = Paint.Style.STROKE
@@ -2450,38 +2452,75 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         titlePaint.color = colWarm
         drawFit(cv, strHelpTitle, cx, 128f, titlePaint)
 
-        val textX = left + 64f
-        val textW = pw - 84f
-        var y = 182f
-        helpPaint.textSize = 19f
-        helpSteps.forEachIndexed { i, step ->
-            // Numara rozeti
-            paint.color = map.accent
-            cv.drawCircle(left + 36f, y - 7f, 15f, paint)
-            labelPaint.textSize = 17f
-            labelPaint.color = colDarkText
-            cv.drawText((i + 1).toString(), left + 36f, y - 1f, labelPaint)
-            helpPaint.color = colText
-            y = drawWrapped(cv, step, textX, y, textW, helpPaint, 26f) + 20f
+        // Metnin kullanabileceği alan: başlığın altından "kapatmak için dokun" yazısının üstüne kadar
+        val areaTop = 160f
+        val areaBottom = 868f
+        val textX = left + 66f
+        val textW = pw - 88f
+        val tipW = pw - 48f
+
+        // Her şey sığana kadar yazı boyunu küçült
+        var size = 20f
+        var stepLines: List<List<String>>
+        var tipLines: List<String>
+        while (true) {
+            helpPaint.textSize = size
+            stepLines = helpSteps.map { wrapLines(it, textW, helpPaint) }
+            helpPaint.textSize = size * 0.9f
+            tipLines = wrapLines(strHelpTip, tipW, helpPaint)
+            val lineH = size * 1.32f
+            val gap = size * 0.85f
+            val total = stepLines.sumOf { it.size } * lineH + gap * (stepLines.size - 1) +
+                size * 1.4f + tipLines.size * lineH * 0.9f
+            if (total <= areaBottom - areaTop || size <= 12f) break
+            size -= 1f
         }
-        helpPaint.textSize = 17f
+
+        val lineH = size * 1.32f
+        val gap = size * 0.85f
+        var y = areaTop + size // ilk satırın taban çizgisi
+        helpPaint.textSize = size
+        helpPaint.color = colText
+        stepLines.forEachIndexed { i, lines ->
+            // Numara rozeti, adımın ilk satırıyla aynı hizada
+            val badgeY = y - size * 0.35f
+            paint.color = map.accent
+            cv.drawCircle(left + 36f, badgeY, size * 0.8f, paint)
+            labelPaint.textSize = size * 0.85f
+            labelPaint.color = colDarkText
+            cv.drawText((i + 1).toString(), left + 36f, badgeY + size * 0.3f, labelPaint)
+            for (line in lines) {
+                cv.drawText(line, textX, y, helpPaint)
+                y += lineH
+            }
+            y += gap
+        }
+
+        // İpucu: adımların altında, ince bir çizgiyle ayrılmış
+        y += size * 0.4f - gap
+        paint.color = withAlpha(colPanelEdge, 60)
+        cv.drawRect(left + 24f, y - size * 0.9f, left + pw - 24f, y - size * 0.9f + 1.5f, paint)
+        y += size * 0.5f
+        helpPaint.textSize = size * 0.9f
         helpPaint.color = colGold
-        drawWrapped(cv, strHelpTip, left + 24f, max(y + 6f, 800f), pw - 48f, helpPaint, 23f)
+        for (line in tipLines) {
+            cv.drawText(line, left + 24f, y, helpPaint)
+            y += lineH * 0.9f
+        }
 
         labelPaint.textSize = 18f
         labelPaint.color = colDim
         cv.drawText(strHelpClose, cx, 905f, labelPaint)
     }
 
-    /** Metni kelime kelime satırlara böler; son satırın altındaki y'yi döndürür. */
-    private fun drawWrapped(cv: Canvas, text: String, x: Float, y0: Float, maxW: Float, p: Paint, lineH: Float): Float {
-        var y = y0
+    /** Metni kelime kelime, verilen genişliğe sığan satırlara böler. */
+    private fun wrapLines(text: String, maxW: Float, p: Paint): List<String> {
+        val out = ArrayList<String>()
         val line = StringBuilder()
         for (word in text.split(' ')) {
             val trial = if (line.isEmpty()) word else "$line $word"
             if (p.measureText(trial) > maxW && line.isNotEmpty()) {
-                cv.drawText(line.toString(), x, y, p)
-                y += lineH
+                out.add(line.toString())
                 line.setLength(0)
                 line.append(word)
             } else {
@@ -2489,8 +2528,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 line.append(trial)
             }
         }
-        if (line.isNotEmpty()) cv.drawText(line.toString(), x, y, p)
-        return y
+        if (line.isNotEmpty()) out.add(line.toString())
+        return out
     }
 
     /** Dönen nokta halkası: bekleniyor göstergesi. */
