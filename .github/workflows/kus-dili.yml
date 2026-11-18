@@ -31,3 +31,22 @@ jobs:
           flutter pub get
           flutter analyze
           flutter test
+
+  firestore-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: kus_dili/firebase/rules-test/package-lock.json
+      - name: Güvenlik kuralı testleri (Emulator Suite)
+        working-directory: kus_dili/firebase/rules-test
+        run: |
+          npm ci
+          npm test

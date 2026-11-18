@@ -12,8 +12,12 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   kurallar, ters dönüşüm, varyant tespiti. Saf Dart, çevrimdışı.
 * **Uygulama iskeleti**: Riverpod, GoRouter, marka teması, açılış ekranı ve
   motoru kullanan çevrimdışı **Kuş Dili Çevirici** ekranı.
+* **Kayıt / giriş (Aşama 3)**: telefon numarası + SMS kodu (Firebase Auth),
+  App Check, benzersiz kullanıcı adıyla profil oluşturma, oturuma göre
+  yönlendirme, Firestore güvenlik kuralları. Kurulum:
+  [`docs/FIREBASE_SETUP.md`](docs/FIREBASE_SETUP.md).
 
-Mesajlaşma, giriş ve şifreleme henüz yok (Aşama 3+).
+Mesajlaşma ve uçtan uca şifreleme henüz yok (Aşama 4+).
 
 ## Kurulum
 
@@ -37,6 +41,10 @@ dart test
 cd kus_dili
 flutter analyze
 flutter test
+
+# Firestore güvenlik kuralları (Java 11+, Node 20+)
+cd kus_dili/firebase/rules-test
+npm ci && npm test
 ```
 
 ## Motor kullanımı

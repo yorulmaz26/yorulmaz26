@@ -44,6 +44,13 @@ kus_dili/
 └─ docs/ARCHITECTURE.md
 ```
 
+Oturum akışı: `sessionStatusProvider` (Firebase hazır mı → oturum var mı →
+profil var mı) GoRouter'ın `redirect` fonksiyonunu besler: `firebaseUnavailable`
+→ kurulum ekranı, `signedOut` → `/auth`, `needsProfile` → `/profile/setup`,
+`ready` → `/home`. Çevirici her durumda erişilebilir. Çevrimdışıyken önbellekte
+profil bulunmaması "profil yok" sayılmaz (yanlışlıkla profil ekranına düşmemek
+için).
+
 Bağımlılık yönü: `presentation → application → domain ← data`. `domain` Firebase'i
 bilmez; böylece iş kuralları sahte depolarla test edilebilir. (Sahte depolar
 **yalnızca testlerde** kullanılır; uygulama gerçek Firebase'e bağlanır.)
@@ -142,7 +149,23 @@ Bağımsız güvenlik incelemesi yapılmadan uygulamada "güvenli" iddiası
 > gövdeye hazır tasarlanır (`ciphertext`, `encVersion`), ancak Aşama 7
 > tamamlanmadan uygulama gerçek kullanıcılara **yayınlanmamalıdır**.
 
-## 5. Firestore veri modeli (taslak)
+## 5. Firestore veri modeli
+
+Aşama 3'te uygulananlar (`firebase/firestore.rules`, emülatörde 15 test):
+
+* `users/{uid}`: `username`, `displayName`, `createdAt` (sunucu zamanı).
+  Telefon numarası profilde **tutulmaz**. Yalnızca görünen ad güncellenebilir.
+* `usernames/{ad}`: `{uid}` — benzersizlik kilidi. Profil ile aynı işlemde
+  yazılır; kurallar `getAfter()` ile ikisinin tutarlılığını doğrular. Kullanıcı
+  başına tek ad, devredilemez, silinemez.
+* Okuma/yazma yalnızca **telefonla doğrulanmış** hesaplara açık
+  (`sign_in_provider == 'phone'`). Tanımsız her yol kapalı.
+* Bilinen sınır: doğrulanmış her kullanıcı profilleri okuyabilir (kullanıcı
+  adıyla arama için gerekli); bu, adların listelenebilmesi demektir. Rehberden
+  telefonla arkadaş bulma, gizlilik nedeniyle ayrı ve hız sınırlı bir sunucu
+  fonksiyonu olarak sonraki aşamalarda tasarlanacak.
+
+Sonraki aşamalar için taslak:
 
 ```
 users/{uid}                 username, displayName, photoPath, createdAt
@@ -184,7 +207,7 @@ userChatSettings/{uid}/chats/{chatId}
 |---|---|---|
 | 1 | Proje kurulumu ve mimari | ✅ iskelet, tema, yönlendirme, Riverpod |
 | 2 | Kuş dili motoru ve testleri | ✅ 81 birim testi |
-| 3 | Kayıt / giriş (telefon) | ⏳ Firebase projesi gerekir |
+| 3 | Kayıt / giriş (telefon) | ✅ kod + testler; gerçek projede deneme kullanıcıda (bkz. FIREBASE_SETUP.md) |
 | 4 | Gerçek zamanlı bireysel mesajlaşma | — |
 | 5 | Otomatik kuş dili mesajlaşma | — |
 | 6 | Mesaj çözme ve dil değiştirme | — |

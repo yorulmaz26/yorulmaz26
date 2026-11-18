@@ -1,0 +1,113 @@
+# Firebase kurulumu (Aşama 3)
+
+Bu adımları yalnızca bir kez, kendi bilgisayarınızda yapmanız gerekir. Kod,
+Firebase'i platform yapılandırma dosyalarından okur; bu dosyalar depoya
+**eklenmez** (`.gitignore`).
+
+## 1. Proje
+
+1. <https://console.firebase.google.com> → **Proje ekle** (ör. `kus-dili`).
+2. **Blaze** (kullandıkça öde) planına geçin. Telefonla SMS doğrulaması ücretsiz
+   planda çalışmaz. Bütçe uyarısı (Billing → Budgets) kurmanız önerilir.
+
+## 2. Uygulamaları bağlama
+
+```bash
+npm install -g firebase-tools
+firebase login
+dart pub global activate flutterfire_cli
+cd kus_dili
+flutterfire configure --project=<proje-id> --platforms=android,ios \
+  --android-package-name=com.kusdili.kus_dili --ios-bundle-id=com.kusdili.kusDili
+```
+
+Bu komut şunları oluşturur/düzenler:
+
+* `android/app/google-services.json` ve Gradle'a `com.google.gms.google-services` eklentisi
+* `ios/Runner/GoogleService-Info.plist`
+* `lib/firebase_options.dart` (uygulama bu dosyayı kullanmaz; zararı yok)
+
+> iOS bundle kimliğini Xcode'daki `PRODUCT_BUNDLE_IDENTIFIER` ile aynı yazın.
+
+## 3. Telefonla giriş
+
+**Authentication → Sign-in method → Telefon → Etkinleştir.**
+
+İsteğe bağlı: **Authentication → Settings → SMS region policy** ile yalnızca
+kullanacağınız ülkelere (ör. Türkiye) izin verin; SMS dolandırıcılığına karşı
+önemlidir.
+
+Geliştirme sırasında SMS harcamamak için: **Telefon → Test için telefon
+numaraları** bölümüne ör. `+90 555 000 00 01` / `123456` ekleyin.
+
+### Android
+
+```bash
+cd android && ./gradlew signingReport
+```
+
+Çıktıdaki **SHA-1** ve **SHA-256** değerlerini (debug ve release anahtarları)
+**Proje ayarları → Android uygulaması → Parmak izi ekle** bölümüne girin.
+Play Store'a yüklediğinizde Play Console'daki **uygulama imzalama anahtarının**
+parmak izlerini de ekleyin. Bunlar eksikse giriş `app-not-authorized` /
+`invalid-app-credential` hatası verir.
+
+### iOS
+
+1. Apple Developer → Keys → **APNs anahtarı** oluşturun (.p8) ve
+   **Proje ayarları → Cloud Messaging → Apple uygulaması** bölümüne yükleyin.
+2. Xcode → Runner → Signing & Capabilities → **Push Notifications** ve
+   **Background Modes → Remote notifications** ekleyin.
+3. `GoogleService-Info.plist` içindeki `REVERSED_CLIENT_ID` değerini
+   (yoksa "Encoded App ID" değerini) Runner → Info → **URL Types** bölümüne
+   URL Scheme olarak ekleyin. (APNs sessiz bildirimi gelmezse reCAPTCHA
+   doğrulaması bu şemaya döner.)
+
+## 4. App Check
+
+**App Check → Uygulamalar**: Android için **Play Integrity**, iOS için
+**App Attest** (DeviceCheck yedekli) sağlayıcısını kaydedin.
+
+Debug derlemeleri hata ayıklama sağlayıcısı kullanır: uygulamayı ilk
+çalıştırdığınızda konsol günlüğünde çıkan debug token'ı
+**App Check → Debug token'ları yönet** bölümüne ekleyin.
+
+Her şey çalıştıktan sonra **Firestore** ve **Authentication** için
+"Zorunlu kıl" (Enforce) seçeneğini açın.
+
+## 5. Firestore ve güvenlik kuralları
+
+1. **Firestore Database → Veritabanı oluştur** → konum: `eur3` (Avrupa) veya
+   `europe-west3`; **üretim modu**.
+2. Kuralları yükleyin:
+
+```bash
+cd kus_dili
+firebase use <proje-id>
+firebase deploy --only firestore:rules,firestore:indexes
+```
+
+Kurallar `firebase/firestore.rules` dosyasındadır; değiştirmeden önce testleri
+çalıştırın (aşağıda).
+
+## 6. Yerel emülatörle geliştirme (isteğe bağlı)
+
+```bash
+cd kus_dili
+firebase emulators:start --only auth,firestore --project demo-kusdili
+flutter run --dart-define=USE_FIREBASE_EMULATOR=true
+# Gerçek cihazda: --dart-define=FIREBASE_EMULATOR_HOST=<bilgisayarın-IP'si>
+```
+
+Auth emülatörü SMS göndermez; kod emülatör arayüzünde
+(<http://localhost:4000/auth>) görünür.
+
+## 7. Testler
+
+```bash
+# Güvenlik kuralları (Java 11+ ve Node 20+ gerekir)
+cd kus_dili/firebase/rules-test && npm ci && npm test
+
+# Uygulama
+cd kus_dili && flutter test
+```
