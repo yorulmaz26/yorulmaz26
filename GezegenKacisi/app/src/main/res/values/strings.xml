@@ -76,7 +76,14 @@
     <string name="mp_help_3">1. telefon: 2&#160;OYUNCU&#160;›&#160;ODA&#160;KUR</string>
     <string name="mp_help_4">2. telefon: 2&#160;OYUNCU&#160;›&#160;ODAYA&#160;KATIL. Telefonlar birbirini kendiliğinden bulur.</string>
     <string name="mp_help_5">Haritayı ve seviyeyi ikiniz de değiştirebilirsiniz. Hazır olunca odayı kuran BAŞLAT’a basar.</string>
-    <string name="mp_help_6">Üst yarıda sen, alt yarıda rakibin oynar. Yanan, rakibini izlemeye devam eder; çok puan alan kazanır.</string>
+    <string name="mp_help_6">Ekranı seç: BÖLÜNMÜŞ&#160;EKRAN’da üstte sen, altta rakibin oynar. TAM&#160;EKRAN’da kendi oyunun büyük görünür, rakibin puanı sağ üst köşede yazar.</string>
+    <string name="mp_help_7">Yanan, rakibini izlemeye devam eder; çok puan alan kazanır.</string>
     <string name="mp_help_tip">Bulamıyorsa: İkisi de aynı ağda mı? Misafir/okul ağları cihazları birbirinden gizleyebilir; o zaman hotspot kullanın.</string>
     <string name="mp_help_close">Kapatmak için dokun</string>
+    <string name="mp_view_label">EKRAN</string>
+    <string name="mp_view_split">BÖLÜNMÜŞ EKRAN</string>
+    <string name="mp_view_full">TAM EKRAN</string>
+    <string name="mp_playing">oynuyor</string>
+    <string name="mp_crashed_short">YANDI</string>
+    <string name="mp_spectating">RAKİBİ İZLİYORSUN</string>
 </resources>

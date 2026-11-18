@@ -39,8 +39,11 @@ Oyundaki **2 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adımla
 4. 2. telefon: **2 OYUNCU** › **ODAYA KATIL**. Telefonlar birbirini kendiliğinden bulur.
 5. Bağlandıktan sonra haritayı ve seviyeyi **iki oyuncu da** değiştirebilir; seçim iki telefonda aynı anda güncellenir.
    Hazır olunca odayı kuran **BAŞLAT**'a basar; 3-2-1 sayımından sonra iki telefonda aynı parkur başlar.
-6. Ekran ikiye bölünür: **üstte sen** (kırmızı roket), **altta rakibin** (mavi roket) canlı görünür.
-   Yanan oyuncu, rakibi de yanana kadar **izlemeye devam eder**. Daha çok puan alan kazanır.
+6. **Ekran seçimi** (lobinin altında, her oyuncu kendi telefonu için seçer):
+   - **BÖLÜNMÜŞ EKRAN:** üstte sen (kırmızı roket), altta rakibin (mavi roket) canlı görünür.
+   - **TAM EKRAN:** kendi oyunun bütün ekranda büyük görünür; rakibin puanı ve durumu (oynuyor / YANDI) sağ üst köşede yazar.
+   Yanan oyuncu, rakibi de yanana kadar **izlemeye devam eder**: bölünmüş ekranda alt yarıdan,
+   tam ekranda ise oyun otomatik olarak rakibin görüntüsüne geçer. Daha çok puan alan kazanır.
 7. Odayı kuran **TEKRAR** ile yeni parkur başlatabilir. **MENÜ** ya da geri tuşu bağlantıyı kapatır.
 
 Notlar: Maç sırasında uygulamadan çıkan oyuncu yanmış sayılır. Bazı misafir/okul Wi-Fi ağları cihazların birbirini
