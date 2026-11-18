@@ -8,7 +8,7 @@ GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
 GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (2)
-GEÇTİ  | Kayıt: rekor kaydedildi (70)
+GEÇTİ  | Kayıt: rekor kaydedildi (43)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Duraklatma → Ana menü → MenuScreen
@@ -33,8 +33,13 @@ GEÇTİ  | Bölüm 73 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Bölüm 78 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Bölüm 93 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Bölüm 100 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 150 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 250 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 350 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 450 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 500 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Harita bölümlerinden ana menüye dönüş
 GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
 GEÇTİ  | Kalıcılık: seçili karakter korundu
 GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 39 geçti, 0 kaldı
+TOPLAM: 44 geçti, 0 kaldı

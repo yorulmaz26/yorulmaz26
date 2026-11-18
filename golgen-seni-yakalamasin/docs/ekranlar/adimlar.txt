@@ -8,3 +8,8 @@ ADIM: bolum 73
 ADIM: bolum 78
 ADIM: bolum 93
 ADIM: bolum 100
+ADIM: bolum 150
+ADIM: bolum 250
+ADIM: bolum 350
+ADIM: bolum 450
+ADIM: bolum 500
