@@ -9,6 +9,12 @@ public final class Chapters {
             "Prizma Bahçesi", "Çoklu Hedef", "Hareketli Taşlar", "Kilitli Kapılar", "Işığın Ustası"
     };
 
+    /** Bölüm aralıklarının konusu. */
+    public static final String[] TOPICS = {
+            "Temel aynalar", "Birden fazla ayna", "Engeller", "Renkli ışıklar", "Renk filtreleri",
+            "Prizmalar", "Birden fazla hedef", "Hareketli bloklar", "Kapılar ve anahtarlar", "Karma mekanikler"
+    };
+
     public static final String[] MECHANICS = {
             "Aynaya dokun, 90° dönsün. Işığı hedefe yönlendir!",
             "Birden fazla ayna var. Işığın izleyeceği yolu baştan planla.",

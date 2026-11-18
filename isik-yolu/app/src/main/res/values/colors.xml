@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="night">#101827</color>
+    <color name="turquoise">#20B8A6</color>
+    <color name="gold">#F5C542</color>
+    <color name="purple">#6D5DFB</color>
+    <color name="white">#FFFFFF</color>
+    <color name="ic_launcher_background">#101827</color>
+</resources>
