@@ -40,6 +40,7 @@ Kesin sürümler `pubspec.lock` içindedir.
 ```bash
 cd hayallerim_cepte
 flutter --version          # 3.50.x önerilir
+java -version              # Android derlemesi için JDK 21 (Android Studio'nun gömülü JDK'sı)
 flutter pub get
 dart run build_runner build   # yalnızca tablolar değiştiğinde (üretilen dosya depoda var)
 flutter run                   # bağlı cihaz/emülatör
