@@ -59,7 +59,7 @@ if adb install -r "$APK" >/dev/null; then ok "APK kurulumu"; else bad "APK kurul
 clear_log
 adb shell am start -W -n $ACT >/dev/null
 sleep 1.0; shot 01_acilis
-expect_screen SplashScreen "Uygulama açılışı"
+if log | grep -q "ekran=SplashScreen"; then ok "Uygulama açılışı → SplashScreen gösterildi"; else bad "Açılış ekranı gösterilmedi"; fi
 # İlk açılışta öğretici gelmeli
 expect_screen TutorialScreen "İlk açılış öğreticisi" 8
 sleep 0.5

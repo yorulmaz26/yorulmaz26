@@ -33,9 +33,11 @@ Sonuçların tamamı: [`ekranlar/test_sonuclari.txt`](ekranlar/test_sonuclari.tx
 | Kararlılık | Çökme (FATAL EXCEPTION) ve ANR yok |
 
 ## 4. Bulunan ve düzeltilen hatalar
-1. **Açılış ekranı test günlüğüne düşmüyordu** → ilk ekran da loglanıyor.
+1. **Açılış ekranı test günlüğüne düşmüyordu** → ilk ekran da loglanıyor; açılış kontrolü yavaş emülatörde zamanlama yarışına girmeyecek şekilde düzeltildi.
 2. **Android'in "Viewing full screen" sistem uyarısı** ilk açılışta dokunuşları yutuyordu (UI testinde 50 adım zincirleme kaldı). Gerçek kullanıcı "Got it"e bir kez basar; test ortamında uyarı önceden onaylanıyor. Düzeltmeden sonra 28/28.
-3. Ekran görüntüsü incelemesiyle düzen düzeltmeleri: karakter adının "Satın Al" butonuyla çakışması, oyun sonu başlığının başarı bildirimi altında kalması, ana menüde gösteri karakterlerinin başlığa yapışık olması, günlük görev ilerleme metninin çubuğa yapışık olması.
+3. **Uyumluluk (letterbox) modu:** manifestteki `resizeableActivity="false"` nedeniyle sistem uygulamayı küçültüp "Tap to restart this app" düğmesi gösterdi; bu düğme Rekorlar butonunu örttü. Ayar kaldırıldı, yapılandırma değişiklikleri uygulama içinde ele alınıyor.
+4. **Duraklatma testi:** oyun hareket sırasında engel/gölge yüzünden bitebildiği için test yeniden deneme yapacak şekilde sağlamlaştırıldı.
+5. Ekran görüntüsü incelemesiyle düzen düzeltmeleri: karakter adının "Satın Al" butonuyla çakışması, oyun sonu başlığının başarı bildirimi altında kalması, ana menüde gösteri karakterlerinin başlığa yapışık olması, günlük görev ilerleme metninin çubuğa yapışık olması.
 
 ## 5. Performans notu (dürüst değerlendirme)
 - Emülatörde ölçülen kare hızı ~21 FPS'dir; CI emülatörü GPU'suz yazılımsal (SwiftShader) çizim kullandığı için bu değer gerçek cihazı temsil etmez. **Gerçek cihazda 60 FPS ölçümü yapılmadı** (bu ortamda fiziksel cihaz yok).
