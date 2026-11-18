@@ -28,6 +28,13 @@ public final class Progress {
     public boolean tutorialSeen;
     public int lastPlayed = 1;
 
+    // can sistemi (bkz. Lives)
+    public int lives = Lives.MAX;
+    public long lifeBaseWall, lifeBaseElapsed = Long.MIN_VALUE, lifeBaseNet = -1, lifeMaxWall;
+    public int lifeBaseBoot = -1;
+    /** Canı düşülmüş, henüz bitmemiş deneme (0 = yok). */
+    public int attemptLevel;
+
     public boolean isUnlocked(int level) {
         return level == 1 || (level >= 2 && level <= LEVEL_COUNT && stars[level - 1] > 0);
     }
@@ -102,6 +109,7 @@ public final class Progress {
         System.arraycopy(fresh.bestMoves, 0, bestMoves, 0, bestMoves.length);
         hints = START_HINTS; hintsUsedTotal = 0; levelsWithoutHint = 0; undoCount = 0;
         dailyDone.clear(); achievements.clear(); tutorialSeen = false; lastPlayed = 1;
+        lives = Lives.MAX; attemptLevel = 0; lifeBaseElapsed = Long.MIN_VALUE;
     }
 
     public String serialize() {
@@ -122,6 +130,13 @@ public final class Progress {
         m.put("vib", vibration);
         m.put("tut", tutorialSeen);
         m.put("last", lastPlayed);
+        m.put("lives", lives);
+        m.put("lbw", lifeBaseWall);
+        m.put("lbe", lifeBaseElapsed);
+        m.put("lbb", lifeBaseBoot);
+        m.put("lbn", lifeBaseNet);
+        m.put("lmw", lifeMaxWall);
+        m.put("att", attemptLevel);
         return Json.write(m);
     }
 
@@ -150,6 +165,13 @@ public final class Progress {
             p.vibration = Json.getBool(m, "vib", true);
             p.tutorialSeen = Json.getBool(m, "tut", false);
             p.lastPlayed = Json.getInt(m, "last", 1);
+            p.lives = Math.max(0, Math.min(Lives.MAX, Json.getInt(m, "lives", Lives.MAX)));
+            p.lifeBaseWall = Json.getLong(m, "lbw", 0);
+            p.lifeBaseElapsed = Json.getLong(m, "lbe", Long.MIN_VALUE);
+            p.lifeBaseBoot = Json.getInt(m, "lbb", -1);
+            p.lifeBaseNet = Json.getLong(m, "lbn", -1);
+            p.lifeMaxWall = Json.getLong(m, "lmw", 0);
+            p.attemptLevel = Json.getInt(m, "att", 0);
             return p;
         } catch (RuntimeException e) {
             return new Progress();

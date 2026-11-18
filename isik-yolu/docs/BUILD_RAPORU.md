@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.2.0
+# Build Raporu — Işık Yolu 1.3.0
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -16,6 +16,20 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.3.0 değişiklikleri
+
+- Bölüm modunda can sistemi: 4 can; 15 dakikada 1 can yenilenir (en fazla 4). Günlük bulmaca can harcamaz.
+- Her bölümde hamle hakkı: 2 × en az hamle + 5. Geri Al hakkı iade etmez. Hak bitince deneme kaybedilir.
+- İlk hamlede 1 can düşer, bölüm kazanılınca geri verilir. Hak bitince, yeniden başlayınca, bölümden
+  çıkınca veya uygulama bölüm ortasında kapatılınca can geri gelmez.
+- Saat hilesi koruması (`Lives`):
+  - aynı açılışta yalnızca `elapsedRealtime` (kullanıcının değiştiremediği monoton saat) sayılır;
+  - telefon yeniden başlatılırsa Android açılış sayacı, varsa Android 13+ ağ saati kullanılır;
+  - saat daha önce görülen en ileri zamandan geri alınmışsa süre sayılmaz;
+  - aynı açılışta duvar saati monoton saatten 2 dakikadan fazla saparsa değişiklik algılanır ve dikkate alınmaz.
+- Arayüz: menüde, bölüm seçmede ve oyun ekranında kalp sayısı ve geri sayım; "Hamle hakkın bitti" ve
+  "Canın kalmadı" pencereleri; oyun ekranında kalan hak (son 3 hakta kırmızı).
 
 ## 1.2.0 değişiklikleri
 
@@ -38,10 +52,10 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.2.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 759 844 bayt | `499425bc8419e6784733cf0f0da69300212cc4fe10c87362699d1a9bcb0af447` |
-| `teslimat/IsikYolu-1.2.0-debug.apk` | 1 854 679 bayt | `cef7f8ad610e5434f26ad878b20e2eb9c2bea0d028d35f9b352f91edf8b13ce3` |
+| `teslimat/IsikYolu-1.3.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 763 972 bayt | `df69d98baf56cff603bb99b31a4dfcd8026492bbabc801a60aea22996dda60bc` |
+| `teslimat/IsikYolu-1.3.0-debug.apk` | 1 862 535 bayt | `b630b001f98a86f0fc17b56728bbd9a72f88cc4de122a55d12ca42140a816ddb` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 3, sürüm adı 1.2.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 4, sürüm adı 1.3.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.

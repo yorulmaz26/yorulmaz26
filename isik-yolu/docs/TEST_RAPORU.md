@@ -1,8 +1,8 @@
-# Test Raporu — Işık Yolu 1.2.0
+# Test Raporu — Işık Yolu 1.3.0
 
 Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 
-**Sonuç: 46 testin 46'sı geçti, 0 hata.** (1.2.0: mantık bölümleri + aydınlık tema)
+**Sonuç: 57 testin 57'si geçti, 0 hata.** (1.3.0: can sistemi)
 
 | Test sınıfı | Test | Sonuç | Süre |
 |---|---|---|---|
@@ -16,7 +16,8 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 | `BeamFollowerTest` (mantık ölçüsü) | 3 | ✅ | 0,09 sn |
 | `StarRatingTest` | 2 | ✅ | <0,01 sn |
 | `ProgressTest` | 9 | ✅ | <0,01 sn |
-| `UiFlowTest` (Robolectric, gerçek çizim) | 3 | ✅ | 77 sn |
+| `LivesTest` (can sistemi, saat hilesi) | 10 | ✅ | <0,1 sn |
+| `UiFlowTest` (Robolectric, gerçek çizim) | 4 | ✅ | ~90 sn |
 
 ## İstenen 10 kontrol
 
@@ -51,6 +52,36 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
   olayları `BoardView.Host` arayüzünden verildi; ham `MotionEvent` sürükleme hareketi otomatik test edilmedi.
 - 60 FPS hedefi cihazda ölçülmedi. Çizim döngüsü bellek ayırmayacak şekilde yazıldı (README › Performans).
 - Ses çalma Robolectric'te gölgelenir; seslerin cihazda duyulması elle denenmelidir.
+
+## Can sistemi (1.3.0)
+
+`LivesTest` testleri sahte bir telefon saatiyle (duvar saati, monoton saat, açılış sayacı ve ağ saati ayrı ayrı
+oynatılarak) yapıldı:
+
+| Senaryo | Beklenen | Sonuç |
+|---|---|---|
+| İlk kurulum, eski kayıt | 4 can | ✅ |
+| Deneme başlar / kazanılır | 3 can → 4 can | ✅ |
+| 4 deneme kaybedilir | 0 can, bölüm başlatılamaz | ✅ |
+| 14 dk, sonra 20 dk geçer | 0 can, ardından 1 can; kalan 5 dk ilerleme korunur | ✅ |
+| Saat 5 saat ileri alınır | can yok, değişiklik algılanır; gerçek 15 dk sonra 1 can | ✅ |
+| Saat 3 saat geri alınır | can yok; gerçek süreyle yenilenir | ✅ |
+| Telefon 32 dk kapalı kalır (yeniden başlatma) | 2 can | ✅ |
+| Saat geri alınıp yeniden başlatılır | süre sayılmaz | ✅ |
+| Saat 10 saat ileri alınıp yeniden başlatılır, ağ saati var | ağ saati kullanılır, can yok | ✅ |
+| Kaydet / yükle | can, sayaç ve süren deneme korunur | ✅ |
+| Hamle hakkı | hak bitince hamle kabul edilmez; geri almak hakkı iade etmez | ✅ |
+
+`UiFlowTest.livesFlow` aynı akışı arayüzde doğrular:
+- 4 denemede hak bitirilir, her seferinde "Hamle hakkın bitti" penceresi çıkar.
+- 0 canla bölüm açılmaz, "Canın kalmadı" penceresi çıkar.
+- 15 dakika (monoton saat) ilerletilince 1 can gelir.
+- Bölümden yarıda çıkmak canı geri getirmez.
+- 500 bölüm kazanılırken can hiç azalmaz.
+
+Bilinen sınır: Android 13 öncesinde ağ saati yoksa, saati ileri alıp telefonu yeniden başlatan oyuncu
+geçen süreyi ileri alınan kadar sayılmış bulur. Saati sonra geri alırsa yenilenme gerçek zaman o noktaya
+gelene kadar durur. Sunucusuz bir oyunda bundan ötesi ancak internet saatiyle mümkün; uygulamanın internet izni yok.
 
 ## Mantık bölümleri (1.2.0)
 

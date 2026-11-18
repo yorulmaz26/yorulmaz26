@@ -12,6 +12,7 @@ import com.isikyolu.engine.Chapters;
 import com.isikyolu.engine.DailyPuzzle;
 import com.isikyolu.engine.GameSession;
 import com.isikyolu.engine.Level;
+import com.isikyolu.engine.Lives;
 import com.isikyolu.engine.Move;
 import com.isikyolu.engine.Progress;
 import com.isikyolu.engine.StarRating;
@@ -39,7 +40,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
     private final int epochDay;
     private final GameSession session;
     private final BoardView board;
-    private final TextView movesText, goalText, hintBadge;
+    private final TextView movesText, movesLabel, goalText, hintBadge;
     private final MiniStars live;
     private boolean finished, thinking;
     private int lastLiveStars = 3;
@@ -51,7 +52,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         this.level = lvl;
         this.daily = epochDay >= 0;
         this.epochDay = epochDay;
-        this.session = new GameSession(lvl);
+        this.session = new GameSession(lvl, !daily);
         Context c = a;
         LinearLayout root = Ui.vertical(c);
 
@@ -87,9 +88,9 @@ public final class GameScreen extends Screen implements BoardView.Host {
         movesText = Ui.text(c, "0", 20, Palette.WHITE, Ui.BOLD);
         movesText.setGravity(Gravity.CENTER);
         movesBox.addView(movesText);
-        TextView ml = Ui.text(c, "HAMLE", 10, Palette.TEXT_DIM, Ui.BOLD);
-        ml.setLetterSpacing(0.1f);
-        movesBox.addView(ml);
+        movesLabel = Ui.text(c, daily ? "HAMLE" : "HAK", 10, Palette.TEXT_DIM, Ui.BOLD);
+        movesLabel.setLetterSpacing(0.1f);
+        movesBox.addView(movesLabel);
         top.addView(movesBox);
         root.addView(top);
 
@@ -102,6 +103,11 @@ public final class GameScreen extends Screen implements BoardView.Host {
         goalText = Ui.text(c, "", 13, Palette.TEXT_DIM, Ui.MEDIUM);
         goalText.setPadding(Ui.dp(c, 8), 0, 0, 0);
         goal.addView(goalText);
+        if (!daily) {
+            LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(-2, -2);
+            ll.leftMargin = Ui.dp(c, 10);
+            goal.addView(new com.isikyolu.game.ui.LivesBadge(c), ll);
+        }
         root.addView(goal);
 
         board = new BoardView(c);
@@ -198,7 +204,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     @Override public boolean onRotate(int x, int y) {
         if (finished || thinking) return false;
-        if (!session.tap(x, y)) return false;
+        if (!session.tap(x, y)) { if (session.isOutOfMoves()) outOfMoves(); return false; }
+        if (!beginAttempt()) return false;
         Game.audio().play(Audio.ROTATE, 0.9f + (float) Math.random() * 0.25f);
         Game.haptics().move();
         board.onMove(session.lastMove(), false);
@@ -209,11 +216,35 @@ public final class GameScreen extends Screen implements BoardView.Host {
     @Override public boolean onPush(int x, int y, int dir) {
         if (finished || thinking) return false;
         if (!session.drag(x, y, dir)) return false;
+        if (!beginAttempt()) return false;
         Game.audio().play(Audio.PUSH);
         Game.haptics().move();
         board.onMove(session.lastMove(), false);
         afterMove();
         return true;
+    }
+
+    /** Denemenin ilk hamlesinde 1 can düşer (kazanınca geri gelir). */
+    private boolean beginAttempt() {
+        if (daily) return true;
+        Progress p = Game.progress();
+        if (p.attemptLevel == level.id) return true;
+        if (!Lives.startAttempt(p, Game.clock(), level.id)) {
+            session.reset();
+            board.onMove(null, false);
+            updateHud();
+            act.showNoLives();
+            return false;
+        }
+        Game.save();
+        return true;
+    }
+
+    private boolean attemptActive() { return !daily && Game.progress().attemptLevel == level.id; }
+
+    @Override public void onHide() {
+        // bölümden çıkıldı: denemenin canı geri gelmez
+        if (attemptActive() && !finished) { Lives.loseAttempt(Game.progress()); Game.save(); }
     }
 
     @Override public void onBlockTapped() { act.toast("Altın bloğu sürükleyerek kaydır"); }
@@ -231,7 +262,21 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     private void reset() {
         if (finished || thinking) return;
-        if (session.moves() == 0) { act.toast("Bölüm zaten başlangıç durumunda"); return; }
+        if (session.actions() == 0) { act.toast("Bölüm zaten başlangıç durumunda"); return; }
+        if (attemptActive()) {
+            Overlay o = new Overlay(act);
+            o.title("Yeniden başla?");
+            o.body("Bu denemenin canı geri gelmez.\nKalan can: " + Game.progress().lives
+                    + (Game.progress().lives == 0 ? "\nYeni deneme için can yenilenmesini beklemen gerekecek." : ""));
+            o.button("Yeniden Başla", Ui.GOLD, Icon.RESET, v -> { o.dismiss(); Lives.loseAttempt(Game.progress()); Game.save(); doReset(); });
+            o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
+            o.show(act.overlayLayer());
+            return;
+        }
+        doReset();
+    }
+
+    private void doReset() {
         session.reset();
         Game.audio().play(Audio.UNDO, 0.8f);
         board.onMove(null, false);
@@ -241,22 +286,56 @@ public final class GameScreen extends Screen implements BoardView.Host {
     private void afterMove() {
         updateHud();
         if (session.isSolved()) win();
+        else if (session.isOutOfMoves()) outOfMoves();
+    }
+
+    /** Hamle hakkı bitti: deneme kaybedildi, can geri gelmez. */
+    private void outOfMoves() {
+        if (finished) return;
+        finished = true;
+        board.setInputEnabled(false);
+        Lives.loseAttempt(Game.progress());
+        Game.save();
+        Game.audio().play(Audio.LOCKED, 0.8f);
+        Game.haptics().error();
+        postDelayed(() -> {
+            Overlay o = new Overlay(act).setCancelable(false);
+            Context c = act;
+            FrameLayout ic = new FrameLayout(c);
+            ic.setBackground(Ui.round(0x33FF5C7A, Ui.dp(c, 34)));
+            ic.addView(Ui.icon(c, Icon.HEART, 0xFFFF5C7A, 38), new FrameLayout.LayoutParams(Ui.dp(c, 38), Ui.dp(c, 38), Gravity.CENTER));
+            o.cardView().addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 68), Ui.dp(c, 68)));
+            o.title("Hamle hakkın bitti");
+            Progress p = Game.progress();
+            o.body("Bu denemede 1 can kaybettin.\nKalan can: " + p.lives + "/" + Lives.MAX
+                    + (p.lives < Lives.MAX ? "\nSonraki can: " + Lives.format(Lives.msUntilNext(p, Game.clock())) : ""));
+            o.button("Tekrar Dene", Ui.PRIMARY, Icon.RESET, v -> { o.dismiss(); act.goLevel(level.id); });
+            o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); act.goLevels(); });
+            o.button("Ana Menü", Ui.SECONDARY, Icon.HOME, v -> { o.dismiss(); act.goMenu(); });
+            o.show(act.overlayLayer());
+        }, 500);
     }
 
     private void updateHud() {
         int m = session.moves();
-        movesText.setText(String.valueOf(m));
+        if (daily) movesText.setText(String.valueOf(m));
+        else {
+            int left = session.budgetLeft();
+            movesText.setText(String.valueOf(left));
+            movesText.setTextColor(left <= 3 ? 0xFFFF7A8E : Palette.WHITE);
+        }
         int stars = StarRating.stars(Math.max(m, 0), level.optimal);
         live.setStars(stars);
         if (stars < lastLiveStars) {
             live.animate().scaleX(1.25f).scaleY(1.25f).setDuration(120).withEndAction(() -> live.animate().scaleX(1f).scaleY(1f).setDuration(160).start()).start();
         }
         lastLiveStars = stars;
+        String pre = daily ? "" : "Hamle " + m + " · ";
         if (m <= StarRating.threeStarLimit(level.optimal))
-            goalText.setText("3 yıldız: en fazla " + level.optimal + " hamle");
+            goalText.setText(pre + "3★ için en fazla " + level.optimal);
         else if (m <= StarRating.twoStarLimit(level.optimal))
-            goalText.setText("2 yıldız: en fazla " + StarRating.twoStarLimit(level.optimal) + " hamle");
-        else goalText.setText("En az hamle: " + level.optimal + " · Sıfırlayıp yeniden dene");
+            goalText.setText(pre + "2★ için en fazla " + StarRating.twoStarLimit(level.optimal));
+        else goalText.setText(pre + "en az hamle " + level.optimal);
         hintBadge.setText(String.valueOf(Game.progress().hints));
     }
 
@@ -320,6 +399,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
             p.dailyDone.add(DailyPuzzle.keyFor(epochDay));
         } else {
             first = p.recordLevel(level.id, stars, session.moves(), session.hintsUsed() > 0);
+            Lives.winAttempt(p, Game.clock(), level.id);
         }
         boolean rewarded = p.hints > hintsBefore;
         Game.save();
@@ -392,7 +472,9 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (act.hasOverlay()) return;
         Overlay o = new Overlay(act);
         o.title("Duraklatıldı");
-        o.body((daily ? "Günlük Bulmaca" : "Bölüm " + level.id + " · " + level.name) + "\nHamle: " + session.moves());
+        o.body((daily ? "Günlük Bulmaca" : "Bölüm " + level.id + " · " + level.name) + "\nHamle: " + session.moves()
+                + (daily ? "" : " · Kalan hak: " + session.budgetLeft())
+                + (attemptActive() ? "\nÇıkarsan bu denemenin canı geri gelmez." : ""));
         o.button("Devam Et", Ui.PRIMARY, Icon.PLAY, v -> o.dismiss());
         o.button("Yeniden Başla", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); reset(); });
         if (daily) o.button("Günlük Bulmaca", Ui.SECONDARY, Icon.CALENDAR, v -> { o.dismiss(); act.goDaily(); });

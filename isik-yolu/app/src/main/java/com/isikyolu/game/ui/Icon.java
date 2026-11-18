@@ -12,7 +12,7 @@ import android.graphics.drawable.Drawable;
 public final class Icon extends Drawable {
     public static final int BACK = 0, PAUSE = 1, UNDO = 2, RESET = 3, BULB = 4, STAR = 5, LOCK = 6, GEAR = 7,
             TROPHY = 8, CALENDAR = 9, SOUND = 10, MUSIC = 11, PLAY = 12, GRID = 13, HELP = 14, VIBRATE = 15,
-            CHECK = 16, FLAME = 17, NEXT = 18, HOME = 19, STAR_OUTLINE = 20, CLOSE = 21;
+            CHECK = 16, FLAME = 17, NEXT = 18, HOME = 19, STAR_OUTLINE = 20, CLOSE = 21, HEART = 22;
 
     private final int kind;
     private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -151,6 +151,15 @@ public final class Icon extends Drawable {
             case CHECK:
                 p.moveTo(s * 0.2f, s * 0.52f); p.lineTo(s * 0.42f, s * 0.74f); p.lineTo(s * 0.8f, s * 0.28f);
                 c.drawPath(p, st);
+                break;
+            case HEART:
+                p.moveTo(m, s * 0.86f);
+                p.cubicTo(s * 0.1f, s * 0.5f, s * 0.08f, s * 0.12f, s * 0.32f, s * 0.14f);
+                p.cubicTo(s * 0.42f, s * 0.15f, s * 0.48f, s * 0.22f, m, s * 0.3f);
+                p.cubicTo(s * 0.52f, s * 0.22f, s * 0.58f, s * 0.15f, s * 0.68f, s * 0.14f);
+                p.cubicTo(s * 0.92f, s * 0.12f, s * 0.9f, s * 0.5f, m, s * 0.86f);
+                p.close();
+                c.drawPath(p, fl);
                 break;
             case CLOSE:
                 c.drawLine(s * 0.25f, s * 0.25f, s * 0.75f, s * 0.75f, st);

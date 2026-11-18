@@ -36,7 +36,12 @@ public final class LevelSelectScreen extends Screen {
         pill.setPadding(Ui.dp(a, 10), Ui.dp(a, 5), Ui.dp(a, 12), Ui.dp(a, 5));
         pill.addView(Ui.icon(a, Icon.STAR, Palette.GOLD, 16));
         pill.addView(Ui.text(a, " " + p.totalStars() + "/" + Progress.LEVEL_COUNT * 3, 14, Palette.GOLD, Ui.BOLD));
-        root.addView(Ui.header(a, "Bölümler", v -> a.goMenu(), pill));
+        LinearLayout right = Ui.horizontal(a);
+        right.addView(new com.isikyolu.game.ui.LivesBadge(a));
+        LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(-2, -2);
+        pl.leftMargin = Ui.dp(a, 6);
+        right.addView(pill, pl);
+        root.addView(Ui.header(a, "Bölümler", v -> a.goMenu(), right));
 
         android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(a);
         hs.setHorizontalScrollBarEnabled(false);

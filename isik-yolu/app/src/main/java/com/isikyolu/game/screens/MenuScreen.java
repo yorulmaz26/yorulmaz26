@@ -45,7 +45,8 @@ public final class MenuScreen extends Screen {
         pill.addView(Ui.icon(a, Icon.STAR, Palette.GOLD, 18));
         TextView st = Ui.text(a, "  " + p.totalStars() + " / " + Progress.LEVEL_COUNT * 3 + "   ·   " + p.completedCount() + " / " + Progress.LEVEL_COUNT + " bölüm", 14, Palette.GOLD, Ui.MEDIUM);
         pill.addView(st);
-        col.addView(pill, Ui.lpMargins(a, -2, -2, 0, 18, 0, 22));
+        col.addView(pill, Ui.lpMargins(a, -2, -2, 0, 18, 0, 10));
+        col.addView(new com.isikyolu.game.ui.LivesBadge(a), Ui.lpMargins(a, -2, -2, 0, 0, 0, 20));
 
         int next = p.nextLevel();
         String playLabel = p.completedCount() == 0 ? "Oyna" : (p.completedCount() >= Progress.LEVEL_COUNT ? "Oyna · Bölüm " + Progress.LEVEL_COUNT : "Devam Et · Bölüm " + next);
@@ -66,10 +67,14 @@ public final class MenuScreen extends Screen {
         col.addView(Ui.button(a, "Nasıl Oynanır?", Ui.GHOST, Icon.HELP, v -> TutorialOverlay.full(a).show(a.overlayLayer())),
                 Ui.lpMargins(a, -1, -2, 0, 0, 0, 0));
         col.addView(Ui.space(a, 18));
-        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.2", 12, Palette.TEXT_FAINT, Ui.REGULAR);
+        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.3", 12, Palette.TEXT_FAINT, Ui.REGULAR);
         col.addView(foot);
         sv.addView(col, new ScrollView.LayoutParams(-1, -2));
         addView(sv, new LayoutParams(-1, -1));
+    }
+
+    @Override public void onShow() {
+        if (Game.takeAbandonedNotice()) act.toast("Yarım bırakılan bölüm için 1 can harcandı");
     }
 
     private LinearLayout.LayoutParams weight(float l, float r) {

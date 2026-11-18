@@ -214,11 +214,73 @@ public class UiFlowTest {
 
         // kayıt: yeni etkinlik aynı ilerlemeyi okur
         Game.save();
-        String saved = Game.progress().serialize();
+        com.isikyolu.engine.Progress before = Game.progress();
+        int[] stars = before.stars.clone();
+        int hints = before.hints, lives = before.lives;
+        java.util.Set<String> ach = new java.util.HashSet<>(before.achievements);
         act.finish();
         MainActivity again = Robolectric.buildActivity(MainActivity.class).setup().get();
-        assertEquals(saved, Game.progress().serialize());
+        assertArrayEquals(stars, Game.progress().stars);
+        assertEquals(hints, Game.progress().hints);
+        assertEquals(lives, Game.progress().lives);
+        assertEquals(ach, Game.progress().achievements);
         again.finish();
+    }
+
+    /** Hamle hakkı biter, can gider; can kalmayınca bölüm açılmaz; 15 dk sonra can gelir. */
+    @Test public void livesFlow() throws Exception {
+        start();
+        Game.progress().tutorialSeen = true;
+        com.isikyolu.engine.Progress p = Game.progress();
+        assertEquals(4, p.lives);
+        shot("12_menu_canlar");
+        final int lvl = 12;
+        Level l = Game.levels().get(lvl);
+        java.util.Set<Integer> sol = new java.util.HashSet<>();
+        for (Move mv : Solver.solve(new Board(l), 100000).moves) sol.add(mv.cell);
+        int mx = -1, my = -1;
+        for (com.isikyolu.engine.Piece pc : l.pieces)
+            if (pc.type == com.isikyolu.engine.Cell.MIRROR && pc.rotatable && !sol.contains(pc.y * l.width + pc.x)) { mx = pc.x; my = pc.y; }
+        if (mx < 0) for (com.isikyolu.engine.Piece pc : l.pieces) if (pc.type == com.isikyolu.engine.Cell.MIRROR && pc.rotatable) { mx = pc.x; my = pc.y; }
+        int budget = com.isikyolu.engine.Lives.moveBudget(l.optimal);
+        for (int round = 0; round < 4; round++) {
+            act.goLevel(lvl);
+            idle(500);
+            closeOverlays();
+            GameScreen gs = (GameScreen) act.currentScreen();
+            // çözüme ait olmayan bir aynayı çevirerek hakkı çözmeden bitir
+            for (int i = 0; i < budget; i++) { assertTrue(gs.onRotate(mx, my)); idle(20); }
+            idle(900);
+            assertEquals("tur " + round, 3 - round, p.lives);
+            assertNotNull("hak bitti penceresi", topOverlay());
+            if (round == 0) shot("13_hak_bitti");
+            closeOverlays();
+        }
+        assertEquals(0, p.lives);
+        act.goLevels();
+        idle(600);
+        act.goLevel(2);
+        idle(600);
+        assertTrue("can yokken bölüm açılmamalı", act.currentScreen() instanceof LevelSelectScreen);
+        assertNotNull("can kalmadı penceresi", topOverlay());
+        shot("14_can_kalmadi");
+        closeOverlays();
+        // 15 dakika geçer (monoton saat)
+        org.robolectric.shadows.ShadowSystemClock.advanceBy(Duration.ofMinutes(15));
+        Game.refreshLives();
+        assertEquals(1, p.lives);
+        // bölümden yarıda çıkmak canı geri getirmez
+        act.goLevel(lvl);
+        idle(500);
+        closeOverlays();
+        GameScreen gs = (GameScreen) act.currentScreen();
+        assertTrue(gs.onRotate(mx, my));
+        idle(100);
+        assertEquals(0, p.lives);
+        act.goMenu();
+        idle(500);
+        assertEquals(0, p.lives);
+        assertEquals(0, p.attemptLevel);
     }
 
     @Test public void splashScreenRenders() throws Exception {
@@ -245,6 +307,7 @@ public class UiFlowTest {
         assertEquals(1500, Game.progress().totalStars());
         assertEquals("başlangıç 3 + her 10 bölümde 1", 3 + 50, Game.progress().hints);
         assertTrue(Game.progress().achievements.contains("efsane"));
+        assertEquals("kazanılan denemelerde can harcanmaz", com.isikyolu.engine.Lives.MAX, Game.progress().lives);
         assertTrue(Game.progress().achievements.contains("kusursuz"));
         act.goLevels();
         idle(800);

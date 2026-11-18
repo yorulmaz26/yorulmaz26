@@ -10,9 +10,17 @@ public final class GameSession {
     private final Deque<Move> history = new ArrayDeque<>();
     private BeamTracer.Result result;
     private int hintsUsed;
+    /** Bu denemede yapılan toplam hamle (geri almalar iade edilmez). */
+    private int actions;
 
-    public GameSession(Level level) {
+    /** Hamle hakkı sınırı uygulanıyor mu (bölüm modu). */
+    public final boolean limited;
+
+    public GameSession(Level level) { this(level, false); }
+
+    public GameSession(Level level, boolean limited) {
         this.level = level;
+        this.limited = limited;
         reset();
     }
 
@@ -24,9 +32,16 @@ public final class GameSession {
     public int hintsUsed() { return hintsUsed; }
     public void markHintUsed() { hintsUsed++; }
 
+    /** Kalan hamle hakkı. */
+    public int budgetLeft() { return Lives.moveBudget(level.optimal) - actions; }
+    public int actions() { return actions; }
+    /** Hak bitti ve çözülmedi mi? */
+    public boolean isOutOfMoves() { return limited && !result.solved && budgetLeft() <= 0; }
+
     public void reset() {
         board = new Board(level);
         history.clear();
+        actions = 0;
         retrace();
     }
 
@@ -46,10 +61,12 @@ public final class GameSession {
 
     public boolean play(Move m) {
         if (result.solved) return false;
+        if (limited && budgetLeft() <= 0) return false;
         if (m.kind == Move.ROTATE && !board.isRotatable(m.cell)) return false;
         if (m.kind == Move.PUSH && !board.canPush(m.cell, m.dir)) return false;
         board.apply(m);
         history.push(m);
+        actions++;
         retrace();
         return true;
     }

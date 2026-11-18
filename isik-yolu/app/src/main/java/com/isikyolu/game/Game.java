@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.isikyolu.engine.LevelPack;
+import com.isikyolu.engine.Lives;
 import com.isikyolu.engine.Progress;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +36,11 @@ public final class Game {
         if (prefs == null) {
             prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             progress = Progress.deserialize(prefs.getString(KEY, null));
+            clockSource = app;
+            // uygulama bir bölümün ortasında kapatıldıysa o denemenin canı geri gelmez
+            if (progress.attemptLevel != 0) { Lives.loseAttempt(progress); abandonedAttempt = true; }
+            Lives.update(progress, clock());
+            save();
         }
         if (audio == null) audio = new Audio(app);
         if (haptics == null) haptics = new Haptics(app);
@@ -52,6 +58,32 @@ public final class Game {
             }
         }
         return levels;
+    }
+
+    private static Context clockSource;
+    private static boolean abandonedAttempt;
+
+    /** Yarım kalan denemede can harcandı mı (bir kez bildirilir). */
+    public static boolean takeAbandonedNotice() { boolean b = abandonedAttempt; abandonedAttempt = false; return b; }
+
+    /** Can sistemi için saatler: monoton saat, açılış sayacı ve (varsa) ağ saati. */
+    public static Lives.Clock clock() {
+        int boot = -1;
+        try {
+            if (clockSource != null) boot = android.provider.Settings.Global.getInt(clockSource.getContentResolver(), android.provider.Settings.Global.BOOT_COUNT);
+        } catch (Exception ignored) { }
+        long net = -1;
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            try { net = android.os.SystemClock.currentNetworkTimeClock().millis(); } catch (Exception ignored) { }
+        }
+        return new Lives.Clock(System.currentTimeMillis(), android.os.SystemClock.elapsedRealtime(), boot, net);
+    }
+
+    /** Canları güncel süreye göre yeniler; saat değişikliği algılanırsa true. */
+    public static boolean refreshLives() {
+        boolean tamper = Lives.update(progress, clock());
+        save();
+        return tamper;
     }
 
     public static LevelPack levels() { return levels; }

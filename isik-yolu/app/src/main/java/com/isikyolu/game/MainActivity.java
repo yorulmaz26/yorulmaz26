@@ -60,7 +60,39 @@ public final class MainActivity extends Activity {
 
     public void goMenu() { show(new MenuScreen(this), false); }
     public void goLevels() { show(new LevelSelectScreen(this), true); }
-    public void goLevel(int id) { show(new GameScreen(this, id), true); }
+    /** Bölüm açılır; can yoksa "can kalmadı" penceresi gösterilir. */
+    public void goLevel(int id) {
+        Game.refreshLives();
+        com.isikyolu.engine.Progress p = Game.progress();
+        if (p.lives <= 0 && p.attemptLevel != id) { showNoLives(); return; }
+        show(new GameScreen(this, id), true);
+    }
+
+    public void showNoLives() {
+        com.isikyolu.game.ui.Overlay o = new com.isikyolu.game.ui.Overlay(this);
+        FrameLayout ic = new FrameLayout(this);
+        ic.setBackground(Ui.round(0x33FF5C7A, Ui.dp(this, 34)));
+        ic.addView(Ui.icon(this, com.isikyolu.game.ui.Icon.HEART, 0xFFFF5C7A, 38), new FrameLayout.LayoutParams(Ui.dp(this, 38), Ui.dp(this, 38), Gravity.CENTER));
+        o.cardView().addView(ic, new LinearLayout.LayoutParams(Ui.dp(this, 68), Ui.dp(this, 68)));
+        o.title("Canın kalmadı");
+        com.isikyolu.engine.Lives.Clock clk = Game.clock();
+        TextView body = o.body("");
+        Runnable[] tick = new Runnable[1];
+        tick[0] = () -> {
+            com.isikyolu.engine.Lives.update(Game.progress(), Game.clock());
+            if (Game.progress().lives > 0) { body.setText("Yeni bir can geldi! Bölümlere dönebilirsin."); return; }
+            body.setText("Her 15 dakikada 1 can yenilenir (en fazla " + com.isikyolu.engine.Lives.MAX + ").\nSonraki can: "
+                    + com.isikyolu.engine.Lives.format(com.isikyolu.engine.Lives.msUntilNext(Game.progress(), Game.clock()))
+                    + "\n\nGünlük bulmaca can harcamaz.");
+            body.postDelayed(tick[0], 1000);
+        };
+        tick[0].run();
+        o.button("Günlük Bulmaca", Ui.GOLD, com.isikyolu.game.ui.Icon.CALENDAR, v -> { o.dismiss(); goDaily(); });
+        o.button("Tamam", Ui.SECONDARY, -1, v -> o.dismiss());
+        o.setOnDismiss(() -> body.removeCallbacks(tick[0]));
+        o.show(overlayLayer());
+        Game.audio().play(Audio.LOCKED);
+    }
     public void goDailyGame(Level level, int epochDay) { show(new GameScreen(this, level, epochDay), true); }
     public void goDaily() { show(new DailyScreen(this), true); }
     public void goAchievements() { show(new AchievementsScreen(this), true); }

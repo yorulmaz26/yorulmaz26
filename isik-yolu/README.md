@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.2.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.2.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.3.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.3.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -40,6 +40,16 @@ Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` 
   Optimum, her bölüm için BFS çözücüyle hesaplanmıştır. Geri Al hamle sayısını da geri alır.
 - **İpucu:** 3 ipucuyla başlanır; **her 10 bölüm tamamlandığında +1 ipucu** kazanılır (aynı bölümü tekrar
   oynamak sayılmaz). İpucu, mevcut durumdan en kısa çözümün ilk hamlesini tahtada altın halkayla gösterir.
+
+## Canlar (bölüm modu)
+
+- 4 canla başlanır; 15 dakikada 1 can yenilenir (en fazla 4). Günlük bulmaca can harcamaz.
+- Her bölümde **hamle hakkı** vardır: 2 × en az hamle + 5. Geri Al hakkı iade etmez.
+- Bir bölümde ilk hamleyi yapınca 1 can düşer, bölümü bitirince geri gelir. Can şu durumlarda geri gelmez:
+  hak bittiğinde, yeniden başlayınca, bölümden çıkınca, uygulama bölüm ortasında kapatılınca.
+- Süre, telefon saatine göre değil, kullanıcının değiştiremediği monoton sistem saatine göre ölçülür.
+  Yeniden başlatmalarda açılış sayacı ve varsa ağ saati kullanılır; saati geri almak süre kazandırmaz
+  (`engine/Lives.java`).
 
 ## Mantık bölümleri
 
