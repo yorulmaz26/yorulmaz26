@@ -225,14 +225,14 @@ public final class MissionsScreen extends Screen {
             boolean done = p.dailyDone(i);
             Ui.panel(c, colL, top, colR, bottom, 36f * u, Theme.alpha(Theme.CARD, 0.95f), done ? Theme.GOLD : Theme.LINE, done ? 3.5f * u : 2f * u);
             Icons.draw(c, Icons.CALENDAR, colL + 70f * u, top + 70f * u, 28f * u, done ? Theme.GOLD : Theme.TEAL);
-            Ui.textFit(c, dailyText[i], colL + 130f * u, top + 82f * u, 40f * u, colR - colL - 180f * u, Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
+            Ui.textFit(c, dailyText[i], colL + 130f * u, top + 78f * u, 40f * u, colR - colL - 180f * u, Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
             int type = p.dailyTypes[i];
             int target = DailyMissions.target(type, p.dailyDay);
             float prog = Math.min(1f, p.dailyProgress[i] / (float) target);
             float bl = colL + 50f * u, br = colR - 320f * u, by = bottom - 75f * u;
             Ui.panel(c, bl, by, br, by + 22f * u, 11f * u, Theme.alpha(Theme.NAVY_DEEP, 0.9f), Theme.LINE, 2f * u);
             if (prog > 0f) Ui.panel(c, bl, by, bl + (br - bl) * prog, by + 22f * u, 11f * u, done ? Theme.GOLD : Theme.TEAL, 0, 0);
-            Ui.text(c, dailyProg[i], bl, by - 18f * u, 30f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
+            Ui.text(c, dailyProg[i], bl, by - 26f * u, 30f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
         }
     }
 

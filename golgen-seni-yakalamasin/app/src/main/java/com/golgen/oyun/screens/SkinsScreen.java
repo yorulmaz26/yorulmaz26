@@ -82,10 +82,10 @@ public final class SkinsScreen extends Screen {
         bg.s = w / 1000f;
         float cw = Math.min(w - 100f * u, 920f * u);
         gridL = (w - cw) / 2f;
-        float previewB = headerBottom() + 470f * u;
         float bh = 120f * u;
-        actionBtn.set(w / 2f - 300f * u, previewB - bh, w / 2f + 300f * u, previewB);
-        gridTop = previewB + 50f * u;
+        float btnTop = headerBottom() + 420f * u;
+        actionBtn.set(w / 2f - 300f * u, btnTop, w / 2f + 300f * u, btnTop + bh);
+        gridTop = btnTop + bh + 60f * u;
         cellW = cw / 4f;
         float avail = h - safeB - 40f * u - gridTop;
         cellH = Math.min(300f * u, avail / 2f);
@@ -130,11 +130,11 @@ public final class SkinsScreen extends Screen {
 
         // Önizleme
         SkinDef s = Skins.ALL[focus];
-        float cx = w / 2f, py = headerBottom() + 170f * u;
+        float cx = w / 2f, py = headerBottom() + 150f * u;
         float t = time * 1.4f;
         WorldRenderer.drawSkinPreview(c, s, cx - 150f * u + (float) Math.sin(t - 0.8f) * 40f * u, py + 20f * u, 70f * u, 0f, 0.9f, true);
         WorldRenderer.drawSkinPreview(c, s, cx + (float) Math.sin(t) * 40f * u, py, 90f * u, (float) Math.sin(t) * 0.25f, 1f, false);
-        Ui.text(c, s.name, cx, py + 175f * u, 50f * u, Theme.WHITE, Paint.Align.CENTER, Ui.BOLD);
+        Ui.text(c, s.name, cx, py + 205f * u, 50f * u, Theme.WHITE, Paint.Align.CENTER, Ui.BOLD);
 
         // Izgara
         for (int i = 0; i < Skins.ALL.length; i++) {

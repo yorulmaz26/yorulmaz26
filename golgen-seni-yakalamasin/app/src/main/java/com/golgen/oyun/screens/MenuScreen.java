@@ -100,14 +100,15 @@ public final class MenuScreen extends Screen {
         bg.drawBackground(c, w, h, scroll);
         float cx = w / 2f;
         // Gösteri: oyuncu Lissajous eğrisinde, gölge 0.9 sn geriden takip eder
-        float areaY = safeT + 560f * u;
-        float ax = 300f * u, ay = 120f * u;
+        float titleBottom = safeT + 420f * u;
+        float areaY = (titleBottom + playBtn.rect.top - 110f * u) / 2f;
+        float ax = 320f * u, ay = Math.min(220f * u, (playBtn.rect.top - titleBottom) * 0.25f);
         float t1 = time * 1.2f, t2 = (time - 0.9f) * 1.2f;
         float px = cx + (float) Math.sin(t1) * ax, py = areaY + (float) Math.sin(t1 * 2f) * ay;
         float sx = cx + (float) Math.sin(t2) * ax, sy = areaY + (float) Math.sin(t2 * 2f) * ay;
         float appear = Math.min(1f, time / 0.6f);
-        WorldRenderer.drawSkinPreview(c, g.skin(), sx, sy, 46f * u, 0f, appear, true);
-        WorldRenderer.drawSkinPreview(c, g.skin(), px, py, 46f * u, (float) Math.cos(t1) * 0.3f, appear, false);
+        WorldRenderer.drawSkinPreview(c, g.skin(), sx, sy, 56f * u, 0f, appear, true);
+        WorldRenderer.drawSkinPreview(c, g.skin(), px, py, 56f * u, (float) Math.cos(t1) * 0.3f, appear, false);
 
         // Başlık
         float ty = safeT + 290f * u;

@@ -114,7 +114,7 @@ public final class GameOverScreen extends Screen {
     public void draw(Canvas c) {
         bg.drawBackground(c, w, h, time * 60f);
         float cx = w / 2f;
-        float top = safeT + 150f * u;
+        float top = safeT + 250f * u;
         Ui.textFit(c, title, cx, top, 72f * u, w - 100f * u, titleColor, Paint.Align.CENTER, Ui.DISPLAY);
         Ui.textFit(c, subtitle, cx, top + 66f * u, 34f * u, w - 140f * u, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
 
