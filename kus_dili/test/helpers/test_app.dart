@@ -5,6 +5,7 @@ import 'package:kus_dili/app/app.dart';
 import 'package:kus_dili/core/firebase/firebase_bootstrap.dart';
 import 'package:kus_dili/core/firebase/firebase_providers.dart';
 import 'package:kus_dili/features/auth/application/auth_providers.dart';
+import 'package:kus_dili/features/calls/application/call_controller.dart';
 import 'package:kus_dili/features/chat/application/chat_providers.dart';
 import 'package:kus_dili/features/crypto/application/crypto_providers.dart';
 import 'package:kus_dili/features/media/application/media_providers.dart';
@@ -15,6 +16,7 @@ import 'package:kus_dili/features/privacy/domain/pin_vault.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_call.dart';
 import 'fake_media.dart';
 import 'fake_push.dart';
 import 'in_memory.dart';
@@ -34,6 +36,8 @@ Widget testApp({
   FakePushMessaging? push,
 }) => ProviderScope(
   overrides: [
+    callEngineFactoryProvider.overrideWithValue(() => FakeCallEngine('app')),
+    iceServerSourceProvider.overrideWithValue(FakeIceServers()),
     pushMessagingProvider.overrideWithValue(push ?? FakePushMessaging()),
     attachmentStorageProvider.overrideWithValue(
       storage ?? InMemoryAttachmentStorage(),

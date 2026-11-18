@@ -31,6 +31,8 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   AES-256-GCM ile şifrelenir, Storage'a yalnızca şifreli hâli yüklenir.
 * **Bildirimler (Aşama 10a)**: içeriksiz ("Yeni bir mesajın var") FCM
   bildirimleri, sohbet başına sessize alma; Cloud Function `functions/` altında.
+* **Aramalar (Aşama 10b)**: birebir sesli ve görüntülü arama (WebRTC,
+  DTLS-SRTP); kurulum bilgileri Signal ile şifreli; kısa ömürlü TURN kimliği.
 * **Gizli sohbet (Aşama 7b)**: PIN (PBKDF2, deneme sınırı) ve biyometri ile
   kilitli sohbet, listeden gizlenen sohbetler, uygulama kilidi, süreli ve tek
   görüntülük mesajlar. Gizli/kilitli bilgisi yalnızca cihazda.

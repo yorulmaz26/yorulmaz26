@@ -129,6 +129,28 @@ firebase deploy --only functions:kusdili,firestore:rules
 Fonksiyon `europe-west1` bölgesinde çalışır; isterseniz `functions/src/index.ts`
 içindeki `REGION` değerini Firestore bölgenize yakın bir bölgeyle değiştirin.
 
+## 5d. Aramalar için TURN sunucusu (önerilir)
+
+STUN tek başına mobil ağlarda çoğu zaman yetmez. Kendi coturn sunucunuzu
+kurun (ör. küçük bir VPS, 3478/UDP+TCP ve 5349/TLS açık) ve
+`/etc/turnserver.conf` içinde:
+
+```
+use-auth-secret
+static-auth-secret=<uzun-rastgele-gizli>
+realm=kusdili
+```
+
+Ardından gizli anahtarı ve adresleri Firebase'e verin (gizli anahtar Secret
+Manager'da durur, uygulamaya gömülmez):
+
+```bash
+firebase functions:secrets:set TURN_SECRET          # coturn'deki değer
+# functions/.env.<proje-id> dosyasına:
+# TURN_URLS=turn:turn.alanadiniz.com:3478,turns:turn.alanadiniz.com:5349
+firebase deploy --only functions:kusdili
+```
+
 ## 6. Yerel emülatörle geliştirme (isteğe bağlı)
 
 ```bash

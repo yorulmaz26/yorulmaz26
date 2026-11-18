@@ -8,6 +8,7 @@ import 'package:material_ui/material_ui.dart';
 
 import '../../../app/router.dart';
 import '../../../app/theme/app_colors.dart';
+import '../../calls/application/call_controller.dart';
 import '../../crypto/application/crypto_providers.dart';
 import '../../privacy/application/privacy_providers.dart';
 import '../../privacy/presentation/unlock_gate.dart';
@@ -185,6 +186,21 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 
+  Future<void> _call(String peer, {required bool video}) async {
+    final router = GoRouter.of(context);
+    unawaited(router.push(Routes.call));
+    try {
+      await ref
+          .read(callControllerProvider.notifier)
+          .startCall(chatId: widget.chatId, peer: peer, video: video);
+    } on CallUnavailableException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    }
+  }
+
   Future<void> _pickAttachment() async {
     final choice = await showModalBottomSheet<String>(
       context: context,
@@ -284,6 +300,20 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           ),
         ),
         actions: [
+          if (!isGroup && otherUid != null) ...[
+            IconButton(
+              key: const Key('voiceCall'),
+              tooltip: 'Sesli arama',
+              icon: const Icon(Icons.call_outlined),
+              onPressed: () => _call(otherUid, video: false),
+            ),
+            IconButton(
+              key: const Key('videoCall'),
+              tooltip: 'Görüntülü arama',
+              icon: const Icon(Icons.videocam_outlined),
+              onPressed: () => _call(otherUid, video: true),
+            ),
+          ],
           IconButton(
             key: const Key('chatSettings'),
             tooltip: 'Sohbet dili',

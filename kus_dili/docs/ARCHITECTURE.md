@@ -296,6 +296,29 @@ içerik gizleme Aşama 10'da (bildirimler) yapılacak.
   ve Android arka plan işleyicisi gerektirir; henüz yapılmadı. FCM'in yeni FID
   tabanlı kaydına geçiş, Admin SDK desteği olgunlaşınca yapılacak.
 
+## 6c. Sesli ve görüntülü arama (Aşama 10b) ✅
+
+* **Medya:** WebRTC; ses ve görüntü DTLS-SRTP ile uçtan uca şifrelidir. Doğrudan
+  (P2P) ya da TURN sunucusu üzerinden akar; TURN içeriği çözemez.
+* **Kurulum (SDP / ICE):** `calls/{id}/signals` altında, her biri Signal ile
+  birebir şifreli. Sunucu SDP'deki DTLS parmak izlerini göremez ve
+  değiştiremez; böylece araya girme (MITM) için sunucuya güvenmek gerekmez.
+  Güvenlik numarası doğrulaması aramalar için de geçerlidir.
+* **Durum:** `calls/{id}` (arayan, aranan, görüntülü mü, ringing → accepted /
+  declined / busy / missed / ended). Kurallar yalnızca iki tarafın okumasına ve
+  izinli geçişlere izin verir (kabul yalnızca aranan, cevapsız yalnızca arayan).
+  Arama yalnızca iki kişilik sohbette; 45 sn cevap yoksa cevapsız.
+* **TURN:** Kimlik bilgileri uygulamaya gömülmez; `turnCredentials` Cloud
+  Function'ı coturn `use-auth-secret` biçiminde 1 saatlik kimlik üretir.
+  Yapılandırılmamışsa yalnızca STUN kullanılır (mobil ağlarda bağlantı kurulamayabilir).
+* **Gelen arama:** uygulama açıkken tam ekran; kapalıyken içeriksiz bildirim
+  ("Gelen sesli arama"). Başka aramadayken gelen arama "meşgul" olur.
+
+**Sınırlar:** Grup araması yok. Telefon kilitliyken / uygulama kapalıyken
+sistem arama ekranı (iOS CallKit + PushKit, Android ConnectionService) yok;
+yalnızca bildirim gelir. Gerçek cihaz/ağ testi yapılmadı (bu ortamda WebRTC
+çalıştırılamıyor; mantık sahte motorla test edildi).
+
 ## 7. Aşama durumu
 
 | # | Aşama | Durum |
@@ -309,6 +332,6 @@ içerik gizleme Aşama 10'da (bildirimler) yapılacak.
 | 7 | Gizli sohbet + E2EE | ✅ 7a: Signal ile E2EE, güvenlik numarası (denetim bekliyor, bkz. §4) · 7b: PIN/biyometri, kilitli ve gizli sohbet, uygulama kilidi, süreli ve tek görüntülük mesaj |
 | 8 | Grup mesajlaşması | ✅ Sender Keys ile E2EE, üyelik değişince anahtar yenileme, yönetici işlemleri, ayrılma |
 | 9 | Medya ve sesli mesaj | — |
-| 10 | Bildirimler ve aramalar | ✅ 10a: içeriksiz bildirimler (FCM + Cloud Function) · 10b aramalar: sırada |
+| 10 | Bildirimler ve aramalar | ✅ içeriksiz bildirimler; uçtan uca şifreli birebir sesli/görüntülü arama (WebRTC) |
 | 11 | Öğrenme modülü | Çevirici ekranı hazır; alıştırmalar/testler sonra |
 | 12 | Test, optimizasyon, yayın | — |

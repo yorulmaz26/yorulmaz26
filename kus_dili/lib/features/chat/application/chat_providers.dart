@@ -23,24 +23,29 @@ final chatSettingsRepositoryProvider = Provider<ChatSettingsRepository>(
 
 /// Uçtan uca şifreleme (Signal). Geliştirme döneminde yazılmış şifresiz
 /// (encVersion 0) mesajlar yalnızca okunabilir.
-final messageSealerProvider = Provider<MessageSealer>((ref) {
+final signalSealerProvider = Provider<SignalSealer?>((ref) {
   final uid = ref.watch(myUidProvider);
   final store = ref.watch(signalStoreProvider);
   final cache = ref.watch(payloadCacheProvider);
   final keys = ref.watch(keyManagerProvider);
   if (uid == null || store == null || cache == null || keys == null) {
-    return const PlaintextDevSealer();
+    return null;
   }
-  return CompositeSealer(
-    SignalSealer(
-      myUid: uid,
-      store: store,
-      directory: ref.watch(keyDirectoryProvider),
-      cache: cache,
-      ensureKeys: keys.ensureKeys,
-      groups: ref.watch(groupDirectoryProvider),
-    ),
+  return SignalSealer(
+    myUid: uid,
+    store: store,
+    directory: ref.watch(keyDirectoryProvider),
+    cache: cache,
+    ensureKeys: keys.ensureKeys,
+    groups: ref.watch(groupDirectoryProvider),
   );
+});
+
+/// Uçtan uca şifreleme (Signal). Geliştirme döneminde yazılmış şifresiz
+/// (encVersion 0) mesajlar yalnızca okunabilir.
+final messageSealerProvider = Provider<MessageSealer>((ref) {
+  final signal = ref.watch(signalSealerProvider);
+  return signal == null ? const PlaintextDevSealer() : CompositeSealer(signal);
 });
 
 final myUidProvider = Provider<String?>(

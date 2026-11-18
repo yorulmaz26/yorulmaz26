@@ -75,3 +75,28 @@ export function isDeadTokenError(code: string | undefined): boolean {
     code === 'messaging/invalid-argument'
   );
 }
+
+/** Gelen arama: aranana içeriksiz, yüksek öncelikli bildirim. */
+export function planCallPush(callee: string, prefs: PushPrefs | undefined): PushTarget[] {
+  if (!prefs || prefs.enabled === false) return [];
+  const tokens = [...new Set((prefs.tokens ?? []).filter((t) => t.length > 0))].slice(
+    -MAX_TOKENS_PER_USER,
+  );
+  return tokens.length ? [{ uid: callee, tokens }] : [];
+}
+
+export function callContent(callId: string, chatId: string, video: boolean): PushContent {
+  return {
+    data: { type: 'call', callId, chatId },
+    notification: {
+      title: 'Kuş Dili',
+      body: video ? 'Gelen görüntülü arama' : 'Gelen sesli arama',
+    },
+    android: {
+      priority: 'high',
+      collapseKey: `call_${callId}`,
+      notification: { tag: `call_${callId}` },
+    },
+    apns: { payload: { aps: { 'thread-id': `call_${callId}`, sound: 'default' } } },
+  };
+}
