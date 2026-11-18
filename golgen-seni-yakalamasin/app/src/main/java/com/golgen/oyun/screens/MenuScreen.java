@@ -20,6 +20,8 @@ public final class MenuScreen extends Screen {
     private String diamondText = "0", bestText = "";
     private int lastDiamonds = -1, lastBest = -1;
     private float scroll;
+    private int lastLives = -1;
+    private String lastTimer = "";
     private final Button loginBtn;
     private boolean loginModal;
     private int loginDay;
@@ -125,6 +127,13 @@ public final class MenuScreen extends Screen {
             bestText = lastBest > 0 ? "EN İYİ SKOR  " + lastBest : "İlk rekorunu kır!";
         }
         tasksBtn.badge = g.progress.claimableDailyCount();
+        int lives = g.lives();
+        String timer = lives < com.golgen.oyun.core.Energy.MAX ? g.energyTimer() : "";
+        if (lives != lastLives || !timer.equals(lastTimer)) {
+            lastLives = lives;
+            lastTimer = timer;
+            missionBtn.sub = "Can " + lives + "/4" + (timer.isEmpty() ? "" : " · " + timer);
+        }
         if (g.progress.level != lastLevel || g.progress.xp != lastXp) {
             lastLevel = g.progress.level;
             lastXp = g.progress.xp;

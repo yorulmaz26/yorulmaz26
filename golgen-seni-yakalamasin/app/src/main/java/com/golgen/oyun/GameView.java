@@ -47,6 +47,9 @@ public final class GameView extends View implements Choreographer.FrameCallback 
     public final PrefsStore store;
     public final SoundSystem sound;
     public final Haptics haptics;
+    public final com.golgen.oyun.core.TimeSource clock;
+    private int lastEnergySec = -1;
+    private String energyText = "";
 
     public final SplashScreen splash;
     public final MenuScreen menu;
@@ -89,6 +92,9 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         store = new PrefsStore(activity);
         progress.load(store);
         progress.ensureDaily(epochDay());
+        clock = new com.golgen.oyun.platform.SystemTime(activity.getContentResolver());
+        progress.energy.tick(clock); // ilk kurulumda 4 can
+        save();
         sound = new SoundSystem(activity);
         haptics = new Haptics(activity);
         applySettings();
@@ -145,9 +151,33 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         go(play);
     }
 
-    public void startMission(int index) {
+    /** Bölüm başlatır: 1 can harcanır (kazanınca geri verilir). Can yoksa uyarır. */
+    public boolean startMission(int index) {
+        if (!progress.energy.consume(clock)) {
+            toast("Canın kalmadı · sonraki can " + energyTimer(), Icons.HEART);
+            if (current != missions) { missions.showTab(MissionsScreen.TAB_LEVELS); go(missions); }
+            return false;
+        }
+        save();
         play.setup(RunResult.MODE_MISSION, index);
         go(play);
+        return true;
+    }
+
+    public int lives() {
+        progress.energy.tick(clock);
+        return progress.energy.lives;
+    }
+
+    /** Sonraki cana kalan süre "dd:ss" (saniyede bir yeniden üretilir). */
+    public String energyTimer() {
+        long ms = progress.energy.msToNext(clock);
+        int sec = (int) ((ms + 999) / 1000);
+        if (sec != lastEnergySec) {
+            lastEnergySec = sec;
+            energyText = sec <= 0 ? "dolu" : (sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60);
+        }
+        return energyText;
     }
 
     public Screen current() { return current; }
@@ -192,6 +222,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
             case "ogretici": tutorial.setFromSettings(true); go(tutorial); break;
             default:
                 if (e.startsWith("gorev:")) {
+                    progress.energy.refill(clock); // test: can sınırına takılmasın
                     try { startMission(Integer.parseInt(e.substring(6))); } catch (NumberFormatException ignored) { }
                 }
                 break;
@@ -243,6 +274,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
 
     // ---------------- Yaşam döngüsü ----------------
     public void onResume() {
+        progress.energy.tick(clock);
         running = true;
         lastNanos = 0;
         sound.onResume();

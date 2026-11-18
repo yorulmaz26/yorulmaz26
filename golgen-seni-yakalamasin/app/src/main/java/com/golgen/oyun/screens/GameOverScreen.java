@@ -34,6 +34,7 @@ public final class GameOverScreen extends Screen {
     private String xpText = "", levelText = "";
     private float xpFrac;
     private boolean levelUp;
+    private String livesText = "";
 
     public GameOverScreen(GameView g) {
         super(g);
@@ -69,6 +70,12 @@ public final class GameOverScreen extends Screen {
         total += rep.levelReward;
         rewardText = "+" + total + " elmas kazandın";
         stars = res.mode == RunResult.MODE_MISSION ? res.stars : 0;
+        if (res.mode == RunResult.MODE_MISSION) {
+            int l = g.lives();
+            livesText = won ? "Can korundu · " + l + "/4" : "-1 can · kalan " + l + "/4" + (l < 4 ? " · sonraki " + g.energyTimer() : "");
+        } else {
+            livesText = "";
+        }
         levelUp = rep.levelUps > 0;
         levelText = "Seviye " + g.progress.level;
         xpText = "+" + rep.xpGained + " XP";
@@ -129,10 +136,14 @@ public final class GameOverScreen extends Screen {
         float top = safeT + 250f * u;
         Ui.textFit(c, title, cx, top, 72f * u, w - 100f * u, titleColor, Paint.Align.CENTER, Ui.DISPLAY);
         Ui.textFit(c, subtitle, cx, top + 66f * u, 34f * u, w - 140f * u, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
+        if (!livesText.isEmpty()) {
+            Icons.draw(c, Icons.HEART, cx - Ui.measure(livesText, 30f * u, Ui.BOLD) / 2f - 30f * u, top + 104f * u, 16f * u, MissionsScreen.HEART);
+            Ui.text(c, livesText, cx, top + 114f * u, 30f * u, MissionsScreen.HEART, Paint.Align.CENTER, Ui.BOLD);
+        }
 
         // Skor kartı
         float cw = Math.min(w - 120f * u, 860f * u);
-        float cardT = top + 130f * u, cardB = cardT + 400f * u;
+        float cardT = top + 150f * u, cardB = cardT + 400f * u;
         Ui.glow(c, cx, (cardT + cardB) / 2f, cw * 0.6f, won || newRecord ? Theme.GOLD : Theme.PURPLE, 0.25f);
         Ui.panel(c, cx - cw / 2f, cardT, cx + cw / 2f, cardB, 48f * u, Theme.alpha(Theme.PANEL, 0.95f), Theme.alpha(Theme.PURPLE, 0.6f), 3f * u);
         Ui.text(c, "SKOR", cx, cardT + 80f * u, 34f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);

@@ -62,6 +62,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         pauseBtn = add(new Button(null, Icons.PAUSE, Button.ICON, this::pause));
         resumeBtn = add(new Button("DEVAM ET", Icons.PLAY, Button.PRIMARY, this::resume));
         restartBtn = add(new Button("YENİDEN BAŞLAT", Icons.RESTART, Button.SECONDARY, () -> {
+            if (mode == RunResult.MODE_MISSION) { g.startMission(missionIndex); return; } // yeni deneme 1 can
             restartNow();
         }));
         homeBtn = add(new Button("ANA MENÜ", Icons.HOME, Button.SECONDARY, g::goMenu));
@@ -248,6 +249,7 @@ public final class PlayScreen extends Screen implements GameEvents {
     private void finishRun() {
         phase = PAUSED; // tekrar çağrılmasın
         world.toResult(mode, missionIndex, result);
+        if (mode == RunResult.MODE_MISSION && result.won) g.progress.energy.refund(g.clock);
         g.progress.applyRun(result, g.epochDay(), report);
         g.save();
         g.gameOver.show(result, report);
@@ -293,7 +295,7 @@ public final class PlayScreen extends Screen implements GameEvents {
                 renderer.particles.burst(x, y, 22, Theme.PURPLE_LIGHT, 600f, 8f, 0.6f);
                 shake = 1f;
                 flash = 0.35f;
-                popups.add("-1 can", x, y - 60f, Theme.PURPLE_LIGHT);
+                popups.add("Darbe!", x, y - 60f, Theme.PURPLE_LIGHT);
                 break;
             case SHADOW_SPAWN:
                 g.sound.play(Synth.SHADOW, 0.9f, 1f);
@@ -413,7 +415,8 @@ public final class PlayScreen extends Screen implements GameEvents {
         float lx = safeL + 44f * u;
         for (int i = 0; i < world.profile().lives; i++) {
             boolean full = i < world.lives;
-            Icons.draw(c, Icons.HEART, lx + 34f * u + i * 66f * u, top + 40f * u, 26f * u, full ? Theme.TEAL : Theme.alpha(Theme.LINE, 0.9f));
+            // Dayanıklılık (bölüm içi darbe hakkı) — bölüm canlarıyla karışmasın diye kalkan simgesi
+            Icons.draw(c, Icons.SHIELD, lx + 30f * u + i * 56f * u, top + 40f * u, 24f * u, full ? Theme.TEAL : Theme.alpha(Theme.LINE, 0.9f));
         }
         Ui.diamond(c, lx + 34f * u, top + 106f * u, 22f * u, 1f);
         Ui.text(c, diamondText, lx + 70f * u, Ui.centerY(top + 106f * u, 40f * u), 40f * u, Theme.GOLD, Paint.Align.LEFT, Ui.NUMBERS);

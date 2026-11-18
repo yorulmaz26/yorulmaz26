@@ -68,6 +68,14 @@ Hazır APK: GitHub Actions her push'ta APK'yı derler, emülatörde test eder ve
   1. aşamada **1 gölge** vardır, **20 yıldız** toplanınca 2. aşama başlar; 2. aşamada **2 gölge** vardır,
   20 yıldız daha toplanınca bölüm biter. Aynı haritanın 5 bölümünde imza engel sıklaşır, özellik güçlenir,
   gölgeler yaklaşır, yıldızlar seyrekleşir; 5. bölüm harita sonudur.
+- **Bölüm canları:** ilk kurulumda **4 can**. Bölüme başlarken 1 can harcanır, bölüm kazanılırsa geri verilir
+  (ölmek veya bölümden çıkmak canı götürür). Her **15 dakikada 1 can** yenilenir (en fazla 4); 60 elmasla anında doldurulabilir.
+  **Saat hilesine karşı:** süre telefon saatinden değil, Android'in kullanıcı tarafından değiştirilemeyen monoton sayacından
+  (`SystemClock.elapsedRealtime`, uyku dahil) ölçülür. Saati ileri almak can kazandırmaz, geri almak kaybettirmez; aynı açılışta
+  saatle oynandığı tespit edilip kaydedilir. Telefon yeniden başlatılırsa (`BOOT_COUNT`) duvar saati kullanılır; saat geri
+  alınmışsa yalnızca açılıştan beri geçen süre sayılır. Sunucu olmadığı için yapılamayan tek şey: kapalıyken saati ileri alıp
+  yeniden başlatarak en fazla bir tam dolum (4 can) elde etmek — bu da bekleyerek alınabilecek miktarla sınırlıdır.
+  Bölüm içindeki 3 darbe hakkı ayrı bir şeydir (kalkan simgeleriyle gösterilir).
 - **Taçlar (1500 adet):** her bölümde ♛ tamamla · ♛ hiç çarpmadan bitir · ♛ kombo hedefine ulaş.
 
 Klasik kademedeki 20 temel harita:
@@ -145,7 +153,7 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 57 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 67 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
   kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı.
 - `tools/smoke_test.sh` — emülatörde uçtan uca test (CI): kurulum, öğretici, tüm menü butonları ve ekran geçişleri,

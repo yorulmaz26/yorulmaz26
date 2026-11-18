@@ -26,6 +26,9 @@ public final class MissionsScreen extends Screen {
     private final Button[] tabs = new Button[3];
     private final Button[] claim = new Button[DailyMissions.PER_DAY];
     private int tab;
+    private final Button refillBtn;
+    private float livesY;
+    static final int HEART = 0xFFFF6B8B;
     private float scroll;
     private float listTop, listBottom, rowH, colL, colR;
     private final String[] levelDesc = new String[Missions.ALL.length];
@@ -70,6 +73,18 @@ public final class MissionsScreen extends Screen {
                 dumpTargets();
             }));
         }
+        refillBtn = add(new Button("DOLDUR · " + Progress.REFILL_COST, Icons.HEART, Button.GOLD, () -> {
+            if (g.progress.buyRefill(g.clock)) {
+                g.sound.play(Synth.PURCHASE);
+                g.haptics.medium();
+                g.toast("Canlar doldu!", Icons.HEART);
+                g.save();
+            } else {
+                g.toast(Progress.REFILL_COST + " elmas gerekli", Icons.LOCK);
+            }
+            dumpTargets();
+        }));
+        refillBtn.id = "can-doldur";
         for (int c = 0; c < Missions.MAPS; c++) {
             chapterTitle[c] = "HARİTA " + (c + 1) + "  ·  " + Maps.ALL[c].name.toUpperCase(new java.util.Locale("tr"));
             mapDesc[c] = Maps.ALL[c].desc + "  ·  " + Maps.ALL[c].featuresText();
@@ -134,7 +149,9 @@ public final class MissionsScreen extends Screen {
         colR = colL + cw;
         float tt = headerBottom() + 10f * u, th = 96f * u, tw = cw / 3f;
         for (int i = 0; i < 3; i++) tabs[i].set(colL + tw * i + 6f * u, tt, colL + tw * (i + 1) - 6f * u, tt + th);
-        listTop = tt + th + 30f * u;
+        livesY = tt + th + 60f * u;
+        refillBtn.set(colR - 330f * u, livesY - 42f * u, colR, livesY + 42f * u);
+        listTop = tt + th + 130f * u;
         listBottom = h - safeB - 30f * u;
         rowH = 180f * u;
         cardH = 470f * u;
@@ -215,6 +232,7 @@ public final class MissionsScreen extends Screen {
     public void update(float dt) {
         super.update(dt);
         bg.update(dt, 0f);
+        refillBtn.visible = tab == TAB_LEVELS && g.lives() < com.golgen.oyun.core.Energy.MAX;
         if (!isDragging() && Math.abs(scrollVel) > 5f) {
             scroll = clampScroll(scroll - scrollVel * dt, contentHeight(), listBottom - listTop);
             scrollVel *= (float) Math.pow(0.05, dt);
@@ -225,6 +243,7 @@ public final class MissionsScreen extends Screen {
     public void draw(Canvas c) {
         bg.drawBackground(c, w, h, time * 40f);
         drawHeader(c, "GÖREVLER");
+        if (tab == TAB_LEVELS) drawLives(c);
         c.save();
         c.clipRect(0, listTop - 10f * u, w, listBottom);
         switch (tab) {
@@ -234,6 +253,15 @@ public final class MissionsScreen extends Screen {
         }
         c.restore();
         drawButtons(c);
+    }
+
+    private void drawLives(Canvas c) {
+        int lives = g.lives();
+        for (int i = 0; i < com.golgen.oyun.core.Energy.MAX; i++) {
+            Icons.draw(c, Icons.HEART, colL + 40f * u + i * 70f * u, livesY, 26f * u, i < lives ? HEART : Theme.alpha(Theme.LINE, 0.9f));
+        }
+        String t = lives >= com.golgen.oyun.core.Energy.MAX ? "Canlar dolu" : "Sonraki can " + g.energyTimer();
+        Ui.text(c, t, colL + 320f * u, Ui.centerY(livesY, 32f * u), 32f * u, lives > 0 ? Theme.WHITE : HEART, Paint.Align.LEFT, Ui.BOLD);
     }
 
     private void drawLevels(Canvas c) {

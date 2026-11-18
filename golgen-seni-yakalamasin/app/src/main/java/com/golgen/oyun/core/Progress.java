@@ -40,6 +40,10 @@ public final class Progress {
     public int lastLoginClaimDay = -1;
 
     /** Günlük giriş ödülleri (7 günlük döngü, 7. gün büyük ödül). */
+    /** Bölüm modu canları (4 can, 15 dk'da bir yenilenir; saat hilesine dayanıklı). */
+    public final Energy energy = new Energy();
+    public static final int REFILL_COST = 60;
+
     public static final int[] LOGIN_REWARDS = {10, 15, 20, 25, 35, 45, 100};
 
     // ---------- Kayıt ----------
@@ -85,6 +89,7 @@ public final class Progress {
         totalPowerups = s.getInt("totalPowerups", 0);
         loginStreak = s.getInt("loginStreak", 0);
         lastLoginClaimDay = s.getInt("lastLoginClaimDay", -1);
+        energy.load(s);
     }
 
     public void save(KeyValueStore s) {
@@ -124,6 +129,7 @@ public final class Progress {
         s.putInt("totalPowerups", totalPowerups);
         s.putInt("loginStreak", loginStreak);
         s.putInt("lastLoginClaimDay", lastLoginClaimDay);
+        energy.save(s);
         s.apply();
     }
 
@@ -138,6 +144,8 @@ public final class Progress {
         java.util.Arrays.fill(dailyProgress, 0);
         java.util.Arrays.fill(missionStars, (byte) 0);
         xp = 0; level = 1; maxCombo = 0; totalPowerups = 0; loginStreak = 0; lastLoginClaimDay = -1;
+        energy.lives = Energy.MAX;
+        energy.progressMs = 0;
     }
 
     // ---------- Günlük ----------
@@ -216,6 +224,15 @@ public final class Progress {
         int r = LOGIN_REWARDS[(loginStreak - 1) % LOGIN_REWARDS.length];
         diamonds += r;
         return r;
+    }
+
+    /** Elmasla canları doldurur. */
+    public boolean buyRefill(TimeSource t) {
+        energy.tick(t);
+        if (energy.lives >= Energy.MAX || diamonds < REFILL_COST) return false;
+        diamonds -= REFILL_COST;
+        energy.refill(t);
+        return true;
     }
 
     // ---------- Yıldızlar ----------

@@ -155,6 +155,8 @@ tap_target MissionsScreen "Başarılar"; sleep 0.4; shot 12_basarilar
 tap_target MissionsScreen "Haritalar"
 tap_target MissionsScreen bolum-0
 expect_screen PlayScreen "Bölüm 1 başlatma (harita düğümü)"
+sleep 0.5
+if [ "$(pref_int enLives)" = "3" ]; then ok "Bölüm başlatınca 1 can harcandı (4 → 3)"; else bad "Can harcama: enLives=$(pref_int enLives)"; fi
 sleep 0.5; shot 13_gorev_oyun
 adbt shell input keyevent KEYCODE_BACK; sleep 0.5
 tap_target PlayScreen "ANA MENÜ"
