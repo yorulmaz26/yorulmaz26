@@ -7,8 +7,8 @@ Android uygulamasıyla **aynı Firebase projesini ve sunucu fonksiyonlarını** 
 | Aşama | İçerik | Durum |
 |---|---|---|
 | 1 | Giriş (telefon + SMS), müşteri kaydı, salon arama/kod, salon sayfası, uzman/hizmet, saat seçimi, özet (başkası adına, indirim kodu, sadakat), randevularım, bilet, iptal / son 2 saatte arama, puanlama | Bu sürümde |
-| 2 | Kuaför paneli (randevular, hizmetler, çalışma saatleri, raporlar, ekip, dükkan) | Sırada |
-| 3 | Moderatör paneli, bildirimler (APNs), takvim, hesap silme | Sırada |
+| 2 | Kuaför paneli: davetler, salon seçimi, randevular (onay/ret/geldi/gelmedi/tamamla/iptal), elden randevu, raporlar, hizmetlerim, çalışma saatleri (çakışma önizlemeli), ekibim ve davet, link/QR | Tamam |
+| 3 | Moderatör paneli, salon kaydı (logo/fotoğraf), dükkan ayarları, kampanyalar, bildirimler (APNs), takvim, hesap silme | Sırada |
 
 ## Derleme
 Xcode projesi [XcodeGen](https://github.com/yonaskolb/XcodeGen) ile `project.yml`'den üretilir:
