@@ -1,0 +1,13 @@
+Yanlis Renk - Audio License
+===========================
+
+All sound effects (sfx/*.ogg) and music loops (music/*.ogg) in this directory
+were procedurally synthesized specifically for this project by its generator
+script, tools/audio/gen_audio.py (Python 3 + numpy, encoded with ffmpeg/Vorbis).
+
+No third-party samples, recordings, loops or sound libraries were used; every
+waveform is computed from mathematical oscillators, envelopes, filtered noise
+and algorithmic reverb inside that script. The audio is original work and may
+be used, modified and redistributed under the project's own license.
+
+To regenerate:  python3 -I tools/audio/gen_audio.py [TEMP_WAV_DIR]
