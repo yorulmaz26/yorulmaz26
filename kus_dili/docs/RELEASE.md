@@ -47,6 +47,9 @@ keyAlias=upload
 keyPassword=...
 ```
 
+- [ ] Derleme için **JDK 21** kullanın (Android Studio'nun JBR'si ya da
+      Temurin 21). JDK 17 ile yayın derlemesinde Android lint aracı Firebase
+      eklentisini incelerken çöker.
 - [ ] `pubspec.yaml` içinde `version: 1.0.0+1` (her yüklemede `+N` artar).
 - [ ] `flutter build appbundle --release` → `build/app/outputs/bundle/release/app-release.aab`
 - [ ] Play Console → **Play App Signing** açık; uygulama imzalama anahtarının
