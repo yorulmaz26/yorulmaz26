@@ -2,7 +2,7 @@
 
 Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalıştırma çıktılarıdır.
 
-## 1. Birim testleri (JUnit, 47 test) — ✅ 47/47 geçti
+## 1. Birim testleri (JUnit, 55 test) — ✅ 55/55 geçti
 Çalıştırıldığı yerler: geliştirme konteynerinde (`javac` + JUnit 4.13.2) ve GitHub Actions'ta `./gradlew testDebugUnitTest`.
 
 | Sınıf | Test | Doğrulanan |
@@ -13,6 +13,7 @@ Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalı�
 | ProgressTest | 8 | Kayıt/okuma gidiş-dönüş (tüm alanlar), kilitli karakter seçiminin reddi, rekor ve ilk 10 listesi, satın alma/seçme, görev açılması ve tek seferlik ödül, günlük görev üretimi (400 gün, tekrarsız) ve ödülün bir kez alınması, oyunlardan günlük ilerleme, sıfırlama |
 | SynthTest | 3 | 8 ses efektinin duyulabilir ve kırpılmamış olması, müzik döngüsü, WAV başlığı |
 | AllocationTest | 1 | 100 sn ısınmadan sonra 30 sn'lik simülasyonda (5 gölge, engeller, elmaslar) iş parçacığı bellek tahsisi < 8 bayt/kare — pratikte sıfır; GC kaynaklı takılma olmaz |
+| LevelsTest | 12 | 100 bölüm/20 harita/5'er bölüm yapısı, haritaların ayırt edilebilirliği (20 farklı renk, 9 efektin hepsi, 9 engelin hepsi kullanılıyor), imza engelin 5 bölümde sıklaşması, **1. aşamada 1 gölge → 20 yıldızla 2. aşama ve 2 gölge → 40 yıldızla bölüm sonu**, yıldızların erişilebilir alanda doğması, yıldız toplayan botun 1/5/38/100. bölümleri 3 dk içinde bitirebilmesi (≈45–65 sn), rüzgâr, buz ataleti, dar geçit, meteor yağmuru, tüm engel türlerinin doğması, lazer kapının yalnızca aktifken zarar vermesi |
 | LongevityTest | 13 | Kalkanın gölge ve engel temasını bir kez emmesi, Yavaş Zaman'ın simülasyonu %55'e düşürmesi, Mıknatıs, kombo çarpanı ve sıfırlanması, aşamalar ve tavan sonrası hız artışı, 60 görev/5 bölüm yapısı ve zorlaştırıcıların profile yansıması, yıldız kuralları, yıldızların kaydı ve yalnızca gelişmede ödül, XP/seviye ödülleri, 7 günlük giriş serisi ve sıfırlanma, 8 günlük görev türü, 21 başarı / 12 karakter |
 | MissionsAndSkinsTest | 3 | ≥8 karakter ve artan fiyatlar, 12 görevin 4 türü de kapsaması, başarı tabloları |
 

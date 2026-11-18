@@ -187,36 +187,6 @@ public class GameWorldTest {
         assertTrue(walls > 50);
     }
 
-    @Test public void missionWinsOnTarget() {
-        GameWorld w = new GameWorld(1);
-        MissionDef m = Missions.ALL[1]; // 5 elmas
-        w.start(m.profile(), m, 1);
-        w.spawnShadows = false;
-        w.spawnObstacles = false;
-        w.spawnDiamonds = false;
-        w.setTarget(500f, 1300f);
-        run(w, 0.3f);
-        for (int i = 0; i < 5; i++) {
-            w.addDiamond(500f, 1250f);
-            run(w, 0.3f);
-        }
-        assertEquals(GameWorld.WON, w.state);
-    }
-
-    @Test public void noHitMissionFailsOnFirstHit() {
-        GameWorld w = new GameWorld(1);
-        MissionDef m = Missions.ALL[3];
-        w.start(m.profile(), m, 1);
-        w.spawnShadows = false;
-        w.spawnObstacles = false;
-        w.setTarget(500f, 1300f);
-        run(w, 0.3f);
-        w.addWall(1260f, 100f, 150f);
-        run(w, 0.5f);
-        assertEquals(GameWorld.DEAD, w.state);
-        assertEquals(GameWorld.CAUSE_OBSTACLE, w.cause);
-    }
-
     @Test public void dodgeCountedOnNearMiss() {
         GameWorld w = quietWorld();
         w.spawnShadows = false;

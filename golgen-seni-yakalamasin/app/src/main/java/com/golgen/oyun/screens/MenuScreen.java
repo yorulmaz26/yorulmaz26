@@ -34,7 +34,7 @@ public final class MenuScreen extends Screen {
         super(g);
         playBtn = add(new Button("OYNA", Icons.PLAY, Button.PRIMARY, g::startEndless));
         playBtn.sub = "Sonsuz Mod";
-        missionBtn = add(new Button("GÖREV MODU", Icons.TARGET, Button.SECONDARY, () -> {
+        missionBtn = add(new Button("HARİTALAR · 100 BÖLÜM", Icons.TARGET, Button.SECONDARY, () -> {
             g.missions.showTab(MissionsScreen.TAB_LEVELS);
             g.go(g.missions);
         }));

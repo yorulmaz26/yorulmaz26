@@ -13,18 +13,6 @@ public class MissionsAndSkinsTest {
         }
     }
 
-    @Test public void missionsCoverAllTypes() {
-        boolean[] seen = new boolean[5];
-        for (int i = 0; i < Missions.ALL.length; i++) {
-            MissionDef m = Missions.ALL[i];
-            assertEquals(i, m.index);
-            seen[m.type] = true;
-            assertFalse(m.description().isEmpty());
-            assertTrue(m.profile().maxDelay() <= 10f);
-        }
-        for (boolean b : seen) assertTrue(b);
-    }
-
     @Test public void achievementTablesConsistent() {
         assertEquals(Achievements.TITLES.length, Achievements.DESCS.length);
         assertTrue(Achievements.COUNT <= 31);

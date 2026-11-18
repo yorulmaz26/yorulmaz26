@@ -1,92 +1,74 @@
 package com.golgen.oyun.core;
 
-/** Görev modu seviye tanımı (veri nesnesi). */
+/**
+ * Görev modu bölüm tanımı. Her bölüm iki aşamalıdır:
+ * 1. aşamada 1 gölge, 2. aşamada 2 gölge vardır; her aşama {@link #STARS_PER_STAGE} yıldız toplanınca biter.
+ * Her 5 bölüm aynı haritada geçer; bölüm ilerledikçe haritanın imza engeli, özellik gücü ve hız artar.
+ */
 public final class MissionDef {
-    public static final int SURVIVE = 0, DODGE = 1, COLLECT = 2, NO_HIT = 3, SCORE = 4;
+    public static final int STAGES = 2;
+    public static final int STARS_PER_STAGE = 20;
+    /** Eski arayüz/test uyumluluğu için tür sabiti (tüm bölümler yıldız toplama). */
+    public static final int STAR_STAGES = 5;
+    public static final int NO_HIT = 3;
 
-    // Zorlaştırıcılar (bit maskesi)
-    public static final int MOD_DARK = 1;          // görüş oyuncu çevresiyle sınırlı
-    public static final int MOD_FAST_SHADOWS = 2;  // gölgeler daha kısa gecikmeyle gelir
-    public static final int MOD_SWARM = 4;         // gölgeler daha erken ve sık doğar
-    public static final int MOD_RUSH = 8;          // akış %25 hızlı
-    public static final String[] MOD_NAMES = {"Karanlık", "Hızlı Gölgeler", "Gölge Akını", "Hızlı Akış"};
-
-    public final int index;
-    public final int chapter;
+    public final int index;       // 0..99
+    public final int mapIndex;    // 0..19
+    public final int sub;         // haritadaki sıra 0..4
+    public final MapTheme map;
     public final String title;
-    public final int type;
-    public final int target;
+    public final int type = STAR_STAGES;
+    public final int target = STARS_PER_STAGE * STAGES;
     public final float timeOffset;
     public final int reward;
-    public final int mods;
-    public final int starCombo;   // 3. yıldız için gereken en yüksek kombo
-    public final boolean boss;    // bölüm sonu
+    public final int starCombo;   // 3. taç için gereken kombo
+    public final boolean boss;    // haritanın son bölümü
+    public final float intensity; // özellik gücü 0.6..1.2
 
-    public MissionDef(int index, int chapter, String title, int type, int target, float timeOffset, int reward,
-                      int mods, int starCombo, boolean boss) {
+    public MissionDef(int index, MapTheme map, int sub) {
         this.index = index;
-        this.chapter = chapter;
-        this.title = title;
-        this.type = type;
-        this.target = target;
-        this.timeOffset = timeOffset;
-        this.reward = reward;
-        this.mods = mods;
-        this.starCombo = starCombo;
-        this.boss = boss;
+        this.map = map;
+        this.mapIndex = map.id;
+        this.sub = sub;
+        this.boss = sub == 4;
+        this.title = "Bölüm " + (index + 1);
+        this.timeOffset = map.id * 7f + sub * 5f;
+        this.reward = 20 + map.id * 6 + sub * 4 + (boss ? 30 : 0);
+        this.starCombo = 6 + map.id / 2 + sub + (boss ? 2 : 0);
+        this.intensity = 0.6f + 0.12f * sub + 0.02f * map.id;
     }
 
-    /** Geriye dönük uyumlu kısa kurucu (zorlaştırıcısız). */
-    public MissionDef(int index, String title, int type, int target, float timeOffset, int reward) {
-        this(index, 0, title, type, target, timeOffset, reward, 0, 4, false);
+    /** Eski isim: bölümün haritası (0..19). */
+    public int chapter() {
+        return mapIndex;
     }
 
-    public boolean has(int mod) {
-        return (mods & mod) != 0;
+    public boolean has(int feature) {
+        return map.has(feature);
     }
 
     public String goal() {
-        switch (type) {
-            case SURVIVE: return target + " saniye hayatta kal";
-            case DODGE: return target + " kez gölgenden kıl payı kaç";
-            case COLLECT: return target + " elmas topla";
-            case SCORE: return target + " puana ulaş";
-            default: return "Engellere çarpmadan " + target + " saniye dayan";
-        }
+        return "2 aşama · her aşamada " + STARS_PER_STAGE + " yıldız topla";
     }
 
     public String modsText() {
-        if (mods == 0) return "";
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < MOD_NAMES.length; i++) {
-            if ((mods & (1 << i)) != 0) {
-                if (sb.length() > 0) sb.append(" · ");
-                sb.append(MOD_NAMES[i]);
-            }
-        }
-        return sb.toString();
+        return map.featuresText();
     }
 
     public String description() {
-        String m = modsText();
-        return m.isEmpty() ? goal() : m + " — " + goal();
+        return map.name + " — " + goal();
     }
 
-    public String starText() {
-        return "★ Tamamla   ★ Çarpmadan   ★ x" + (1 + Math.min(4, starCombo / 4)) + " kombo (" + starCombo + ")";
+    public String crownText() {
+        return "Tamamla · Çarpmadan bitir · " + starCombo + " kombo";
     }
 
+    /** Toplam yıldız ilerlemesi (0..40). */
     public int progress(GameWorld w) {
-        switch (type) {
-            case SURVIVE:
-            case NO_HIT: return (int) w.time;
-            case DODGE: return w.dodges;
-            case SCORE: return w.score();
-            default: return w.diamonds;
-        }
+        return (w.levelStage - 1) * STARS_PER_STAGE + w.stageStars;
     }
 
-    /** Kazanılan yıldız: 1 tamamlama + 1 hiç çarpmama + 1 kombo hedefi. */
+    /** Taç: 1 tamamlama + 1 hiç çarpmama + 1 kombo hedefi. */
     public int stars(RunResult r) {
         if (!r.won) return 0;
         int s = 1;
@@ -95,31 +77,41 @@ public final class MissionDef {
         return s;
     }
 
-    /** Bu görev için zorluk profili üretir. */
+    /** Bu bölüm için zorluk profili. */
     public DifficultyProfile profile() {
         DifficultyProfile p = DifficultyProfile.endless();
         p.timeOffset = timeOffset;
-        if (type == DODGE) {
-            p.shadowSpawnTimes = new float[]{2.4f, 9f, 17f, 27f, 38f};
-            p.shadowDelays = new float[]{2.4f, 3.4f, 4.4f, 2.8f, 5.2f};
-            p.intervalStart = 2.2f;
-        } else if (type == COLLECT) {
-            p.diamondIntervalMin = 1.3f;
-            p.diamondIntervalMax = 2.2f;
-        } else if (type == NO_HIT) {
-            p.lives = 1;
+        p.rampSeconds = 140f;
+        // Gölgeler bölüm mantığıyla doğar (aşamalar); otomatik takvim kapalı.
+        float shrink = 1f - 0.03f * sub;
+        float d1 = map.shadowDelay1 * shrink, d2 = map.shadowDelay2 * shrink;
+        if (map.has(MapTheme.F_FAST_SHADOWS)) { d1 *= 0.8f; d2 *= 0.8f; }
+        d1 = Math.max(1.7f, d1);
+        d2 = Math.max(2.4f, d2);
+        p.shadowDelays = new float[]{d1, d2};
+        p.shadowSpawnTimes = new float[]{d1 + 0.4f};
+        p.maxShadows = 2;
+        // Engel karışımı: imza engel bölümle birlikte sıklaşır
+        float[] w = map.weights.clone();
+        for (int i = 0; i < w.length; i++) {
+            if (Obstacle.WEIGHT_ORDER[i] == map.signature) w[i] += sub * 0.6f + (boss ? 1.5f : 0f);
         }
-        if (has(MOD_FAST_SHADOWS)) {
-            float[] d = p.shadowDelays.clone();
-            for (int i = 0; i < d.length; i++) d[i] = Math.max(1.6f, d[i] * 0.7f);
-            p.shadowDelays = d;
-        }
-        if (has(MOD_SWARM)) {
-            float[] t = p.shadowSpawnTimes.clone();
-            for (int i = 0; i < t.length; i++) t[i] = Math.max(p.shadowDelays[i % p.shadowDelays.length] + 0.2f, t[i] * 0.55f);
-            p.shadowSpawnTimes = t;
-        }
-        if (has(MOD_RUSH)) p.scrollMul = 1.25f;
+        p.weights = w;
+        // Özellikler
+        float k = intensity;
+        if (map.has(MapTheme.F_WIND)) p.wind = 140f * k;
+        if (map.has(MapTheme.F_ICE)) p.iceGrip = 3.2f / k;
+        if (map.has(MapTheme.F_NARROW)) p.narrow = 70f + 40f * sub;
+        if (map.has(MapTheme.F_STORM)) p.meteorInterval = 2.6f / k;
+        if (map.has(MapTheme.F_RUSH)) p.scrollMul = 1.12f + 0.03f * sub;
+        p.intervalStart = 1.9f - 0.04f * sub;
+        // Yıldız sıklığı: harita ve bölüm ilerledikçe seyrekleşir (aşama başına ~40-70 sn)
+        p.starIntervalMin = Math.min(3.4f, 2.4f + 0.03f * map.id + 0.1f * sub);
+        p.starIntervalMax = p.starIntervalMin + 1.2f;
+        p.diamondIntervalMin = 3.5f;
+        p.diamondIntervalMax = 6f;
+        p.powerupIntervalMin = 10f;
+        p.powerupIntervalMax = 16f;
         return p;
     }
 }

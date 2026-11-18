@@ -66,9 +66,22 @@ public final class Ui {
         }
     }
 
+    private static final int[] extraKeys = new int[64];
+    private static final Paint[] extraPaints = new Paint[64];
+    private static int extraCount;
+
     private static Paint glowPaintFor(int color) {
         for (int i = 0; i < GLOW_COLORS.length; i++) if ((GLOW_COLORS[i] & 0xffffff) == (color & 0xffffff)) return glowPaints[i];
-        return glowPaints[0];
+        // Harita renkleri: ilk kullanımda bir kez oluşturulur (kare başına tahsis yok)
+        int key = color | 0xFF000000;
+        for (int i = 0; i < extraCount; i++) if (extraKeys[i] == key) return extraPaints[i];
+        if (extraCount >= extraKeys.length) return glowPaints[0];
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
+        p.setColorFilter(new PorterDuffColorFilter(key, PorterDuff.Mode.SRC_IN));
+        extraKeys[extraCount] = key;
+        extraPaints[extraCount] = p;
+        extraCount++;
+        return p;
     }
 
     /** Yumuşak neon ışıma (önceden üretilmiş doku). */

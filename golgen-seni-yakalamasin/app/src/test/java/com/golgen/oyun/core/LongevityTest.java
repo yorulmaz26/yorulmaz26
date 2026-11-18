@@ -102,27 +102,6 @@ public class LongevityTest {
         assertTrue(w.scroll > p.scrollMax);
     }
 
-    @Test public void sixtyMissionsInFiveChaptersWithGrowingDifficulty() {
-        assertEquals(60, Missions.ALL.length);
-        for (int c = 0; c < Missions.CHAPTERS; c++) {
-            MissionDef boss = Missions.ALL[c * Missions.PER_CHAPTER + Missions.PER_CHAPTER - 1];
-            assertTrue(boss.boss);
-            assertEquals(c, boss.chapter);
-        }
-        assertEquals(0, Missions.ALL[0].mods);
-        assertTrue(Missions.ALL[59].has(MissionDef.MOD_DARK) && Missions.ALL[59].has(MissionDef.MOD_RUSH));
-        for (int i = 1; i < Missions.ALL.length; i++) {
-            assertTrue(Missions.ALL[i].timeOffset >= Missions.ALL[i - 1].timeOffset || Missions.ALL[i].chapter > Missions.ALL[i - 1].chapter);
-            assertTrue(Missions.ALL[i].profile().maxDelay() <= 10f);
-            for (float t : Missions.ALL[i].profile().shadowSpawnTimes) assertTrue(t > 0f);
-        }
-        // Zorlaştırıcılar profile yansır
-        MissionDef fast = null;
-        for (MissionDef m : Missions.ALL) if (m.has(MissionDef.MOD_FAST_SHADOWS)) { fast = m; break; }
-        assertNotNull(fast);
-        assertTrue(fast.profile().shadowDelays[0] < DifficultyProfile.endless().shadowDelays[0]);
-    }
-
     @Test public void starsRules() {
         MissionDef m = Missions.ALL[5];
         RunResult r = new RunResult();

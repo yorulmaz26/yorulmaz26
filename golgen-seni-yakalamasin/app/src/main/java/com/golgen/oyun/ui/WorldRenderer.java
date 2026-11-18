@@ -5,6 +5,8 @@ import android.graphics.Shader;
 
 import com.golgen.oyun.core.Diamond;
 import com.golgen.oyun.core.GameWorld;
+import com.golgen.oyun.core.MapTheme;
+import com.golgen.oyun.core.Maps;
 import com.golgen.oyun.core.Obstacle;
 import com.golgen.oyun.core.PowerUp;
 import com.golgen.oyun.core.Shadow;
@@ -20,6 +22,21 @@ public final class WorldRenderer {
     private float bgH = -1;
     private float t;
     private final float[] tmp = new float[2];
+    private MapTheme theme = Maps.ENDLESS;
+    private Shader themeShader;
+    private float themeH = -1;
+    private int obstacleColor = Theme.PURPLE, obstacleLight = Theme.PURPLE_LIGHT, accentColor = Theme.TEAL;
+
+    /** Harita teması (renkler, arka plan efekti). */
+    public void setTheme(MapTheme m) {
+        theme = m == null ? Maps.ENDLESS : m;
+        themeShader = null;
+        obstacleColor = theme.obstacle;
+        obstacleLight = Theme.lerp(theme.obstacle, Theme.WHITE, 0.35f);
+        accentColor = theme.accent;
+    }
+
+    public MapTheme theme() { return theme; }
 
     public WorldRenderer() {
         long seed = 99;
@@ -39,38 +56,123 @@ public final class WorldRenderer {
     }
 
     public void drawBackground(Canvas c, float w, float h, float scrollDistance) {
-        c.drawColor(Theme.NAVY);
-        if (bgShader == null || bgH != h) {
-            bgShader = Ui.vertical(0, h, 0x00000000, 0x33000000 | (Theme.PURPLE & 0xffffff));
-            bgH = h;
+        if (themeShader == null || themeH != h) {
+            themeShader = Ui.vertical(0, h, theme.bgTop, theme.bgBottom);
+            themeH = h;
         }
-        Ui.shaderPaint.setShader(bgShader);
+        Ui.shaderPaint.setShader(themeShader);
         c.drawRect(0, 0, w, h, Ui.shaderPaint);
-        // Neon ızgara
+        Ui.shaderPaint.setShader(null);
+        // Neon ızgara (harita rengi)
         float worldH = h / s;
         float spacing = 125f;
         Ui.stroke.setStrokeWidth(Math.max(1f, 1.6f * s));
-        Ui.stroke.setColor(Theme.alpha(Theme.PURPLE, 0.09f));
+        Ui.stroke.setColor(Theme.alpha(theme.grid, 0.08f));
         for (float x = spacing / 2f; x < 1000f; x += spacing) c.drawLine(x * s, 0, x * s, h, Ui.stroke);
         float off = scrollDistance % spacing;
         for (float y = off - spacing; y < worldH; y += spacing) {
             float k = Math.max(0f, Math.min(1f, y / worldH));
-            Ui.stroke.setColor(Theme.alpha(Theme.PURPLE, 0.04f + 0.1f * k));
+            Ui.stroke.setColor(Theme.alpha(theme.grid, 0.03f + 0.09f * k));
             c.drawLine(0, y * s, w, y * s, Ui.stroke);
         }
-        // Paralaks yıldızlar
+        drawDecorations(c, worldH, scrollDistance);
+    }
+
+    /** Haritaya özgü arka plan efekti (dekor; oyunu etkilemez). */
+    private void drawDecorations(Canvas c, float worldH, float scrollDistance) {
         Ui.fill.setShader(null);
+        int acc = theme.accent;
         for (int i = 0; i < STARS; i++) {
-            float y = (starY[i] + scrollDistance * starZ[i]) % 2400f;
-            if (y > worldH) continue;
-            float tw = 0.5f + 0.5f * (float) Math.sin(t * 2f + i);
-            Ui.fill.setColor(Theme.alpha(i % 3 == 0 ? Theme.TEAL : Theme.WHITE, 0.15f + 0.35f * starZ[i] * tw));
-            c.drawCircle(starX[i] * s, y * s, (1.2f + 2.6f * starZ[i]) * s, Ui.fill);
+            float z = starZ[i];
+            float x = starX[i], y;
+            switch (theme.deco) {
+                case MapTheme.DECO_SNOW: {
+                    y = (starY[i] + t * (60f + 90f * z) + scrollDistance * z * 0.5f) % 2400f;
+                    x = (x + (float) Math.sin(t * 0.8f + i) * 30f + 1000f) % 1000f;
+                    Ui.fill.setColor(Theme.alpha(Theme.WHITE, 0.25f + 0.45f * z));
+                    c.drawCircle(x * s, y * s, (2f + 4f * z) * s, Ui.fill);
+                    break;
+                }
+                case MapTheme.DECO_RAIN: {
+                    y = (starY[i] + t * (900f + 600f * z)) % 2400f;
+                    Ui.stroke.setColor(Theme.alpha(theme.grid, 0.18f + 0.3f * z));
+                    Ui.stroke.setStrokeWidth((1.5f + 2f * z) * s);
+                    c.drawLine(x * s, y * s, (x - 12f) * s, (y + 46f * (0.6f + z)) * s, Ui.stroke);
+                    break;
+                }
+                case MapTheme.DECO_EMBERS: {
+                    y = 2400f - ((starY[i] + t * (70f + 120f * z)) % 2400f);
+                    x = (x + (float) Math.sin(t * 1.3f + i * 0.7f) * 24f + 1000f) % 1000f;
+                    float fl = 0.5f + 0.5f * (float) Math.sin(t * 9f + i);
+                    Ui.fill.setColor(Theme.alpha(i % 2 == 0 ? acc : theme.obstacle, (0.25f + 0.5f * z) * (0.5f + 0.5f * fl)));
+                    c.drawCircle(x * s, y * s, (1.8f + 3.5f * z) * s, Ui.fill);
+                    break;
+                }
+                case MapTheme.DECO_BUBBLES: {
+                    y = 2400f - ((starY[i] + t * (40f + 80f * z)) % 2400f);
+                    x = (x + (float) Math.sin(t * 0.9f + i) * 18f + 1000f) % 1000f;
+                    Ui.stroke.setColor(Theme.alpha(acc, 0.15f + 0.35f * z));
+                    Ui.stroke.setStrokeWidth(2f * s);
+                    c.drawCircle(x * s, y * s, (4f + 12f * z) * s, Ui.stroke);
+                    break;
+                }
+                case MapTheme.DECO_LEAVES: {
+                    y = (starY[i] + t * (50f + 70f * z) + scrollDistance * 0.3f * z) % 2400f;
+                    x = (x + (float) Math.sin(t * 0.7f + i) * 60f + t * 25f + 2000f) % 1000f;
+                    c.save();
+                    c.rotate((t * 60f + i * 37f) % 360f, x * s, y * s);
+                    Ui.fill.setColor(Theme.alpha(i % 3 == 0 ? acc : theme.obstacle, 0.25f + 0.4f * z));
+                    Ui.rf.set((x - 9f - 6f * z) * s, (y - 4f) * s, (x + 9f + 6f * z) * s, (y + 4f) * s);
+                    c.drawOval(Ui.rf, Ui.fill);
+                    c.restore();
+                    break;
+                }
+                case MapTheme.DECO_DUST: {
+                    y = (starY[i] + scrollDistance * z * 0.6f) % 2400f;
+                    x = (x + t * (120f + 260f * z)) % 1000f;
+                    Ui.stroke.setColor(Theme.alpha(theme.grid, 0.08f + 0.2f * z));
+                    Ui.stroke.setStrokeWidth((1.5f + 2f * z) * s);
+                    c.drawLine(x * s, y * s, (x + 40f + 60f * z) * s, y * s, Ui.stroke);
+                    break;
+                }
+                case MapTheme.DECO_SPARKS: {
+                    y = (starY[i] + scrollDistance * z) % 2400f;
+                    float tw = Math.max(0f, (float) Math.sin(t * 3f + i * 1.7f));
+                    float r = (3f + 7f * z) * tw;
+                    if (r < 0.5f) break;
+                    Ui.stroke.setColor(Theme.alpha(i % 2 == 0 ? acc : theme.grid, 0.25f + 0.5f * z));
+                    Ui.stroke.setStrokeWidth(2f * s);
+                    c.drawLine((x - r) * s, y * s, (x + r) * s, y * s, Ui.stroke);
+                    c.drawLine(x * s, (y - r) * s, x * s, (y + r) * s, Ui.stroke);
+                    break;
+                }
+                case MapTheme.DECO_CODE: {
+                    float col = (i % 16) * 62.5f + 20f;
+                    y = (starY[i] + t * (200f + 300f * z)) % 2400f;
+                    Ui.fill.setColor(Theme.alpha(theme.grid, 0.12f + 0.25f * z));
+                    for (int k = 0; k < 4; k++) {
+                        float yy = y - k * 26f;
+                        Ui.rf.set((col - 5f) * s, (yy - 9f) * s, (col + 5f) * s, (yy + 9f) * s);
+                        Ui.fill.setAlpha((int) (255 * (0.12f + 0.25f * z) * (1f - k * 0.22f)));
+                        c.drawRect(Ui.rf, Ui.fill);
+                    }
+                    break;
+                }
+                default: { // DECO_STARS
+                    y = (starY[i] + scrollDistance * z) % 2400f;
+                    float tw = 0.5f + 0.5f * (float) Math.sin(t * 2f + i);
+                    Ui.fill.setColor(Theme.alpha(i % 3 == 0 ? acc : Theme.WHITE, 0.15f + 0.35f * z * tw));
+                    c.drawCircle(x * s, y * s, (1.2f + 2.6f * z) * s, Ui.fill);
+                    break;
+                }
+            }
         }
     }
 
     public void drawWorld(Canvas c, GameWorld w, SkinDef skin, boolean playerVisible) {
+        if (w.profile().narrow > 0f) drawNarrow(c, w);
         drawDiamonds(c, w);
+        drawStars(c, w);
         drawPowerups(c, w);
         drawObstacles(c, w);
         drawShadows(c, w, skin);
@@ -85,6 +187,30 @@ public final class WorldRenderer {
             float x = d.x * s, y = (d.y + bob) * s;
             Ui.glow(c, x, y, GameWorld.DIAMOND_R * 3.2f * s, Theme.GOLD, 0.55f);
             Ui.diamond(c, x, y, GameWorld.DIAMOND_R * s, 1f);
+        }
+    }
+
+    private void drawNarrow(Canvas c, GameWorld w) {
+        float n = w.profile().narrow * s, hpx = w.height * s;
+        Ui.fill.setShader(null);
+        Ui.fill.setColor(Theme.alpha(obstacleColor, 0.12f));
+        c.drawRect(0, 0, n, hpx, Ui.fill);
+        c.drawRect(GameWorld.WIDTH * s - n, 0, GameWorld.WIDTH * s, hpx, Ui.fill);
+        Ui.neonLine(c, n, 0, n, hpx, 6f * s, obstacleColor);
+        Ui.neonLine(c, GameWorld.WIDTH * s - n, 0, GameWorld.WIDTH * s - n, hpx, 6f * s, obstacleColor);
+    }
+
+    private void drawStars(Canvas c, GameWorld w) {
+        float r = GameWorld.STAR_R * s;
+        for (int i = 0; i < w.starPool.size(); i++) {
+            Diamond st = w.starPool.get(i);
+            float x = st.x * s, y = (st.y + (float) Math.sin(st.phase * 4f + i) * 5f) * s;
+            float pulse = 0.85f + 0.15f * (float) Math.sin(st.phase * 6f + i);
+            Ui.glow(c, x, y, r * 3.4f * pulse, Theme.GOLD, 0.6f);
+            c.save();
+            c.rotate((st.phase * 40f) % 360f, x, y);
+            Icons.draw(c, Icons.STAR, x, y, r * 1.05f, 0xFFFFF1B8);
+            c.restore();
         }
     }
 
@@ -118,17 +244,17 @@ public final class WorldRenderer {
                     float top = (o.y - o.h / 2f) * s, bottom = (o.y + o.h / 2f) * s;
                     float gl = (o.gapX - o.gapW / 2f) * s, gr = (o.gapX + o.gapW / 2f) * s;
                     float r = o.h / 2f * s;
-                    if (gl > 0) Ui.neonRect(c, -r * 2f, top, gl, bottom, r, Theme.PURPLE, 18f * s);
-                    if (gr < GameWorld.WIDTH * s) Ui.neonRect(c, gr, top, GameWorld.WIDTH * s + r * 2f, bottom, r, Theme.PURPLE, 18f * s);
+                    if (gl > 0) Ui.neonRect(c, -r * 2f, top, gl, bottom, r, obstacleColor, 18f * s);
+                    if (gr < GameWorld.WIDTH * s) Ui.neonRect(c, gr, top, GameWorld.WIDTH * s + r * 2f, bottom, r, obstacleColor, 18f * s);
                     // Boşluk kenar işaretleri
-                    Ui.glow(c, gl, (top + bottom) / 2f, 40f * s, Theme.TEAL, 0.6f);
-                    Ui.glow(c, gr, (top + bottom) / 2f, 40f * s, Theme.TEAL, 0.6f);
+                    Ui.glow(c, gl, (top + bottom) / 2f, 40f * s, accentColor, 0.6f);
+                    Ui.glow(c, gr, (top + bottom) / 2f, 40f * s, accentColor, 0.6f);
                     break;
                 }
                 case Obstacle.MINE: {
                     float x = o.x * s, y = o.y * s, r = o.mineRadius() * s;
-                    Ui.glow(c, x, y, r * 2.8f, Theme.PURPLE, 0.75f);
-                    Ui.stroke.setColor(Theme.PURPLE_LIGHT);
+                    Ui.glow(c, x, y, r * 2.8f, obstacleColor, 0.75f);
+                    Ui.stroke.setColor(obstacleLight);
                     Ui.stroke.setStrokeWidth(5f * s);
                     for (int k = 0; k < 8; k++) {
                         double a = o.phase * 1.5 + k * Math.PI / 4;
@@ -136,7 +262,7 @@ public final class WorldRenderer {
                         c.drawLine(x + cx * r * 0.9f, y + sy * r * 0.9f, x + cx * r * 1.3f, y + sy * r * 1.3f, Ui.stroke);
                     }
                     Ui.fill.setShader(null);
-                    Ui.fill.setColor(Theme.PURPLE_DARK);
+                    Ui.fill.setColor(Theme.lerp(obstacleColor, Theme.NAVY_DEEP, 0.55f));
                     c.drawCircle(x, y, r, Ui.fill);
                     Ui.stroke.setStrokeWidth(4f * s);
                     c.drawCircle(x, y, r, Ui.stroke);
@@ -147,12 +273,120 @@ public final class WorldRenderer {
                 case Obstacle.SWEEPER: {
                     float l = (o.x - o.w / 2f) * s, r = (o.x + o.w / 2f) * s;
                     float top = (o.y - o.h / 2f) * s, bottom = (o.y + o.h / 2f) * s;
-                    Ui.neonRect(c, l, top, r, bottom, o.h / 2f * s, Theme.PURPLE_LIGHT, 18f * s);
+                    Ui.neonRect(c, l, top, r, bottom, o.h / 2f * s, obstacleLight, 18f * s);
+                    break;
+                }
+                case Obstacle.GATE: {
+                    float l = (o.x - o.w / 2f) * s, r = (o.x + o.w / 2f) * s, y = o.y * s;
+                    // uç direkler
+                    Ui.fill.setShader(null);
+                    Ui.fill.setColor(accentColor);
+                    c.drawCircle(l, y, 14f * s, Ui.fill);
+                    c.drawCircle(r, y, 14f * s, Ui.fill);
+                    if (o.gateActive()) {
+                        Ui.neonLine(c, l, y, r, y, o.h * s, obstacleColor);
+                    } else if (o.gateWarning()) {
+                        float bl = (float) Math.abs(Math.sin(o.phase * 18f));
+                        Ui.stroke.setColor(Theme.alpha(obstacleLight, 0.25f + 0.6f * bl));
+                        Ui.stroke.setStrokeWidth(4f * s);
+                        for (float xx = l; xx < r; xx += 36f * s) c.drawLine(xx, y, Math.min(r, xx + 18f * s), y, Ui.stroke);
+                    } else {
+                        Ui.stroke.setColor(Theme.alpha(obstacleLight, 0.15f));
+                        Ui.stroke.setStrokeWidth(2f * s);
+                        c.drawLine(l, y, r, y, Ui.stroke);
+                    }
+                    break;
+                }
+                case Obstacle.BOUNCER: {
+                    float x = o.x * s, y = o.y * s, r = o.r * s;
+                    Ui.glow(c, x, y, r * 2.6f, obstacleColor, 0.7f);
+                    Ui.fill.setShader(null);
+                    Ui.fill.setColor(Theme.lerp(obstacleColor, Theme.NAVY_DEEP, 0.4f));
+                    c.drawCircle(x, y, r, Ui.fill);
+                    Ui.stroke.setColor(obstacleLight);
+                    Ui.stroke.setStrokeWidth(5f * s);
+                    c.drawCircle(x, y, r, Ui.stroke);
+                    float dir = o.vx > 0 ? 1f : -1f;
+                    Ui.fill.setColor(Theme.alpha(Theme.WHITE, 0.85f));
+                    c.drawCircle(x + dir * r * 0.35f, y, r * 0.22f, Ui.fill);
+                    break;
+                }
+                case Obstacle.METEOR: {
+                    float x = o.x * s, y = o.y * s, r = o.r * s;
+                    if (o.y < 0f) {
+                        // Uyarı: ekranın üstünde yanıp sönen işaret
+                        float bl = 0.4f + 0.6f * (float) Math.abs(Math.sin(t * 10f));
+                        Ui.path.reset();
+                        float ty = 40f * s;
+                        Ui.path.moveTo(x, ty + 30f * s);
+                        Ui.path.lineTo(x - 22f * s, ty);
+                        Ui.path.lineTo(x + 22f * s, ty);
+                        Ui.path.close();
+                        Ui.fill.setShader(null);
+                        Ui.fill.setColor(Theme.alpha(accentColor, bl));
+                        c.drawPath(Ui.path, Ui.fill);
+                        Ui.stroke.setColor(Theme.alpha(accentColor, 0.15f * bl));
+                        Ui.stroke.setStrokeWidth(8f * s);
+                        c.drawLine(x, ty + 40f * s, x, ty + 400f * s, Ui.stroke);
+                    } else {
+                        // Alev izi
+                        for (int k = 4; k >= 1; k--) {
+                            Ui.fill.setColor(Theme.alpha(accentColor, 0.12f * (5 - k)));
+                            c.drawCircle(x, y - k * r * 0.9f, r * (1f - k * 0.15f), Ui.fill);
+                        }
+                        Ui.glow(c, x, y, r * 2.8f, obstacleColor, 0.8f);
+                        Ui.fill.setColor(Theme.lerp(obstacleColor, Theme.NAVY_DEEP, 0.3f));
+                        c.drawCircle(x, y, r, Ui.fill);
+                        Ui.stroke.setColor(obstacleLight);
+                        Ui.stroke.setStrokeWidth(3f * s);
+                        c.drawCircle(x, y, r, Ui.stroke);
+                    }
+                    break;
+                }
+                case Obstacle.ORBITER: {
+                    float x = o.x * s, y = o.y * s, R = Obstacle.ORBIT_R * s, br = Obstacle.ORBIT_BALL * s;
+                    Ui.stroke.setColor(Theme.alpha(obstacleColor, 0.18f));
+                    Ui.stroke.setStrokeWidth(2f * s);
+                    c.drawCircle(x, y, R, Ui.stroke);
+                    float cx = (float) Math.cos(o.angle) * R, cy = (float) Math.sin(o.angle) * R;
+                    Ui.stroke.setColor(Theme.alpha(obstacleLight, 0.35f));
+                    Ui.stroke.setStrokeWidth(4f * s);
+                    c.drawLine(x - cx, y - cy, x + cx, y + cy, Ui.stroke);
+                    Ui.fill.setShader(null);
+                    Ui.fill.setColor(accentColor);
+                    c.drawCircle(x, y, 12f * s, Ui.fill);
+                    for (int k = -1; k <= 1; k += 2) {
+                        float bx = x + cx * k, by = y + cy * k;
+                        Ui.glow(c, bx, by, br * 2.6f, obstacleColor, 0.75f);
+                        Ui.fill.setColor(Theme.lerp(obstacleColor, Theme.NAVY_DEEP, 0.35f));
+                        c.drawCircle(bx, by, br, Ui.fill);
+                        Ui.stroke.setColor(obstacleLight);
+                        Ui.stroke.setStrokeWidth(4f * s);
+                        c.drawCircle(bx, by, br, Ui.stroke);
+                    }
+                    break;
+                }
+                case Obstacle.ZIGZAG: {
+                    float top = (o.y - o.h / 2f) * s, bottom = (o.y + o.h / 2f) * s;
+                    float gl = (o.gapX - o.gapW / 2f) * s, gr = (o.gapX + o.gapW / 2f) * s;
+                    float r = o.h / 2f * s;
+                    if (gl > 0) Ui.neonRect(c, -r * 2f, top, gl, bottom, r, obstacleLight, 18f * s);
+                    if (gr < GameWorld.WIDTH * s) Ui.neonRect(c, gr, top, GameWorld.WIDTH * s + r * 2f, bottom, r, obstacleLight, 18f * s);
+                    // Kayma yönü okları
+                    float dir = (float) Math.cos(o.phase * o.speed) >= 0 ? 1f : -1f;
+                    float mx = (gl + gr) / 2f, my = (top + bottom) / 2f;
+                    Ui.stroke.setColor(Theme.alpha(accentColor, 0.8f));
+                    Ui.stroke.setStrokeWidth(4f * s);
+                    for (int k = 0; k < 2; k++) {
+                        float ax = mx + dir * (k * 22f - 10f) * s;
+                        c.drawLine(ax, my - 12f * s, ax + dir * 12f * s, my, Ui.stroke);
+                        c.drawLine(ax + dir * 12f * s, my, ax, my + 12f * s, Ui.stroke);
+                    }
                     break;
                 }
                 default: { // ROTOR
                     float hx = (float) Math.cos(o.angle) * o.w / 2f, hy = (float) Math.sin(o.angle) * o.w / 2f;
-                    Ui.neonLine(c, (o.x - hx) * s, (o.y - hy) * s, (o.x + hx) * s, (o.y + hy) * s, o.h * s, Theme.PURPLE);
+                    Ui.neonLine(c, (o.x - hx) * s, (o.y - hy) * s, (o.x + hx) * s, (o.y + hy) * s, o.h * s, obstacleColor);
                     Ui.glow(c, o.x * s, o.y * s, 60f * s, Theme.GOLD, 0.5f);
                     Ui.fill.setShader(null);
                     Ui.fill.setColor(Theme.GOLD);

@@ -18,8 +18,8 @@ public final class RecordsScreen extends Screen {
     private final WorldRenderer bg = new WorldRenderer();
     private final Button back;
     private String best = "0";
-    private final String[] labels = {"En uzun süre", "Toplam elmas", "Oynanan oyun", "Gölgeden kaçış", "Tamamlanan görev", "Başarılar",
-            "Oyuncu seviyesi", "Yıldızlar", "En yüksek kombo", "Güçlendirme", "Giriş serisi", "Karakterler"};
+    private final String[] labels = {"En uzun süre", "Toplam elmas", "Oynanan oyun", "Gölgeden kaçış", "Tamamlanan bölüm", "Başarılar",
+            "Oyuncu seviyesi", "Taçlar", "En yüksek kombo", "Güçlendirme", "Giriş serisi", "Karakterler"};
     private final String[] values = new String[12];
     private final String[] top = new String[Progress.TOP_N];
     private float scroll, contentH;

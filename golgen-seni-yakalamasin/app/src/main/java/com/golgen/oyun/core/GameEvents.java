@@ -12,6 +12,8 @@ public interface GameEvents {
     int SHIELD_BREAK = 8;
     int STAGE = 9;         // GameWorld.stage yeni aşama
     int COMBO = 10;        // çarpan arttı
+    int STAR = 11;         // bölüm yıldızı toplandı
+    int LEVEL_STAGE = 12;  // bölümde 2. aşamaya geçildi
 
     void onEvent(int type, float x, float y);
 }

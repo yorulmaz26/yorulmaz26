@@ -40,7 +40,7 @@ public final class GameOverScreen extends Screen {
         againBtn = add(new Button("TEKRAR OYNA", Icons.RESTART, Button.PRIMARY, () -> {
             if (r.mode == RunResult.MODE_MISSION) g.startMission(r.missionIndex); else g.startEndless();
         }));
-        nextBtn = add(new Button("SONRAKİ GÖREV", Icons.NEXT, Button.GOLD, () -> g.startMission(r.missionIndex + 1)));
+        nextBtn = add(new Button("SONRAKİ BÖLÜM", Icons.NEXT, Button.GOLD, () -> g.startMission(r.missionIndex + 1)));
         menuBtn = add(new Button("ANA MENÜ", Icons.HOME, Button.SECONDARY, g::goMenu));
     }
 
@@ -51,7 +51,7 @@ public final class GameOverScreen extends Screen {
         newRecord = rep.newRecord;
         if (res.mode == RunResult.MODE_MISSION) {
             MissionDef m = Missions.ALL[res.missionIndex];
-            title = won ? "GÖREV TAMAMLANDI" : "GÖREV BAŞARISIZ";
+            title = won ? "BÖLÜM TAMAMLANDI" : "BÖLÜM BAŞARISIZ";
             subtitle = m.title + " — " + m.description();
             titleColor = won ? Theme.GOLD : Theme.PURPLE_LIGHT;
         } else {
@@ -74,7 +74,7 @@ public final class GameOverScreen extends Screen {
         xpText = "+" + rep.xpGained + " XP";
         xpFrac = g.progress.xp / (float) Progress.xpForLevel(g.progress.level);
         if (levelUp) g.toast("Seviye atladın! Seviye " + g.progress.level + "  +" + rep.levelReward, Icons.STAR);
-        if (rep.newStars > 0) g.toast("+" + rep.newStars + " yeni yıldız", Icons.STAR);
+        if (rep.newStars > 0) g.toast("+" + rep.newStars + " yeni taç", Icons.STAR);
         nextBtn.visible = res.mode == RunResult.MODE_MISSION && won && res.missionIndex + 1 < Missions.ALL.length;
         againBtn.label = res.mode == RunResult.MODE_MISSION && won ? "TEKRAR" : "TEKRAR OYNA";
 

@@ -21,6 +21,15 @@ public final class DifficultyProfile {
     public float overdrivePerSecond = 1.0f, overdriveMax = 260f;
     public float scrollMul = 1f;
 
+    // ---- Harita/bölüm ayarları (sonsuz modda kapalı) ----
+    /** Engel ağırlıkları (Obstacle.WEIGHT_ORDER sırası); null ise zamana göre açılan klasik karışım. */
+    public float[] weights;
+    public float wind;            // rüzgâr gücü (birim/sn), 0 = yok
+    public float iceGrip;         // 0 = normal; >0 kaygan (ivme katsayısı)
+    public float narrow;          // her iki yandan kapanan genişlik (birim)
+    public float meteorInterval;  // >0 ise ek meteor yağmuru aralığı (sn)
+    public float starIntervalMin = 1.2f, starIntervalMax = 2.0f;
+
     public static DifficultyProfile endless() {
         return new DifficultyProfile();
     }

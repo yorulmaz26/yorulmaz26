@@ -133,9 +133,9 @@ public final class GameView extends View implements Choreographer.FrameCallback 
 
     // ---------------- Ekran geçişleri ----------------
     public void go(Screen next) {
-        if (next == current && fadeDir == 0) return;
+        // Aynı ekrana tekrar geçiş de (ör. oyundan yeni bölüme) yeniden başlatır.
         pending = next;
-        fadeDir = 1;
+        if (fadeDir != 1) fadeDir = 1;
     }
 
     public void goMenu() { go(menu); }

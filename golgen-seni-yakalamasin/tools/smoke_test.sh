@@ -144,11 +144,11 @@ expect_screen MenuScreen "Geri tuşu → Ana menü"
 tap_target MenuScreen "Görevler"
 expect_screen MissionsScreen "Görevler butonu"
 sleep 0.6; shot 10_gunluk_gorevler
-tap_target MissionsScreen "Görev Modu"; sleep 0.4; shot 11_gorev_modu
+tap_target MissionsScreen "Haritalar"; sleep 0.4; shot 11_haritalar
 tap_target MissionsScreen "Başarılar"; sleep 0.4; shot 12_basarilar
-tap_target MissionsScreen "Görev Modu"
-tap_target MissionsScreen seviye-0
-expect_screen PlayScreen "Görev 1 başlatma"
+tap_target MissionsScreen "Haritalar"
+tap_target MissionsScreen bolum-0
+expect_screen PlayScreen "Bölüm 1 başlatma (harita düğümü)"
 sleep 0.5; shot 13_gorev_oyun
 adb shell input keyevent KEYCODE_BACK; sleep 0.5
 tap_target PlayScreen "ANA MENÜ"
@@ -176,6 +176,24 @@ expect_screen TutorialScreen "Ayarlar → Öğretici"
 sleep 0.6; shot 17_ogretici
 tap_target TutorialScreen Kapat
 expect_screen MenuScreen "Öğretici kapat"
+
+# 6b) Farklı haritalardan oynanış görüntüleri (debug ekstrasıyla bölüm aç)
+for lv in 2 17 27 37 72 99; do
+  adb shell am start -n $ACT --es ekran gorev:$lv >/dev/null
+  if wait_screen PlayScreen 6; then
+    sleep 0.8
+    for i in 1 2 3; do
+      adb shell input swipe 300 1600 800 1450 260
+      adb shell input swipe 800 1450 650 1900 260
+      adb shell input swipe 650 1900 300 1600 260
+    done
+    shot "19_harita_bolum_$((lv+1))"
+  else
+    bad "Bölüm $((lv+1)) açılamadı"
+  fi
+done
+adb shell am start -n $ACT --es ekran menu >/dev/null
+if wait_screen MenuScreen 8; then ok "Harita bölümleri açılıp oynandı (6 harita)"; else bad "Harita bölümlerinden menüye dönüş"; fi
 
 # 7) Kalıcılık: uygulamayı öldür ve yeniden aç → öğretici tekrar gelmemeli, veriler korunmalı
 adb shell am force-stop $PKG

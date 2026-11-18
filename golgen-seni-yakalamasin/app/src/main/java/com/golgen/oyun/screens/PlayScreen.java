@@ -45,6 +45,9 @@ public final class PlayScreen extends Screen implements GameEvents {
     private int lastStage = -1, lastMult = -1;
     private String multText = "";
     private boolean dark;
+    private int lastLevelStage = -1;
+    private String levelStageText = "";
+    private float levelBanner;
 
     private final Button pauseBtn;
     private final Button resumeBtn, restartBtn, homeBtn, soundBtn, musicBtn, vibBtn;
@@ -130,7 +133,9 @@ public final class PlayScreen extends Screen implements GameEvents {
         lastScore = lastSec = lastDiamonds = lastProg = -1;
         lastStage = lastMult = -1;
         stageBanner = 0f;
-        dark = mission != null && mission.has(MissionDef.MOD_DARK);
+        dark = mission != null && mission.has(com.golgen.oyun.core.MapTheme.F_DARK);
+        renderer.setTheme(mission != null ? mission.map : com.golgen.oyun.core.Maps.ENDLESS);
+        lastLevelStage = -1;
         setPausedUi(false);
         syncToggles();
     }
@@ -235,6 +240,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         if (shake > 0f) shake = Math.max(0f, shake - dt * 3f);
         if (flash > 0f) flash = Math.max(0f, flash - dt * 2.5f);
         if (stageBanner > 0f && phase != PAUSED) stageBanner -= dt;
+        if (levelBanner > 0f && phase != PAUSED) levelBanner -= dt;
         if (phase == ENDING && phaseTime > 1.15f) finishRun();
         refreshHud();
     }
@@ -261,16 +267,12 @@ public final class PlayScreen extends Screen implements GameEvents {
         int m = world.multiplier();
         if (m != lastMult) { lastMult = m; multText = "x" + m + " KOMBO"; }
         if (mission != null) {
-            int pr = Math.min(mission.target, mission.progress(world));
-            if (pr != lastProg) {
+            int pr = world.stageStars;
+            if (pr != lastProg || world.levelStage != lastLevelStage) {
                 lastProg = pr;
-                String unit;
-                switch (mission.type) {
-                    case MissionDef.DODGE: unit = " kaçış"; break;
-                    case MissionDef.COLLECT: unit = " elmas"; break;
-                    default: unit = " sn"; break;
-                }
-                progText = pr + " / " + mission.target + unit;
+                lastLevelStage = world.levelStage;
+                progText = pr + " / " + MissionDef.STARS_PER_STAGE;
+                levelStageText = "AŞAMA " + world.levelStage + "/" + MissionDef.STAGES + "  ·  " + mission.title;
             }
         }
     }
@@ -329,6 +331,17 @@ public final class PlayScreen extends Screen implements GameEvents {
                     stageBanner = 1.8f;
                 }
                 break;
+            case STAR:
+                g.sound.play(Synth.DIAMOND, 0.7f, 1.25f);
+                renderer.particles.burst(x, y, 10, Theme.GOLD, 380f, 6f, 0.5f);
+                break;
+            case LEVEL_STAGE:
+                g.sound.play(Synth.SHADOW, 1f, 0.8f);
+                g.sound.play(Synth.SUCCESS, 0.7f, 1f);
+                g.haptics.medium();
+                levelBanner = 2.4f;
+                flash = 0.3f;
+                break;
             case COMBO:
                 g.haptics.light();
                 popups.add("x" + world.multiplier() + " KOMBO!", x, y - 95f, Theme.GOLD);
@@ -366,6 +379,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         drawHud(c);
         if (phase == READY) drawReadyHint(c);
         if (stageBanner > 0f && phase == PLAYING) drawStageBanner(c);
+        if (levelBanner > 0f && phase == PLAYING) drawLevelBanner(c);
         if (phase == ENDING) drawEnding(c);
         if (phase == PAUSED && resumeBtn.visible) drawPause(c);
         drawButtons(c);
@@ -405,13 +419,22 @@ public final class PlayScreen extends Screen implements GameEvents {
         Ui.text(c, diamondText, lx + 70f * u, Ui.centerY(top + 106f * u, 40f * u), 40f * u, Theme.GOLD, Paint.Align.LEFT, Ui.NUMBERS);
         // Görev ilerlemesi
         if (mission != null) {
-            float bw = Math.min(w - 200f * u, 640f * u), by = top + 180f * u;
-            Ui.text(c, mission.title, cx, by, 30f * u, Theme.TEAL, Paint.Align.CENTER, Ui.BOLD);
-            float barT = by + 20f * u;
-            Ui.panel(c, cx - bw / 2f, barT, cx + bw / 2f, barT + 16f * u, 8f * u, Theme.alpha(Theme.PANEL, 0.9f), Theme.LINE, 2f * u);
-            float p = Math.min(1f, lastProg / (float) mission.target);
-            if (p > 0f) Ui.panel(c, cx - bw / 2f, barT, cx - bw / 2f + bw * p, barT + 16f * u, 8f * u, Theme.TEAL, 0, 0);
-            Ui.text(c, progText, cx, barT + 56f * u, 30f * u, Theme.WHITE, Paint.Align.CENTER, Ui.MEDIUM);
+            float bw = Math.min(w - 260f * u, 560f * u), by = top + 182f * u;
+            int stageCol = world.levelStage == 2 ? Theme.PURPLE_LIGHT : Theme.TEAL;
+            Ui.text(c, levelStageText, cx, by, 28f * u, stageCol, Paint.Align.CENTER, Ui.BOLD);
+            float barT = by + 18f * u;
+            Ui.panel(c, cx - bw / 2f, barT, cx + bw / 2f, barT + 18f * u, 9f * u, Theme.alpha(Theme.PANEL, 0.9f), Theme.LINE, 2f * u);
+            float p = Math.min(1f, lastProg / (float) MissionDef.STARS_PER_STAGE);
+            if (p > 0f) Ui.panel(c, cx - bw / 2f, barT, cx - bw / 2f + bw * p, barT + 18f * u, 9f * u, Theme.GOLD, 0, 0);
+            // iki aşama noktası
+            for (int k = 0; k < MissionDef.STAGES; k++) {
+                boolean done = k < world.levelStage - 1, cur = k == world.levelStage - 1;
+                Ui.fill.setShader(null);
+                Ui.fill.setColor(done ? Theme.GOLD : (cur ? stageCol : Theme.LINE));
+                c.drawCircle(cx + bw / 2f + 30f * u + k * 30f * u, barT + 9f * u, 9f * u, Ui.fill);
+            }
+            Icons.draw(c, Icons.STAR, cx - 40f * u, barT + 52f * u, 16f * u, Theme.GOLD);
+            Ui.text(c, progText, cx - 16f * u, barT + 62f * u, 30f * u, Theme.WHITE, Paint.Align.LEFT, Ui.NUMBERS);
         }
         // Gölge sayısı
         int sh = world.shadows.size();
@@ -446,12 +469,22 @@ public final class PlayScreen extends Screen implements GameEvents {
         Ui.text(c, "Akış hızlanıyor", w / 2f, cy + 60f * u, 34f * u, Theme.alpha(Theme.TEAL, a), Paint.Align.CENTER, Ui.MEDIUM);
     }
 
+    private void drawLevelBanner(Canvas c) {
+        float t = levelBanner / 2.4f;
+        float a = t > 0.85f ? (1f - t) / 0.15f : Math.min(1f, t / 0.3f);
+        float cy = h * 0.42f;
+        c.drawColor(Theme.alpha(Theme.NAVY_DEEP, 0.35f * a));
+        Ui.glow(c, w / 2f, cy - 20f * u, 460f * u, Theme.PURPLE, 0.45f * a);
+        Ui.text(c, "2. AŞAMA", w / 2f, cy, 96f * u, Theme.alpha(Theme.WHITE, a), Paint.Align.CENTER, Ui.DISPLAY);
+        Ui.text(c, "Gölgeler ikiye çıktı! 20 yıldız daha topla", w / 2f, cy + 66f * u, 34f * u, Theme.alpha(Theme.PURPLE_LIGHT, a), Paint.Align.CENTER, Ui.BOLD);
+    }
+
     private void drawReadyHint(Canvas c) {
         float cx = w / 2f, cy = h * 0.58f;
         float pulse = 0.6f + 0.4f * (float) Math.sin(time * 4f);
         Ui.panel(c, cx - 400f * u, cy - 80f * u, cx + 400f * u, cy + 120f * u, 40f * u, Theme.alpha(Theme.NAVY_DEEP, 0.8f), Theme.alpha(Theme.TEAL, 0.6f), 3f * u);
         Ui.text(c, "Parmağını bas ve sürükle", cx, cy, 44f * u, Theme.alpha(Theme.WHITE, pulse), Paint.Align.CENTER, Ui.BOLD);
-        String sub = mission != null ? mission.description() : "Gölgen geçmiş hareketlerini tekrar eder";
+        String sub = mission != null ? mission.map.name + " · " + mission.map.featuresText() + " · 2 aşama × 20 yıldız" : "Gölgen geçmiş hareketlerini tekrar eder";
         Ui.textFit(c, sub, cx, cy + 60f * u, 32f * u, 760f * u, Theme.TEAL, Paint.Align.CENTER, Ui.MEDIUM);
     }
 
@@ -460,7 +493,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         c.drawColor(Theme.alpha(Theme.NAVY_DEEP, 0.55f * k));
         String title;
         int color;
-        if (world.state == GameWorld.WON) { title = "GÖREV TAMAM!"; color = Theme.GOLD; }
+        if (world.state == GameWorld.WON) { title = "BÖLÜM TAMAM!"; color = Theme.GOLD; }
         else if (world.cause == GameWorld.CAUSE_SHADOW) { title = "GÖLGEN SENİ YAKALADI"; color = Theme.PURPLE_LIGHT; }
         else { title = "ENGELE ÇARPTIN"; color = Theme.PURPLE_LIGHT; }
         float sc = 0.8f + 0.2f * k;

@@ -22,6 +22,7 @@ public final class GameWorld {
     public static final float MAGNET_RANGE = 430f;
     public static final float COMBO_WINDOW = 4f;
     public static final float STAGE_SECONDS = 30f;
+    public static final float STAR_R = 24f;
 
     public static final int RUNNING = 0, DEAD = 1, WON = 2;
     public static final int CAUSE_NONE = 0, CAUSE_SHADOW = 1, CAUSE_OBSTACLE = 2;
@@ -55,6 +56,14 @@ public final class GameWorld {
     public int combo, maxCombo, bonus, powerupsCollected, lastPowerup;
     public float comboTimer;
     public int stage;
+    // Bölüm (görev modu): 2 aşama × 20 yıldız
+    public int levelStage = 1;
+    public int stageStars;
+    public int totalStars;
+    public float windX;
+    private float ivx, ivy;   // buz ataleti
+    public final Pool<Diamond> starPool = new Pool<>(24, Diamond::new);
+    private float nextStarAt, nextMeteorAt;
 
     public final MotionRecorder recorder;
     public final Pool<Shadow> shadows;
@@ -89,8 +98,8 @@ public final class GameWorld {
 
     public float minPlayerY() { return height * 0.24f; }
     public float maxPlayerY() { return height - PLAYER_R - 24f; }
-    public float minPlayerX() { return PLAYER_R + 14f; }
-    public float maxPlayerX() { return WIDTH - PLAYER_R - 14f; }
+    public float minPlayerX() { return PLAYER_R + 14f + profile.narrow; }
+    public float maxPlayerX() { return WIDTH - PLAYER_R - 14f - profile.narrow; }
 
     public void start(DifficultyProfile p, MissionDef m, long seed) {
         profile = p;
@@ -112,6 +121,12 @@ public final class GameWorld {
         slowTimer = magnetTimer = shadowGrace = comboTimer = 0f;
         combo = maxCombo = bonus = powerupsCollected = 0;
         stage = 1;
+        levelStage = 1;
+        stageStars = totalStars = 0;
+        windX = ivx = ivy = 0f;
+        starPool.clear();
+        nextStarAt = 1.5f;
+        nextMeteorAt = p.meteorInterval > 0f ? 4f : Float.MAX_VALUE;
         powerups.clear();
         nextPowerupAt = 9f;
         recorder.clear();
@@ -186,12 +201,30 @@ public final class GameWorld {
             if (events != null) events.onEvent(GameEvents.STAGE, px, py);
         }
 
+        // Rüzgâr: hedefi (ve dolayısıyla karakteri) yavaşça yana iter
+        if (profile.wind > 0f) {
+            windX = profile.wind * (float) Math.sin(time * 0.45f + 1.3f);
+            tx = Geometry.clamp(tx + windX * dt, minPlayerX(), maxPlayerX());
+        }
         // Oyuncu: hedefe en fazla MAX_SPEED ile ilerle
         float dx = tx - px, dy = ty - py;
         float dist = (float) Math.sqrt(dx * dx + dy * dy);
         float maxMove = MAX_SPEED * dt;
         float ox = px, oy = py;
-        if (dist <= maxMove || dist < 0.001f) {
+        if (profile.iceGrip > 0f) {
+            // Buz: istenen hıza ataletle yaklaş
+            float wantVx = 0f, wantVy = 0f;
+            if (dist > 0.5f) {
+                float sp = Math.min(MAX_SPEED, dist * 8f);
+                wantVx = dx / dist * sp;
+                wantVy = dy / dist * sp;
+            }
+            float k = Math.min(1f, profile.iceGrip * dt);
+            ivx += (wantVx - ivx) * k;
+            ivy += (wantVy - ivy) * k;
+            px = Geometry.clamp(px + ivx * dt, minPlayerX(), maxPlayerX());
+            py = Geometry.clamp(py + ivy * dt, minPlayerY(), maxPlayerY());
+        } else if (dist <= maxMove || dist < 0.001f) {
             px = tx;
             py = ty;
         } else {
@@ -209,10 +242,14 @@ public final class GameWorld {
         if (spawnObstacles && time >= nextObstacleAt) spawnObstacle(d);
         if (spawnDiamonds && time >= nextDiamondAt) spawnDiamond();
         if (spawnPowerups && time >= nextPowerupAt) spawnPowerup();
+        if (mission != null && spawnDiamonds && time >= nextStarAt) spawnStars();
+        if (spawnObstacles && time >= nextMeteorAt) spawnMeteor(d);
         updateObstacles(dt);
         if (state != RUNNING) return;
         updateDiamonds(dt);
         updatePowerups(dt);
+        if (mission != null) updateStars(dt);
+        if (state != RUNNING) return;
         checkMission();
     }
 
@@ -281,7 +318,15 @@ public final class GameWorld {
         float dt = profile.difficultyTime(time);
         // %40 duvar; kalan olasılık zorluk zamanına göre açılmış türler arasında paylaşılır.
         int mapped = Obstacle.WALL;
-        if (rng.nextInt(10) >= 4) {
+        if (profile.weights != null) {
+            float total = 0f;
+            for (float wv : profile.weights) total += wv;
+            float r = rng.nextFloat() * total;
+            for (int i = 0; i < profile.weights.length; i++) {
+                r -= profile.weights[i];
+                if (r <= 0f && profile.weights[i] > 0f) { mapped = Obstacle.WEIGHT_ORDER[i]; break; }
+            }
+        } else if (rng.nextInt(10) >= 4) {
             int n = 0;
             if (dt >= profile.mineFrom) avail[n++] = Obstacle.MINE;
             if (dt >= profile.sweeperFrom) avail[n++] = Obstacle.SWEEPER;
@@ -296,8 +341,9 @@ public final class GameWorld {
                 o.gapW = profile.gap(d);
                 float half = o.gapW / 2f;
                 float maxShift = Geometry.clamp(MAX_SPEED * interval * 0.32f, 180f, 560f);
-                float lo = Math.max(half + 20f, lastGapX - maxShift);
-                float hi = Math.min(WIDTH - half - 20f, lastGapX + maxShift);
+                float lo = Math.max(profile.narrow + half + 20f, lastGapX - maxShift);
+                float hi = Math.min(WIDTH - profile.narrow - half - 20f, lastGapX + maxShift);
+                if (hi < lo) { lo = hi = WIDTH / 2f; }
                 o.gapX = lo + rng.nextFloat() * Math.max(0f, hi - lo);
                 lastGapX = o.gapX;
                 o.y = -o.h;
@@ -321,7 +367,7 @@ public final class GameWorld {
                 o.y = -o.h;
                 break;
             }
-            default: { // ROTOR
+            case Obstacle.ROTOR: {
                 o.w = 420f + 140f * d;
                 o.h = 22f;
                 o.x = o.w / 2f + 10f + rng.nextFloat() * (WIDTH - o.w - 20f);
@@ -329,6 +375,48 @@ public final class GameWorld {
                 o.angle = rng.nextFloat() * 3.14f;
                 o.y = -o.w / 2f - o.h;
                 extraWait = (o.w * 0.5f) / profile.scroll(d);
+                break;
+            }
+            case Obstacle.GATE: {
+                o.h = 20f;
+                float span = WIDTH - 2f * profile.narrow;
+                o.w = span * (0.5f + 0.12f * rng.nextFloat());
+                boolean left = rng.nextBoolean();
+                o.x = left ? profile.narrow + o.w / 2f : WIDTH - profile.narrow - o.w / 2f;
+                o.phase = rng.nextFloat() * Obstacle.GATE_WARN; // kapalı evrede başla
+                o.y = -o.h;
+                break;
+            }
+            case Obstacle.BOUNCER: {
+                o.r = Obstacle.BOUNCER_R;
+                o.x = 120f + rng.nextFloat() * (WIDTH - 240f);
+                o.vx = (rng.nextBoolean() ? 1f : -1f) * (260f + 220f * d);
+                o.y = -o.r;
+                break;
+            }
+            case Obstacle.METEOR: {
+                initMeteor(o);
+                break;
+            }
+            case Obstacle.ORBITER: {
+                o.x = Obstacle.ORBIT_R + 60f + rng.nextFloat() * (WIDTH - 2f * Obstacle.ORBIT_R - 120f);
+                o.speed = (rng.nextBoolean() ? 1f : -1f) * (1.4f + 0.8f * d);
+                o.angle = rng.nextFloat() * 6.28f;
+                o.y = -Obstacle.ORBIT_R - Obstacle.ORBIT_BALL;
+                extraWait = Obstacle.ORBIT_R / profile.scroll(d);
+                break;
+            }
+            default: { // ZIGZAG
+                o.h = 34f;
+                o.gapW = profile.gap(d) + 30f;
+                float lo = profile.narrow + o.gapW / 2f + 20f, hi = WIDTH - profile.narrow - o.gapW / 2f - 20f;
+                o.baseX = (lo + hi) / 2f;
+                o.amp = Math.max(0f, Math.min(260f, (hi - lo) / 2f));
+                o.speed = 1.1f + 0.7f * d;
+                o.phase = rng.nextFloat() * 6.28f;
+                o.gapX = o.baseX + (float) Math.sin(o.phase * o.speed) * o.amp;
+                lastGapX = o.gapX;
+                o.y = -o.h;
                 break;
             }
         }
@@ -383,6 +471,44 @@ public final class GameWorld {
                     break;
                 }
             }
+            switch (o.type) {
+                case Obstacle.GATE: {
+                    if (o.gateActive()) {
+                        hit = Geometry.circleRect(px, py, pr, o.x - o.w / 2f, o.y - o.h / 2f, o.x + o.w / 2f, o.y + o.h / 2f);
+                    }
+                    break;
+                }
+                case Obstacle.BOUNCER: {
+                    o.x += o.vx * dt;
+                    float lo = profile.narrow + o.r, hi = WIDTH - profile.narrow - o.r;
+                    if (o.x < lo) { o.x = lo; o.vx = -o.vx; }
+                    if (o.x > hi) { o.x = hi; o.vx = -o.vx; }
+                    hit = Geometry.circleCircle(px, py, pr, o.x, o.y, o.r * 0.9f);
+                    break;
+                }
+                case Obstacle.METEOR: {
+                    o.y += o.speed * dt; // akışa ek düşüş hızı
+                    hit = Geometry.circleCircle(px, py, pr, o.x, o.y, o.r * 0.9f);
+                    break;
+                }
+                case Obstacle.ORBITER: {
+                    o.angle += o.speed * dt;
+                    float cx = (float) Math.cos(o.angle) * Obstacle.ORBIT_R, cy = (float) Math.sin(o.angle) * Obstacle.ORBIT_R;
+                    hit = Geometry.circleCircle(px, py, pr, o.x + cx, o.y + cy, Obstacle.ORBIT_BALL * 0.9f)
+                            || Geometry.circleCircle(px, py, pr, o.x - cx, o.y - cy, Obstacle.ORBIT_BALL * 0.9f);
+                    break;
+                }
+                case Obstacle.ZIGZAG: {
+                    o.gapX = o.baseX + (float) Math.sin(o.phase * o.speed) * o.amp;
+                    float top = o.y - o.h / 2f, bottom = o.y + o.h / 2f;
+                    float gl = o.gapX - o.gapW / 2f, gr = o.gapX + o.gapW / 2f;
+                    hit = Geometry.circleRect(px, py, pr, -50f, top, gl, bottom)
+                            || Geometry.circleRect(px, py, pr, gr, top, WIDTH + 50f, bottom);
+                    break;
+                }
+                default:
+                    break;
+            }
             if (hit && invuln <= 0f && !obstaclesHarmless && shield) {
                 breakShield();
             } else if (hit && invuln <= 0f && !obstaclesHarmless) {
@@ -426,6 +552,105 @@ public final class GameWorld {
                 diamondPool.free(i);
             }
         }
+    }
+
+    private void initMeteor(Obstacle o) {
+        o.type = Obstacle.METEOR;
+        o.r = Obstacle.METEOR_R;
+        o.x = profile.narrow + 60f + rng.nextFloat() * (WIDTH - 2f * profile.narrow - 120f);
+        o.y = -520f;          // ekranın üstünde başlar: üstte uyarı işareti görünür
+        o.speed = 520f;       // akışa ek düşüş hızı
+        o.phase = 0f;
+    }
+
+    private void spawnMeteor(float d) {
+        nextMeteorAt = time + profile.meteorInterval * (0.7f + 0.6f * rng.nextFloat()) * (1f - 0.3f * d);
+        Obstacle o = obstacles.obtain();
+        if (o == null) return;
+        o.reset();
+        initMeteor(o);
+    }
+
+    /** Yıldız grupları: tek, dikey çizgi, çapraz, yatay sıra, yay. */
+    private void spawnStars() {
+        DifficultyProfile p = profile;
+        nextStarAt = time + p.starIntervalMin + rng.nextFloat() * (p.starIntervalMax - p.starIntervalMin);
+        float baseY = -STAR_R * 2f;
+        for (int i = 0; i < obstacles.size(); i++) {
+            Obstacle o = obstacles.get(i);
+            if (o.type != Obstacle.METEOR && Math.abs(o.y - baseY) < o.halfExtent() + 80f) {
+                nextStarAt = time + 0.2f;
+                return;
+            }
+        }
+        float lo = minPlayerX() + 10f, hi = maxPlayerX() - 10f;
+        int pattern = rng.nextInt(5);
+        int n = pattern == 0 ? 1 : 3;
+        float x = lo + 120f + rng.nextFloat() * Math.max(1f, hi - lo - 240f);
+        for (int k = 0; k < n; k++) {
+            Diamond s = starPool.obtain();
+            if (s == null) return;
+            float sx = x, sy = baseY;
+            switch (pattern) {
+                case 1: sy = baseY - k * 85f; break;                                     // dikey
+                case 2: sx = x + (k - 1) * 90f; sy = baseY - k * 80f; break;            // çapraz
+                case 3: sx = x + (k - 1) * 110f; break;                                  // yatay
+                case 4: sx = x + (k - 1) * 105f; sy = baseY - (k == 1 ? 60f : 0f); break; // yay
+                default: break;
+            }
+            s.set(Geometry.clamp(sx, lo, hi), sy);
+        }
+    }
+
+    private void updateStars(float dt) {
+        float cr = PLAYER_R + STAR_R + 8f;
+        for (int i = starPool.size() - 1; i >= 0; i--) {
+            Diamond st = starPool.get(i);
+            st.y += scroll * dt;
+            st.phase += dt;
+            if (magnetTimer > 0f) {
+                float mx = px - st.x, my = py - st.y;
+                float md2 = mx * mx + my * my;
+                if (md2 < MAGNET_RANGE * MAGNET_RANGE && md2 > 1f) {
+                    float ml = (float) Math.sqrt(md2);
+                    st.x += mx / ml * 950f * dt;
+                    st.y += my / ml * 950f * dt;
+                }
+            }
+            if (Geometry.dist2(px, py, st.x, st.y) < cr * cr) {
+                starPool.free(i);
+                collectStar(st.x, st.y);
+                if (state != RUNNING) return;
+            } else if (st.y > height + 60f) {
+                starPool.free(i);
+            }
+        }
+    }
+
+    private void collectStar(float x, float y) {
+        stageStars++;
+        totalStars++;
+        addCombo(10);
+        if (events != null) events.onEvent(GameEvents.STAR, x, y);
+        if (stageStars >= MissionDef.STARS_PER_STAGE) {
+            if (levelStage < MissionDef.STAGES) {
+                levelStage++;
+                stageStars = 0;
+                // 2. aşama: ikinci gölge katılır
+                if (profile.shadowDelays.length > 1) addShadow(profile.shadowDelays[1]);
+                if (events != null) events.onEvent(GameEvents.LEVEL_STAGE, px, py);
+            } else {
+                state = WON;
+                if (events != null) events.onEvent(GameEvents.WIN, px, py);
+            }
+        }
+    }
+
+    /** Test için yıldız ekleme. */
+    public Diamond addStar(float x, float y) {
+        Diamond s = starPool.obtain();
+        if (s != null) s.set(x, y);
+        return s;
     }
 
     private void breakShield() {
@@ -483,11 +708,7 @@ public final class GameWorld {
     }
 
     private void checkMission() {
-        if (mission == null) return;
-        if (mission.progress(this) >= mission.target) {
-            state = WON;
-            if (events != null) events.onEvent(GameEvents.WIN, px, py);
-        }
+        // Bölüm sonu yıldız toplamayla belirlenir (collectStar).
     }
 
     private void die(int c) {

@@ -53,7 +53,7 @@ public final class Progress {
         unlockedSkins = s.getInt("unlockedSkins", 1) | 1;
         selectedSkin = s.getInt("selectedSkin", 0);
         if (selectedSkin < 0 || selectedSkin >= Skins.ALL.length || (unlockedSkins & (1 << selectedSkin)) == 0) selectedSkin = 0;
-        missionsCompleted = Math.max(0, Math.min(Missions.ALL.length, s.getInt("missionsCompleted", 0)));
+        missionsCompleted = Math.max(0, Math.min(Missions.ALL.length, s.getInt("levelsDone", 0)));
         achievements = s.getInt("achievements", 0);
         String top = s.getString("topScores", "");
         java.util.Arrays.fill(topScores, 0);
@@ -73,7 +73,7 @@ public final class Progress {
             dailyProgress[i] = s.getInt("dailyProg" + i, 0);
         }
         dailyClaimed = s.getInt("dailyClaimed", 0);
-        String stars = s.getString("missionStars", "");
+        String stars = s.getString("levelCrowns", "");
         java.util.Arrays.fill(missionStars, (byte) 0);
         for (int i = 0; i < stars.length() && i < missionStars.length; i++) {
             int v = stars.charAt(i) - '0';
@@ -97,7 +97,7 @@ public final class Progress {
         s.putInt("gamesPlayed", gamesPlayed);
         s.putInt("unlockedSkins", unlockedSkins);
         s.putInt("selectedSkin", selectedSkin);
-        s.putInt("missionsCompleted", missionsCompleted);
+        s.putInt("levelsDone", missionsCompleted);
         s.putInt("achievements", achievements);
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < TOP_N; i++) {
@@ -117,7 +117,7 @@ public final class Progress {
         s.putInt("dailyClaimed", dailyClaimed);
         StringBuilder st = new StringBuilder(missionStars.length);
         for (byte b : missionStars) st.append((char) ('0' + b));
-        s.putString("missionStars", st.toString());
+        s.putString("levelCrowns", st.toString());
         s.putInt("xp", xp);
         s.putInt("level", level);
         s.putInt("maxCombo", maxCombo);

@@ -60,17 +60,37 @@ Hazır APK: GitHub Actions her push'ta APK'yı derler, emülatörde test eder ve
 ### Modlar
 - **Sonsuz Mod:** mümkün olduğunca uzun hayatta kal. Her 30 sn'de yeni **aşama**; zorluk tavana ulaştıktan sonra da
   akış hızlanmaya devam eder (hiç bitmeyen artış). Rekor ve ilk 10 skor cihazda saklanır.
-- **Görev Modu:** **5 bölüm × 12 = 60 seviye**. Beş görev türü: hayatta kal, gölgeden kıl payı kaç, elmas topla,
-  **engellere çarpmadan** tamamla, **puan hedefi**. Her bölüm yeni zorlaştırıcılar getirir ve bir **bölüm finali** ile biter:
-  | Bölüm | Zorlaştırıcı |
-  |---|---|
-  | 1 · Alacakaranlık | Yok (temel) |
-  | 2 · Neon Sokaklar | Hızlı Akış (%25 hızlı) |
-  | 3 · Karanlık Labirent | Karanlık: görüş oyuncunun çevresiyle sınırlı |
-  | 4 · Gölge Fırtınası | Hızlı Gölgeler (kısa gecikme) + Gölge Akını (erken ve sık gölge) |
-  | 5 · Sonsuz Gece | Hepsinin karışımı; final tüm zorlaştırıcılarla |
-- **Yıldızlar (180 adet):** ★ tamamla · ★ hiç çarpmadan bitir · ★ kombo hedefine ulaş. Yeni yıldız başına +10 elmas;
-  seviyeleri tekrar oynamak için sebep.
+- **Görev Modu — 100 bölüm, 20 harita:** her harita 5 bölümden oluşur; her bölüm **2 aşamalıdır**:
+  1. aşamada **1 gölge** vardır, **20 yıldız** toplanınca 2. aşama başlar; 2. aşamada **2 gölge** vardır,
+  20 yıldız daha toplanınca bölüm biter. Aynı haritanın 5 bölümünde imza engel sıklaşır, özellik güçlenir,
+  gölgeler yaklaşır, yıldızlar seyrekleşir; 5. bölüm harita sonudur.
+- **Taçlar (300 adet):** her bölümde ♛ tamamla · ♛ hiç çarpmadan bitir · ♛ kombo hedefine ulaş.
+
+| # | Harita | Arka plan efekti | İmza engel | Özellik |
+|---|---|---|---|---|
+| 1 | Neon Kapı | yıldızlar | mayın | klasik |
+| 2 | Kristal Mağara | kıvılcım | salınan blok | klasik |
+| 3 | Yağmurlu Şehir | yağmur | kayan boşluklu duvar | rüzgâr |
+| 4 | Lav Çekirdeği | köz | meteor | meteor yağmuru |
+| 5 | Buz Çölü | kar | kayan boşluklu duvar | buz (atalet) |
+| 6 | Derin Okyanus | kabarcık | dönen çift top | karanlık |
+| 7 | Sonbahar Ormanı | yaprak | dönen lazer | rüzgâr |
+| 8 | Elektrik Santrali | kıvılcım | lazer kapı | klasik |
+| 9 | Kum Fırtınası | kum | seken top | rüzgâr + meteor |
+| 10 | Gece Pazarı | kıvılcım | dönen çift top | hızlı akış |
+| 11 | Yıldız Tozu | yıldızlar | seken top | hızlı akış |
+| 12 | Sis Bataklığı | toz | mayın | karanlık |
+| 13 | Saat Kulesi | kıvılcım | dönen lazer | hızlı gölgeler |
+| 14 | Kızıl Gezegen | toz | dönen lazer | meteor yağmuru |
+| 15 | Ayna Labirenti | kıvılcım | kayan boşluklu duvar | dar geçit |
+| 16 | Kuzey Işıkları | kar | dönen çift top | buz + karanlık |
+| 17 | Volkan Zirvesi | köz | meteor | meteor + hızlı akış |
+| 18 | Siber Ağ | kod yağmuru | lazer kapı | hızlı gölgeler + hızlı akış |
+| 19 | Kara Delik | yıldızlar | dönen çift top | karanlık + çekim rüzgârı |
+| 20 | Gölge Tahtı | köz | lazer kapı | karanlık + hızlı gölgeler + meteor + hızlı akış |
+
+Engel türleri (9): boşluklu duvar, mayın, salınan blok, dönen lazer, **yanıp sönen lazer kapı** (önce uyarır),
+**seken top**, **meteor** (ekranın üstünde uyarı işareti), **dönen çift top**, **kayan boşluklu duvar**.
 
 ### Uzun süreli oynanış
 - **Güçlendirmeler:** Kalkan (bir engel veya gölge temasını emer), Yavaş Zaman (dünya %55 hızda akar; gölge geçmişi bozulmaz),
@@ -119,7 +139,7 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 47 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 55 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
   kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı.
 - `tools/smoke_test.sh` — emülatörde uçtan uca test (CI): kurulum, öğretici, tüm menü butonları ve ekran geçişleri,

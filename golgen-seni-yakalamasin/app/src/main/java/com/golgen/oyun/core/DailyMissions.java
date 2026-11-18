@@ -58,7 +58,7 @@ public final class DailyMissions {
             case SURVIVE_SINGLE: return "Tek oyunda " + target + " sn hayatta kal";
             case DODGE: return "Toplam " + target + " kez gölgeden kaç";
             case POWERUPS: return target + " güçlendirme topla";
-            case MISSION_WINS: return target + " görev seviyesi tamamla";
+            case MISSION_WINS: return target + " bölüm tamamla";
             case COMBO_SINGLE: return "Tek oyunda " + target + " kombo yap";
             default: return "Tek oyunda " + target + " puan yap";
         }
