@@ -58,6 +58,8 @@ jobs:
     name: Emülatörde uçtan uca UI testi
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
@@ -98,6 +100,23 @@ jobs:
           cat ui-test-out/fps.txt || true
           echo "----- SONUÇLAR -----"
           cat ui-test-out/test_sonuclari.txt || true
+      - name: Ekran görüntülerini ve sonuçları depoya kaydet
+        if: always() && github.event_name == 'push'
+        working-directory: .
+        run: |
+          D=golgen-seni-yakalamasin/docs/ekranlar
+          rm -rf "$D" && mkdir -p "$D"
+          for f in ui-test-out/ekranlar/*.png; do
+            [ -f "$f" ] || continue
+            convert "$f" -resize 540x "$D/$(basename "$f")" || cp "$f" "$D/"
+          done
+          cp ui-test-out/test_sonuclari.txt ui-test-out/fps.txt ui-test-out/cihaz.txt "$D/" 2>/dev/null || true
+          grep GolgenUI ui-test-out/logcat.txt > "$D/ui_olaylari.txt" 2>/dev/null || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$D"
+          git commit -m "CI: emülatör ekran görüntüleri ve test sonuçları [skip ci]" || exit 0
+          for i in 1 2 3; do git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}" && break; sleep 5; done
       - uses: actions/upload-artifact@v4
         if: always()
         with:

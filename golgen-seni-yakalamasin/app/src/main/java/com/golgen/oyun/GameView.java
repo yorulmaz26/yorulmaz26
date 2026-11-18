@@ -314,6 +314,10 @@ public final class GameView extends View implements Choreographer.FrameCallback 
 
     @Override
     public boolean onTouchEvent(MotionEvent e) {
+        if (debuggable && (e.getActionMasked() == MotionEvent.ACTION_DOWN || e.getActionMasked() == MotionEvent.ACTION_UP)) {
+            android.util.Log.i("GolgenUI", "dokunma a=" + e.getActionMasked() + " x=" + (int) e.getX() + " y=" + (int) e.getY()
+                    + " fade=" + fadeDir + " ekranAdi=" + current.getClass().getSimpleName());
+        }
         if (fadeDir == 1) return true; // geçiş sırasında girişi yut
         return current.onTouch(e);
     }

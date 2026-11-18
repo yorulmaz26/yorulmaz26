@@ -159,6 +159,7 @@ public abstract class Screen {
                     b.pointerId = -1;
                 }
                 if (clicked != null) {
+                    if (g.debuggable) android.util.Log.i("GolgenUI", "tik ad=" + (clicked.id != null ? clicked.id : clicked.label));
                     g.sound.play(Synth.TAP, 0.7f, 1f);
                     g.haptics.light();
                     if (clicked.onClick != null) clicked.onClick.run();
