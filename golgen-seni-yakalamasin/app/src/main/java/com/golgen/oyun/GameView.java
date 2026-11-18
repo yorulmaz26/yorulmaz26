@@ -319,7 +319,14 @@ public final class GameView extends View implements Choreographer.FrameCallback 
                     + " fade=" + fadeDir + " ekranAdi=" + current.getClass().getSimpleName());
         }
         if (fadeDir == 1) return true; // geçiş sırasında girişi yut
+        if (e.getActionMasked() == MotionEvent.ACTION_UP) performClick();
         return current.onTouch(e);
+    }
+
+    @Override
+    public boolean performClick() {
+        // Erişilebilirlik servisleri için tıklama olayı; oyun girdisi onTouchEvent'te işlenir.
+        return super.performClick();
     }
 
     @Override
