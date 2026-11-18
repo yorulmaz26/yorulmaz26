@@ -1,13 +1,13 @@
 GEÇTİ  | APK kurulumu
-GEÇTİ  | Uygulama açılışı → SplashScreen
+KALDI  | Uygulama açılışı → beklenen SplashScreen, bulunan TutorialScreen
 GEÇTİ  | İlk açılış öğreticisi → TutorialScreen
 GEÇTİ  | Öğretici → Ana menü → MenuScreen
 GEÇTİ  | OYNA butonu → PlayScreen
 GEÇTİ  | Duraklatma menüsü açıldı
-KALDI  | Duraklatmada oyun bitti
+GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
 GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (1)
-GEÇTİ  | Kayıt: rekor kaydedildi (61)
+GEÇTİ  | Kayıt: rekor kaydedildi (101)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Duraklatma → Ana menü → MenuScreen
@@ -17,8 +17,7 @@ GEÇTİ  | Geri tuşu → Ana menü → MenuScreen
 GEÇTİ  | Görevler butonu → MissionsScreen
 GEÇTİ  | Görev 1 başlatma → PlayScreen
 GEÇTİ  | Görev → Ana menü → MenuScreen
-KALDI  | Rekorlar butonu → beklenen RecordsScreen, bulunan MenuScreen
-KALDI  | hedef bulunamadı: RecordsScreen/ikon-3
+GEÇTİ  | Rekorlar butonu → RecordsScreen
 GEÇTİ  | Rekorlar geri butonu → MenuScreen
 GEÇTİ  | Ayarlar butonu → SettingsScreen
 GEÇTİ  | Ayarlar: ses ve titreşim kapatıldı ve kaydedildi
@@ -27,4 +26,4 @@ GEÇTİ  | Öğretici kapat → MenuScreen
 GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
 GEÇTİ  | Kalıcılık: seçili karakter korundu
 GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 26 geçti, 3 kaldı
+TOPLAM: 27 geçti, 1 kaldı
