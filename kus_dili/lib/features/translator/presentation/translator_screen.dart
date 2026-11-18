@@ -4,6 +4,7 @@ import 'package:kus_dili_engine/kus_dili_engine.dart';
 import 'package:material_ui/material_ui.dart';
 
 import '../../../app/theme/app_colors.dart';
+import '../../learn/application/learn_providers.dart';
 import '../application/translator_controller.dart';
 
 /// Türkçe ↔ Kuş Dili çevirici. İnternet gerektirmez; mesajlaşmadan
@@ -105,6 +106,16 @@ class _TranslatorScreenState extends ConsumerState<TranslatorScreen> {
                             toKus ? 'Kuş dili' : 'Türkçe',
                             style: Theme.of(context).textTheme.labelLarge,
                           ),
+                        ),
+                        IconButton(
+                          key: const Key('speakOutput'),
+                          tooltip: 'Sesli oku',
+                          icon: const Icon(Icons.volume_up, size: 18),
+                          onPressed: output.text.isEmpty
+                              ? null
+                              : () => ref
+                                    .read(speakerProvider)
+                                    .speak(output.text),
                         ),
                         IconButton(
                           tooltip: 'Kopyala',

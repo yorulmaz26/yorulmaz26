@@ -11,9 +11,16 @@ void main() {
     Routes.firebaseSetup,
   ];
 
-  test('Çevirici her durumda açık', () {
+  test('Çevirici ve öğrenme modülü her durumda açık', () {
     for (final s in SessionStatus.values) {
-      expect(redirectFor(s, Routes.translator), isNull, reason: '$s');
+      for (final loc in [
+        Routes.translator,
+        Routes.learn,
+        Routes.learnQuiz,
+        Routes.learnLesson('aile'),
+      ]) {
+        expect(redirectFor(s, loc), isNull, reason: '$s $loc');
+      }
     }
   });
 

@@ -27,9 +27,10 @@ class ChatListScreen extends ConsumerWidget {
         title: const Text('Kuş Dili'),
         actions: [
           IconButton(
-            tooltip: 'Çevirici',
-            icon: const Icon(Icons.translate),
-            onPressed: () => context.push(Routes.translator),
+            key: const Key('openLearn'),
+            tooltip: 'Kuş dilini öğren',
+            icon: const Icon(Icons.school_outlined),
+            onPressed: () => context.push(Routes.learn),
           ),
           IconButton(
             key: const Key('openProfile'),

@@ -6,6 +6,7 @@ import '../features/auth/application/auth_providers.dart';
 import '../features/auth/presentation/phone_auth_screen.dart';
 import '../features/crypto/presentation/safety_number_screen.dart';
 import '../features/home/presentation/firebase_setup_screen.dart';
+import '../features/learn/presentation/learn_screens.dart';
 import '../features/calls/presentation/call_screen.dart';
 import '../features/chat/presentation/chat_list_screen.dart';
 import '../features/chat/presentation/chat_screen.dart';
@@ -35,6 +36,10 @@ abstract final class Routes {
   static const privacy = '/settings/privacy';
   static const notifications = '/settings/notifications';
   static const call = '/call';
+  static const learn = '/learn';
+  static const learnQuiz = '/learn/quiz';
+  static const learnPronounce = '/learn/pronounce';
+  static String learnLesson(String id) => '/learn/lesson/$id';
   static String chat(String id) => '/chats/$id';
   static String safetyNumber(String chatId, String uid) =>
       '/chats/$chatId/safety/$uid';
@@ -44,7 +49,10 @@ abstract final class Routes {
 ///
 /// Çevirici her durumda açıktır (öğrenme modülü mesajlaşmadan bağımsızdır).
 String? redirectFor(SessionStatus status, String location) {
-  if (location == Routes.translator) return null;
+  // Çevirici ve öğrenme modülü hesapsız, çevrimdışı da kullanılabilir.
+  if (location == Routes.translator || location.startsWith(Routes.learn)) {
+    return null;
+  }
   String? onlyAt(String target) => location == target ? null : target;
   return switch (status) {
     SessionStatus.firebaseUnavailable => onlyAt(Routes.firebaseSetup),
@@ -108,6 +116,25 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.hiddenChats,
         builder: (context, state) => const HiddenChatsScreen(),
+      ),
+      GoRoute(
+        path: Routes.learn,
+        builder: (context, state) => const LearnHomeScreen(),
+        routes: [
+          GoRoute(
+            path: 'quiz',
+            builder: (context, state) => const QuizScreen(),
+          ),
+          GoRoute(
+            path: 'pronounce',
+            builder: (context, state) => const PronounceScreen(),
+          ),
+          GoRoute(
+            path: 'lesson/:id',
+            builder: (context, state) =>
+                LessonScreen(lessonId: state.pathParameters['id']!),
+          ),
+        ],
       ),
       GoRoute(
         path: Routes.call,

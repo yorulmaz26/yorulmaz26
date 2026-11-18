@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +10,7 @@ import 'package:kus_dili/features/auth/application/auth_providers.dart';
 import 'package:kus_dili/features/calls/application/call_controller.dart';
 import 'package:kus_dili/features/chat/application/chat_providers.dart';
 import 'package:kus_dili/features/crypto/application/crypto_providers.dart';
+import 'package:kus_dili/features/learn/application/learn_providers.dart';
 import 'package:kus_dili/features/media/application/media_providers.dart';
 import 'package:kus_dili/features/notifications/application/push_providers.dart';
 import 'package:kus_dili/features/privacy/application/privacy_providers.dart';
@@ -16,6 +19,7 @@ import 'package:kus_dili/features/privacy/domain/pin_vault.dart';
 import 'package:material_ui/material_ui.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_learn.dart';
 import 'fake_call.dart';
 import 'fake_media.dart';
 import 'fake_push.dart';
@@ -34,8 +38,15 @@ Widget testApp({
   FakeMediaSource? media,
   FakeVoiceRecorder? recorder,
   FakePushMessaging? push,
+  FakeSpeaker? speaker,
+  InMemoryProgressStore? progress,
 }) => ProviderScope(
   overrides: [
+    speakerProvider.overrideWithValue(speaker ?? FakeSpeaker()),
+    progressStoreProvider.overrideWithValue(
+      progress ?? InMemoryProgressStore(),
+    ),
+    learnRandomProvider.overrideWithValue(Random(3)),
     callEngineFactoryProvider.overrideWithValue(() => FakeCallEngine('app')),
     iceServerSourceProvider.overrideWithValue(FakeIceServers()),
     pushMessagingProvider.overrideWithValue(push ?? FakePushMessaging()),

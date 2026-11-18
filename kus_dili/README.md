@@ -33,6 +33,8 @@ uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
   bildirimleri, sohbet başına sessize alma; Cloud Function `functions/` altında.
 * **Aramalar (Aşama 10b)**: birebir sesli ve görüntülü arama (WebRTC,
   DTLS-SRTP); kurulum bilgileri Signal ile şifreli; kısa ömürlü TURN kimliği.
+* **Öğrenme modülü (Aşama 11)**: dersler, 4 alıştırma türü, mini test,
+  sesli telaffuz, ilerleme ve günlük seri; hesapsız ve çevrimdışı.
 * **Gizli sohbet (Aşama 7b)**: PIN (PBKDF2, deneme sınırı) ve biyometri ile
   kilitli sohbet, listeden gizlenen sohbetler, uygulama kilidi, süreli ve tek
   görüntülük mesajlar. Gizli/kilitli bilgisi yalnızca cihazda.

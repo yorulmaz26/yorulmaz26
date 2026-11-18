@@ -58,8 +58,8 @@ class SplashScreen extends ConsumerWidget {
                 ),
               const SizedBox(height: 16),
               TextButton(
-                onPressed: () => context.push(Routes.translator),
-                child: const Text('Çevrimdışı çevirici'),
+                onPressed: () => context.push(Routes.learn),
+                child: const Text('Kuş dilini öğren (çevrimdışı)'),
               ),
             ],
           ),

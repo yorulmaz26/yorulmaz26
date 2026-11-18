@@ -319,6 +319,22 @@ sistem arama ekranı (iOS CallKit + PushKit, Android ConnectionService) yok;
 yalnızca bildirim gelir. Gerçek cihaz/ağ testi yapılmadı (bu ortamda WebRTC
 çalıştırılamıyor; mantık sahte motorla test edildi).
 
+## 6d. Kuş dili öğrenme modülü (Aşama 11) ✅
+
+Mesajlaşmadan bağımsızdır: hesap ve internet gerektirmez (Firebase
+yapılandırılmamış olsa bile açılır). İçerik `learn/domain/curriculum.dart`
+içinde Türkçe yazılır; kuş dili karşılıkları motorla üretildiği için hatasızdır.
+
+* Dersler: temel kural, selamlaşma, aile, duygular, günlük hayat, doğa.
+* Alıştırmalar: Türkçe → kuş dili seçme, kuş dili → Türkçe seçme, kuş dilinde
+  yazma (ipuçlu; kurala uyan her yazım kabul), karışık kelimelerden cümle kurma.
+  Yanlış seçenekler öğretici hatalardan üretilir (başka varyant, eksik hece,
+  yanlış sesli tekrarı).
+* Mini test (10 soru, tüm derslerden), telaffuz ekranı ve çevirici çıktısını
+  Türkçe sesle okuma (cihaz TTS).
+* İlerleme cihazda: XP, seviye, doğruluk, tamamlanan dersler (%80), en iyi test
+  puanı, günlük seri.
+
 ## 7. Aşama durumu
 
 | # | Aşama | Durum |
@@ -333,5 +349,5 @@ yalnızca bildirim gelir. Gerçek cihaz/ağ testi yapılmadı (bu ortamda WebRTC
 | 8 | Grup mesajlaşması | ✅ Sender Keys ile E2EE, üyelik değişince anahtar yenileme, yönetici işlemleri, ayrılma |
 | 9 | Medya ve sesli mesaj | — |
 | 10 | Bildirimler ve aramalar | ✅ içeriksiz bildirimler; uçtan uca şifreli birebir sesli/görüntülü arama (WebRTC) |
-| 11 | Öğrenme modülü | Çevirici ekranı hazır; alıştırmalar/testler sonra |
+| 11 | Öğrenme modülü | ✅ 6 ders, 4 alıştırma türü, mini test, telaffuz (TTS), ilerleme/seri; hesapsız ve çevrimdışı |
 | 12 | Test, optimizasyon, yayın | — |

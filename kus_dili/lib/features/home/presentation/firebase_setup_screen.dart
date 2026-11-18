@@ -31,8 +31,8 @@ class FirebaseSetupScreen extends ConsumerWidget {
             ),
           const SizedBox(height: 24),
           FilledButton(
-            onPressed: () => context.push(Routes.translator),
-            child: const Text('Çevrimdışı çeviriciyi aç'),
+            onPressed: () => context.push(Routes.learn),
+            child: const Text('Kuş dilini öğren (çevrimdışı)'),
           ),
         ],
       ),
