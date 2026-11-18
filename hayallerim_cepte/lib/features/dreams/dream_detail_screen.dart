@@ -144,7 +144,7 @@ class DreamDetailScreen extends ConsumerWidget {
               const SectionHeader('Açıklama'),
               Text(readable.description, style: const TextStyle(height: 1.45)),
             ],
-            if (!dream.isCompleted && progress >= 1 && steps.isNotEmpty) ...[
+            if (!dream.isCompleted && ProgressLogic.allStepsDone(steps)) ...[
               Gap.h16,
               FilledButton.icon(
                 style: FilledButton.styleFrom(backgroundColor: AppColors.gold),

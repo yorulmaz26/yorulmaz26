@@ -8,30 +8,34 @@ import '../theme/app_colors.dart';
 /// Vektörel çizildiği için her çözünürlükte keskindir ve varlık dosyası
 /// gerektirmez.
 class AppLogo extends StatelessWidget {
-  const AppLogo({super.key, this.size = 120, this.progress = 1});
+  const AppLogo({super.key, this.size = 120, this.progress = 1, this.square = false});
   final double size;
 
   /// 0..1 — açılış animasyonu için çizim ilerlemesi.
   final double progress;
 
+  /// Uygulama ikonu için köşesiz kare arka plan (işletim sistemi maskeler).
+  final bool square;
+
   @override
   Widget build(BuildContext context) => SizedBox(
         width: size,
         height: size,
-        child: CustomPaint(painter: _LogoPainter(progress)),
+        child: CustomPaint(painter: _LogoPainter(progress, square)),
       );
 }
 
 class _LogoPainter extends CustomPainter {
-  _LogoPainter(this.t);
+  _LogoPainter(this.t, this.square);
   final double t;
+  final bool square;
 
   @override
   void paint(Canvas canvas, Size s) {
     final w = s.width;
     final h = s.height;
     // Arka plan rozeti
-    final r = RRect.fromRectAndRadius(Offset.zero & s, Radius.circular(w * 0.26));
+    final r = RRect.fromRectAndRadius(Offset.zero & s, Radius.circular(square ? 0 : w * 0.26));
     canvas.drawRRect(
       r,
       Paint()

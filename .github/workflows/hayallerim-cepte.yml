@@ -1,0 +1,80 @@
+name: Hayallerim Cepte (Flutter)
+
+on:
+  push:
+    paths:
+      - "hayallerim_cepte/**"
+      - ".github/workflows/hayallerim-cepte.yml"
+  pull_request:
+    paths:
+      - "hayallerim_cepte/**"
+  workflow_dispatch:
+
+concurrency:
+  group: hayallerim-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: hayallerim_cepte
+
+env:
+  FLUTTER_VERSION: "3.50.0"
+
+jobs:
+  test:
+    name: Analiz + testler
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Üretilen kod güncel mi?
+        run: |
+          dart run build_runner build
+          git diff --exit-code -- lib/core/database/app_database.g.dart
+      - run: flutter analyze
+      - run: flutter test
+
+  android:
+    name: Android APK
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hayallerim-cepte-apk
+          path: hayallerim_cepte/build/app/outputs/flutter-apk/app-release.apk
+
+  ios:
+    name: iOS (imzasız derleme)
+    needs: test
+    runs-on: macos-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter build ios --release --no-codesign

@@ -1,5 +1,7 @@
 # Kuaförüm Cepte
 
+> Bu depoda ayrıca **Hayallerim Cepte** (Flutter, tamamen çevrimdışı yaşam planlayıcısı) bulunur: [`hayallerim_cepte/`](hayallerim_cepte/README.md)
+
 > Güzelliğe Bir Dokunuş, Randevuya Tek Tık.
 
 Türkiye pazarı için Android kuaför/güzellik salonu randevu uygulaması.

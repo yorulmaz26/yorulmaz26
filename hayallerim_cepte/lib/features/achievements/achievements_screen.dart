@@ -64,7 +64,7 @@ class AchievementsScreen extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 0.78,
+                  childAspectRatio: 0.66,
                   children: [
                     for (final a in kAchievements) _Badge(def: a, unlockedAt: unlocked[a.code]),
                   ],

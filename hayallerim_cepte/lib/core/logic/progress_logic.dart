@@ -4,23 +4,33 @@ import '../utils/dates.dart';
 /// Hayal ilerlemesi, bahçe aşamaları, seri ve seviye hesapları.
 abstract final class ProgressLogic {
   /// Tamamlanan adımlara göre ilerleme (0..1). Ağırlıklı modda her adımın
-  /// `weight` değeri dikkate alınır. Hayal tamamlandıysa 1.
+  /// `weight` değeri dikkate alınır.
+  ///
+  /// * Gerçekleşen hayal her zaman 1'dir.
+  /// * Yalnızca otomatik "Hayalimi oluşturdum" adımı varsa ilerleme 0'dır
+  ///   (yeni hayal tohum olarak başlar).
+  /// * Gerçekleşmemiş hayal en fazla 0,99 olur: son adım, hayali
+  ///   "gerçekleştirdim" olarak işaretlemektir.
   static double dreamProgress(List<DreamMilestone> steps, {required bool weighted, bool completed = false}) {
     if (completed) return 1;
-    if (steps.isEmpty) return 0;
+    if (steps.length <= 1) return 0;
+    double p;
     if (!weighted) {
-      final done = steps.where((s) => s.isCompleted).length;
-      return done / steps.length;
+      p = steps.where((s) => s.isCompleted).length / steps.length;
+    } else {
+      var total = 0;
+      var done = 0;
+      for (final s in steps) {
+        final w = s.weight < 1 ? 1 : s.weight;
+        total += w;
+        if (s.isCompleted) done += w;
+      }
+      p = total == 0 ? 0 : done / total;
     }
-    var total = 0;
-    var done = 0;
-    for (final s in steps) {
-      final w = s.weight < 1 ? 1 : s.weight;
-      total += w;
-      if (s.isCompleted) done += w;
-    }
-    return total == 0 ? 0 : done / total;
+    return p >= 1 ? 0.99 : p;
   }
+
+  static bool allStepsDone(List<DreamMilestone> steps) => steps.length > 1 && steps.every((s) => s.isCompleted);
 
   static const stageNames = [
     'Tohum',

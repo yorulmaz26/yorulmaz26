@@ -2,10 +2,28 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>tr</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Hayallerine, günlüğüne ve zaman kapsülüne fotoğraf eklemek için kamerayı kullanırız. Fotoğraflar yalnızca bu cihazda saklanır.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Hayal panona ve günlüğüne fotoğraf seçebilmen için galerine erişiriz. Fotoğraflar yalnızca bu cihazda saklanır.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Hayal panonu, kolajlarını ve rozet kartlarını fotoğraflarına kaydetmek için gereklidir.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Günlüğüne ve zaman kapsülüne sesli not ekleyebilmen için mikrofonu kullanırız. Kayıtlar yalnızca bu cihazda saklanır.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Uygulama kilidini ve gizli içeriklerini Face ID ile açabilmen için kullanılır.</string>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<false/>
+	<key>UIFileSharingEnabled</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>tr</string>
 	<key>CFBundleDisplayName</key>
 	<string>Hayallerim Cepte</string>
 	<key>CFBundleExecutable</key>
@@ -15,7 +33,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>hayallerim_cepte</string>
+	<string>Hayallerim Cepte</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

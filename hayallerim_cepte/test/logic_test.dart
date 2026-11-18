@@ -114,6 +114,11 @@ void main() {
       expect(ProgressLogic.dreamProgress(w, weighted: true), 0.75);
       expect(ProgressLogic.dreamProgress(const [], weighted: false), 0);
       expect(ProgressLogic.dreamProgress(const [], weighted: false, completed: true), 1);
+      // Yalnızca otomatik ilk adım → tohum
+      expect(ProgressLogic.dreamProgress([step(true)], weighted: false), 0);
+      // Tüm adımlar bitti ama hayal işaretlenmedi → %99
+      expect(ProgressLogic.dreamProgress([step(true), step(true)], weighted: false), 0.99);
+      expect(ProgressLogic.allStepsDone([step(true), step(true)]), true);
     });
 
     test('bahçe aşamaları', () {
