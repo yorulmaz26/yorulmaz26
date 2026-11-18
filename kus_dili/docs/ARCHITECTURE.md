@@ -350,4 +350,4 @@ içinde Türkçe yazılır; kuş dili karşılıkları motorla üretildiği içi
 | 9 | Medya ve sesli mesaj | — |
 | 10 | Bildirimler ve aramalar | ✅ içeriksiz bildirimler; uçtan uca şifreli birebir sesli/görüntülü arama (WebRTC) |
 | 11 | Öğrenme modülü | ✅ 6 ders, 4 alıştırma türü, mini test, telaffuz (TTS), ilerleme/seri; hesapsız ve çevrimdışı |
-| 12 | Test, optimizasyon, yayın | — |
+| 12 | Test, optimizasyon, yayın | ✅ yayın yapılandırması, ekran görüntüsü engeli, sayfalama, CI derlemeleri, yayın/gizlilik/mağaza belgeleri — yayın öncesi açık maddeler: docs/RELEASE.md |

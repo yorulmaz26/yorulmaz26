@@ -10,6 +10,7 @@ final class PrivacyPrefs {
     this.lockedChats = const {},
     this.appLock = false,
     this.biometrics = false,
+    this.blockScreenshots = false,
   });
 
   factory PrivacyPrefs.fromJson(Map<String, Object?> j) => PrivacyPrefs(
@@ -17,6 +18,7 @@ final class PrivacyPrefs {
     lockedChats: {...?(j['locked'] as List?)?.cast<String>()},
     appLock: j['appLock'] == true,
     biometrics: j['bio'] == true,
+    blockScreenshots: j['noShots'] == true,
   );
 
   final Set<String> hiddenChats;
@@ -28,6 +30,9 @@ final class PrivacyPrefs {
   /// PIN yerine biyometri kullanılabilsin.
   final bool biometrics;
 
+  /// Tüm uygulamada ekran görüntüsünü engelle (Android).
+  final bool blockScreenshots;
+
   bool isHidden(String chatId) => hiddenChats.contains(chatId);
   bool isLocked(String chatId) => lockedChats.contains(chatId);
 
@@ -36,11 +41,13 @@ final class PrivacyPrefs {
     Set<String>? lockedChats,
     bool? appLock,
     bool? biometrics,
+    bool? blockScreenshots,
   }) => PrivacyPrefs(
     hiddenChats: hiddenChats ?? this.hiddenChats,
     lockedChats: lockedChats ?? this.lockedChats,
     appLock: appLock ?? this.appLock,
     biometrics: biometrics ?? this.biometrics,
+    blockScreenshots: blockScreenshots ?? this.blockScreenshots,
   );
 
   Map<String, Object?> toJson() => {
@@ -48,6 +55,7 @@ final class PrivacyPrefs {
     'locked': lockedChats.toList()..sort(),
     'appLock': appLock,
     'bio': biometrics,
+    'noShots': blockScreenshots,
   };
 }
 

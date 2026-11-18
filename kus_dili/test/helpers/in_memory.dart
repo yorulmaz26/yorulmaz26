@@ -13,6 +13,9 @@ class InMemorySecureKv implements SecureKv {
 
   @override
   Future<void> delete(String key) async => data.remove(key);
+
+  @override
+  Future<void> clearAll() async => data.clear();
 }
 
 /// YALNIZCA TESTLER: bellek içi çözülmüş içerik önbelleği.
@@ -34,4 +37,7 @@ class InMemoryPayloadCache implements PayloadCache {
   @override
   Future<void> removeChat(String chatId) async =>
       data.removeWhere((k, _) => k.startsWith('$chatId/'));
+
+  @override
+  Future<void> clearAll() async => data.clear();
 }

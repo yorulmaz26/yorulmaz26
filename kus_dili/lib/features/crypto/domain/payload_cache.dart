@@ -9,4 +9,7 @@ abstract interface class PayloadCache {
   Future<void> put(String chatId, String bodyHash, String payloadJson);
   Future<void> remove(String chatId, String bodyHash);
   Future<void> removeChat(String chatId);
+
+  /// Hesap silinirken: tüm çözülmüş içerik.
+  Future<void> clearAll();
 }

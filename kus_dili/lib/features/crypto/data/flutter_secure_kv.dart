@@ -23,4 +23,7 @@ final class FlutterSecureKv implements SecureKv {
 
   @override
   Future<void> delete(String key) => _s.delete(key: key);
+
+  @override
+  Future<void> clearAll() => _s.deleteAll();
 }

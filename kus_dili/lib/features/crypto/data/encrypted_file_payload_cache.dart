@@ -111,4 +111,11 @@ final class EncryptedFilePayloadCache implements PayloadCache {
     final f = await _file(chatId);
     if (await f.exists()) await f.delete();
   });
+
+  @override
+  Future<void> clearAll() => _serial(() async {
+    _chats.clear();
+    final dir = Directory('${(await _directory()).path}/kus_cache/$_owner');
+    if (await dir.exists()) await dir.delete(recursive: true);
+  });
 }

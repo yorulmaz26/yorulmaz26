@@ -40,5 +40,9 @@ void main() {
 
     await again.removeChat('d_a_b');
     expect(await make().get('d_a_b', 'h1'), isNull);
+
+    await again.put('d_x_y', 'h', 'x');
+    await again.clearAll();
+    expect(tmp.listSync(recursive: true).whereType<File>(), isEmpty);
   });
 }

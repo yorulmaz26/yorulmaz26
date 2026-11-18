@@ -11,6 +11,7 @@ import '../../../app/theme/app_colors.dart';
 import '../../calls/application/call_controller.dart';
 import '../../crypto/application/crypto_providers.dart';
 import '../../privacy/application/privacy_providers.dart';
+import '../../privacy/presentation/secure_scope.dart';
 import '../../privacy/presentation/unlock_gate.dart';
 import '../application/chat_controller.dart';
 import '../application/chat_providers.dart';
@@ -78,31 +79,35 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final view = MessageView.of(p, viewMode: mode);
     await showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        key: const Key('viewOnceDialog'),
-        title: const Text('Tek görüntülük mesaj'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (p.attachment != null) AttachmentView(attachment: p.attachment!),
-            if (p.hasText)
-              Text(view.primary, style: Theme.of(ctx).textTheme.titleMedium),
-            if (view.isEncodedNow) ...[
-              const SizedBox(height: 8),
-              Text(view.original, style: Theme.of(ctx).textTheme.bodySmall),
+      builder: (ctx) => SecureScope(
+        enabled: true,
+        child: AlertDialog(
+          key: const Key('viewOnceDialog'),
+          title: const Text('Tek görüntülük mesaj'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (p.attachment != null)
+                AttachmentView(attachment: p.attachment!),
+              if (p.hasText)
+                Text(view.primary, style: Theme.of(ctx).textTheme.titleMedium),
+              if (view.isEncodedNow) ...[
+                const SizedBox(height: 8),
+                Text(view.original, style: Theme.of(ctx).textTheme.bodySmall),
+              ],
+              const SizedBox(height: 12),
+              const Text('Kapattığında bu mesaj silinecek.'),
             ],
-            const SizedBox(height: 12),
-            const Text('Kapattığında bu mesaj silinecek.'),
+          ),
+          actions: [
+            TextButton(
+              key: const Key('closeViewOnce'),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Kapat'),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            key: const Key('closeViewOnce'),
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Kapat'),
-          ),
-        ],
       ),
     );
     await ref
@@ -275,132 +280,156 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         ? null
         : ref.watch(profileByUidProvider(otherUid)).value;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: InkWell(
-          key: const Key('chatTitle'),
-          onTap: isGroup
-              ? () => context.push(Routes.groupInfo(widget.chatId))
-              : null,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(isGroup ? (chat?.name ?? '') : (other?.displayName ?? '')),
-              if (isGroup && chat != null)
-                Text(
-                  '${chat.members.length} üye · bilgi için dokun',
-                  style: Theme.of(context).textTheme.labelSmall,
-                )
-              else if (other != null)
-                Text(
-                  '@${other.username}',
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-            ],
+    final secret =
+        (prefs?.isLocked(widget.chatId) ?? false) ||
+        (prefs?.isHidden(widget.chatId) ?? false);
+    return SecureScope(
+      enabled: secret,
+      child: Scaffold(
+        appBar: AppBar(
+          title: InkWell(
+            key: const Key('chatTitle'),
+            onTap: isGroup
+                ? () => context.push(Routes.groupInfo(widget.chatId))
+                : null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(isGroup ? (chat?.name ?? '') : (other?.displayName ?? '')),
+                if (isGroup && chat != null)
+                  Text(
+                    '${chat.members.length} üye · bilgi için dokun',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  )
+                else if (other != null)
+                  Text(
+                    '@${other.username}',
+                    style: Theme.of(context).textTheme.labelSmall,
+                  ),
+              ],
+            ),
           ),
-        ),
-        actions: [
-          if (!isGroup && otherUid != null) ...[
+          actions: [
+            if (!isGroup && otherUid != null) ...[
+              IconButton(
+                key: const Key('voiceCall'),
+                tooltip: 'Sesli arama',
+                icon: const Icon(Icons.call_outlined),
+                onPressed: () => _call(otherUid, video: false),
+              ),
+              IconButton(
+                key: const Key('videoCall'),
+                tooltip: 'Görüntülü arama',
+                icon: const Icon(Icons.videocam_outlined),
+                onPressed: () => _call(otherUid, video: true),
+              ),
+            ],
             IconButton(
-              key: const Key('voiceCall'),
-              tooltip: 'Sesli arama',
-              icon: const Icon(Icons.call_outlined),
-              onPressed: () => _call(otherUid, video: false),
-            ),
-            IconButton(
-              key: const Key('videoCall'),
-              tooltip: 'Görüntülü arama',
-              icon: const Icon(Icons.videocam_outlined),
-              onPressed: () => _call(otherUid, video: true),
-            ),
-          ],
-          IconButton(
-            key: const Key('chatSettings'),
-            tooltip: 'Sohbet dili',
-            icon: const Icon(Icons.tune),
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              isScrollControlled: true,
-              builder: (_) => ChatSettingsSheet(
-                chatId: widget.chatId,
-                initial: settings,
-                onSave: controller.saveSettings,
+              key: const Key('chatSettings'),
+              tooltip: 'Sohbet dili',
+              icon: const Icon(Icons.tune),
+              onPressed: () => showModalBottomSheet<void>(
+                context: context,
+                isScrollControlled: true,
+                builder: (_) => ChatSettingsSheet(
+                  chatId: widget.chatId,
+                  initial: settings,
+                  onSave: controller.saveSettings,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          _E2eeBanner(
-            chatId: widget.chatId,
-            otherUid: otherUid,
-            isGroup: isGroup,
-          ),
-          if (isGroup &&
-              chat != null &&
-              me != null &&
-              !chat.members.contains(me))
-            const Padding(
-              padding: EdgeInsets.all(8),
-              child: Text('Artık bu grubun üyesi değilsin.'),
+          ],
+        ),
+        body: Column(
+          children: [
+            _E2eeBanner(
+              chatId: widget.chatId,
+              otherUid: otherUid,
+              isGroup: isGroup,
             ),
-          Expanded(
-            child: messages.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (e, _) =>
-                  const Center(child: Text('Mesajlar yüklenemedi.')),
-              data: (all) {
-                final list = _alive(all);
-                if (me != null) {
-                  WidgetsBinding.instance.addPostFrameCallback(
-                    (_) => _maybeMarkRead(list, chat, me),
-                  );
-                }
-                return ListView.builder(
-                  reverse: true,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  itemCount: list.length,
-                  itemBuilder: (context, i) {
-                    final m = list[list.length - 1 - i];
-                    final mine = m.senderId == me;
-                    return MessageBubble(
-                      key: ValueKey(m.id),
-                      showSender: isGroup && !mine,
-                      chatId: widget.chatId,
-                      message: m,
-                      isMine: mine,
-                      viewMode: mine ? ViewMode.asSent : settings.viewMode,
-                      chat: chat,
-                      onLongPress: (p) => _actions(m, p, mine),
-                      onOpenViewOnce: (p) =>
-                          _openViewOnce(m, p, settings.viewMode),
+            if (isGroup &&
+                chat != null &&
+                me != null &&
+                !chat.members.contains(me))
+              const Padding(
+                padding: EdgeInsets.all(8),
+                child: Text('Artık bu grubun üyesi değilsin.'),
+              ),
+            Expanded(
+              child: messages.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (e, _) =>
+                    const Center(child: Text('Mesajlar yüklenemedi.')),
+                data: (all) {
+                  final list = _alive(all);
+                  if (me != null) {
+                    WidgetsBinding.instance.addPostFrameCallback(
+                      (_) => _maybeMarkRead(list, chat, me),
                     );
-                  },
-                );
+                  }
+                  // Limit doluysa daha eski mesajlar olabilir.
+                  final more =
+                      all.length >=
+                      ref.watch(messageLimitProvider(widget.chatId));
+                  return ListView.builder(
+                    reverse: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    itemCount: list.length + (more ? 1 : 0),
+                    itemBuilder: (context, i) {
+                      if (i == list.length) {
+                        return Center(
+                          child: TextButton.icon(
+                            key: const Key('loadOlder'),
+                            icon: const Icon(Icons.history),
+                            label: const Text('Daha eski mesajlar'),
+                            onPressed: () => ref
+                                .read(
+                                  messageLimitProvider(widget.chatId).notifier,
+                                )
+                                .loadMore(),
+                          ),
+                        );
+                      }
+                      final m = list[list.length - 1 - i];
+                      final mine = m.senderId == me;
+                      return MessageBubble(
+                        key: ValueKey(m.id),
+                        showSender: isGroup && !mine,
+                        chatId: widget.chatId,
+                        message: m,
+                        isMine: mine,
+                        viewMode: mine ? ViewMode.asSent : settings.viewMode,
+                        chat: chat,
+                        onLongPress: (p) => _actions(m, p, mine),
+                        onOpenViewOnce: (p) =>
+                            _openViewOnce(m, p, settings.viewMode),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            _Composer(
+              input: _input,
+              state: composer,
+              settings: settings,
+              onCancel: () {
+                if (composer.editing != null) _input.clear();
+                controller.cancel();
+              },
+              onToggleViewOnce: controller.toggleViewOnce,
+              onAttach: _pickAttachment,
+              onVoice: (media) async {
+                await controller.sendMedia(media);
+              },
+              onSend: () async {
+                final text = _input.text;
+                final ok = await controller.submit(text);
+                if (ok && _input.text == text) _input.clear();
               },
             ),
-          ),
-          _Composer(
-            input: _input,
-            state: composer,
-            settings: settings,
-            onCancel: () {
-              if (composer.editing != null) _input.clear();
-              controller.cancel();
-            },
-            onToggleViewOnce: controller.toggleViewOnce,
-            onAttach: _pickAttachment,
-            onVoice: (media) async {
-              await controller.sendMedia(media);
-            },
-            onSend: () async {
-              final text = _input.text;
-              final ok = await controller.submit(text);
-              if (ok && _input.text == text) _input.clear();
-            },
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

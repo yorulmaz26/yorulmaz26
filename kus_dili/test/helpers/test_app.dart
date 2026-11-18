@@ -4,6 +4,8 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kus_dili/app/app.dart';
+import 'package:kus_dili/features/account/application/account_providers.dart';
+import 'package:kus_dili/features/account/domain/account_service.dart';
 import 'package:kus_dili/core/firebase/firebase_bootstrap.dart';
 import 'package:kus_dili/core/firebase/firebase_providers.dart';
 import 'package:kus_dili/features/auth/application/auth_providers.dart';
@@ -14,6 +16,7 @@ import 'package:kus_dili/features/learn/application/learn_providers.dart';
 import 'package:kus_dili/features/media/application/media_providers.dart';
 import 'package:kus_dili/features/notifications/application/push_providers.dart';
 import 'package:kus_dili/features/privacy/application/privacy_providers.dart';
+import 'package:kus_dili/features/privacy/data/secure_screen.dart';
 import 'package:kus_dili/features/privacy/domain/biometric_auth.dart';
 import 'package:kus_dili/features/privacy/domain/pin_vault.dart';
 import 'package:material_ui/material_ui.dart';
@@ -40,8 +43,12 @@ Widget testApp({
   FakePushMessaging? push,
   FakeSpeaker? speaker,
   InMemoryProgressStore? progress,
+  FakeSecureScreen? secureScreen,
+  FakeAccountService? account,
 }) => ProviderScope(
   overrides: [
+    accountServiceProvider.overrideWithValue(account ?? FakeAccountService()),
+    secureScreenProvider.overrideWithValue(secureScreen ?? FakeSecureScreen()),
     speakerProvider.overrideWithValue(speaker ?? FakeSpeaker()),
     progressStoreProvider.overrideWithValue(
       progress ?? InMemoryProgressStore(),
@@ -101,4 +108,26 @@ void tallScreen(WidgetTester t) {
   t.view.physicalSize = const Size(1080, 2340);
   t.view.devicePixelRatio = 2.25;
   addTearDown(t.view.reset);
+}
+
+/// YALNIZCA TESTLER: FLAG_SECURE sahtesi.
+class FakeSecureScreen implements SecureScreen {
+  final List<bool> calls = [];
+  bool get secure => calls.isNotEmpty && calls.last;
+
+  @override
+  Future<void> setSecure(bool secure) async => calls.add(secure);
+}
+
+/// YALNIZCA TESTLER: hesap silme sahtesi.
+class FakeAccountService implements AccountService {
+  FakeAccountService({this.fail = false});
+  bool fail;
+  int calls = 0;
+
+  @override
+  Future<void> deleteAccount() async {
+    calls++;
+    if (fail) throw Exception('sunucu hatası');
+  }
 }

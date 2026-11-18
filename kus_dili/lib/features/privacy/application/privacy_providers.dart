@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../chat/application/chat_providers.dart';
 import '../../crypto/application/crypto_providers.dart';
 import '../data/local_auth_biometric.dart';
+import '../data/secure_screen.dart';
 import '../domain/biometric_auth.dart';
 import '../domain/local_privacy_prefs.dart';
 import '../domain/pin_vault.dart';
@@ -66,6 +67,9 @@ class PrivacyPrefsController extends AsyncNotifier<PrivacyPrefs> {
 
   Future<void> setBiometrics(bool on) => _save(_cur.copyWith(biometrics: on));
 
+  Future<void> setBlockScreenshots(bool on) =>
+      _save(_cur.copyWith(blockScreenshots: on));
+
   /// PIN kaldırılınca PIN'e bağlı tüm kilitler de kalkar (aksi hâlde
   /// açılamayan sohbetler oluşur).
   Future<void> clearLocks() =>
@@ -117,3 +121,32 @@ class UnlockController extends Notifier<UnlockState> {
 final unlockProvider = NotifierProvider<UnlockController, UnlockState>(
   UnlockController.new,
 );
+
+final secureScreenProvider = Provider<SecureScreen>(
+  (ref) => PlatformSecureScreen(),
+);
+
+/// Şu an ekranda gizli içerik gösteren bileşen sayısı.
+class SecureContentCounter extends Notifier<int> {
+  @override
+  int build() => 0;
+  // Ekran kapanırken sağlayıcı zaten yok edilmiş olabilir.
+  void enter() {
+    if (ref.mounted) state = state + 1;
+  }
+
+  void leave() {
+    if (ref.mounted) state = state > 0 ? state - 1 : 0;
+  }
+}
+
+final secureContentProvider = NotifierProvider<SecureContentCounter, int>(
+  SecureContentCounter.new,
+);
+
+/// Ekran görüntüsü engeli açık olmalı mı?
+final screenSecureProvider = Provider<bool>((ref) {
+  final prefs = ref.watch(privacyPrefsProvider).value;
+  return (prefs?.blockScreenshots ?? false) ||
+      ref.watch(secureContentProvider) > 0;
+});

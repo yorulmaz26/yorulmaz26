@@ -1,4 +1,5 @@
 import { initializeApp } from 'firebase-admin/app';
+import { getAuth } from 'firebase-admin/auth';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { defineSecret, defineString } from 'firebase-functions/params';
@@ -6,6 +7,7 @@ import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { logger } from 'firebase-functions/v2';
 
+import { leaveGroup, ownedDocPaths } from './account';
 import { parseUrls, turnCredentials as makeTurnCredentials } from './turn';
 import {
   callContent,
@@ -119,3 +121,40 @@ export const turnCredentials = onCall(
     });
   },
 );
+
+/**
+ * Hesabı kalıcı olarak siler (mağaza kuralı: uygulama içinden hesap silme).
+ * Profil, kullanıcı adı, açık anahtarlar, bildirim belirteçleri, sohbet
+ * ayarları silinir; gruplardan çıkılır; en sonda Firebase hesabı silinir.
+ */
+export const deleteAccount = onCall({ region: REGION }, async (req) => {
+  const auth = req.auth;
+  if (!auth || auth.token.firebase?.sign_in_provider !== 'phone') {
+    throw new HttpsError('unauthenticated', 'Giriş gerekli.');
+  }
+  const uid = auth.uid;
+  const db = getFirestore();
+  const profile = (await db.doc(`users/${uid}`).get()).data();
+
+  // Gruplardan çık.
+  const groups = await db
+    .collection('chats')
+    .where('members', 'array-contains', uid)
+    .where('type', '==', 'group')
+    .get();
+  for (const g of groups.docs) {
+    const d = g.data();
+    await g.ref.update(
+      leaveGroup({ id: g.id, members: d.members ?? [], admins: d.admins ?? [] }, uid),
+    );
+  }
+
+  // Alt koleksiyonlarla birlikte sahip olunan belgeler.
+  for (const path of ownedDocPaths(uid, profile?.username)) {
+    await db.recursiveDelete(db.doc(path));
+  }
+
+  await getAuth().deleteUser(uid);
+  logger.info('hesap silindi', { groups: groups.size });
+  return { ok: true };
+});

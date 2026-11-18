@@ -65,3 +65,46 @@ jobs:
         run: |
           npm ci
           npm test
+
+  android-build:
+    # Yerel yapılandırmayı (izinler, eklentiler, R8 kuralları) doğrular.
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.0
+          cache: true
+      - name: APK (debug + küçültülmüş release)
+        working-directory: kus_dili
+        run: |
+          flutter pub get
+          flutter build apk --debug
+          flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kus-dili-apk
+          path: kus_dili/build/app/outputs/flutter-apk/*.apk
+          retention-days: 7
+
+  ios-build:
+    needs: test
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.50.0
+          cache: true
+      - name: iOS (imzasız)
+        working-directory: kus_dili
+        run: |
+          flutter pub get
+          flutter build ios --release --no-codesign

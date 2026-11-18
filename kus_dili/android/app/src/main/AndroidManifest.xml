@@ -8,7 +8,10 @@
     <!-- Sesli mesaj kaydı -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <application
-        android:label="kus_dili"
+        android:label="Kuş Dili"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

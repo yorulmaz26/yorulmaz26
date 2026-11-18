@@ -4,7 +4,8 @@
 
 Türkçe mesajları geleneksel kuş diline çeviren, uçtan uca şifreli mesajlaşma
 uygulaması (Flutter, Android + iOS). Mimari ve güvenlik sınırları:
-[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). Yayın kontrol listesi:
+[`docs/RELEASE.md`](docs/RELEASE.md).
 
 ## Şu an çalışan
 

@@ -76,6 +76,18 @@ class PrivacySettingsScreen extends ConsumerWidget {
             value: (prefs?.biometrics ?? false) && bioAvailable,
             onChanged: hasPin && bioAvailable ? c.setBiometrics : null,
           ),
+          SwitchListTile(
+            key: const Key('blockScreenshotsSwitch'),
+            secondary: const Icon(Icons.screenshot_monitor_outlined),
+            title: const Text('Ekran görüntüsünü engelle'),
+            subtitle: const Text(
+              'Android: tüm uygulamada ekran görüntüsü ve kaydı engellenir. '
+              'Kilitli/gizli sohbetlerde ve tek görüntülük mesajlarda her '
+              'zaman engellenir. iOS bunu desteklemez.',
+            ),
+            value: prefs?.blockScreenshots ?? false,
+            onChanged: c.setBlockScreenshots,
+          ),
           const Divider(),
           ListTile(
             key: const Key('openHiddenChats'),

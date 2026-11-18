@@ -74,6 +74,9 @@ class _KusDiliAppState extends ConsumerState<KusDiliApp> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(screenSecureProvider, (_, secure) {
+      ref.read(secureScreenProvider).setSecure(secure);
+    });
     return MaterialApp.router(
       title: 'Kuş Dili',
       debugShowCheckedModeBanner: false,

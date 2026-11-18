@@ -47,3 +47,8 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 packages/kus_dili_engine/pubspec.lock
+
+# Yayın imzası — asla depoya eklemeyin
+android/key.properties
+*.jks
+*.keystore

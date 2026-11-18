@@ -62,8 +62,27 @@ final chatProvider = StreamProvider.family<Chat?, String>(
   (ref, chatId) => ref.watch(chatRepositoryProvider).watchChat(chatId),
 );
 
+/// Sohbette yüklenecek mesaj sayısı (sayfalama). Eski mesajlar istendikçe
+/// [pageSize] kadar artar; böylece uzun sohbetler hızlı açılır.
+class MessageLimit extends Notifier<int> {
+  MessageLimit(this.chatId);
+  final String chatId;
+  static const pageSize = 50;
+
+  @override
+  int build() => pageSize;
+
+  void loadMore() => state = state + pageSize;
+}
+
+final messageLimitProvider = NotifierProvider.family<MessageLimit, int, String>(
+  MessageLimit.new,
+);
+
 final messagesProvider = StreamProvider.family<List<ChatMessage>, String>(
-  (ref, chatId) => ref.watch(chatRepositoryProvider).watchMessages(chatId),
+  (ref, chatId) => ref
+      .watch(chatRepositoryProvider)
+      .watchMessages(chatId, limit: ref.watch(messageLimitProvider(chatId))),
 );
 
 final profileByUidProvider = StreamProvider.family<UserProfile?, String>(
@@ -90,8 +109,11 @@ typedef SealedRef = ({
   String body,
 });
 
-final openedPayloadProvider = FutureProvider.family<MessagePayload, SealedRef>(
-  (ref, s) => ref
-      .watch(messageSealerProvider)
-      .open(s.chatId, s.senderId, s.encVersion, s.body),
-);
+/// Ekrandan çıkan mesajın çözülmüş hâli bellekten atılır; tekrar gerekince
+/// cihazdaki şifreli önbellekten hızlıca okunur.
+final openedPayloadProvider = FutureProvider.autoDispose
+    .family<MessagePayload, SealedRef>(
+      (ref, s) => ref
+          .watch(messageSealerProvider)
+          .open(s.chatId, s.senderId, s.encVersion, s.body),
+    );
