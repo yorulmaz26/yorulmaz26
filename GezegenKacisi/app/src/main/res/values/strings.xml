@@ -41,4 +41,31 @@
     <string name="map_asteroid_desc">Dönen ve salınan asteroitler</string>
     <string name="map_asteroid_tip">Kuleler yukarı aşağı kayar, zamanla!</string>
     <string name="wind">RÜZGÂR</string>
+
+    <!-- 2 oyuncu -->
+    <string name="two_players">2 OYUNCU</string>
+    <string name="mp_info1">İki telefon aynı Wi-Fi ağına bağlı olsun</string>
+    <string name="mp_info2">ya da biri diğerine hotspot açsın</string>
+    <string name="mp_host">ODA KUR</string>
+    <string name="mp_join">ODAYA KATIL</string>
+    <string name="back">GERİ</string>
+    <string name="mp_leave">AYRIL</string>
+    <string name="mp_room_open">Oda kuruldu</string>
+    <string name="mp_waiting">Rakip bekleniyor</string>
+    <string name="mp_searching">Oda aranıyor</string>
+    <string name="mp_join_hint">Diğer telefonda: 2 OYUNCU › ODAYA KATIL</string>
+    <string name="mp_connected">Rakip bağlandı!</string>
+    <string name="mp_start">BAŞLAT</string>
+    <string name="mp_wait_host">Oda kurucusu başlatacak</string>
+    <string name="mp_you">SEN</string>
+    <string name="mp_opponent">RAKİP</string>
+    <string name="mp_you_crashed">YANDIN</string>
+    <string name="mp_watching">Rakibini izliyorsun</string>
+    <string name="mp_opp_crashed">RAKİP YANDI</string>
+    <string name="mp_win">KAZANDIN!</string>
+    <string name="mp_lose">KAYBETTİN</string>
+    <string name="mp_draw">BERABERE</string>
+    <string name="mp_disconnected">BAĞLANTI KOPTU</string>
+    <string name="mp_retry_wait">Tekrar için oda kurucusunu bekle</string>
+    <string name="mp_failed">Ağa bağlanılamadı. Wi-Fi açık mı?</string>
 </resources>

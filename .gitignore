@@ -17,6 +17,8 @@ keystore/
 *.keystore
 # Yalnızca test/debug imzası (şifre: android). Yayın anahtarı ASLA depoya konmaz.
 !app/debug.keystore
+# Gezegen Kaçışı oyununun test imzası (şifre: android); güncellemelerin üst üste kurulabilmesi için sabit
+!GezegenKacisi/app/debug.keystore
 .firebaserc
 .env
 .env.*

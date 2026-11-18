@@ -11,8 +11,18 @@ android {
         applicationId = "com.example.gezegenkacisi"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "1.2"
+        versionCode = 4
+        versionName = "1.3"
+    }
+
+    // Sabit test imzası: her derlemede aynı anahtar kullanılır, böylece yeni sürüm eskisinin üstüne kurulur.
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
     }
 
     buildTypes {

@@ -45,7 +45,10 @@ import kotlin.random.Random
  */
 class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
-    private enum class State { MENU, READY, PLAYING, DYING, OVER }
+    private enum class State { MENU, READY, PLAYING, DYING, OVER, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
+
+    /** 2 oyuncu lobisinin aşamaları. */
+    private enum class Lobby { CHOOSE, HOSTING, JOINING, CONNECTED }
 
     private class Palette(val base: Int, val dark: Int, val light: Int, val accent: Int, val atmo: Int)
 
@@ -83,6 +86,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         var x = 0f; var y = 0f; var vx = 0f; var vy = 0f
         var life = 0f; var maxLife = 1f; var size = 1f; var drag = 0f
         var color = 0; var alive = false
+        var owner = 0 // 0: ben, 1: rakip (bölünmüş ekranda hangi yarıda çizileceği), -1: ikisi de
     }
 
     companion object {
@@ -97,6 +101,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val WIND_BASE = 430f       // gaz devlerinde rüzgârın en büyük kuvveti (Orta)
         private const val FIRE_GRAVITY = 1150f   // ateş topunun yer çekimi
         private const val FIRE_R = 15f           // ateş topunun çarpışma yarıçapı
+
+        // --- 2 oyuncu ---
+        private const val MP_STEP = 1f / 120f     // iki telefonda aynı sabit adımla simülasyon
+        private const val MP_ROCKET_X = 180f      // ekran oranından bağımsız sabit roket konumu
+        private const val MP_FIRST_X = 900f       // ilk kulenin konumu
+        private const val MP_SPAWN_X = 2100f      // yeni kulelerin üretildiği uzaklık
+        private const val MP_COUNTDOWN_NS = 3_000_000_000L
 
         private const val PREFS = "gezegen_kacisi"
         private const val KEY_BEST_LEGACY = "best"
@@ -125,7 +136,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     // --- Ekran ölçeği ---
     private var scale = 1f
-    private var worldW = 500f
+    private var worldW = 500f   // oyun dünyasının görünen genişliği (2 oyuncuda yarım ekrana göre)
+    private var uiW = 500f      // tam ekran arayüz genişliği
+    private var curW = 500f     // drawFit için geçerli genişlik
     private var artScale = 0f
     private var artMap = -1
 
@@ -169,6 +182,32 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var wind = 0f          // + aşağı, - yukarı iter
     private var windPhase = 0f
 
+    // --- Paylaşılan dünya: 2 oyuncuda iki telefon aynı tohumla aynı parkuru üretir ---
+    private var worldRng = Random(1)
+    private var progress = 0       // roketin hizasından geçen kule sayısı
+    private var worldTime = 0f     // rüzgâr ve salınım bu zamana göre hesaplanır
+
+    // --- 2 oyuncu ---
+    private var net: NetLink? = null
+    private var lobby = Lobby.CHOOSE
+    private var netMessage = ""
+    private var mpScale = 1f
+    private var mpStartNs = 0L
+    private var simTime = 0f
+    private var myAlive = true
+    private var oppAlive = true
+    private var oppY = WORLD_H * 0.45f
+    private var oppDispY = WORLD_H * 0.45f
+    private var oppAngle = 0f
+    private var oppBoost = 0f
+    private var oppScore = 0
+    private var sendTimer = 0f
+    private var endTimer = 0f
+    private var mpResult = 0          // 1 kazandın, -1 kaybettin, 0 berabere
+    private var mpDisconnected = false
+    private val emitAccs = FloatArray(2)
+    private var spawnOwner = 0
+
     // --- Menü ---
     private var cardAnim = 0f      // harita değişince kart içeriği kayar (-1..1 → 0)
     private var downX = 0f
@@ -201,6 +240,31 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strMenu = context.getString(R.string.menu)
     private val strWind = context.getString(R.string.wind)
     private val mapTips = Maps.ALL.map { context.getString(it.tipRes) }
+    private val strTwoPlayers = context.getString(R.string.two_players)
+    private val strMpInfo1 = context.getString(R.string.mp_info1)
+    private val strMpInfo2 = context.getString(R.string.mp_info2)
+    private val strHost = context.getString(R.string.mp_host)
+    private val strJoin = context.getString(R.string.mp_join)
+    private val strBack = context.getString(R.string.back)
+    private val strLeave = context.getString(R.string.mp_leave)
+    private val strRoomOpen = context.getString(R.string.mp_room_open)
+    private val strWaiting = context.getString(R.string.mp_waiting)
+    private val strSearching = context.getString(R.string.mp_searching)
+    private val strJoinHint = context.getString(R.string.mp_join_hint)
+    private val strConnected = context.getString(R.string.mp_connected)
+    private val strMpStart = context.getString(R.string.mp_start)
+    private val strWaitHost = context.getString(R.string.mp_wait_host)
+    private val strYou = context.getString(R.string.mp_you)
+    private val strOpponent = context.getString(R.string.mp_opponent)
+    private val strYouCrashed = context.getString(R.string.mp_you_crashed)
+    private val strWatching = context.getString(R.string.mp_watching)
+    private val strOppCrashed = context.getString(R.string.mp_opp_crashed)
+    private val strWin = context.getString(R.string.mp_win)
+    private val strLose = context.getString(R.string.mp_lose)
+    private val strDraw = context.getString(R.string.mp_draw)
+    private val strDisconnected = context.getString(R.string.mp_disconnected)
+    private val strRetryWait = context.getString(R.string.mp_retry_wait)
+    private val strNoNetwork = context.getString(R.string.mp_failed)
     private val mapNames = Maps.ALL.map { context.getString(it.nameRes) }
     private val mapDescs = Maps.ALL.map { context.getString(it.descRes) }
     private val diffNames = Difficulty.entries.map { context.getString(it.nameRes) }
@@ -218,6 +282,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val colAccent = hex(0xFFFF5B4A)
     private val colFin = hex(0xFFD8402F)
     private val colDarkText = hex(0xFF2A1A00)
+    private val colGreen = hex(0xFF4CD98A)
+    private val colBlue = hex(0xFF4F8BFF)       // rakibin roket rengi
+    private val colBlueDark = hex(0xFF2F5FD0)
 
     // --- Fırçalar ---
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -250,6 +317,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val startBtn = RectF()
     private val retryBtn = RectF()
     private val menuBtn = RectF()
+    private val multiBtn = RectF()
+    private val hostBtn = RectF()
+    private val joinBtn = RectF()
+    private val backBtn = RectF()
 
     // --- Roket geometrisi (sağa bakar, merkez 0,0) ---
     private val bodyPath = Path().apply {
@@ -354,12 +425,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     fun pause() {
         if (state == State.PLAYING) paused = true
+        // 2 oyuncuda oyun bekletilemez: uygulamadan çıkan oyuncu yanmış sayılır
+        if (state == State.MP_PLAYING && myAlive) mpCrash()
         running = false
         Choreographer.getInstance().removeFrameCallback(this)
         sound.onPause()
     }
 
     fun release() {
+        net?.close()
+        net = null
         sound.release()
     }
 
@@ -368,6 +443,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (state) {
             State.MENU -> return false
             State.PLAYING -> if (!paused) paused = true else toMenu()
+            State.MP_LOBBY, State.MP_COUNTDOWN, State.MP_PLAYING, State.MP_OVER -> leaveMp()
             else -> toMenu()
         }
         return true
@@ -398,8 +474,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         super.onSizeChanged(w, h, oldw, oldh)
         if (w <= 0 || h <= 0) return
         scale = h / WORLD_H
-        worldW = w / scale
-        rocketX = worldW * 0.3f
+        uiW = w / scale
+        curW = uiW
+        if (isMpView()) {
+            mpScale = (h / 2f) / WORLD_H
+            worldW = w / mpScale
+            rocketX = MP_ROCKET_X
+        } else {
+            worldW = uiW
+            rocketX = worldW * 0.3f
+        }
         buildBackground(w, h)
         // Gezegen görselleri pahalı; ölçek çok değişmediyse yeniden üretme.
         if (mainArts.isEmpty() || artMap != mapIndex || abs(scale - artScale) / artScale > 0.15f) buildPlanetArts()
@@ -411,15 +495,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Menü ve oyun sonu düğmelerinin yerleri. */
     private fun layoutUi() {
-        val cx = worldW / 2f
-        soundBtn.set(worldW - 78f, 24f, worldW - 22f, 80f)
+        val cx = uiW / 2f
+        soundBtn.set(uiW - 78f, 24f, uiW - 22f, 80f)
 
-        val cardHalf = min(worldW / 2f - 60f, 210f)
+        val cardHalf = min(uiW / 2f - 60f, 210f)
         mapCard.set(cx - cardHalf, 262f, cx + cardHalf, 592f)
         arrowLeft.set(mapCard.left - 54f, 398f, mapCard.left - 6f, 458f)
         arrowRight.set(mapCard.right + 6f, 398f, mapCard.right + 54f, 458f)
 
-        val rowHalf = min(worldW / 2f - 26f, 230f)
+        val rowHalf = min(uiW / 2f - 26f, 230f)
         val gap = 10f
         val n = diffBtns.size
         val bw = (rowHalf * 2f - gap * (n - 1)) / n
@@ -428,10 +512,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             diffBtns[i].set(l, 694f, l + bw, 752f)
         }
 
-        val sw = min(worldW - 96f, 300f)
-        startBtn.set(cx - sw / 2f, 794f, cx + sw / 2f, 870f)
+        val sw = min(uiW - 96f, 300f)
+        startBtn.set(cx - sw / 2f, 778f, cx + sw / 2f, 850f)
+        val mw = min(uiW - 140f, 240f)
+        multiBtn.set(cx - mw / 2f, 868f, cx + mw / 2f, 922f)
 
-        val half = min(worldW / 2f - 28f, 180f)
+        val lw = min(uiW / 2f - 50f, 170f)
+        hostBtn.set(cx - lw, 470f, cx + lw, 540f)
+        joinBtn.set(cx - lw, 562f, cx + lw, 632f)
+        backBtn.set(cx - 110f, 870f, cx + 110f, 928f)
+
+        val half = min(uiW / 2f - 28f, 180f)
         retryBtn.set(cx - half, 684f, cx - 7f, 748f)
         menuBtn.set(cx + 7f, 684f, cx + half, 748f)
     }
@@ -452,7 +543,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 onPress()
             }
             // İkinci parmakla da itiş yapılabilsin
-            MotionEvent.ACTION_POINTER_DOWN -> if (state == State.PLAYING) onPress()
+            MotionEvent.ACTION_POINTER_DOWN -> if (state == State.PLAYING || state == State.MP_PLAYING) onPress()
             MotionEvent.ACTION_UP -> onRelease(wx, wy)
         }
         return true
@@ -490,6 +581,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 flap()
             }
             State.PLAYING -> flap()
+            State.MP_PLAYING -> if (myAlive) flap()
             else -> Unit
         }
     }
@@ -506,6 +598,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 if (swipe) changeMap(if (dx < 0f) 1 else -1)
                 else if (!moved) menuTap(downX, downY)
             }
+            State.MP_LOBBY -> {
+                val swipe = abs(dx) > 60f && abs(dx) > abs(dy) * 1.3f &&
+                    downY > mapCard.top - 40f && downY < mapCard.bottom + 40f
+                if (lobby == Lobby.CONNECTED && net?.isHost == true && swipe) changeMap(if (dx < 0f) 1 else -1)
+                else if (!moved) lobbyTap(downX, downY)
+            }
+            State.MP_OVER -> if (!moved && stateTimer > 0.6f) mpOverTap(downX, downY)
             State.OVER -> if (!moved && stateTimer > 0.6f) {
                 when {
                     hit(soundBtn, downX, downY) -> toggleSound()
@@ -523,6 +622,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             hit(arrowLeft, x, y, 18f) -> changeMap(-1)
             hit(arrowRight, x, y, 18f) -> changeMap(1)
             hit(startBtn, x, y) -> startReady()
+            hit(multiBtn, x, y, 6f) -> enterLobby()
             else -> {
                 for (i in diffBtns.indices) {
                     if (hit(diffBtns[i], x, y, 6f)) {
@@ -563,6 +663,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         sound.setMusicTheme(map.musicTheme)
         sound.play(SoundManager.Sfx.SWIPE)
         refreshBestTexts()
+        sendSelection()
     }
 
     private fun selectDifficulty(d: Difficulty) {
@@ -570,6 +671,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             difficulty = d
             prefs.edit().putInt(KEY_DIFF, d.ordinal).apply()
             refreshBestTexts()
+            sendSelection()
         }
         sound.play(SoundManager.Sfx.CLICK)
     }
@@ -595,7 +697,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     // Oyun mantığı
     // =====================================================================
 
-    private fun resetGame() {
+    private fun resetGame(seed: Long = System.nanoTime()) {
+        worldRng = Random(seed)
+        progress = 0
+        worldTime = 0f
         columns.clear()
         stateTimer = 0f
         rocketY = WORLD_H * 0.45f
@@ -609,8 +714,37 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         paused = false
         fireballs.clear()
         fireTimer = 2.2f
-        windPhase = rnd(0f, TWO_PI)
+        windPhase = wr(0f, TWO_PI)
     }
+
+    /** Dünya üretimi için tohumlu rastgele sayı: iki telefonda aynı sonucu verir. */
+    private fun wr(a: Float, b: Float): Float = a + worldRng.nextFloat() * (b - a)
+
+    private fun computeWind(): Float = if (map.kind == MapKind.GAS) {
+        WIND_BASE * difficulty.hazard * sin(worldTime * 0.62f + windPhase) *
+            (0.75f + 0.25f * sin(worldTime * 1.7f))
+    } else 0f
+
+    private fun isMpView() =
+        state == State.MP_COUNTDOWN || state == State.MP_PLAYING || state == State.MP_OVER
+
+    private fun worldRunning() = state == State.PLAYING || state == State.MP_PLAYING
+
+    /** Roketin bir adımlık fiziği: yer çekimi, rüzgâr, tavan ve eğim. */
+    private fun stepRocket(dt: Float) {
+        val maxFall = MAX_FALL * min(1f, map.gravityMul)
+        rocketVy = min(rocketVy + (GRAVITY * map.gravityMul + wind) * dt, maxFall)
+        rocketY += rocketVy * dt
+        if (rocketY < 22f) {
+            rocketY = 22f
+            if (rocketVy < 0f) rocketVy = 0f
+        }
+        val target = (rocketVy / MAX_FALL * 75f).coerceIn(-28f, 75f)
+        rocketAngle += (target - rocketAngle) * min(1f, dt * 12f)
+    }
+
+    private fun currentSpeed(): Float =
+        (difficulty.baseSpeed + min(progress, difficulty.speedCapScore) * difficulty.speedPerScore) * map.speedMul
 
     private fun update(dt: Float) {
         time += dt
@@ -627,16 +761,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val worldSpeed = when (state) {
             State.MENU -> base * 0.5f
             State.READY -> base * 0.7f
-            State.PLAYING -> speed
-            State.DYING, State.OVER -> base * 0.12f
+            State.PLAYING, State.MP_PLAYING -> speed
+            State.DYING, State.OVER, State.MP_OVER -> base * 0.12f
+            State.MP_LOBBY -> base * 0.5f
+            State.MP_COUNTDOWN -> base * 0.3f
         }
+        pollNet()
         updateStars(dt, worldSpeed)
         updateShootingStar(dt)
         // Gaz devlerinde rüzgâr: yavaşça yön değiştirir; menüde de görsel olarak eser
-        wind = if (map.kind == MapKind.GAS) {
-            WIND_BASE * difficulty.hazard * sin(time * 0.62f + windPhase) *
-                (0.75f + 0.25f * sin(time * 1.7f))
-        } else 0f
+        if (!isMpView()) {
+            worldTime += dt
+            wind = computeWind()
+        }
         updateMotes(dt, worldSpeed)
 
         when (state) {
@@ -648,17 +785,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 emit(dt, 28f, 0.8f)
             }
             State.PLAYING -> {
-                val maxFall = MAX_FALL * min(1f, map.gravityMul)
-                rocketVy = min(rocketVy + (GRAVITY * map.gravityMul + wind) * dt, maxFall)
-                rocketY += rocketVy * dt
-                if (rocketY < 22f) {
-                    rocketY = 22f
-                    if (rocketVy < 0f) rocketVy = 0f
-                }
-                val target = (rocketVy / MAX_FALL * 75f).coerceIn(-28f, 75f)
-                rocketAngle += (target - rocketAngle) * min(1f, dt * 12f)
-                speed = (difficulty.baseSpeed +
-                    min(score, difficulty.speedCapScore) * difficulty.speedPerScore) * map.speedMul
+                stepRocket(dt)
+                speed = currentSpeed()
                 updateColumns(dt)
                 updateFireballs(dt)
                 emit(dt, 55f, 1f + boost * 0.6f)
@@ -673,6 +801,27 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 }
             }
             State.OVER -> Unit
+            State.MP_LOBBY -> Unit
+            State.MP_COUNTDOWN -> {
+                rocketY = WORLD_H * 0.45f + sin(time * 2.6f) * 14f
+                rocketAngle = cos(time * 2.6f) * -7f
+                oppDispY = WORLD_H * 0.45f + sin(time * 2.6f + 1.2f) * 14f
+                oppAngle = cos(time * 2.6f + 1.2f) * -7f
+                emit(dt, 28f, 0.8f)
+                emitFor(1, dt, 28f, 0.8f, rocketX, oppDispY, oppAngle)
+                if (System.nanoTime() >= mpStartNs) {
+                    state = State.MP_PLAYING
+                    stateTimer = 0f
+                    simTime = 0f
+                    rocketY = WORLD_H * 0.45f
+                    rocketVy = 0f
+                    rocketAngle = 0f
+                    oppY = rocketY
+                    flap()
+                }
+            }
+            State.MP_PLAYING -> updateMp(dt)
+            State.MP_OVER -> Unit
         }
         updateParticles(dt)
     }
@@ -680,13 +829,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private fun updateColumns(dt: Float) {
         for (col in columns) {
             col.x -= speed * dt
-            if (col.swayAmp > 0f) col.offset = col.swayAmp * sin(time * SWAY_SPEED + col.swayPhase)
+            if (col.swayAmp > 0f) col.offset = col.swayAmp * sin(worldTime * SWAY_SPEED + col.swayPhase)
         }
 
-        val spawnX = worldW + 200f
+        val mp = isMpView()
+        val spawnX = if (mp) MP_SPAWN_X else worldW + 200f
         val last = columns.lastOrNull()
         if (last == null) {
-            columns.add(makeColumn(spawnX))
+            columns.add(makeColumn(if (mp) MP_FIRST_X else spawnX))
         } else if (last.x + difficulty.spacing <= spawnX) {
             columns.add(makeColumn(last.x + difficulty.spacing))
         }
@@ -700,10 +850,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         for (col in columns) {
             if (!col.scored && col.x < rocketX) {
                 col.scored = true
-                score++
-                scoreText = score.toString()
-                scorePulse = 1f
-                sound.play(SoundManager.Sfx.SCORE)
+                progress++
+                if (state == State.PLAYING || (state == State.MP_PLAYING && myAlive)) {
+                    score = progress
+                    scoreText = score.toString()
+                    scorePulse = 1f
+                    sound.play(SoundManager.Sfx.SCORE)
+                }
             }
         }
     }
@@ -711,18 +864,18 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     /** Ortada bir geçiş boşluğu bırakan, üstte ve altta gezegen kulesi olan bir engel üretir. */
     private fun makeColumn(x: Float): Column {
         val d = difficulty
-        val gapH = max(d.minGap, d.startGap - score * d.gapShrink)
+        val gapH = max(d.minGap, d.startGap - progress * d.gapShrink)
         val amp = if (map.kind == MapKind.ASTEROID) d.swayAmp else 0f
         val minY = 110f + gapH / 2f + amp
         val maxY = WORLD_H - 110f - gapH / 2f - amp
-        val gapY = (lastGapY + rnd(-d.gapJump, d.gapJump)).coerceIn(minY, maxY)
+        val gapY = (lastGapY + wr(-d.gapJump, d.gapJump)).coerceIn(minY, maxY)
         lastGapY = gapY
 
         val planets = ArrayList<Planet>()
         buildStack(planets, gapY - gapH / 2f, -1f, amp) // üst kule
         buildStack(planets, gapY + gapH / 2f, 1f, amp)  // alt kule
-        val col = Column(x, planets, amp, rnd(0f, TWO_PI))
-        if (amp > 0f) col.offset = amp * sin(time * SWAY_SPEED + col.swayPhase)
+        val col = Column(x, planets, amp, wr(0f, TWO_PI))
+        if (amp > 0f) col.offset = amp * sin(worldTime * SWAY_SPEED + col.swayPhase)
         return col
     }
 
@@ -732,13 +885,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
      */
     private fun buildStack(out: MutableList<Planet>, gapEdge: Float, dir: Float, extra: Float) {
         val stack = ArrayList<Planet>()
-        val mainR = rnd(60f, MAIN_R) * map.planetMul
+        val mainR = wr(60f, MAIN_R) * map.planetMul
         var cy = gapEdge + dir * mainR
         val spinning = map.kind == MapKind.ASTEROID
         stack.add(
             Planet(
-                0f, cy, mainR, mainArts[Random.nextInt(mainArts.size)],
-                if (spinning) rnd(0f, 360f) else 0f, if (spinning) rnd(-35f, 35f) else 0f
+                0f, cy, mainR, mainArts[worldRng.nextInt(mainArts.size)],
+                if (spinning) wr(0f, 360f) else 0f, if (spinning) wr(-35f, 35f) else 0f
             )
         )
 
@@ -748,13 +901,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val topLimit = -10f - extra
         val bottomLimit = WORLD_H + 10f + extra
         while (guard++ < 16 && (if (dir < 0f) farEdge > topLimit else farEdge < bottomLimit)) {
-            val r = rnd(34f, MOON_R)
-            val dx = rnd(-0.25f, 0.25f) * min(r, prevR)
+            val r = wr(34f, MOON_R)
+            val dx = wr(-0.25f, 0.25f) * min(r, prevR)
             cy = farEdge + dir * (r * 0.7f)
             stack.add(
                 Planet(
-                    dx, cy, r, moonArts[Random.nextInt(moonArts.size)],
-                    if (spinning) rnd(0f, 360f) else 0f, if (spinning) rnd(-60f, 60f) else 0f
+                    dx, cy, r, moonArts[worldRng.nextInt(moonArts.size)],
+                    if (spinning) wr(0f, 360f) else 0f, if (spinning) wr(-60f, 60f) else 0f
                 )
             )
             farEdge = cy + dir * r
@@ -820,6 +973,280 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
         bestValueText = best.toString()
         bestText = context.getString(R.string.best_format, best)
+    }
+
+    // =====================================================================
+    // 2 oyuncu: lobi, bağlantı ve maç
+    // =====================================================================
+
+    private fun enterLobby() {
+        sound.play(SoundManager.Sfx.CLICK)
+        resetGame()
+        state = State.MP_LOBBY
+        lobby = Lobby.CHOOSE
+        netMessage = ""
+    }
+
+    private fun closeNet() {
+        net?.close()
+        net = null
+    }
+
+    private fun startHost() {
+        closeNet()
+        net = NetLink(context).also { it.host() }
+        lobby = Lobby.HOSTING
+        netMessage = ""
+        sound.play(SoundManager.Sfx.CLICK)
+    }
+
+    private fun startJoin() {
+        closeNet()
+        net = NetLink(context).also { it.join() }
+        lobby = Lobby.JOINING
+        netMessage = ""
+        sound.play(SoundManager.Sfx.CLICK)
+    }
+
+    /** 2 oyuncudan çıkıp ana menüye döner. */
+    private fun leaveMp() {
+        closeNet()
+        val wasMpView = isMpView()
+        sound.play(SoundManager.Sfx.CLICK)
+        toMenu()
+        if (wasMpView) {
+            worldW = uiW
+            rocketX = worldW * 0.3f
+            buildStars()
+            buildMotes()
+        }
+    }
+
+    private fun lobbyTap(x: Float, y: Float) {
+        when (lobby) {
+            Lobby.CHOOSE -> when {
+                hit(hostBtn, x, y) -> startHost()
+                hit(joinBtn, x, y) -> startJoin()
+                hit(backBtn, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toMenu() }
+            }
+            Lobby.HOSTING, Lobby.JOINING -> if (hit(backBtn, x, y)) {
+                closeNet()
+                lobby = Lobby.CHOOSE
+                sound.play(SoundManager.Sfx.CLICK)
+            }
+            Lobby.CONNECTED -> {
+                if (hit(multiBtn, x, y, 6f)) {
+                    leaveMp()
+                    return
+                }
+                if (net?.isHost != true) return // seçimleri oda kurucusu yapar
+                when {
+                    hit(arrowLeft, x, y, 18f) -> changeMap(-1)
+                    hit(arrowRight, x, y, 18f) -> changeMap(1)
+                    hit(startBtn, x, y) -> hostStart()
+                    else -> for (i in diffBtns.indices) {
+                        if (hit(diffBtns[i], x, y, 6f)) {
+                            selectDifficulty(Difficulty.entries[i])
+                            return
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun mpOverTap(x: Float, y: Float) {
+        val canRetry = !mpDisconnected && net?.isHost == true
+        if (canRetry) {
+            when {
+                hit(retryBtn, x, y) -> hostStart()
+                hit(menuBtn, x, y) -> leaveMp()
+            }
+        } else if (hit(backBtn, x, y)) {
+            leaveMp()
+        }
+    }
+
+    /** Oda kurucusu harita/seviye değiştirince katılan telefona bildirir. */
+    private fun sendSelection() {
+        val n = net ?: return
+        if (n.isHost && n.connected) n.send("C", mapIndex, difficulty.ordinal)
+    }
+
+    private fun applySelection(m: Int, d: Int) {
+        val nd = Difficulty.entries.getOrNull(d) ?: return
+        if (nd != difficulty) {
+            difficulty = nd
+            refreshBestTexts()
+        }
+        if (m in Maps.ALL.indices && m != mapIndex) changeMap(m - mapIndex)
+    }
+
+    /** Ağdan gelen olayları oyun döngüsünde işler. */
+    private fun pollNet() {
+        val n = net ?: return
+        while (net === n) {
+            val e = n.events.poll() ?: break
+            when (e) {
+                is NetLink.Event.Connected -> {
+                    lobby = Lobby.CONNECTED
+                    netMessage = ""
+                    sound.play(SoundManager.Sfx.START)
+                    n.send("H", NetLink.PROTOCOL)
+                    sendSelection()
+                }
+                is NetLink.Event.Failed -> {
+                    closeNet()
+                    lobby = Lobby.CHOOSE
+                    netMessage = strNoNetwork
+                }
+                is NetLink.Event.Disconnected -> onPeerLost()
+                is NetLink.Event.Message -> handleMessage(e.parts)
+            }
+        }
+    }
+
+    private fun handleMessage(p: List<String>) {
+        val host = net?.isHost == true
+        when (p[0]) {
+            "C" -> if (!host && p.size >= 3) {
+                applySelection(p[1].toIntOrNull() ?: return, p[2].toIntOrNull() ?: return)
+            }
+            "G" -> if (!host && p.size >= 2) beginMatch(p[1].toLongOrNull() ?: return)
+            "S" -> if (p.size >= 5) {
+                oppY = (p[1].toIntOrNull() ?: return) / 10f
+                oppAngle = (p[2].toIntOrNull() ?: return).toFloat()
+                oppBoost = max(oppBoost, (p[3].toIntOrNull() ?: 0) / 100f)
+                oppScore = p[4].toIntOrNull() ?: oppScore
+            }
+            "D" -> if (p.size >= 3 && (state == State.MP_PLAYING || state == State.MP_COUNTDOWN)) {
+                oppDead(p[1].toIntOrNull() ?: oppScore, (p[2].toIntOrNull() ?: 0) / 10f)
+            }
+            "BYE" -> onPeerLost()
+        }
+    }
+
+    private fun onPeerLost() {
+        closeNet()
+        when (state) {
+            State.MP_LOBBY -> {
+                lobby = Lobby.CHOOSE
+                netMessage = strDisconnected
+            }
+            State.MP_COUNTDOWN, State.MP_PLAYING -> {
+                mpDisconnected = true
+                state = State.MP_OVER
+                stateTimer = 0f
+                sound.play(SoundManager.Sfx.GAME_OVER)
+            }
+            State.MP_OVER -> mpDisconnected = true
+            else -> Unit
+        }
+    }
+
+    /** Oda kurucusu yeni maçı başlatır: tohumu gönderir, iki telefon aynı parkuru üretir. */
+    private fun hostStart() {
+        val n = net ?: return
+        if (!n.connected) return
+        val seed = Random.nextLong()
+        n.send("G", seed)
+        beginMatch(seed)
+    }
+
+    private fun beginMatch(seed: Long) {
+        state = State.MP_COUNTDOWN
+        resetGame(seed)
+        mpScale = (height / 2f) / WORLD_H
+        worldW = width / mpScale
+        rocketX = MP_ROCKET_X
+        buildStars()
+        buildMotes()
+        myAlive = true
+        oppAlive = true
+        oppY = WORLD_H * 0.45f
+        oppDispY = oppY
+        oppAngle = 0f
+        oppBoost = 0f
+        oppScore = 0
+        mpResult = 0
+        mpDisconnected = false
+        endTimer = 0f
+        sendTimer = 0f
+        simTime = 0f
+        mpStartNs = System.nanoTime() + MP_COUNTDOWN_NS
+        stateTimer = 0f
+        sound.play(SoundManager.Sfx.START)
+    }
+
+    private fun updateMp(dt: Float) {
+        // Dünya, başlangıçtan geçen gerçek süreye göre sabit adımlarla ilerler: iki telefon senkron kalır
+        val target = (System.nanoTime() - mpStartNs) / 1_000_000_000f
+        var steps = 0
+        while (simTime + MP_STEP <= target && steps < 240) {
+            mpStep(MP_STEP)
+            simTime += MP_STEP
+            steps++
+        }
+        if (steps == 240) simTime = target
+
+        oppBoost = max(0f, oppBoost - dt * 3.5f)
+        oppDispY += (oppY - oppDispY) * min(1f, dt * 14f)
+
+        val n = net
+        sendTimer -= dt
+        if (myAlive && n != null && sendTimer <= 0f) {
+            sendTimer = 0.05f
+            n.send("S", (rocketY * 10f).toInt(), rocketAngle.toInt(), (boost * 100f).toInt(), score)
+        }
+        if (myAlive) emit(dt, 55f, 1f + boost * 0.6f)
+        if (oppAlive) emitFor(1, dt, 55f, 1f + oppBoost * 0.6f, rocketX, oppDispY, oppAngle)
+
+        if (!myAlive && !oppAlive) {
+            endTimer += dt
+            if (endTimer > 1.3f) finishMatch()
+        }
+    }
+
+    private fun mpStep(dt: Float) {
+        worldTime += dt
+        wind = computeWind()
+        speed = currentSpeed()
+        if (myAlive) stepRocket(dt)
+        updateColumns(dt)
+        updateFireballs(dt)
+        if (myAlive && rocketHits()) mpCrash()
+    }
+
+    private fun mpCrash() {
+        if (!myAlive) return
+        myAlive = false
+        explode(rocketX, rocketY, 0)
+        shake = 0.45f
+        flash = 0.2f
+        performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
+        sound.play(SoundManager.Sfx.CRASH)
+        net?.send("D", score, (rocketY * 10f).toInt())
+    }
+
+    private fun oppDead(sc: Int, y: Float) {
+        if (!oppAlive) return
+        oppAlive = false
+        oppScore = sc
+        oppY = y
+        oppDispY = y
+        explode(rocketX, y, 1)
+        sound.play(SoundManager.Sfx.CRASH)
+    }
+
+    private fun finishMatch() {
+        state = State.MP_OVER
+        stateTimer = 0f
+        mpResult = when {
+            score > oppScore -> 1
+            score < oppScore -> -1
+            else -> 0
+        }
+        sound.play(if (mpResult > 0) SoundManager.Sfx.RECORD else SoundManager.Sfx.GAME_OVER)
     }
 
     // --- Yıldızlar ve kayan yıldız ---
@@ -1008,20 +1435,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private fun updateFireballs(dt: Float) {
         if (map.kind != MapKind.LAVA) return
-        if (state == State.PLAYING) {
+        if (worldRunning()) {
             fireTimer -= dt
             if (fireTimer <= 0f) {
-                fireTimer = rnd(2.3f, 3.6f) / difficulty.hazard
+                fireTimer = wr(2.3f, 3.6f) / difficulty.hazard
                 // Topu, roketin hizasına tepeye yakınken varacak şekilde ileriye koy
                 val warn = 0.8f
-                val x = min(worldW - 30f, rocketX + speed * (warn + rnd(0.35f, 0.85f)))
-                fireballs.add(Fireball(x, WORLD_H + 40f, -rnd(980f, 1200f), warn))
+                val maxX = if (isMpView()) 860f else worldW - 30f
+                val x = min(maxX, rocketX + speed * (warn + wr(0.35f, 0.85f)))
+                fireballs.add(Fireball(x, WORLD_H + 40f, -wr(980f, 1200f), warn))
             }
         }
         val iter = fireballs.iterator()
         while (iter.hasNext()) {
             val fb = iter.next()
-            if (state == State.PLAYING) fb.x -= speed * dt
+            if (worldRunning()) fb.x -= speed * dt
             if (fb.warn > 0f) {
                 fb.warn -= dt
                 if (fb.warn <= 0f) sound.play(SoundManager.Sfx.FIRE)
@@ -1030,11 +1458,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             fb.vy += FIRE_GRAVITY * dt
             fb.y += fb.vy * dt
             if (Random.nextFloat() < 0.7f) {
+                spawnOwner = -1
                 spawn(
                     fb.x + rnd(-6f, 6f), fb.y + rnd(-6f, 6f), rnd(-30f, 30f), -fb.vy * 0.15f,
                     rnd(0.25f, 0.5f), rnd(2f, 4.5f),
                     if (Random.nextBoolean()) hex(0xFFFFB347) else hex(0xFFFF5A1F), 2f
                 )
+                spawnOwner = 0
             }
             if (fb.vy > 0f && fb.y > WORLD_H + 60f || fb.x < -60f) iter.remove()
         }
@@ -1076,22 +1506,30 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         p.x = x; p.y = y; p.vx = vx; p.vy = vy
         p.life = life; p.maxLife = life; p.size = size
         p.color = color; p.drag = drag; p.alive = true
+        p.owner = spawnOwner
     }
 
-    private fun emit(dt: Float, rate: Float, strength: Float) {
-        emitAcc += dt * rate
-        while (emitAcc >= 1f) {
-            emitAcc -= 1f
-            emitExhaust(strength)
+    private fun emit(dt: Float, rate: Float, strength: Float) =
+        emitFor(0, dt, rate, strength, rocketX, rocketY, rocketAngle)
+
+    /** [owner] roketinin egzozu (0: ben, 1: rakip). */
+    private fun emitFor(owner: Int, dt: Float, rate: Float, strength: Float, x: Float, y: Float, angle: Float) {
+        emitAccs[owner] += dt * rate
+        while (emitAccs[owner] >= 1f) {
+            emitAccs[owner] -= 1f
+            emitExhaust(strength, x, y, angle, owner)
         }
     }
 
-    private fun emitExhaust(strength: Float) {
-        val rad = rocketAngle * DEG
+    private fun emitExhaust(
+        strength: Float, x: Float = rocketX, y: Float = rocketY, angle: Float = rocketAngle, owner: Int = 0
+    ) {
+        spawnOwner = owner
+        val rad = angle * DEG
         val cs = cos(rad)
         val sn = sin(rad)
-        val tx = rocketX - 24f * cs
-        val ty = rocketY - 24f * sn
+        val tx = x - 24f * cs
+        val ty = y - 24f * sn
         val spread = rnd(-0.3f, 0.3f)
         val sp = rnd(130f, 230f) * strength
         val vx = -cs * sp - sn * spread * sp
@@ -1102,9 +1540,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             else -> hex(0xFFFF7A3A)
         }
         spawn(tx, ty, vx, vy, rnd(0.25f, 0.5f), rnd(2.2f, 4.5f), color, 2.2f)
+        spawnOwner = 0
     }
 
-    private fun explode(x: Float, y: Float) {
+    private fun explode(x: Float, y: Float, owner: Int = 0) {
+        spawnOwner = owner
         val colors = intArrayOf(
             hex(0xFFFFFFFF), hex(0xFFFFE27A), hex(0xFFFFB347),
             hex(0xFFFF6A3D), hex(0xFFE8432E), hex(0xFFC9CEE6)
@@ -1117,6 +1557,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 rnd(0.45f, 1.2f), rnd(2.5f, 7f), colors[Random.nextInt(colors.size)], 2.4f
             )
         }
+        spawnOwner = 0
+        if (owner != 0) return
         shockT = 0f
         shockX = x
         shockY = y
@@ -1148,6 +1590,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         super.onDraw(canvas)
         val bg = bgBitmap
         if (bg != null) canvas.drawBitmap(bg, 0f, 0f, null) else canvas.drawColor(map.bgColors[0])
+        curW = uiW
+        if (isMpView()) {
+            drawMp(canvas)
+            return
+        }
 
         canvas.save()
         canvas.scale(scale, scale)
@@ -1218,9 +1665,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
     }
 
-    private fun drawParticles(cv: Canvas) {
+    private fun drawParticles(cv: Canvas, owner: Int = 0) {
         for (p in particles) {
-            if (!p.alive) continue
+            if (!p.alive || (p.owner != owner && p.owner >= 0)) continue
             val f = p.life / p.maxLife
             paint.color = withAlpha(p.color, (f * 235).toInt())
             cv.drawCircle(p.x, p.y, p.size * (0.35f + 0.65f * f), paint)
@@ -1238,14 +1685,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         paint.style = Paint.Style.FILL
     }
 
-    private fun drawRocket(cv: Canvas) {
+    private fun drawRocket(
+        cv: Canvas, x: Float = rocketX, y: Float = rocketY, angle: Float = rocketAngle,
+        boostV: Float = boost, alt: Boolean = false
+    ) {
         cv.save()
-        cv.translate(rocketX, rocketY)
-        cv.rotate(rocketAngle)
+        cv.translate(x, y)
+        cv.rotate(angle)
 
         // Alev: dokununca bir anlığına uzar
         val flicker = 0.85f + 0.15f * sin(time * 47f) + rnd(-0.06f, 0.06f)
-        val len = (13f + boost * 24f) * flicker
+        val len = (13f + boostV * 24f) * flicker
         cv.save()
         cv.translate(-19f, 0f)
         flamePath.reset()
@@ -1272,7 +1722,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         // Nozul ve kanatçıklar
         paint.color = hex(0xFF4A4F6E)
         cv.drawRect(-23f, -6.5f, -18f, 6.5f, paint)
-        paint.color = colFin
+        paint.color = if (alt) colBlueDark else colFin
         cv.drawPath(finTop, paint)
         cv.drawPath(finBottom, paint)
 
@@ -1281,7 +1731,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         paint.shader = bodyShader
         cv.drawPath(bodyPath, paint)
         paint.shader = null
-        paint.color = colAccent
+        paint.color = if (alt) colBlue else colAccent
         cv.drawPath(noseAccent, paint)
         cv.drawPath(stripeAccent, paint)
 
@@ -1308,22 +1758,34 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     // --- Arayüz ---
 
     private fun drawHud(cv: Canvas) {
-        val cx = worldW / 2f
+        val cx = uiW / 2f
         when (state) {
             State.MENU -> drawMenu(cv, cx)
             State.READY -> drawReady(cv, cx)
             State.PLAYING, State.DYING -> drawScore(cv, cx)
             State.OVER -> drawGameOver(cv, cx)
+            State.MP_LOBBY -> drawLobby(cv, cx)
+            State.MP_COUNTDOWN, State.MP_PLAYING, State.MP_OVER -> Unit
         }
         if (paused) drawPaused(cv, cx)
     }
 
-    private fun drawMenu(cv: Canvas, cx: Float) {
+    /** Ana menü. [mp] ise aynı ekran 2 oyuncu lobisinde (bağlandıktan sonra) kullanılır. */
+    private fun drawMenu(cv: Canvas, cx: Float, mp: Boolean = false) {
         val bob = sin(time * 1.6f) * 3f
-        titlePaint.textSize = 60f
-        drawShadowText(cv, strTitle1, cx, 122f + bob, titlePaint, colText)
-        drawShadowText(cv, strTitle2, cx, 184f + bob, titlePaint, colWarm)
-        drawSoundButton(cv, 255)
+        val host = net?.isHost == true
+        if (mp) {
+            titlePaint.textSize = 54f
+            drawShadowText(cv, strTwoPlayers, cx, 132f + bob, titlePaint, colWarm)
+            textPaint.textSize = 23f
+            textPaint.color = colGreen
+            drawFit(cv, strConnected, cx, 186f, textPaint)
+        } else {
+            titlePaint.textSize = 60f
+            drawShadowText(cv, strTitle1, cx, 122f + bob, titlePaint, colText)
+            drawShadowText(cv, strTitle2, cx, 184f + bob, titlePaint, colWarm)
+            drawSoundButton(cv, 255)
+        }
 
         // --- Harita kartı ---
         labelPaint.textSize = 19f
@@ -1357,8 +1819,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawFitW(cv, mapDescs[mapIndex], pcx, mapCard.bottom - 32f, textPaint, mapCard.width() - 28f)
         cv.restore()
 
-        drawArrow(cv, arrowLeft, -1f)
-        drawArrow(cv, arrowRight, 1f)
+        if (!mp || host) {
+            drawArrow(cv, arrowLeft, -1f)
+            drawArrow(cv, arrowRight, 1f)
+        }
 
         // Sayfa noktaları
         val n = Maps.ALL.size
@@ -1378,20 +1842,38 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             drawButton(cv, diffBtns[i], diffNames[i], d.color, if (sel) colDarkText else d.color, sel, 255)
         }
 
+        if (mp) {
+            if (host) {
+                drawPulseButton(cv, startBtn, strMpStart)
+            } else {
+                val dots = ".".repeat(1 + (time * 2f).toInt() % 3)
+                textPaint.textSize = 21f
+                textPaint.color = colText
+                drawFit(cv, strWaitHost + dots, cx, startBtn.centerY() + 8f, textPaint)
+            }
+            drawButton(cv, multiBtn, strLeave, colPanelEdge, colText, false, 255, 19f)
+            return
+        }
+
         // --- Başla ---
-        val pulse = 1f + 0.025f * sin(time * 4f)
-        cv.save()
-        cv.scale(pulse, pulse, startBtn.centerX(), startBtn.centerY())
-        paint.color = hex(0x55000000)
-        tmpRect.set(startBtn)
-        tmpRect.offset(0f, 5f)
-        cv.drawRoundRect(tmpRect, startBtn.height() / 2f, startBtn.height() / 2f, paint)
-        drawButton(cv, startBtn, strStart, colWarm, colDarkText, true, 255, 28f)
-        cv.restore()
+        drawPulseButton(cv, startBtn, strStart)
+        drawButton(cv, multiBtn, strTwoPlayers, colBlue, colText, false, 255, 19f)
 
         labelPaint.textSize = 19f
         labelPaint.color = colGold
-        drawFit(cv, bestText, cx, startBtn.bottom + 52f, labelPaint)
+        drawFit(cv, bestText, cx, multiBtn.bottom + 44f, labelPaint)
+    }
+
+    private fun drawPulseButton(cv: Canvas, r: RectF, text: String) {
+        val pulse = 1f + 0.025f * sin(time * 4f)
+        cv.save()
+        cv.scale(pulse, pulse, r.centerX(), r.centerY())
+        paint.color = hex(0x55000000)
+        tmpRect.set(r)
+        tmpRect.offset(0f, 5f)
+        cv.drawRoundRect(tmpRect, r.height() / 2f, r.height() / 2f, paint)
+        drawButton(cv, r, text, colWarm, colDarkText, true, 255, 28f)
+        cv.restore()
     }
 
     private fun drawArtAt(cv: Canvas, art: PlanetArt, x: Float, y: Float, r: Float) {
@@ -1523,9 +2005,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     /** Sol üstte rüzgârın yönünü ve gücünü gösteren ok. */
-    private fun drawWindGauge(cv: Canvas) {
-        val gx = 52f
-        val gy = 74f
+    private fun drawWindGauge(cv: Canvas, gx: Float = 52f, gy: Float = 74f) {
         val maxW = WIND_BASE * difficulty.hazard
         val k = (wind / maxW).coerceIn(-1f, 1f)
         paint.color = withAlpha(colPanel, 190)
@@ -1560,7 +2040,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val ease = 1f - (1f - t).pow(3)
         val a = (ease * 255).toInt()
         val top = 330f + (1f - ease) * 70f
-        val panelW = min(worldW - 48f, 360f)
+        val panelW = min(uiW - 48f, 360f)
         val panelH = 290f
 
         titlePaint.textSize = 56f
@@ -1620,12 +2100,255 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private fun drawPaused(cv: Canvas, cx: Float) {
         paint.color = hex(0xAA05071A)
-        cv.drawRect(0f, 0f, worldW, WORLD_H, paint)
+        cv.drawRect(0f, 0f, uiW, WORLD_H, paint)
         titlePaint.textSize = 54f
         drawShadowText(cv, strPaused, cx, 470f, titlePaint, colText)
         textPaint.textSize = 26f
         textPaint.color = colDim
         drawFit(cv, strTapToContinue, cx, 530f, textPaint)
+    }
+
+    // --- 2 oyuncu çizimi ---
+
+    /** Bölünmüş ekran: üst yarı ben, alt yarı rakip. İkisi de aynı parkuru gösterir. */
+    private fun drawMp(canvas: Canvas) {
+        val halfH = height / 2f
+        for (owner in 0..1) {
+            curW = worldW
+            canvas.save()
+            canvas.clipRect(0f, owner * halfH, width.toFloat(), (owner + 1) * halfH)
+            canvas.translate(0f, owner * halfH)
+            canvas.scale(mpScale, mpScale)
+            if (owner == 0 && shake > 0f) {
+                val m = shake / 0.45f * 9f
+                canvas.translate(rnd(-m, m), rnd(-m, m))
+            }
+            drawStars(canvas)
+            drawShootingStar(canvas)
+            drawMotes(canvas)
+            drawColumns(canvas)
+            drawFireballs(canvas)
+            drawParticles(canvas, owner)
+            if (owner == 0) {
+                if (myAlive) drawRocket(canvas)
+                drawShockwave(canvas)
+            } else if (oppAlive) {
+                drawRocket(canvas, rocketX, oppDispY, oppAngle, oppBoost, alt = true)
+            }
+            drawHalfHud(canvas, owner)
+            canvas.restore()
+        }
+
+        // Ayırıcı çizgi
+        paint.color = hex(0xFF0A0D26)
+        canvas.drawRect(0f, halfH - 4f, width.toFloat(), halfH + 4f, paint)
+        paint.color = withAlpha(map.accent, 210)
+        canvas.drawRect(0f, halfH - 1.5f, width.toFloat(), halfH + 1.5f, paint)
+
+        canvas.save()
+        canvas.scale(scale, scale)
+        curW = uiW
+        if (state == State.MP_COUNTDOWN) drawCountdown(canvas)
+        if (state == State.MP_OVER) drawMpOver(canvas)
+        canvas.restore()
+
+        if (flash > 0f) canvas.drawColor(withAlpha(Color.WHITE, (flash / 0.2f * 140).toInt()))
+    }
+
+    /** Yarım ekranın üstündeki isim, skor ve "yandı" katmanı (dünya birimi; yarı ölçekli). */
+    private fun drawHalfHud(cv: Canvas, owner: Int) {
+        val cx = worldW / 2f
+        val me = owner == 0
+        val alive = if (me) myAlive else oppAlive
+
+        if (!alive) {
+            paint.color = hex(0x8805071A)
+            cv.drawRect(0f, 0f, worldW, WORLD_H, paint)
+        }
+
+        val name = if (me) strYou else strOpponent
+        labelPaint.textSize = 32f
+        val tw = labelPaint.measureText(name) + 56f
+        tmpRect.set(30f, 30f, 30f + tw, 96f)
+        drawButton(cv, tmpRect, name, if (me) colAccent else colBlue, Color.WHITE, true, 235, 32f)
+
+        titlePaint.textSize = 130f * (if (me) 1f + 0.18f * scorePulse else 1f)
+        drawShadowText(cv, (if (me) score else oppScore).toString(), cx, 175f, titlePaint, colText)
+
+        if (map.kind == MapKind.GAS && alive) drawWindGauge(cv, worldW - 70f, 70f)
+
+        if (state == State.MP_COUNTDOWN && me) {
+            textPaint.textSize = 42f
+            textPaint.color = map.accent
+            drawFit(cv, mapTips[mapIndex], cx, 300f, textPaint)
+        }
+
+        if (!alive) {
+            titlePaint.textSize = 120f
+            drawShadowText(cv, if (me) strYouCrashed else strOppCrashed, cx, 540f, titlePaint, if (me) colAccent else colBlue)
+            if (me && oppAlive && state == State.MP_PLAYING) {
+                textPaint.textSize = 48f
+                textPaint.color = colText
+                drawFit(cv, strWatching, cx, 640f, textPaint)
+            }
+        }
+    }
+
+    private fun drawCountdown(cv: Canvas) {
+        val cx = uiW / 2f
+        val cy = 500f
+        val left = (mpStartNs - System.nanoTime()) / 1_000_000_000f
+        val n = ceil(left).toInt().coerceIn(1, 3)
+        val k = (left - (n - 1)).coerceIn(0f, 1f) // 1 → 0 her saniye
+        paint.color = withAlpha(colPanel, 235)
+        cv.drawCircle(cx, cy, 66f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 4f
+        paint.color = map.accent
+        tmpRect.set(cx - 66f, cy - 66f, cx + 66f, cy + 66f)
+        cv.drawArc(tmpRect, -90f, 360f * k, false, paint)
+        paint.style = Paint.Style.FILL
+        titlePaint.textSize = 84f * (0.9f + 0.25f * k)
+        drawShadowText(cv, n.toString(), cx, cy + titlePaint.textSize * 0.35f, titlePaint, colWarm)
+    }
+
+    private fun drawMpOver(cv: Canvas) {
+        val cx = uiW / 2f
+        val t = (stateTimer / 0.35f).coerceIn(0f, 1f)
+        val ease = 1f - (1f - t).pow(3)
+        val a = (ease * 255).toInt()
+
+        paint.color = withAlpha(hex(0xFF05071A), (a * 0.6f).toInt())
+        cv.drawRect(0f, 0f, uiW, WORLD_H, paint)
+
+        val title: String
+        val titleColor: Int
+        when {
+            mpDisconnected -> { title = strDisconnected; titleColor = colDim }
+            mpResult > 0 -> { title = strWin; titleColor = colGold }
+            mpResult < 0 -> { title = strLose; titleColor = colAccent }
+            else -> { title = strDraw; titleColor = colText }
+        }
+        val top = 340f + (1f - ease) * 60f
+        titlePaint.textSize = 62f
+        titlePaint.color = withAlpha(Color.BLACK, (a * 0.4f).toInt())
+        drawFit(cv, title, cx, top - 37f, titlePaint)
+        titlePaint.color = withAlpha(titleColor, a)
+        drawFit(cv, title, cx, top - 42f, titlePaint)
+
+        val panelW = min(uiW - 48f, 360f)
+        val panelH = 220f
+        tmpRect.set(cx - panelW / 2f, top, cx + panelW / 2f, top + panelH)
+        paint.color = withAlpha(colPanel, (a * 0.92f).toInt())
+        cv.drawRoundRect(tmpRect, 28f, 28f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(colPanelEdge, (a * 0.45f).toInt())
+        cv.drawRoundRect(tmpRect, 28f, 28f, paint)
+        paint.style = Paint.Style.FILL
+        paint.color = withAlpha(colPanelEdge, (a * 0.25f).toInt())
+        cv.drawRect(cx - 1f, top + 30f, cx + 1f, top + panelH - 30f, paint)
+
+        for (side in 0..1) {
+            val x = cx + (if (side == 0) -1f else 1f) * panelW / 4f
+            labelPaint.textSize = 22f
+            labelPaint.color = withAlpha(if (side == 0) colAccent else colBlue, a)
+            cv.drawText(if (side == 0) strYou else strOpponent, x, top + 58f, labelPaint)
+            titlePaint.textSize = 80f
+            val winner = !mpDisconnected && ((side == 0 && mpResult > 0) || (side == 1 && mpResult < 0))
+            titlePaint.color = withAlpha(if (winner) colGold else colText, a)
+            cv.drawText((if (side == 0) score else oppScore).toString(), x, top + 158f, titlePaint)
+        }
+
+        labelPaint.textSize = 18f
+        labelPaint.color = withAlpha(colDim, a)
+        drawFit(cv, mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal], cx, top + panelH + 44f, labelPaint)
+
+        val ba = (((stateTimer - 0.45f) / 0.25f).coerceIn(0f, 1f) * 255).toInt()
+        if (ba <= 0) return
+        if (!mpDisconnected && net?.isHost == true) {
+            drawButton(cv, retryBtn, strRetry, colWarm, colDarkText, true, ba, 22f)
+            drawButton(cv, menuBtn, strMenu, colPanelEdge, colText, false, ba, 22f)
+        } else {
+            if (!mpDisconnected) {
+                val dots = ".".repeat(1 + (time * 2f).toInt() % 3)
+                textPaint.textSize = 21f
+                textPaint.color = withAlpha(colText, ba)
+                drawFit(cv, strRetryWait + dots, cx, retryBtn.centerY() + 8f, textPaint)
+            }
+            drawButton(cv, backBtn, strMenu, colPanelEdge, colText, false, ba, 20f)
+        }
+    }
+
+    private fun drawLobby(cv: Canvas, cx: Float) {
+        if (lobby == Lobby.CONNECTED) {
+            drawMenu(cv, cx, mp = true)
+            return
+        }
+        val bob = sin(time * 1.6f) * 3f
+        titlePaint.textSize = 56f
+        drawShadowText(cv, strTwoPlayers, cx, 170f + bob, titlePaint, colWarm)
+        val dots = ".".repeat(1 + (time * 2f).toInt() % 3)
+
+        when (lobby) {
+            Lobby.CHOOSE -> {
+                textPaint.textSize = 21f
+                textPaint.color = colDim
+                drawFit(cv, strMpInfo1, cx, 250f, textPaint)
+                drawFit(cv, strMpInfo2, cx, 282f, textPaint)
+                labelPaint.textSize = 20f
+                labelPaint.color = map.accent
+                drawFit(cv, mapNames[mapIndex] + "  ·  " + diffNames[difficulty.ordinal], cx, 372f, labelPaint)
+                drawButton(cv, hostBtn, strHost, colWarm, colDarkText, true, 255, 24f)
+                drawButton(cv, joinBtn, strJoin, colBlue, colText, false, 255, 24f)
+                if (netMessage.isNotEmpty()) {
+                    textPaint.textSize = 21f
+                    textPaint.color = colAccent
+                    drawFit(cv, netMessage, cx, 700f, textPaint)
+                }
+            }
+            Lobby.HOSTING -> {
+                textPaint.textSize = 26f
+                textPaint.color = colText
+                drawFit(cv, strRoomOpen, cx, 290f, textPaint)
+                textPaint.textSize = 24f
+                textPaint.color = colGreen
+                drawFit(cv, strWaiting + dots, cx, 350f, textPaint)
+                val ip = net?.localAddress.orEmpty()
+                if (ip.isNotEmpty()) {
+                    labelPaint.textSize = 19f
+                    labelPaint.color = colDim
+                    drawFit(cv, "IP  $ip", cx, 410f, labelPaint)
+                }
+                textPaint.textSize = 20f
+                textPaint.color = colDim
+                drawFit(cv, strJoinHint, cx, 480f, textPaint)
+                drawFit(cv, strMpInfo1, cx, 516f, textPaint)
+                drawSpinner(cv, cx, 680f)
+            }
+            Lobby.JOINING -> {
+                textPaint.textSize = 24f
+                textPaint.color = colGreen
+                drawFit(cv, strSearching + dots, cx, 350f, textPaint)
+                textPaint.textSize = 20f
+                textPaint.color = colDim
+                drawFit(cv, strMpInfo1, cx, 440f, textPaint)
+                drawFit(cv, strMpInfo2, cx, 472f, textPaint)
+                drawSpinner(cv, cx, 680f)
+            }
+            Lobby.CONNECTED -> Unit
+        }
+        drawButton(cv, backBtn, strBack, colPanelEdge, colText, false, 255, 20f)
+    }
+
+    /** Dönen nokta halkası: bekleniyor göstergesi. */
+    private fun drawSpinner(cv: Canvas, x: Float, y: Float) {
+        for (i in 0 until 10) {
+            val a = i / 10f * TWO_PI + time * 3f
+            val k = i / 9f
+            paint.color = withAlpha(map.accent, (40 + 200 * k).toInt())
+            cv.drawCircle(x + cos(a) * 34f, y + sin(a) * 34f, 3f + 4f * k, paint)
+        }
     }
 
     /** Metni verilen genişliğe sığmazsa küçülterek çizer. */
@@ -1650,7 +2373,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Metni ekrana sığmazsa küçülterek çizer. */
     private fun drawFit(cv: Canvas, text: String, x: Float, y: Float, p: Paint) {
-        val maxW = worldW - 40f
+        val maxW = curW - 40f
         val w = p.measureText(text)
         if (w <= maxW) {
             cv.drawText(text, x, y, p)
