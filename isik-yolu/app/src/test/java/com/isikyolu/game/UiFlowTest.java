@@ -132,7 +132,7 @@ public class UiFlowTest {
         shot("03_bolum_secme");
 
         // farklı mekaniklerden örnek bölümler
-        for (int id : new int[]{12, 25, 35, 45, 55, 65, 75, 85, 95}) {
+        for (int id : new int[]{12, 25, 35, 45, 55, 65, 75, 85, 95, 150, 250, 350, 450, 500}) {
             act.goLevel(id);
             idle(700);
             closeOverlays();
@@ -227,10 +227,10 @@ public class UiFlowTest {
         shot("01_acilis");
     }
 
-    @Test public void allHundredLevelsPlayableThroughUi() throws Exception {
+    @Test public void allLevelsPlayableThroughUi() throws Exception {
         start();
         Game.progress().tutorialSeen = true;
-        for (int id = 1; id <= 100; id++) {
+        for (int id = 1; id <= com.isikyolu.engine.Progress.LEVEL_COUNT; id++) {
             assertTrue("kilitli: " + id, Game.progress().isUnlocked(id));
             act.goLevel(id);
             idle(300);
@@ -241,8 +241,9 @@ public class UiFlowTest {
             assertEquals("yıldız: bölüm " + id, 3, Game.progress().stars[id]);
             closeOverlays();
         }
-        assertEquals(100, Game.progress().completedCount());
-        assertEquals(300, Game.progress().totalStars());
+        assertEquals(500, Game.progress().completedCount());
+        assertEquals(1500, Game.progress().totalStars());
+        assertEquals("başlangıç 3 + her 10 bölümde 1", 3 + 50, Game.progress().hints);
         assertTrue(Game.progress().achievements.contains("efsane"));
         assertTrue(Game.progress().achievements.contains("kusursuz"));
         act.goLevels();

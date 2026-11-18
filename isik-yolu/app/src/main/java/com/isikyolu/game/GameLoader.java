@@ -13,7 +13,7 @@ public final class GameLoader {
         Handler h = new Handler(Looper.getMainLooper());
         new Thread(() -> {
             boolean ok;
-            try { ok = Game.loadLevels(a).size() == 100; } catch (Exception e) { ok = false; }
+            try { ok = Game.loadLevels(a).size() == com.isikyolu.engine.Progress.LEVEL_COUNT; } catch (Exception e) { ok = false; }
             final boolean r = ok;
             h.post(() -> cb.done(r));
         }, "bolum-yukleyici").start();

@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.0.0
+# Build Raporu — Işık Yolu 1.1.0
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -17,18 +17,26 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
 
+## 1.1.0 değişiklikleri
+
+- 500 bölüm (5 dünya). İlk 100 bölüm değişmedi.
+- Yeni ayna tasarımı: 90° çentikli döner taban, metal çerçeveli cam bıçak, ışık vurunca dönen yansıma parıltısı; sabit aynalar cıvatalı çelik yuvada.
+- İpucu kuralı: 3 ipucuyla başlanır, her 10 tamamlanan bölümde +1 (3 yıldız ödülü kaldırıldı).
+- Tema: aurora bantlı arka plan, parlayan yıldızlar, cam efektli kartlar, parlaklık katmanlı butonlar, degrade başlık, renk geçişli tahta çerçevesi, dünya sekmeleri.
+- 25 başarı (dünya başarıları ve yüksek yıldız hedefleri eklendi).
+
 ## Çıktılar
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.0.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 712 548 bayt | `48e30eae530f9f50fa2649b8c9f7cd61df8083d288214b4609e3ba1f0723006f` |
-| `teslimat/IsikYolu-1.0.0-debug.apk` | 1 770 315 bayt | `19db024829796996f603dc331df00dd09d59f690a300684d38750827053ddeb6` |
+| `teslimat/IsikYolu-1.1.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 756 176 bayt | `a8411f87d3c367744daee7de8213fc3af6799789242979f0fe3c7c9cefce0347` |
+| `teslimat/IsikYolu-1.1.0-debug.apk` | 1 846 963 bayt | `9c93fe621da4ef48e751e78b34e31977de65c9e7f46648ab442f074b262cadb1` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 1, sürüm adı 1.0.0, etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 2, sürüm adı 1.1.0 (1.0.0'ın üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.
-- APK içeriği: `assets/levels.json` (58 KB, 100 bölüm), 11 WAV ses (müzik 1,4 MB), vektör ikon ve amblem.
+- APK içeriği: `assets/levels.json` (500 bölüm), 11 WAV ses (müzik 1,4 MB), vektör ikon ve amblem.
 
 ## Komutlar ve sonuçlar
 

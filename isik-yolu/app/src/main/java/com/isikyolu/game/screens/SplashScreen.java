@@ -27,6 +27,8 @@ public final class SplashScreen extends Screen {
         col.addView(logo, new LinearLayout.LayoutParams(Ui.dp(a, 170), Ui.dp(a, 170)));
         TextView title = Ui.text(a, "Işık Yolu", 44, Palette.WHITE, Ui.BOLD);
         title.setLetterSpacing(0.04f);
+        Ui.gradientText(title, 0xFFFFE08A, 0xFFFFFFFF, 0xFF7DF0E0);
+        title.setShadowLayer(Ui.dp(a, 16), 0, 0, 0x6620B8A6);
         col.addView(title);
         TextView sub = Ui.text(a, "Işığı yönlendir, yolu bul", 16, Palette.TURQUOISE, Ui.MEDIUM);
         col.addView(sub);

@@ -22,6 +22,10 @@ public final class BackgroundView extends View {
     private final int[] mc = new int[MOTES];
     private RadialGradient[] glows;
     private final Matrix m = new Matrix();
+    private final Paint aurora = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final android.graphics.Path band = new android.graphics.Path();
+    private LinearGradient auroraA, auroraB;
+    private final Paint flare = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final long start = SystemClock.uptimeMillis();
 
     public BackgroundView(Context c) {
@@ -35,12 +39,35 @@ public final class BackgroundView extends View {
     }
 
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
-        bg.setShader(new LinearGradient(0, 0, 0, h, new int[]{0xFF141E33, Palette.NIGHT, Palette.NIGHT_DEEP}, null, Shader.TileMode.CLAMP));
+        bg.setShader(new LinearGradient(0, 0, 0, h, new int[]{0xFF1A1D3F, 0xFF131B33, Palette.NIGHT, Palette.NIGHT_DEEP},
+                new float[]{0f, 0.3f, 0.65f, 1f}, Shader.TileMode.CLAMP));
+        auroraA = new LinearGradient(0, 0, 0, h * 0.35f, new int[]{0x0020B8A6, 0x2620B8A6, 0x0020B8A6}, null, Shader.TileMode.CLAMP);
+        auroraB = new LinearGradient(0, 0, 0, h * 0.35f, new int[]{0x006D5DFB, 0x246D5DFB, 0x006D5DFB}, null, Shader.TileMode.CLAMP);
         float r = Math.max(w, h) * 0.55f;
         glows = new RadialGradient[]{
                 new RadialGradient(0, 0, r, 0x336D5DFB, 0x006D5DFB, Shader.TileMode.CLAMP),
                 new RadialGradient(0, 0, r * 0.8f, 0x2620B8A6, 0x0020B8A6, Shader.TileMode.CLAMP),
                 new RadialGradient(0, 0, r * 0.6f, 0x1CF5C542, 0x00F5C542, Shader.TileMode.CLAMP)};
+    }
+
+    private void drawBand(Canvas c, int w, int h, float t, float top, float amp, float thick, LinearGradient sh) {
+        band.reset();
+        int steps = 24;
+        for (int k = 0; k <= steps; k++) {
+            float x = w * k / (float) steps;
+            float y = h * (top + amp * 0.3f * (float) Math.sin(k * 0.45f + t * 0.12f) + amp * 0.15f * (float) Math.sin(k * 0.9f - t * 0.07f));
+            if (k == 0) band.moveTo(x, y); else band.lineTo(x, y);
+        }
+        for (int k = steps; k >= 0; k--) {
+            float x = w * k / (float) steps;
+            float y = h * (top + thick + amp * 0.3f * (float) Math.sin(k * 0.45f + t * 0.12f + 0.8f) + amp * 0.2f * (float) Math.sin(k * 0.7f + t * 0.05f));
+            band.lineTo(x, y);
+        }
+        band.close();
+        m.setTranslate(0, h * top - h * 0.05f);
+        sh.setLocalMatrix(m);
+        aurora.setShader(sh);
+        c.drawPath(band, aurora);
     }
 
     @Override protected void onDraw(Canvas c) {
@@ -59,6 +86,11 @@ public final class BackgroundView extends View {
                 c.drawRect(0, 0, w, h, glow);
             }
         }
+        // aurora bantları
+        if (auroraA != null) {
+            drawBand(c, w, h, t, 0.08f, 0.16f, 0.21f, auroraA);
+            drawBand(c, w, h, t + 7f, 0.2f, 0.12f, 0.17f, auroraB);
+        }
         float d = getResources().getDisplayMetrics().density;
         for (int i = 0; i < MOTES; i++) {
             float y = (my[i] - t * mv[i]) % 1f;
@@ -67,6 +99,13 @@ public final class BackgroundView extends View {
             float a = 0.25f + 0.35f * (0.5f + 0.5f * (float) Math.sin(t * 1.3f + mp[i]));
             dot.setColor(Palette.withAlpha(mc[i], (int) (a * 255)));
             c.drawCircle(x * w, y * h, ms[i] * d, dot);
+            if (ms[i] > 1.9f) { // parlak yıldızlarda artı biçimli ışıltı
+                float L = ms[i] * d * (2.5f + 2f * a);
+                flare.setStrokeWidth(d * 0.6f);
+                flare.setColor(Palette.withAlpha(mc[i], (int) (a * 160)));
+                c.drawLine(x * w - L, y * h, x * w + L, y * h, flare);
+                c.drawLine(x * w, y * h - L, x * w, y * h + L, flare);
+            }
         }
         postInvalidateDelayed(33);
     }

@@ -9,10 +9,12 @@ import java.util.Set;
 
 /** Oyuncu ilerlemesi. Platformdan bağımsızdır; JSON metni olarak kaydedilir. */
 public final class Progress {
-    public static final int LEVEL_COUNT = 100;
-    public static final int START_HINTS = 5;
+    public static final int LEVEL_COUNT = 500;
+    public static final int START_HINTS = 3;
+    /** Her bu kadar bölüm tamamlandığında +1 ipucu. */
+    public static final int HINT_EVERY = 10;
 
-    /** stars[1..100]; 0 = tamamlanmadı. */
+    /** stars[1..500]; 0 = tamamlanmadı. */
     public final int[] stars = new int[LEVEL_COUNT + 1];
     /** En iyi hamle sayısı (0 = yok). */
     public final int[] bestMoves = new int[LEVEL_COUNT + 1];
@@ -64,10 +66,20 @@ public final class Progress {
         if (bestMoves[level] == 0 || moves < bestMoves[level]) bestMoves[level] = moves;
         if (first) {
             if (!usedHint) levelsWithoutHint++;
-            if (stars == 3) hints++; // ödül: ilk seferde 3 yıldız +1 ipucu
+            if (completedCount() % HINT_EVERY == 0) hints++; // ödül: her 10 tamamlanan bölümde +1 ipucu
         }
         lastPlayed = Math.min(LEVEL_COUNT, level + 1);
         return first;
+    }
+
+    /** Bir sonraki ipucu ödülüne kalan bölüm sayısı. */
+    public int levelsUntilNextHint() { return HINT_EVERY - completedCount() % HINT_EVERY; }
+
+    /** Bir dünyadaki (1–5) tamamlanan bölüm sayısı. */
+    public int completedInWorld(int world) {
+        int n = 0;
+        for (int i = (world - 1) * 100 + 1; i <= world * 100 && i <= LEVEL_COUNT; i++) if (stars[i] > 0) n++;
+        return n;
     }
 
     public boolean useHint() {

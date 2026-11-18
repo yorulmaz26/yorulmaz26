@@ -2,6 +2,7 @@
 
 Işık kaynağından çıkan ışını aynalar, prizmalar, renk filtreleri, hareketli bloklar ve
 kapı–anahtar düzenekleriyle hedeflere ulaştırdığın, bölüm geçmeli bir mantık bulmacası.
+**500 bölüm**: 5 dünya × 10 grup × 10 bölüm.
 Android için **Java** ile, **Android Studio / Gradle** projesi olarak geliştirildi; dikey (9:16),
 tamamen çevrimdışı, Türkçe.
 
@@ -12,13 +13,13 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.0.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.0.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.1.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.1.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
 | Motor testleri | `./gradlew :engine:test` |
 | Arayüz testleri + ekran görüntüleri | `./gradlew :app:testDebugUnitTest` → `docs/ekranlar/*.png` |
-| Bölümleri yeniden üret | `./gradlew :engine:generateLevels -Pfrom=1 -Pto=100` |
+| Bölümleri yeniden üret | `./gradlew :engine:generateLevels -Pfrom=1 -Pto=500` |
 | Sesleri yeniden üret | `java tools/SoundGen.java app/src/main/res/raw` |
 
 Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` içinde `sdk.dir` olmalı
@@ -26,7 +27,7 @@ Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` 
 
 ## Oynanış
 
-- **Aynalar:** turkuaz halkalı aynaya dokun, 90° döner (`/` ↔ `\`). Koyu çerçeveli aynalar sabittir.
+- **Aynalar:** turkuaz çentikli döner tabandaki aynaya dokun, 90° döner (`/` ↔ `\`). Cıvatalı çelik yuvadaki bronz çerçeveli aynalar sabittir.
 - **Duvarlar** ve **kaynak kutuları** ışığı durdurur.
 - **Renkli ışık:** hedef halka yalnızca kendi rengindeki ışıkla yanar. Işınlar hedefte karışır: kırmızı + yeşil = sarı,
   kırmızı + mavi = pembe, yeşil + mavi = camgöbeği. Halkadaki küçük noktalar karışımın bileşenlerini gösterir.
@@ -37,8 +38,20 @@ Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` 
 - Bütün hedefler aynı anda doğru renkte yandığında bölüm biter.
 - **Yıldızlar:** optimum hamlede 3 ★, optimum + max(2, ⌈optimum/2⌉) hamleye kadar 2 ★, daha fazlası 1 ★.
   Optimum, her bölüm için BFS çözücüyle hesaplanmıştır. Geri Al hamle sayısını da geri alır.
-- **İpucu:** 5 ipucuyla başlanır; bir bölümü ilk seferde 3 ★ ile bitirmek +1 ipucu verir. İpucu, mevcut durumdan
-  en kısa çözümün ilk hamlesini tahtada altın halkayla gösterir.
+- **İpucu:** 3 ipucuyla başlanır; **her 10 bölüm tamamlandığında +1 ipucu** kazanılır (aynı bölümü tekrar
+  oynamak sayılmaz). İpucu, mevcut durumdan en kısa çözümün ilk hamlesini tahtada altın halkayla gösterir.
+
+## Dünyalar
+
+| Dünya | Bölümler | Zorluk | Özellik |
+|---|---|---|---|
+| Işık Bahçesi | 1–100 | Başlangıç | 10 mekanik sırayla öğretilir |
+| Kristal Mağaralar | 101–200 | Zor | Aynı konular, daha uzun yollar, daha çok yanıltıcı ayna |
+| Gece Bahçesi | 201–300 | Uzman | Her grupta ek düzenek (ek kaynak, filtre, blok veya kapı) |
+| Yıldız Atölyesi | 301–400 | Usta | 8 sütunlu büyük tahtalar |
+| Işık Tapınağı | 401–500 | Efsane | 8×11 tahtalar, en uzun çözümler |
+
+Bölüm seçme ekranında dünyalar sekme olarak gösterilir; yeni dünyaya girişte tanıtım kartı açılır.
 
 ## Ekranlar
 
@@ -46,13 +59,13 @@ Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` 
 |---|---|---|
 | 1 | Açılış (animasyonlu amblem, bölümler arka planda yüklenir) | `screens/SplashScreen` |
 | 2 | Ana menü (devam et, yıldız sayacı, kutucuklar) | `screens/MenuScreen` |
-| 3 | Bölüm seçme (10 grup × 10, yıldızlar, kilitler) | `screens/LevelSelectScreen` |
+| 3 | Bölüm seçme (5 dünya sekmesi, her dünyada 10 grup × 10, yıldızlar, kilitler) | `screens/LevelSelectScreen` |
 | 4 | Oyun (tahta, hamle sayacı, canlı yıldız göstergesi, Geri Al / Sıfırla / İpucu) | `screens/GameScreen` |
 | 5 | Duraklatma (devam, yeniden başla, ses/müzik/titreşim) | `GameScreen#showPause` |
 | 6 | Bölüm tamamlandı (yıldız animasyonu, sonraki bölüm) | `GameScreen#showComplete` |
 | 7 | İpucu penceresi | `GameScreen#requestHint` |
 | 8 | Günlük bulmaca (tarih, seri, son 7 gün) | `screens/DailyScreen` |
-| 9 | Başarılar (17 başarı, ilerleme çubukları) | `screens/AchievementsScreen` |
+| 9 | Başarılar (25 başarı, ilerleme çubukları) | `screens/AchievementsScreen` |
 | 10 | Ayarlar (ses, müzik, titreşim, öğretici, ilerlemeyi sıfırla) | `screens/SettingsScreen` |
 
 Ayrıca: Türkçe öğretici (ilk açılışta 3 sayfa, her yeni mekanikte canlı örnek tahtalı tanıtım kartı,
@@ -68,7 +81,7 @@ isik-yolu/
     Solver         BFS en kısa çözüm (optimum hamle, ipucu); kutulama yapmayan özel hash tablosu
     GameSession    oturum: dokunma, sürükleme, geri alma, sıfırlama, ipucu, yıldız
     LevelGenerator çözümden geriye bölüm üretici + çözücü doğrulaması
-    Chapters       10 grup: adlar, konular, mekanik açıklamaları, üretici ayarları
+    Chapters       5 dünya / 50 grup: adlar, konular, mekanik açıklamaları, üretici ayarları ve zorlaştırma
     DailyPuzzle    tarihten deterministik günlük bulmaca
     Progress, Achievements, StarRating, Json, Level, LevelPack
     tools/         GenerateLevels (bölüm üretimi), Ascii (metin çizimi)
@@ -79,7 +92,7 @@ isik-yolu/
     screens/       10 ekran
     ui/            BoardView (Canvas çizimi + dokunma), BackgroundView, LogoView, StarsView,
                    Overlay, TutorialOverlay, Demos, Icon (vektör ikonlar), Palette, Ui
-    assets/levels.json   100 bölüm (JSON, veri odaklı)
+    assets/levels.json   500 bölüm (JSON, veri odaklı)
     res/raw/*.wav        sentezlenmiş sesler ve müzik
   tools/SoundGen.java    ses ve müzik sentezleyicisi
   teslimat/              hazır APK'lar
@@ -106,7 +119,10 @@ Motor görselden tamamen bağımsızdır: `BoardView` yalnızca `GameSession`'ı
 3. Yol üzerindeki aynaların bir kısmı sabitlenir, kalanları karıştırılır; yol dışına yanıltıcı ayna, filtre ve duvar eklenir.
 4. BFS ile doğrulanır. Bölüm şu durumlarda reddedilir: çözülemiyorsa, başlangıçta zaten çözülmüşse, optimum hedef
    aralıkta değilse, durum uzayı ipucu için fazla büyükse, kapı başlangıçta açıksa ya da düzen başka bir bölümün kopyasıysa.
-5. Tohumlar sabittir; aynı komut aynı 100 bölümü üretir.
+5. Sonraki dünyalarda aynı ayarlar zorlaştırılır: daha büyük tahta, daha çok dönüş ve yanıltıcı nesne, daha
+   yüksek optimum, 3. dünyadan itibaren grup başına ek düzenek. Bir bölüm istenen aralıkta üretilemezse aralık
+   adım adım gevşetilir.
+6. Tohumlar sabittir; aynı komut aynı 500 bölümü üretir. İlk 100 bölüm önceki sürümle birebir aynıdır, kayıtlar bozulmaz.
 
 ## Unity terimlerinin karşılıkları
 
@@ -123,7 +139,7 @@ Motor görselden tamamen bağımsızdır: `BoardView` yalnızca `GameSession`'ı
 - Çizim sırasında bellek ayrılmaz; boyalar, `Path` ve `RectF` önceden oluşturulur. Parçacıklar sabit boyutlu havuzda tutulur (en fazla 280).
 - Işın yeniden yalnızca hamleden sonra hesaplanır; değişmeyen ışın parçaları yeniden animasyona girmez.
 - Arka plan 30 FPS, tahta 60 FPS (`postInvalidateOnAnimation`) çalışır. Tahta donanım katmanında çizilir.
-- İpucu BFS'i arka plan iş parçacığında çalışır. En büyük bölümün durum uzayı 44 992'dir.
+- İpucu BFS'i arka plan iş parçacığında çalışır. En büyük bölümün durum uzayı 79 872'dir (sınır 80 000).
 
 ## Gizlilik
 

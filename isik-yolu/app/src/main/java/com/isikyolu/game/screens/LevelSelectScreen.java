@@ -20,10 +20,12 @@ import com.isikyolu.game.ui.Palette;
 import com.isikyolu.game.ui.SquareFrame;
 import com.isikyolu.game.ui.Ui;
 
-/** 3. Bölüm seçme: 10 grup × 10 bölüm, yıldızlar ve kilitler. */
+/** 3. Bölüm seçme: 5 dünya sekmesi, her dünyada 10 grup × 10 bölüm, yıldızlar ve kilitler. */
 public final class LevelSelectScreen extends Screen {
     private final ScrollView sv;
+    private final LinearLayout list, tabs;
     private View currentChapterView;
+    private int world;
 
     public LevelSelectScreen(MainActivity a) {
         super(a);
@@ -33,28 +35,79 @@ public final class LevelSelectScreen extends Screen {
         pill.setBackground(Ui.round(0x22F5C542, Ui.dp(a, 14)));
         pill.setPadding(Ui.dp(a, 10), Ui.dp(a, 5), Ui.dp(a, 12), Ui.dp(a, 5));
         pill.addView(Ui.icon(a, Icon.STAR, Palette.GOLD, 16));
-        pill.addView(Ui.text(a, " " + p.totalStars() + "/300", 14, Palette.GOLD, Ui.BOLD));
+        pill.addView(Ui.text(a, " " + p.totalStars() + "/" + Progress.LEVEL_COUNT * 3, 14, Palette.GOLD, Ui.BOLD));
         root.addView(Ui.header(a, "Bölümler", v -> a.goMenu(), pill));
+
+        android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(a);
+        hs.setHorizontalScrollBarEnabled(false);
+        tabs = Ui.horizontal(a);
+        tabs.setPadding(Ui.dp(a, 12), Ui.dp(a, 2), Ui.dp(a, 12), Ui.dp(a, 6));
+        hs.addView(tabs);
+        root.addView(hs);
 
         sv = new ScrollView(a);
         sv.setVerticalScrollBarEnabled(false);
-        LinearLayout list = Ui.vertical(a);
+        list = Ui.vertical(a);
         int pad = Ui.dp(a, 16);
         list.setPadding(pad, Ui.dp(a, 4), pad, Ui.dp(a, 28));
-        int next = p.nextLevel();
-        for (int ch = 1; ch <= Chapters.COUNT; ch++) {
-            View v = chapter(a, p, ch, next);
-            list.addView(v, Ui.lpMargins(a, -1, -2, 0, 8, 0, 8));
-            if (ch == Chapters.chapterOf(next)) currentChapterView = v;
-        }
         sv.addView(list);
         root.addView(sv, new LinearLayout.LayoutParams(-1, 0, 1f));
         addView(root, new LayoutParams(-1, -1));
+        world = Chapters.worldOf(p.nextLevel());
+        showWorld(world, true);
+        final int w0 = world;
+        hs.post(() -> { View t = tabs.getChildAt(w0 - 1); if (t != null) hs.smoothScrollTo(Math.max(0, t.getLeft() - Ui.dp(a, 24)), 0); });
     }
 
-    @Override public void onShow() {
-        if (currentChapterView != null)
-            sv.post(() -> sv.scrollTo(0, Math.max(0, currentChapterView.getTop() - Ui.dp(getContext(), 8))));
+    private void buildTabs() {
+        Context c = getContext();
+        Progress p = Game.progress();
+        tabs.removeAllViews();
+        for (int w = 1; w <= Chapters.WORLDS; w++) {
+            final int ww = w;
+            boolean open = p.isUnlocked((w - 1) * 100 + 1);
+            boolean sel = w == world;
+            LinearLayout t = Ui.vertical(c);
+            t.setGravity(Gravity.CENTER);
+            t.setPadding(Ui.dp(c, 14), Ui.dp(c, 8), Ui.dp(c, 14), Ui.dp(c, 8));
+            GradientDrawable bg;
+            if (sel) bg = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF22C7B2, 0xFF3D8CE8});
+            else bg = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{0xFF1E2C4A, 0xFF172238});
+            bg.setCornerRadius(Ui.dp(c, 16));
+            if (!sel) bg.setStroke(Ui.dp(c, 1), 0x33A9C1FF);
+            t.setBackground(bg);
+            TextView n = Ui.text(c, Chapters.WORLD_NAMES[w - 1], 14, sel ? Palette.WHITE : (open ? Palette.WHITE : Palette.TEXT_FAINT), Ui.BOLD);
+            t.addView(n);
+            TextView sub = Ui.text(c, open ? p.completedInWorld(w) + "/100" : "Kilitli", 11, sel ? 0xDDFFFFFF : Palette.TEXT_DIM, Ui.MEDIUM);
+            t.addView(sub);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
+            lp.rightMargin = Ui.dp(c, 8);
+            Ui.clickable(t, v -> { if (ww != world) showWorld(ww, false); });
+            tabs.addView(t, lp);
+        }
+    }
+
+    private void showWorld(int w, boolean scrollToCurrent) {
+        world = w;
+        buildTabs();
+        Progress p = Game.progress();
+        Context c = getContext();
+        list.removeAllViews();
+        currentChapterView = null;
+        TextView intro = Ui.text(c, Chapters.WORLD_INTROS[w - 1], 14, Palette.TEXT_DIM, Ui.REGULAR);
+        intro.setGravity(Gravity.CENTER);
+        list.addView(intro, Ui.lpMargins(c, -1, -2, 8, 4, 8, 6));
+        int next = p.nextLevel();
+        for (int ch = (w - 1) * 10 + 1; ch <= w * 10; ch++) {
+            View v = chapter((MainActivity) c, p, ch, next);
+            list.addView(v, Ui.lpMargins(c, -1, -2, 0, 8, 0, 8));
+            if (ch == Chapters.chapterOf(next)) currentChapterView = v;
+        }
+        list.setAlpha(0f);
+        list.animate().alpha(1f).setDuration(220).start();
+        if (scrollToCurrent && currentChapterView != null)
+            sv.post(() -> sv.scrollTo(0, Math.max(0, currentChapterView.getTop() - Ui.dp(c, 8))));
+        else sv.scrollTo(0, 0);
     }
 
     private View chapter(MainActivity a, Progress p, int ch, int next) {
@@ -76,7 +129,7 @@ public final class LevelSelectScreen extends Screen {
         LinearLayout tc = Ui.vertical(c);
         tc.setPadding(Ui.dp(c, 12), 0, 0, 0);
         tc.addView(Ui.text(c, Chapters.NAMES[ch - 1], 17, open ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
-        tc.addView(Ui.text(c, first + "–" + (first + 9) + " · " + Chapters.TOPICS[ch - 1], 13, Palette.TEXT_DIM, Ui.REGULAR));
+        tc.addView(Ui.text(c, first + "–" + (first + 9) + " · " + Chapters.topic(ch), 13, Palette.TEXT_DIM, Ui.REGULAR));
         head.addView(tc, new LinearLayout.LayoutParams(0, -2, 1f));
         head.addView(Ui.icon(c, open ? Icon.STAR : Icon.LOCK, open ? Palette.GOLD : Palette.TEXT_FAINT, 16));
         head.addView(Ui.text(c, " " + stars + "/30", 13, open ? Palette.GOLD : Palette.TEXT_FAINT, Ui.MEDIUM));
@@ -97,6 +150,7 @@ public final class LevelSelectScreen extends Screen {
     }
 
     static int chapterColor(int ch) {
+        ch = Chapters.mechanicOf(ch);
         int[] cols = {Palette.TURQUOISE, 0xFF34C6D8, 0xFF8F9BB8, 0xFFFF6F7D, 0xFFE15CFF, 0xFFB8C8FF,
                 Palette.PURPLE, Palette.GOLD, 0xFFFF9F43, 0xFF3DDC84};
         return cols[(ch - 1) % cols.length];

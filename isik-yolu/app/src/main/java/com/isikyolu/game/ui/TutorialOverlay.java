@@ -109,6 +109,14 @@ public final class TutorialOverlay extends Overlay {
                 Chapters.NAMES[ch - 1], Chapters.MECHANICS[ch - 1], Demos.chapter(ch));
     }
 
+    /** Yeni dünyaya giriş kartı (101, 201, ...). */
+    public static TutorialOverlay world(Context c, int w) {
+        List<Page> l = new ArrayList<>();
+        l.add(new Page("YENİ DÜNYA · " + w + "/" + Chapters.WORLDS, Chapters.WORLD_NAMES[w - 1],
+                Chapters.WORLD_INTROS[w - 1], Demos.chapter(10)));
+        return new TutorialOverlay(c, l);
+    }
+
     public static TutorialOverlay first(Context c) { return new TutorialOverlay(c, basics()); }
 
     public static TutorialOverlay chapter(Context c, int ch) {
@@ -119,7 +127,7 @@ public final class TutorialOverlay extends Overlay {
 
     public static TutorialOverlay full(Context c) {
         List<Page> l = basics();
-        for (int ch = 1; ch <= Chapters.COUNT; ch++) l.add(mechanic(ch));
+        for (int ch = 1; ch <= Chapters.MECHANIC_COUNT; ch++) l.add(mechanic(ch));
         TutorialOverlay t = new TutorialOverlay(c, l);
         t.setCancelable(true);
         return t;

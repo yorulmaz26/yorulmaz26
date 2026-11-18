@@ -11,9 +11,9 @@ public class LevelPackTest {
 
     @Test public void allLevelsLoad() throws Exception {
         LevelPack p = TestUtil.pack();
-        assertEquals(100, p.size());
+        assertEquals(Progress.LEVEL_COUNT, p.size());
         Set<String> sigs = new HashSet<>();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= Progress.LEVEL_COUNT; i++) {
             Level l = p.get(i);
             assertNotNull("eksik bölüm " + i, l);
             assertEquals(Chapters.chapterOf(i), l.chapter);
@@ -30,12 +30,13 @@ public class LevelPackTest {
 
     @Test public void chaptersIntroduceTheirMechanics() throws Exception {
         LevelPack p = TestUtil.pack();
-        for (int i = 1; i <= 100; i++) {
+        for (int i = 1; i <= Progress.LEVEL_COUNT; i++) {
             Level l = p.get(i);
-            int ch = l.chapter;
+            int ch = Chapters.mechanicOf(l.chapter);
+            int world = Chapters.worldOf(i);
             boolean colored = false;
             for (Piece x : l.pieces) if (x.type == Cell.SOURCE && x.color != LightColor.WHITE) colored = true;
-            if (ch <= 2) {
+            if (ch <= 2 && world <= 2) {
                 assertEquals(0, l.count(Cell.FILTER) + l.count(Cell.PRISM) + l.count(Cell.BLOCK) + l.count(Cell.DOOR));
                 assertFalse(colored);
             }
@@ -71,7 +72,17 @@ public class LevelPackTest {
         assertEquals(1, p.get(1).optimal);
         assertTrue(avg[10] > avg[1]);
         assertTrue(avg[2] > avg[1]);
-        for (int ch = 1; ch <= 10; ch++) {
+        // dünyalar giderek zorlaşır
+        double prevWorld = 0;
+        for (int w = 1; w <= Chapters.WORLDS; w++) {
+            double sum = 0;
+            for (int i = 1; i <= 100; i++) sum += p.get((w - 1) * 100 + i).optimal;
+            double avgW = sum / 100;
+            System.out.printf("Dünya %d ortalama optimum: %.2f%n", w, avgW);
+            assertTrue("dünya " + w, avgW > prevWorld);
+            prevWorld = avgW;
+        }
+        for (int ch = 1; ch <= Chapters.COUNT; ch++) {
             // bölüm grubunun ikinci yarısı ilk yarısından kolay olmamalı
             double a = 0, b = 0;
             for (int i = 1; i <= 5; i++) a += p.get((ch - 1) * 10 + i).optimal;

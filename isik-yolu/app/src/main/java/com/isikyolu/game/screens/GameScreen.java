@@ -62,7 +62,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         LinearLayout tc = Ui.vertical(c);
         tc.setPadding(Ui.dp(c, 14), 0, Ui.dp(c, 8), 0);
         String t = daily ? "Günlük Bulmaca" : "Bölüm " + lvl.id;
-        String sub = daily ? DailyScreen.prettyDate(epochDay) : Chapters.NAMES[lvl.chapter - 1] + " · " + Chapters.TOPICS[lvl.chapter - 1];
+        String sub = daily ? DailyScreen.prettyDate(epochDay) : Chapters.NAMES[lvl.chapter - 1] + " · " + Chapters.topic(lvl.chapter);
         tc.addView(Ui.text(c, t, 21, Palette.WHITE, Ui.BOLD));
         TextView st = Ui.text(c, sub, 13, Palette.TEXT_DIM, Ui.REGULAR);
         st.setSingleLine(true);
@@ -155,8 +155,10 @@ public final class GameScreen extends Screen implements BoardView.Host {
             }).show(act.overlayLayer());
         } else if (level.id == 1 && p.stars[1] == 0) {
             pointFirstMove();
-        } else if (level.id % 10 == 1 && p.stars[level.id] == 0) {
+        } else if (level.id <= 100 && level.id % 10 == 1 && p.stars[level.id] == 0) {
             TutorialOverlay.chapter(act, level.chapter).show(act.overlayLayer());
+        } else if (level.id > 100 && level.id % 100 == 1 && p.stars[level.id] == 0) {
+            TutorialOverlay.world(act, Chapters.worldOf(level.id)).show(act.overlayLayer());
         }
     }
 
@@ -259,11 +261,11 @@ public final class GameScreen extends Screen implements BoardView.Host {
         o.cardView().addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 68), Ui.dp(c, 68)));
         o.title("İpucu");
         if (p.hints > 0) {
-            o.body("Bir sonraki doğru hamle tahtada altın halkayla gösterilir.\nKalan ipucu: " + p.hints);
+            o.body("Bir sonraki doğru hamle tahtada altın halkayla gösterilir.\nKalan ipucu: " + p.hints + "\nHer 10 bölümde +1 ipucu · sonrakine " + p.levelsUntilNextHint() + " bölüm");
             o.button("İpucu Göster", Ui.GOLD, Icon.BULB, v -> { o.dismiss(); useHint(); });
             o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
         } else {
-            o.body("İpucun kalmadı.\nBir bölümü ilk denemede 3 yıldızla bitirdiğinde +1 ipucu kazanırsın.");
+            o.body("İpucun kalmadı.\nHer 10 bölüm tamamladığında +1 ipucu kazanırsın.\nSonraki ipucuna " + p.levelsUntilNextHint() + " bölüm kaldı.");
             o.button("Tamam", Ui.PRIMARY, -1, v -> o.dismiss());
         }
         o.show(act.overlayLayer());
@@ -348,18 +350,23 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (daily) b.append("\nSeri: ").append(Game.progress().dailyStreak(DailyPuzzle.today())).append(" gün");
         o.body(b.toString());
         if (rewarded) {
-            TextView r = Ui.text(c, "+1 ipucu kazandın!", 15, Palette.GOLD, Ui.BOLD);
+            TextView r = Ui.text(c, "+1 ipucu kazandın! (" + Game.progress().completedCount() + " bölüm tamamlandı)", 15, Palette.GOLD, Ui.BOLD);
+            r.setGravity(Gravity.CENTER);
             o.cardView().addView(r, Ui.lpMargins(c, -2, -2, 0, 4, 0, 4));
+        }
+        if (!rewarded && !daily && first) {
+            TextView r = Ui.text(c, "Sonraki ipucuna " + Game.progress().levelsUntilNextHint() + " bölüm kaldı", 13, Palette.TEXT_DIM, Ui.MEDIUM);
+            o.cardView().addView(r, Ui.lpMargins(c, -2, -2, 0, 0, 0, 4));
         }
         if (daily) {
             o.button("Ana Menü", Ui.PRIMARY, Icon.HOME, v -> { o.dismiss(); act.goMenu(); });
             o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.goDailyGame(level, epochDay); });
-        } else if (level.id < 100) {
+        } else if (level.id < Progress.LEVEL_COUNT) {
             o.button("Sonraki Bölüm", Ui.PRIMARY, Icon.NEXT, v -> { o.dismiss(); act.goLevel(level.id + 1); });
             o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.goLevel(level.id); });
             o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); act.goLevels(); });
         } else {
-            o.body("Tebrikler! 100 bölümün hepsini bitirdin. Sen gerçek bir Işık Ustasısın!");
+            o.body("Tebrikler! " + Progress.LEVEL_COUNT + " bölümün hepsini bitirdin. Sen gerçek bir Işık Ustasısın!");
             o.button("Bölümler", Ui.PRIMARY, Icon.GRID, v -> { o.dismiss(); act.goLevels(); });
             o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.goLevel(level.id); });
         }

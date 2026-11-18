@@ -2,9 +2,12 @@ package com.isikyolu.game.ui;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.graphics.LinearGradient;
+import android.graphics.Shader;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -49,25 +52,41 @@ public final class Ui {
         return g;
     }
 
-    public static GradientDrawable card(Context c) {
+    /** Cam efektli kart: degrade dolgu, ince açık kenar ve üstte yumuşak ışık. */
+    public static Drawable card(Context c) {
+        float r = dp(c, 22);
         GradientDrawable g = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
-                new int[]{0xFF1B2843, 0xFF151F34});
-        g.setCornerRadius(dp(c, 22));
-        g.setStroke(dp(c, 1), Palette.CARD_BORDER);
-        return g;
+                new int[]{0xF21E2D4D, 0xF2172340, 0xF2121B31});
+        g.setCornerRadius(r);
+        g.setStroke(dp(c, 1), 0x33A9C1FF);
+        GradientDrawable shine = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM,
+                new int[]{0x1AFFFFFF, 0x00FFFFFF});
+        shine.setCornerRadius(r);
+        LayerDrawable l = new LayerDrawable(new Drawable[]{g, shine});
+        l.setLayerInset(1, dp(c, 1), dp(c, 1), dp(c, 1), dp(c, 40));
+        return l;
+    }
+
+    /** Metne yatay renk geçişi uygular (başlıklar için). */
+    public static void gradientText(TextView t, int... colors) {
+        t.addOnLayoutChangeListener((v, l, top, r, b, ol, ot, or, ob) -> {
+            float w = t.getPaint().measureText(t.getText().toString());
+            t.getPaint().setShader(new LinearGradient(0, 0, Math.max(1, w), 0, colors, null, Shader.TileMode.CLAMP));
+            if (r - l != or - ol) t.invalidate();
+        });
     }
 
     private static Drawable buttonBg(Context c, int style, float radius) {
         GradientDrawable g;
         switch (style) {
             case PRIMARY:
-                g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF20B8A6, 0xFF1AA0C8});
+                g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF22C7B2, 0xFF1AA8C6, 0xFF3D8CE8});
                 break;
             case GOLD:
-                g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFFF5C542, 0xFFF0A93A});
+                g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFFFFD45E, 0xFFF5C542, 0xFFF09A38});
                 break;
             case PURPLE:
-                g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF6D5DFB, 0xFF8B5DFB});
+                g = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, new int[]{0xFF6D5DFB, 0xFF9A5DFB});
                 break;
             case GHOST:
                 g = new GradientDrawable();
@@ -79,8 +98,16 @@ public final class Ui {
                 g.setStroke(dp(c, 1), 0xFF2E3D5C);
         }
         g.setCornerRadius(radius);
+        Drawable content = g;
+        if (style != GHOST) {
+            GradientDrawable shine = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[]{0x2EFFFFFF, 0x00FFFFFF});
+            shine.setCornerRadius(radius);
+            LayerDrawable l = new LayerDrawable(new Drawable[]{g, shine});
+            l.setLayerInset(1, 0, 0, 0, dp(c, 22));
+            content = l;
+        }
         GradientDrawable mask = round(0xFFFFFFFF, radius);
-        return new RippleDrawable(ColorStateList.valueOf(0x33FFFFFF), g, mask);
+        return new RippleDrawable(ColorStateList.valueOf(0x33FFFFFF), content, mask);
     }
 
     public static int textColorFor(int style) { return style == GOLD ? Palette.NIGHT : Palette.WHITE; }

@@ -1,12 +1,37 @@
 package com.isikyolu.engine;
 
-/** 10 bölüm grubu: adlar, yeni mekanik açıklamaları ve üretici ayarları. */
+/**
+ * 500 bölüm = 5 dünya × 10 grup × 10 bölüm. İlk dünya mekanikleri sırayla öğretir; sonraki dünyalar
+ * aynı on konuyu daha büyük tahtalarda, daha çok yanıltıcı nesne ve ek mekaniklerle tekrar işler.
+ */
 public final class Chapters {
-    public static final int COUNT = 10;
+    /** Toplam grup sayısı. */
+    public static final int COUNT = 50;
+    /** Mekanik konusu sayısı (her dünyada tekrar eder). */
+    public static final int MECHANIC_COUNT = 10;
+    public static final int WORLDS = 5;
+
+    public static final String[] WORLD_NAMES = {"Işık Bahçesi", "Kristal Mağaralar", "Gece Bahçesi", "Yıldız Atölyesi", "Işık Tapınağı"};
+    public static final String[] WORLD_LEVELS = {"Başlangıç", "Zor", "Uzman", "Usta", "Efsane"};
+    public static final String[] WORLD_INTROS = {
+            "Işığın temel kurallarını öğren.",
+            "Bildiğin mekanikler, daha çok ayna ve daha uzun yollarla geri dönüyor.",
+            "Mekanikler birbirine karışıyor: her grupta beklenmedik bir ek düzenek var.",
+            "Daha büyük tahtalar ve daha az hata payı. Planlamadan dokunma!",
+            "Son sınav: en uzun yollar, en çok yanıltıcı nesne. Gerçek Işık Ustaları için."
+    };
 
     public static final String[] NAMES = {
             "İlk Kıvılcım", "Ayna Labirenti", "Gölge Duvarlar", "Renk Cümbüşü", "Süzgeç Atölyesi",
-            "Prizma Bahçesi", "Çoklu Hedef", "Hareketli Taşlar", "Kilitli Kapılar", "Işığın Ustası"
+            "Prizma Bahçesi", "Çoklu Hedef", "Hareketli Taşlar", "Kilitli Kapılar", "Işığın Ustası",
+            "Kristal Kapı", "Yankı Odası", "Taş Koridor", "Renkli Damlalar", "Cam Süzgeçler",
+            "Gökkuşağı Kuyusu", "Çifte Parıltı", "Kayan Kayalar", "Mühürlü Geçit", "Mağaranın Kalbi",
+            "Ay Işığı", "Sarmaşık Yolu", "Gölge Çitler", "Çiçek Renkleri", "Sisli Cam",
+            "Çiy Prizması", "Ateşböcekleri", "Bahçe Taşları", "Gizli Kapılar", "Gece Yarısı",
+            "Yıldız Tozu", "Kuyruklu Yıldız", "Kara Delik", "Nebula", "Yıldız Camı",
+            "Takımyıldızı", "Çifte Güneş", "Gezegen Taşları", "Kozmik Kilit", "Süpernova",
+            "Tapınak Kapısı", "Sonsuz Aynalar", "Kadim Duvarlar", "Altın Renkler", "Mabet Camları",
+            "Işık Sunağı", "Yedi Hedef", "Kayan Sütunlar", "Son Mühür", "Işığın Kalbi"
     };
 
     /** Bölüm aralıklarının konusu. */
@@ -32,8 +57,71 @@ public final class Chapters {
 
     public static int chapterOf(int levelId) { return (levelId - 1) / 10 + 1; }
 
-    /** Bölüm numarası için üretici ayarı (1–100). */
+    public static int worldOf(int levelId) { return (levelId - 1) / 100 + 1; }
+
+    public static int worldOfChapter(int chapter) { return (chapter - 1) / 10 + 1; }
+
+    /** Grubun mekanik konusu (1–10). */
+    public static int mechanicOf(int chapter) { return (chapter - 1) % 10 + 1; }
+
+    /** Grup konusu, dünya zorluğuyla birlikte. */
+    public static String topic(int chapter) {
+        int w = worldOfChapter(chapter);
+        String t = TOPICS[mechanicOf(chapter) - 1];
+        return w == 1 ? t : t + " · " + WORLD_LEVELS[w - 1];
+    }
+
+    /** Bölüm numarası için üretici ayarı (1–500). */
     public static LevelGenerator.Config configFor(int levelId) {
+        int local = (levelId - 1) % 100 + 1;
+        int k = worldOf(levelId) - 1;
+        LevelGenerator.Config c = baseConfig(local);
+        if (k > 0) harden(c, k, (local - 1) / 10 + 1, (local - 1) % 10);
+        // Tek kaynaklı ayna bölümlerinde optimum, yoldaki ayna sayısını aşamaz.
+        if (c.sourceColors.length == 1 && c.prismSources == 0 && c.blocks == 0 && c.doors == 0) {
+            c.turnsMax = Math.max(c.turnsMax, c.minOpt + 1);
+            c.turnsMin = Math.max(c.turnsMin, Math.min(c.minOpt, c.turnsMax));
+        }
+        return c;
+    }
+
+    /** Sonraki dünyalar için zorlaştırma: k = 1..4. */
+    static void harden(LevelGenerator.Config c, int k, int mech, int i) {
+        c.w = Math.min(8, c.w + (k >= 2 ? 1 : 0));
+        c.h = Math.min(11, c.h + (k >= 1 ? 1 : 0) + (k >= 3 ? 1 : 0));
+        c.turnsMin = Math.min(4, c.turnsMin + (k >= 2 ? 1 : 0));
+        c.turnsMax = Math.min(6, c.turnsMax + 1 + (k >= 3 ? 1 : 0));
+        c.decoyRot += k;
+        c.decoyFixed += k / 2;
+        c.walls += 2 * k;
+        c.fixedFrac = Math.max(c.fixedFrac, 0.2);
+        if (k >= 2) {
+            // her grupta farklı ek düzenek
+            int extra = (mech + i) % 4;
+            boolean white = c.sourceColors[0] == LightColor.WHITE;
+            if (extra == 0 && c.sourceColors.length < 3) {
+                int[] s = java.util.Arrays.copyOf(c.sourceColors, c.sourceColors.length + 1);
+                s[s.length - 1] = LightColor.WHITE;
+                c.sourceColors = s;
+            } else if (extra == 1) {
+                c.decoyFilters += 1;
+                if (white && c.filterSources == 0 && c.prismSources == 0) c.filterSources = 1;
+            } else if (extra == 2) {
+                c.blocks = Math.max(c.blocks, 1);
+            } else {
+                if (c.sourceColors.length < 2) c.sourceColors = new int[]{c.sourceColors[0], LightColor.WHITE};
+                c.doors = Math.max(c.doors, 1);
+            }
+        }
+        int base = c.minOpt;
+        c.minOpt = base + k + (k >= 3 ? 1 : 0);
+        c.maxOpt = c.minOpt + 3;
+        c.maxRot = c.blocks > 0 ? Math.min(11, c.maxRot + 2) : 16;
+        if (c.blocks > 1) c.maxRot = 8;
+        c.stateCap = 80000;
+    }
+
+    private static LevelGenerator.Config baseConfig(int levelId) {
         int ch = chapterOf(levelId), i = (levelId - 1) % 10;
         LevelGenerator.Config c = new LevelGenerator.Config();
         final int W = LightColor.WHITE, R = LightColor.RED, G = LightColor.GREEN, B = LightColor.BLUE;
@@ -116,11 +204,6 @@ public final class Chapters {
                 mixed(c, i);
                 c.minOpt = 5 + i / 3; c.maxOpt = c.minOpt + 3; c.maxRot = 14;
                 break;
-        }
-        // Tek kaynaklı ayna bölümlerinde optimum, yoldaki ayna sayısını aşamaz.
-        if (c.sourceColors.length == 1 && c.prismSources == 0 && c.blocks == 0 && c.doors == 0) {
-            c.turnsMax = Math.max(c.turnsMax, c.minOpt + 1);
-            c.turnsMin = Math.max(c.turnsMin, Math.min(c.minOpt, c.turnsMax));
         }
         return c;
     }

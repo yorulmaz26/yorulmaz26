@@ -2,6 +2,9 @@ package com.isikyolu.game.ui;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.LinearGradient;
+import android.graphics.RadialGradient;
+import android.graphics.Shader;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -84,6 +87,8 @@ public final class BoardView extends View {
     private final Paint beam = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final RectF rect = new RectF();
+    private final Paint shaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Shader glassShader, glassFixedShader, plateShader, mountShader, frameShader;
 
     public BoardView(Context c) {
         super(c);
@@ -116,6 +121,7 @@ public final class BoardView extends View {
         pcount = 0;
         clearHint();
         refreshBeams(true);
+        if (getWidth() > 0) layoutBoard();
         requestLayout();
         invalidate();
     }
@@ -228,6 +234,22 @@ public final class BoardView extends View {
         cell = Math.min((getWidth() - 2 * pad) / gw, (getHeight() - 2 * pad) / gh);
         ox = (getWidth() - cell * gw) / 2f;
         oy = (getHeight() - cell * gh) / 2f;
+        buildShaders();
+    }
+
+    /** Çizimde ayırma yapmamak için gölgelendiriciler boyut değişince bir kez kurulur. */
+    private void buildShaders() {
+        if (cell <= 0) return;
+        float T = cell * 0.085f;
+        glassShader = new LinearGradient(0, -T, 0, T, new int[]{0xFFFFFFFF, 0xFFD6E6FA, 0xFF9DBBE6, 0xFF6F8FC4},
+                new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
+        glassFixedShader = new LinearGradient(0, -T, 0, T, new int[]{0xFFF2F0EA, 0xFFC9CCD6, 0xFF8E95A8, 0xFF656C80},
+                new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
+        plateShader = new RadialGradient(-cell * 0.1f, -cell * 0.12f, cell * 0.5f, new int[]{0xFF34466E, 0xFF1E2A46, 0xFF141C31},
+                new float[]{0f, 0.6f, 1f}, Shader.TileMode.CLAMP);
+        mountShader = new LinearGradient(0, -cell * 0.4f, 0, cell * 0.4f, 0xFF46526F, 0xFF262F47, Shader.TileMode.CLAMP);
+        frameShader = new LinearGradient(ox, oy, ox + gw * cell, oy + gh * cell,
+                new int[]{0xFF20B8A6, 0xFF6D5DFB, 0xFFF5C542}, null, Shader.TileMode.CLAMP);
     }
 
     private final float[] tmp = new float[2];
@@ -285,18 +307,35 @@ public final class BoardView extends View {
     }
 
     private void drawBoardBack(Canvas c) {
-        float r = cell * 0.3f;
-        rect.set(ox - cell * 0.18f, oy - cell * 0.18f, ox + gw * cell + cell * 0.18f, oy + gh * cell + cell * 0.18f);
-        fill.setColor(0xCC0C1424);
-        c.drawRoundRect(rect, r, r, fill);
-        stroke.setStrokeWidth(cell * 0.03f);
-        stroke.setColor(0x4420B8A6);
+        float r = cell * 0.32f, m = cell * 0.2f;
+        rect.set(ox - m, oy - m, ox + gw * cell + m, oy + gh * cell + m);
+        // dış parıltı
+        stroke.setStrokeWidth(cell * 0.22f);
+        stroke.setColor(0x1420B8A6);
         c.drawRoundRect(rect, r, r, stroke);
+        fill.setColor(0xE60B1222);
+        c.drawRoundRect(rect, r, r, fill);
+        // renk geçişli çerçeve
+        if (frameShader != null) {
+            shaderPaint.setShader(frameShader);
+            shaderPaint.setStyle(Paint.Style.STROKE);
+            shaderPaint.setStrokeWidth(cell * 0.035f);
+            shaderPaint.setAlpha(150);
+            c.drawRoundRect(rect, r, r, shaderPaint);
+            shaderPaint.setStyle(Paint.Style.FILL);
+            shaderPaint.setAlpha(255);
+        }
         float g = cell * 0.05f;
-        for (int y = 0; y < gh; y++) for (int x = 0; x < gw; x++) {
-            fill.setColor(((x + y) & 1) == 0 ? Palette.TILE : Palette.TILE_ALT);
-            rect.set(ox + x * cell + g, oy + y * cell + g, ox + (x + 1) * cell - g, oy + (y + 1) * cell - g);
-            c.drawRoundRect(rect, cell * 0.14f, cell * 0.14f, fill);
+        for (int y = 0; y < gh; y++) {
+            for (int x = 0; x < gw; x++) {
+                rect.set(ox + x * cell + g, oy + y * cell + g, ox + (x + 1) * cell - g, oy + (y + 1) * cell - g);
+                fill.setColor(((x + y) & 1) == 0 ? 0xFF1C2944 : 0xFF19243D);
+                c.drawRoundRect(rect, cell * 0.16f, cell * 0.16f, fill);
+                // üst kenar ışığı
+                stroke.setStrokeWidth(cell * 0.015f);
+                stroke.setColor(0x14FFFFFF);
+                c.drawLine(rect.left + cell * 0.15f, rect.top + cell * 0.02f, rect.right - cell * 0.15f, rect.top + cell * 0.02f, stroke);
+            }
         }
     }
 
@@ -464,43 +503,96 @@ public final class BoardView extends View {
     }
 
     private void drawMirror(Canvas c, float cx, float cy, int i, boolean rot, int lit) {
-        if (lit != 0) {
-            fill.setColor(Palette.withAlpha(Palette.light(lit), 46));
-            c.drawCircle(cx, cy, cell * 0.44f, fill);
-        }
-        if (!rot) {
-            float h = cell * 0.38f;
-            rect.set(cx - h, cy - h, cx + h, cy + h);
-            fill.setColor(0xFF262F45);
-            c.drawRoundRect(rect, cell * 0.1f, cell * 0.1f, fill);
-            fill.setColor(0xFF4A5570);
-            float q = h * 0.72f;
-            c.drawCircle(cx - q, cy - q, cell * 0.035f, fill);
-            c.drawCircle(cx + q, cy - q, cell * 0.035f, fill);
-            c.drawCircle(cx - q, cy + q, cell * 0.035f, fill);
-            c.drawCircle(cx + q, cy + q, cell * 0.035f, fill);
-        } else {
-            stroke.setStrokeWidth(cell * 0.025f);
-            stroke.setColor(Palette.withAlpha(Palette.TURQUOISE, 70 + (int) (120 * pulse[i])));
-            c.drawCircle(cx, cy, cell * (0.4f + 0.05f * pulse[i]), stroke);
-        }
         c.save();
-        c.rotate(mirrorAngle[i], cx, cy);
-        float L = cell * 0.4f, T = cell * 0.075f;
-        rect.set(cx - L, cy - T, cx + L, cy + T + cell * 0.03f);
-        fill.setColor(rot ? 0xFF6F7FA0 : 0xFF4E5873);
-        c.drawRoundRect(rect, T, T, fill);
-        rect.set(cx - L, cy - T, cx + L, cy + T);
-        fill.setColor(rot ? Palette.MIRROR : Palette.MIRROR_FIXED);
-        c.drawRoundRect(rect, T, T, fill);
-        stroke.setStrokeWidth(cell * 0.02f);
-        stroke.setColor(0xAAFFFFFF);
-        c.drawLine(cx - L * 0.8f, cy - T * 0.4f, cx + L * 0.8f, cy - T * 0.4f, stroke);
-        c.restore();
-        if (rot) {
-            fill.setColor(Palette.TURQUOISE);
-            c.drawCircle(cx, cy, cell * 0.06f, fill);
+        c.translate(cx, cy);
+        int litCol = lit != 0 ? Palette.light(lit) : 0;
+        if (lit != 0) {
+            fill.setColor(Palette.withAlpha(litCol, 40));
+            c.drawCircle(0, 0, cell * 0.47f, fill);
         }
+        if (rot) {
+            // döner taban: koyu disk, 90° adım çentikleri, turkuaz halka
+            shaderPaint.setShader(plateShader);
+            c.drawCircle(0, 0, cell * 0.42f, shaderPaint);
+            stroke.setStrokeWidth(cell * 0.022f);
+            stroke.setColor(Palette.withAlpha(Palette.TURQUOISE, 90 + (int) (150 * pulse[i])));
+            c.drawCircle(0, 0, cell * (0.41f + 0.04f * pulse[i]), stroke);
+            stroke.setStrokeWidth(cell * 0.03f);
+            stroke.setColor(Palette.withAlpha(Palette.TURQUOISE, 170));
+            for (int k = 0; k < 4; k++) {
+                float a = (float) (k * Math.PI / 2);
+                float r1 = cell * 0.35f, r2 = cell * 0.41f;
+                c.drawLine((float) Math.cos(a) * r1, (float) Math.sin(a) * r1, (float) Math.cos(a) * r2, (float) Math.sin(a) * r2, stroke);
+            }
+        } else {
+            // sabit yuva: çelik plaka ve cıvatalar
+            float h = cell * 0.4f;
+            rect.set(-h, -h + cell * 0.03f, h, h + cell * 0.03f);
+            fill.setColor(0xFF070B14);
+            c.drawRoundRect(rect, cell * 0.1f, cell * 0.1f, fill);
+            rect.set(-h, -h, h, h);
+            shaderPaint.setShader(mountShader);
+            c.drawRoundRect(rect, cell * 0.1f, cell * 0.1f, shaderPaint);
+            float q = h * 0.74f;
+            for (int k = 0; k < 4; k++) {
+                float bx = (k & 1) == 0 ? -q : q, by = k < 2 ? -q : q;
+                fill.setColor(0xFF1E2538);
+                c.drawCircle(bx, by + cell * 0.008f, cell * 0.038f, fill);
+                fill.setColor(0xFF8D98B3);
+                c.drawCircle(bx, by, cell * 0.032f, fill);
+            }
+        }
+        c.rotate(mirrorAngle[i]);
+        float L = cell * 0.43f, T = cell * 0.085f;
+        // gölge
+        rect.set(-L, -T + cell * 0.045f, L, T + cell * 0.045f);
+        fill.setColor(0x80050810);
+        c.drawRoundRect(rect, T, T, fill);
+        // metal çerçeve
+        rect.set(-L, -T, L, T);
+        fill.setColor(rot ? 0xFF4F6188 : 0xFF6E5B3E);
+        c.drawRoundRect(rect, T, T, fill);
+        // cam yüzey
+        float g = cell * 0.022f;
+        rect.set(-L + g, -T + g, L - g, T - g);
+        shaderPaint.setShader(rot ? glassShader : glassFixedShader);
+        c.drawRoundRect(rect, T - g, T - g, shaderPaint);
+        if (lit != 0) {
+            fill.setColor(Palette.withAlpha(litCol, 110));
+            c.drawRoundRect(rect, T - g, T - g, fill);
+        }
+        // parlama çizgisi
+        stroke.setStrokeWidth(cell * 0.018f);
+        stroke.setColor(0xDDFFFFFF);
+        c.drawLine(-L * 0.72f, -T * 0.38f, L * 0.55f, -T * 0.38f, stroke);
+        stroke.setColor(0x66FFFFFF);
+        c.drawLine(L * 0.64f, -T * 0.38f, L * 0.74f, -T * 0.38f, stroke);
+        // uç kapakları
+        fill.setColor(rot ? Palette.TURQUOISE : 0xFFC9A45A);
+        c.drawCircle(-L + T * 0.55f, 0, T * 0.42f, fill);
+        c.drawCircle(L - T * 0.55f, 0, T * 0.42f, fill);
+        c.rotate(-mirrorAngle[i]);
+        // merkez mil
+        if (rot) {
+            fill.setColor(0xFF0F1A2C);
+            c.drawCircle(0, 0, cell * 0.07f, fill);
+            fill.setColor(Palette.TURQUOISE);
+            c.drawCircle(0, 0, cell * 0.052f, fill);
+            fill.setColor(0xCCFFFFFF);
+            c.drawCircle(-cell * 0.015f, -cell * 0.015f, cell * 0.018f, fill);
+        }
+        // ışık vurunca dönen yansıma parıltısı
+        if (lit != 0) {
+            float fl = cell * (0.2f + 0.04f * (float) Math.sin(time * 7f + i));
+            c.rotate(time * 40f + i * 17f);
+            path.reset();
+            path.moveTo(0, -fl); path.lineTo(fl * 0.16f, -fl * 0.16f); path.lineTo(fl, 0); path.lineTo(fl * 0.16f, fl * 0.16f);
+            path.lineTo(0, fl); path.lineTo(-fl * 0.16f, fl * 0.16f); path.lineTo(-fl, 0); path.lineTo(-fl * 0.16f, -fl * 0.16f);
+            path.close();
+            fill.setColor(Palette.withAlpha(Palette.lighten(litCol, 0.6f), 230));
+            c.drawPath(path, fill);
+        }
+        c.restore();
     }
 
     private void drawFilter(Canvas c, float cx, float cy, int color, int lit) {

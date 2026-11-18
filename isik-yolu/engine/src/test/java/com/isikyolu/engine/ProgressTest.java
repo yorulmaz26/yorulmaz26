@@ -58,6 +58,32 @@ public class ProgressTest {
         assertEquals(hints, p.hints); // ödül yalnızca ilk seferde
     }
 
+    @Test public void hintRewardEveryTenLevels() {
+        Progress p = new Progress();
+        assertEquals(3, p.hints);
+        for (int i = 1; i <= 9; i++) p.recordLevel(i, 3, 1, false);
+        assertEquals("3 yıldız tek başına ipucu vermez", 3, p.hints);
+        assertEquals(1, p.levelsUntilNextHint());
+        p.recordLevel(10, 1, 9, false);
+        assertEquals(4, p.hints);
+        assertEquals(10, p.levelsUntilNextHint());
+        p.recordLevel(10, 3, 1, false); // tekrar oynamak ödül vermez
+        assertEquals(4, p.hints);
+        for (int i = 11; i <= 30; i++) p.recordLevel(i, 2, 5, false);
+        assertEquals(6, p.hints);
+    }
+
+    @Test public void oldHundredLevelSaveStillLoads() {
+        StringBuilder s = new StringBuilder("{\"stars\":[");
+        for (int i = 0; i < 100; i++) s.append(i == 0 ? "" : ",").append(3);
+        s.append("],\"hints\":7}");
+        Progress p = Progress.deserialize(s.toString());
+        assertEquals(100, p.completedCount());
+        assertTrue(p.isUnlocked(101));
+        assertFalse(p.isUnlocked(102));
+        assertEquals(7, p.hints);
+    }
+
     @Test public void achievementsUnlock() {
         Progress p = new Progress();
         for (int i = 1; i <= 10; i++) p.recordLevel(i, 3, 1, false);
