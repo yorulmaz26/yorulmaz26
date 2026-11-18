@@ -15,17 +15,18 @@ uzanan gezegen kulelerinin arasındaki boşluktan geçtikçe puan kazanırsın.
 
 - **Ses ve müzik:** İtiş, puan, patlama, rekor ve menü sesleri ile her haritaya özel döngülü müzik.
   Ses dosyası yok, hepsi `SoundManager.kt` içinde kodla üretiliyor. Menüdeki hoparlör düğmesi sesi açıp kapatır.
-- **5 harita** (menüde oklarla ya da kaydırarak seçilir):
+- **5 harita** (menüde oklarla ya da kaydırarak seçilir). Her birinin engeli, tehlikesi, arka planı ve müziği farklı:
 
-  | Harita | Fark |
-  |---|---|
-  | Dünya Yörüngesi | Dengeli, karışık gezegenler |
-  | Buz Kuşağı | Düşük yer çekimi, roket süzülür |
-  | Lav Denizi | Daha hızlı akış, biraz daha güçlü yer çekimi |
-  | Gaz Devleri | Büyük ve halkalı gezegenler |
-  | Asteroit Kuşağı | Kuleler yukarı aşağı salınır |
+  | Harita | Engeller | Özel kural | Dekor | Müzik |
+  |---|---|---|---|---|
+  | Dünya Yörüngesi | Mavi gezegenler, aylar | Klasik | Dev Dünya ufku, uydular | Orta tempo, sakin |
+  | Buz Kuşağı | Köşeli buz kristalleri | Çok düşük yer çekimi, yavaş düşüş | Kutup ışıkları, kar | Yavaş çanlar, davulsuz |
+  | Lav Denizi | Kızgın lav kayaları | Yerden fırlayan ateş topları (önce zemin kızarır) | Dev kızıl güneş, kıvılcımlar | Hızlı, davullu |
+  | Gaz Devleri | Dev halkalı gaz devleri | Roketi yukarı/aşağı iten rüzgâr (sol üstte gösterge) | Arkada dev gaz devi | Yavaş, dalgalı |
+  | Asteroit Kuşağı | Dönen düzensiz asteroitler | Kuleler yukarı aşağı salınır | Toz kuşağı, uçuşan taşlar | Ritmik, senkoplu |
 
-- **Seviyeler:** Kolay, Orta, Zor. Geçiş boşluğu, hız, kule aralığı ve salınım seviyeye göre değişir.
+- **Seviyeler:** Kolay, Orta, Zor. Geçiş boşluğu, hız, kule aralığı ve haritanın özel tehlikesinin şiddeti
+  (ateş topu sıklığı, rüzgâr gücü, salınım) seviyeye göre değişir.
 - Her harita ve seviye için ayrı rekor tutulur. Oyun sonunda **Tekrar** ya da **Menü** seçilir, geri tuşu menüye döner.
 
 ## Çalıştırma

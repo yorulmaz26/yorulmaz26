@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.LinearGradient
@@ -51,7 +52,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     /** Önceden çizilmiş gezegen görseli (her karede yeniden çizmemek için). */
     private class PlanetArt(val bitmap: Bitmap, val baseR: Float, val padX: Float, val padY: Float)
 
-    private class Planet(val dx: Float, val y: Float, val r: Float, val art: PlanetArt)
+    /** [rot] başlangıç açısı, [spin] derece/saniye dönüş hızı (yalnızca asteroitler döner). */
+    private class Planet(
+        val dx: Float, val y: Float, val r: Float, val art: PlanetArt,
+        val rot: Float = 0f, val spin: Float = 0f
+    )
+
+    /** Haritaya özgü atmosfer parçacığı: kar tanesi, kıvılcım, rüzgâr çizgisi, taş, uydu. */
+    private class Mote {
+        var x = 0f; var y = 0f; var vx = 0f; var vy = 0f
+        var size = 1f; var phase = 0f; var len = 0f
+    }
+
+    /** Lav Denizi'nde yerden fırlayan ateş topu. Önce [warn] süresi boyunca zemin kızarır. */
+    private class Fireball(var x: Float, var y: Float, var vy: Float, var warn: Float)
 
     /** Bir engel kulesi. Asteroit Kuşağı'nda tüm kule [swayAmp] kadar yukarı aşağı salınır. */
     private class Column(var x: Float, val planets: List<Planet>, val swayAmp: Float, val swayPhase: Float) {
@@ -80,6 +94,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val MAIN_R = 86f
         private const val MOON_R = 56f
         private const val SWAY_SPEED = 1.7f      // asteroit kulelerinin salınım hızı
+        private const val WIND_BASE = 430f       // gaz devlerinde rüzgârın en büyük kuvveti (Orta)
+        private const val FIRE_GRAVITY = 1150f   // ateş topunun yer çekimi
+        private const val FIRE_R = 15f           // ateş topunun çarpışma yarıçapı
 
         private const val PREFS = "gezegen_kacisi"
         private const val KEY_BEST_LEGACY = "best"
@@ -145,6 +162,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var shootX = 0f
     private var shootY = 0f
 
+    // --- Harita tehlikeleri ---
+    private val motes = ArrayList<Mote>()
+    private val fireballs = ArrayList<Fireball>()
+    private var fireTimer = 0f
+    private var wind = 0f          // + aşağı, - yukarı iter
+    private var windPhase = 0f
+
     // --- Menü ---
     private var cardAnim = 0f      // harita değişince kart içeriği kayar (-1..1 → 0)
     private var downX = 0f
@@ -175,6 +199,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strStart = context.getString(R.string.start)
     private val strRetry = context.getString(R.string.retry)
     private val strMenu = context.getString(R.string.menu)
+    private val strWind = context.getString(R.string.wind)
+    private val mapTips = Maps.ALL.map { context.getString(it.tipRes) }
     private val mapNames = Maps.ALL.map { context.getString(it.nameRes) }
     private val mapDescs = Maps.ALL.map { context.getString(it.descRes) }
     private val diffNames = Difficulty.entries.map { context.getString(it.nameRes) }
@@ -289,6 +315,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         PlanetType.OCEAN to listOf(
             Palette(hex(0xFF2F74DA), hex(0xFF10357A), hex(0xFF8CC4FF), hex(0xFF4DB36E), hex(0xFF86BEFF))
         ),
+        PlanetType.CRYSTAL to listOf(
+            Palette(hex(0xFF7FE8FF), hex(0xFF1F6FA8), hex(0xFFF0FDFF), hex(0xFFBFF6FF), hex(0xFF8CF0FF)),
+            Palette(hex(0xFFA8C8FF), hex(0xFF3A4FB0), hex(0xFFFFFFFF), hex(0xFFDDE6FF), hex(0xFFB0C8FF)),
+            Palette(hex(0xFF8CFFE0), hex(0xFF1F8A78), hex(0xFFEFFFFA), hex(0xFFC0FFEE), hex(0xFF9CFFE6))
+        ),
+        PlanetType.ASTEROID to listOf(
+            Palette(hex(0xFF8A7B6A), hex(0xFF3A3028), hex(0xFFC8B8A0), hex(0xFF5A4C40), hex(0xFF8A7B6A)),
+            Palette(hex(0xFF7A7C86), hex(0xFF2E3038), hex(0xFFB8BCC8), hex(0xFF50525C), hex(0xFF7A7C86)),
+            Palette(hex(0xFF9A7350), hex(0xFF3E2A1A), hex(0xFFD8B088), hex(0xFF6A4A30), hex(0xFF9A7350))
+        ),
         PlanetType.MOON to listOf(
             Palette(hex(0xFFA3A3AE), hex(0xFF4E4F5E), hex(0xFFDADBE3), hex(0xFF6E6F7E), hex(0xFFDADBE3)),
             Palette(hex(0xFFB5A58C), hex(0xFF5A4E3E), hex(0xFFE6DAC3), hex(0xFF7A6B55), hex(0xFFE6DAC3)),
@@ -368,6 +404,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         // Gezegen görselleri pahalı; ölçek çok değişmediyse yeniden üretme.
         if (mainArts.isEmpty() || artMap != mapIndex || abs(scale - artScale) / artScale > 0.15f) buildPlanetArts()
         buildStars()
+        buildMotes()
         layoutUi()
         if (state == State.MENU || state == State.READY) resetGame()
     }
@@ -520,6 +557,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             buildBackground(width, height)
             buildPlanetArts()
             buildStars()
+            buildMotes()
         }
         cardAnim = dir.toFloat()
         sound.setMusicTheme(map.musicTheme)
@@ -569,6 +607,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         speed = difficulty.baseSpeed * map.speedMul
         lastGapY = WORLD_H / 2f
         paused = false
+        fireballs.clear()
+        fireTimer = 2.2f
+        windPhase = rnd(0f, TWO_PI)
     }
 
     private fun update(dt: Float) {
@@ -591,6 +632,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
         updateStars(dt, worldSpeed)
         updateShootingStar(dt)
+        // Gaz devlerinde rüzgâr: yavaşça yön değiştirir; menüde de görsel olarak eser
+        wind = if (map.kind == MapKind.GAS) {
+            WIND_BASE * difficulty.hazard * sin(time * 0.62f + windPhase) *
+                (0.75f + 0.25f * sin(time * 1.7f))
+        } else 0f
+        updateMotes(dt, worldSpeed)
 
         when (state) {
             State.MENU -> Unit
@@ -601,7 +648,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 emit(dt, 28f, 0.8f)
             }
             State.PLAYING -> {
-                rocketVy = min(rocketVy + GRAVITY * map.gravityMul * dt, MAX_FALL)
+                val maxFall = MAX_FALL * min(1f, map.gravityMul)
+                rocketVy = min(rocketVy + (GRAVITY * map.gravityMul + wind) * dt, maxFall)
                 rocketY += rocketVy * dt
                 if (rocketY < 22f) {
                     rocketY = 22f
@@ -612,13 +660,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 speed = (difficulty.baseSpeed +
                     min(score, difficulty.speedCapScore) * difficulty.speedPerScore) * map.speedMul
                 updateColumns(dt)
+                updateFireballs(dt)
                 emit(dt, 55f, 1f + boost * 0.6f)
                 if (rocketHits()) crash()
             }
-            State.DYING -> if (stateTimer > 0.9f) {
+            State.DYING -> {
+                updateFireballs(dt)
+                if (stateTimer > 0.9f) {
                 state = State.OVER
                 stateTimer = 0f
                 sound.play(if (newBest) SoundManager.Sfx.RECORD else SoundManager.Sfx.GAME_OVER)
+                }
             }
             State.OVER -> Unit
         }
@@ -660,7 +712,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private fun makeColumn(x: Float): Column {
         val d = difficulty
         val gapH = max(d.minGap, d.startGap - score * d.gapShrink)
-        val amp = if (map.sway) d.swayAmp else 0f
+        val amp = if (map.kind == MapKind.ASTEROID) d.swayAmp else 0f
         val minY = 110f + gapH / 2f + amp
         val maxY = WORLD_H - 110f - gapH / 2f - amp
         val gapY = (lastGapY + rnd(-d.gapJump, d.gapJump)).coerceIn(minY, maxY)
@@ -682,7 +734,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val stack = ArrayList<Planet>()
         val mainR = rnd(60f, MAIN_R) * map.planetMul
         var cy = gapEdge + dir * mainR
-        stack.add(Planet(0f, cy, mainR, mainArts[Random.nextInt(mainArts.size)]))
+        val spinning = map.kind == MapKind.ASTEROID
+        stack.add(
+            Planet(
+                0f, cy, mainR, mainArts[Random.nextInt(mainArts.size)],
+                if (spinning) rnd(0f, 360f) else 0f, if (spinning) rnd(-35f, 35f) else 0f
+            )
+        )
 
         var prevR = mainR
         var farEdge = cy + dir * mainR
@@ -693,7 +751,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val r = rnd(34f, MOON_R)
             val dx = rnd(-0.25f, 0.25f) * min(r, prevR)
             cy = farEdge + dir * (r * 0.7f)
-            stack.add(Planet(dx, cy, r, moonArts[Random.nextInt(moonArts.size)]))
+            stack.add(
+                Planet(
+                    dx, cy, r, moonArts[Random.nextInt(moonArts.size)],
+                    if (spinning) rnd(0f, 360f) else 0f, if (spinning) rnd(-60f, 60f) else 0f
+                )
+            )
             farEdge = cy + dir * r
             prevR = r
         }
@@ -710,6 +773,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val hy = rocketY + hitX[i] * sn
             val hr = hitR[i]
             if (hy + hr > WORLD_H) return true // uzayın derinliklerine düştü
+            for (fb in fireballs) {
+                if (fb.warn > 0f) continue
+                val dx = fb.x - hx
+                val dy = fb.y - hy
+                val rr = FIRE_R + hr
+                if (dx * dx + dy * dy < rr * rr) return true
+            }
             for (col in columns) {
                 if (abs(col.x - hx) > col.halfWidth + hr) continue
                 for (pl in col.planets) {
@@ -801,6 +871,197 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 shootX = rnd(worldW * 0.4f, worldW + 60f)
                 shootY = rnd(-20f, WORLD_H * 0.35f)
             }
+        }
+    }
+
+    // --- Harita atmosferi: kar, kıvılcım, rüzgâr çizgileri, taşlar, uydular ---
+
+    private fun buildMotes() {
+        motes.clear()
+        val count = when (map.kind) {
+            MapKind.EARTH -> 4
+            MapKind.ICE -> 90
+            MapKind.LAVA -> 55
+            MapKind.GAS -> 30
+            MapKind.ASTEROID -> 22
+        }
+        repeat(count) { motes.add(Mote().also { resetMote(it, true) }) }
+    }
+
+    /** Parçacığı yeniden konumlar. [anywhere] ise ekranın herhangi bir yerine, değilse giriş kenarına. */
+    private fun resetMote(m: Mote, anywhere: Boolean) {
+        m.phase = rnd(0f, TWO_PI)
+        when (map.kind) {
+            MapKind.EARTH -> { // yavaş geçen uydular
+                m.x = if (anywhere) rnd(0f, worldW) else worldW + 20f
+                m.y = rnd(40f, WORLD_H * 0.6f)
+                m.vx = -rnd(8f, 22f); m.vy = rnd(-3f, 3f)
+                m.size = rnd(2.5f, 4f)
+            }
+            MapKind.ICE -> { // kar taneleri
+                m.x = if (anywhere) rnd(0f, worldW) else rnd(0f, worldW + 80f)
+                m.y = if (anywhere) rnd(0f, WORLD_H) else -10f
+                m.vx = -rnd(10f, 30f); m.vy = rnd(28f, 70f)
+                m.size = rnd(1.2f, 3.4f)
+            }
+            MapKind.LAVA -> { // yükselen kıvılcımlar
+                m.x = rnd(0f, worldW + 40f)
+                m.y = if (anywhere) rnd(0f, WORLD_H) else WORLD_H + 10f
+                m.vx = rnd(-15f, 5f); m.vy = -rnd(40f, 120f)
+                m.size = rnd(1.3f, 3.2f)
+            }
+            MapKind.GAS -> { // rüzgâr çizgileri
+                m.x = if (anywhere) rnd(0f, worldW) else worldW + rnd(10f, 120f)
+                m.y = rnd(0f, WORLD_H)
+                m.vx = -rnd(120f, 220f); m.vy = 0f
+                m.size = rnd(1.2f, 2.4f)
+                m.len = rnd(40f, 110f)
+            }
+            MapKind.ASTEROID -> { // önden geçen küçük taşlar
+                m.x = if (anywhere) rnd(0f, worldW) else worldW + rnd(10f, 200f)
+                m.y = rnd(0f, WORLD_H)
+                m.vx = -rnd(0.9f, 1.6f); m.vy = rnd(-12f, 12f) // vx burada dünya hızının katı
+                m.size = rnd(2.5f, 7f)
+                m.len = rnd(-120f, 120f) // dönüş hızı
+            }
+        }
+    }
+
+    private fun updateMotes(dt: Float, worldSpeed: Float) {
+        for (m in motes) {
+            when (map.kind) {
+                MapKind.EARTH -> { m.x += m.vx * dt; m.y += m.vy * dt }
+                MapKind.ICE -> {
+                    m.x += (m.vx - worldSpeed * 0.25f + sin(time * 1.3f + m.phase) * 18f) * dt
+                    m.y += m.vy * dt
+                }
+                MapKind.LAVA -> {
+                    m.x += (m.vx - worldSpeed * 0.2f + sin(time * 3f + m.phase) * 12f) * dt
+                    m.y += m.vy * dt
+                }
+                MapKind.GAS -> {
+                    m.x += (m.vx - worldSpeed * 0.6f) * dt
+                    m.y += wind * 0.22f * dt
+                }
+                MapKind.ASTEROID -> {
+                    m.x += m.vx * worldSpeed * dt
+                    m.y += m.vy * dt
+                    m.phase += m.len * DEG * dt
+                }
+            }
+            val out = m.x < -130f || m.y > WORLD_H + 20f || m.y < -30f
+            if (out) resetMote(m, false)
+        }
+    }
+
+    private fun drawMotes(cv: Canvas) {
+        when (map.kind) {
+            MapKind.EARTH -> for (m in motes) {
+                paint.color = hex(0xFF9AA3C6)
+                cv.drawRect(m.x - m.size * 1.6f, m.y - 0.8f, m.x + m.size * 1.6f, m.y + 0.8f, paint)
+                cv.drawRect(m.x - 1.2f, m.y - 1.6f, m.x + 1.2f, m.y + 1.6f, paint)
+                val blink = sin(time * 4f + m.phase) > 0.6f
+                if (blink) {
+                    paint.color = hex(0xFFFF5B4A)
+                    cv.drawCircle(m.x + m.size * 1.6f, m.y, 1.6f, paint)
+                }
+            }
+            MapKind.ICE -> for (m in motes) {
+                paint.color = withAlpha(Color.WHITE, (120 + 80 * sin(time * 2f + m.phase)).toInt())
+                cv.drawCircle(m.x, m.y, m.size, paint)
+            }
+            MapKind.LAVA -> for (m in motes) {
+                val f = 0.6f + 0.4f * sin(time * 9f + m.phase)
+                paint.color = withAlpha(hex(0xFFFF7A2B), (60 * f).toInt())
+                cv.drawCircle(m.x, m.y, m.size * 2.6f, paint)
+                paint.color = withAlpha(hex(0xFFFFD27A), (230 * f).toInt())
+                cv.drawCircle(m.x, m.y, m.size, paint)
+            }
+            MapKind.GAS -> {
+                paint.style = Paint.Style.STROKE
+                paint.strokeCap = Paint.Cap.ROUND
+                for (m in motes) {
+                    // Çizgi, rüzgârın yönüne göre eğilir
+                    val slope = wind * 0.22f / (abs(m.vx) + 1f)
+                    paint.strokeWidth = m.size
+                    paint.color = withAlpha(hex(0xFFF2C8FF), 70)
+                    cv.drawLine(m.x, m.y, m.x + m.len, m.y - m.len * slope, paint)
+                }
+                paint.style = Paint.Style.FILL
+            }
+            MapKind.ASTEROID -> for (m in motes) {
+                cv.save()
+                cv.translate(m.x, m.y)
+                cv.rotate(m.phase / DEG)
+                paint.color = hex(0xFF5A5048)
+                tmpRect.set(-m.size, -m.size * 0.7f, m.size, m.size * 0.7f)
+                cv.drawOval(tmpRect, paint)
+                paint.color = hex(0xFF8C7C68)
+                tmpRect.set(-m.size * 0.7f, -m.size * 0.6f, m.size * 0.3f, m.size * 0.1f)
+                cv.drawOval(tmpRect, paint)
+                cv.restore()
+            }
+        }
+    }
+
+    // --- Lav Denizi: ateş topları ---
+
+    private fun updateFireballs(dt: Float) {
+        if (map.kind != MapKind.LAVA) return
+        if (state == State.PLAYING) {
+            fireTimer -= dt
+            if (fireTimer <= 0f) {
+                fireTimer = rnd(2.3f, 3.6f) / difficulty.hazard
+                // Topu, roketin hizasına tepeye yakınken varacak şekilde ileriye koy
+                val warn = 0.8f
+                val x = min(worldW - 30f, rocketX + speed * (warn + rnd(0.35f, 0.85f)))
+                fireballs.add(Fireball(x, WORLD_H + 40f, -rnd(980f, 1200f), warn))
+            }
+        }
+        val iter = fireballs.iterator()
+        while (iter.hasNext()) {
+            val fb = iter.next()
+            if (state == State.PLAYING) fb.x -= speed * dt
+            if (fb.warn > 0f) {
+                fb.warn -= dt
+                if (fb.warn <= 0f) sound.play(SoundManager.Sfx.FIRE)
+                continue
+            }
+            fb.vy += FIRE_GRAVITY * dt
+            fb.y += fb.vy * dt
+            if (Random.nextFloat() < 0.7f) {
+                spawn(
+                    fb.x + rnd(-6f, 6f), fb.y + rnd(-6f, 6f), rnd(-30f, 30f), -fb.vy * 0.15f,
+                    rnd(0.25f, 0.5f), rnd(2f, 4.5f),
+                    if (Random.nextBoolean()) hex(0xFFFFB347) else hex(0xFFFF5A1F), 2f
+                )
+            }
+            if (fb.vy > 0f && fb.y > WORLD_H + 60f || fb.x < -60f) iter.remove()
+        }
+    }
+
+    private fun drawFireballs(cv: Canvas) {
+        for (fb in fireballs) {
+            if (fb.warn > 0f) {
+                // Uyarı: zemin kızarır ve titreşir
+                val k = 1f - fb.warn / 0.8f
+                val pulse = 0.6f + 0.4f * sin(time * 30f)
+                paint.color = withAlpha(hex(0xFFFF3B1F), (k * 150 * pulse).toInt())
+                tmpRect.set(fb.x - 34f, WORLD_H - 26f, fb.x + 34f, WORLD_H + 26f)
+                cv.drawOval(tmpRect, paint)
+                paint.color = withAlpha(hex(0xFFFFD27A), (k * 220 * pulse).toInt())
+                tmpRect.set(fb.x - 16f, WORLD_H - 10f, fb.x + 16f, WORLD_H + 10f)
+                cv.drawOval(tmpRect, paint)
+                continue
+            }
+            paint.color = withAlpha(hex(0xFFFF5A1F), 70)
+            cv.drawCircle(fb.x, fb.y, FIRE_R * 2.4f, paint)
+            paint.color = withAlpha(hex(0xFFFF8A2B), 160)
+            cv.drawCircle(fb.x, fb.y, FIRE_R * 1.45f, paint)
+            paint.color = hex(0xFFFFD27A)
+            cv.drawCircle(fb.x, fb.y, FIRE_R, paint)
+            paint.color = hex(0xFFFFFBE6)
+            cv.drawCircle(fb.x - 3f, fb.y - 3f, FIRE_R * 0.45f, paint)
         }
     }
 
@@ -896,7 +1157,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
         drawStars(canvas)
         drawShootingStar(canvas)
+        drawMotes(canvas)
         drawColumns(canvas)
+        drawFireballs(canvas)
         drawParticles(canvas)
         if (state == State.READY || state == State.PLAYING) drawRocket(canvas)
         drawShockwave(canvas)
@@ -943,7 +1206,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val px = col.x + pl.dx
                 val py = pl.y + col.offset
                 dst.set(px - art.padX * k, py - art.padY * k, px + art.padX * k, py + art.padY * k)
-                cv.drawBitmap(art.bitmap, null, dst, bitmapPaint)
+                if (pl.spin != 0f || pl.rot != 0f) {
+                    cv.save()
+                    cv.rotate(pl.rot + pl.spin * time, px, py)
+                    cv.drawBitmap(art.bitmap, null, dst, bitmapPaint)
+                    cv.restore()
+                } else {
+                    cv.drawBitmap(art.bitmap, null, dst, bitmapPaint)
+                }
             }
         }
     }
@@ -1225,6 +1495,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         tmpRect.set(cx - tw / 2f, 240f, cx + tw / 2f, 282f)
         drawButton(cv, tmpRect, diffNames[d.ordinal], d.color, colDarkText, true, 255)
 
+        // Haritaya özel ipucu
+        textPaint.textSize = 21f
+        textPaint.color = map.accent
+        drawFit(cv, mapTips[mapIndex], cx, 330f, textPaint)
+        if (map.kind == MapKind.GAS) drawWindGauge(cv)
+
         val pulse = 0.5f + 0.5f * sin(time * 4f)
         textPaint.textSize = 30f
         textPaint.color = withAlpha(colText, (140 + 115 * pulse).toInt())
@@ -1243,6 +1519,40 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private fun drawScore(cv: Canvas, cx: Float) {
         titlePaint.textSize = 92f * (1f + 0.18f * scorePulse)
         drawShadowText(cv, scoreText, cx, 150f, titlePaint, colText)
+        if (map.kind == MapKind.GAS) drawWindGauge(cv)
+    }
+
+    /** Sol üstte rüzgârın yönünü ve gücünü gösteren ok. */
+    private fun drawWindGauge(cv: Canvas) {
+        val gx = 52f
+        val gy = 74f
+        val maxW = WIND_BASE * difficulty.hazard
+        val k = (wind / maxW).coerceIn(-1f, 1f)
+        paint.color = withAlpha(colPanel, 190)
+        cv.drawCircle(gx, gy, 32f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(map.accent, 150)
+        cv.drawCircle(gx, gy, 32f, paint)
+
+        val len = 6f + 16f * abs(k)
+        val dir = if (k >= 0f) 1f else -1f
+        val strong = abs(k) > 0.6f
+        paint.color = if (strong) colAccent else colText
+        paint.strokeWidth = 4f
+        paint.strokeCap = Paint.Cap.ROUND
+        paint.strokeJoin = Paint.Join.ROUND
+        cv.drawLine(gx, gy - len * dir, gx, gy + len * dir, paint)
+        iconPath.reset()
+        iconPath.moveTo(gx - 8f, gy + (len - 8f) * dir)
+        iconPath.lineTo(gx, gy + len * dir)
+        iconPath.lineTo(gx + 8f, gy + (len - 8f) * dir)
+        cv.drawPath(iconPath, paint)
+        paint.style = Paint.Style.FILL
+
+        labelPaint.textSize = 14f
+        labelPaint.color = withAlpha(colDim, 230)
+        cv.drawText(strWind, gx, gy + 54f, labelPaint)
     }
 
     private fun drawGameOver(cv: Canvas, cx: Float) {
@@ -1389,7 +1699,278 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             p.color = withAlpha(Color.WHITE, Random.nextInt(25, 110))
             cv.drawCircle(rnd(0f, w.toFloat()), rnd(0f, h.toFloat()), rnd(0.4f, 1.1f) * scale, p)
         }
+        drawScenery(cv, w.toFloat(), h.toFloat())
         bgBitmap = bmp
+    }
+
+    /** Haritaya özgü, hareketsiz büyük dekor (piksel koordinatlarında, arka plan bitmap'ine). */
+    private fun drawScenery(cv: Canvas, w: Float, h: Float) {
+        val p = Paint(Paint.ANTI_ALIAS_FLAG)
+        when (map.kind) {
+            MapKind.EARTH -> {
+                // Sol üstte Güneş ışığı
+                p.shader = RadialGradient(
+                    w * 0.05f, h * 0.04f, w * 0.7f,
+                    intArrayOf(hex(0x88FFF4D6), hex(0x22FFD9A0), 0), floatArrayOf(0f, 0.35f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawRect(0f, 0f, w, h, p)
+                // Sağ altta dev Dünya ufku
+                val r = h * 0.42f
+                val cx = w * 0.95f
+                val cy = h + r * 0.45f
+                p.shader = RadialGradient(
+                    cx, cy, r * 1.18f,
+                    intArrayOf(hex(0x664FB4FF), hex(0x334FB4FF), 0), floatArrayOf(0.8f, 0.88f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r * 1.18f, p)
+                p.shader = RadialGradient(
+                    cx - r * 0.5f, cy - r * 0.6f, r * 1.6f,
+                    intArrayOf(hex(0xFF3C8EE8), hex(0xFF1A4FA0), hex(0xFF061A40)), floatArrayOf(0f, 0.45f, 1f),
+                    Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r, p)
+                p.shader = null
+                val save = cv.save()
+                val clip = Path().apply { addCircle(cx, cy, r, Path.Direction.CW) }
+                cv.clipPath(clip)
+                repeat(9) { // kıtalar
+                    val bx = cx + rnd(-0.9f, 0.4f) * r
+                    val by = cy + rnd(-1f, -0.5f) * r
+                    repeat(6) {
+                        p.color = withAlpha(if (Random.nextInt(3) == 0) hex(0xFF8A7A4A) else hex(0xFF3E8F55), 200)
+                        cv.drawCircle(bx + rnd(-0.12f, 0.12f) * r, by + rnd(-0.06f, 0.06f) * r, rnd(0.03f, 0.08f) * r, p)
+                    }
+                }
+                p.style = Paint.Style.STROKE
+                p.strokeCap = Paint.Cap.ROUND
+                p.strokeWidth = r * 0.025f
+                p.color = withAlpha(Color.WHITE, 120)
+                repeat(10) { // bulutlar
+                    val y = cy + rnd(-1f, -0.45f) * r
+                    val x = cx + rnd(-1f, 0.3f) * r
+                    cv.drawLine(x, y, x + rnd(0.1f, 0.3f) * r, y + rnd(-0.01f, 0.01f) * r, p)
+                }
+                p.style = Paint.Style.FILL
+                cv.restoreToCount(save)
+                p.color = hex(0x55000818) // oyun alanı okunaklı kalsın
+                cv.drawCircle(cx, cy, r, p)
+            }
+            MapKind.ICE -> {
+                // Kutup ışıkları
+                p.maskFilter = BlurMaskFilter(h * 0.025f, BlurMaskFilter.Blur.NORMAL)
+                p.style = Paint.Style.STROKE
+                p.strokeCap = Paint.Cap.ROUND
+                val colors = intArrayOf(hex(0xFF39FFB0), hex(0xFF39D9FF), hex(0xFF9B7BFF))
+                val path = Path()
+                for (band in 0 until 3) {
+                    val baseY = h * (0.12f + band * 0.09f)
+                    val ph = rnd(0f, 6f)
+                    path.reset()
+                    path.moveTo(-20f, baseY)
+                    var x = -20f
+                    while (x < w + 40f) {
+                        x += w / 12f
+                        path.lineTo(x, baseY + sin(x / w * 7f + ph) * h * 0.04f)
+                    }
+                    p.strokeWidth = h * (0.05f - band * 0.01f)
+                    p.color = withAlpha(colors[band], 70)
+                    cv.drawPath(path, p)
+                    // Aşağı sarkan ışık perdeleri
+                    p.strokeWidth = w * 0.006f
+                    var rx = rnd(0f, w / 18f)
+                    while (rx < w) {
+                        val ry = baseY + sin(rx / w * 7f + ph) * h * 0.04f
+                        p.color = withAlpha(colors[band], Random.nextInt(18, 45))
+                        cv.drawLine(rx, ry, rx, ry + h * rnd(0.05f, 0.14f), p)
+                        rx += w / rnd(14f, 26f)
+                    }
+                }
+                p.maskFilter = null
+                p.style = Paint.Style.FILL
+                // Uzakta soluk buz gezegeni
+                p.shader = RadialGradient(
+                    w * 0.18f, h * 0.6f, w * 0.1f,
+                    intArrayOf(hex(0x66E6FBFF), hex(0x445FB0D0), hex(0x00203040)), null, Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(w * 0.2f, h * 0.62f, w * 0.1f, p)
+                p.shader = null
+                // Alt kısımda buz sisi
+                p.shader = LinearGradient(
+                    0f, h * 0.7f, 0f, h, 0, hex(0x5596E6FF), Shader.TileMode.CLAMP
+                )
+                cv.drawRect(0f, h * 0.7f, w, h, p)
+                p.shader = null
+            }
+            MapKind.LAVA -> {
+                // Dev kızıl güneş
+                val r = w * 0.34f
+                val cx = w * 0.8f
+                val cy = h * 0.15f
+                p.shader = RadialGradient(
+                    cx, cy, r * 2.1f,
+                    intArrayOf(hex(0x99FF5A1F), hex(0x33FF3B1F), 0), floatArrayOf(0.3f, 0.6f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r * 2.1f, p)
+                p.shader = RadialGradient(
+                    cx - r * 0.2f, cy - r * 0.2f, r * 1.1f,
+                    intArrayOf(hex(0xFFFFE08A), hex(0xFFFF7A1F), hex(0xFFB3200F)), floatArrayOf(0f, 0.55f, 1f),
+                    Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r, p)
+                p.shader = null
+                repeat(6) { // güneş lekeleri
+                    p.color = withAlpha(hex(0xFF7A1505), 110)
+                    val a = rnd(0f, TWO_PI)
+                    val d = rnd(0f, 0.7f) * r
+                    cv.drawCircle(cx + cos(a) * d, cy + sin(a) * d, rnd(0.04f, 0.1f) * r, p)
+                }
+                p.color = hex(0x44000000)
+                cv.drawCircle(cx, cy, r, p)
+                // Alttan yükselen kor ışığı
+                p.shader = LinearGradient(
+                    0f, h * 0.6f, 0f, h,
+                    intArrayOf(0, hex(0x55FF5A1F), hex(0xAAFF8A2B)), floatArrayOf(0f, 0.7f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawRect(0f, h * 0.6f, w, h, p)
+                p.shader = null
+            }
+            MapKind.GAS -> {
+                // Arkada dev, halkalı gaz devi
+                val r = w * 0.48f
+                val cx = w * 0.22f
+                val cy = h * 0.36f
+                val save = cv.save()
+                cv.clipPath(Path().apply { addCircle(cx, cy, r, Path.Direction.CW) })
+                val bands = intArrayOf(hex(0xFF8E4BC8), hex(0xFFD98AD0), hex(0xFF6A2E9E), hex(0xFFF0B0E0), hex(0xFF7B3BB0))
+                var y = cy - r
+                var i = 0
+                while (y < cy + r) {
+                    val bh = rnd(0.06f, 0.16f) * r
+                    p.color = bands[i++ % bands.size]
+                    cv.drawRect(cx - r, y, cx + r, y + bh, p)
+                    y += bh
+                }
+                p.shader = RadialGradient(
+                    cx - r * 0.4f, cy - r * 0.4f, r * 1.9f,
+                    intArrayOf(0, hex(0x66000000), hex(0xEE05010C)), floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(cx, cy, r, p)
+                p.shader = null
+                cv.restoreToCount(save)
+                p.style = Paint.Style.STROKE
+                cv.save()
+                cv.rotate(-14f, cx, cy)
+                for (k in 0 until 5) {
+                    val rr = r * (1.3f + k * 0.12f)
+                    p.strokeWidth = r * 0.05f
+                    p.color = withAlpha(hex(0xFFF0C8FF), 70 - k * 10)
+                    tmpArtRect.set(cx - rr, cy - rr * 0.22f, cx + rr, cy + rr * 0.22f)
+                    cv.drawOval(tmpArtRect, p)
+                }
+                cv.restore()
+                p.style = Paint.Style.FILL
+                p.color = hex(0x77100420) // derinlik için karart
+                cv.drawRect(0f, 0f, w, h, p)
+            }
+            MapKind.ASTEROID -> {
+                // Çapraz toz ve taş kuşağı
+                repeat(1400) {
+                    val t = Random.nextFloat()
+                    val spread = (Random.nextFloat() + Random.nextFloat() + Random.nextFloat() - 1.5f) * h * 0.12f
+                    val x = t * w
+                    val y = h * 0.78f - t * h * 0.42f + spread
+                    p.color = withAlpha(
+                        if (Random.nextBoolean()) hex(0xFFB8A48A) else hex(0xFF8A8A96), Random.nextInt(30, 120)
+                    )
+                    cv.drawCircle(x, y, rnd(0.5f, 2.6f) * scale, p)
+                }
+                p.shader = LinearGradient(
+                    0f, h * 0.78f, w, h * 0.36f,
+                    intArrayOf(hex(0x22C8A060), hex(0x11C8A060)), null, Shader.TileMode.CLAMP
+                )
+                cv.drawRect(0f, 0f, w, h, p)
+                p.shader = null
+                // Uzakta kahverengi cüce gezegen
+                p.shader = RadialGradient(
+                    w * 0.78f, h * 0.13f, w * 0.12f,
+                    intArrayOf(hex(0xFFC8A070), hex(0xFF6A4A2A), hex(0xFF2A1A10)), floatArrayOf(0f, 0.6f, 1f),
+                    Shader.TileMode.CLAMP
+                )
+                cv.drawCircle(w * 0.8f, h * 0.15f, w * 0.1f, p)
+                p.shader = null
+            }
+        }
+    }
+
+    /** Altıgen, sivri buz kristali silueti. */
+    private fun crystalShape(r: Float): Path {
+        val path = Path()
+        val rot = rnd(0f, 60f) * DEG
+        for (i in 0 until 6) {
+            val a = rot + i * 60f * DEG
+            val rr = r * (if (i % 2 == 0) rnd(1.06f, 1.16f) else rnd(0.98f, 1.06f))
+            val x = cos(a) * rr
+            val y = sin(a) * rr
+            if (i == 0) path.moveTo(x, y) else path.lineTo(x, y)
+        }
+        path.close()
+        return path
+    }
+
+    /** Düzensiz, yumrulu asteroit silueti. */
+    private fun asteroidShape(r: Float): Path {
+        val n = 11
+        val xs = FloatArray(n)
+        val ys = FloatArray(n)
+        for (i in 0 until n) {
+            val a = i * TWO_PI / n
+            val rr = r * rnd(0.9f, 1.12f)
+            xs[i] = cos(a) * rr
+            ys[i] = sin(a) * rr
+        }
+        val path = Path()
+        path.moveTo((xs[0] + xs[n - 1]) / 2f, (ys[0] + ys[n - 1]) / 2f)
+        for (i in 0 until n) {
+            val j = (i + 1) % n
+            path.quadTo(xs[i], ys[i], (xs[i] + xs[j]) / 2f, (ys[i] + ys[j]) / 2f)
+        }
+        path.close()
+        return path
+    }
+
+    /** Kristal yüzeyleri: merkezden kenarlara açık/koyu üçgen yüzler, iç parıltı. */
+    private fun paintCrystal(cv: Canvas, p: Paint, r: Float, pal: Palette) {
+        val path = Path()
+        val n = 6
+        val rot = rnd(0f, 60f) * DEG
+        val ox = -0.12f * r
+        val oy = -0.15f * r
+        for (i in 0 until n) {
+            val a1 = rot + i * TWO_PI / n
+            val a2 = rot + (i + 1) * TWO_PI / n
+            path.reset()
+            path.moveTo(ox, oy)
+            path.lineTo(cos(a1) * r * 1.3f, sin(a1) * r * 1.3f)
+            path.lineTo(cos(a2) * r * 1.3f, sin(a2) * r * 1.3f)
+            path.close()
+            p.color = withAlpha(
+                when (i % 3) { 0 -> pal.light; 1 -> pal.base; else -> pal.dark }, Random.nextInt(70, 140)
+            )
+            cv.drawPath(path, p)
+        }
+        // İç kristal ve çizgiler
+        p.style = Paint.Style.STROKE
+        p.strokeWidth = r * 0.03f
+        p.color = withAlpha(Color.WHITE, 150)
+        for (i in 0 until n) {
+            val a = rot + i * TWO_PI / n
+            cv.drawLine(ox, oy, cos(a) * r * 1.2f, sin(a) * r * 1.2f, p)
+        }
+        p.style = Paint.Style.FILL
+        p.color = withAlpha(Color.WHITE, 200)
+        cv.drawCircle(-0.35f * r, -0.4f * r, r * 0.1f, p)
+        p.color = withAlpha(Color.WHITE, 120)
+        cv.drawCircle(0.25f * r, 0.3f * r, r * 0.05f, p)
     }
 
     /** Seçili haritanın gezegen ve uydu görsellerini üretir. */
@@ -1428,8 +2009,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val p = Paint(Paint.ANTI_ALIAS_FLAG)
         val path = Path()
 
+        val shape: Path? = when (type) {
+            PlanetType.CRYSTAL -> crystalShape(r)
+            PlanetType.ASTEROID -> asteroidShape(r)
+            else -> null
+        }
+
         // Atmosfer parıltısı
-        val glowAlpha = if (type == PlanetType.MOON) 35 else 105
+        val glowAlpha = when (type) {
+            PlanetType.MOON -> 35
+            PlanetType.ASTEROID -> 0
+            PlanetType.CRYSTAL -> 80
+            else -> 105
+        }
         p.shader = RadialGradient(
             0f, 0f, r * 1.2f,
             intArrayOf(withAlpha(pal.atmo, glowAlpha), withAlpha(pal.atmo, glowAlpha), withAlpha(pal.atmo, 0)),
@@ -1441,14 +2033,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (ringed) drawRing(cv, p, r, pal.light, front = false)
 
         // Gövde + yüzey: ayrı katmanda, SRC_ATOP ile yalnızca gezegenin içine çizilir
-        val layer = cv.saveLayer(-r - 2f, -r - 2f, r + 2f, r + 2f, null)
+        val lr = r * 1.2f
+        val layer = cv.saveLayer(-lr, -lr, lr, lr, null)
         p.color = Color.WHITE
         p.shader = RadialGradient(
             -0.35f * r, -0.4f * r, r * 1.5f,
             intArrayOf(pal.light, pal.base, pal.dark),
             floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP
         )
-        cv.drawCircle(0f, 0f, r, p)
+        if (shape != null) cv.drawPath(shape, p) else cv.drawCircle(0f, 0f, r, p)
         p.shader = null
         p.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP)
         when (type) {
@@ -1458,16 +2051,18 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             PlanetType.ICE -> paintIce(cv, p, path, r, pal)
             PlanetType.LAVA -> paintLava(cv, p, path, r, pal)
             PlanetType.OCEAN -> paintOcean(cv, p, path, r, pal)
+            PlanetType.CRYSTAL -> paintCrystal(cv, p, r, pal)
+            PlanetType.ASTEROID -> paintRocky(cv, p, r, pal, 10)
         }
         // Gece tarafı gölgesi (ışık sol üstten)
         p.style = Paint.Style.FILL
         p.color = Color.WHITE
         p.shader = RadialGradient(
             -0.4f * r, -0.45f * r, r * 1.8f,
-            intArrayOf(0, 0, hex(0xC8000000)),
+            intArrayOf(0, 0, hex(if (type == PlanetType.CRYSTAL) 0x90000000 else 0xC8000000)),
             floatArrayOf(0f, 0.48f, 1f), Shader.TileMode.CLAMP
         )
-        cv.drawCircle(0f, 0f, r, p)
+        cv.drawCircle(0f, 0f, lr, p)
         p.shader = null
         p.xfermode = null
         cv.restoreToCount(layer)
@@ -1475,9 +2070,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         // Kenar ışığı
         p.style = Paint.Style.STROKE
         p.strokeWidth = r * 0.035f
-        p.color = withAlpha(pal.light, 130)
-        tmpArtRect.set(-r * 0.975f, -r * 0.975f, r * 0.975f, r * 0.975f)
-        cv.drawArc(tmpArtRect, 195f, 90f, false, p)
+        if (shape != null) {
+            p.color = withAlpha(pal.light, if (type == PlanetType.CRYSTAL) 200 else 70)
+            p.strokeJoin = Paint.Join.ROUND
+            cv.drawPath(shape, p)
+        } else {
+            p.color = withAlpha(pal.light, 130)
+            tmpArtRect.set(-r * 0.975f, -r * 0.975f, r * 0.975f, r * 0.975f)
+            cv.drawArc(tmpArtRect, 195f, 90f, false, p)
+        }
         p.style = Paint.Style.FILL
 
         if (ringed) drawRing(cv, p, r, pal.light, front = true)

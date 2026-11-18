@@ -26,13 +26,19 @@
 
     <!-- Haritalar -->
     <string name="map_earth">Dünya Yörüngesi</string>
-    <string name="map_earth_desc">Dengeli rota · karışık gezegenler</string>
+    <string name="map_earth_desc">Klasik rota · mavi gezegenler</string>
+    <string name="map_earth_tip">Gezegenlerin arasındaki boşluktan geç</string>
     <string name="map_ice">Buz Kuşağı</string>
-    <string name="map_ice_desc">Düşük yer çekimi · süzülerek uç</string>
+    <string name="map_ice_desc">Çok düşük yer çekimi · buz kristalleri</string>
+    <string name="map_ice_tip">Roket süzülür, hafif dokun!</string>
     <string name="map_lava">Lav Denizi</string>
-    <string name="map_lava_desc">Kızgın gezegenler · daha hızlı akış</string>
+    <string name="map_lava_desc">Fırlayan ateş topları · hızlı akış</string>
+    <string name="map_lava_tip">Kızaran yerden ateş topu fırlar, kaç!</string>
     <string name="map_gas">Gaz Devleri</string>
-    <string name="map_gas_desc">Dev halkalı gezegenler</string>
+    <string name="map_gas_desc">Değişken rüzgâr · dev halkalı gezegenler</string>
+    <string name="map_gas_tip">Rüzgâr oku nereyi gösteriyorsa oraya iter</string>
     <string name="map_asteroid">Asteroit Kuşağı</string>
-    <string name="map_asteroid_desc">Kuleler yukarı aşağı kayıyor</string>
+    <string name="map_asteroid_desc">Dönen ve salınan asteroitler</string>
+    <string name="map_asteroid_tip">Kuleler yukarı aşağı kayar, zamanla!</string>
+    <string name="wind">RÜZGÂR</string>
 </resources>
