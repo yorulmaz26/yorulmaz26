@@ -17,7 +17,7 @@ namespace WorldWonders.View
         [SerializeField] int levelNumber = 1;
         [SerializeField] float cellSize = 1f;
         [SerializeField] SpriteRenderer piecePrefab;
-        [SerializeField] Sprite[] stoneSprites = new Sprite[6];   // sikke, parşömen, amfora, skarabe, pusula, taç
+        [SerializeField] Sprite[] stoneSprites = new Sprite[6];   // sikke, parşömen, amfora, defne çelengi, pusula, taç
         [SerializeField] Sprite diskSprite, relicSprite, blockSprite;
         [SerializeField] Color lineTint = new Color(1f, .95f, .7f), bombTint = new Color(1f, .8f, .55f);
         [SerializeField] float fallSpeed = 12f;

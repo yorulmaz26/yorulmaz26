@@ -248,7 +248,7 @@ const STONES = [
   { id:'coin',    name:'Altın Sikke',     color:'#f4c430' },
   { id:'scroll',  name:'Antik Parşömen',  color:'#e8d6ad' },
   { id:'amphora', name:'Antik Amfora',    color:'#d0632e' },
-  { id:'scarab',  name:'Mısır Skarabesi', color:'#2fa36b' },
+  { id:'wreath',  name:'Defne Çelengi',   color:'#2fa36b' },
   { id:'compass', name:'Safir Pusula',    color:'#2f6fd6' },
   { id:'crown',   name:'Yakut Taç',       color:'#d4233a' },
 ];
@@ -464,17 +464,31 @@ function drawAmphora(c){
   c.restore();
   rrect(c,-11,-42,22,6,3); c.fillStyle='#b4501f'; c.fill(); c.strokeStyle='#6d2a0c'; c.lineWidth=1.2; c.stroke();
 }
-function drawScarab(c){
-  c.lineCap='round'; c.lineJoin='round'; c.strokeStyle='#0b3a25'; c.lineWidth=3.4;
-  [-1,1].forEach(s=>{ [[[14,-14],[29,-24],[33,-33]],[[17,0],[33,-2],[39,5]],[[15,15],[29,25],[31,37]]].forEach(L=>{ c.beginPath(); c.moveTo(s*L[0][0],L[0][1]); c.lineTo(s*L[1][0],L[1][1]); c.lineTo(s*L[2][0],L[2][1]); c.stroke(); }); });
+function drawWreath(c){
+  // Defne çelengi: Antik Yunan ve Roma'da zafer simgesi. Üstü açık halka + altta altın kurdele.
+  const leaf = (x,y,rot,len) => { c.save(); c.translate(x,y); c.rotate(rot);
+    c.beginPath(); c.moveTo(-len,0); c.quadraticCurveTo(0,-len*.55,len,0); c.quadraticCurveTo(0,len*.55,-len,0); c.closePath();
+    c.fillStyle = grad(c,-len,-len*.5,len,len*.5,[[0,'#a6f0a8'],[.45,'#3fae5a'],[1,'#17653a']]); c.fill();
+    c.lineWidth=1.1; c.strokeStyle='#0e4a29'; c.stroke();
+    c.beginPath(); c.moveTo(-len*.8,0); c.lineTo(len*.7,0); c.strokeStyle='rgba(220,255,210,.6)'; c.lineWidth=1; c.stroke(); c.restore(); };
   softShadow(c);
-  c.beginPath(); c.ellipse(0,9,25,28,0,0,TAU); c.fillStyle = rgrad(c,-9,0,2,0,8,32,[[0,'#a6f7cb'],[.45,'#2fb072'],[1,'#0b5233']]); c.fill(); softShadow(c,false);
-  c.beginPath(); c.ellipse(0,-17,18,10,0,0,TAU); c.fillStyle = rgrad(c,-5,-20,1,0,-17,20,[[0,'#7fe6ad'],[1,'#0f6640']]); c.fill();
-  c.beginPath(); c.ellipse(0,-30,10,6.5,0,0,TAU); c.fillStyle='#0f5a39'; c.fill();
-  c.strokeStyle='#0b3a25'; c.lineWidth=2.5; c.beginPath(); c.moveTo(-5,-35); c.lineTo(-8,-42); c.moveTo(5,-35); c.lineTo(8,-42); c.stroke();
-  c.strokeStyle='rgba(255,214,110,.9)'; c.lineWidth=1.6; c.beginPath(); c.ellipse(0,9,25,28,0,0,TAU); c.stroke(); c.beginPath(); c.ellipse(0,-17,18,10,0,0,TAU); c.stroke();
-  c.strokeStyle='#073b24'; c.lineWidth=1.8; c.beginPath(); c.moveTo(0,-7); c.lineTo(0,37); c.stroke();
-  c.fillStyle='rgba(255,255,255,.42)'; c.beginPath(); c.ellipse(-10,4,4.5,14,.15,0,TAU); c.fill(); c.beginPath(); c.ellipse(-7,-19,6,2.5,-.2,0,TAU); c.fill();
+  c.lineCap='round'; c.strokeStyle='#5b3d14'; c.lineWidth=4.5;
+  c.beginPath(); c.arc(0,2,30,Math.PI*.56,Math.PI*1.34); c.stroke();
+  c.beginPath(); c.arc(0,2,30,Math.PI*.44,-Math.PI*.34,true); c.stroke();
+  softShadow(c,false);
+  for (const s of [-1,1]) for (let i=0;i<7;i++){
+    const t = i/6, a = Math.PI/2 - s*(Math.PI*.12 + t*Math.PI*.7), tan = a - s*Math.PI/2, len = 11 - t*2.4;
+    const cx = Math.cos(a)*30, cy = 2 + Math.sin(a)*30;
+    leaf(cx + Math.cos(a)*6, cy + Math.sin(a)*6, tan - s*.55, len);
+    leaf(cx - Math.cos(a)*5, cy - Math.sin(a)*5, tan + s*.55, len*.92);
+  }
+  [[-1,1],[1,1]].forEach(([s])=>{ const a = Math.PI/2 - s*Math.PI*.83; leaf(Math.cos(a)*30, 2+Math.sin(a)*30, a - s*Math.PI/2, 8); });
+  [[-20,-14],[21,-10],[-27,8],[26,12]].forEach(([x,y])=>{ c.beginPath(); c.arc(x,y,2.6,0,TAU); c.fillStyle='#e8b23a'; c.fill(); });
+  // altın kurdele
+  c.fillStyle = grad(c,0,26,0,44,[[0,'#fff0a8'],[1,'#b9831b']]); c.strokeStyle='#7a520c'; c.lineWidth=1.2;
+  [[-1],[1]].forEach(([s])=>{ c.beginPath(); c.moveTo(0,33); c.quadraticCurveTo(s*14,22,s*15,32); c.quadraticCurveTo(s*12,40,0,33); c.fill(); c.stroke();
+    c.beginPath(); c.moveTo(s*2,35); c.lineTo(s*9,46); c.lineTo(s*4,45); c.lineTo(s*1,38); c.closePath(); c.fill(); c.stroke(); });
+  c.beginPath(); c.arc(0,33.5,4,0,TAU); c.fill(); c.stroke();
 }
 function drawCompass(c){
   softShadow(c); c.beginPath(); c.moveTo(0,-45); c.lineTo(39,0); c.lineTo(0,45); c.lineTo(-39,0); c.closePath(); c.fillStyle='#1d4fb8'; c.fill(); softShadow(c,false);
@@ -499,7 +513,7 @@ function drawCrown(c){
   [-21,0,21].forEach(x=>{ c.beginPath(); c.arc(x,19.5,4.2,0,TAU); c.fillStyle = x? '#2fb0ff':'#ff3d5f'; c.fill(); c.fillStyle='rgba(255,255,255,.8)'; c.beginPath(); c.arc(x-1.3,18.2,1.3,0,TAU); c.fill(); });
   [[-38,-14],[0,-30],[38,-14]].forEach(([x,y])=>{ c.beginPath(); c.arc(x,y,5.5,0,TAU); c.fillStyle = rgrad(c,x-2,y-2,1,x,y,6,[[0,'#fff7c8'],[1,'#c48d18']]); c.fill(); });
 }
-const STONE_DRAW = [drawCoin, drawScroll, drawAmphora, drawScarab, drawCompass, drawCrown];
+const STONE_DRAW = [drawCoin, drawScroll, drawAmphora, drawWreath, drawCompass, drawCrown];
 
 function drawDisk(c){
   for (let i=0;i<12;i++){ c.save(); c.rotate(i/12*TAU); c.beginPath(); c.moveTo(-6,-30); c.lineTo(0,-47); c.lineTo(6,-30); c.closePath(); c.fillStyle = i%2 ? '#ffd45a' : '#ffefa6'; c.fill(); c.restore(); }
