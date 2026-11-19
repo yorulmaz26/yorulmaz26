@@ -1,4 +1,5 @@
 GEÇTİ  | APK kurulumu
+GEÇTİ  | Magic Lumos logo animasyonu gösterildi
 GEÇTİ  | Uygulama açılışı → SplashScreen gösterildi
 GEÇTİ  | İlk açılış öğreticisi → TutorialScreen
 GEÇTİ  | Öğretici → Ana menü → MenuScreen
@@ -7,8 +8,8 @@ GEÇTİ  | OYNA butonu → PlayScreen
 GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
-GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (1)
-GEÇTİ  | Kayıt: rekor kaydedildi (71)
+GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (2)
+GEÇTİ  | Kayıt: rekor kaydedildi (43)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Duraklatma → Ana menü → MenuScreen
@@ -43,4 +44,4 @@ GEÇTİ  | Harita bölümlerinden ana menüye dönüş
 GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
 GEÇTİ  | Kalıcılık: seçili karakter korundu
 GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 45 geçti, 0 kaldı
+TOPLAM: 46 geçti, 0 kaldı
