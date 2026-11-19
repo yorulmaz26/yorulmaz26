@@ -12,10 +12,11 @@ Match-3 + Jigsaw Puzzle + 3D dünya haritası. Tek dosyalık bir web prototipi. 
 - **Hedefler:** taş toplama, engel kırma, katman temizleme, eser indirme, puan
 - **Puzzle:** her 5 bölümde 1 parça. Parça uçup yerine oturuyor, son parçada tamamlama animasyonu oynuyor
 - **3D Harita:** eğimli dünya düzlemi, ayakta duran anıtlar, rota, sürükleyerek gezinme, tamamlanan harikanın "yükselme" animasyonu
+- **Can:** 3 can, para yok. Kaybedilen bölüm 1 can götürür, 20 dakikada 1 can yenilenir (süre öneri)
 - **Koleksiyon:** 7 harika ve "Antik Dünya: yakında" kartı
 
 ## Test modu
-Ayarlar (⚙) → **Test modu** açıldığında oyun ekranına "Bölümü Kazan" düğmesi, ayarlara da "parçaya atla" seçeneği ekleniyor.
+Ayarlar (⚙) → **Test modu** açıldığında oyun ekranına "Bölümü Kazan" düğmesi, ayarlara da "parçaya atla" ve "canları doldur" seçenekleri ekleniyor.
 
 ## Tasarım
 Konsept analizi ve öncelikli eksik kararlar: [`TASARIM.md`](TASARIM.md)
