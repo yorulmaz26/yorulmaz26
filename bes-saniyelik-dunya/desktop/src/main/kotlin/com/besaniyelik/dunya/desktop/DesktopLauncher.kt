@@ -44,7 +44,7 @@ class ScreenshotTour(private val dir: String) {
     init {
         fun screen(name: String, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(45)); steps.add(Step.Shot(name)) }
         if (System.getProperty("introGif") != null) {
-            for (i in 0 until 70) { steps.add(Step.Wait(3)); steps.add(Step.Shot("gif_%03d".format(i))) }
+            for (i in 0 until 115) { steps.add(Step.Wait(3)); steps.add(Step.Shot("gif_%03d".format(i))) }
             steps.add(Step.Run { Gdx.app.exit() })
         }
         // açılış animasyonu kareleri (60 fps varsayımıyla zaman damgaları)

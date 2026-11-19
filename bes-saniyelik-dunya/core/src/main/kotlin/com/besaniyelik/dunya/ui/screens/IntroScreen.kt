@@ -66,7 +66,10 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     private val tBurst get() = tBigJump + 0.28f
     private val tSoftware get() = tBurst + 0.05f
     private val tFlip get() = tSoftware + 0.45f
-    private val tEnd get() = tFlip + 0.95f
+    private val tEnd get() = tFlip + 1.4f // logonun tamamı bir süre ekranda kalır
+
+    /** Animasyon hızı: 1 = özgün, daha küçük = daha yavaş (toplam ≈ 7 sn). */
+    private val speed = 0.65f
 
     init {
         val layout = Gdx.files.internal("intro/layout.txt").readString("UTF-8").lines().filter { it.isNotBlank() && !it.startsWith("#") }
@@ -103,9 +106,9 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     private fun once(key: String, f: () -> Unit) { if (played.add(key)) f() }
 
     override fun renderWorld(dt: Float) {
-        t += dt
+        t += dt * speed
         if (t > tEnd + 0.15f) finish()
-        particles.update(dt)
+        particles.update(dt * speed)
         val b = game.batch
         stage.viewport.apply()
         b.projectionMatrix = stage.camera.combined
@@ -151,7 +154,7 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
                 particles.burst(dust, px(p.sx + p.w / 2f), py((p.sy + p.h).toFloat()), 4, 120f, 0.4f, 34f, Color(0.7f, 0.85f, 1f, 0.5f))
                 if (i % 3 == 0) game.audio.play(Sfx.LAND, 1.2f)
             }
-            letterDip[i] = max(0f, letterDip[i] - dt * 6f)
+            letterDip[i] = max(0f, letterDip[i] - dt * speed * 6f)
             val dip = -sin(letterDip[i] * Math.PI.toFloat()) * 12f
             val squash = if (k in 0.36f..0.5f) 0.88f else 1f
             drawPart(b, p, 0f, dy + dip, min(1f, lt * 6f), squash)

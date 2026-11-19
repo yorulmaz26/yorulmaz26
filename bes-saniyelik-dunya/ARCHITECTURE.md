@@ -76,7 +76,7 @@ ui/         UiKit (UIManager: buton, panel, çubuk), screens/ (20 ekran), Assets
 
 ## Açılış animasyonu (Magic Lumos Software)
 
-`IntroScreen` uygulama açılışında ~4,3 sn oynar (dokununca geçilir). `tools/intro/extract_logo.py` şirket logosunu (`tools/intro/magic_lumos_logo.jpg`) parlaklık anahtarlamasıyla katmanlara ayırır: 10 harf, SOFTWARE'in 10 karakteri, köşeli parantezler, kod işaretleri ve kenarları yumuşatılmış devre çizgileri (`assets/intro/`, konumlar `layout.txt`). Animasyon oyunun diliyle kurgulanmıştır: devre çizgileri merkezden açılır → harfler zıplayarak düşer → oyunun karakteri harflerin üstünde zıplar → "Lumos" ışık patlaması → SOFTWARE ters yer çekimiyle baş aşağı gelip düzelir → ışık süzmesi ve "sunar".
+`IntroScreen` uygulama açılışında ~7,4 sn oynar (dokununca geçilir). `tools/intro/extract_logo.py` şirket logosunu (`tools/intro/magic_lumos_logo.jpg`) parlaklık anahtarlamasıyla katmanlara ayırır: 10 harf, SOFTWARE'in 10 karakteri, köşeli parantezler, kod işaretleri ve kenarları yumuşatılmış devre çizgileri (`assets/intro/`, konumlar `layout.txt`). Animasyon oyunun diliyle kurgulanmıştır: devre çizgileri merkezden açılır → harfler zıplayarak düşer → oyunun karakteri harflerin üstünde zıplar → "Lumos" ışık patlaması → SOFTWARE ters yer çekimiyle baş aşağı gelip düzelir → ışık süzmesi ve "sunar".
 
 ## Grafik ve ses kaynakları
 
