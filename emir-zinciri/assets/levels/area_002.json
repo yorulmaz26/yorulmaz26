@@ -1,0 +1,214 @@
+{
+    "area": 2,
+    "levels": [
+        {
+            "id": 6,
+            "area": 2,
+            "name": "Duvarlar",
+            "goalText": "Duvarların arasından çıkışa ulaş.",
+            "hint": "Duvara çarpan robot yerinde kalır ve kart boşa gider.",
+            "story": "Yön Labirenti'nde koridorlar duvarlarla örülü. Robotlarının yönünü iyi planla.",
+            "map": [
+                "#....#",
+                "#.##.#",
+                "#.#E.#",
+                "######"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 14,
+            "par": 11,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 7,
+            "area": 2,
+            "name": "Geri Vites",
+            "goalText": "Yeni kart: Geri git.",
+            "hint": "'Geri git' robotu döndürmeden bir hücre geri götürür. Dönüşlerden tasarruf et.",
+            "map": [
+                "#E##",
+                "#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 1
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK"
+            ],
+            "maxCommands": 8,
+            "par": 4,
+            "tutorial": "back",
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 8,
+            "area": 2,
+            "name": "Kart Sınırı",
+            "goalText": "Yalnızca 8 kart kullanabilirsin.",
+            "hint": "Uzun yol 10 kart ister. Robotun arkasındaki yolu düşün.",
+            "map": [
+                "......",
+                ".####.",
+                "...E.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK"
+            ],
+            "maxCommands": 8,
+            "par": 8,
+            "tutorial": "limit",
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 9,
+            "area": 2,
+            "name": "Labirent",
+            "goalText": "Labirentin çıkışını bul.",
+            "hint": "Çıkmaz sokaklara girme. Yolu önce gözünle takip et.",
+            "map": [
+                "#######",
+                "#...#E#",
+                "#.#.#.#",
+                "#.#...#",
+                "#.#####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK"
+            ],
+            "maxCommands": 18,
+            "par": 15,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 10,
+            "area": 2,
+            "name": "Yön Ustası",
+            "goalText": "Az kartla çıkışa ulaş.",
+            "hint": "Robot aşağı bakıyor. Gerçekten dönmen gerekiyor mu?",
+            "map": [
+                "....E",
+                ".###.",
+                ".#...",
+                ".#.##",
+                "...  "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK"
+            ],
+            "maxCommands": 9,
+            "par": 7,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

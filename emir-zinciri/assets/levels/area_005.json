@@ -1,0 +1,303 @@
+{
+    "area": 5,
+    "levels": [
+        {
+            "id": 21,
+            "area": 5,
+            "name": "Enerji Hücresi",
+            "goalText": "Enerjin bitmeden çıkışa ulaş.",
+            "hint": "Her adım 1 enerji harcar. Hücrenin üstündeyken 'Enerji topla' kullan.",
+            "story": "Enerji İstasyonu çöktü. Robotlarının enerjisi sınırlı: her hamleyi hesapla.",
+            "map": [
+                ".c....E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0,
+                    "energy": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS",
+                "WAIT",
+                "COLLECT"
+            ],
+            "maxCommands": 10,
+            "par": 7,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "tutorial": "energy",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 22,
+            "area": 5,
+            "name": "Şarj İstasyonu",
+            "goalText": "Şarj olup çıkışa git.",
+            "hint": "Şarj istasyonunda 'Enerji topla' robotu tamamen doldurur.",
+            "map": [
+                "......E",
+                "...Q   "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0,
+                    "energy": 4,
+                    "maxEnergy": 6
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS",
+                "WAIT",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 11,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 23,
+            "area": 5,
+            "name": "Enerji Soketi",
+            "goalText": "Soketi doldurup kapıyı aç.",
+            "hint": "Yeni kart: Enerji aktar. Sokete bakarken 3 enerji aktarır.",
+            "map": [
+                "  K    ",
+                "c....DE"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS",
+                "WAIT",
+                "COLLECT",
+                "TRANSFER"
+            ],
+            "maxCommands": 12,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "energy": true,
+            "tutorial": "transfer",
+            "solution": {
+                "A": [
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "TRANSFER",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 24,
+            "area": 5,
+            "name": "Enerji Ağı",
+            "goalText": "Soket 6 enerji istiyor.",
+            "hint": "Robot en fazla 6 enerji taşıyabilir. Şarj istasyonunu akıllıca kullan.",
+            "map": [
+                ".Q.K...",
+                "...#...",
+                "...Dc.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "energy": 3,
+                    "maxEnergy": 6
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS",
+                "WAIT",
+                "COLLECT",
+                "TRANSFER"
+            ],
+            "maxCommands": 24,
+            "par": 22,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 18
+            },
+            "energy": true,
+            "values": {
+                "3,0": 6
+            },
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "COLLECT",
+                    "FORWARD",
+                    "TRANSFER",
+                    "BACK",
+                    "COLLECT",
+                    "FORWARD",
+                    "TRANSFER",
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "COLLECT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 25,
+            "area": 5,
+            "name": "Büyük Tek Robot Görevi",
+            "goalText": "Öğrendiğin her şeyi kullan.",
+            "hint": "Anahtar, soket, kutu ve çukur: hepsi tek bir planın parçası.",
+            "story": "Tek robotla son sınav. Bu görevi başaran komutanlar ikinci robotlarına kavuşur.",
+            "map": [
+                "  s  K   ",
+                ".B..D.DoE",
+                "...Q     "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "energy": 8
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS",
+                "WAIT",
+                "COLLECT",
+                "TRANSFER"
+            ],
+            "maxCommands": 26,
+            "par": 21,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 15
+            },
+            "energy": true,
+            "channels": {
+                "5,0": 2,
+                "6,1": 2
+            },
+            "solution": {
+                "A": [
+                    "PICK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "COLLECT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "TRANSFER",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "DROP",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

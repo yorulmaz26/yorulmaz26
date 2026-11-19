@@ -1,0 +1,189 @@
+{
+    "area": 1,
+    "levels": [
+        {
+            "id": 1,
+            "area": 1,
+            "name": "İlk Adım",
+            "goalText": "Robotu yeşil çıkışa götür.",
+            "hint": "'İleri git' kartını iki kez zincire ekle ve Başlat'a bas.",
+            "story": "Merkezi yapay zekâ kontrolden çıktı. Sen eski komuta teknolojisini kullanabilen son Robot Komutan'sın. İlk robotunu uyandır!",
+            "map": [
+                "..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD"
+            ],
+            "maxCommands": 4,
+            "par": 2,
+            "tutorial": "first_move",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "area": 1,
+            "name": "İlk Dönüş",
+            "goalText": "Köşeyi dön ve çıkışa ulaş.",
+            "hint": "Robot yalnızca baktığı yöne ilerler. Köşede 'Sağa dön' kullan.",
+            "map": [
+                "...",
+                "  .",
+                "  E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 8,
+            "par": 5,
+            "tutorial": "turn",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 3,
+            "area": 1,
+            "name": "İki Yön",
+            "goalText": "Önce sola, sonra sağa dön.",
+            "hint": "Robotun yüzü hangi yöne bakıyor? Dönüşler robotun kendi yönüne göredir.",
+            "map": [
+                "  .E",
+                "  . ",
+                "... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 10,
+            "par": 7,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 4,
+            "area": 1,
+            "name": "Zikzak",
+            "goalText": "Kıvrımlı yolu izle.",
+            "hint": "Her köşede robotun yönünü düşün. Boşluğa düşen robot kaybolur.",
+            "map": [
+                ".E",
+                ". ",
+                "..",
+                " .",
+                ".."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 14,
+            "par": 11,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "area": 1,
+            "name": "İlk Komut Finali",
+            "goalText": "En kısa yolu bul.",
+            "hint": "İki yol var. Daha az kart kullanan yolu seç: bazen geri dönmek daha kısadır.",
+            "map": [
+                "E.....",
+                ".    .",
+                ".    .",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 14,
+            "par": 8,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

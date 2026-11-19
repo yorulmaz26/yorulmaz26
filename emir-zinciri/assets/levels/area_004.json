@@ -1,0 +1,234 @@
+{
+    "area": 4,
+    "levels": [
+        {
+            "id": 16,
+            "area": 4,
+            "name": "Anahtar",
+            "goalText": "Yeni kart: Butona bas.",
+            "hint": "Anahtar paneline bakarken 'Butona bas' kapıyı açar.",
+            "story": "Kapı Kontrolü bölgesinde güvenlik kapıları kilitli kaldı. Panelleri doğru sırayla kullan.",
+            "map": [
+                " s   ",
+                "..D.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 10,
+            "par": 7,
+            "tutorial": "press",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 17,
+            "area": 4,
+            "name": "Basınç Plakası",
+            "goalText": "Kapıyı açık tut.",
+            "hint": "Plaka üzerinde kutu veya robot durduğu sürece kapı açık kalır.",
+            "map": [
+                ".Bp  ",
+                "...DE"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 10,
+            "par": 7,
+            "tutorial": "plate",
+            "solution": {
+                "A": [
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 18,
+            "area": 4,
+            "name": "Ters Kapı",
+            "goalText": "Mor kapılar tersine çalışır.",
+            "hint": "Anahtar normal kapıları açarken ters kapıları kapatır. Sıra önemli!",
+            "map": [
+                " s.s  ",
+                "..d..DE"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 12,
+            "par": 9,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 19,
+            "area": 4,
+            "name": "Zamanlı Düğme",
+            "goalText": "Kapı yalnızca 4 adım açık kalır.",
+            "hint": "Zamanlı düğmeye bastıktan sonra vakit kaybetme.",
+            "map": [
+                "t     ",
+                "...D.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 9,
+            "par": 7,
+            "values": {
+                "0,0": 4
+            },
+            "tutorial": "timer",
+            "solution": {
+                "A": [
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 20,
+            "area": 4,
+            "name": "Kapı Finali",
+            "goalText": "Zamanlamayı ve plakayı birlikte kullan.",
+            "hint": "Yeni kart: Bekle. Ters kapı açılana kadar beklemen gerekebilir.",
+            "map": [
+                "t   ... ",
+                ".Dd.BpDE#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH",
+                "PRESS",
+                "WAIT"
+            ],
+            "maxCommands": 20,
+            "par": 11,
+            "channels": {
+                "5,1": 2,
+                "6,1": 2
+            },
+            "values": {
+                "0,0": 3
+            },
+            "tutorial": "wait",
+            "solution": {
+                "A": [
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "PICK",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

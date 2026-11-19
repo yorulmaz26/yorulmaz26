@@ -1,0 +1,241 @@
+{
+    "area": 3,
+    "levels": [
+        {
+            "id": 11,
+            "area": 3,
+            "name": "İlk Kutu",
+            "goalText": "Kutuyu sarı hedefe taşı.",
+            "hint": "'Nesne al' önündeki kutuyu kaldırır, 'Nesne bırak' önündeki hücreye bırakır.",
+            "story": "Taşıma Tesisi'nde yükler yerlerine ulaşmadı. Kutuları hedeflere taşı.",
+            "map": [
+                ".B.x"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP"
+            ],
+            "maxCommands": 8,
+            "par": 4,
+            "objectives": [
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "tutorial": "carry",
+            "solution": {
+                "A": [
+                    "PICK",
+                    "FORWARD",
+                    "FORWARD",
+                    "DROP"
+                ]
+            }
+        },
+        {
+            "id": 12,
+            "area": 3,
+            "name": "Teslimat",
+            "goalText": "Kutuyu hedefe bırak, sonra çıkışa git.",
+            "hint": "Birden fazla hedef var: hepsini tamamla.",
+            "map": [
+                ".B..",
+                "....",
+                "x..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP"
+            ],
+            "maxCommands": 14,
+            "par": 9,
+            "objectives": [
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "REACH_EXIT"
+                }
+            ],
+            "solution": {
+                "A": [
+                    "PICK",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "DROP",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 13,
+            "area": 3,
+            "name": "İtme Gücü",
+            "goalText": "Yeni kart: İt.",
+            "hint": "'İt' kutuyu bir hücre öne iter ve robot da ilerler. Taşımaktan kısa olabilir.",
+            "map": [
+                "..B.x"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH"
+            ],
+            "maxCommands": 7,
+            "par": 3,
+            "objectives": [
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "tutorial": "push",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "PUSH",
+                    "PUSH"
+                ]
+            }
+        },
+        {
+            "id": 14,
+            "area": 3,
+            "name": "Çukuru Doldur",
+            "goalText": "Çukurun üstünden geç.",
+            "hint": "Çukura itilen kutu çukuru doldurur ve üstünden yürünebilir.",
+            "map": [
+                "..Bo.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH"
+            ],
+            "maxCommands": 8,
+            "par": 5,
+            "tutorial": "pit",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "PUSH",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 15,
+            "area": 3,
+            "name": "Taşıma Finali",
+            "goalText": "İki kutuyu hedeflere yerleştir ve çıkışa ulaş.",
+            "hint": "Üç kutu var ama iki hedef: üçüncü kutu çukur için.",
+            "map": [
+                "x..B..  ",
+                "x.B.B.oE",
+                "......  "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "BACK",
+                "PICK",
+                "DROP",
+                "PUSH"
+            ],
+            "maxCommands": 26,
+            "par": 22,
+            "objectives": [
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "REACH_EXIT"
+                }
+            ],
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PICK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "DROP",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}
