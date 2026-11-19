@@ -1,0 +1,492 @@
+package com.yuruyensehir.game.screens
+
+import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.utils.Align
+import com.yuruyensehir.game.ui.Palette
+import com.yuruyensehir.logic.*
+
+/** Alt sayfa panellerinin içerikleri. Her çağrıda güncel durumdan yeniden kurulur. */
+object Panels {
+    private const val GREEN = "[#2E8B57]"
+    private const val RED = "[#D84A2B]"
+    private const val SOFT = "[#8A7660]"
+
+    private fun Table.section(s: GameScreen, text: String, width: Float) {
+        add(s.ui.label(text, "default")).width(width).padTop(14f).padBottom(4f).row()
+    }
+
+    private fun Table.text(s: GameScreen, text: String, width: Float, style: String = "small") {
+        add(s.ui.label(text, style, wrap = true)).width(width).padTop(2f).row()
+    }
+
+    private fun Table.cardRow(card: Table, width: Float) {
+        add(card).width(width).padTop(8f).row()
+    }
+
+    fun effectText(def: BuildingDef): String {
+        val parts = ArrayList<String>()
+        if (def.produces.isNotEmpty()) parts += "Üretir: " + def.produces.entries.joinToString(", ") { "${it.key.title} ${fmt(it.value)}/dk" }
+        if (def.consumes.isNotEmpty()) parts += "Tüketir: " + def.consumes.entries.joinToString(", ") { "${it.key.title} ${fmt(it.value)}/dk" }
+        if (def.housing > 0) parts += "Barınma: ${def.housing} kişi"
+        if (def.storage.isNotEmpty()) parts += "Depo: " + def.storage.entries.filter { it.key != Resource.WASTE }.take(4).joinToString(", ") { "${it.key.title} +${fmt(it.value)}" } + if (def.storage.size > 4) "…" else ""
+        if (def.workers > 0) parts += "İşçi: ${def.workers} (${def.profession?.title ?: "-"})"
+        if (def.happiness > 0) parts += "Mutluluk +${fmt(def.happiness)}"
+        if (def.researchPerMin > 0) parts += "Bilgi +${fmt(def.researchPerMin)}/dk"
+        if (def.taxPerPop > 0) parts += "Vergi: kişi başı ${fmt(def.taxPerPop)} altın/dk"
+        if (def.carrierCarePerMin > 0) parts += "Taşıyıcı bakımı ${fmt(def.carrierCarePerMin)}/dk"
+        if (def.gatherPerMin > 0) parts += "Toplama ${fmt(def.gatherPerMin)}/dk (biyoma göre)"
+        if (def.supportRadius > 0) parts += "Çevredeki binalar %20 hafifler"
+        if (def.healthRadius > 0) parts += "Sağlık kapsamı ${def.healthRadius} kare"
+        if (def.revealBonus > 0) parts += "Keşif menzili +${def.revealBonus}"
+        if (def.travelSpeedBonus > 0) parts += "Yolculuk hızı +%${(def.travelSpeedBonus * 100).toInt()}"
+        if (def.upkeepGold > 0) parts += "Bakım: ${fmt(def.upkeepGold)} altın/dk"
+        return parts.joinToString(" • ")
+    }
+
+    // ------------------------------------------------------------------ İnşa
+    fun build(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val tabs = Table()
+        for (c in BuildingCategory.entries) {
+            val b = s.ui.button(c.title, "chip") { s.currentBuildCategory = c }
+            b.pad(8f, 12f, 8f, 12f)
+            b.isChecked = s.currentBuildCategory == c
+            tabs.add(b).padRight(6f)
+        }
+        t.add(tabs).left().row()
+        val r = s.core.lastBalance
+        t.text(s, "${SOFT}Yük ${r.totalWeight.toInt()}/${r.capacity.toInt()} • Denge %${r.balancePercent} • Alan: ${CityGrid.usableCells(st)} kare[]", width)
+        val defs = BuildingCatalog.all.filter { it.category == s.currentBuildCategory && it.buildable }
+        for (def in defs) {
+            val card = s.ui.card(Color.WHITE)
+            val lock = BuildingSystem.lockReason(st, def)
+            val uniqueDone = def.unique && st.count(def.type) > 0
+            val left = Table()
+            left.add(s.ui.label(def.title + if (st.count(def.type) > 0) "  ${SOFT}(${st.count(def.type)} adet)[]" else "", "default")).left().row()
+            left.add(s.ui.label("${SOFT}${def.w}x${def.h} kare • Ağırlık ${fmt(def.weight)} • ${fmt(def.buildSeconds)} sn[]", "small")).left().row()
+            left.add(s.ui.label(def.description, "small", wrap = true)).width(width - 190f).left().padTop(2f).row()
+            left.add(s.ui.label(effectText(def), "small", wrap = true)).width(width - 190f).left().padTop(2f).row()
+            def.adjacency.forEach { a -> left.add(s.ui.label("${GREEN}Komşuluk: ${a.note}[]", "small", wrap = true)).width(width - 190f).left().row() }
+            left.add(s.ui.label("Maliyet: " + s.ui.costText(def.cost, st.store), "small", wrap = true)).width(width - 190f).left().padTop(4f).row()
+            if (lock != null) left.add(s.ui.label("$RED$lock[]", "small", wrap = true)).width(width - 190f).left().row()
+            if (uniqueDone) left.add(s.ui.label("${SOFT}Bu yapıdan yalnızca bir tane olabilir.[]", "small")).left().row()
+            card.add(left).expandX().left().top()
+            val btn = s.ui.button("Seç", "primary") { s.beginPlacement(def.type) }
+            btn.isDisabled = lock != null || uniqueDone || !st.store.canAfford(def.cost)
+            card.add(btn).width(140f).right().top()
+            t.cardRow(card, width)
+        }
+    }
+
+    // ------------------------------------------------------------------ Bina
+    fun building(s: GameScreen, t: Table, width: Float, b: PlacedBuilding) {
+        val st = s.state
+        val def = b.def
+        val status = st.buildingStatus[b.id]
+        val eff = ProductionSystem.efficiency(st, b)
+        val stText = when {
+            b.underConstruction -> "${SOFT}${if (b.level > 1) "Geliştiriliyor" else "İnşa ediliyor"}: ${b.constructionLeft.toInt()} sn kaldı[]"
+            !b.enabled -> "${RED}Kapalı[]"
+            def.workers > 0 && b.workers == 0 -> "${RED}Çalışan yok![]"
+            status?.missingInput != null && status.inputRatio < 0.99 -> "${RED}Girdi eksik: ${status.missingInput?.title} (%${(status.inputRatio * 100).toInt()})[]"
+            else -> "${GREEN}Çalışıyor • Verim %${(eff * 100).toInt()}[]"
+        }
+        t.text(s, def.description, width)
+        t.text(s, stText, width, "default")
+
+        val hp = Table()
+        hp.add(s.ui.label("Sağlamlık %${b.hp.toInt()}", "small")).width(200f).left()
+        hp.add(s.bar((b.hp / 100).toFloat(), if (b.hp > 60) Palette.green else Palette.orange, width - 220f)).left()
+        t.add(hp).width(width).padTop(6f).row()
+
+        if (def.workers > 0) {
+            val w = Table()
+            w.add(s.ui.label("Çalışanlar: ${b.workers}/${def.workers} ${def.profession?.title ?: ""} • Boşta: ${PopulationSystem.freeWorkers(st)}", "small")).expandX().left()
+            w.add(s.ui.button("-", "default") { s.act(BuildingSystem.setWorkers(st, b.id, b.workers - 1)) }).width(70f).padRight(6f)
+            w.add(s.ui.button("+", "default") { s.act(BuildingSystem.setWorkers(st, b.id, b.workers + 1)) }).width(70f)
+            t.add(w).width(width).padTop(6f).row()
+        }
+
+        val ratio = status?.inputRatio ?: 1.0
+        val bio = ProductionSystem.biomeOutputFactor(st, b)
+        if (def.produces.isNotEmpty() && !b.underConstruction) t.text(s, "Üretim: " + def.produces.entries.joinToString(", ") { "${it.key.title} ${fmt(it.value * eff * ratio * bio)}/dk" }, width)
+        if (def.consumes.isNotEmpty() && !b.underConstruction) t.text(s, "Tüketim: " + ProductionSystem.consumesWithModifiers(st, b).entries.joinToString(", ") { "${it.key.title} ${fmt(it.value * eff * ratio)}/dk" }, width)
+        if (def.gatherPerMin > 0) {
+            val biome = st.world.biomeAt(st.travel.position)
+            t.text(s, "Toplanan (${biome.title}): " + biome.yields.entries.joinToString(", ") { "${it.key.title} ${fmt(def.gatherPerMin * eff * it.value * if (st.travel.traveling) 0.4 else 1.0)}/dk" } +
+                " • Kalan yatak: ${fmt(ProductionSystem.depositLeft(st, st.travel.position))}", width)
+        }
+        if (def.housing > 0) t.text(s, "Barınma: ${(def.housing * (1 + 0.5 * (b.level - 1))).toInt()} kişi", width)
+        val others = effectText(def).split(" • ").filter { !it.startsWith("Üretir") && !it.startsWith("Tüketir") && !it.startsWith("Barınma") && !it.startsWith("İşçi") }
+        if (others.isNotEmpty()) t.text(s, others.joinToString(" • "), width)
+        def.adjacency.forEach { a ->
+            val on = BuildingSystem.activeAdjacencies(st, b).contains(a)
+            t.text(s, (if (on) "$GREEN• " else "$SOFT• ") + a.note + if (on) " (etkin)[]" else " (komşu yok)[]", width)
+        }
+        val supported = st.buildings.any { it.def.supportRadius > 0 && it.id != b.id && it.gapTo(b) <= 1 } && def.supportRadius == 0
+        t.text(s, "${SOFT}Ağırlık: ${fmt(WeightBalanceSystem.weightOf(st, b, supported))}${if (supported) " (destekli)" else ""} • Konum ${b.x},${b.y}[]", width)
+
+        val actions = Table()
+        actions.defaults().expandX().fillX().pad(4f)
+        if (b.level < def.maxLevel) {
+            val cost = BuildingSystem.upgradeCost(b)
+            val up = s.ui.button("Geliştir › Sv ${b.level + 1}", "primary") { s.act(BuildingSystem.upgrade(st, b.id)) }
+            up.isDisabled = b.underConstruction || !st.store.canAfford(cost)
+            actions.add(up).colspan(2).row()
+            actions.add(s.ui.label("Maliyet: " + s.ui.costText(cost, st.store) + "  ${SOFT}(geliştirme sırasında bina çalışmaz)[]", "small", wrap = true)).colspan(2).row()
+        } else actions.add(s.ui.label("${SOFT}En yüksek seviye.[]", "small")).colspan(2).row()
+        if (b.hp < 99.5) {
+            val cost = BuildingSystem.repairCost(b)
+            val rep = s.ui.button("Onar (${cost.describe()})", "gold") { s.act(BuildingSystem.repair(st, b.id)) }
+            rep.isDisabled = !st.store.canAfford(cost)
+            actions.add(rep).colspan(2).row()
+        }
+        if (b.type != BuildingType.CITY_CENTER) {
+            val mv = s.ui.button("Taşı", "default") { s.startMove(b) }
+            mv.isDisabled = b.underConstruction
+            actions.add(mv)
+            actions.add(s.ui.button(if (b.enabled) "Kapat" else "Aç", "default") { s.act(BuildingSystem.setEnabled(st, b.id, !b.enabled)) }).row()
+            actions.add(s.ui.label("${SOFT}Taşıma ücreti: ${BuildingSystem.moveCost(b).describe()}[]", "small", wrap = true)).colspan(2).row()
+            actions.add(s.ui.button(if (s.demolishPending(b)) "Emin misiniz? Tekrar dokunun" else "Sök (%50 iade)", "danger") { s.requestDemolish(b) }).colspan(2).row()
+        }
+        t.add(actions).width(width).padTop(10f).row()
+    }
+
+    // ------------------------------------------------------------------ Taşıyıcı
+    fun carrier(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val c = st.carrier
+        val r = s.core.lastBalance
+        t.text(s, "${c.name} • ${c.species} • Seviye ${c.level}", width, "default")
+        val xp = Table()
+        xp.add(s.ui.label("Deneyim ${c.xp.toInt()}/${CarrierSystem.xpForNext(c.level).toInt()}", "small")).width(240f).left()
+        xp.add(s.bar((c.xp / CarrierSystem.xpForNext(c.level)).toFloat(), Palette.gold, width - 260f))
+        t.add(xp).width(width).padTop(4f).row()
+
+        fun stat(name: String, v: Double, max: Double, col: Color, note: String = "") {
+            val row = Table()
+            row.add(s.ui.label("$name %${(v / max * 100).toInt()}$note", "small")).width(240f).left()
+            row.add(s.bar((v / max).toFloat(), col, width - 260f))
+            t.add(row).width(width).padTop(4f).row()
+        }
+        stat("Can", c.health, CarrierSystem.maxHealth(st), Palette.green)
+        stat("Açlık", c.hunger, 100.0, if (c.hunger > 70) Palette.red else Palette.orange)
+        stat("Susuzluk", c.thirst, 100.0, if (c.thirst > 70) Palette.red else Color.valueOf("4FC3F7"))
+        stat("Yorgunluk", c.fatigue, 100.0, if (c.fatigue > 80) Palette.red else Color.valueOf("B39DDB"))
+        stat("Enerji", c.energy, 100.0, Palette.gold)
+        stat("Güven", c.trust, 100.0, Palette.turquoise)
+
+        val biome = st.world.biomeAt(st.travel.position)
+        t.text(s, "Hız: ${fmt(CarrierSystem.speed(st, r))} bölge/dk (arazi: ${biome.title} ×${fmt(CarrierSystem.terrainFactor(st, biome))}) • Kapasite ${r.capacity.toInt()} • Hareket verimliliği %${r.efficiencyPercent}", width)
+        val (food, water) = CarrierSystem.estimatedFeedPerMinute(st)
+        t.text(s, "Tahmini ihtiyaç: yiyecek ${fmt(food)}/dk, su ${fmt(water)}/dk. Dinlenirken bulunduğu araziden kendini besler (${biome.title}: otlak %${(biome.forage * 100).toInt()}, su %${(biome.waterAvail * 100).toInt()}).", width)
+        if (c.forcedRest) t.text(s, "${RED}${c.name} bitkin! Yorgunluk %55'in altına inene kadar yürümeyecek.[]", width)
+        if (r.overloaded) t.text(s, "${RED}Aşırı yük! Taşıyıcı yavaşlar ve hızla yorulur. Bina sökün, kaynak harcayın veya kapasiteyi geliştirin.[]", width)
+
+        val ctl = Table()
+        ctl.defaults().expandX().fillX().pad(4f)
+        ctl.add(s.ui.button("Besle", "green") { s.act(CarrierSystem.feed(st)) })
+        ctl.add(s.ui.button(if (c.resting) "Uyandır" else "Dinlendir", "primary") { s.act(CarrierSystem.setResting(st, !c.resting)) }).row()
+        ctl.add(s.ui.button("Otomatik besleme: ${if (c.autoFeed) "Açık" else "Kapalı"}", "default") { c.autoFeed = !c.autoFeed; s.act(ActionResult.ok(if (c.autoFeed) "Otomatik besleme açıldı." else "Otomatik besleme kapatıldı.")) }).colspan(2)
+        t.add(ctl).width(width).padTop(8f).row()
+
+        t.section(s, "Özel Yetenekler", width)
+        for (a in CarrierAbility.entries) {
+            val card = s.ui.card(Color.WHITE)
+            val left = Table()
+            val active = c.abilityActiveLeft[a] ?: 0.0
+            val cd = c.abilityCooldown[a] ?: 0.0
+            val state = when {
+                c.level < a.unlockLevel -> "${SOFT}Seviye ${a.unlockLevel}'de açılır[]"
+                active > 0 -> "${GREEN}Etkin: ${active.toInt()} sn[]"
+                cd > 0 -> "${SOFT}Hazırlanıyor: ${cd.toInt()} sn[]"
+                else -> "${GREEN}Hazır[]" + if (a.energyCost > 0) " • Enerji ${a.energyCost.toInt()}" else ""
+            }
+            left.add(s.ui.label(a.title, "default")).left().row()
+            left.add(s.ui.label(a.description, "small", wrap = true)).width(width - 190f).left().row()
+            left.add(s.ui.label(state, "small")).left()
+            card.add(left).expandX().left()
+            val b = s.ui.button("Kullan", "primary") { s.act(CarrierSystem.activateAbility(st, a)) }
+            b.isDisabled = c.level < a.unlockLevel || cd > 0 || c.energy < a.energyCost
+            card.add(b).width(140f)
+            t.cardRow(card, width)
+        }
+
+        t.section(s, "Taşıyıcı Gelişimi", width)
+        for (u in CarrierUpgrade.entries) {
+            val card = s.ui.card(Color.WHITE)
+            val left = Table()
+            val lvl = c.upgrade(u)
+            left.add(s.ui.label("${u.title}  ${SOFT}$lvl/${u.maxLevel}[]", "default")).left().row()
+            left.add(s.ui.label(u.description, "small", wrap = true)).width(width - 190f).left().row()
+            if (lvl < u.maxLevel) {
+                val req = CarrierSystem.requiredLevel(st, u)
+                val cost = CarrierSystem.upgradeCost(st, u)
+                left.add(s.ui.label("Maliyet: " + s.ui.costText(cost, st.store) + if (c.level < req) "  ${RED}Seviye $req gerekli[]" else "", "small", wrap = true)).width(width - 190f).left()
+                val b = s.ui.button("Geliştir", "primary") { s.act(CarrierSystem.upgrade(st, u)) }
+                b.isDisabled = c.level < req || !st.store.canAfford(cost)
+                card.add(left).expandX().left()
+                card.add(b).width(140f)
+            } else {
+                left.add(s.ui.label("${GREEN}Tamamlandı[]", "small")).left()
+                card.add(left).expandX().left()
+            }
+            t.cardRow(card, width)
+        }
+    }
+
+    // ------------------------------------------------------------------ Ekonomi
+    fun economy(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val r = s.core.lastBalance
+        t.section(s, "Ağırlık ve Denge", width)
+        val bal = Table()
+        bal.add(s.ui.label("Denge %${r.balancePercent}", "small")).width(240f).left()
+        bal.add(s.bar(r.balance.toFloat(), if (r.balance > 0.85) Palette.green else if (r.balance > 0.6) Palette.gold else Palette.red, width - 260f))
+        bal.row()
+        bal.add(s.ui.label("Yük ${r.totalWeight.toInt()}/${r.capacity.toInt()}", "small")).width(240f).left().padTop(4f)
+        bal.add(s.bar(r.loadRatio.toFloat().coerceAtMost(1f), if (r.loadRatio > 1) Palette.red else if (r.loadRatio > 0.8) Palette.gold else Palette.turquoise, width - 260f)).padTop(4f)
+        t.add(bal).width(width).row()
+        t.text(s, "Bina ağırlığı ${r.buildingWeight.toInt()} • Depolanan yük ${r.cargoWeight.toInt()} • Ön %${(r.frontShare * 100).toInt()} / Arka %${100 - (r.frontShare * 100).toInt()} • Sol %${(r.leftShare * 100).toInt()} / Sağ %${100 - (r.leftShare * 100).toInt()} • Hareket verimliliği %${r.efficiencyPercent}", width)
+        val tips = ArrayList<String>()
+        if (r.offsetX < -0.12) tips += "Ağırlık arkada: ağır binaları veya depoları öne taşıyın."
+        if (r.offsetX > 0.12) tips += "Ağırlık önde: bazı ağır binaları arkaya alın."
+        if (r.offsetY > 0.1) tips += "Sol taraf ağır: dengeyi sağa kaydırın."
+        if (r.offsetY < -0.1) tips += "Sağ taraf ağır: dengeyi sola kaydırın."
+        if (r.loadRatio > 0.8) tips += "Yük kapasiteye yakın: Destek İskelesi kurun, hafif yapı araştırın veya stokları kullanın."
+        if (tips.isEmpty()) tips += "Denge iyi durumda. Depolanan kaynaklar da ağırlık yapar ve depolara dağılır."
+        tips.forEach { t.text(s, "• $it", width) }
+
+        t.section(s, "Kaynaklar (dakika başına)", width)
+        val flow = EconomySystem.estimate(st)
+        val tbl = Table()
+        tbl.defaults().pad(3f)
+        tbl.add(s.ui.label("${SOFT}Kaynak[]", "small")).width(width * 0.36f).left()
+        tbl.add(s.ui.label("${SOFT}Stok[]", "small")).width(width * 0.22f).left()
+        tbl.add(s.ui.label("${SOFT}Üretim[]", "small")).width(width * 0.14f).left()
+        tbl.add(s.ui.label("${SOFT}Tüketim[]", "small")).width(width * 0.14f).left()
+        tbl.add(s.ui.label("${SOFT}Net[]", "small")).width(width * 0.12f).left().row()
+        for (res in Resource.entries) {
+            val p = flow.produced[res] ?: 0.0; val c = flow.consumed[res] ?: 0.0
+            if (st.store[res] < 0.5 && p == 0.0 && c == 0.0 && res.advanced) continue
+            val name = Table()
+            name.add(s.ui.dot(Palette.resource(res), 14f)).size(14f).padRight(6f)
+            name.add(s.ui.label(res.title, "small"))
+            tbl.add(name).left()
+            tbl.add(s.ui.label(if (res == Resource.GOLD) fmt(st.store[res]) else "${fmt(st.store[res])}/${fmt(st.store.cap(res))}", "small")).left()
+            tbl.add(s.ui.label(fmt(p), "small")).left()
+            tbl.add(s.ui.label(fmt(c), "small")).left()
+            tbl.add(s.ui.label(s.ui.rate(p - c), "small")).left().row()
+        }
+        t.add(tbl).width(width).row()
+        t.text(s, "${SOFT}Tüketime nüfus (kişi başı yiyecek ${fmt(PopulationSystem.FOOD_PER_POP)}, su ${fmt(PopulationSystem.WATER_PER_POP)}/dk) ve taşıyıcının otomatik beslenmesi dahildir.[]", width)
+
+        t.section(s, "Üretim Zincirleri", width)
+        val chains = listOf(
+            "Su + Tohum › Tarla › Yiyecek" to listOf(BuildingType.WATER_COLLECTOR, BuildingType.FARM),
+            "Odun + Metal › Atölye › Alet" to listOf(BuildingType.WORKSHOP),
+            "Taş + Enerji › Metal İşleme › Metal" to listOf(BuildingType.METALWORKS, BuildingType.POWER_PLANT),
+            "Odun › Enerji Üretim Tesisi › Enerji" to listOf(BuildingType.POWER_PLANT),
+            "Yiyecek + Su › Tekstil Atölyesi › Kumaş" to listOf(BuildingType.TEXTILE),
+            "Metal + Kristal + Nadir Maden › Teknoloji Laboratuvarı › Teknoloji Bileşeni, Hafif Malzeme" to listOf(BuildingType.TECH_LAB),
+            "Yiyecek + Su › Taşıyıcı Bakım Merkezi › Dayanıklılık ve Güven" to listOf(BuildingType.CARRIER_CARE),
+            "Atık › Geri Dönüşüm Merkezi › Taş + Metal" to listOf(BuildingType.RECYCLER),
+            "Arazi › Toplayıcı Rampası › Biyom kaynakları" to listOf(BuildingType.GATHERER),
+        )
+        for ((txt, req) in chains) {
+            val ok = req.all { st.count(it) > 0 }
+            t.text(s, (if (ok) "$GREEN• " else "$SOFT• ") + txt + "[]", width)
+        }
+    }
+
+    // ------------------------------------------------------------------ Nüfus
+    fun population(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val p = st.population
+        val housing = PopulationSystem.housing(st)
+        t.text(s, "Nüfus ${p.count} / barınma $housing • Çalışan ${PopulationSystem.employed(st)} • Boşta ${PopulationSystem.freeWorkers(st)}", width, "default")
+        val bars = Table()
+        bars.add(s.ui.label("Mutluluk %${p.happiness.toInt()}", "small")).width(240f).left()
+        bars.add(s.bar((p.happiness / 100).toFloat(), Palette.gold, width - 260f)).row()
+        bars.add(s.ui.label("Sağlık %${p.health.toInt()}", "small")).width(240f).left().padTop(4f)
+        bars.add(s.bar((p.health / 100).toFloat(), Palette.green, width - 260f)).padTop(4f).row()
+        bars.add(s.ui.label("Yeni yerleşimci", "small")).width(240f).left().padTop(4f)
+        bars.add(s.bar((p.growthTimer / PopulationSystem.GROWTH_SECONDS).toFloat(), Palette.turquoise, width - 260f)).padTop(4f)
+        t.add(bars).width(width).padTop(4f).row()
+        if (p.count >= housing) t.text(s, "${RED}Barınma dolu: nüfus artışı için ev inşa edin.[]", width)
+        val hb = PopulationSystem.happinessBreakdown(st)
+        t.text(s, "Mutluluk etkenleri: " + hb.factors.joinToString(", ") { (n, v) -> "$n ${if (v >= 0) "$GREEN+" else RED}${fmt(v)}[]" } + " › hedef %${hb.target.toInt()}", width)
+
+        t.section(s, "Meslekler", width)
+        val prof = PopulationSystem.byProfession(st)
+        t.text(s, if (prof.isEmpty()) "${SOFT}Henüz kimse çalışmıyor.[]" else prof.entries.joinToString(" • ") { "${it.key.title}: ${it.value}" }, width)
+
+        t.section(s, "Çalışan Atama", width)
+        t.add(s.ui.button("Boştakileri Otomatik Ata", "primary") { PopulationSystem.autoAssign(st); s.act(ActionResult.ok("Çalışanlar dağıtıldı.")) }).width(width).row()
+        for (b in st.buildings.filter { it.def.workers > 0 }.sortedBy { it.id }) {
+            val row = Table()
+            val col = if (b.workers < b.def.workers) RED else ""
+            row.add(s.ui.label("${b.def.title} Sv${b.level}  $col${b.workers}/${b.def.workers}${if (col.isNotEmpty()) "[]" else ""} ${SOFT}${b.def.profession?.title ?: ""}${if (!b.enabled) " (kapalı)" else ""}[]", "small", wrap = true)).width(width - 170f).left()
+            row.add(s.ui.button("-", "default") { s.act(BuildingSystem.setWorkers(st, b.id, b.workers - 1)) }).width(70f).padRight(6f)
+            row.add(s.ui.button("+", "default") { s.act(BuildingSystem.setWorkers(st, b.id, b.workers + 1)) }).width(70f)
+            t.add(row).width(width).padTop(6f).row()
+        }
+    }
+
+    // ------------------------------------------------------------------ Araştırma
+    fun research(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val rs = st.research
+        var rate = 0.0
+        for (b in st.buildings) if (b.def.researchPerMin > 0) rate += b.def.researchPerMin * ProductionSystem.efficiency(st, b)
+        if (st.count(BuildingType.RESEARCH_CENTER) == 0) t.text(s, "${RED}Bilgi üretmek için Araştırma Merkezi kurun (Yönetim).[]", width)
+        t.text(s, "Bilgi üretimi: ${fmt(rate)}/dk • Biriken puan: ${fmt(rs.bankedPoints)}", width, "default")
+        val cur = rs.current
+        if (cur != null) {
+            val def = TechCatalog.get(cur)
+            val row = Table()
+            row.add(s.ui.label("${def.title} ${fmt(rs.progress)}/${fmt(def.points)}", "small")).width(320f).left()
+            row.add(s.bar((rs.progress / def.points).toFloat(), Palette.turquoise, width - 340f))
+            t.add(row).width(width).padTop(6f).row()
+            t.add(s.ui.button("Araştırmayı Durdur (puanlar saklanır)", "default") { s.act(ResearchSystem.cancel(st)) }).width(width).padTop(6f).row()
+        }
+        for (branch in ResearchBranch.entries) {
+            t.section(s, branch.title, width)
+            for (def in TechCatalog.all.filter { it.branch == branch }) {
+                val card = s.ui.card(if (ResearchSystem.has(st, def.id)) Color.valueOf("E8F6EA") else Color.WHITE)
+                val left = Table()
+                left.add(s.ui.label(def.title, "default")).left().row()
+                left.add(s.ui.label(def.description, "small", wrap = true)).width(width - 190f).left().row()
+                when {
+                    ResearchSystem.has(st, def.id) -> left.add(s.ui.label("${GREEN}Tamamlandı[]", "small")).left()
+                    rs.current == def.id -> left.add(s.ui.label("${GREEN}Araştırılıyor[]", "small")).left()
+                    else -> {
+                        val req = def.requires.filter { !ResearchSystem.has(st, it) }
+                        left.add(s.ui.label("Bilgi ${fmt(def.points)} • " + s.ui.costText(def.cost, st.store) +
+                            if (req.isNotEmpty()) "  ${RED}Gerekli: ${req.joinToString { TechCatalog.get(it).title }}[]" else "", "small", wrap = true)).width(width - 190f).left()
+                    }
+                }
+                card.add(left).expandX().left()
+                if (!ResearchSystem.has(st, def.id) && rs.current != def.id) {
+                    val b = s.ui.button("Başlat", "primary") { s.act(ResearchSystem.start(st, def.id)) }
+                    b.isDisabled = !ResearchSystem.available(st, def.id) || rs.current != null || !st.store.canAfford(def.cost)
+                    card.add(b).width(140f)
+                }
+                t.cardRow(card, width)
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------ Harita / Rota
+    fun map(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val tr = st.travel
+        if (s.mode == ViewMode.MAP) t.add(s.ui.button("Şehre Dön", "default") { s.setMode(ViewMode.CITY); s.closePanel() }).width(width).row()
+        else t.add(s.ui.button("Haritayı Aç", "primary") { s.setMode(ViewMode.MAP); s.showPanel(PanelId.MAP) }).width(width).row()
+
+        val here = st.world.biomeAt(tr.position)
+        val card = s.ui.card(Color.WHITE)
+        val left = Table()
+        left.add(s.ui.label("Bulunduğunuz yer: ${here.title}", "default")).left().row()
+        left.add(s.ui.label(here.hint + " Tehlike %${(here.danger * 100).toInt()} • Hız ×${fmt(here.moveFactor)}", "small", wrap = true)).width(width - 40f).left().row()
+        left.add(s.ui.label("Toplanabilir: " + here.yields.entries.joinToString(", ") { "${it.key.title} %${(it.value * 100).toInt()}" } + " • Kalan yatak ${fmt(ProductionSystem.depositLeft(st, tr.position))}", "small", wrap = true)).width(width - 40f).left()
+        card.add(left).expandX().left()
+        t.cardRow(card, width)
+
+        if (tr.traveling) {
+            val c2 = s.ui.card(Color.valueOf("E6F7F5"))
+            val l2 = Table()
+            l2.add(s.ui.label("Yolda: ${tr.routeName}", "default")).left().row()
+            l2.add(s.ui.label("${tr.routeIndex}/${tr.route.size} bölge • kalan ~${fmt(TravelSystem.remainingMinutes(st))} dk • hedef ${st.world.biomeAt(tr.route.last()).title}" +
+                if (!CarrierSystem.canMove(st)) " • ${RED}duraklatıldı[]" else "", "small", wrap = true)).width(width - 190f).left()
+            c2.add(l2).expandX().left()
+            c2.add(s.ui.button("Durdur", "danger") { s.act(TravelSystem.stop(st)) }).width(140f)
+            t.cardRow(c2, width)
+        }
+
+        val target = s.mapTarget()
+        if (target == null) {
+            t.text(s, if (s.mode == ViewMode.MAP) "Rota planlamak için haritada keşfedilmiş bir bölgeye dokunun. Sürükleyerek gezinebilirsiniz." else "Haritayı açıp hedef seçin.", width)
+            t.text(s, "${SOFT}Keşfedilen bölge: ${tr.explored.size} • Toplam yol: ${tr.distanceTraveled} bölge • Keşif menzili ${TravelSystem.revealRadius(st)}[]", width)
+            return
+        }
+        val tb = st.world.biomeAt(target)
+        val err = TravelSystem.canTarget(st, target)
+        t.section(s, "Hedef: ${if (TravelSystem.isExplored(st, target)) tb.title else "Keşfedilmemiş bölge"} (${target.dist(tr.position)} bölge uzakta)", width)
+        if (TravelSystem.isExplored(st, target)) t.text(s, tb.hint + " Toplanabilir: " + tb.yields.keys.joinToString { it.title }, width)
+        if (err != null) { t.text(s, "$RED$err[]", width); return }
+        if (tr.traveling) t.text(s, "${SOFT}Yeni rota seçerseniz mevcut yolculuk değişir.[]", width)
+        val routes = s.mapRoutes()
+        routes.forEachIndexed { i, ro ->
+            val chosen = i == s.chosenRouteIndex()
+            val rc = s.ui.card(if (chosen) Color.valueOf("FFF1C9") else Color.WHITE)
+            val rl = Table()
+            val foodOk = st.store[Resource.FOOD] >= ro.foodCost * 0.5; val waterOk = st.store[Resource.WATER] >= ro.waterCost * 0.5
+            rl.add(s.ui.label(ro.name + if (chosen) "  ${GREEN}(seçili)[]" else "", "default")).left().row()
+            rl.add(s.ui.label("${ro.distance} bölge • ~${fmt(ro.estMinutes)} dk • Tehlike: ${ro.dangerLabel}", "small")).left().row()
+            rl.add(s.ui.label("Tahmini erzak: ${if (foodOk) "" else RED}yiyecek ${fmt(ro.foodCost)}${if (foodOk) "" else "[]"}, ${if (waterOk) "" else RED}su ${fmt(ro.waterCost)}${if (waterOk) "" else "[]"}", "small", wrap = true)).width(width - 190f).left().row()
+            rl.add(s.ui.label("${SOFT}Arazi: " + ro.biomes.entries.joinToString(", ") { "${it.key.title} ${it.value}" } + "[]", "small", wrap = true)).width(width - 190f).left()
+            rc.add(rl).expandX().left()
+            rc.add(s.ui.button(if (chosen) "Seçili" else "Seç", "default") { s.chooseRoute(i) }).width(140f)
+            t.cardRow(rc, width)
+        }
+        if (routes.isNotEmpty()) {
+            val go = s.ui.button("Yola Çık", "primary") { s.startRoute() }
+            go.isDisabled = st.carrier.forcedRest
+            t.add(go).width(width).padTop(10f).row()
+            t.text(s, "${SOFT}Yolculuk sırasında taşıyıcı daha çok yer, içer ve yorulur. Dengesiz şehirler zorlu arazide hasar alabilir.[]", width)
+        }
+    }
+
+    // ------------------------------------------------------------------ Günlük
+    fun log(s: GameScreen, t: Table, width: Float) {
+        val entries = s.state.log.asReversed().take(80)
+        for (e in entries) {
+            val col = when (e.kind) {
+                LogKind.WARNING -> RED; LogKind.STAGE -> "[#C07A10]"; LogKind.RESEARCH -> "[#1A9C90]"
+                LogKind.EVENT -> "[#8E5BB5]"; LogKind.TRAVEL -> "[#2E7DB5]"; LogKind.CARRIER -> "[#4E9F45]"; else -> ""
+            }
+            t.add(s.ui.label("${SOFT}Gün ${e.day}[]  $col${e.text}${if (col.isNotEmpty()) "[]" else ""}", "small", wrap = true)).width(width).padTop(5f).row()
+        }
+    }
+
+    // ------------------------------------------------------------------ Ayarlar
+    fun settings(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val set = st.settings
+        t.section(s, "Grafik", width)
+        val g = Table()
+        g.defaults().expandX().fillX().pad(4f)
+        g.add(s.ui.button("Grafik: ${if (set.graphicsHigh) "Yüksek" else "Düşük (pil dostu)"}", "default") {
+            set.graphicsHigh = !set.graphicsHigh; s.act(ActionResult.ok(if (set.graphicsHigh) "Yüksek grafik" else "Düşük grafik: daha az efekt ve insan"))
+        }).row()
+        g.add(s.ui.button("Ağırlık merkezi göstergesi: ${if (set.showWeightOverlay) "Açık" else "Kapalı"}", "default") {
+            set.showWeightOverlay = !set.showWeightOverlay; s.act(ActionResult.ok("Gösterge ${if (set.showWeightOverlay) "açıldı" else "kapandı"}"))
+        }).row()
+        t.add(g).width(width).row()
+
+        t.section(s, "Kayıt", width)
+        t.text(s, "Oyun her 30 saniyede bir ve uygulama arka plana alındığında otomatik kaydedilir. Bozuk kayıtta yedekten yüklenir.", width)
+        s.game.saveError?.let { t.text(s, "${RED}Son kayıt hatası: $it[]", width) }
+        t.add(s.ui.button("Şimdi Kaydet", "primary") { s.game.save(); s.act(ActionResult(s.game.saveError == null, if (s.game.saveError == null) "Kaydedildi." else "Kayıt başarısız: ${s.game.saveError}")) }).width(width).padTop(6f).row()
+
+        t.section(s, "İstatistikler", width)
+        val stats = st.stats
+        val lines = listOf(
+            "Medeniyet aşaması: ${StageSystem.title(st.stage)} (puan ${StageSystem.score(st)}${StageSystem.nextThreshold(st.stage)?.let { " / sonraki $it" } ?: ""})",
+            "Oyun günü: ${st.day} • Dünya tohumu: ${st.seed}",
+            "İnşa edilen bina: ${stats.buildingsBuilt} • Geliştirme: ${stats.upgradesDone}",
+            "En yüksek nüfus: ${stats.peakPopulation} • Çözülen olay: ${stats.eventsResolved}",
+            "Üretilen yiyecek: ${fmt(stats.foodProduced)} • Su: ${fmt(stats.waterProduced)} • Toplanan: ${fmt(stats.gathered)}",
+            "Katedilen yol: ${st.travel.distanceTraveled} bölge • Keşfedilen bölge: ${st.travel.explored.size}",
+            "Tamamlanan araştırma: ${st.research.completed.size}/${TechCatalog.all.size}",
+        )
+        lines.forEach { t.text(s, it, width) }
+
+        t.section(s, "Yeni Oyun", width)
+        t.text(s, "${RED}Mevcut şehir ve bütün ilerleme silinir.[]", width)
+        t.add(s.ui.button(if (s.newGameConfirm()) "Emin misiniz? Silmek için tekrar dokunun" else "Yeni Oyun Başlat", "danger") { s.requestNewGame() }).width(width).padTop(6f).row()
+        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.1.0 (Aşama 1-3 + temel yolculuk)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+    }
+}

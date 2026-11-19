@@ -2,6 +2,8 @@
 
 > Güzelliğe Bir Dokunuş, Randevuya Tek Tık.
 
+> Bu depoda ayrıca bağımsız bir oyun projesi bulunur: [`yuruyen-sehir/`](yuruyen-sehir/README.md) — *Yürüyen Şehir: Göçebe Medeniyet* (Kotlin + libGDX).
+
 Türkiye pazarı için Android kuaför/güzellik salonu randevu uygulaması.
 Kotlin + Jetpack Compose (Material 3) istemci, Firebase (Auth, Firestore, Functions, Storage, FCM, App Check) arka uç.
 

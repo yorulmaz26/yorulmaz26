@@ -1,0 +1,79 @@
+name: Yürüyen Şehir (oyun)
+
+on:
+  push:
+    paths:
+      - "yuruyen-sehir/**"
+      - ".github/workflows/yuruyen-sehir.yml"
+  pull_request:
+    paths:
+      - "yuruyen-sehir/**"
+  workflow_dispatch:
+
+concurrency:
+  group: yuruyen-sehir-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: yuruyen-sehir
+
+jobs:
+  build:
+    name: Mantık testleri + debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Testler ve APK
+        run: ./gradlew :logic:test :desktop:compileKotlin :android:assembleDebug --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yuruyen-sehir-debug-apk
+          path: yuruyen-sehir/android/build/outputs/apk/debug/*.apk
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yuruyen-sehir-test-raporu
+          path: yuruyen-sehir/logic/build/reports/tests
+          if-no-files-found: ignore
+
+  smoke:
+    name: Emülatörde açılış testi
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: yuruyen-sehir-debug-apk
+          path: yuruyen-sehir/apk
+      - name: KVM erişimi
+        working-directory: .
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: APK'yı kur, aç ve çökme olmadığını doğrula
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          working-directory: yuruyen-sehir
+          script: bash scripts/smoke-test.sh apk/android-debug.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yuruyen-sehir-emulator-ekran
+          path: yuruyen-sehir/smoke/
+          if-no-files-found: ignore
