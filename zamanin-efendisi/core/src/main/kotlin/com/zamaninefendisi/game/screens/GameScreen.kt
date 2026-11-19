@@ -118,6 +118,8 @@ class GameScreen(
         parts += "Odun ${s.wood}"
         if (level.hasEnemies) parts += "Can ${s.heroHp}"
         s.energy?.let { parts += "Enerji $it" }
+        if (level.freezes > 0) parts += "Buz ${s.freezes}"
+        if (s.combos > 0) parts += "Kombo ${s.combos}"
         statsLabel.setText(parts.joinToString(" · "))
         goalsTable.clearChildren()
         val met = s.goalsMet()
@@ -128,7 +130,7 @@ class GameScreen(
         }
         if (level.hasEnemies && level.protect.isNotEmpty()) {
             goalsTable.add(ui.label("!", assets.fontS, Theme.purple)).width(26f)
-            val who = if (level.enemyEra == Era.FUTURE) "Robotlar (Gelecek'te)" else "Akıncılar (${level.enemyEra.locative})"
+            val who = "Düşmanlar (${level.enemyEra.locative})"
             goalsTable.add(ui.label("$who mor çerçeveli hücreye ulaşırsa kaybedersin", assets.fontS, Theme.purple, wrap = true)).width(620f).left().row()
         }
         val hint = if (game.progression.data.settings.hints) s.currentHint() else null
@@ -160,10 +162,36 @@ class GameScreen(
         }
     }
 
+    private fun selectUnit(id: Int) {
+        val u = session.unit(id)
+        if (u == null) { clearUnitSelection(); return }
+        anim.selectedUnit = id
+        anim.reach = session.unitReach(u)
+        anim.targets = session.unitTargets(u)
+    }
+
+    private fun clearUnitSelection() { anim.selectedUnit = -1; anim.reach = emptySet(); anim.targets = emptySet() }
+
     private fun onWorldTap(p: Pos) {
         closePopup()
         if (session.status != SessionStatus.PLAYING || queue.isNotEmpty()) return
-        if (!session.inBounds(p)) { anim.selected = null; return }
+        if (!session.inBounds(p)) { anim.selected = null; clearUnitSelection(); return }
+        // Birlik komutası
+        if (anim.selectedUnit >= 0) {
+            val id = anim.selectedUnit
+            when (p) {
+                in anim.targets -> { clearUnitSelection(); perform(Action.UnitAttack(id, p)); return }
+                in anim.reach -> { clearUnitSelection(); perform(Action.UnitMove(id, p)); return }
+            }
+            clearUnitSelection()
+            if (session.unitAt(p)?.id == id) return
+        }
+        val tappedUnit = if (session.heroEra == level.enemyEra) session.unitAt(p) else null
+        if (tappedUnit != null) {
+            selectUnit(tappedUnit.id)
+            showUnitInfo(tappedUnit)
+            return
+        }
         anim.selected = p
         val opts = session.options(p)
         val dist = p.manhattan(session.heroPos)
@@ -179,7 +207,7 @@ class GameScreen(
     }
 
     private fun requestEra(era: Era) {
-        closePopup()
+        closePopup(); clearUnitSelection()
         if (era == session.heroEra) { ui.toast(root, "Zaten ${era.locative}sın. Haritaya dokunarak hareket et."); return }
         perform(Action.SwitchEra(era))
     }
@@ -232,13 +260,18 @@ class GameScreen(
             is GameEvent.WallDamaged -> { anim.pops[e.at] = 0.35f; game.audio.play("hit", 0.3f) }
             is GameEvent.Paradox -> { ui.toast(root, e.text, Theme.purple); game.audio.play("paradox"); game.vibrate(40) }
             is GameEvent.EnemySpawned -> if (session.heroEra == level.enemyEra) floatAt(e.at, if (level.enemyEra == Era.FUTURE) "Yeni robot" else "Yeni akıncı", Theme.red)
-            is GameEvent.EnemyMoved, is GameEvent.Message -> {}
+            is GameEvent.EnemyDamaged -> floatAt(e.at, "-${e.amount}", Theme.orange)
+            is GameEvent.UnitDamaged -> if (e.amount > 0) floatAt(e.at, "-${e.amount}", Theme.red) else floatAt(e.at, "Kalkan!", Theme.blue)
+            is GameEvent.UnitLost -> { ui.toast(root, "Bir birliğini kaybettin!", Theme.red); game.audio.play("lose", 0.3f) }
+            is GameEvent.Shot -> anim.shots += floatArrayOf(e.from.x.toFloat(), e.from.y.toFloat(), e.to.x.toFloat(), e.to.y.toFloat(), 0.35f)
+            is GameEvent.Combo -> { ui.toast(root, "Zaman Zinciri Kombosu! Üç çağı birbirine bağladın (×${e.count}).", Theme.purple); game.audio.play("win", 0.4f, 1.3f) }
+            is GameEvent.EnemyMoved, is GameEvent.UnitMoved, is GameEvent.Message -> {}
         }
     }
 
     private fun undo() {
         if (session.actions.isEmpty() || session.status != SessionStatus.PLAYING) return
-        queue.clear(); closePopup()
+        queue.clear(); closePopup(); clearUnitSelection()
         val before = session.heroEra
         session = LevelSession.replay(level, session.actions.dropLast(1))
         if (session.heroEra != before) anim.startTransition(session.heroPos)
@@ -248,7 +281,7 @@ class GameScreen(
     }
 
     private fun restart() {
-        queue.clear(); closePopup()
+        queue.clear(); closePopup(); clearUnitSelection()
         if (session.status == SessionStatus.LOST && !game.progression.canStart(level.id)) { ui.toast(root, "Canın kalmadı", Theme.red); return }
         session = LevelSession(level)
         recorded = false
@@ -278,7 +311,13 @@ class GameScreen(
         // Zaman görüşü: aynı hücrenin bütün çağlardaki hâli.
         val line = s.timeline.eras.joinToString("  →  ") { era -> "${era.title}: ${s.cell(era, p).displayName}" }
         box.add(ui.label(line, assets.fontS, Theme.inkSoft, wrap = true)).width(600f).left().padTop(4f).padBottom(10f).row()
-        s.enemyAt(p)?.takeIf { s.heroEra == level.enemyEra }?.let { box.add(ui.label("${it.kind.title} · can ${it.hp}", assets.fontS, Theme.red)).left().row() }
+        s.enemyAt(p)?.takeIf { s.heroEra == level.enemyEra }?.let { e ->
+            val k = e.kind
+            box.add(ui.label("${k.title} · can ${e.hp}/${k.hp} · saldırı ${e.attack} · savunma ${k.defense} · menzil ${k.range}", assets.fontS, Theme.red, wrap = true)).width(600f).left().row()
+            box.add(ui.label("Strateji: ${e.strategy.title} — ${e.strategy.description}", assets.fontS, Theme.inkSoft, wrap = true)).width(600f).left().row()
+            if (e.frozenTurns > 0) box.add(ui.label("Donmuş: ${e.frozenTurns} tur", assets.fontS, Theme.blue)).left().row()
+        }
+        if (c.frozen) box.add(ui.label("Bu nesnenin zamanı donmuş: sonraki çağlarda değişmeyecek.", assets.fontS, Theme.blue, wrap = true)).width(600f).left().row()
         val btns = Table()
         btns.defaults().pad(5f)
         for (o in opts) {
@@ -286,10 +325,14 @@ class GameScreen(
                 closePopup(); anim.selected = null; perform(o.action)
             }
             b.isDisabled = !o.enabled
-            btns.add(b).width(290f).height(70f)
-            if (btns.children.size % 2 == 0) btns.row()
+            if (o.action is Action.Build && o.enabled && s.timeline.eras.last() != s.heroEra) {
+                btns.add(b).width(400f).height(70f)
+                btns.add(ui.button("Önizle", Theme.purple, assets.fontS) { showForesight(o.action) }).width(180f).height(70f).row()
+            } else {
+                btns.add(b).width(590f).colspan(2).height(70f).row()
+            }
             val reason = o.reason
-            if (!o.enabled && reason != null) { btns.row(); btns.add(ui.label(reason, assets.fontS, Theme.red, wrap = true)).colspan(2).width(590f).left().row() }
+            if (!o.enabled && reason != null) btns.add(ui.label(reason, assets.fontS, Theme.red, wrap = true)).colspan(2).width(590f).left().row()
         }
         if (opts.isEmpty()) {
             val why = if (p.manhattan(s.heroPos) > 1) "Buraya ulaşan bir yol yok. Başka bir çağda yol açmayı dene." else "Bu hücrede ${s.heroEra.locative} yapabileceğin bir şey yok."
@@ -304,6 +347,47 @@ class GameScreen(
     }
 
     private fun closePopup() { popup?.remove(); popup = null }
+
+    private fun showUnitInfo(u: com.zamaninefendisi.logic.AllyUnit) {
+        val box = ui.panel(Theme.panel)
+        box.pad(16f, 22f, 16f, 22f)
+        val t = u.type
+        box.add(ui.label("${t.title} · can ${u.hp}/${t.hp}", assets.fontM, Color.valueOf("4F8BE8"))).left().row()
+        val range = if (t.minRange == t.maxRange) "${t.maxRange}" else "${t.minRange}–${t.maxRange}"
+        box.add(ui.label("Saldırı ${t.attack} · Savunma ${t.defense} · Menzil $range · Hareket ${t.move}", assets.fontS, Theme.ink)).left().row()
+        box.add(ui.label("Çağ uyumu: ${t.eras.joinToString(", ") { it.title }}", assets.fontS, Theme.inkSoft)).left().row()
+        t.ability?.let { box.add(ui.label("${it.title}: ${it.description}", assets.fontS, Theme.purple, wrap = true)).width(600f).left().row() }
+        box.add(ui.label("Mavi hücreye dokun: yürü · Kırmızı hedefe dokun: saldır. Komuta etmediğin birlikler menzildeki düşmana kendiliğinden ateş eder.", assets.fontS, Theme.inkSoft, wrap = true)).width(600f).left().padTop(6f).row()
+        box.add(ui.button("Kapat", Theme.grey, assets.fontS, Theme.ink) { closePopup(); clearUnitSelection() }).width(200f).height(60f).padTop(8f)
+        box.pack()
+        box.setPosition((stage.width - box.width) / 2f, eraBar.y + eraBar.height + 90f)
+        stage.addActor(box)
+        popup = box
+    }
+
+    private fun showForesight(a: Action) {
+        val f = session.foresee(a) ?: return
+        closePopup()
+        val box = ui.panel(Theme.panel)
+        box.pad(18f, 22f, 18f, 22f)
+        box.add(ui.label("Geleceği Önceden Görme", assets.fontM, Theme.purple)).left().row()
+        if (f.changes.isEmpty()) box.add(ui.label("Görünür bir değişiklik olmayacak.", assets.fontS, Theme.inkSoft)).left().row()
+        for ((era, p, ch) in f.changes.take(8)) {
+            val (a0, a1) = ch
+            box.add(ui.label("${era.title} $p: ${a0.displayName.ifEmpty { "boş" }} → ${a1.displayName.ifEmpty { "boş" }}", assets.fontS, Theme.eraColor(era).let { Theme.darker(it, 0.8f) }, wrap = true)).width(600f).left().row()
+            flashes.getOrPut(era) { HashMap() }[p] = 2.5f
+        }
+        if (f.changes.size > 8) box.add(ui.label("… ve ${f.changes.size - 8} hücre daha", assets.fontS, Theme.inkSoft)).left().row()
+        for (n in f.notes) box.add(ui.label(n, assets.fontS, Theme.red, wrap = true)).width(600f).left().row()
+        val row = Table()
+        row.add(ui.button("Uygula", Theme.green, assets.fontS) { closePopup(); anim.selected = null; perform(a) }).size(220f, 66f).padRight(12f)
+        row.add(ui.button("Vazgeç", Theme.grey, assets.fontS, Theme.ink) { closePopup(); anim.selected = null }).size(220f, 66f)
+        box.add(row).padTop(10f)
+        box.pack()
+        box.setPosition((stage.width - box.width) / 2f, eraBar.y + eraBar.height + 90f)
+        stage.addActor(box)
+        popup = box
+    }
 
     // ------------------------------------------------------------------ Pencereler
 
@@ -361,6 +445,7 @@ class GameScreen(
             val rw = buildString {
                 append("+${r.gold} altın   +${r.xp} deneyim")
                 if (r.crystals > 0) append("   +${r.crystals} kristal")
+                if (r.comboGold > 0) append("   (kombo +${r.comboGold})")
             }
             box.add(ui.label(rw, assets.fontM, Theme.orange)).row()
             if (r.levelUp) box.add(ui.label("Zaman Ustası seviyen yükseldi!", assets.fontS, Theme.purple)).padTop(4f).row()
@@ -478,6 +563,7 @@ class GameScreen(
                 sr.rect(x, y, cell - 1f, cell - 1f)
                 featureColor(c.feature)?.let { sr.color = it; sr.rect(x + cell * 0.2f, y + cell * 0.2f, cell * 0.6f - 1f, cell * 0.6f - 1f) }
                 if (era == level.enemyEra && session.enemyAt(pp) != null) { sr.color = Theme.red; sr.circle(x + cell / 2, y + cell / 2, cell * 0.35f, 8) }
+                if (era == level.enemyEra && session.unitAt(pp) != null) { sr.color = Color.valueOf("4F8BE8"); sr.circle(x + cell / 2, y + cell / 2, cell * 0.35f, 8) }
                 if (era == session.heroEra && pp == session.heroPos) { sr.color = Theme.ink; sr.circle(x + cell / 2, y + cell / 2, cell * 0.38f, 10) }
                 fl?.get(pp)?.let { t -> sr.color = Color(1f, 1f, 0.6f, (t / 1.2f) * 0.9f); sr.rect(x - 1, y - 1, cell + 1, cell + 1) }
             }
@@ -497,6 +583,7 @@ class GameScreen(
         Feature.ENEMY_CAMP, Feature.ENEMY_FORT -> Theme.red
         Feature.SHRINE, Feature.SHRINE_ACTIVE -> Theme.gold
         Feature.CRYSTAL -> Theme.blue
+        Feature.WATCHTOWER, Feature.STONE_TOWER, Feature.ENERGY_TURRET -> Theme.teal
     }
 
     private fun floatAtHero(text: String, color: Color) = floatAt(session.heroPos, text, color)

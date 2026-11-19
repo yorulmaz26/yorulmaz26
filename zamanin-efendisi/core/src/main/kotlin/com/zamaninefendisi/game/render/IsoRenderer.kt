@@ -53,6 +53,12 @@ class WorldAnim {
     var transitionFrom: Pos = Pos(0, 0)
     var heroX = 0f; var heroY = 0f
     val enemyVis = HashMap<Int, FloatArray>()
+    val unitVis = HashMap<Int, FloatArray>()
+    /** Atış animasyonları: x1, y1, x2, y2, kalan süre. */
+    val shots = ArrayList<FloatArray>()
+    var selectedUnit: Int = -1
+    var reach: Set<Pos> = emptySet()
+    var targets: Set<Pos> = emptySet()
     val fading = ArrayList<FloatArray>() // x, y, life
     var selected: Pos? = null
     var shake = 0f
@@ -72,6 +78,14 @@ class WorldAnim {
             v[0] += (e.pos.x - v[0]) * k; v[1] += (e.pos.y - v[1]) * k
         }
         enemyVis.keys.retainAll(alive)
+        val aliveU = HashSet<Int>()
+        for (u in s.units) {
+            aliveU += u.id
+            val v = unitVis.getOrPut(u.id) { floatArrayOf(u.pos.x.toFloat(), u.pos.y.toFloat()) }
+            v[0] += (u.pos.x - v[0]) * k; v[1] += (u.pos.y - v[1]) * k
+        }
+        unitVis.keys.retainAll(aliveU)
+        shots.removeAll { it[4] -= dt; it[4] <= 0f }
         fading.removeAll { it[2] -= dt; it[2] <= 0f }
         if (shake > 0f) shake = (shake - dt).coerceAtLeast(0f)
     }
@@ -80,6 +94,8 @@ class WorldAnim {
         heroX = s.heroPos.x.toFloat(); heroY = s.heroPos.y.toFloat()
         enemyVis.clear()
         for (e in s.enemies) enemyVis[e.id] = floatArrayOf(e.pos.x.toFloat(), e.pos.y.toFloat())
+        unitVis.clear()
+        for (u in s.units) unitVis[u.id] = floatArrayOf(u.pos.x.toFloat(), u.pos.y.toFloat())
     }
 
     fun startTransition(from: Pos) { transition = 0f; transitionFrom = from }
@@ -151,14 +167,29 @@ class IsoRenderer(private val sr: ShapeRenderer) {
                 if (p in adj) diamondOutline(cx, cy + lift(cell.terrain), 0.86f, Color(1f, 1f, 1f, 0.55f), 2.5f)
                 if (p == anim.selected) diamondOutline(cx, cy + lift(cell.terrain), 0.95f, Color(1f, 0.85f, 0.2f, 1f), 4f)
                 if (p in protect) diamondOutline(cx, cy + lift(cell.terrain), 0.7f, Color(0.55f, 0.42f, 0.88f, 0.9f), 3f)
+                if (p in anim.reach) diamondOutline(cx, cy + lift(cell.terrain), 0.8f, Color(0.25f, 0.55f, 0.95f, 0.95f), 3.5f)
+                if (p in anim.targets) diamondOutline(cx, cy + lift(cell.terrain), 0.8f, Color(0.92f, 0.3f, 0.3f, 0.95f), 3.5f)
                 drawFeature(cx, cy + lift(cell.terrain), cell.feature, cell.level, cell.durability, p, anim.time, k * pop)
+                if (cell.frozen) drawFrost(cx, cy + lift(cell.terrain), anim.time + p.x)
                 if (p in markers) drawFlag(cx, cy, anim.time)
                 // Bu hücredeki varlıklar
-                if (viewEra == s.level.enemyEra) for (e in s.enemies) {
-                    val v = anim.enemyVis[e.id] ?: continue
-                    if (v[0].roundToInt() == x && v[1].roundToInt() == y) {
-                        if (e.kind == com.zamaninefendisi.logic.EnemyKind.ROBOT) drawRobot(L.cx(v[0], v[1]), L.cy(v[0], v[1]), anim.time + e.id, k)
-                        else drawRaider(L.cx(v[0], v[1]), L.cy(v[0], v[1]), anim.time + e.id, k)
+                if (viewEra == s.level.enemyEra) {
+                    for (e in s.enemies) {
+                        val v = anim.enemyVis[e.id] ?: continue
+                        if (v[0].roundToInt() == x && v[1].roundToInt() == y) {
+                            val ex = L.cx(v[0], v[1]); val ey = L.cy(v[0], v[1])
+                            drawEnemy(e.kind, ex, ey, anim.time + e.id, k, e.frozenTurns > 0)
+                            if (e.kind.hp > 1) hpBar(ex, ey + L.tw * 0.66f, e.hp, e.kind.hp, C.enemy)
+                        }
+                    }
+                    for (u in s.units) {
+                        val v = anim.unitVis[u.id] ?: continue
+                        if (v[0].roundToInt() == x && v[1].roundToInt() == y) {
+                            val ux = L.cx(v[0], v[1]); val uy = L.cy(v[0], v[1])
+                            if (u.id == anim.selectedUnit) { sr.color = tmp.set(1f, 0.85f, 0.2f, 0.9f); sr.ellipse(ux - L.tw * 0.2f, uy - L.tw * 0.08f, L.tw * 0.4f, L.tw * 0.16f, 18) }
+                            drawUnit(u.type, ux, uy, anim.time + u.id, k)
+                            hpBar(ux, uy + L.tw * 0.66f, u.hp, u.type.hp, C.ally)
+                        }
                     }
                 }
                 if (s.heroEra == viewEra && anim.heroX.roundToInt() == x && anim.heroY.roundToInt() == y) {
@@ -166,6 +197,15 @@ class IsoRenderer(private val sr: ShapeRenderer) {
                     drawHero(hx, hy + lift(g[s.heroPos].terrain).coerceAtLeast(0f), anim.time, k, s.heroEra)
                 }
             }
+        }
+        for (sh in anim.shots) {
+            val t = 1f - sh[4] / 0.35f
+            val x1 = L.cx(sh[0], sh[1]); val y1 = L.cy(sh[0], sh[1]) + L.tw * 0.35f
+            val x2 = L.cx(sh[2], sh[3]); val y2 = L.cy(sh[2], sh[3]) + L.tw * 0.3f
+            sr.color = tmp.set(1f, 0.95f, 0.6f, 0.5f * (1f - t))
+            sr.rectLine(x1, y1, x2, y2, 2f)
+            sr.color = tmp.set(1f, 0.8f, 0.2f, 1f)
+            sr.circle(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, L.tw * 0.04f, 10)
         }
         for (f in anim.fading) {
             val a = f[2] / 0.6f
@@ -314,6 +354,22 @@ class IsoRenderer(private val sr: ShapeRenderer) {
                 box(cx + u * 0.2f, cy + u * 0.02f, 0.2f, 0.2f, u * 0.5f, C.enemyStone, C.enemyDark, C.enemyStoneDark)
                 flagPole(cx, cy + u * 0.32f, u * 0.32f, C.enemy, time)
             }
+            Feature.WATCHTOWER -> {
+                box(cx, cy, 0.3f, 0.3f, u * 0.5f, C.wood, C.trunk, C.woodDark)
+                tri(cx - u * 0.2f, cy + u * 0.5f, cx, cy + u * 0.42f, cx, cy + u * 0.72f, Theme.darker(C.roofRed, 0.85f))
+                tri(cx, cy + u * 0.42f, cx + u * 0.2f, cy + u * 0.5f, cx, cy + u * 0.72f, C.roofRed)
+            }
+            Feature.STONE_TOWER -> {
+                box(cx, cy, 0.36f, 0.36f, u * 0.6f, C.stone, C.stoneDark, C.stoneMid)
+                for (i in -1..1) box(cx + i * u * 0.09f, cy - i * u * 0.045f + u * 0.6f, 0.1f, 0.1f, u * 0.08f, C.stone, C.stoneDark, C.stoneMid)
+                flagPole(cx, cy + u * 0.68f, u * 0.25f, Theme.blue, time)
+            }
+            Feature.ENERGY_TURRET -> {
+                box(cx, cy, 0.34f, 0.34f, u * 0.4f, C.techWhite, C.techBlue, C.techLight)
+                val g = 0.6f + 0.4f * sin(time * 4f)
+                sr.color = tmp.set(0.35f, 0.85f, 1f, g); sr.circle(cx, cy + u * 0.52f, u * 0.09f, 16)
+                sr.color = tmp.set(1f, 1f, 1f, 0.9f); sr.circle(cx - u * 0.02f, cy + u * 0.54f, u * 0.03f, 8)
+            }
             Feature.CRYSTAL -> {
                 val fy = cy + u * 0.22f + sin(time * 2.5f + p.x) * u * 0.04f
                 sr.color = tmp.set(0f, 0f, 0f, 0.12f); sr.ellipse(cx - u * 0.1f, cy - u * 0.03f, u * 0.2f, u * 0.07f, 12)
@@ -394,6 +450,108 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         tri(cx - u * 0.05f, cy + u * 0.14f + bob, cx + u * 0.05f, cy + u * 0.14f + bob, cx, cy + u * 0.2f + bob, Theme.gold)
     }
 
+    private fun hpBar(cx: Float, cy: Float, hp: Int, max: Int, col: Color) {
+        val w = L.tw * 0.36f; val h = L.tw * 0.05f
+        sr.color = tmp.set(1f, 1f, 1f, 0.9f); sr.rect(cx - w / 2 - 2f, cy - 2f, w + 4f, h + 4f)
+        sr.color = tmp.set(0.85f, 0.83f, 0.9f, 1f); sr.rect(cx - w / 2, cy, w, h)
+        sr.color = col; sr.rect(cx - w / 2, cy, w * (hp.coerceAtLeast(0).toFloat() / max), h)
+    }
+
+    private fun drawFrost(cx: Float, cy: Float, time: Float) {
+        val a = 0.35f + 0.1f * sin(time * 2f)
+        sr.color = tmp.set(0.75f, 0.92f, 1f, a)
+        sr.triangle(cx - L.tw * 0.42f, cy, cx, cy + L.th * 0.42f, cx + L.tw * 0.42f, cy)
+        sr.triangle(cx - L.tw * 0.42f, cy, cx, cy - L.th * 0.42f, cx + L.tw * 0.42f, cy)
+        sr.color = tmp.set(1f, 1f, 1f, 0.9f)
+        val r = L.tw * 0.12f; val sx = cx + L.tw * 0.26f; val sy = cy + L.tw * 0.32f
+        for (i in 0 until 3) {
+            val ang = i * MathUtils.PI / 3f
+            sr.rectLine(sx - MathUtils.cos(ang) * r, sy - MathUtils.sin(ang) * r, sx + MathUtils.cos(ang) * r, sy + MathUtils.sin(ang) * r, 2f)
+        }
+    }
+
+    private fun drawUnit(type: com.zamaninefendisi.logic.UnitType, cx: Float, cy: Float, time: Float, k: Float) {
+        val u = L.tw * k
+        val bob = sin(time * 3.5f) * u * 0.015f
+        sr.color = tmp.set(0f, 0f, 0f, 0.18f); sr.ellipse(cx - u * 0.15f, cy - u * 0.05f, u * 0.3f, u * 0.12f, 14)
+        val body = when (type) {
+            com.zamaninefendisi.logic.UnitType.MAGE -> C.allyMage
+            com.zamaninefendisi.logic.UnitType.MECH, com.zamaninefendisi.logic.UnitType.ROBOT, com.zamaninefendisi.logic.UnitType.ENERGY -> C.allyTech
+            else -> C.ally
+        }
+        when (type) {
+            com.zamaninefendisi.logic.UnitType.MECH, com.zamaninefendisi.logic.UnitType.ROBOT -> {
+                box(cx, cy + u * 0.04f, if (type == com.zamaninefendisi.logic.UnitType.MECH) 0.4f else 0.3f, 0.3f, u * 0.28f, C.robotTop, body, C.robotMid)
+                box(cx, cy + u * 0.32f + bob, 0.2f, 0.2f, u * 0.12f, C.robotTop, body, C.robotMid)
+                sr.color = C.crystal; sr.circle(cx + u * 0.04f, cy + u * 0.38f + bob, u * 0.025f, 8)
+            }
+            com.zamaninefendisi.logic.UnitType.ENERGY -> {
+                tri(cx - u * 0.12f, cy, cx + u * 0.12f, cy, cx, cy + u * 0.3f, body)
+                val g = 0.6f + 0.4f * sin(time * 5f)
+                sr.color = tmp.set(0.4f, 0.9f, 1f, g); sr.circle(cx, cy + u * 0.4f + bob, u * 0.09f, 14)
+            }
+            else -> {
+                tri(cx - u * 0.14f, cy, cx + u * 0.14f, cy, cx, cy + u * 0.4f + bob, Theme.darker(body, 0.85f))
+                tri(cx, cy - u * 0.02f, cx + u * 0.14f, cy, cx, cy + u * 0.4f + bob, body)
+                sr.color = C.skin; sr.circle(cx, cy + u * 0.44f + bob, u * 0.075f, 14)
+            }
+        }
+        when (type) {
+            com.zamaninefendisi.logic.UnitType.KNIGHT -> {
+                sr.color = C.stoneMid; sr.circle(cx - u * 0.13f, cy + u * 0.18f, u * 0.09f, 14)
+                sr.color = C.techWhite; sr.circle(cx - u * 0.13f, cy + u * 0.18f, u * 0.05f, 10)
+                sr.color = C.stoneDark; sr.arc(cx, cy + u * 0.45f + bob, u * 0.085f, 0f, 180f, 10)
+            }
+            com.zamaninefendisi.logic.UnitType.ARCHER -> {
+                sr.color = C.trunk; sr.arc(cx + u * 0.12f, cy + u * 0.22f, u * 0.14f, -70f, 140f, 12)
+                sr.color = C.ally; sr.circle(cx + u * 0.12f, cy + u * 0.22f, u * 0.1f, 10)
+                sr.color = C.trunk; sr.rectLine(cx + u * 0.16f, cy + u * 0.09f, cx + u * 0.16f, cy + u * 0.35f, 1.5f)
+            }
+            com.zamaninefendisi.logic.UnitType.WARRIOR -> { sr.color = C.trunk; sr.rectLine(cx + u * 0.15f, cy + u * 0.05f, cx + u * 0.2f, cy + u * 0.35f, 4f) }
+            com.zamaninefendisi.logic.UnitType.ENGINEER -> {
+                box(cx + u * 0.17f, cy + u * 0.02f, 0.14f, 0.14f, u * 0.1f, C.wood, C.trunk, C.woodDark)
+                sr.color = C.stoneDark; sr.rectLine(cx + u * 0.1f, cy + u * 0.28f, cx + u * 0.24f, cy + u * 0.36f, 3f)
+            }
+            com.zamaninefendisi.logic.UnitType.SOLDIER -> { sr.color = C.stoneDark; sr.rectLine(cx + u * 0.08f, cy + u * 0.25f, cx + u * 0.28f, cy + u * 0.3f, 3f) }
+            com.zamaninefendisi.logic.UnitType.MAGE -> {
+                tri(cx - u * 0.09f, cy + u * 0.48f + bob, cx + u * 0.09f, cy + u * 0.48f + bob, cx + u * 0.02f, cy + u * 0.66f + bob, C.allyMage)
+                sr.color = C.trunk; sr.rectLine(cx + u * 0.16f, cy, cx + u * 0.16f, cy + u * 0.5f, 2f)
+                sr.color = tmp.set(0.7f, 0.9f, 1f, 0.7f + 0.3f * sin(time * 4f)); sr.circle(cx + u * 0.16f, cy + u * 0.52f, u * 0.04f, 10)
+            }
+            else -> {}
+        }
+    }
+
+    private fun drawEnemy(kind: com.zamaninefendisi.logic.EnemyKind, cx: Float, cy: Float, time: Float, k: Float, frozen: Boolean) {
+        when (kind) {
+            com.zamaninefendisi.logic.EnemyKind.ROBOT -> drawRobot(cx, cy, time, k)
+            com.zamaninefendisi.logic.EnemyKind.TECHNICIAN -> {
+                drawRobot(cx, cy, time, k)
+                val u = L.tw * k
+                sr.color = C.crystal; sr.rectLine(cx + u * 0.08f, cy + u * 0.44f, cx + u * 0.14f, cy + u * 0.6f, 2f); sr.circle(cx + u * 0.14f, cy + u * 0.61f, u * 0.025f, 8)
+            }
+            com.zamaninefendisi.logic.EnemyKind.BRUTE -> drawRaider(cx, cy, time, k * 1.25f, C.enemyDark, C.enemyStoneDark)
+            com.zamaninefendisi.logic.EnemyKind.ARCHER -> {
+                drawRaider(cx, cy, time, k, C.enemy, C.enemyDark, spear = false)
+                val u = L.tw * k
+                sr.color = C.trunk; sr.arc(cx + u * 0.12f, cy + u * 0.22f, u * 0.13f, -70f, 140f, 12)
+                sr.color = C.enemy; sr.circle(cx + u * 0.12f, cy + u * 0.22f, u * 0.09f, 10)
+            }
+            com.zamaninefendisi.logic.EnemyKind.PLUNDERER -> {
+                drawRaider(cx, cy, time, k, C.plunder, C.trunk, spear = false)
+                val u = L.tw * k
+                sr.color = C.field; sr.circle(cx - u * 0.14f, cy + u * 0.2f, u * 0.08f, 12)
+            }
+            com.zamaninefendisi.logic.EnemyKind.PHASER -> drawRaider(cx, cy, time, k, C.phaser, C.allyMage, spear = false)
+            com.zamaninefendisi.logic.EnemyKind.SABOTEUR -> drawRaider(cx, cy, time, k, C.saboteur, C.ink, spear = false)
+            else -> drawRaider(cx, cy, time, k)
+        }
+        if (frozen) {
+            val u = L.tw * k
+            sr.color = tmp.set(0.75f, 0.92f, 1f, 0.55f); sr.circle(cx, cy + u * 0.25f, u * 0.25f, 18)
+        }
+    }
+
     private fun drawRobot(cx: Float, cy: Float, time: Float, k: Float) {
         val u = L.tw * k
         val hover = sin(time * 3f) * u * 0.03f
@@ -406,14 +564,16 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         sr.circle(cx, cy + u * 0.55f + hover, u * 0.02f, 8)
     }
 
-    private fun drawRaider(cx: Float, cy: Float, time: Float, k: Float) {
+    private fun drawRaider(cx: Float, cy: Float, time: Float, k: Float, body: Color = C.enemy, head: Color = C.enemyDark, spear: Boolean = true) {
         val u = L.tw * k
         val bob = abs(sin(time * 5f)) * u * 0.02f
         sr.color = tmp.set(0f, 0f, 0f, 0.18f); sr.ellipse(cx - u * 0.14f, cy - u * 0.05f, u * 0.28f, u * 0.11f, 14)
-        tri(cx - u * 0.13f, cy, cx + u * 0.13f, cy, cx, cy + u * 0.36f + bob, C.enemy)
-        sr.color = C.enemyDark; sr.circle(cx, cy + u * 0.4f + bob, u * 0.075f, 14)
-        sr.color = C.trunk; sr.rectLine(cx + u * 0.16f, cy - u * 0.02f, cx + u * 0.16f, cy + u * 0.5f, 2.5f)
-        tri(cx + u * 0.13f, cy + u * 0.5f, cx + u * 0.19f, cy + u * 0.5f, cx + u * 0.16f, cy + u * 0.58f, C.stone)
+        tri(cx - u * 0.13f, cy, cx + u * 0.13f, cy, cx, cy + u * 0.36f + bob, body)
+        sr.color = head; sr.circle(cx, cy + u * 0.4f + bob, u * 0.075f, 14)
+        if (spear) {
+            sr.color = C.trunk; sr.rectLine(cx + u * 0.16f, cy - u * 0.02f, cx + u * 0.16f, cy + u * 0.5f, 2.5f)
+            tri(cx + u * 0.13f, cy + u * 0.5f, cx + u * 0.19f, cy + u * 0.5f, cx + u * 0.16f, cy + u * 0.58f, C.stone)
+        }
     }
 
     // ------------------------------------------------------------ İlkel şekiller
@@ -466,6 +626,8 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         val skin = c("FFD7B0"); val hood = c("FFFFFF"); val levelDot = c("FFFFFF")
         val robotTop = c("F2F4FA"); val robotMid = c("C9CEDF"); val robotDark = c("9EA5BF")
         val crystal = c("7FE3F0"); val crystalDark = c("4FB8D9")
+        val ally = c("4F8BE8"); val allyMage = c("9B6CE6"); val allyTech = c("6FA8F0")
+        val plunder = c("C98A4E"); val phaser = c("C59BF0"); val saboteur = c("6E4A9E"); val ink = c("3B3355")
     }
 }
 

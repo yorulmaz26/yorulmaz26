@@ -18,7 +18,7 @@ logic/    Saf Kotlin oyun mantığı — grafikten bağımsız, JVM'de test edil
   CausalityEngine.kt  Artımlı yeniden hesaplama, paradoks tespiti, nedensellik bağlantıları, döngü/geriye dönük bağlantı denetimi
   LevelSession.kt     Bölüm simülasyonu: kahraman, eylemler, düşman yapay zekâsı, zaman tuzağı, hedefler, günlük
   Level.kt            Bölüm tanımı (ASCII harita), hedef türleri, öğretici ipuçları
-  levels/             Alan ve bölüm kataloğu (Area01–Area05: 1–25. bölümler)
+  levels/             Alan ve bölüm kataloğu (Area01–Area07: 1–35. bölümler)
   save/               Sürümlü kayıt + göç, 4 can sistemi (saat hilesi korumalı), ilerleme/ödül/Zaman Ustası seviyesi
 core/     libGDX katmanı
   ZamaninEfendisiGame Ekran yönetimi ve ortak hizmetler
@@ -77,6 +77,19 @@ Masaüstü geliştirici kısayolları: `-Dzaman.start=game:3:2` (3. bölüm, ç�
 | 4 · Taş Köprüler | 16–20 | Yapı evrimi hedefleri (Şimdi'de taş köprü, Gelecek'te şehir/enerji kalkanı); zaman mühürleri ile çağlar arası bağlantılar |
 | 5 · Enerji Vadisi | 21–25 | Zaman enerjisi: her geçiş 1 enerji; kristaller enerji verir; aynı kristali iki çağda toplamak paradoksla silinir |
 
+### Alan 6–7 (Aşama 3)
+
+| Alan | Bölümler | Yeni kural |
+|---|---|---|
+| 6 · Donmuş Yıllar | 26–30 | Zamanı Dondur: dondurulan nesne sonraki çağlarda değişmez (köy harabeye dönmez, ağaç ormana, kamp kaleye büyümez) |
+| 7 · Yıkılmış Krallık | 31–35 | Müttefik birlikler (dokun → mavi: yürü, kırmızı: saldır), nöbet, kuleler, 6 düşman stratejisi |
+
+**Savaş:** hasar = saldırı − savunma (en az 1). Şövalye kalkanı 1 hasar emer, Mekanik Koruyucu komşularını korur,
+Kuşatma Mühendisi kaleye 3 kat vurur, Zaman Büyücüsü vurduğunu 2 tur dondurur. Düşman stratejileri: Saldırgan,
+Savunmacı (kalesi düşünce öfkelenir), Kaynak Odaklı (yağma), Zaman Manipülatörü (duvar üstünden faz atlar, sen yokken
+hızlanır), Paradoks Yaratıcısı (senin yapılarını siler; köprün silinirse üstündeki kahraman akıntıya kapılır),
+Teknoloji Uzmanı (uzaktan vurur, arayı açar, her 3 turda güçlenir).
+
 Kahraman korunan hücrenin üstünde durursa düşmanlar içeri giremez. Akıncı/robot yolu kapalıysa kırılabilir çite yüklenir,
 o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
 
@@ -86,7 +99,7 @@ o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
 |---|---|---|
 | 1 | Proje, izometrik harita, Geçmiş↔Şimdi, nedensellik motoru, 5 bölüm, başarı/başarısızlık, kayıt, canlar | **Tamamlandı** |
 | 2 | Gelecek çağı, yapı/doğa evrimi (kadim orman), zaman enerjisi ve kristaller, robotlar, mühür bağlantıları, 20 yeni bölüm (toplam 25) | **Tamamlandı** |
-| 3 | Birlikler, tur tabanlı savaş, 6 düşman stratejisi, kaynaklar, özel mekanikler | Planlandı |
+| 3 | 9 birlik türü (can/saldırı/savunma/menzil/hareket/yetenek/çağ uyumu), nöbet, kuleler, 6 düşman stratejisi, zaman dondurma, zincir kombosu, önceden görme, Alan 6–7 (toplam 35 bölüm) | **Tamamlandı** |
 | 4 | Zaman Kalesi (15 bina), araştırma ağacı, ekonomi, market | Planlandı |
 | 5 | Günlük/haftalık görevler, sonsuz mod, seferler, koleksiyon/müze, başarımlar, prestij | Planlandı |
 | 6 | 100 alan / 500 bölüm, patronlar, dünya finalleri | Tasarım: docs/ALANLAR.md |

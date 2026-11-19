@@ -5,7 +5,7 @@ import com.zamaninefendisi.logic.LevelSession
 import com.zamaninefendisi.logic.SessionStatus
 import com.zamaninefendisi.logic.levels.LevelCatalog
 
-data class Reward(val gold: Int, val crystals: Int, val xp: Int, val firstClear: Boolean, val newStars: Int, val levelUp: Boolean)
+data class Reward(val gold: Int, val crystals: Int, val xp: Int, val firstClear: Boolean, val newStars: Int, val levelUp: Boolean, val comboGold: Int = 0)
 
 /** Zaman Ustası seviyesi: her seviye bir öncekinden 50 deneyim puanı daha fazla ister. */
 object MasterLevel {
@@ -77,7 +77,8 @@ class Progression(private val saves: SaveSystem, clock: GameClock) {
         val stars = session.stars()
         val first = !old.completed
         val newStars = (stars - old.stars).coerceAtLeast(0)
-        val gold = if (first) 30 + 10 * stars else 5 + 10 * newStars
+        val comboGold = 10 * session.combos
+        val gold = (if (first) 30 + 10 * stars else 5 + 10 * newStars) + comboGold
         val crystals = newStars + if (first && session.level.id % 5 == 0) 3 else 0
         val xp = if (first) 40 + 10 * stars else 10 + 10 * newStars
         val levelBefore = MasterLevel.levelOf(data.xp)
@@ -101,10 +102,12 @@ class Progression(private val saves: SaveSystem, clock: GameClock) {
                 inProgress = null,
             )
         }
-        return Reward(gold, crystals, xp, first, newStars, MasterLevel.levelOf(data.xp) > levelBefore)
+        return Reward(gold, crystals, xp, first, newStars, MasterLevel.levelOf(data.xp) > levelBefore, comboGold)
     }
 
     private fun mergeStats(s: Stats, session: LevelSession) = s.copy(
+        bestCombo = maxOf(s.bestCombo, session.combos),
+        unitsLost = s.unitsLost + (session.level.units.size - session.units.size),
         eraSwitches = s.eraSwitches + session.actions.count { it is Action.SwitchEra },
         buildings = s.buildings + session.timeline.changes.count { !it.voided },
         paradoxes = s.paradoxes + session.paradoxCount,

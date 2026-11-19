@@ -14,8 +14,8 @@ gerçekten oynanabilir olduğunu gösterir.
 | 3 | 11–15 | Kayıp Orman | Doğa evrimi: ormanı önlemek için kesmek, üç çağlık çöl, şehir için ağaç seçimi, orman kalkanı, yaşlı ağaç patronu | **Oynanabilir** |
 | 4 | 16–20 | Taş Köprüler | Yapı evrimi: taş köprü, iki şehir, enerji kalkanı, zaman mühürleri (çağlar arası bağlantı), Taş Kral patronu | **Oynanabilir** |
 | 5 | 21–25 | Enerji Vadisi | Zaman enerjisi, kristaller ve kristal paradoksu · 25: Enerji Lordu (özel patron) | **Oynanabilir** |
-| 6 | 26–30 | Donmuş Yıllar | Zaman dondurma: bir nesne çağlar boyunca evrilmez | Aşama 3 |
-| 7 | 31–35 | Yıkılmış Krallık | Savunma inşası, kule menzili | Aşama 3 |
+| 6 | 26–30 | Donmuş Yıllar | Zaman dondurma: tarihî yapıyı koruma, ormanı durdurma, kampı küçük tutma, fidanı fidan bırakma · Buz Devri patronu | **Oynanabilir** |
+| 7 | 31–35 | Yıkılmış Krallık | Müttefik birlikler, savunma kuleleri, yağmacı/ajan/faz hırsızı/savunmacı okçu/teknoloji uzmanı · Yıkılmış Kral patronu | **Oynanabilir** |
 | 8 | 36–40 | Kayıp Teknoloji | Teknoloji aktarımı: Gelecek planını Geçmiş'te kurma | Aşama 3 |
 | 9 | 41–45 | Sonsuz Döngü | Geri sarma: son 3 turu enerjiyle geri alma (bölüm içi mekanik) | Aşama 3 |
 | 10 | 46–50 | Paradoks Kalesi | İlk büyük paradoks · 50: **1. dünya finali** | Aşama 3 |

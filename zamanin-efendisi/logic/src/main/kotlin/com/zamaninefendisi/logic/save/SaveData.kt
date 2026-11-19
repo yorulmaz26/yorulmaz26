@@ -49,6 +49,8 @@ data class Stats(
     val paradoxes: Int = 0,
     val enemiesDefeated: Int = 0,
     val fewestActionsWin: Int = 0,
+    val bestCombo: Int = 0,
+    val unitsLost: Int = 0,
 )
 
 /** Yarım kalan bölüm: eylem listesi deterministik olarak yeniden oynatılır. */

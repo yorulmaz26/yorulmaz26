@@ -73,6 +73,8 @@ class ProfileScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             "Kalıcı değişiklik" to "${st.buildings}",
             "Çözülen/yaşanan paradoks" to "${st.paradoxes}",
             "Yenilen düşman" to "${st.enemiesDefeated}",
+            "Rekor: en yüksek kombo" to "${st.bestCombo}",
+            "Kaybedilen birlik" to "${st.unitsLost}",
             "Rekor: en az eylemle zafer" to if (st.fewestActionsWin > 0) "${st.fewestActionsWin} eylem" else "—",
         )
         val t = ui.panel(Theme.panel)
@@ -107,6 +109,11 @@ class HowToPlayScreen(game: ZamaninEfendisiGame, private val returnTo: (() -> Sc
         "Gelecek ve Kadim Orman" to "Alan 2'de Gelecek açılır: Geçmiş'teki bir değişiklik artık iki çağ boyunca evrilir. En az bir çağ yaşamış bir ağacın yanında (köşeler dahil) 2 ya da daha fazla bitki varsa, sonraki çağda geçilmez bir Kadim Orman olur. Orman hem kahramanı hem düşmanı durdurur.",
         "Zaman Enerjisi ve Kristaller" to "Bazı bölümlerde her çağ geçişi 1 zaman enerjisi harcar. Zaman kristalinin üstüne yürüyünce 1 enerji kazanırsın. Geçmiş'te toplanan kristal sonraki çağlarda hiç var olmamış olur; aynı kristali önce Gelecek'te, sonra Geçmiş'te toplarsan Gelecek'teki kazanç paradoksla silinir.",
         "Zaman Mühürleri" to "Uyuyan bir mühür uyandırıldığında başka bir çağda bir şey değişir: nehir kurur, dağ yarılır. Hücre bilgisinde bütün çağlardaki hâli görebilirsin. Nedensellik hiçbir zaman geriye işlemez.",
+        "Zamanı Dondurma" to "Alan 6'da dondurma hakkı kazanırsın. Zamanı dondurulan nesne sonraki çağlara olduğu gibi aktarılır: köy harabeye dönmez, ağaç ormana dönüşmez, düşman kampı kaleye büyümez. Dondurulmuş nesne bitki ya da yapı olarak sayılmaya devam eder.",
+        "Birlikler" to "Alan 7'de müttefik birlikler komutanda. Düşmanların bulunduğu çağdayken bir birliğe dokun: mavi hücreler yürüyebileceği, kırmızı hücreler saldırabileceği yerlerdir. Her komut bir tur sürer. Komuta etmediğin birlikler menzillerindeki en zayıf düşmana kendiliğinden ateş eder. Hasar = saldırı − savunma (en az 1). Şövalyenin kalkanı, koruyucunun zırhı, büyücünün zaman kilidi gibi yetenekleri kullan.",
+        "Kuleler" to "Geçmiş'te kurulan gözcü kulesi Şimdi'de yıkılmaz taş kule, Gelecek'te enerji topu olur. Kuleler her tur menzillerindeki en yakın düşmana kendiliğinden ateş eder.",
+        "Düşman Stratejileri" to "Saldırgan düşmanlar kaleye koşar. Savunmacılar kalelerini korur, kale düşerse öfkelenir. Yağmacılar tarla ve köyleri talan eder. Zaman Hırsızları duvarların üstünden faz atlar ve sen başka çağdayken hızlanır. Paradoks Ajanları senin yaptığın yapıları siler. Teknoloji Uzmanları uzaktan vurur, arayı açar ve güçlenir. Bir düşmana dokunarak stratejisini görebilirsin.",
+        "Önizleme ve Kombo" to "Bir inşa seçeneğinin yanındaki Önizle düğmesi, eylemin ileri çağlarda neyi değiştireceğini uygulamadan gösterir. Kısa sürede üç farklı çağda kalıcı değişiklik yaparsan Zaman Zinciri Kombosu kazanırsın; her kombo ödülüne altın ekler.",
         "Paradoks" to "Geçmiş'te yaptığın bir değişiklik, Şimdi'de daha önce yaptığın bir şeyi imkânsız kılarsa o eylem hiç gerçekleşmemiş olur. Harcadığın odun geri döner; kazandığın odun ise buharlaşır. Bütün bunları Günlük'te görebilirsin.",
         "Yıldızlar ve Canlar" to "Bölümü az eylemle bitirirsen 3 yıldız kazanırsın (Bekle eylem sayılmaz). 4 canın var; başarısız bir denemede 1 can gider ve her can 15 dakikada sırayla yenilenir. Tamamladığın bölümleri can harcamadan tekrar oynayabilirsin; Geri Al ise her zaman ücretsizdir.",
     )
