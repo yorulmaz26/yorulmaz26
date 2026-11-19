@@ -76,15 +76,15 @@ class SaveAndLivesTest {
     fun saveRoundTripAndBackup() {
         val st = InMemoryStorage()
         val sys = SaveSystem(st)
-        val data = SaveData(gold = 77, levels = mapOf(1 to LevelProgress(3, 8, 1, 2)),
+        val data = SaveData(xp = 77, levels = mapOf(1 to LevelProgress(3, 8, 1, 2)),
             inProgress = InProgress(2, listOf(Action.SwitchEra(Era.PAST), Action.Build(BuildKind.PLANT, Pos(4, 4)), Action.Wait)))
         sys.save(data)
-        sys.save(data.copy(gold = 78))
-        assertEquals(78, sys.load().gold)
+        sys.save(data.copy(xp = 78))
+        assertEquals(78, sys.load().xp)
         assertEquals(data.inProgress, sys.load().inProgress)
         st.files[SaveSystem.MAIN] = "{bozuk"
         val recovered = sys.load()
-        assertEquals(77, recovered.gold)
+        assertEquals(77, recovered.xp)
         assertNotNull(sys.lastLoadProblem)
     }
 
@@ -94,7 +94,7 @@ class SaveAndLivesTest {
         val old = """{"stars":{"1":3,"2":1},"coins":120,"unknownField":true}"""
         val d = sys.decode(old)!!
         assertEquals(SAVE_VERSION, d.version)
-        assertEquals(120, d.gold)
+        assertEquals(120, d.wallet[com.zamaninefendisi.logic.meta.Resource.GOLD])
         assertEquals(3, d.levels[1]!!.stars)
         assertTrue(d.levels[2]!!.completed)
     }

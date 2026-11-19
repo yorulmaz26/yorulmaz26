@@ -138,6 +138,7 @@ object Palette {
  */
 class IsoRenderer(private val sr: ShapeRenderer) {
     private lateinit var L: IsoLayout
+    var cosmetics: Cosmetics? = null
     private var era: Era = Era.PAST
     private val tmp = Color()
 
@@ -218,8 +219,12 @@ class IsoRenderer(private val sr: ShapeRenderer) {
 
     // ------------------------------------------------------------ Zemin
 
+    private val tinted = Color()
+
     private fun drawTile(cx: Float, cy: Float, t: Terrain, p: Pos, time: Float, k: Float) {
-        val col = Palette.tile(era, t)
+        val base = Palette.tile(era, t)
+        val tint = cosmetics?.themeTint
+        val col = if (tint != null && t == Terrain.GRASS) Palette.TileColors(tinted.set(base.top).lerp(tint, 0.4f), base.left, base.right, base.detail) else base
         val hw = L.tw / 2f * k; val hh = L.th / 2f * k
         val top = cy + lift(t)
         val th = L.thick * k
@@ -417,10 +422,12 @@ class IsoRenderer(private val sr: ShapeRenderer) {
     }
 
     private fun castle(cx: Float, cy: Float, u: Float, time: Float) {
-        box(cx, cy, 0.72f, 0.72f, u * 0.3f, C.castle, C.castleDark, C.castleMid)
-        box(cx - u * 0.24f, cy + u * 0.02f, 0.22f, 0.22f, u * 0.52f, C.castle, C.castleDark, C.castleMid)
-        box(cx + u * 0.24f, cy + u * 0.02f, 0.22f, 0.22f, u * 0.52f, C.castle, C.castleDark, C.castleMid)
-        box(cx, cy - u * 0.14f, 0.24f, 0.24f, u * 0.62f, C.castle, C.castleDark, C.castleMid)
+        val cs = cosmetics?.castle
+        val top = cs?.getOrNull(0) ?: C.castle; val mid = cs?.getOrNull(1) ?: C.castleMid; val dark = cs?.getOrNull(2) ?: C.castleDark
+        box(cx, cy, 0.72f, 0.72f, u * 0.3f, top, dark, mid)
+        box(cx - u * 0.24f, cy + u * 0.02f, 0.22f, 0.22f, u * 0.52f, top, dark, mid)
+        box(cx + u * 0.24f, cy + u * 0.02f, 0.22f, 0.22f, u * 0.52f, top, dark, mid)
+        box(cx, cy - u * 0.14f, 0.24f, 0.24f, u * 0.62f, top, dark, mid)
         val glow = 0.75f + 0.25f * sin(time * 2.5f)
         sr.color = tmp.set(0.55f, 0.42f, 0.95f, glow); sr.circle(cx, cy + u * 0.68f, u * 0.07f, 16)
         sr.color = tmp.set(1f, 0.85f, 0.3f, 1f); sr.circle(cx, cy + u * 0.68f, u * 0.035f, 12)
@@ -440,7 +447,7 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         val u = L.tw * k
         val bob = sin(time * 4f) * u * 0.02f
         sr.color = tmp.set(0f, 0f, 0f, 0.18f); sr.ellipse(cx - u * 0.16f, cy - u * 0.06f, u * 0.32f, u * 0.13f, 16)
-        val cloak = Theme.eraColor(era)
+        val cloak = cosmetics?.heroCloak ?: Theme.eraColor(era)
         tri(cx - u * 0.15f, cy, cx + u * 0.15f, cy, cx, cy + u * 0.42f + bob, Theme.darker(cloak, 0.85f))
         tri(cx, cy - u * 0.02f, cx + u * 0.15f, cy, cx, cy + u * 0.42f + bob, cloak)
         sr.color = C.skin; sr.circle(cx, cy + u * 0.46f + bob, u * 0.085f, 16)
@@ -477,7 +484,7 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         val body = when (type) {
             com.zamaninefendisi.logic.UnitType.MAGE -> C.allyMage
             com.zamaninefendisi.logic.UnitType.MECH, com.zamaninefendisi.logic.UnitType.ROBOT, com.zamaninefendisi.logic.UnitType.ENERGY -> C.allyTech
-            else -> C.ally
+            else -> cosmetics?.ally ?: C.ally
         }
         when (type) {
             com.zamaninefendisi.logic.UnitType.MECH, com.zamaninefendisi.logic.UnitType.ROBOT -> {
@@ -574,6 +581,75 @@ class IsoRenderer(private val sr: ShapeRenderer) {
             sr.color = C.trunk; sr.rectLine(cx + u * 0.16f, cy - u * 0.02f, cx + u * 0.16f, cy + u * 0.5f, 2.5f)
             tri(cx + u * 0.13f, cy + u * 0.5f, cx + u * 0.19f, cy + u * 0.5f, cx + u * 0.16f, cy + u * 0.58f, C.stone)
         }
+    }
+
+    // ------------------------------------------------------------ Zaman Kalesi sahnesi
+
+    /** Zaman Kalesi avlusunu ve binaları çizer. [slots]: bina → (x, y, seviye). */
+    fun drawCastleScene(layout: IsoLayout, w: Int, h: Int, slots: List<Triple<Pos, Int, Int>>, selected: Pos?, time: Float) {
+        L = layout
+        era = Era.PRESENT
+        val byPos = slots.associateBy { it.first }
+        for (sum in 0..(w + h - 2)) for (x in 0 until w) {
+            val y = sum - x
+            if (y !in 0 until h) continue
+            val p = Pos(x, y)
+            val cx = L.cx(x.toFloat(), y.toFloat()); val cy = L.cy(x.toFloat(), y.toFloat())
+            drawTile(cx, cy, Terrain.GRASS, p, time, 1f)
+            if (p == selected) diamondOutline(cx, cy, 0.95f, Color(1f, 0.85f, 0.2f, 1f), 4f)
+            val slot = byPos[p]
+            if (slot == null) {
+                decoration(cx, cy, p, time)
+                continue
+            }
+            val (_, kind, lvl) = slot
+            if (lvl <= 0) { diamondOutline(cx, cy, 0.6f, Color(1f, 1f, 1f, 0.8f), 3f); sr.color = tmp.set(1f, 1f, 1f, 0.9f); sr.rectLine(cx - 8f, cy, cx + 8f, cy, 3f); sr.rectLine(cx, cy - 6f, cx, cy + 6f, 3f); continue }
+            building(kind, lvl, cx, cy, time)
+        }
+    }
+
+    private fun decoration(cx: Float, cy: Float, p: Pos, time: Float) {
+        val c = cosmetics ?: return
+        val cols = c.decorationColors
+        when (c.decoration) {
+            "deco_flags" -> if ((p.x + p.y) % 2 == 0) flagPole(cx, cy, L.tw * 0.45f, cols.getOrElse((p.x + p.y) % cols.size.coerceAtLeast(1)) { Theme.orange }, time)
+            "deco_garden" -> { for (i in 0..3) { sr.color = cols.getOrElse(i % cols.size.coerceAtLeast(1)) { Theme.pink }; sr.circle(cx + (i - 1.5f) * L.tw * 0.1f, cy + (i % 2) * L.th * 0.12f, L.tw * 0.04f, 8) } }
+            "deco_fountain" -> if (p.x == 0 && p.y == 0 || (p.x + p.y) % 5 == 0) {
+                box(cx, cy, 0.4f, 0.4f, L.tw * 0.08f, C.stone, C.stoneDark, C.stoneMid)
+                sr.color = tmp.set(0.5f, 0.9f, 1f, 0.8f); sr.circle(cx, cy + L.tw * 0.16f + sin(time * 3f) * 3f, L.tw * 0.06f, 12)
+            }
+            else -> {}
+        }
+    }
+
+    /** Bina türüne göre şekil; seviye yükseldikçe büyür. [kind]: BuildingType sırası. */
+    private fun building(kind: Int, lvl: Int, cx: Float, cy: Float, time: Float) {
+        val u = L.tw * (0.75f + 0.07f * lvl)
+        val roof = cosmetics?.roof ?: C.roofRed
+        when (kind) {
+            0 -> { castle(cx, cy, u * 1.1f, time) }
+            1 -> { tower(cx, cy, u, 0.7f + 0.1f * lvl, C.cityB); sr.color = Theme.blue; sr.circle(cx, cy + u * (0.5f + 0.06f * lvl), u * 0.09f, 14) }
+            2 -> { box(cx, cy, 0.7f, 0.5f, u * 0.22f, C.hutWall, C.woodDark, C.wood); sr.color = roof; sr.rect(cx - u * 0.15f, cy + u * 0.22f, u * 0.3f, u * 0.04f) }
+            3 -> { box(cx, cy, 0.5f, 0.5f, u * 0.28f, C.stone, C.stoneDark, C.stoneMid); flagPole(cx, cy + u * 0.28f, u * 0.35f, Theme.red, time) }
+            4 -> { box(cx, cy, 0.45f, 0.45f, u * 0.32f, C.techWhite, C.techBlue, C.techLight); sr.color = C.crystal; sr.rectLine(cx, cy + u * 0.32f, cx, cy + u * 0.6f, 3f); sr.circle(cx, cy + u * 0.62f, u * 0.04f, 10) }
+            5 -> {
+                box(cx, cy, 0.5f, 0.5f, u * 0.08f, C.stone, C.stoneDark, C.stoneMid)
+                val g = 0.6f + 0.4f * sin(time * 3f)
+                sr.color = tmp.set(0.55f, 0.42f, 0.95f, g); sr.arc(cx, cy + u * 0.35f, u * 0.25f, 0f, 360f, 24)
+                sr.color = tmp.set(0.95f, 0.93f, 1f, 1f); sr.circle(cx, cy + u * 0.35f, u * 0.17f, 20)
+            }
+            6 -> { box(cx, cy, 0.55f, 0.45f, u * 0.25f, C.techWhite, C.techBlue, C.techLight); box(cx + u * 0.12f, cy + u * 0.05f, 0.12f, 0.12f, u * 0.55f, C.stoneMid, C.stoneDark, C.stone); sr.color = tmp.set(1f, 0.9f, 0.3f, 0.7f + 0.3f * sin(time * 5f)); sr.circle(cx - u * 0.08f, cy + u * 0.32f, u * 0.05f, 10) }
+            7 -> { box(cx, cy, 0.6f, 0.5f, u * 0.25f, C.townWall, C.stoneDark, C.stoneMid); for (i in -1..1) box(cx + i * u * 0.12f, cy - u * 0.12f - i * u * 0.02f, 0.06f, 0.06f, u * 0.25f, C.techWhite, C.stoneMid, C.techWhite); tri(cx - u * 0.3f, cy + u * 0.25f, cx + u * 0.3f, cy + u * 0.25f, cx, cy + u * 0.42f, roof) }
+            8 -> { tri(cx - u * 0.25f, cy, cx + u * 0.05f, cy - u * 0.1f, cx - u * 0.05f, cy + u * 0.4f, C.woodDark); tri(cx + u * 0.05f, cy - u * 0.1f, cx + u * 0.25f, cy + u * 0.02f, cx - u * 0.05f, cy + u * 0.4f, C.wood); flagPole(cx + u * 0.2f, cy, u * 0.4f, Theme.green, time) }
+            9 -> { house(cx, cy, u, C.hutWall, Theme.gold); sr.color = Theme.gold; sr.circle(cx - u * 0.2f, cy + u * 0.05f, u * 0.05f, 10) }
+            10 -> { box(cx, cy, 0.36f, 0.36f, u * 0.6f, C.stone, C.stoneDark, C.stoneMid); for (i in -1..1) box(cx + i * u * 0.09f, cy - i * u * 0.045f + u * 0.6f, 0.1f, 0.1f, u * 0.08f, C.stone, C.stoneDark, C.stoneMid) }
+            11 -> { box(cx, cy, 0.5f, 0.5f, u * 0.1f, C.stoneMid, C.stoneDark, C.stone); val fy = cy + u * 0.3f; tri(cx - u * 0.12f, fy, cx, fy - u * 0.18f, cx, fy + u * 0.22f, C.crystalDark); tri(cx, fy - u * 0.18f, cx + u * 0.12f, fy, cx, fy + u * 0.22f, C.crystal) }
+            12 -> { house(cx, cy, u, C.townWall, C.roofBlue); sr.color = C.field; sr.rect(cx - u * 0.05f, cy + u * 0.05f, u * 0.1f, u * 0.08f) }
+            13 -> { house(cx, cy, u, C.hutWall, roof); sr.color = C.stoneDark; sr.circle(cx + u * 0.18f, cy + u * 0.1f, u * 0.06f, 10); sr.color = C.hutWall; sr.circle(cx + u * 0.18f, cy + u * 0.1f, u * 0.025f, 8) }
+            else -> { house(cx, cy, u, C.townWall, roof); sr.color = C.field; sr.rect(cx + u * 0.12f, cy + u * 0.08f, u * 0.08f, u * 0.1f) }
+        }
+        sr.color = C.levelDot
+        for (i in 0 until lvl) sr.circle(cx - L.tw * 0.3f + i * L.tw * 0.07f, cy - L.th * 0.3f, L.tw * 0.025f, 8)
     }
 
     // ------------------------------------------------------------ İlkel şekiller

@@ -1,6 +1,7 @@
 package com.zamaninefendisi.game.screens
 
 import com.badlogic.gdx.Screen
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.zamaninefendisi.game.ZamaninEfendisiGame
@@ -47,6 +48,7 @@ class ProfileScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         val p = game.progression
         val d = p.data
         val lvl = MasterLevel.levelOf(d.xp)
+        val frame = com.zamaninefendisi.game.render.Cosmetics(d.equipped).frame
         val card = ui.panel(Theme.panel)
         card.pad(26f)
         card.add(ui.label("Zaman Muhafızı", assets.fontL, Theme.ink)).row()
@@ -58,15 +60,18 @@ class ProfileScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         bar.add(Table().apply { background = assets.panel(Theme.creamDeep, true) }).width((w * (1 - prog)).coerceAtLeast(0f)).height(22f)
         card.add(bar).padTop(10f).row()
         card.add(ui.label("${d.xp - MasterLevel.xpFor(lvl)} / ${MasterLevel.xpFor(lvl + 1) - MasterLevel.xpFor(lvl)} deneyim", assets.fontS, Theme.inkSoft)).padTop(6f).row()
-        root.add(card).width(660f).padBottom(18f).row()
+        val framed = Table().apply { background = assets.panel(if (frame == Color.WHITE) Theme.creamDeep else frame); pad(8f) }
+        framed.add(card).width(644f)
+        root.add(framed).width(660f).padBottom(18f).row()
 
         val done = LevelCatalog.levels.count { p.isCompleted(it.id) }
         val st = d.stats
         val rows = listOf(
             "Tamamlanan bölüm" to "$done / ${LevelCatalog.levels.size}",
             "Toplam yıldız" to "${p.totalStars()} / ${LevelCatalog.levels.size * 3}",
-            "Altın" to "${d.gold}",
-            "Zaman kristali" to "${d.crystals}",
+            "Altın" to "${p.amount(com.zamaninefendisi.logic.meta.Resource.GOLD)}",
+            "Zaman kristali" to "${p.amount(com.zamaninefendisi.logic.meta.Resource.CRYSTAL)}",
+            "Rekor: en güçlü zaman kalesi" to "${p.kingdomPower()}",
             "Kazanılan deneme" to "${st.levelsWon}",
             "Başarısız deneme" to "${st.levelsFailed}",
             "Zaman geçişi" to "${st.eraSwitches}",

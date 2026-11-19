@@ -116,8 +116,9 @@ abstract class BaseScreen(val game: ZamaninEfendisiGame) : ScreenAdapter() {
         val t = ui.panel(Theme.panel, small = true)
         val livesText = if (lives.lives >= MAX_LIVES) "Can ${lives.lives}/$MAX_LIVES" else "Can ${lives.lives}/$MAX_LIVES · ${com.zamaninefendisi.game.ui.formatTime(lives.regenRemainingMs)}"
         t.add(ui.label(livesText, assets.fontS, Theme.red)).padRight(18f)
-        t.add(ui.label("Altın ${p.data.gold}", assets.fontS, Theme.darker(Theme.gold, 0.8f))).padRight(18f)
-        t.add(ui.label("Kristal ${p.data.crystals}", assets.fontS, Theme.purple)).padRight(18f)
+        t.add(ui.label("Altın ${p.amount(com.zamaninefendisi.logic.meta.Resource.GOLD)}", assets.fontS, Theme.darker(Theme.gold, 0.8f))).padRight(18f)
+        t.add(ui.label("Kristal ${p.amount(com.zamaninefendisi.logic.meta.Resource.CRYSTAL)}", assets.fontS, Theme.purple)).padRight(18f)
+        t.add(ui.label("Bilim ${p.amount(com.zamaninefendisi.logic.meta.Resource.SCIENCE)}", assets.fontS, Theme.blue)).padRight(18f)
         t.add(ui.label("Yıldız ${p.totalStars()}", assets.fontS, Theme.orange))
         t.pad(10f, 18f, 10f, 18f)
         return t

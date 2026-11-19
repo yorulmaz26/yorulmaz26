@@ -19,7 +19,8 @@ logic/    Saf Kotlin oyun mantığı — grafikten bağımsız, JVM'de test edil
   LevelSession.kt     Bölüm simülasyonu: kahraman, eylemler, düşman yapay zekâsı, zaman tuzağı, hedefler, günlük
   Level.kt            Bölüm tanımı (ASCII harita), hedef türleri, öğretici ipuçları
   levels/             Alan ve bölüm kataloğu (Area01–Area07: 1–35. bölümler)
-  save/               Sürümlü kayıt + göç, 4 can sistemi (saat hilesi korumalı), ilerleme/ödül/Zaman Ustası seviyesi
+  save/               Sürümlü kayıt + göç (v0→v1→v2), 4 can sistemi (saat hilesi korumalı), ilerleme/ödül/Zaman Ustası seviyesi
+  meta/               Ekonomi (10 kaynak), Zaman Kalesi binaları ve üretimi, araştırma ağacı, market ve ödeme sağlayıcısı soyutlaması
 core/     libGDX katmanı
   ZamaninEfendisiGame Ekran yönetimi ve ortak hizmetler
   render/IsoRenderer  Kod ile çizilen izometrik dünya ve animasyonlar (görsel dosya gerektirmez)
@@ -100,13 +101,25 @@ o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
 | 1 | Proje, izometrik harita, Geçmiş↔Şimdi, nedensellik motoru, 5 bölüm, başarı/başarısızlık, kayıt, canlar | **Tamamlandı** |
 | 2 | Gelecek çağı, yapı/doğa evrimi (kadim orman), zaman enerjisi ve kristaller, robotlar, mühür bağlantıları, 20 yeni bölüm (toplam 25) | **Tamamlandı** |
 | 3 | 9 birlik türü (can/saldırı/savunma/menzil/hareket/yetenek/çağ uyumu), nöbet, kuleler, 6 düşman stratejisi, zaman dondurma, zincir kombosu, önceden görme, Alan 6–7 (toplam 35 bölüm) | **Tamamlandı** |
-| 4 | Zaman Kalesi (15 bina), araştırma ağacı, ekonomi, market | Planlandı |
+| 4 | Zaman Kalesi (15 bina, çevrimdışı üretim, görsel büyüme), 5 kategorili 20 düğümlü araştırma ağacı, 10 kaynaklı ekonomi, 10 kategorili market (kozmetikler oyunda görünür), envanter, Zaman Rehberi | **Tamamlandı** |
 | 5 | Günlük/haftalık görevler, sonsuz mod, seferler, koleksiyon/müze, başarımlar, prestij | Planlandı |
 | 6 | 100 alan / 500 bölüm, patronlar, dünya finalleri | Tasarım: docs/ALANLAR.md |
 | 7 | Performans, ses/animasyon cilası, ekran uyumluluğu, Google Play hazırlığı | Planlandı |
 
-Şu an olmayan özellikler arayüzde düğme olarak gösterilmez (sahte düğme yoktur). Altın, kristal ve deneyim
-kazanılır ve kaydedilir; harcanacakları Zaman Kalesi/market Aşama 4'te gelecektir.
+Şu an olmayan özellikler arayüzde düğme olarak gösterilmez (sahte düğme yoktur).
+
+### Zaman Kalesi, araştırma ve market (Aşama 4)
+
+- **15 bina** (Zaman Çekirdeği, Laboratuvar, Depo, Akademi, Teknoloji Merkezi, Portal, Enerji Santrali, Müze, Keşif
+  Merkezi, Ticaret Merkezi, Savunma Kulesi, Kristal Madeni, Arşiv, Atölye, Görev Merkezi), her biri 5 seviye; diğer
+  binalar çekirdeğin seviyesini aşamaz. Üretim, canlarla aynı manipülasyona dayanıklı saatle çevrimdışı birikir ve
+  depo sınırına kadar dolar.
+- **Araştırma**: Zaman Bilimi, Medeniyet, Askerî, Teknoloji, Paradoks Bilimi (4'er kademe). Etkiler: önizleme hakları,
+  Zaman Rehberi (1 kristale doğrulanmış çözümün sıradaki adımı), ödül/üretim çarpanları, savaşta +can, otomatik toplama…
+  Hiçbiri bulmacayı kendiliğinden çözmez.
+- **Market**: 10 kategori; kale/asker/portal/bina/harita/karakter görünümleri, dekorasyon, profil çerçevesi, zafer
+  animasyonu oyunda gerçekten uygulanır; kaynak paketleri anında verir. Ödeme `PurchaseProvider` arayüzünden geçer
+  (şimdilik oyun içi para; Google Play Billing ileride bu arayüzle eklenebilir). Para harcamadan ilerlemek mümkündür.
 
 ## Testler
 

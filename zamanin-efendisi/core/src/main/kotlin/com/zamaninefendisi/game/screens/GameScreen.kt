@@ -38,8 +38,14 @@ class GameScreen(
     /** Geliştirici otomatik oynatma: eylemler arayüzün kendi yolundan sırayla uygulanır. */
     autoplay: List<Action> = emptyList(),
 ) : BaseScreen(game) {
-    private var session = LevelSession.replay(level, initialActions)
-    private val renderer = IsoRenderer(game.shapes)
+    private val hpBonus = game.progression.heroHpBonus()
+    private var session = LevelSession.replay(level, initialActions, hpBonus)
+    private var foresightLeft: Int? = game.progression.foresightCharges()
+    private val cosmetics = com.zamaninefendisi.game.render.Cosmetics(game.progression.data.equipped)
+    private var portalT = 1f
+    private val particles = ArrayList<FloatArray>()
+    private val particleColors = ArrayList<Color>()
+    private val renderer = IsoRenderer(game.shapes).also { it.cosmetics = com.zamaninefendisi.game.render.Cosmetics(game.progression.data.equipped) }
     private val anim = WorldAnim().also { it.snap(session) }
     private var layout = IsoLayout(0f, 0f, 60f)
     private val queue = ArrayDeque<Action>()
@@ -144,6 +150,7 @@ class GameScreen(
         actionRow.clearChildren()
         if (level.hasEnemies) actionRow.add(ui.button("Bekle", Theme.purple, assets.fontS) { perform(Action.Wait) }).width(150f)
         actionRow.add(ui.button("Günlük", Theme.teal, assets.fontS) { showJournal() }).width(150f)
+        if (game.progression.hasGuide()) actionRow.add(ui.button("Rehber", Theme.gold, assets.fontS) { useGuide() }).width(150f)
         actionRow.add(ui.button("Yeniden", Theme.orange, assets.fontS) { restart() }).width(150f)
         undoButton.isDisabled = s.actions.isEmpty() || s.status != SessionStatus.PLAYING
     }
@@ -232,6 +239,7 @@ class GameScreen(
         for (e in events) when (e) {
             is GameEvent.HeroMoved -> game.audio.play("move", 0.35f)
             is GameEvent.EraSwitched -> {
+                portalT = 0f
                 anim.startTransition(session.heroPos)
                 anim.snap(session)
                 game.audio.play("switch")
@@ -273,7 +281,7 @@ class GameScreen(
         if (session.actions.isEmpty() || session.status != SessionStatus.PLAYING) return
         queue.clear(); closePopup(); clearUnitSelection()
         val before = session.heroEra
-        session = LevelSession.replay(level, session.actions.dropLast(1))
+        session = LevelSession.replay(level, session.actions.dropLast(1), hpBonus)
         if (session.heroEra != before) anim.startTransition(session.heroPos)
         anim.snap(session)
         refreshHud(); saveProgress()
@@ -283,11 +291,32 @@ class GameScreen(
     private fun restart() {
         queue.clear(); closePopup(); clearUnitSelection()
         if (session.status == SessionStatus.LOST && !game.progression.canStart(level.id)) { ui.toast(root, "Canın kalmadı", Theme.red); return }
-        session = LevelSession(level)
+        session = LevelSession(level, hpBonus)
         recorded = false
+        foresightLeft = game.progression.foresightCharges()
         anim.snap(session); anim.startTransition(session.heroPos)
         stage.actors.filter { it.userObject == MODAL }.forEach { it.remove() }
         refreshHud(); saveProgress()
+    }
+
+    /** Zaman Rehberi: oyuncu doğrulanmış çözümün başındaysa sıradaki adımı gösterir (1 kristal). */
+    private fun useGuide() {
+        val sol = level.solution
+        val acts = session.actions
+        val onTrack = acts.size < sol.size && acts.indices.all { acts[it] == sol[it] }
+        if (!onTrack) { ui.toast(root, "Rehber yalnızca kendi çözüm yolunu bilir. Yeniden başlatırsan baştan yol gösterebilir.", Theme.purple); return }
+        if (!game.progression.spendGuide()) { ui.toast(root, "Rehber için 1 Zaman Kristali gerekli", Theme.red); return }
+        val next = sol[acts.size]
+        val text = when (next) {
+            is Action.Move -> { anim.selected = next.to; "Sıradaki adım: ${next.to} hücresine yürü" }
+            is Action.SwitchEra -> "Sıradaki adım: ${next.era.title} çağına geç"
+            is Action.Build -> { anim.selected = next.at; "Sıradaki adım: ${next.at} hücresinde \"${next.kind.title}\"" }
+            is Action.Attack -> { anim.selected = next.at; "Sıradaki adım: ${next.at} hücresindeki düşmana saldır" }
+            is Action.UnitMove -> { anim.selected = next.to; "Sıradaki adım: ${session.unit(next.unit)?.type?.title} birliğini ${next.to} hücresine götür" }
+            is Action.UnitAttack -> { anim.selected = next.at; "Sıradaki adım: ${session.unit(next.unit)?.type?.title} ile ${next.at} hedefine saldır" }
+            Action.Wait -> "Sıradaki adım: bir tur bekle"
+        }
+        ui.toast(root, text, Theme.darker(Theme.gold, 0.7f))
     }
 
     fun saveProgress() {
@@ -327,7 +356,13 @@ class GameScreen(
             b.isDisabled = !o.enabled
             if (o.action is Action.Build && o.enabled && s.timeline.eras.last() != s.heroEra) {
                 btns.add(b).width(400f).height(70f)
-                btns.add(ui.button("Önizle", Theme.purple, assets.fontS) { showForesight(o.action) }).width(180f).height(70f).row()
+                val left = foresightLeft
+                val fb = ui.button(if (left == null) "Önizle" else "Önizle ($left)", Theme.purple, assets.fontS) {
+                    if (left != null) foresightLeft = left - 1
+                    showForesight(o.action)
+                }
+                fb.isDisabled = left != null && left <= 0
+                btns.add(fb).width(180f).height(70f).row()
             } else {
                 btns.add(b).width(590f).colspan(2).height(70f).row()
             }
@@ -442,12 +477,10 @@ class GameScreen(
             box.add(ui.label("Zaman Dengesi Sağlandı!", assets.fontL, Theme.green)).row()
             box.add(ui.label("★".repeat(stars) + "☆".repeat(3 - stars), assets.fontXL, Theme.gold)).padTop(6f).row()
             box.add(ui.label("${session.actionsUsed} eylem · 3 yıldız için en fazla ${level.par}", assets.fontS, Theme.inkSoft)).padBottom(12f).row()
-            val rw = buildString {
-                append("+${r.gold} altın   +${r.xp} deneyim")
-                if (r.crystals > 0) append("   +${r.crystals} kristal")
-                if (r.comboGold > 0) append("   (kombo +${r.comboGold})")
-            }
-            box.add(ui.label(rw, assets.fontM, Theme.orange)).row()
+            box.add(ui.label("+${r.gold} altın   +${r.xp} deneyim" + if (r.comboGold > 0) "   (kombo +${r.comboGold})" else "", assets.fontM, Theme.orange)).row()
+            val others = r.gains.filterKeys { it != com.zamaninefendisi.logic.meta.Resource.GOLD }
+            if (others.isNotEmpty()) box.add(ui.label(others.entries.joinToString(" · ") { "+${it.value} ${it.key.title}" }, assets.fontS, Theme.purple, wrap = true, align = Align.center)).width(560f).row()
+            spawnVictoryParticles()
             if (r.levelUp) box.add(ui.label("Zaman Ustası seviyen yükseldi!", assets.fontS, Theme.purple)).padTop(4f).row()
             val summary = session.causalSummary().take(3)
             if (summary.isNotEmpty()) {
@@ -517,6 +550,7 @@ class GameScreen(
         val protect = if (session.heroEra == level.enemyEra) level.protect.toSet() else emptySet()
         renderer.draw(session, session.heroEra, layout, anim, markers, protect)
         sr.end()
+        lastDelta = delta
         cam.position.x -= shakeX; cam.update()
         // Uçan yazılar
         game.batch.projectionMatrix = cam.combined
@@ -534,11 +568,14 @@ class GameScreen(
     }
 
     /** Çağ düğmelerinin içine o çağın canlı küçük haritası çizilir: bir çağdaki değişiklik diğerlerinde anında görünür. */
+    private var lastDelta = 0f
+
     override fun drawOverlay() {
         val sr = game.shapes
         sr.projectionMatrix = stage.camera.combined
         Gdx.gl.glEnable(GL20.GL_BLEND)
         sr.begin(ShapeRenderer.ShapeType.Filled)
+        drawEffects(sr, lastDelta)
         for ((era, b) in eraButtons) {
             if (!b.hasParent() || b.stage == null) continue
             tmpV.set(0f, 0f); b.localToStageCoordinates(tmpV)
@@ -569,6 +606,42 @@ class GameScreen(
             }
         }
         sr.end()
+    }
+
+    private fun spawnVictoryParticles() {
+        particles.clear(); particleColors.clear()
+        val cols = cosmetics.victory
+        repeat(90) { i ->
+            val x = stage.width * Math.random().toFloat()
+            particles += floatArrayOf(x, stage.height + 20f + 300f * Math.random().toFloat(), (Math.random().toFloat() - 0.5f) * 60f, -(120f + 160f * Math.random().toFloat()), 4f)
+            particleColors += cols[i % cols.size]
+        }
+    }
+
+    private fun drawEffects(sr: ShapeRenderer, delta: Float) {
+        if (portalT < 1f) {
+            portalT = (portalT + delta / 0.7f).coerceAtMost(1f)
+            val hx = layout.cx(anim.heroX, anim.heroY); val hy = layout.cy(anim.heroX, anim.heroY) + layout.tw * 0.3f
+            for ((i, c) in cosmetics.portal.withIndex()) {
+                val t = (portalT - i * 0.08f).coerceIn(0f, 1f)
+                if (t <= 0f) continue
+                sr.color = Color(c.r, c.g, c.b, (1f - t) * 0.8f)
+                sr.arc(hx, hy, 20f + t * 260f, 0f, 360f, 40)
+            }
+        }
+        val it = particles.iterator(); var idx = 0
+        val keep = ArrayList<Color>()
+        while (it.hasNext()) {
+            val p = it.next(); val c = particleColors[idx++]
+            p[0] += p[2] * delta; p[1] += p[3] * delta; p[4] -= delta
+            if (p[4] <= 0f || p[1] < -20f) { it.remove(); continue }
+            keep += c
+            sr.color = Color(c.r, c.g, c.b, (p[4] / 1.5f).coerceAtMost(1f))
+            if (cosmetics.victoryStyle == "anim_crystals") sr.triangle(p[0] - 5f, p[1], p[0] + 5f, p[1], p[0], p[1] + 12f)
+            else if (cosmetics.victoryStyle == "anim_petals") sr.ellipse(p[0] - 6f, p[1] - 3f, 12f, 7f, 10)
+            else sr.rect(p[0] - 4f, p[1] - 4f, 8f, 8f)
+        }
+        particleColors.clear(); particleColors.addAll(keep)
     }
 
     private fun featureColor(f: Feature): Color? = when (f) {

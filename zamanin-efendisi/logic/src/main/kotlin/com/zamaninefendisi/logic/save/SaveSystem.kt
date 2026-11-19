@@ -72,11 +72,24 @@ class SaveSystem(private val storage: SaveStorage) {
             while (v < SAVE_VERSION) {
                 obj = when (v) {
                     0 -> migrate0to1(obj)
+                    1 -> migrate1to2(obj)
                     else -> obj
                 }
                 v++
             }
             return obj
+        }
+
+        /** Sürüm 1 → 2: altın ve kristal çok kaynaklı cüzdana taşınır. */
+        private fun migrate1to2(o: JsonObject): JsonObject = buildJsonObject {
+            o.forEach { (k, v) -> if (k != "version" && k != "wallet") put(k, v) }
+            put("version", 2)
+            putJsonObject("wallet") {
+                put("GOLD", o["gold"]?.jsonPrimitive?.intOrNull ?: 0)
+                put("CRYSTAL", o["crystals"]?.jsonPrimitive?.intOrNull ?: 0)
+            }
+            put("gold", 0)
+            put("crystals", 0)
         }
 
         /** Sürüm 0 (ön sürüm): yıldızlar "stars": {"1": 3} biçimindeydi ve altın "coins" adını taşıyordu. */

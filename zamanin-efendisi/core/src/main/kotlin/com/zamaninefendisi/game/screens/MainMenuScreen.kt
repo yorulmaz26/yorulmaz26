@@ -20,7 +20,7 @@ class MainMenuScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         val p = game.progression
         root.top().pad(30f)
         root.add(resourceBar()).padTop(10f).row()
-        root.add().height(330f).row()
+        root.add().height(290f).row()
         root.add(ui.label("Zamanın Efendisi", assets.fontXL, Theme.ink, align = Align.center)).row()
         root.add(ui.label("Üç Çağ", assets.fontL, Theme.orange, align = Align.center)).padBottom(10f).row()
         val lvl = MasterLevel.levelOf(p.data.xp)
@@ -42,18 +42,21 @@ class MainMenuScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         val grid = Table()
         fun cell(text: String, color: com.badlogic.gdx.graphics.Color, f: () -> Unit) =
             grid.add(ui.button(text, color, assets.fontM) { f() }).width(272f).height(88f).pad(8f)
+        cell("Zaman Kalesi", Theme.purple) { game.go(CastleScreen(game)) }
         cell("Bölüm Seçimi", Theme.blue) { game.go(LevelSelectScreen(game)) }
+        grid.row()
+        cell("Market", Theme.orange) { game.go(MarketScreen(game)) }
+        cell("Envanter", Theme.teal) { game.go(InventoryScreen(game)) }
+        grid.row()
         cell("Zaman Günlüğü", Theme.purple) { game.go(JournalScreen(game)) }
-        grid.row()
         cell("Profil", Theme.teal) { game.go(ProfileScreen(game)) }
-        cell("Nasıl Oynanır", Theme.green) { game.go(HowToPlayScreen(game)) }
         grid.row()
+        cell("Nasıl Oynanır", Theme.green) { game.go(HowToPlayScreen(game)) }
         cell("Ayarlar", Theme.inkSoft) { game.go(SettingsScreen(game)) }
-        cell("Çıkış", Theme.red) { Gdx.app.exit() }
         buttons.add(grid).row()
         root.add(buttons).row()
         root.add().expandY().row()
-        root.add(ui.label("Sürüm 0.3 · Aşama 3: Strateji · 7 alan, 35 bölüm", assets.fontS, Theme.muted, align = Align.center)).padBottom(10f)
+        root.add(ui.label("Sürüm 0.4 · Aşama 4: Zaman Kalesi, araştırma, market", assets.fontS, Theme.muted, align = Align.center)).padBottom(10f)
     }
 
     override fun drawOverlay() {

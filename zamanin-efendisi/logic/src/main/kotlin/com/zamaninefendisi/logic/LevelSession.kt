@@ -54,12 +54,12 @@ data class Foresight(val changes: List<Triple<Era, Pos, Pair<CellState, CellStat
  * Tek bir bölüm denemesinin tam simülasyonu. Grafikten bağımsızdır.
  * Bütün durum, eylem listesinden deterministik olarak yeniden üretilebilir ([replay]); geri alma bu yolla yapılır.
  */
-class LevelSession(val level: LevelDef) {
+class LevelSession(val level: LevelDef, val heroHpBonus: Int = 0) {
     val timeline = CausalityEngine(level)
 
     var heroPos: Pos = level.heroStart; private set
     var heroEra: Era = level.startEra; private set
-    var heroHp: Int = level.heroHp; private set
+    var heroHp: Int = level.heroHp + (if (level.hasEnemies) heroHpBonus else 0); private set
     var wood: Int = level.startWood; private set
     var energy: Int? = level.energy; private set
     var freezes: Int = level.freezes; private set
@@ -728,7 +728,7 @@ class LevelSession(val level: LevelDef) {
     /** Geleceği önceden görme: eylem yapılmadan önce dünyanın hangi hücrelerinin nasıl değişeceğini hesaplar. */
     fun foresee(a: Action): Foresight? {
         if (validate(a) != null) return null
-        val sim = replay(level, _actions + a)
+        val sim = replay(level, _actions + a, heroHpBonus)
         val changes = ArrayList<Triple<Era, Pos, Pair<CellState, CellState>>>()
         for (era in timeline.eras) {
             val g0 = timeline.grid(era); val g1 = sim.timeline.grid(era)
@@ -750,8 +750,8 @@ class LevelSession(val level: LevelDef) {
         )
 
         /** Eylem listesini baştan oynatır. Geri alma ve kayıttan devam bu yolla deterministik çalışır. */
-        fun replay(level: LevelDef, actions: List<Action>): LevelSession {
-            val s = LevelSession(level)
+        fun replay(level: LevelDef, actions: List<Action>, heroHpBonus: Int = 0): LevelSession {
+            val s = LevelSession(level, heroHpBonus)
             for (a in actions) {
                 if (s.status != SessionStatus.PLAYING || s.validate(a) != null) break
                 s.perform(a)
