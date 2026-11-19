@@ -1,0 +1,38 @@
+name: Emir Zinciri
+
+on:
+  push:
+    paths: ["emir-zinciri/**", ".github/workflows/emir-zinciri.yml"]
+  pull_request:
+    paths: ["emir-zinciri/**", ".github/workflows/emir-zinciri.yml"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Testler + debug APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: emir-zinciri
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Testler (bölüm doğrulaması dahil) ve APK
+        run: ./gradlew :logic:test :core:test :android:assembleDebug --stacktrace
+      - uses: actions/upload-artifact@v4
+        with:
+          name: emir-zinciri-debug-apk
+          path: emir-zinciri/android/build/outputs/apk/debug/*.apk
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: emir-zinciri-test-reports
+          path: |
+            emir-zinciri/logic/build/reports/tests
+            emir-zinciri/core/build/reports/tests
+          if-no-files-found: ignore
