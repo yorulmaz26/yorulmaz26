@@ -165,11 +165,11 @@ class IsoRenderer(private val sr: ShapeRenderer) {
                 val cx = L.cx(x.toFloat(), y.toFloat())
                 val cy = L.cy(x.toFloat(), y.toFloat()) - (1f - k) * L.tw * 0.6f
                 drawTile(cx, cy, cell.terrain, p, anim.time, k)
-                if (p in adj) diamondOutline(cx, cy + lift(cell.terrain), 0.86f, Color(1f, 1f, 1f, 0.55f), 2.5f)
-                if (p == anim.selected) diamondOutline(cx, cy + lift(cell.terrain), 0.95f, Color(1f, 0.85f, 0.2f, 1f), 4f)
-                if (p in protect) diamondOutline(cx, cy + lift(cell.terrain), 0.7f, Color(0.55f, 0.42f, 0.88f, 0.9f), 3f)
-                if (p in anim.reach) diamondOutline(cx, cy + lift(cell.terrain), 0.8f, Color(0.25f, 0.55f, 0.95f, 0.95f), 3.5f)
-                if (p in anim.targets) diamondOutline(cx, cy + lift(cell.terrain), 0.8f, Color(0.92f, 0.3f, 0.3f, 0.95f), 3.5f)
+                if (p in adj) diamondOutline(cx, cy + lift(cell.terrain), 0.86f, HL_ADJ, 2.5f)
+                if (p == anim.selected) diamondOutline(cx, cy + lift(cell.terrain), 0.95f, HL_SEL, 4f)
+                if (p in protect) diamondOutline(cx, cy + lift(cell.terrain), 0.7f, HL_PROTECT, 3f)
+                if (p in anim.reach) diamondOutline(cx, cy + lift(cell.terrain), 0.8f, HL_REACH, 3.5f)
+                if (p in anim.targets) diamondOutline(cx, cy + lift(cell.terrain), 0.8f, HL_TARGET, 3.5f)
                 drawFeature(cx, cy + lift(cell.terrain), cell.feature, cell.level, cell.durability, p, anim.time, k * pop)
                 if (cell.frozen) drawFrost(cx, cy + lift(cell.terrain), anim.time + p.x)
                 if (p in markers) drawFlag(cx, cy, anim.time)
@@ -596,7 +596,7 @@ class IsoRenderer(private val sr: ShapeRenderer) {
             val p = Pos(x, y)
             val cx = L.cx(x.toFloat(), y.toFloat()); val cy = L.cy(x.toFloat(), y.toFloat())
             drawTile(cx, cy, Terrain.GRASS, p, time, 1f)
-            if (p == selected) diamondOutline(cx, cy, 0.95f, Color(1f, 0.85f, 0.2f, 1f), 4f)
+            if (p == selected) diamondOutline(cx, cy, 0.95f, HL_SEL, 4f)
             val slot = byPos[p]
             if (slot == null) {
                 decoration(cx, cy, p, time)
@@ -706,6 +706,13 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         val plunder = c("C98A4E"); val phaser = c("C59BF0"); val saboteur = c("6E4A9E"); val ink = c("3B3355")
     }
 }
+
+// Kare başına nesne üretmemek için sabit vurgu renkleri.
+private val HL_ADJ = Color(1f, 1f, 1f, 0.55f)
+private val HL_SEL = Color(1f, 0.85f, 0.2f, 1f)
+private val HL_PROTECT = Color(0.55f, 0.42f, 0.88f, 0.9f)
+private val HL_REACH = Color(0.25f, 0.55f, 0.95f, 0.95f)
+private val HL_TARGET = Color(0.92f, 0.3f, 0.3f, 0.95f)
 
 private object Theme2 {
     val waterEdge = Color.valueOf("9FD8F2")

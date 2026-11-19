@@ -30,6 +30,8 @@ import com.zamaninefendisi.logic.levels.LevelCatalog
 import java.util.ArrayDeque
 import java.util.EnumMap
 
+private val ALLY = Color.valueOf("4F8BE8")
+
 /** Oynanışın hangi mod için olduğu: sonuç, can ve ödül kuralları buna göre değişir. */
 sealed class PlayMode {
     data object Main : PlayMode()
@@ -637,7 +639,7 @@ class GameScreen(
         sr.projectionMatrix = cam.combined
         Gdx.gl.glEnable(GL20.GL_BLEND)
         sr.begin(ShapeRenderer.ShapeType.Filled)
-        val markers = level.goals.flatMap { it.markers }.filter { it.first == session.heroEra }.map { it.second }.toSet()
+        val markers = markersByEra[session.heroEra].orEmpty()
         val protect = if (session.heroEra == level.enemyEra) level.protect.toSet() else emptySet()
         renderer.draw(session, session.heroEra, layout, anim, markers, protect)
         sr.end()
@@ -651,7 +653,7 @@ class GameScreen(
             val f = it.next()
             f.life -= delta; f.y += delta * 50f
             if (f.life <= 0) { it.remove(); continue }
-            assets.fontM.color = Color(f.color.r, f.color.g, f.color.b, (f.life / 0.5f).coerceAtMost(1f))
+            assets.fontM.color = scratch.set(f.color.r, f.color.g, f.color.b, (f.life / 0.5f).coerceAtMost(1f))
             assets.fontM.draw(game.batch, f.text, f.x - 150f, f.y, 300f, Align.center, false)
         }
         assets.fontM.color = Color.WHITE
@@ -672,7 +674,7 @@ class GameScreen(
             tmpV.set(0f, 0f); b.localToStageCoordinates(tmpV)
             if (era == session.heroEra) {
                 val pulse = 0.6f + 0.4f * kotlin.math.sin(time * 4f)
-                sr.color = Color(0.23f, 0.2f, 0.33f, pulse)
+                sr.color = scratch.set(0.23f, 0.2f, 0.33f, pulse)
                 val bx = tmpV.x; val by = tmpV.y; val bw = b.width; val bh = b.height
                 sr.rect(bx - 6f, by - 6f, bw + 12f, 6f); sr.rect(bx - 6f, by + bh, bw + 12f, 6f)
                 sr.rect(bx - 6f, by, 6f, bh); sr.rect(bx + bw, by, 6f, bh)
@@ -681,7 +683,7 @@ class GameScreen(
             val cell = minOf(areaW / level.width, areaH / level.height)
             val ox = tmpV.x + (b.width - cell * level.width) / 2f
             val oy = tmpV.y + 52f + (areaH - cell * level.height) / 2f
-            sr.color = Color(1f, 1f, 1f, 0.9f); sr.rect(ox - 4f, oy - 4f, cell * level.width + 8f, cell * level.height + 8f)
+            sr.color = scratch.set(1f, 1f, 1f, 0.9f); sr.rect(ox - 4f, oy - 4f, cell * level.width + 8f, cell * level.height + 8f)
             val g = session.timeline.grid(era)
             val fl = flashes[era]
             for (pp in g.positions()) {
@@ -691,9 +693,9 @@ class GameScreen(
                 sr.rect(x, y, cell - 1f, cell - 1f)
                 featureColor(c.feature)?.let { sr.color = it; sr.rect(x + cell * 0.2f, y + cell * 0.2f, cell * 0.6f - 1f, cell * 0.6f - 1f) }
                 if (era == level.enemyEra && session.enemyAt(pp) != null) { sr.color = Theme.red; sr.circle(x + cell / 2, y + cell / 2, cell * 0.35f, 8) }
-                if (era == level.enemyEra && session.unitAt(pp) != null) { sr.color = Color.valueOf("4F8BE8"); sr.circle(x + cell / 2, y + cell / 2, cell * 0.35f, 8) }
+                if (era == level.enemyEra && session.unitAt(pp) != null) { sr.color = ALLY; sr.circle(x + cell / 2, y + cell / 2, cell * 0.35f, 8) }
                 if (era == session.heroEra && pp == session.heroPos) { sr.color = Theme.ink; sr.circle(x + cell / 2, y + cell / 2, cell * 0.38f, 10) }
-                fl?.get(pp)?.let { t -> sr.color = Color(1f, 1f, 0.6f, (t / 1.2f) * 0.9f); sr.rect(x - 1, y - 1, cell + 1, cell + 1) }
+                fl?.get(pp)?.let { t -> sr.color = scratch.set(1f, 1f, 0.6f, (t / 1.2f) * 0.9f); sr.rect(x - 1, y - 1, cell + 1, cell + 1) }
             }
         }
         sr.end()
@@ -716,7 +718,7 @@ class GameScreen(
             for ((i, c) in cosmetics.portal.withIndex()) {
                 val t = (portalT - i * 0.08f).coerceIn(0f, 1f)
                 if (t <= 0f) continue
-                sr.color = Color(c.r, c.g, c.b, (1f - t) * 0.8f)
+                sr.color = scratch.set(c.r, c.g, c.b, (1f - t) * 0.8f)
                 sr.arc(hx, hy, 20f + t * 260f, 0f, 360f, 40)
             }
         }
@@ -727,7 +729,7 @@ class GameScreen(
             p[0] += p[2] * delta; p[1] += p[3] * delta; p[4] -= delta
             if (p[4] <= 0f || p[1] < -20f) { it.remove(); continue }
             keep += c
-            sr.color = Color(c.r, c.g, c.b, (p[4] / 1.5f).coerceAtMost(1f))
+            sr.color = scratch.set(c.r, c.g, c.b, (p[4] / 1.5f).coerceAtMost(1f))
             if (cosmetics.victoryStyle == "anim_crystals") sr.triangle(p[0] - 5f, p[1], p[0] + 5f, p[1], p[0], p[1] + 12f)
             else if (cosmetics.victoryStyle == "anim_petals") sr.ellipse(p[0] - 6f, p[1] - 3f, 12f, 7f, 10)
             else sr.rect(p[0] - 4f, p[1] - 4f, 8f, 8f)
@@ -735,7 +737,14 @@ class GameScreen(
         particleColors.clear(); particleColors.addAll(keep)
     }
 
-    private fun featureColor(f: Feature): Color? = when (f) {
+    private val scratch = Color()
+    private val featureColors = java.util.EnumMap<Feature, Color?>(Feature::class.java).apply { Feature.entries.forEach { put(it, computeFeatureColor(it)) } }
+    private fun featureColor(f: Feature): Color? = featureColors[f]
+    private val markersByEra = java.util.EnumMap<Era, Set<Pos>>(Era::class.java).apply {
+        Era.entries.forEach { e -> put(e, level.goals.flatMap { it.markers }.filter { it.first == e }.map { it.second }.toSet()) }
+    }
+
+    private fun computeFeatureColor(f: Feature): Color? = when (f) {
         Feature.NONE, Feature.STUMP -> null
         Feature.SAPLING, Feature.TREE, Feature.FOREST -> Color.valueOf("3E9E45")
         Feature.FIELD -> Theme.gold

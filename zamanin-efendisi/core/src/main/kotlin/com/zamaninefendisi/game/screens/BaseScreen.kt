@@ -47,6 +47,9 @@ abstract class BaseScreen(val game: ZamaninEfendisiGame) : ScreenAdapter() {
         })
     }
 
+    private var basePadTop = -1f
+    private var basePadBottom = 0f
+
     open fun extraInput(): InputProcessor? = null
 
     override fun show() {
@@ -93,6 +96,11 @@ abstract class BaseScreen(val game: ZamaninEfendisiGame) : ScreenAdapter() {
 
     override fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
+        // Çentikli ekranlar: güvenli alan boşluğunu sanal sahne birimine çevirip kök tabloya uygula.
+        val scale = stage.height / height.coerceAtLeast(1)
+        if (basePadTop < 0f) { basePadTop = root.padTop; basePadBottom = root.padBottom }
+        root.padTop(basePadTop + Gdx.graphics.safeInsetTop * scale).padBottom(basePadBottom + Gdx.graphics.safeInsetBottom * scale)
+        root.invalidateHierarchy()
     }
 
     override fun dispose() {

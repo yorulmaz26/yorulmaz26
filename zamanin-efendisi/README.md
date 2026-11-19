@@ -104,7 +104,7 @@ o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
 | 4 | Zaman Kalesi (15 bina, çevrimdışı üretim, görsel büyüme), 5 kategorili 20 düğümlü araştırma ağacı, 10 kaynaklı ekonomi, 10 kategorili market (kozmetikler oyunda görünür), envanter, Zaman Rehberi | **Tamamlandı** |
 | 5 | Prosedürel üretici (5 şablon, çözüm simülasyonla doğrulanır), Sonsuz Mod, Günlük Bulmaca, Haftalık Kriz, günlük/haftalık görevler, zaman seferleri, 150 eserlik koleksiyon + 6 salonlu müze, 30 başarım, alternatif tarih görevleri, Krallık Savunması, Yeni Zaman Döngüsü (prestij), rastgele zaman olayları, kişisel rekorlar | **Tamamlandı** |
 | 6 | 100 alan / 500 bölüm: Alan 1–7 elle, Alan 8–100 temaya göre üretilmiş ve doğrulanmış; her 5. bölüm patron, her 25. özel patron, her 50. dünya finali; dünya haritası (5 dünya) ve alan seçimi | **Tamamlandı** (ayrıntı ve sınırlar: docs/ALANLAR.md) |
-| 7 | Performans, ses/animasyon cilası, ekran uyumluluğu, Google Play hazırlığı | Planlandı |
+| 7 | Kare başına bellek ayırmalarının kaldırılması, çentik güvenli alanları, release imzalama yapılandırması, AAB, Google Play belgeleri (docs/YAYIN.md), masaüstü duman testleri | **Tamamlandı** — gerçek cihaz testi hariç (aşağıya bakın) |
 
 Şu an olmayan özellikler arayüzde düğme olarak gösterilmez (sahte düğme yoktur).
 
@@ -121,9 +121,21 @@ o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
   animasyonu oyunda gerçekten uygulanır; kaynak paketleri anında verir. Ödeme `PurchaseProvider` arayüzünden geçer
   (şimdilik oyun içi para; Google Play Billing ileride bu arayüzle eklenebilir). Para harcamadan ilerlemek mümkündür.
 
+## Bilinen sınırlar
+
+- **Gerçek Android cihazda/emülatörde test edilmedi.** Geliştirme ortamında KVM ve cihaz yoktu. Debug ve release (R8)
+  APK/AAB derlemeleri başarılı; oyun masaüstü başlatıcısıyla (aynı `core` kodu) yazılım OpenGL üzerinde çalıştırılıp
+  ekran görüntüleriyle ve otomatik oynatmayla denetlendi. Yayından önce en az bir düşük ve bir orta segment cihazda
+  dokunma hassasiyeti, yazı boyutları ve 60 FPS doğrulanmalıdır.
+- Alan 8–100 bölümleri temaya göre üretilir; tabloda adı geçen alan özgü mekaniklerin çoğu (gelgit, faz katmanları,
+  paralel çizgiler…) ayrı kurallar olarak kodlanmadı. Ayrıntı: docs/ALANLAR.md.
+- Müzik yok; yalnızca kodla üretilmiş kısa ses efektleri var.
+- Günlük/haftalık içerik cihaz saatine dayanır (çevrimdışı oyunda saat değiştirmek günlük bulmacayı değiştirebilir);
+  canlar, üretim ve seferler ise monotonik saatle korunur.
+
 ## Testler
 
-`logic` modülündeki JUnit testleri: her bölümün referans çözümle kazanıldığı ve par'ı aştırmadığı, her adımda artımlı
+`logic` modülündeki 54 JUnit testi (`./gradlew :logic:test`): 500 bölümün her birinin doğrulanmış çözümle kazanıldığı; her bölümün referans çözümle kazanıldığı ve par'ı aştırmadığı, her adımda artımlı
 nedensellik sonucunun sıfırdan hesapla birebir aynı olduğu, rastgele 1200 değişiklikte artımlı = tam hesap, yalnızca
 yakın hücrelerin yeniden hesaplandığı, Gelecek'in Geçmiş'i etkilemediği, paradoks ve geri ödeme, aynı çağ bağlantıları
 ile döngü ve geriye dönük bağlantı tespiti, kayıt gidiş-dönüş/yedekten kurtarma/sürüm 0 göçü, can yenilenmesi ve saat
