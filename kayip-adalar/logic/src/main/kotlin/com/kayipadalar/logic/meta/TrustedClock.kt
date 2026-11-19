@@ -1,6 +1,6 @@
 package com.kayipadalar.logic.meta
 
-import com.kayipadalar.logic.save.ClockState
+import com.kayipadalar.logic.kingdom.ClockState
 
 /** Platformdan alınan zaman örneği. [mono]: önyüklemeden beri geçen ms (Android: SystemClock.elapsedRealtime). */
 data class TimeSample(val wall: Long, val mono: Long, val boot: Long)

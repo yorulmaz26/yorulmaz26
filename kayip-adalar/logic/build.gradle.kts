@@ -12,16 +12,5 @@ dependencies {
 tasks.test {
     useJUnit()
     systemProperty("assets.dir", rootProject.file("assets").absolutePath)
-    System.getProperty("genIds")?.let { systemProperty("genIds", it) }
-    System.getProperty("debugLevel")?.let { systemProperty("debugLevel", it) }
     maxHeapSize = "2g"
-}
-
-tasks.register<JavaExec>("generateLevels") {
-    group = "kayip adalar"
-    description = "Alan 2-100 bölüm dosyalarını üretir ve çözülebilirliği doğrular."
-    classpath = sourceSets["main"].runtimeClasspath
-    mainClass.set("com.kayipadalar.logic.tools.GenerateLevelsKt")
-    args(rootProject.file("assets").absolutePath, (project.findProperty("areas") ?: project.findProperty("fromArea") ?: "2").toString(), (project.findProperty("toArea") ?: "100").toString())
-    maxHeapSize = "3g"
 }

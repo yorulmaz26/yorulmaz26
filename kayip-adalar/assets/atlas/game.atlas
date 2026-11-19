@@ -1,0 +1,1608 @@
+
+game.png
+size: 2048, 2048
+format: RGBA8888
+filter: MipMapLinearLinear, Linear
+repeat: none
+buildings/archer_tower
+  rotate: false
+  xy: 889, 638
+  size: 182, 152
+  orig: 182, 152
+  offset: 0, 0
+  index: -1
+buildings/b_archery
+  rotate: false
+  xy: 588, 926
+  size: 188, 180
+  orig: 188, 180
+  offset: 0, 0
+  index: -1
+buildings/b_barracks
+  rotate: false
+  xy: 584, 566
+  size: 172, 184
+  orig: 172, 184
+  offset: 0, 0
+  index: -1
+buildings/b_depot
+  rotate: false
+  xy: 1802, 254
+  size: 146, 142
+  orig: 146, 142
+  offset: 0, 0
+  index: -1
+buildings/b_explore
+  rotate: false
+  xy: 301, 909
+  size: 182, 180
+  orig: 182, 180
+  offset: 0, 0
+  index: -1
+buildings/b_farm
+  rotate: false
+  xy: 888, 482
+  size: 166, 152
+  orig: 166, 152
+  offset: 0, 0
+  index: -1
+buildings/b_lumber
+  rotate: false
+  xy: 538, 177
+  size: 156, 180
+  orig: 156, 180
+  offset: 0, 0
+  index: -1
+buildings/b_main
+  rotate: false
+  xy: 1795, 1872
+  size: 246, 174
+  orig: 246, 174
+  offset: 0, 0
+  index: -1
+buildings/b_quarry
+  rotate: false
+  xy: 584, 380
+  size: 172, 182
+  orig: 172, 182
+  offset: 0, 0
+  index: -1
+buildings/b_shipyard
+  rotate: false
+  xy: 300, 717
+  size: 176, 188
+  orig: 176, 188
+  offset: 0, 0
+  index: -1
+buildings/b_tower
+  rotate: false
+  xy: 388, 159
+  size: 146, 186
+  orig: 146, 186
+  offset: 0, 0
+  index: -1
+buildings/b_wall
+  rotate: false
+  xy: 1058, 486
+  size: 158, 148
+  orig: 158, 148
+  offset: 0, 0
+  index: -1
+buildings/barracks
+  rotate: false
+  xy: 1164, 1141
+  size: 208, 152
+  orig: 208, 152
+  offset: 0, 0
+  index: -1
+buildings/cannon_tower
+  rotate: false
+  xy: 2, 716
+  size: 180, 150
+  orig: 180, 150
+  offset: 0, 0
+  index: -1
+buildings/castle
+  rotate: false
+  xy: 594, 1842
+  size: 298, 204
+  orig: 298, 204
+  offset: 0, 0
+  index: -1
+buildings/crystal_mine
+  rotate: false
+  xy: 892, 1094
+  size: 200, 178
+  orig: 200, 178
+  offset: 0, 0
+  index: -1
+buildings/culture
+  rotate: false
+  xy: 1190, 230
+  size: 152, 146
+  orig: 152, 146
+  offset: 0, 0
+  index: -1
+buildings/defense_tower
+  rotate: false
+  xy: 2, 870
+  size: 180, 152
+  orig: 180, 152
+  offset: 0, 0
+  index: -1
+buildings/farm
+  rotate: false
+  xy: 1488, 1190
+  size: 224, 146
+  orig: 224, 146
+  offset: 0, 0
+  index: -1
+buildings/garden
+  rotate: false
+  xy: 1642, 251
+  size: 156, 142
+  orig: 156, 142
+  offset: 0, 0
+  index: -1
+buildings/hi_barracks
+  rotate: false
+  xy: 1195, 1297
+  size: 289, 262
+  orig: 289, 262
+  offset: 0, 0
+  index: -1
+buildings/hi_castle
+  rotate: false
+  xy: 892, 1276
+  size: 268, 203
+  orig: 268, 203
+  offset: 0, 0
+  index: -1
+buildings/hi_farm
+  rotate: false
+  xy: 1195, 1563
+  size: 290, 192
+  orig: 290, 192
+  offset: 0, 0
+  index: -1
+buildings/hi_house
+  rotate: false
+  xy: 302, 1378
+  size: 286, 224
+  orig: 286, 224
+  offset: 0, 0
+  index: -1
+buildings/hi_lumber
+  rotate: false
+  xy: 592, 1296
+  size: 296, 261
+  orig: 296, 261
+  offset: 0, 0
+  index: -1
+buildings/hi_mine
+  rotate: false
+  xy: 302, 1093
+  size: 282, 281
+  orig: 282, 281
+  offset: 0, 0
+  index: -1
+buildings/hi_port
+  rotate: false
+  xy: 594, 1561
+  size: 297, 277
+  orig: 297, 277
+  offset: 0, 0
+  index: -1
+buildings/hi_quarry
+  rotate: false
+  xy: 1497, 1775
+  size: 294, 271
+  orig: 294, 271
+  offset: 0, 0
+  index: -1
+buildings/hospital
+  rotate: false
+  xy: 936, 70
+  size: 168, 150
+  orig: 168, 150
+  offset: 0, 0
+  index: -1
+buildings/house_big
+  rotate: false
+  xy: 1874, 734
+  size: 172, 138
+  orig: 172, 138
+  offset: 0, 0
+  index: -1
+buildings/house_small
+  rotate: false
+  xy: 2, 424
+  size: 174, 128
+  orig: 174, 128
+  offset: 0, 0
+  index: -1
+buildings/lumber
+  rotate: false
+  xy: 892, 934
+  size: 194, 156
+  orig: 194, 156
+  offset: 0, 0
+  index: -1
+buildings/mill
+  rotate: false
+  xy: 585, 754
+  size: 182, 168
+  orig: 182, 168
+  offset: 0, 0
+  index: -1
+buildings/mine
+  rotate: false
+  xy: 1162, 967
+  size: 198, 170
+  orig: 198, 170
+  offset: 0, 0
+  index: -1
+buildings/port
+  rotate: false
+  xy: 1794, 1036
+  size: 210, 192
+  orig: 210, 192
+  offset: 0, 0
+  index: -1
+buildings/quarry
+  rotate: false
+  xy: 1794, 876
+  size: 202, 156
+  orig: 202, 156
+  offset: 0, 0
+  index: -1
+buildings/ranch
+  rotate: false
+  xy: 1488, 1016
+  size: 202, 170
+  orig: 202, 170
+  offset: 0, 0
+  index: -1
+buildings/research
+  rotate: false
+  xy: 588, 1110
+  size: 226, 182
+  orig: 226, 182
+  offset: 0, 0
+  index: -1
+buildings/school
+  rotate: false
+  xy: 298, 407
+  size: 164, 148
+  orig: 164, 148
+  offset: 0, 0
+  index: -1
+buildings/shipyard
+  rotate: false
+  xy: 1162, 771
+  size: 192, 192
+  orig: 192, 192
+  offset: 0, 0
+  index: -1
+buildings/siege_workshop
+  rotate: false
+  xy: 1488, 1340
+  size: 226, 144
+  orig: 226, 144
+  offset: 0, 0
+  index: -1
+buildings/temple
+  rotate: false
+  xy: 850, 224
+  size: 162, 152
+  orig: 162, 152
+  offset: 0, 0
+  index: -1
+buildings/town_hall
+  rotate: false
+  xy: 1794, 1480
+  size: 228, 204
+  orig: 228, 204
+  offset: 0, 0
+  index: -1
+buildings/trade
+  rotate: false
+  xy: 1795, 1688
+  size: 230, 180
+  orig: 230, 180
+  offset: 0, 0
+  index: -1
+buildings/wall
+  rotate: false
+  xy: 1531, 642
+  size: 160, 126
+  orig: 160, 126
+  offset: 0, 0
+  index: -1
+buildings/war_academy
+  rotate: false
+  xy: 1488, 860
+  size: 194, 152
+  orig: 194, 152
+  offset: 0, 0
+  index: -1
+buildings/worker_camp
+  rotate: false
+  xy: 1664, 496
+  size: 158, 142
+  orig: 158, 142
+  offset: 0, 0
+  index: -1
+decor/banner_blue
+  rotate: false
+  xy: 818, 1190
+  size: 70, 102
+  orig: 70, 102
+  offset: 0, 0
+  index: -1
+decor/banner_red
+  rotate: false
+  xy: 1090, 960
+  size: 68, 102
+  orig: 68, 102
+  offset: 0, 0
+  index: -1
+decor/banner_red2
+  rotate: false
+  xy: 1096, 1140
+  size: 62, 98
+  orig: 62, 98
+  offset: 0, 0
+  index: -1
+decor/barrel
+  rotate: false
+  xy: 1695, 646
+  size: 58, 64
+  orig: 58, 64
+  offset: 0, 0
+  index: -1
+decor/crates
+  rotate: false
+  xy: 1482, 393
+  size: 124, 92
+  orig: 124, 92
+  offset: 0, 0
+  index: -1
+decor/fountain
+  rotate: false
+  xy: 1686, 876
+  size: 104, 102
+  orig: 104, 102
+  offset: 0, 0
+  index: -1
+decor/lamp
+  rotate: false
+  xy: 818, 1084
+  size: 70, 102
+  orig: 70, 102
+  offset: 0, 0
+  index: -1
+decor/m_chest
+  rotate: false
+  xy: 698, 198
+  size: 148, 178
+  orig: 148, 178
+  offset: 0, 0
+  index: -1
+decor/m_crystals
+  rotate: false
+  xy: 1161, 639
+  size: 142, 128
+  orig: 142, 128
+  offset: 0, 0
+  index: -1
+decor/m_head
+  rotate: false
+  xy: 806, 16
+  size: 126, 178
+  orig: 126, 178
+  offset: 0, 0
+  index: -1
+decor/m_lighthouse
+  rotate: false
+  xy: 771, 744
+  size: 114, 156
+  orig: 114, 156
+  offset: 0, 0
+  index: -1
+decor/m_palm
+  rotate: false
+  xy: 1336, 383
+  size: 50, 100
+  orig: 50, 100
+  offset: 0, 0
+  index: -1
+decor/m_rocks
+  rotate: false
+  xy: 1307, 639
+  size: 118, 128
+  orig: 118, 128
+  offset: 0, 0
+  index: -1
+decor/m_ruins
+  rotate: false
+  xy: 892, 794
+  size: 184, 136
+  orig: 184, 136
+  offset: 0, 0
+  index: -1
+decor/statue
+  rotate: false
+  xy: 1134, 380
+  size: 90, 102
+  orig: 90, 102
+  offset: 0, 0
+  index: -1
+decor/tent
+  rotate: false
+  xy: 1638, 774
+  size: 122, 82
+  orig: 122, 82
+  offset: 0, 0
+  index: -1
+decor/tent_red
+  rotate: false
+  xy: 1410, 3
+  size: 118, 78
+  orig: 118, 78
+  offset: 0, 0
+  index: -1
+decor/well
+  rotate: false
+  xy: 1096, 1066
+  size: 62, 70
+  orig: 62, 70
+  offset: 0, 0
+  index: -1
+effects/fx_boom0
+  rotate: false
+  xy: 186, 656
+  size: 110, 76
+  orig: 110, 76
+  offset: 0, 0
+  index: -1
+effects/fx_boom2
+  rotate: false
+  xy: 1532, 3
+  size: 102, 78
+  orig: 102, 78
+  offset: 0, 0
+  index: -1
+effects/fx_boom3
+  rotate: false
+  xy: 1764, 698
+  size: 106, 82
+  orig: 106, 82
+  offset: 0, 0
+  index: -1
+effects/fx_build0
+  rotate: false
+  xy: 760, 380
+  size: 132, 82
+  orig: 132, 82
+  offset: 0, 0
+  index: -1
+effects/fx_build1
+  rotate: false
+  xy: 1860, 400
+  size: 102, 82
+  orig: 102, 82
+  offset: 0, 0
+  index: -1
+effects/fx_build2
+  rotate: false
+  xy: 1492, 772
+  size: 142, 84
+  orig: 142, 84
+  offset: 0, 0
+  index: -1
+effects/fx_merge0
+  rotate: false
+  xy: 1694, 1064
+  size: 96, 78
+  orig: 96, 78
+  offset: 0, 0
+  index: -1
+effects/fx_portal1
+  rotate: false
+  xy: 1300, 2
+  size: 106, 74
+  orig: 106, 74
+  offset: 0, 0
+  index: -1
+effects/fx_portal2
+  rotate: false
+  xy: 1638, 3
+  size: 144, 86
+  orig: 144, 86
+  offset: 0, 0
+  index: -1
+icons/crown
+  rotate: false
+  xy: 1966, 430
+  size: 80, 54
+  orig: 80, 54
+  offset: 0, 0
+  index: -1
+icons/helmet
+  rotate: false
+  xy: 1430, 771
+  size: 58, 52
+  orig: 58, 52
+  offset: 0, 0
+  index: -1
+icons/mail
+  rotate: false
+  xy: 2, 384
+  size: 74, 36
+  orig: 74, 36
+  offset: 0, 0
+  index: -1
+icons/r_build
+  rotate: false
+  xy: 1246, 80
+  size: 132, 146
+  orig: 132, 146
+  offset: 0, 0
+  index: -1
+icons/r_explore
+  rotate: false
+  xy: 1220, 487
+  size: 134, 148
+  orig: 134, 148
+  offset: 0, 0
+  index: -1
+icons/r_research
+  rotate: false
+  xy: 1346, 233
+  size: 130, 146
+  orig: 130, 146
+  offset: 0, 0
+  index: -1
+icons/r_train
+  rotate: false
+  xy: 1358, 489
+  size: 134, 146
+  orig: 134, 146
+  offset: 0, 0
+  index: -1
+icons/r_upgrade
+  rotate: false
+  xy: 1108, 76
+  size: 134, 148
+  orig: 134, 148
+  offset: 0, 0
+  index: -1
+icons/refresh
+  rotate: false
+  xy: 1096, 1242
+  size: 64, 30
+  orig: 64, 30
+  offset: 0, 0
+  index: -1
+icons/scroll
+  rotate: false
+  xy: 388, 349
+  size: 74, 54
+  orig: 74, 54
+  offset: 0, 0
+  index: -1
+icons/shield
+  rotate: false
+  xy: 1695, 714
+  size: 62, 56
+  orig: 62, 56
+  offset: 0, 0
+  index: -1
+icons/swords
+  rotate: false
+  xy: 1874, 194
+  size: 72, 56
+  orig: 72, 56
+  offset: 0, 0
+  index: -1
+icons/trophy
+  rotate: false
+  xy: 388, 105
+  size: 74, 50
+  orig: 74, 50
+  offset: 0, 0
+  index: -1
+islands/big_crystal
+  rotate: false
+  xy: 895, 1483
+  size: 296, 276
+  orig: 304, 284
+  offset: 4, 4
+  index: -1
+islands/big_desert
+  rotate: false
+  xy: 1497, 1488
+  size: 293, 283
+  orig: 301, 291
+  offset: 4, 4
+  index: -1
+islands/big_forest
+  rotate: false
+  xy: 2, 1307
+  size: 296, 295
+  orig: 304, 303
+  offset: 4, 4
+  index: -1
+islands/big_mountain
+  rotate: false
+  xy: 2, 1026
+  size: 295, 277
+  orig: 303, 285
+  offset: 4, 4
+  index: -1
+islands/big_snow
+  rotate: false
+  xy: 1197, 1759
+  size: 296, 287
+  orig: 304, 295
+  offset: 4, 4
+  index: -1
+islands/big_swamp
+  rotate: false
+  xy: 896, 1763
+  size: 297, 283
+  orig: 305, 291
+  offset: 4, 4
+  index: -1
+islands/crystal
+  rotate: false
+  xy: 640, 15
+  size: 162, 158
+  orig: 162, 158
+  offset: 0, 0
+  index: -1
+islands/gold
+  rotate: false
+  xy: 466, 3
+  size: 170, 152
+  orig: 170, 152
+  offset: 0, 0
+  index: -1
+islands/home
+  rotate: false
+  xy: 1794, 1232
+  size: 225, 244
+  orig: 225, 244
+  offset: 0, 0
+  index: -1
+islands/ice
+  rotate: false
+  xy: 1016, 228
+  size: 170, 148
+  orig: 170, 148
+  offset: 0, 0
+  index: -1
+islands/mountain
+  rotate: false
+  xy: 1552, 93
+  size: 160, 142
+  orig: 160, 142
+  offset: 0, 0
+  index: -1
+islands/mystic
+  rotate: false
+  xy: 300, 559
+  size: 176, 154
+  orig: 176, 154
+  offset: 0, 0
+  index: -1
+islands/swamp
+  rotate: false
+  xy: 1496, 493
+  size: 164, 142
+  orig: 164, 142
+  offset: 0, 0
+  index: -1
+islands/volcano
+  rotate: false
+  xy: 2, 556
+  size: 174, 156
+  orig: 174, 156
+  offset: 0, 0
+  index: -1
+nature/bush
+  rotate: false
+  xy: 1090, 2
+  size: 80, 64
+  orig: 80, 64
+  offset: 0, 0
+  index: -1
+nature/crystals
+  rotate: false
+  xy: 1872, 18
+  size: 70, 80
+  orig: 70, 80
+  offset: 0, 0
+  index: -1
+nature/flowers
+  rotate: false
+  xy: 180, 382
+  size: 92, 64
+  orig: 92, 64
+  offset: 0, 0
+  index: -1
+nature/palm
+  rotate: false
+  xy: 186, 924
+  size: 110, 98
+  orig: 110, 98
+  offset: 0, 0
+  index: -1
+nature/rocks
+  rotate: false
+  xy: 1358, 771
+  size: 68, 52
+  orig: 68, 52
+  offset: 0, 0
+  index: -1
+nature/stump
+  rotate: false
+  xy: 936, 2
+  size: 150, 64
+  orig: 150, 64
+  offset: 0, 0
+  index: -1
+nature/tree_autumn
+  rotate: false
+  xy: 896, 380
+  size: 124, 98
+  orig: 124, 98
+  offset: 0, 0
+  index: -1
+nature/tree_oak
+  rotate: false
+  xy: 180, 450
+  size: 112, 98
+  orig: 112, 98
+  offset: 0, 0
+  index: -1
+nature/tree_pine
+  rotate: false
+  xy: 2000, 1000
+  size: 42, 32
+  orig: 42, 32
+  offset: 0, 0
+  index: -1
+nature/tree_round
+  rotate: false
+  xy: 1764, 784
+  size: 106, 88
+  orig: 106, 88
+  offset: 0, 0
+  index: -1
+nature/tree_sakura
+  rotate: false
+  xy: 466, 457
+  size: 114, 98
+  orig: 114, 98
+  offset: 0, 0
+  index: -1
+portraits/commander
+  rotate: false
+  xy: 760, 466
+  size: 124, 274
+  orig: 124, 274
+  offset: 0, 0
+  index: -1
+portraits/explorer
+  rotate: false
+  xy: 132, 102
+  size: 124, 274
+  orig: 124, 274
+  offset: 0, 0
+  index: -1
+portraits/king
+  rotate: false
+  xy: 2, 102
+  size: 126, 274
+  orig: 126, 274
+  offset: 0, 0
+  index: -1
+portraits/scholar
+  rotate: false
+  xy: 260, 102
+  size: 124, 274
+  orig: 124, 274
+  offset: 0, 0
+  index: -1
+resources/energy
+  rotate: false
+  xy: 250, 4
+  size: 80, 94
+  orig: 80, 94
+  offset: 0, 0
+  index: -1
+resources/food
+  rotate: false
+  xy: 1024, 380
+  size: 106, 98
+  orig: 106, 98
+  offset: 0, 0
+  index: -1
+resources/gem
+  rotate: false
+  xy: 480, 765
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+resources/gold
+  rotate: false
+  xy: 334, 6
+  size: 128, 92
+  orig: 128, 92
+  offset: 0, 0
+  index: -1
+resources/iron
+  rotate: false
+  xy: 1610, 397
+  size: 124, 92
+  orig: 124, 92
+  offset: 0, 0
+  index: -1
+resources/map
+  rotate: false
+  xy: 1364, 971
+  size: 120, 94
+  orig: 120, 94
+  offset: 0, 0
+  index: -1
+resources/potion
+  rotate: false
+  xy: 1716, 1236
+  size: 74, 96
+  orig: 74, 96
+  offset: 0, 0
+  index: -1
+resources/stone
+  rotate: false
+  xy: 2, 4
+  size: 122, 94
+  orig: 122, 94
+  offset: 0, 0
+  index: -1
+resources/ui_food
+  rotate: false
+  xy: 1718, 1410
+  size: 72, 74
+  orig: 72, 74
+  offset: 0, 0
+  index: -1
+resources/ui_people
+  rotate: false
+  xy: 1718, 1336
+  size: 72, 70
+  orig: 72, 70
+  offset: 0, 0
+  index: -1
+resources/ui_star
+  rotate: false
+  xy: 1090, 888
+  size: 68, 68
+  orig: 68, 68
+  offset: 0, 0
+  index: -1
+resources/ui_wood
+  rotate: false
+  xy: 1952, 240
+  size: 94, 76
+  orig: 94, 76
+  offset: 0, 0
+  index: -1
+resources/water
+  rotate: false
+  xy: 1080, 786
+  size: 78, 98
+  orig: 78, 98
+  offset: 0, 0
+  index: -1
+resources/wood
+  rotate: false
+  xy: 128, 4
+  size: 118, 94
+  orig: 118, 94
+  offset: 0, 0
+  index: -1
+ships/ship_explore
+  rotate: false
+  xy: 1480, 239
+  size: 158, 144
+  orig: 158, 144
+  offset: 0, 0
+  index: -1
+ships/ship_siege
+  rotate: false
+  xy: 1382, 85
+  size: 166, 144
+  orig: 166, 144
+  offset: 0, 0
+  index: -1
+ships/ship_trade
+  rotate: false
+  xy: 1716, 105
+  size: 154, 142
+  orig: 154, 142
+  offset: 0, 0
+  index: -1
+terrain/t0
+  rotate: false
+  xy: 1694, 982
+  size: 96, 78
+  orig: 96, 78
+  offset: 0, 0
+  index: -1
+terrain/t1
+  rotate: false
+  xy: 1952, 488
+  size: 94, 76
+  orig: 94, 76
+  offset: 0, 0
+  index: -1
+terrain/t12
+  rotate: false
+  xy: 1952, 320
+  size: 94, 76
+  orig: 94, 76
+  offset: 0, 0
+  index: -1
+terrain/t14
+  rotate: false
+  xy: 780, 904
+  size: 108, 76
+  orig: 108, 76
+  offset: 0, 0
+  index: -1
+terrain/t15
+  rotate: false
+  xy: 2026, 1646
+  size: 18, 38
+  orig: 18, 38
+  offset: 0, 0
+  index: -1
+terrain/t2
+  rotate: false
+  xy: 1952, 568
+  size: 94, 78
+  orig: 94, 78
+  offset: 0, 0
+  index: -1
+terrain/t3
+  rotate: false
+  xy: 1950, 156
+  size: 92, 80
+  orig: 92, 80
+  offset: 0, 0
+  index: -1
+terrain/t6
+  rotate: false
+  xy: 1948, 72
+  size: 98, 80
+  orig: 98, 80
+  offset: 0, 0
+  index: -1
+terrain/t8
+  rotate: false
+  xy: 1952, 650
+  size: 94, 80
+  orig: 94, 80
+  offset: 0, 0
+  index: -1
+ui/logo
+  rotate: false
+  xy: 2, 1606
+  size: 588, 440
+  orig: 588, 440
+  offset: 0, 0
+  index: -1
+units/carrier
+  rotate: false
+  xy: 487, 869
+  size: 94, 98
+  orig: 94, 98
+  offset: 0, 0
+  index: -1
+units/cavalry
+  rotate: false
+  xy: 1738, 400
+  size: 118, 92
+  orig: 118, 92
+  offset: 0, 0
+  index: -1
+units/commander
+  rotate: false
+  xy: 1826, 606
+  size: 122, 88
+  orig: 122, 88
+  offset: 0, 0
+  index: -1
+units/farmer
+  rotate: false
+  xy: 1075, 686
+  size: 82, 96
+  orig: 82, 96
+  offset: 0, 0
+  index: -1
+units/infantry
+  rotate: false
+  xy: 1716, 1146
+  size: 74, 86
+  orig: 74, 86
+  offset: 0, 0
+  index: -1
+units/mage
+  rotate: false
+  xy: 186, 830
+  size: 110, 90
+  orig: 110, 90
+  offset: 0, 0
+  index: -1
+units/miner
+  rotate: false
+  xy: 180, 552
+  size: 114, 100
+  orig: 114, 100
+  offset: 0, 0
+  index: -1
+units/priest
+  rotate: false
+  xy: 1874, 102
+  size: 70, 88
+  orig: 70, 88
+  offset: 0, 0
+  index: -1
+units/spearman
+  rotate: false
+  xy: 1786, 9
+  size: 82, 92
+  orig: 82, 92
+  offset: 0, 0
+  index: -1
+units/u_archer
+  rotate: false
+  xy: 1429, 639
+  size: 98, 128
+  orig: 98, 128
+  offset: 0, 0
+  index: -1
+units/u_cavalry
+  rotate: false
+  xy: 1364, 827
+  size: 118, 140
+  orig: 118, 140
+  offset: 0, 0
+  index: -1
+units/u_farmer
+  rotate: false
+  xy: 186, 736
+  size: 110, 90
+  orig: 110, 90
+  offset: 0, 0
+  index: -1
+units/u_scout
+  rotate: false
+  xy: 1376, 1173
+  size: 108, 120
+  orig: 108, 120
+  offset: 0, 0
+  index: -1
+units/u_woodcutter
+  rotate: false
+  xy: 480, 559
+  size: 100, 98
+  orig: 100, 98
+  offset: 0, 0
+  index: -1
+units/u_worker
+  rotate: false
+  xy: 1390, 387
+  size: 88, 98
+  orig: 88, 98
+  offset: 0, 0
+  index: -1
+units/woodcutter
+  rotate: false
+  xy: 1376, 1069
+  size: 108, 100
+  orig: 108, 100
+  offset: 0, 0
+  index: -1
+units/worker
+  rotate: false
+  xy: 780, 984
+  size: 108, 96
+  orig: 108, 96
+  offset: 0, 0
+  index: -1
+weather/cloud
+  rotate: false
+  xy: 466, 361
+  size: 112, 92
+  orig: 112, 92
+  offset: 0, 0
+  index: -1
+weather/dusk
+  rotate: false
+  xy: 487, 971
+  size: 94, 118
+  orig: 94, 118
+  offset: 0, 0
+  index: -1
+weather/fog
+  rotate: false
+  xy: 1228, 383
+  size: 104, 100
+  orig: 104, 100
+  offset: 0, 0
+  index: -1
+weather/moon
+  rotate: false
+  xy: 1860, 486
+  size: 88, 116
+  orig: 88, 116
+  offset: 0, 0
+  index: -1
+weather/rain
+  rotate: false
+  xy: 1174, 2
+  size: 122, 70
+  orig: 122, 70
+  offset: 0, 0
+  index: -1
+weather/snowfall
+  rotate: false
+  xy: 1946, 4
+  size: 78, 64
+  orig: 78, 64
+  offset: 0, 0
+  index: -1
+weather/sun
+  rotate: false
+  xy: 480, 661
+  size: 100, 100
+  orig: 100, 100
+  offset: 0, 0
+  index: -1
+
+game2.png
+size: 2048, 512
+format: RGBA8888
+filter: MipMapLinearLinear, Linear
+repeat: none
+buildings/b_house
+  rotate: false
+  xy: 984, 374
+  size: 148, 136
+  orig: 148, 136
+  offset: 0, 0
+  index: -1
+buildings/warehouse
+  rotate: false
+  xy: 508, 372
+  size: 158, 138
+  orig: 158, 138
+  offset: 0, 0
+  index: -1
+decor/bench
+  rotate: false
+  xy: 254, 2
+  size: 102, 76
+  orig: 102, 76
+  offset: 0, 0
+  index: -1
+decor/cart
+  rotate: false
+  xy: 302, 198
+  size: 78, 80
+  orig: 78, 80
+  offset: 0, 0
+  index: -1
+decor/chest
+  rotate: false
+  xy: 1710, 206
+  size: 86, 78
+  orig: 86, 78
+  offset: 0, 0
+  index: -1
+decor/m_arch
+  rotate: false
+  xy: 172, 374
+  size: 166, 136
+  orig: 166, 136
+  offset: 0, 0
+  index: -1
+decor/m_statue
+  rotate: false
+  xy: 1824, 306
+  size: 130, 90
+  orig: 130, 90
+  offset: 0, 0
+  index: -1
+decor/m_wreck
+  rotate: false
+  xy: 314, 290
+  size: 78, 80
+  orig: 78, 80
+  offset: 0, 0
+  index: -1
+effects/fx_boom1
+  rotate: false
+  xy: 580, 290
+  size: 82, 78
+  orig: 82, 78
+  offset: 0, 0
+  index: -1
+effects/fx_merge1
+  rotate: false
+  xy: 2, 2
+  size: 138, 76
+  orig: 138, 76
+  offset: 0, 0
+  index: -1
+effects/fx_merge2
+  rotate: false
+  xy: 172, 290
+  size: 138, 80
+  orig: 138, 80
+  offset: 0, 0
+  index: -1
+effects/fx_portal0
+  rotate: false
+  xy: 1608, 214
+  size: 98, 70
+  orig: 98, 70
+  offset: 0, 0
+  index: -1
+effects/fx_up0
+  rotate: false
+  xy: 396, 294
+  size: 86, 78
+  orig: 86, 78
+  offset: 0, 0
+  index: -1
+effects/fx_up1
+  rotate: false
+  xy: 1958, 422
+  size: 88, 88
+  orig: 88, 88
+  offset: 0, 0
+  index: -1
+effects/fx_up2
+  rotate: false
+  xy: 1120, 278
+  size: 102, 88
+  orig: 102, 88
+  offset: 0, 0
+  index: -1
+effects/fx_up3
+  rotate: false
+  xy: 170, 198
+  size: 128, 88
+  orig: 128, 88
+  offset: 0, 0
+  index: -1
+icons/alert
+  rotate: false
+  xy: 748, 304
+  size: 68, 64
+  orig: 68, 64
+  offset: 0, 0
+  index: -1
+icons/check
+  rotate: false
+  xy: 750, 240
+  size: 66, 60
+  orig: 66, 60
+  offset: 0, 0
+  index: -1
+icons/cross
+  rotate: false
+  xy: 286, 82
+  size: 70, 60
+  orig: 70, 60
+  offset: 0, 0
+  index: -1
+icons/gear
+  rotate: false
+  xy: 396, 236
+  size: 68, 54
+  orig: 68, 54
+  offset: 0, 0
+  index: -1
+icons/key
+  rotate: false
+  xy: 894, 220
+  size: 68, 58
+  orig: 68, 58
+  offset: 0, 0
+  index: -1
+icons/lock
+  rotate: false
+  xy: 1896, 166
+  size: 54, 56
+  orig: 54, 56
+  offset: 0, 0
+  index: -1
+icons/lock_small
+  rotate: false
+  xy: 820, 222
+  size: 70, 56
+  orig: 70, 56
+  offset: 0, 0
+  index: -1
+icons/minus
+  rotate: false
+  xy: 966, 222
+  size: 70, 58
+  orig: 70, 58
+  offset: 0, 0
+  index: -1
+icons/people
+  rotate: false
+  xy: 286, 146
+  size: 68, 48
+  orig: 68, 48
+  offset: 0, 0
+  index: -1
+icons/r_alliance
+  rotate: false
+  xy: 1552, 370
+  size: 132, 140
+  orig: 132, 140
+  offset: 0, 0
+  index: -1
+icons/r_diplomacy
+  rotate: false
+  xy: 1276, 368
+  size: 134, 142
+  orig: 134, 142
+  offset: 0, 0
+  index: -1
+icons/r_quest
+  rotate: false
+  xy: 1688, 370
+  size: 132, 140
+  orig: 132, 140
+  offset: 0, 0
+  index: -1
+icons/r_trade
+  rotate: false
+  xy: 1414, 370
+  size: 134, 140
+  orig: 134, 140
+  offset: 0, 0
+  index: -1
+icons/r_war
+  rotate: false
+  xy: 1136, 370
+  size: 136, 140
+  orig: 136, 140
+  offset: 0, 0
+  index: -1
+icons/star
+  rotate: false
+  xy: 666, 300
+  size: 78, 68
+  orig: 78, 68
+  offset: 0, 0
+  index: -1
+icons/target
+  rotate: false
+  xy: 384, 178
+  size: 66, 54
+  orig: 66, 54
+  offset: 0, 0
+  index: -1
+icons/trash
+  rotate: false
+  xy: 1896, 108
+  size: 52, 54
+  orig: 52, 54
+  offset: 0, 0
+  index: -1
+islands/desert
+  rotate: false
+  xy: 2, 226
+  size: 164, 140
+  orig: 164, 140
+  offset: 0, 0
+  index: -1
+islands/forest
+  rotate: false
+  xy: 2, 82
+  size: 158, 140
+  orig: 158, 140
+  offset: 0, 0
+  index: -1
+islands/grass
+  rotate: false
+  xy: 342, 376
+  size: 162, 134
+  orig: 162, 134
+  offset: 0, 0
+  index: -1
+islands/rocky
+  rotate: false
+  xy: 670, 372
+  size: 154, 138
+  orig: 154, 138
+  offset: 0, 0
+  index: -1
+islands/snow
+  rotate: false
+  xy: 2, 370
+  size: 166, 140
+  orig: 166, 140
+  offset: 0, 0
+  index: -1
+nature/stone_rune
+  rotate: false
+  xy: 1058, 294
+  size: 58, 76
+  orig: 58, 76
+  offset: 0, 0
+  index: -1
+nature/stone_rune2
+  rotate: false
+  xy: 1896, 226
+  size: 54, 76
+  orig: 54, 76
+  offset: 0, 0
+  index: -1
+resources/crystal
+  rotate: false
+  xy: 1824, 400
+  size: 130, 110
+  orig: 130, 110
+  offset: 0, 0
+  index: -1
+resources/ui_gold
+  rotate: false
+  xy: 486, 298
+  size: 90, 70
+  orig: 90, 70
+  offset: 0, 0
+  index: -1
+resources/ui_stone
+  rotate: false
+  xy: 666, 242
+  size: 80, 54
+  orig: 80, 54
+  offset: 0, 0
+  index: -1
+ships/ship_war
+  rotate: false
+  xy: 828, 374
+  size: 152, 136
+  orig: 152, 136
+  offset: 0, 0
+  index: -1
+terrain/t10
+  rotate: false
+  xy: 1958, 266
+  size: 88, 74
+  orig: 88, 74
+  offset: 0, 0
+  index: -1
+terrain/t11
+  rotate: false
+  xy: 1954, 186
+  size: 92, 76
+  orig: 92, 76
+  offset: 0, 0
+  index: -1
+terrain/t13
+  rotate: false
+  xy: 1800, 224
+  size: 92, 78
+  orig: 92, 78
+  offset: 0, 0
+  index: -1
+terrain/t16
+  rotate: false
+  xy: 1954, 106
+  size: 92, 76
+  orig: 92, 76
+  offset: 0, 0
+  index: -1
+terrain/t17
+  rotate: false
+  xy: 144, 2
+  size: 106, 76
+  orig: 106, 76
+  offset: 0, 0
+  index: -1
+terrain/t4
+  rotate: false
+  xy: 1608, 288
+  size: 92, 78
+  orig: 92, 78
+  offset: 0, 0
+  index: -1
+terrain/t5
+  rotate: false
+  xy: 1704, 288
+  size: 92, 78
+  orig: 92, 78
+  offset: 0, 0
+  index: -1
+terrain/t7
+  rotate: false
+  xy: 1800, 146
+  size: 92, 74
+  orig: 92, 74
+  offset: 0, 0
+  index: -1
+terrain/t9
+  rotate: false
+  xy: 1958, 344
+  size: 88, 74
+  orig: 88, 74
+  offset: 0, 0
+  index: -1
+units/archer
+  rotate: false
+  xy: 950, 284
+  size: 104, 86
+  orig: 104, 86
+  offset: 0, 0
+  index: -1
+units/engineer
+  rotate: false
+  xy: 828, 282
+  size: 118, 88
+  orig: 118, 88
+  offset: 0, 0
+  index: -1
+units/king
+  rotate: false
+  xy: 1226, 276
+  size: 100, 88
+  orig: 100, 88
+  offset: 0, 0
+  index: -1
+units/shieldman
+  rotate: false
+  xy: 1330, 272
+  size: 80, 92
+  orig: 80, 92
+  offset: 0, 0
+  index: -1
+units/swordsman
+  rotate: false
+  xy: 1414, 280
+  size: 100, 86
+  orig: 100, 86
+  offset: 0, 0
+  index: -1
+units/u_infantry
+  rotate: false
+  xy: 1518, 236
+  size: 86, 130
+  orig: 86, 130
+  offset: 0, 0
+  index: -1
+units/u_stonecutter
+  rotate: false
+  xy: 164, 82
+  size: 118, 112
+  orig: 118, 112
+  offset: 0, 0
+  index: -1
+weather/storm
+  rotate: false
+  xy: 1414, 218
+  size: 82, 58
+  orig: 82, 58
+  offset: 0, 0
+  index: -1

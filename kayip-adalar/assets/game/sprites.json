@@ -1,0 +1,914 @@
+{
+ "buildings/archer_tower.png": [
+  182,
+  152
+ ],
+ "buildings/b_archery.png": [
+  188,
+  180
+ ],
+ "buildings/b_barracks.png": [
+  172,
+  184
+ ],
+ "buildings/b_depot.png": [
+  146,
+  142
+ ],
+ "buildings/b_explore.png": [
+  182,
+  180
+ ],
+ "buildings/b_farm.png": [
+  166,
+  152
+ ],
+ "buildings/b_house.png": [
+  148,
+  136
+ ],
+ "buildings/b_lumber.png": [
+  156,
+  180
+ ],
+ "buildings/b_main.png": [
+  246,
+  174
+ ],
+ "buildings/b_quarry.png": [
+  172,
+  182
+ ],
+ "buildings/b_shipyard.png": [
+  176,
+  188
+ ],
+ "buildings/b_tower.png": [
+  146,
+  186
+ ],
+ "buildings/b_wall.png": [
+  158,
+  148
+ ],
+ "buildings/barracks.png": [
+  208,
+  152
+ ],
+ "buildings/cannon_tower.png": [
+  180,
+  150
+ ],
+ "buildings/castle.png": [
+  298,
+  204
+ ],
+ "buildings/crystal_mine.png": [
+  200,
+  178
+ ],
+ "buildings/culture.png": [
+  152,
+  146
+ ],
+ "buildings/defense_tower.png": [
+  180,
+  152
+ ],
+ "buildings/farm.png": [
+  224,
+  146
+ ],
+ "buildings/garden.png": [
+  156,
+  142
+ ],
+ "buildings/hi_barracks.png": [
+  289,
+  262
+ ],
+ "buildings/hi_castle.png": [
+  268,
+  203
+ ],
+ "buildings/hi_farm.png": [
+  290,
+  192
+ ],
+ "buildings/hi_house.png": [
+  286,
+  224
+ ],
+ "buildings/hi_lumber.png": [
+  296,
+  261
+ ],
+ "buildings/hi_mine.png": [
+  282,
+  281
+ ],
+ "buildings/hi_port.png": [
+  297,
+  277
+ ],
+ "buildings/hi_quarry.png": [
+  294,
+  271
+ ],
+ "buildings/hospital.png": [
+  168,
+  150
+ ],
+ "buildings/house_big.png": [
+  172,
+  138
+ ],
+ "buildings/house_small.png": [
+  174,
+  128
+ ],
+ "buildings/lumber.png": [
+  194,
+  156
+ ],
+ "buildings/mill.png": [
+  182,
+  168
+ ],
+ "buildings/mine.png": [
+  198,
+  170
+ ],
+ "buildings/port.png": [
+  210,
+  192
+ ],
+ "buildings/quarry.png": [
+  202,
+  156
+ ],
+ "buildings/ranch.png": [
+  202,
+  170
+ ],
+ "buildings/research.png": [
+  226,
+  182
+ ],
+ "buildings/school.png": [
+  164,
+  148
+ ],
+ "buildings/shipyard.png": [
+  192,
+  192
+ ],
+ "buildings/siege_workshop.png": [
+  226,
+  144
+ ],
+ "buildings/temple.png": [
+  162,
+  152
+ ],
+ "buildings/town_hall.png": [
+  228,
+  204
+ ],
+ "buildings/trade.png": [
+  230,
+  180
+ ],
+ "buildings/wall.png": [
+  160,
+  126
+ ],
+ "buildings/war_academy.png": [
+  194,
+  152
+ ],
+ "buildings/warehouse.png": [
+  158,
+  138
+ ],
+ "buildings/worker_camp.png": [
+  158,
+  142
+ ],
+ "decor/banner_blue.png": [
+  70,
+  102
+ ],
+ "decor/banner_red.png": [
+  68,
+  102
+ ],
+ "decor/banner_red2.png": [
+  62,
+  98
+ ],
+ "decor/barrel.png": [
+  58,
+  64
+ ],
+ "decor/bench.png": [
+  102,
+  76
+ ],
+ "decor/cart.png": [
+  78,
+  80
+ ],
+ "decor/chest.png": [
+  86,
+  78
+ ],
+ "decor/crates.png": [
+  124,
+  92
+ ],
+ "decor/fountain.png": [
+  104,
+  102
+ ],
+ "decor/lamp.png": [
+  70,
+  102
+ ],
+ "decor/m_arch.png": [
+  166,
+  136
+ ],
+ "decor/m_chest.png": [
+  148,
+  178
+ ],
+ "decor/m_crystals.png": [
+  142,
+  128
+ ],
+ "decor/m_head.png": [
+  126,
+  178
+ ],
+ "decor/m_lighthouse.png": [
+  114,
+  156
+ ],
+ "decor/m_palm.png": [
+  50,
+  100
+ ],
+ "decor/m_rocks.png": [
+  118,
+  128
+ ],
+ "decor/m_ruins.png": [
+  184,
+  136
+ ],
+ "decor/m_statue.png": [
+  130,
+  90
+ ],
+ "decor/m_wreck.png": [
+  78,
+  80
+ ],
+ "decor/statue.png": [
+  90,
+  102
+ ],
+ "decor/tent.png": [
+  122,
+  82
+ ],
+ "decor/tent_red.png": [
+  118,
+  78
+ ],
+ "decor/well.png": [
+  62,
+  70
+ ],
+ "effects/fx_boom0.png": [
+  110,
+  76
+ ],
+ "effects/fx_boom1.png": [
+  82,
+  78
+ ],
+ "effects/fx_boom2.png": [
+  102,
+  78
+ ],
+ "effects/fx_boom3.png": [
+  106,
+  82
+ ],
+ "effects/fx_build0.png": [
+  132,
+  82
+ ],
+ "effects/fx_build1.png": [
+  102,
+  82
+ ],
+ "effects/fx_build2.png": [
+  142,
+  84
+ ],
+ "effects/fx_merge0.png": [
+  96,
+  78
+ ],
+ "effects/fx_merge1.png": [
+  138,
+  76
+ ],
+ "effects/fx_merge2.png": [
+  138,
+  80
+ ],
+ "effects/fx_portal0.png": [
+  98,
+  70
+ ],
+ "effects/fx_portal1.png": [
+  106,
+  74
+ ],
+ "effects/fx_portal2.png": [
+  144,
+  86
+ ],
+ "effects/fx_up0.png": [
+  86,
+  78
+ ],
+ "effects/fx_up1.png": [
+  88,
+  88
+ ],
+ "effects/fx_up2.png": [
+  102,
+  88
+ ],
+ "effects/fx_up3.png": [
+  128,
+  88
+ ],
+ "icons/alert.png": [
+  68,
+  64
+ ],
+ "icons/check.png": [
+  66,
+  60
+ ],
+ "icons/cross.png": [
+  70,
+  60
+ ],
+ "icons/crown.png": [
+  80,
+  54
+ ],
+ "icons/gear.png": [
+  68,
+  54
+ ],
+ "icons/helmet.png": [
+  58,
+  52
+ ],
+ "icons/key.png": [
+  68,
+  58
+ ],
+ "icons/lock.png": [
+  54,
+  56
+ ],
+ "icons/lock_small.png": [
+  70,
+  56
+ ],
+ "icons/mail.png": [
+  74,
+  36
+ ],
+ "icons/minus.png": [
+  70,
+  58
+ ],
+ "icons/people.png": [
+  68,
+  48
+ ],
+ "icons/r_alliance.png": [
+  132,
+  140
+ ],
+ "icons/r_build.png": [
+  132,
+  146
+ ],
+ "icons/r_diplomacy.png": [
+  134,
+  142
+ ],
+ "icons/r_explore.png": [
+  134,
+  148
+ ],
+ "icons/r_quest.png": [
+  132,
+  140
+ ],
+ "icons/r_research.png": [
+  130,
+  146
+ ],
+ "icons/r_trade.png": [
+  134,
+  140
+ ],
+ "icons/r_train.png": [
+  134,
+  146
+ ],
+ "icons/r_upgrade.png": [
+  134,
+  148
+ ],
+ "icons/r_war.png": [
+  136,
+  140
+ ],
+ "icons/refresh.png": [
+  64,
+  30
+ ],
+ "icons/scroll.png": [
+  74,
+  54
+ ],
+ "icons/shield.png": [
+  62,
+  56
+ ],
+ "icons/star.png": [
+  78,
+  68
+ ],
+ "icons/swords.png": [
+  72,
+  56
+ ],
+ "icons/target.png": [
+  66,
+  54
+ ],
+ "icons/trash.png": [
+  52,
+  54
+ ],
+ "icons/trophy.png": [
+  74,
+  50
+ ],
+ "islands/big_crystal.png": [
+  304,
+  284
+ ],
+ "islands/big_desert.png": [
+  301,
+  291
+ ],
+ "islands/big_forest.png": [
+  304,
+  303
+ ],
+ "islands/big_mountain.png": [
+  303,
+  285
+ ],
+ "islands/big_snow.png": [
+  304,
+  295
+ ],
+ "islands/big_swamp.png": [
+  305,
+  291
+ ],
+ "islands/crystal.png": [
+  162,
+  158
+ ],
+ "islands/desert.png": [
+  164,
+  140
+ ],
+ "islands/forest.png": [
+  158,
+  140
+ ],
+ "islands/gold.png": [
+  170,
+  152
+ ],
+ "islands/grass.png": [
+  162,
+  134
+ ],
+ "islands/home.png": [
+  225,
+  244
+ ],
+ "islands/ice.png": [
+  170,
+  148
+ ],
+ "islands/mountain.png": [
+  160,
+  142
+ ],
+ "islands/mystic.png": [
+  176,
+  154
+ ],
+ "islands/rocky.png": [
+  154,
+  138
+ ],
+ "islands/snow.png": [
+  166,
+  140
+ ],
+ "islands/swamp.png": [
+  164,
+  142
+ ],
+ "islands/volcano.png": [
+  174,
+  156
+ ],
+ "nature/bush.png": [
+  80,
+  64
+ ],
+ "nature/crystals.png": [
+  70,
+  80
+ ],
+ "nature/flowers.png": [
+  92,
+  64
+ ],
+ "nature/palm.png": [
+  110,
+  98
+ ],
+ "nature/rocks.png": [
+  68,
+  52
+ ],
+ "nature/stone_rune.png": [
+  58,
+  76
+ ],
+ "nature/stone_rune2.png": [
+  54,
+  76
+ ],
+ "nature/stump.png": [
+  150,
+  64
+ ],
+ "nature/tree_autumn.png": [
+  124,
+  98
+ ],
+ "nature/tree_oak.png": [
+  112,
+  98
+ ],
+ "nature/tree_pine.png": [
+  42,
+  32
+ ],
+ "nature/tree_round.png": [
+  106,
+  88
+ ],
+ "nature/tree_sakura.png": [
+  114,
+  98
+ ],
+ "portraits/commander.png": [
+  124,
+  274
+ ],
+ "portraits/explorer.png": [
+  124,
+  274
+ ],
+ "portraits/king.png": [
+  126,
+  274
+ ],
+ "portraits/scholar.png": [
+  124,
+  274
+ ],
+ "resources/crystal.png": [
+  130,
+  110
+ ],
+ "resources/energy.png": [
+  80,
+  94
+ ],
+ "resources/food.png": [
+  106,
+  98
+ ],
+ "resources/gem.png": [
+  100,
+  100
+ ],
+ "resources/gold.png": [
+  128,
+  92
+ ],
+ "resources/iron.png": [
+  124,
+  92
+ ],
+ "resources/map.png": [
+  120,
+  94
+ ],
+ "resources/potion.png": [
+  74,
+  96
+ ],
+ "resources/stone.png": [
+  122,
+  94
+ ],
+ "resources/ui_food.png": [
+  72,
+  74
+ ],
+ "resources/ui_gold.png": [
+  90,
+  70
+ ],
+ "resources/ui_people.png": [
+  72,
+  70
+ ],
+ "resources/ui_star.png": [
+  68,
+  68
+ ],
+ "resources/ui_stone.png": [
+  80,
+  54
+ ],
+ "resources/ui_wood.png": [
+  94,
+  76
+ ],
+ "resources/water.png": [
+  78,
+  98
+ ],
+ "resources/wood.png": [
+  118,
+  94
+ ],
+ "ships/ship_explore.png": [
+  158,
+  144
+ ],
+ "ships/ship_siege.png": [
+  166,
+  144
+ ],
+ "ships/ship_trade.png": [
+  154,
+  142
+ ],
+ "ships/ship_war.png": [
+  152,
+  136
+ ],
+ "terrain/t0.png": [
+  96,
+  78
+ ],
+ "terrain/t1.png": [
+  94,
+  76
+ ],
+ "terrain/t10.png": [
+  88,
+  74
+ ],
+ "terrain/t11.png": [
+  92,
+  76
+ ],
+ "terrain/t12.png": [
+  94,
+  76
+ ],
+ "terrain/t13.png": [
+  92,
+  78
+ ],
+ "terrain/t14.png": [
+  108,
+  76
+ ],
+ "terrain/t15.png": [
+  18,
+  38
+ ],
+ "terrain/t16.png": [
+  92,
+  76
+ ],
+ "terrain/t17.png": [
+  106,
+  76
+ ],
+ "terrain/t2.png": [
+  94,
+  78
+ ],
+ "terrain/t3.png": [
+  92,
+  80
+ ],
+ "terrain/t4.png": [
+  92,
+  78
+ ],
+ "terrain/t5.png": [
+  92,
+  78
+ ],
+ "terrain/t6.png": [
+  98,
+  80
+ ],
+ "terrain/t7.png": [
+  92,
+  74
+ ],
+ "terrain/t8.png": [
+  94,
+  80
+ ],
+ "terrain/t9.png": [
+  88,
+  74
+ ],
+ "ui/logo.png": [
+  588,
+  440
+ ],
+ "units/archer.png": [
+  104,
+  86
+ ],
+ "units/carrier.png": [
+  94,
+  98
+ ],
+ "units/cavalry.png": [
+  118,
+  92
+ ],
+ "units/commander.png": [
+  122,
+  88
+ ],
+ "units/engineer.png": [
+  118,
+  88
+ ],
+ "units/farmer.png": [
+  82,
+  96
+ ],
+ "units/infantry.png": [
+  74,
+  86
+ ],
+ "units/king.png": [
+  100,
+  88
+ ],
+ "units/mage.png": [
+  110,
+  90
+ ],
+ "units/miner.png": [
+  114,
+  100
+ ],
+ "units/priest.png": [
+  70,
+  88
+ ],
+ "units/shieldman.png": [
+  80,
+  92
+ ],
+ "units/spearman.png": [
+  82,
+  92
+ ],
+ "units/swordsman.png": [
+  100,
+  86
+ ],
+ "units/u_archer.png": [
+  98,
+  128
+ ],
+ "units/u_cavalry.png": [
+  118,
+  140
+ ],
+ "units/u_farmer.png": [
+  110,
+  90
+ ],
+ "units/u_infantry.png": [
+  86,
+  130
+ ],
+ "units/u_scout.png": [
+  108,
+  120
+ ],
+ "units/u_stonecutter.png": [
+  118,
+  112
+ ],
+ "units/u_woodcutter.png": [
+  100,
+  98
+ ],
+ "units/u_worker.png": [
+  88,
+  98
+ ],
+ "units/woodcutter.png": [
+  108,
+  100
+ ],
+ "units/worker.png": [
+  108,
+  96
+ ],
+ "weather/cloud.png": [
+  112,
+  92
+ ],
+ "weather/dusk.png": [
+  94,
+  118
+ ],
+ "weather/fog.png": [
+  104,
+  100
+ ],
+ "weather/moon.png": [
+  88,
+  116
+ ],
+ "weather/rain.png": [
+  122,
+  70
+ ],
+ "weather/snowfall.png": [
+  78,
+  64
+ ],
+ "weather/storm.png": [
+  82,
+  58
+ ],
+ "weather/sun.png": [
+  100,
+  100
+ ]
+}

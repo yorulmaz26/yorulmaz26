@@ -4,10 +4,10 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.utils.Disposable
-import com.kayipadalar.logic.save.SettingsState
+import com.kayipadalar.logic.kingdom.Settings
 
 /** Ses efektleri ve müzik. Dosyalar assets/sfx altında (tools/make_audio.py ile sentezlenir). */
-class AudioManager(private val settings: SettingsState) : Disposable {
+class AudioManager(private val settings: Settings) : Disposable {
     private val sounds = HashMap<String, Sound>()
     private var music: Music? = null
 
