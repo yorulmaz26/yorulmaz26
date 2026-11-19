@@ -51,6 +51,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
     private int lastEnergySec = -1;
     private String energyText = "";
 
+    public final com.golgen.oyun.screens.LogoScreen logo;
     public final SplashScreen splash;
     public final MenuScreen menu;
     public final PlayScreen play;
@@ -99,6 +100,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         haptics = new Haptics(activity);
         applySettings();
 
+        logo = new com.golgen.oyun.screens.LogoScreen(this);
         splash = new SplashScreen(this);
         menu = new MenuScreen(this);
         play = new PlayScreen(this);
@@ -108,9 +110,9 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         records = new RecordsScreen(this);
         settings = new SettingsScreen(this);
         tutorial = new TutorialScreen(this);
-        current = splash;
+        current = logo;
         current.enter();
-        android.util.Log.i("GolgenUI", "ekran=SplashScreen");
+        android.util.Log.i("GolgenUI", "ekran=LogoScreen");
     }
 
     public void applySettings() {

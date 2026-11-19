@@ -64,10 +64,13 @@ adb uninstall $PKG >/dev/null 2>&1 || true
 if adb install -r "$APK" >/dev/null; then ok "APK kurulumu"; else bad "APK kurulumu"; fi
 clear_log
 adb shell am start -W -n $ACT >/dev/null
-sleep 1.0; shot 01_acilis
+sleep 0.9; shot 00_logo_a
+sleep 1.6; shot 00_logo_b
+if log | grep -q "ekran=LogoScreen"; then ok "Magic Lumos logo animasyonu gösterildi"; else bad "Logo animasyonu gösterilmedi"; fi
+wait_screen SplashScreen 8; sleep 0.8; shot 01_acilis
 if log | grep -q "ekran=SplashScreen"; then ok "Uygulama açılışı → SplashScreen gösterildi"; else bad "Açılış ekranı gösterilmedi"; fi
 # İlk açılışta öğretici gelmeli
-expect_screen TutorialScreen "İlk açılış öğreticisi" 8
+expect_screen TutorialScreen "İlk açılış öğreticisi" 14
 sleep 0.5
 # Öğretici: sürükleyerek 1. adımı geç
 for i in 1 2 3 4; do adb shell input swipe 300 1700 800 1500 250; adb shell input swipe 800 1500 300 1800 250; done
@@ -213,7 +216,7 @@ if wait_screen MenuScreen 8; then ok "Harita bölümlerinden ana menüye dönü�
 adb shell am force-stop $PKG
 clear_log
 adb shell am start -W -n $ACT >/dev/null
-expect_screen MenuScreen "Yeniden açılış (öğretici atlanır, kayıt yüklenir)" 10
+expect_screen MenuScreen "Yeniden açılış (öğretici atlanır, kayıt yüklenir)" 16
 if [ "$(pref_int selectedSkin)" = "2" ]; then ok "Kalıcılık: seçili karakter korundu"; else bad "Kalıcılık: selectedSkin=$(pref_int selectedSkin)"; fi
 sleep 1; shot 18_yeniden_acilis
 
