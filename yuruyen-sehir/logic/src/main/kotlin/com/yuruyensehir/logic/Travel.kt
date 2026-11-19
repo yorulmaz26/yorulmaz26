@@ -204,6 +204,7 @@ object TravelSystem {
             state.log("Varış: ${biome.title}. ${biome.hint}", LogKind.TRAVEL)
             CarrierSystem.addXp(state, 15.0)
         }
+        CivSystem.onEnterCell(state, cell)
         EventSystem.maybeTrigger(state, biome)
     }
 
@@ -347,6 +348,9 @@ object EventSystem {
                 "trust" -> state.carrier.trust = (state.carrier.trust + value.toDouble()).coerceIn(0.0, 100.0)
                 "health" -> state.carrier.health = (state.carrier.health + value.toDouble()).coerceIn(CarrierSystem.HEALTH_FLOOR, CarrierSystem.maxHealth(state))
                 "fatigue" -> state.carrier.fatigue = (state.carrier.fatigue + value.toDouble()).coerceIn(0.0, 100.0)
+                "rel" -> CivSystem.civ(state, value.substringBefore(':').toInt())?.let { c ->
+                    c.relation = (c.relation + value.substringAfter(':').toDouble()).coerceIn(-100.0, 100.0)
+                }
             }
         }
         state.pendingEvent = null

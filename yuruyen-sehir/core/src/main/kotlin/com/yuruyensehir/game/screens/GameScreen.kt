@@ -32,6 +32,7 @@ import com.yuruyensehir.logic.*
 enum class PanelId(val title: String) {
     BUILD("İnşa Et"), BUILDING("Bina"), CARRIER("Taşıyıcı"), ECONOMY("Kaynak Ekonomisi"), POPULATION("Nüfus"),
     RESEARCH("Araştırma"), MAP("Dünya Haritası ve Rota"), LOG("Dünya Günlüğü"), SETTINGS("Ayarlar ve İstatistikler"),
+    TRADE("Ticaret"), DIPLOMACY("Diplomasi"),
 }
 
 enum class ViewMode { CITY, MAP }
@@ -430,13 +431,13 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         val items = listOf(
             "İnşa Et" to { togglePanel(PanelId.BUILD) }, "Taşıyıcı" to { togglePanel(PanelId.CARRIER) },
             "Harita" to { if (mode == ViewMode.MAP) { setMode(ViewMode.CITY); closePanel() } else { setMode(ViewMode.MAP); showPanel(PanelId.MAP) } },
-            "Ekonomi" to { togglePanel(PanelId.ECONOMY) },
+            "Ekonomi" to { togglePanel(PanelId.ECONOMY) }, "Ticaret" to { togglePanel(PanelId.TRADE) },
             "Nüfus" to { togglePanel(PanelId.POPULATION) }, "Araştırma" to { togglePanel(PanelId.RESEARCH) },
-            "Günlük" to { togglePanel(PanelId.LOG) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
+            "Diplomasi" to { togglePanel(PanelId.DIPLOMACY) }, "Günlük" to { togglePanel(PanelId.LOG) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
         )
         items.forEachIndexed { i, (t, f) ->
-            nav.add(ui.button(t, "nav", f).apply { pad(12f, 6f, 12f, 6f) }).expandX().fillX().uniformX().pad(4f)
-            if (i == 3) nav.row()
+            nav.add(ui.button(t, "nav", f).apply { pad(12f, 2f, 12f, 2f) }).expandX().fillX().uniformX().pad(3f)
+            if (i == 4) nav.row()
         }
 
         // Yerleştirme çubuğu
@@ -623,7 +624,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
 
     fun togglePanel(id: PanelId) {
         if (openPanel == id) closePanel() else {
-            if (id != PanelId.MAP && mode == ViewMode.MAP && id != PanelId.CARRIER) setMode(ViewMode.CITY)
+            if (id != PanelId.MAP && mode == ViewMode.MAP && id != PanelId.CARRIER && id != PanelId.DIPLOMACY && id != PanelId.TRADE) setMode(ViewMode.CITY)
             showPanel(id)
         }
     }
@@ -663,6 +664,8 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             PanelId.MAP -> Panels.map(this, content, width)
             PanelId.LOG -> Panels.log(this, content, width)
             PanelId.SETTINGS -> Panels.settings(this, content, width)
+            PanelId.TRADE -> Panels.trade(this, content, width)
+            PanelId.DIPLOMACY -> Panels.diplomacy(this, content, width)
         }
         scroll.layout()
         scroll.scrollY = keepY
@@ -717,6 +720,20 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     fun replanRoutes() {
         val c = mapSelected ?: return
         routes = if (TravelSystem.canTarget(state, c) == null) TravelSystem.planRoutes(state, c) else emptyList()
+    }
+
+    /** Ticaret/Diplomasi panellerinde seçili medeniyet. */
+    var selectedCivId = -1
+    private var confirmWarId = -1
+    fun openCiv(id: Int, panel: PanelId) {
+        selectedCivId = id
+        if (panel != PanelId.MAP && mode == ViewMode.MAP) setMode(ViewMode.CITY)
+        showPanel(panel)
+    }
+    fun selectCiv(id: Int) { selectedCivId = id; confirmWarId = -1; refreshPanel() }
+    fun warPending(id: Int) = confirmWarId == id
+    fun requestWar(id: Int) {
+        if (confirmWarId == id) { confirmWarId = -1; act(DiplomacySystem.declareWar(state, id)) } else { confirmWarId = id; refreshPanel() }
     }
 
     fun newGameConfirm(): Boolean = confirmNewGame

@@ -56,7 +56,8 @@ enum class BuildingType {
     SMALL_HOUSE, LARGE_HOUSE, APARTMENTS, HEALTH_CENTER, REST_AREA,
     FARM, GREENHOUSE, WATER_COLLECTOR, MILL, WORKSHOP, METALWORKS, TEXTILE, FOOD_FACTORY, POWER_PLANT, RECYCLER,
     FOOD_STORAGE, WATER_STORAGE, MATERIAL_STORAGE,
-    CARRIER_CARE, TECH_LAB, NAVIGATION_TOWER, GATHERER, SUPPORT_FRAME, CULTURE_CENTER;
+    CARRIER_CARE, TECH_LAB, NAVIGATION_TOWER, GATHERER, SUPPORT_FRAME, CULTURE_CENTER,
+    TRADE_MARKET, TRADE_DEPOT;
 
     val def: BuildingDef get() = BuildingCatalog.get(this)
 }
@@ -255,6 +256,20 @@ object BuildingCatalog {
             "Navigatörler rotayı iyileştirir: yolculuk hızı +%10.",
             1, 1, 20.0, amounts(WOOD to 50, METAL to 15, CLOTH to 10), 30.0,
             workers = 1, profession = Profession.NAVIGATOR, travelSpeedBonus = 0.10, unique = true, minStage = 1, maxLevel = 3,
+        ),
+        BuildingDef(
+            BuildingType.TRADE_MARKET, "Ticaret Pazarı", BuildingCategory.SPECIAL,
+            "Tüccarlar ticaret menzilini +2 bölge artırır, satış fiyatlarını iyileştirir ve kervan göndermeyi sağlar (seviye başına 1 kervan).",
+            2, 2, 34.0, amounts(WOOD to 80, STONE to 40, CLOTH to 20), 40.0,
+            workers = 2, profession = Profession.MERCHANT, happiness = 2.0, upkeepGold = 0.2, unique = true, minStage = 1, maxLevel = 3,
+        ),
+        BuildingDef(
+            BuildingType.TRADE_DEPOT, "Ticaret Deposu", BuildingCategory.STORAGE,
+            "Ticaret mallarını depolar ve +1 kervan yuvası sağlar.",
+            2, 1, 16.0, amounts(WOOD to 60, STONE to 20), 20.0,
+            storage = amounts(FOOD to 80, WATER to 80, WOOD to 80, STONE to 80, METAL to 60, CLOTH to 60, TOOLS to 40,
+                CRYSTAL to 20, RARE_ORE to 20, ANCIENT_PART to 20, TECH_PART to 20, LIGHT_MATERIAL to 30, CARE_ESSENCE to 20),
+            minStage = 1, maxLevel = 3,
         ),
         BuildingDef(
             BuildingType.SUPPORT_FRAME, "Destek İskelesi", BuildingCategory.SPECIAL,

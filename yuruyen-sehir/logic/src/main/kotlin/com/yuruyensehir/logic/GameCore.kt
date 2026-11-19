@@ -15,7 +15,8 @@ object StageSystem {
     fun score(state: GameState): Int {
         val buildings = state.buildings.filter { !it.underConstruction }.sumOf { it.level }
         return state.population.count * 2 + buildings * 3 + state.research.completed.size * 6 +
-            state.travel.distanceTraveled / 2 + (state.carrier.level - 1) * 8
+            state.travel.distanceTraveled / 2 + (state.carrier.level - 1) * 8 +
+            state.civs.count { it.met } * 4 + state.civs.sumOf { it.treaties.size } * 3
     }
 
     fun nextThreshold(stage: Int): Int? = thresholds.getOrNull(stage + 1)
@@ -62,6 +63,7 @@ class GameCore(val state: GameState) {
         lastBalance = report
         CarrierSystem.step(state, dt, report, offline)
         if (!offline) TravelSystem.step(state, dt, report)
+        CivSystem.step(state, dt, offline)
         state.eventCooldown = (state.eventCooldown - dt).coerceAtLeast(0.0)
         StageSystem.check(state)
     }
@@ -106,6 +108,7 @@ class GameCore(val state: GameState) {
             ResourceSystem.recalcCapacity(state)
             state.store.clampToCapacity()
             TravelSystem.reveal(state, state.travel.position)
+            CivSystem.ensureNearby(state)
             state.log("Büyük Çöküş'ün ardından ${state.carrier.name} adlı ${state.carrier.species} sırtında küçük topluluğunuzla yola çıktınız.", LogKind.STAGE)
             state.log("İpucu: Tarla ve Su Toplama Tesisi kurarak işe başlayın. Ağırlık dengesine dikkat edin!", LogKind.INFO)
             return GameCore(state)

@@ -12,6 +12,10 @@ import com.yuruyensehir.logic.BuildingType
 import com.yuruyensehir.logic.Biome
 import com.yuruyensehir.logic.Cell
 import com.yuruyensehir.logic.EventSystem
+import com.yuruyensehir.logic.CivSystem
+import com.yuruyensehir.logic.Culture
+import com.yuruyensehir.logic.Resource
+import com.yuruyensehir.logic.TravelSystem
 
 /** Oyunu otomatik sürüp belirli anlarda ekran görüntüsü alır (görsel doğrulama için). */
 class ScreenshotScript(private val dir: String) : GameHook {
@@ -49,7 +53,21 @@ class ScreenshotScript(private val dir: String) : GameHook {
         450L to { shot(it, "11_olay") },
         455L to { g -> g.core.state.pendingEvent = null; g.gameScreen.dismissModalForTest(); g.gameScreen.togglePanel(PanelId.POPULATION) },
         480L to { shot(it, "12_nufus") },
-        485L to { Gdx.app.exit() },
+        485L to { g ->
+            val s = g.core.state
+            TravelSystem.stop(s)
+            val m = s.civs.first { it.culture == Culture.MERCHANT_GUILD }
+            s.travel.position = Cell(m.position.x - 1, m.position.y)
+            s.store.amounts[Resource.GOLD] = 300.0
+            CivSystem.meetCheck(s, offline = false)
+            g.gameScreen.openCiv(m.id, PanelId.TRADE)
+        },
+        510L to { shot(it, "13_ticaret") },
+        515L to { g -> g.gameScreen.openCiv(g.core.state.civs.first { it.met }.id, PanelId.DIPLOMACY) },
+        540L to { shot(it, "14_diplomasi") },
+        545L to { g -> g.gameScreen.closePanel(); g.gameScreen.setMode(ViewMode.MAP); g.gameScreen.tapMapCellForTest(g.core.state.civs.first { it.met }.position) },
+        570L to { shot(it, "15_harita_medeniyet") },
+        575L to { Gdx.app.exit() },
     )
 
     override fun onFrame(game: YuruyenSehirGame, frame: Long) {

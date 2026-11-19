@@ -43,6 +43,8 @@ object BuildingArt {
         NAVIGATION_TOWER -> BuildingStyle(44f, c("F3F7FA"), c("2EC4B6"), Roof.TOWER, 16f)
         GATHERER -> BuildingStyle(8f, c("C69C6D"), c("D9B98C"), Roof.FLAT)
         SUPPORT_FRAME -> BuildingStyle(10f, c("B98B5E"), c("D2AC7E"), Roof.FLAT)
+        TRADE_MARKET -> BuildingStyle(14f, c("FFF3D6"), c("F6C445"), Roof.GABLE, 16f)
+        TRADE_DEPOT -> BuildingStyle(18f, c("E3C59A"), c("D9A21B"), Roof.GABLE, 10f)
     }
 
     private val windowed = setOf(SMALL_HOUSE, LARGE_HOUSE, APARTMENTS, CITY_CENTER, TOWN_HALL, HEALTH_CENTER, CULTURE_CENTER)
@@ -230,7 +232,18 @@ object BuildingArt {
             sr.rectLine(pax, pay, pbx, pby + hgt, 2f); sr.rectLine(pbx, pby, pax, pay + hgt, 2f)
             sr.rectLine(pdx, pdy, pax, pay + hgt, 2f); sr.rectLine(pax, pay, pdx, pdy + hgt, 2f)
         }
-        if (t == FOOD_STORAGE || t == MATERIAL_STORAGE) {
+        if (t == TRADE_MARKET) {
+            // Çizgili tente ve sandıklar
+            sr.setColor(0.93f, 0.42f, 0.3f, alpha)
+            for (k in 0 until 4) {
+                val f0 = k / 4f + 0.04f; val f1 = f0 + 0.12f
+                Draw.quad(sr, pax + (pbx - pax) * f0, pay + (pby - pay) * f0 + hgt, pax + (pbx - pax) * f1, pay + (pby - pay) * f1 + hgt,
+                    pax + (pbx - pax) * f1, pay + (pby - pay) * f1 + hgt - 6, pax + (pbx - pax) * f0, pay + (pby - pay) * f0 + hgt - 6)
+            }
+            sr.setColor(0.72f, 0.52f, 0.3f, alpha); sr.rect(pax + 6, pay + 2, 8f, 7f); sr.rect(pax + 16, pay + 5, 7f, 6f)
+            sr.setColor(0.97f, 0.77f, 0.27f, alpha); sr.circle(pax + 10, pay + 12, 2.5f, 8)
+        }
+        if (t == FOOD_STORAGE || t == MATERIAL_STORAGE || t == TRADE_DEPOT) {
             // kapı
             val mx = (pax + pbx) / 2; val my = (pay + pby) / 2
             sr.setColor(0.45f, 0.3f, 0.2f, alpha)

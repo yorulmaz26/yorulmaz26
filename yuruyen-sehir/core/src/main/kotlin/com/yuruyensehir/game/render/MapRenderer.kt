@@ -66,6 +66,21 @@ class MapRenderer {
             sr.setColor(0.4f, 0.3f, 0.2f, 1f); sr.rectLine(px + SIZE / 2, py + 10, px + SIZE / 2, py + 44, 2.5f)
             sr.color = Palette.red; sr.triangle(px + SIZE / 2, py + 44, px + SIZE / 2 + 16, py + 38 + sin(time * 4) * 2, px + SIZE / 2, py + 32)
         }
+        // Medeniyetler: çadır ve ilişki renginde bayrak
+        for (civ in state.civs) {
+            if (!civ.met) continue
+            val c = civ.position
+            if (c.x < x0 || c.x > x1 || c.y < y0 || c.y > y1) continue
+            val px = c.x * SIZE + SIZE / 2; val py = c.y * SIZE + SIZE / 2
+            sr.setColor(0f, 0f, 0f, 0.18f); Draw.ellipseFan(sr, px, py - 12, 18f, 6f, 12)
+            sr.color = Color.valueOf("FFF1D6"); sr.triangle(px - 16, py - 12, px + 16, py - 12, px, py + 10)
+            sr.color = Color.valueOf("B98B5E"); sr.triangle(px - 5, py - 12, px + 5, py - 12, px, py)
+            val col = Palette.relation(civ.status)
+            sr.setColor(0.4f, 0.3f, 0.2f, 1f); sr.rectLine(px + 8, py - 12, px + 8, py + 22, 2f)
+            sr.color = col; sr.triangle(px + 8, py + 22, px + 24, py + 17 + sin(time * 4 + civ.id) * 2, px + 8, py + 12)
+            if (civ.atWar) { sr.color = Palette.red; sr.rectLine(px - 14, py + 16, px - 4, py + 26, 2.5f); sr.rectLine(px - 14, py + 26, px - 4, py + 16, 2.5f) }
+        }
+
         // Şehir konumu
         val pp = t.position
         val cx = pp.x * SIZE + SIZE / 2; val cy = pp.y * SIZE + SIZE / 2

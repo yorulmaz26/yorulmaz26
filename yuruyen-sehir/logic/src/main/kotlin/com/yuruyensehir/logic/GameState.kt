@@ -138,7 +138,7 @@ data class TravelState(
 }
 
 @Serializable
-enum class LogKind { INFO, BUILD, CARRIER, TRAVEL, EVENT, RESEARCH, STAGE, WARNING }
+enum class LogKind { INFO, BUILD, CARRIER, TRAVEL, EVENT, RESEARCH, STAGE, WARNING, DIPLOMACY }
 
 @Serializable
 data class LogEntry(val day: Int, val text: String, val kind: LogKind = LogKind.INFO)
@@ -166,6 +166,7 @@ data class Stats(
     var foodProduced: Double = 0.0,
     var waterProduced: Double = 0.0,
     var gathered: Double = 0.0,
+    var trades: Int = 0,
 )
 
 @Serializable
@@ -188,6 +189,12 @@ data class GameState(
     val stats: Stats = Stats(),
     var lastSavedEpochMs: Long = 0L,
     var eventCooldown: Double = 0.0,
+    val civs: MutableList<Civilization> = mutableListOf(),
+    val generatedRegions: MutableSet<Long> = mutableSetOf(),
+    var nextCivId: Int = 1,
+    /** Medeniyet itibarı (0-100): ticaret, yardım ve anlaşmalarla artar, savaşla düşer. */
+    var reputation: Double = 20.0,
+    val caravans: MutableList<Caravan> = mutableListOf(),
 ) {
     /** Şehir yapısı değiştiğinde artar; önbellekli hesaplamalar bunu izler. */
     @Transient var cityVersion: Int = 0

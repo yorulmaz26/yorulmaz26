@@ -409,7 +409,24 @@ object Panels {
         if (target == null) {
             t.text(s, if (s.mode == ViewMode.MAP) "Rota planlamak için haritada keşfedilmiş bir bölgeye dokunun. Sürükleyerek gezinebilirsiniz." else "Haritayı açıp hedef seçin.", width)
             t.text(s, "${SOFT}Keşfedilen bölge: ${tr.explored.size} • Toplam yol: ${tr.distanceTraveled} bölge • Keşif menzili ${TravelSystem.revealRadius(st)}[]", width)
+            val near = CivSystem.met(st).sortedBy { it.position.dist(tr.position) }.take(4)
+            if (near.isNotEmpty()) {
+                t.section(s, "Bilinen medeniyetler", width)
+                near.forEach { civ -> t.text(s, "• ${civ.name} [#${Palette.relationHex(civ.status)}]${civ.status.title}[] — ${civ.position.dist(tr.position)} bölge", width) }
+            }
             return
+        }
+        CivSystem.at(st, target)?.let { civ ->
+            val cc = s.ui.card(Color.valueOf("FFF8E6"))
+            val cl = Table()
+            cl.add(s.ui.label("${civ.name} • [#${Palette.relationHex(civ.status)}]${civ.status.title}[]", "default")).left().row()
+            cl.add(s.ui.label(civ.culture.title + " • Güç ${civ.power.toInt()}", "small")).left()
+            cc.add(cl).expandX().left()
+            val bt = Table()
+            bt.add(s.ui.button("Ticaret", "gold") { s.openCiv(civ.id, PanelId.TRADE) }).width(150f).row()
+            bt.add(s.ui.button("Diplomasi", "primary") { s.openCiv(civ.id, PanelId.DIPLOMACY) }).width(150f).padTop(4f)
+            cc.add(bt)
+            t.cardRow(cc, width)
         }
         val tb = st.world.biomeAt(target)
         val err = TravelSystem.canTarget(st, target)
@@ -445,7 +462,8 @@ object Panels {
         for (e in entries) {
             val col = when (e.kind) {
                 LogKind.WARNING -> RED; LogKind.STAGE -> "[#C07A10]"; LogKind.RESEARCH -> "[#1A9C90]"
-                LogKind.EVENT -> "[#8E5BB5]"; LogKind.TRAVEL -> "[#2E7DB5]"; LogKind.CARRIER -> "[#4E9F45]"; else -> ""
+                LogKind.EVENT -> "[#8E5BB5]"; LogKind.TRAVEL -> "[#2E7DB5]"; LogKind.CARRIER -> "[#4E9F45]"
+                LogKind.DIPLOMACY -> "[#B5651D]"; else -> ""
             }
             t.add(s.ui.label("${SOFT}Gün ${e.day}[]  $col${e.text}${if (col.isNotEmpty()) "[]" else ""}", "small", wrap = true)).width(width).padTop(5f).row()
         }
@@ -481,12 +499,152 @@ object Panels {
             "Üretilen yiyecek: ${fmt(stats.foodProduced)} • Su: ${fmt(stats.waterProduced)} • Toplanan: ${fmt(stats.gathered)}",
             "Katedilen yol: ${st.travel.distanceTraveled} bölge • Keşfedilen bölge: ${st.travel.explored.size}",
             "Tamamlanan araştırma: ${st.research.completed.size}/${TechCatalog.all.size}",
+            "Ticaret işlemi: ${stats.trades} • Tanınan medeniyet: ${st.civs.count { it.met }} • İtibar %${st.reputation.toInt()}",
         )
         lines.forEach { t.text(s, it, width) }
 
         t.section(s, "Yeni Oyun", width)
         t.text(s, "${RED}Mevcut şehir ve bütün ilerleme silinir.[]", width)
         t.add(s.ui.button(if (s.newGameConfirm()) "Emin misiniz? Silmek için tekrar dokunun" else "Yeni Oyun Başlat", "danger") { s.requestNewGame() }).width(width).padTop(6f).row()
-        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.1.0 (Aşama 1-3 + temel yolculuk)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.2.0 (Aşama 1-4 + ticaret ve diplomasi)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+    }
+
+    // ------------------------------------------------------------------ Ticaret
+    private fun civSelector(s: GameScreen, t: Table, width: Float): Civilization? {
+        val st = s.state
+        val met = CivSystem.met(st).sortedBy { it.position.dist(st.travel.position) }
+        if (met.isEmpty()) {
+            t.text(s, "Henüz hiçbir medeniyetle karşılaşmadınız. Yolculuk ederek keşfedin; başlangıç bölgesinin doğusunda bir tüccar loncası dolaşıyor.", width, "default")
+            return null
+        }
+        if (met.none { it.id == s.selectedCivId }) s.selectedCivId = met.first().id
+        val chips = Table()
+        met.take(6).forEachIndexed { i, c ->
+            val b = s.ui.button(c.name.substringBeforeLast(' '), "chip") { s.selectCiv(c.id) }
+            b.pad(8f, 10f, 8f, 10f)
+            b.isChecked = c.id == s.selectedCivId
+            chips.add(b).padRight(6f).padTop(4f)
+            if (i == 2) chips.row()
+        }
+        t.add(chips).left().row()
+        return met.first { it.id == s.selectedCivId }
+    }
+
+    private fun civHeader(s: GameScreen, t: Table, width: Float, c: Civilization) {
+        val st = s.state
+        val hex = Palette.relationHex(c.status)
+        t.text(s, "${c.name} • [#$hex]${c.status.title}[] • ${c.position.dist(st.travel.position)} bölge uzakta • ${st.world.biomeAt(c.position).title}", width, "default")
+        t.text(s, "${SOFT}${c.culture.title}: ${c.culture.description} Sunar: ${c.culture.offers.joinToString { it.title }} • İster: ${c.culture.wants.joinToString { it.title }}[]", width)
+    }
+
+    fun trade(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        t.text(s, "İtibar %${st.reputation.toInt()} • Ticaret Pazarı: ${if (TradeSystem.hasMarket(st)) "${GREEN}var (satış fiyatları daha iyi)[]" else "${SOFT}yok (Özel menüsünden kurun)[]"}", width)
+        val c = civSelector(s, t, width) ?: return
+        civHeader(s, t, width, c)
+        val reason = TradeSystem.canTrade(st, c)
+        if (reason != null) t.text(s, "$RED$reason[]", width)
+        else t.text(s, "${GREEN}Ticaret menzilinde (${TradeSystem.range(st, c)} bölge). Fiyatlar 10 birim içindir; her alışverişte stok ve fiyat değişir.[]", width)
+
+        val tbl = Table()
+        tbl.defaults().pad(3f)
+        val wName = width * 0.28f; val wNum = width * 0.13f; val wBtn = width * 0.21f
+        tbl.add(s.ui.label("${SOFT}Kaynak[]", "small")).width(wName).left()
+        tbl.add(s.ui.label("${SOFT}Sizde[]", "small")).width(wNum).left()
+        tbl.add(s.ui.label("${SOFT}Onlarda[]", "small")).width(wNum).left()
+        tbl.add(s.ui.label("${SOFT}10 al[]", "small")).width(wBtn)
+        tbl.add(s.ui.label("${SOFT}10 sat[]", "small")).width(wBtn).row()
+        for (r in Resource.entries.filter { TradeSystem.tradable(it) }) {
+            val q = TradeSystem.quote(st, c, r)
+            val name = Table()
+            name.add(s.ui.dot(Palette.resource(r), 14f)).size(14f).padRight(6f)
+            val tag = when (r) { in c.culture.offers -> " ${GREEN}ucuz[]"; in c.culture.wants -> " [#C07A10]aranan[]"; else -> "" }
+            name.add(s.ui.label(r.title + tag, "small"))
+            tbl.add(name).left()
+            tbl.add(s.ui.label(fmt(st.store[r]), "small")).left()
+            tbl.add(s.ui.label(fmt(c.stock[r] ?: 0.0), "small")).left()
+            val buy = s.ui.button("${fmt(q.buy * TradeSystem.LOT)} A", "default") { s.act(TradeSystem.buy(st, c.id, r)) }
+            buy.pad(6f, 4f, 6f, 4f)
+            buy.isDisabled = reason != null || st.store[Resource.GOLD] < q.buy * TradeSystem.LOT || (c.stock[r] ?: 0.0) < TradeSystem.LOT
+            val sell = s.ui.button("${fmt(q.sell * TradeSystem.LOT)} A", "gold") { s.act(TradeSystem.sell(st, c.id, r)) }
+            sell.pad(6f, 4f, 6f, 4f)
+            sell.isDisabled = reason != null || st.store[r] < TradeSystem.LOT
+            tbl.add(buy).width(wBtn).fillX()
+            tbl.add(sell).width(wBtn).fillX().row()
+        }
+        t.add(tbl).width(width).row()
+        t.text(s, "${SOFT}A = altın. Bölge fiyatı etkiler: çölde su pahalı, ormanda odun ucuzdur. İyi ilişki ve ticaret anlaşması fiyatları düşürür.[]", width)
+
+        t.section(s, "Kervanlar (${st.caravans.size}/${TradeSystem.caravanSlots(st)} yuva)", width)
+        for (k in st.caravans) {
+            val row = Table()
+            val name = CivSystem.civ(st, k.civId)?.name ?: "?"
+            row.add(s.ui.label("${fmt(k.amount)} ${k.resource.title} › $name (~${fmt(k.payout)} A)", "small", wrap = true)).width(width * 0.55f).left()
+            row.add(s.bar((1 - k.secondsLeft / k.totalSeconds).toFloat(), Palette.gold, width * 0.4f))
+            t.add(row).width(width).padTop(4f).row()
+        }
+        val cr = TradeSystem.caravanReason(st, c)
+        if (cr != null) t.text(s, "$SOFT$cr[]", width)
+        else {
+            t.text(s, "Kervanlar 30 birim malı ${c.name} pazarına götürüp neredeyse alış fiyatından satar; dönüş ~${fmt(TradeSystem.caravanSeconds(st, c) / 60)} dk. Küçük bir haydut riski vardır (müttefiklerde yok).", width)
+            val grid = Table()
+            var n = 0
+            for (r in Resource.entries.filter { TradeSystem.tradable(it) && st.store[it] >= TradeSystem.CARAVAN_LOT }) {
+                grid.add(s.ui.button("${r.title} › ${fmt(TradeSystem.caravanPayout(st, c, r))} A", "primary") { s.act(TradeSystem.sendCaravan(st, c.id, r)) }.apply { pad(8f, 6f, 8f, 6f) })
+                    .width(width / 2 - 8f).pad(3f)
+                if (++n % 2 == 0) grid.row()
+            }
+            if (n == 0) t.text(s, "${SOFT}Kervan için en az 30 birimlik bir mal gerekli.[]", width) else t.add(grid).width(width).row()
+        }
+    }
+
+    // ------------------------------------------------------------------ Diplomasi
+    fun diplomacy(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val rep = Table()
+        rep.add(s.ui.label("Medeniyet itibarı %${st.reputation.toInt()}", "small")).width(260f).left()
+        rep.add(s.bar((st.reputation / 100).toFloat(), Palette.turquoise, width - 280f))
+        t.add(rep).width(width).row()
+        t.text(s, "${SOFT}İtibar ticaret, yardım ve anlaşmalarla artar; savaş ilanı düşürür. Yeni karşılaşılan medeniyetlerin ilk tavrını ve fiyatları etkiler.[]", width)
+        val c = civSelector(s, t, width) ?: return
+        civHeader(s, t, width, c)
+        val relRow = Table()
+        relRow.add(s.ui.label("İlişki ${c.relation.toInt()}", "small")).width(260f).left()
+        relRow.add(s.bar(((c.relation + 100) / 200).toFloat(), Palette.relation(c.status), width - 280f))
+        t.add(relRow).width(width).padTop(4f).row()
+        t.text(s, "Güç: ${DiplomacySystem.powerLabel(c)} • Anlaşmalar: ${if (c.treaties.isEmpty()) "yok" else c.treaties.joinToString { it.title }}" +
+            (if (c.culture.nomadic) " • Göçebe (yer değiştirir)" else " • Yerleşik"), width)
+        if (!DiplomacySystem.inContact(st, c)) t.text(s, "${RED}Elçi göndermek için en fazla 8 bölge yakında olmalısınız.[]", width)
+
+        val g = Table()
+        g.defaults().pad(4f).width(width / 2 - 8f)
+        fun action(label: String, style: String, reason: String?, f: () -> ActionResult) {
+            val b = s.ui.button(label, style) { s.act(f()) }
+            b.pad(10f, 6f, 10f, 6f)
+            b.isDisabled = reason != null
+            g.add(b)
+        }
+        val contact = if (DiplomacySystem.inContact(st, c)) null else "uzak"
+        action("Altın hediye (${fmt(DiplomacySystem.GIFT_GOLD)})", "gold", contact ?: if (c.atWar || st.store[Resource.GOLD] < DiplomacySystem.GIFT_GOLD) "x" else null) { DiplomacySystem.giftGold(st, c.id) }
+        val aidRes = c.culture.wants.firstOrNull { st.store[it] >= DiplomacySystem.AID_AMOUNT } ?: c.culture.wants.first()
+        action("Yardım: ${fmt(DiplomacySystem.AID_AMOUNT)} ${aidRes.title}", "green", contact ?: if (c.atWar || st.store[aidRes] < DiplomacySystem.AID_AMOUNT) "x" else null) { DiplomacySystem.sendAid(st, c.id, aidRes) }
+        g.row()
+        for ((i, tr) in Treaty.entries.withIndex()) {
+            action(tr.title, "primary", DiplomacySystem.treatyReason(st, c, tr)) { DiplomacySystem.propose(st, c.id, tr) }
+            if (i % 2 == 1) g.row()
+        }
+        if (c.atWar) action("Barış görüşmesi", "primary", DiplomacySystem.peaceReason(st, c)) { DiplomacySystem.makePeace(st, c.id) }
+        else {
+            val b = s.ui.button(if (s.warPending(c.id)) "Emin misiniz? Tekrar dokunun" else "Savaş ilan et", "danger") { s.requestWar(c.id) }
+            b.pad(10f, 6f, 10f, 6f)
+            g.add(b)
+        }
+        g.row()
+        t.add(g).width(width).padTop(6f).row()
+        // Gerekçeler
+        for (tr in Treaty.entries) DiplomacySystem.treatyReason(st, c, tr)?.let { t.text(s, "${SOFT}${tr.title}: $it[]", width) }
+        if (c.atWar) DiplomacySystem.peaceReason(st, c)?.let { t.text(s, "${SOFT}Barış: $it[]", width) }
+        t.text(s, "${SOFT}Etkiler: Ticaret anlaşması fiyatları %10 düşürür, menzili +2 artırır ve ilişkiyi zamanla güçlendirir. Geçiş izni sınır ücretlerini kaldırır. Müttefikler yardım gönderir ve kervanlarınızı korur; fakat geleneksel rakipleri (${c.culture.rival.title}) size soğur. Savaşta yakındaki düşman baskın yapar.[]", width)
+        t.add(s.ui.button("Bu medeniyetle ticaret yap", "default") { s.openCiv(c.id, PanelId.TRADE) }).width(width).padTop(8f).row()
     }
 }

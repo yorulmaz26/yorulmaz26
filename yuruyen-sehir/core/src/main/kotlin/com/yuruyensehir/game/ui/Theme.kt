@@ -60,6 +60,17 @@ object Palette {
         Resource.CARE_ESSENCE -> Color.valueOf("81C784")
     }
 
+    fun relation(r: com.yuruyensehir.logic.Relation): Color = when (r) {
+        com.yuruyensehir.logic.Relation.ENEMY -> Color.valueOf("D84A2B")
+        com.yuruyensehir.logic.Relation.RIVAL -> Color.valueOf("FF9F43")
+        com.yuruyensehir.logic.Relation.NEUTRAL -> Color.valueOf("F6C445")
+        com.yuruyensehir.logic.Relation.FRIEND -> Color.valueOf("7BC86C")
+        com.yuruyensehir.logic.Relation.PARTNER -> Color.valueOf("2EC4B6")
+        com.yuruyensehir.logic.Relation.ALLY -> Color.valueOf("4E7FD9")
+    }
+
+    fun relationHex(r: com.yuruyensehir.logic.Relation): String = relation(r).toString().substring(0, 6)
+
     fun biome(b: Biome): Color = when (b) {
         Biome.PLAINS -> Color.valueOf("A8DC7A")
         Biome.FOREST -> Color.valueOf("6DBE6A")
