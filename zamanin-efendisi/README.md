@@ -102,7 +102,7 @@ o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
 | 2 | Gelecek çağı, yapı/doğa evrimi (kadim orman), zaman enerjisi ve kristaller, robotlar, mühür bağlantıları, 20 yeni bölüm (toplam 25) | **Tamamlandı** |
 | 3 | 9 birlik türü (can/saldırı/savunma/menzil/hareket/yetenek/çağ uyumu), nöbet, kuleler, 6 düşman stratejisi, zaman dondurma, zincir kombosu, önceden görme, Alan 6–7 (toplam 35 bölüm) | **Tamamlandı** |
 | 4 | Zaman Kalesi (15 bina, çevrimdışı üretim, görsel büyüme), 5 kategorili 20 düğümlü araştırma ağacı, 10 kaynaklı ekonomi, 10 kategorili market (kozmetikler oyunda görünür), envanter, Zaman Rehberi | **Tamamlandı** |
-| 5 | Günlük/haftalık görevler, sonsuz mod, seferler, koleksiyon/müze, başarımlar, prestij | Planlandı |
+| 5 | Prosedürel üretici (5 şablon, çözüm simülasyonla doğrulanır), Sonsuz Mod, Günlük Bulmaca, Haftalık Kriz, günlük/haftalık görevler, zaman seferleri, 150 eserlik koleksiyon + 6 salonlu müze, 30 başarım, alternatif tarih görevleri, Krallık Savunması, Yeni Zaman Döngüsü (prestij), rastgele zaman olayları, kişisel rekorlar | **Tamamlandı** |
 | 6 | 100 alan / 500 bölüm, patronlar, dünya finalleri | Tasarım: docs/ALANLAR.md |
 | 7 | Performans, ses/animasyon cilası, ekran uyumluluğu, Google Play hazırlığı | Planlandı |
 

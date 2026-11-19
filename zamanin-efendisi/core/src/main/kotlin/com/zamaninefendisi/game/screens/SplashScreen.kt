@@ -80,6 +80,13 @@ object DevStart {
             "research" -> ResearchScreen(game)
             "market" -> MarketScreen(game, com.zamaninefendisi.logic.meta.ShopCategory.entries[parts.getOrNull(1)?.toIntOrNull() ?: 0])
             "inventory" -> InventoryScreen(game)
+            "challenges" -> ChallengesScreen(game)
+            "quests" -> QuestsScreen(game)
+            "expeditions" -> ExpeditionsScreen(game)
+            "collection" -> CollectionScreen(game)
+            "museum" -> MuseumScreen(game)
+            "achievements" -> AchievementsScreen(game)
+            "endless" -> { val cm = game.progression.continuity; GameScreen(game, cm.endlessLevel(cm.startEndless()), emptyList(), mode = PlayMode.Endless) }
             "rich" -> { game.progression.update { d -> d.copy(wallet = com.zamaninefendisi.logic.meta.Resource.entries.associateWith { 5000 }) }; CastleScreen(game) }
             "journal" -> JournalScreen(game)
             "profile" -> ProfileScreen(game)

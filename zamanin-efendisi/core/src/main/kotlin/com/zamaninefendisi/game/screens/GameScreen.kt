@@ -30,6 +30,17 @@ import com.zamaninefendisi.logic.levels.LevelCatalog
 import java.util.ArrayDeque
 import java.util.EnumMap
 
+/** Oynanışın hangi mod için olduğu: sonuç, can ve ödül kuralları buna göre değişir. */
+sealed class PlayMode {
+    data object Main : PlayMode()
+    data object Endless : PlayMode()
+    data class Daily(val day: Int) : PlayMode()
+    data class Weekly(val week: Int) : PlayMode()
+    data object Alt : PlayMode()
+    data class Defense(val wave: Int) : PlayMode()
+    data object Prestige : PlayMode()
+}
+
 /** Oynanış ekranı: izometrik harita, zaman geçiş arayüzü, hedefler, eylem menüsü ve sonuç pencereleri. */
 class GameScreen(
     game: ZamaninEfendisiGame,
@@ -37,8 +48,9 @@ class GameScreen(
     initialActions: List<Action>,
     /** Geliştirici otomatik oynatma: eylemler arayüzün kendi yolundan sırayla uygulanır. */
     autoplay: List<Action> = emptyList(),
+    val mode: PlayMode = PlayMode.Main,
 ) : BaseScreen(game) {
-    private val hpBonus = game.progression.heroHpBonus()
+    private val hpBonus = if (mode == PlayMode.Prestige) 0 else game.progression.heroHpBonus()
     private var session = LevelSession.replay(level, initialActions, hpBonus)
     private var foresightLeft: Int? = game.progression.foresightCharges()
     private val cosmetics = com.zamaninefendisi.game.render.Cosmetics(game.progression.data.equipped)
@@ -87,7 +99,7 @@ class GameScreen(
         bar.pad(10f, 14f, 10f, 14f)
         bar.add(ui.button("Menü", Theme.inkSoft, assets.fontS) { showPause() }).size(110f, 64f)
         val title = Table()
-        title.add(ui.label("Bölüm ${level.id} · ${level.name}", assets.fontM, Theme.ink, align = Align.center)).row()
+        title.add(ui.label(if (mode == PlayMode.Main || mode == PlayMode.Alt) "Bölüm ${level.id} · ${level.name}" else level.name, assets.fontM, Theme.ink, align = Align.center)).row()
         title.add(statsLabel).padTop(2f)
         bar.add(title).expandX()
         undoButton = ui.button("Geri Al", Theme.blue, assets.fontS) { undo() }
@@ -139,7 +151,7 @@ class GameScreen(
             val who = "Düşmanlar (${level.enemyEra.locative})"
             goalsTable.add(ui.label("$who mor çerçeveli hücreye ulaşırsa kaybedersin", assets.fontS, Theme.purple, wrap = true)).width(620f).left().row()
         }
-        val hint = if (game.progression.data.settings.hints) s.currentHint() else null
+        val hint = if (game.progression.data.settings.hints && mode == PlayMode.Main) s.currentHint() else null
         hintBox.isVisible = hint != null && s.status == SessionStatus.PLAYING
         hintLabel.setText(hint ?: "")
         for ((era, b) in eraButtons) {
@@ -290,7 +302,7 @@ class GameScreen(
 
     private fun restart() {
         queue.clear(); closePopup(); clearUnitSelection()
-        if (session.status == SessionStatus.LOST && !game.progression.canStart(level.id)) { ui.toast(root, "Canın kalmadı", Theme.red); return }
+        if (mode == PlayMode.Main && session.status == SessionStatus.LOST && !game.progression.canStart(level.id)) { ui.toast(root, "Canın kalmadı", Theme.red); return }
         session = LevelSession(level, hpBonus)
         recorded = false
         foresightLeft = game.progression.foresightCharges()
@@ -320,6 +332,7 @@ class GameScreen(
     }
 
     fun saveProgress() {
+        if (mode != PlayMode.Main) return
         if (session.status == SessionStatus.PLAYING) game.progression.saveInProgress(level.id, session.actions)
         else if (game.progression.data.inProgress?.levelId == level.id) game.progression.clearInProgress()
     }
@@ -435,8 +448,11 @@ class GameScreen(
         box.add(ui.button("Devam Et", Theme.green) { m.remove() }).width(420f).height(84f).padBottom(12f).row()
         box.add(ui.button("Yeniden Başlat", Theme.orange) { m.remove(); restart() }).width(420f).height(84f).padBottom(12f).row()
         box.add(ui.button("Nasıl Oynanır", Theme.blue) { saveProgress(); game.go(HowToPlayScreen(game, returnTo = { GameScreen(game, level, session.actions) })) }).width(420f).height(84f).padBottom(12f).row()
-        box.add(ui.button("Bölümlere Dön", Theme.inkSoft) { saveProgress(); game.go(LevelSelectScreen(game)) }).width(420f).height(84f).row()
-        box.add(ui.label("İlerlemen kaydedilir; çıkmak can harcamaz.", assets.fontS, Theme.inkSoft)).padTop(14f)
+        box.add(ui.button(if (mode == PlayMode.Main) "Bölümlere Dön" else "Mücadelelere Dön", Theme.inkSoft) {
+            saveProgress()
+            game.go(if (mode == PlayMode.Main) LevelSelectScreen(game) else ChallengesScreen(game))
+        }).width(420f).height(84f).row()
+        box.add(ui.label(if (mode == PlayMode.Main) "İlerlemen kaydedilir; çıkmak can harcamaz." else "Mücadeleler can harcamaz.", assets.fontS, Theme.inkSoft)).padTop(14f)
         m = ui.modal(root, box, dismissOnOutside = true)
     }
 
@@ -466,6 +482,7 @@ class GameScreen(
     private fun onFinished() {
         if (recorded) return
         recorded = true
+        if (mode != PlayMode.Main) { onModeFinished(); return }
         val p = game.progression
         val box = ui.panel(Theme.panel)
         box.pad(30f)
@@ -514,11 +531,82 @@ class GameScreen(
             box.add(row).padTop(20f)
         }
         m = ui.modal(root, box)
+        announceAchievements()
+    }
+
+    private fun announceAchievements() {
+        val fresh = game.progression.continuity.checkAchievements()
+        if (fresh.isNotEmpty()) ui.toast(root, "Başarım açıldı: " + fresh.joinToString(", ") { it.title } + " (+${fresh.sumOf { it.reward }} kristal)", Theme.purple)
+    }
+
+    /** Ana bölüm dışındaki modların sonuç penceresi. */
+    private fun onModeFinished() {
+        val cm = game.progression.continuity
+        val won = session.status == SessionStatus.WON
+        val box = ui.panel(Theme.panel)
+        box.pad(30f)
+        lateinit var m: Table
+        box.add(ui.label(if (won) "Başarılı!" else "Zaman Çizgisi Kırıldı", assets.fontL, if (won) Theme.green else Theme.red)).row()
+        if (!won) box.add(ui.label(session.failReason ?: "", assets.fontS, Theme.ink, wrap = true, align = Align.center)).width(560f).padTop(8f).row()
+        fun info(t: String, c: Color = Theme.purple) = box.add(ui.label(t, assets.fontS, c, wrap = true, align = Align.center)).width(560f).padTop(8f).row()
+        fun rewardText(r: Map<com.zamaninefendisi.logic.meta.Resource, Int>) = r.entries.joinToString(" · ") { "+${it.value} ${it.key.title}" }
+        val row = Table()
+        row.defaults().pad(6f)
+        when (val md = mode) {
+            PlayMode.Endless -> {
+                val next = cm.endlessResult(session)
+                if (next != null) {
+                    info("Aşama ${next.stage - 1} geçildi! Rekor: ${game.progression.data.continuity.endlessBest}")
+                    row.add(ui.button("Sonraki Aşama ›", Theme.green, assets.fontS) { game.go(GameScreen(game, cm.endlessLevel(next), emptyList(), mode = PlayMode.Endless)) }).size(260f, 80f)
+                } else info("Seri sona erdi. En uzun seri: ${game.progression.data.continuity.endlessBest} aşama")
+                row.add(ui.button("Mücadeleler", Theme.blue, assets.fontS) { game.go(ChallengesScreen(game)) }).size(220f, 80f)
+            }
+            is PlayMode.Daily -> {
+                val r = cm.recordDaily(session, md.day)
+                if (won) info(if (r.isEmpty()) "${session.actionsUsed} eylem. Bugünün en iyisi: ${game.progression.data.continuity.dailyBest[md.day]}" else "Günün bulmacası çözüldü! ${rewardText(r)} ve bir koleksiyon eseri")
+                row.add(ui.button("Tekrar", Theme.orange, assets.fontS) { m.remove(); restart() }).size(180f, 80f)
+                row.add(ui.button("Mücadeleler", Theme.blue, assets.fontS) { game.go(ChallengesScreen(game)) }).size(220f, 80f)
+            }
+            is PlayMode.Weekly -> {
+                val r = cm.recordWeekly(session, md.week)
+                if (won) info(if (r.isEmpty()) "Bu haftanın krizi zaten çözülmüştü." else "Haftalık kriz çözüldü! ${rewardText(r)}")
+                row.add(ui.button("Tekrar", Theme.orange, assets.fontS) { m.remove(); restart() }).size(180f, 80f)
+                row.add(ui.button("Mücadeleler", Theme.blue, assets.fontS) { game.go(ChallengesScreen(game)) }).size(220f, 80f)
+            }
+            is PlayMode.Defense -> {
+                val ok = cm.recordDefense(md.wave, session)
+                if (ok) {
+                    info("Dalga ${md.wave} püskürtüldü! En iyi: ${game.progression.data.continuity.defenseBest}")
+                    row.add(ui.button("Dalga ${md.wave + 1} ›", Theme.green, assets.fontS) { game.go(GameScreen(game, cm.defenseLevel(md.wave + 1), emptyList(), mode = PlayMode.Defense(md.wave + 1))) }).size(240f, 80f)
+                } else info("Kale düştü. Savunma 1. dalgadan yeniden başlar.")
+                row.add(ui.button("Mücadeleler", Theme.blue, assets.fontS) { game.go(ChallengesScreen(game)) }).size(220f, 80f)
+            }
+            PlayMode.Alt -> {
+                val task = cm.altTask(level)
+                val ok = cm.recordAlt(level, session)
+                info(if (ok) "Alternatif tarih yazıldı: ${task.title}! +1 Kadim Parça, +50 altın ve bir eser" else if (won) "Bölüm kazanıldı ama görev koşulu sağlanmadı: ${task.description}" else task.description, if (ok) Theme.green else Theme.purple)
+                row.add(ui.button("Tekrar", Theme.orange, assets.fontS) { m.remove(); restart() }).size(180f, 80f)
+                row.add(ui.button("Mücadeleler", Theme.blue, assets.fontS) { game.go(ChallengesScreen(game)) }).size(220f, 80f)
+            }
+            PlayMode.Prestige -> {
+                val cycle = cm.recordPrestige(level.id, session)
+                if (cycle) info("Zaman Döngüsü tamamlandı! +3 Zaman Mührü, +10 kristal. Yeni döngü başladı.", Theme.green)
+                else if (won) info("Döngü ilerlemesi: ${game.progression.data.continuity.cycleDone.size}/${com.zamaninefendisi.logic.levels.LevelCatalog.levels.size}")
+                row.add(ui.button("Tekrar", Theme.orange, assets.fontS) { m.remove(); restart() }).size(180f, 80f)
+                row.add(ui.button("Döngü", Theme.blue, assets.fontS) { game.go(PrestigeScreen(game)) }).size(220f, 80f)
+            }
+            PlayMode.Main -> {}
+        }
+        game.audio.play(if (won) "win" else "lose")
+        if (won) spawnVictoryParticles()
+        box.add(row).padTop(18f)
+        m = ui.modal(root, box)
+        announceAchievements()
     }
 
     override fun onBack() {
         if (popup != null) { closePopup(); return }
-        if (session.status == SessionStatus.PLAYING) showPause() else game.go(LevelSelectScreen(game))
+        if (session.status == SessionStatus.PLAYING) showPause() else game.go(if (mode == PlayMode.Main) LevelSelectScreen(game) else ChallengesScreen(game))
     }
 
     // ------------------------------------------------------------------ Çizim

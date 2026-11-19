@@ -33,7 +33,7 @@ class ZamaninEfendisiGame(
         shapes = ShapeRenderer(8000)
         assets.load()
         ui = Ui(this)
-        progression = Progression(SaveSystem(GdxSaveStorage(platform.externalSaveDir)), platform.clock)
+        progression = Progression(SaveSystem(GdxSaveStorage(platform.externalSaveDir)), platform.clock) { java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()).toLong() }
         audio = AudioManager { progression.data.settings.sound }
         audio.load()
         setScreen(SplashScreen(this))
