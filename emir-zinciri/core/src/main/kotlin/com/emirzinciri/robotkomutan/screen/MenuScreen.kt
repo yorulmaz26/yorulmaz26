@@ -39,7 +39,10 @@ class MenuScreen(game: EmirZinciriGame) : BaseScreen(game) {
             val def = services.catalog[nextId]
             if (def != null && !allDone) game.go(GameScreen(game, def)) else game.go(LevelSelectScreen(game))
         }.also { it.pad(22f) }).width(560f).padTop(18f).row()
-        root.add(ui.button("Bölümler", Theme.turquoise, Theme.white, "map") { game.go(LevelSelectScreen(game)) }).width(560f).padTop(14f).row()
+        val row0 = com.badlogic.gdx.scenes.scene2d.ui.Table()
+        row0.add(ui.button("Bölümler", Theme.turquoise, Theme.white, "map") { game.go(LevelSelectScreen(game)) }).growX().uniformX().padRight(7f)
+        row0.add(ui.button("Fabrika", Theme.orange, Theme.white, "gear") { game.go(FactoryScreen(game)) }).growX().uniformX().padLeft(7f)
+        root.add(row0).width(560f).padTop(14f).row()
         val row = com.badlogic.gdx.scenes.scene2d.ui.Table()
         row.add(ui.button("Komutlar", Theme.white, Theme.ink, "book") { game.go(EncyclopediaScreen(game)) }).growX().uniformX().padRight(7f)
         row.add(ui.button("Profil", Theme.white, Theme.ink, "chart") { game.go(StatsScreen(game)) }).growX().uniformX().padLeft(7f)

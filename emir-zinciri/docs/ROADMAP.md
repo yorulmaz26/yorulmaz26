@@ -18,8 +18,13 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 - ✅ Çok robotlu çözücü (Dijkstra, toplam kart maliyeti); 45 bölümün tamamında par = optimum doğrulanır.
 - ⬜ Alan 10 (46–50, Robot İsyanı patronu) düşman yapay zekâsı gerektirir.
 
-## Aşama 5 — Kalıcı fabrika ⬜
-Kaynaklar (altın, metal, mikroçip) bölümlerden zaten birikiyor ve kaydediliyor; fabrika ekranı, binalar, araştırma ve robot geliştirme henüz yok.
+## Aşama 5 — Kalıcı fabrika 🟡 (çekirdek ✅)
+- ✅ 15 bina kataloğu; 7'si kurulabilir ve gerçek etkili: Komuta Merkezi (seviye sınırı, bina açma), Enerji Santrali, Metal İşleme (enerji harcar), Kaynak Deposu (kapasite), Mikroçip Laboratuvarı (metal harcar), Araştırma Merkezi (TP + kademe), Ticaret Merkezi (metal/enerji → altın).
+- ✅ Gerçek zamanlı ve çevrimdışı üretim (dakikalık zincir hesabı, depo ve 8 saat sınırı); süre ölçümü can sistemiyle aynı saat korumasını kullanır.
+- ✅ Araştırma ağacı: 4 dalda 13 etkili düğüm (altın/XP bonusu bölüm ödüllerine uygulanır, üretim, depo, çevrimdışı süre, ticaret kuru). Askerî dal savaş sistemine kadar kilitli.
+- ✅ İzometrik fabrika görünümü (binalar seviyeyle yükselir), üretim raporu, 10 test.
+- ⬜ Diğer 8 bina (robot üretimi, garaj, akademi, savunma, keşif, tamir, müze, yapay zekâ lab.) bağlı oldukları sistemlerle gelecek; arayüzde kilitli ve nedeni yazılı.
+- ⬜ Robot geliştirme ve programlanabilir üretim hatları (fabrika otomasyonu) — Aşama 6 robot sınıflarıyla birlikte.
 
 ## Aşama 6–9 ⬜
 Robot sınıfları, savaş, düşman yapay zekâsı, patronlar; günlük/haftalık görevler, sonsuz mod, market, harita editörü, koleksiyon, başarımlar; 500 bölüme genişleme; müzik ve yayın hazırlığı.

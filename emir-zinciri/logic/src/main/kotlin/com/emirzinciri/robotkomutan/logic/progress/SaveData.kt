@@ -60,6 +60,7 @@ data class SaveData(
     var settings: Settings = Settings(),
     val tutorialsSeen: MutableSet<String> = mutableSetOf(),
     var stats: PlayerStats = PlayerStats(),
+    var factory: com.emirzinciri.robotkomutan.logic.factory.FactoryState = com.emirzinciri.robotkomutan.logic.factory.FactoryState(),
 ) {
     fun record(levelId: Int): LevelRecord = levels.getOrPut(levelId) { LevelRecord() }
     fun stars(levelId: Int): Int = levels[levelId]?.stars ?: 0

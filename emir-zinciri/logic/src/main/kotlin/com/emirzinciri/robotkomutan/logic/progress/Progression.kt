@@ -19,6 +19,7 @@ data class WinResult(
 /** Bölüm açma, ödül ve can kuralları. Saf mantık: arayüz ve kayıt dosyasından bağımsız test edilir. */
 class Progression(val save: SaveData, clock: GameClock) {
     val lives = LivesSystem(save.lives, clock)
+    val factory = com.emirzinciri.robotkomutan.logic.factory.Factory(save.factory, save.wallet, clock)
 
     fun isCompleted(levelId: Int) = save.stars(levelId) > 0
 
@@ -69,6 +70,10 @@ class Progression(val save: SaveData, clock: GameClock) {
         val gainedStars = (stars - prev).coerceAtLeast(0)
         if (gainedStars > 0) reward += Reward(gold = 5L * gainedStars * tier(def), xp = 5L * gainedStars)
         if (!first && gainedStars == 0) reward += Reward(gold = 1)
+        // Araştırma bonusları (Komut Teknolojisi)
+        val gb = factory.bonus(com.emirzinciri.robotkomutan.logic.factory.Effect.GOLD_BONUS)
+        val xb = factory.bonus(com.emirzinciri.robotkomutan.logic.factory.Effect.XP_BONUS)
+        if (gb > 0 || xb > 0) reward = reward.copy(gold = reward.gold * (100 + gb) / 100, xp = reward.xp * (100 + xb) / 100)
         apply(reward)
         return WinResult(rec.stars, prev, first, reward, newBest && !first)
     }

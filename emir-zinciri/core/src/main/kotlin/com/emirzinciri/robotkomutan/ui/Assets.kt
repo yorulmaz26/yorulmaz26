@@ -36,7 +36,7 @@ class Assets(density: Float) : Disposable {
     private val rings = HashMap<Int, NinePatch>()
 
     init {
-        val chars = FreeTypeFontGenerator.DEFAULT_CHARS + "çğıöşüÇĞİÖŞÜâÂîÎûÛ…–—’‘“”•×·→←↑↓±≤≥"
+        val chars = FreeTypeFontGenerator.DEFAULT_CHARS + "çğıöşüÇĞİÖŞÜâÂîÎûÛ…–—’‘“”•×·→←↑↓±≤≥−"
         fun gen(file: String, size: Int): BitmapFont {
             val g = FreeTypeFontGenerator(Gdx.files.internal("fonts/$file"))
             val p = FreeTypeFontGenerator.FreeTypeFontParameter().apply {

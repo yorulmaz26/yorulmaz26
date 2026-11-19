@@ -59,7 +59,7 @@ class StatsScreen(game: EmirZinciriGame) : BaseScreen(game) {
             table.add(ui.label(v, assets.fontBold, Theme.ink)).right().row()
         }
         list.add(table).growX().pad(8f, 16f, 8f, 16f).row()
-        list.add(ui.label("Kaynaklar şimdilik birikir; Robot Fabrikası (sonraki aşama) bunları bina ve robot geliştirmede kullanacak.",
+        list.add(ui.label("Kaynakları Robot Fabrikası'nda bina kurmak, araştırma ve ticaret için kullanabilirsin.",
             assets.fontSmall, Theme.inkFaint, wrap = true)).growX().pad(8f, 24f, 24f, 24f)
     }
 

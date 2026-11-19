@@ -22,6 +22,7 @@ class SplashScreen(game: EmirZinciriGame, private val startup: StartupOptions) :
             startup.openScreen == "settings" -> SettingsScreen(game)
             startup.openScreen == "book" -> EncyclopediaScreen(game)
             startup.openScreen == "stats" -> StatsScreen(game)
+            startup.openScreen == "factory" -> FactoryScreen(game)
             else -> null
         } ?: MenuScreen(game)
         startup.screenshotPath?.let { (next as BaseScreen).scheduleScreenshot(it, startup.screenshotAfter) }
