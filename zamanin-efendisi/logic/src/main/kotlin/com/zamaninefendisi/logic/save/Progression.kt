@@ -36,8 +36,9 @@ object MasterLevel {
 }
 
 /** Kayıt verisi üzerindeki oyun kuralları (bölüm kilidi, ödüller, canlar, kale, araştırma, market). */
-class Progression(private val saves: SaveSystem, private val clock: GameClock) {
+class Progression(private val saves: SaveSystem, private val clock: GameClock, tzOffsetMs: () -> Long = { 0L }) {
     val lifeSystem = LifeSystem(clock)
+    val continuity = ContinuityManager(this, clock, tzOffsetMs)
     var data: SaveData = saves.load()
         private set
 
@@ -45,6 +46,7 @@ class Progression(private val saves: SaveSystem, private val clock: GameClock) {
         data = data.copy(lives = lifeSystem.update(data.lives))
         tickProduction()
         persist()
+        continuity.tick()
     }
 
     fun persist() = saves.save(data)
@@ -150,6 +152,7 @@ class Progression(private val saves: SaveSystem, private val clock: GameClock) {
                 inProgress = null,
             )
         }
+        continuity.onLevelWon(session)
         return Reward(gains.filterValues { it > 0 }, xp, first, newStars, MasterLevel.levelOf(data.xp) > levelBefore, comboGold)
     }
 
@@ -188,6 +191,7 @@ class Progression(private val saves: SaveSystem, private val clock: GameClock) {
             production = data.production.copy(pending = data.production.pending.mapValues { it.value - it.value.toInt() }),
         )
         persist()
+        if (whole.isNotEmpty()) continuity.event(com.zamaninefendisi.logic.continuity.QuestType.COLLECT_PRODUCTION)
         return whole
     }
 
@@ -197,6 +201,7 @@ class Progression(private val saves: SaveSystem, private val clock: GameClock) {
         if (!chk.ok) return false
         val next = (data.buildings[b] ?: 0) + 1
         update { it.copy(wallet = it.wallet.minus(b.costFor(next)), buildings = it.buildings + (b to next)) }
+        continuity.event(com.zamaninefendisi.logic.continuity.QuestType.UPGRADE_BUILDING)
         return true
     }
 
@@ -223,6 +228,7 @@ class Progression(private val saves: SaveSystem, private val clock: GameClock) {
                 wallet = w,
                 owned = if (item.consumable) it.owned else it.owned + itemId,
                 equipped = if (item.consumable) it.equipped else it.equipped + (item.category to itemId),
+                continuity = it.continuity.copy(shopBought = it.continuity.shopBought + 1),
             )
         }
         return null

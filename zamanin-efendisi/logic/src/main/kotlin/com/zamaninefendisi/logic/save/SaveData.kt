@@ -30,6 +30,7 @@ data class SaveData(
     val stats: Stats = Stats(),
     val inProgress: InProgress? = null,
     val seenIntros: Set<Int> = emptySet(),
+    val continuity: com.zamaninefendisi.logic.continuity.ContinuityState = com.zamaninefendisi.logic.continuity.ContinuityState(),
 )
 
 /** Kale üretiminin biriktiği durum ve son ölçüm anı (manipülasyona dayanıklı süre için). */
