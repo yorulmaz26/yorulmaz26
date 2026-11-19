@@ -18,7 +18,7 @@ object CarrierSystem {
     fun needMultiplier(state: GameState): Double {
         var m = 1.0 - 0.10 * state.carrier.upgrade(CarrierUpgrade.EFFICIENCY)
         if (ResearchSystem.has(state, TechId.NUTRITIOUS_FODDER)) m *= 0.85
-        return m
+        return m * Bonuses.needs(state)
     }
 
     fun fatigueMultiplier(state: GameState): Double = 1.0 - 0.12 * state.carrier.upgrade(CarrierUpgrade.DURABILITY)
@@ -46,10 +46,11 @@ object CarrierSystem {
         if (ResearchSystem.has(state, TechId.ROUTE_SCIENCE)) s *= 1.10
         val nav = state.buildings.firstOrNull { it.type == BuildingType.NAVIGATION_TOWER && !it.underConstruction && it.enabled && it.workers > 0 }
         if (nav != null) s *= 1.0 + nav.def.travelSpeedBonus * nav.level
-        return s
+        return s * Bonuses.speed(state)
     }
 
     fun terrainFactor(state: GameState, biome: Biome): Double {
+        if (biome in state.carrier.kind.adapted) return 1.0
         val adapt = 0.15 * state.carrier.upgrade(CarrierUpgrade.TERRAIN)
         return biome.moveFactor + (1.0 - biome.moveFactor) * adapt.coerceAtMost(0.8)
     }
@@ -70,22 +71,23 @@ object CarrierSystem {
 
         val hungerRate = (if (moving) 5.0 else 2.4) * loadFactor * needs
         var thirstRate = (if (moving) 5.5 else 2.6) * loadFactor * needs
-        if (biome == Biome.DESERT || biome == Biome.VOLCANIC) thirstRate *= 1.5
+        if ((biome == Biome.DESERT || biome == Biome.VOLCANIC) && biome !in c.kind.adapted) thirstRate *= 1.5
+        thirstRate *= c.kind.thirstMult
         c.hunger += hungerRate * minutes
         c.thirst += thirstRate * minutes
 
         // Dinlenirken bulunduğu araziden kendini besler.
         if (!moving) {
-            c.hunger -= 2.6 * biome.forage * minutes
+            c.hunger -= 2.6 * biome.forage * c.kind.forageMult * minutes
             c.thirst -= 2.8 * biome.waterAvail * minutes
         }
 
-        val terrainStress = 1.0 + (1.0 - biome.moveFactor) + (1.0 - report.balance) * biome.roughness
+        val terrainStress = 1.0 + (1.0 - terrainFactor(state, biome)) + (1.0 - report.balance) * biome.roughness
         when {
             moving -> {
                 var f = 4.0 * loadFactor * terrainStress * fatigueMultiplier(state)
                 if (c.abilityActive(CarrierAbility.QUICK_MARCH)) f *= 1.5
-                if (biome == Biome.SNOW) f *= 1.25
+                if (biome == Biome.SNOW && biome !in c.kind.adapted) f *= 1.25
                 c.fatigue += f * minutes
                 c.energy -= 2.0 * minutes
             }
@@ -221,9 +223,12 @@ object CarrierSystem {
         return ActionResult.ok("${u.title} geliştirildi.")
     }
 
+    /** Kadim Taşıyıcı yetenekleri bir seviye erken açar. */
+    fun unlockLevel(state: GameState, a: CarrierAbility) = (a.unlockLevel - if (state.carrier.kind == CarrierSpecies.ANCIENT_CARRIER) 1 else 0).coerceAtLeast(1)
+
     fun activateAbility(state: GameState, a: CarrierAbility): ActionResult {
         val c = state.carrier
-        if (c.level < a.unlockLevel) return ActionResult.fail("${a.title} taşıyıcı seviyesi ${a.unlockLevel}'de açılır.")
+        if (c.level < unlockLevel(state, a)) return ActionResult.fail("${a.title} taşıyıcı seviyesi ${unlockLevel(state, a)}'de açılır.")
         if ((c.abilityCooldown[a] ?: 0.0) > 0) return ActionResult.fail("${a.title} henüz hazır değil.")
         if (c.energy < a.energyCost) return ActionResult.fail("Taşıyıcının enerjisi yetersiz.")
         c.energy -= a.energyCost
@@ -242,8 +247,9 @@ object CarrierSystem {
         val biome = state.world.biomeAt(state.travel.position)
         var h = (if (moving) 5.0 else 2.4) * loadFactor * needs
         var t = (if (moving) 5.5 else 2.6) * loadFactor * needs
-        if (!moving) { h -= 2.6 * biome.forage; t -= 2.8 * biome.waterAvail }
-        if (biome == Biome.DESERT || biome == Biome.VOLCANIC) t *= 1.5
+        if ((biome == Biome.DESERT || biome == Biome.VOLCANIC) && biome !in state.carrier.kind.adapted) t *= 1.5
+        t *= state.carrier.kind.thirstMult
+        if (!moving) { h -= 2.6 * biome.forage * state.carrier.kind.forageMult; t -= 2.8 * biome.waterAvail }
         return Pair(h.coerceAtLeast(0.0) * FOOD_PER_POINT, t.coerceAtLeast(0.0) * WATER_PER_POINT)
     }
 }

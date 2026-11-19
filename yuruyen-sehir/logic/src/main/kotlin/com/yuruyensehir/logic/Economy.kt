@@ -43,7 +43,7 @@ object WeightBalanceSystem {
         var f = 1.0
         if (ResearchSystem.has(state, TechId.LIGHT_TIMBER)) f *= 0.90
         if (ResearchSystem.has(state, TechId.COMPOSITE_ROOFS)) f *= 0.85
-        return f
+        return f * Bonuses.buildingWeight(state)
     }
 
     fun cargoWeightFactor(state: GameState) = if (ResearchSystem.has(state, TechId.HANGING_STORAGE)) 0.75 else 1.0
@@ -51,7 +51,7 @@ object WeightBalanceSystem {
     fun capacity(state: GameState): Double {
         var c = 600.0 + 120.0 * state.carrier.upgrade(CarrierUpgrade.CAPACITY) + 25.0 * (state.carrier.level - 1)
         if (ResearchSystem.has(state, TechId.MUSCLE_TRAINING)) c *= 1.15
-        return c
+        return c * state.carrier.kind.capacityMult
     }
 
     fun weightOf(state: GameState, b: PlacedBuilding, supported: Boolean): Double {
@@ -153,7 +153,7 @@ object ProductionSystem {
         val hpFactor = 0.4 + 0.6 * (b.hp / 100.0)
         val upkeepPenalty = if (def.upkeepGold > 0 && state.store[GOLD] <= 0.0) 0.5 else 1.0
         return workerRatio * hpFactor * happinessFactor(state) * (1.0 + BuildingSystem.adjacencyBonus(state, b)) *
-            BuildingSystem.levelMultiplier(b) * researchMultiplier(state, b.type) * upkeepPenalty
+            BuildingSystem.levelMultiplier(b) * researchMultiplier(state, b.type) * upkeepPenalty * Bonuses.production(state, b.type)
     }
 
     /** Biyom etkisi: su toplayıcılar biyomun su bulunabilirliğine göre çalışır. */
@@ -211,7 +211,7 @@ object ProductionSystem {
             }
             state.buildingStatus[b.id] = BuildingStatus(eff, ratio, missing)
         }
-        if (research > 0) ResearchSystem.addPoints(state, research)
+        if (research > 0) ResearchSystem.addPoints(state, research * Bonuses.research(state))
         // Vergi ve bakım giderleri
         val pop = state.population.count
         var tax = 0.0

@@ -58,6 +58,9 @@ data class Civilization(
     var lastGiftDay: Int = -1,
     var raidTimer: Double = 0.0,
     var aidTimer: Double = 0.0,
+    /** Rastgele ticaret fırsatı: bu kaynağa geçici olarak yüksek fiyat öderler. */
+    var boostResource: Resource? = null,
+    var boostSeconds: Double = 0.0,
 ) {
     val status: Relation
         get() = when {
@@ -210,6 +213,13 @@ object CivSystem {
                     c.position = Cell(nx, ny)
                     if (c.met && TravelSystem.isExplored(state, c.position).not()) state.travel.explored += c.position.key()
                 }
+            }
+            if (c.boostSeconds > 0) { c.boostSeconds -= dt; if (c.boostSeconds <= 0) c.boostResource = null }
+            else if (!offline && c.met && !c.hostile && c.position.dist(state.travel.position) <= 8 && state.nextRandom() < 0.0015 * dt) {
+                val pool = Resource.entries.filter { TradeSystem.tradable(it) && it !in c.culture.offers }
+                val r = pool[(state.nextRandom() * pool.size).toInt().coerceAtMost(pool.size - 1)]
+                c.boostResource = r; c.boostSeconds = 300.0
+                state.log("Ticaret fırsatı: ${c.name} 5 dakika boyunca ${r.title} için neredeyse iki kat fiyat ödüyor!", LogKind.DIPLOMACY)
             }
             if (!offline) regionalEvents(state, c, dt)
         }

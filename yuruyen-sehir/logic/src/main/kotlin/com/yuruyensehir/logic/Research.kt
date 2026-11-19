@@ -65,6 +65,9 @@ data class ResearchState(
     var progress: Double = 0.0,
     /** Henüz harcanmamış bilgi puanı (aktif araştırma yokken birikir). */
     var bankedPoints: Double = 0.0,
+    var masteryLevel: Int = 0,
+    var masteryProgress: Double = 0.0,
+    var masteryActive: Boolean = false,
 )
 
 object ResearchSystem {
@@ -100,6 +103,17 @@ object ResearchSystem {
         val r = state.research
         val cur = r.current
         if (cur == null) {
+            if (r.masteryActive) {
+                r.masteryProgress += points + r.bankedPoints
+                r.bankedPoints = 0.0
+                while (r.masteryProgress >= MasterySystem.cost(r.masteryLevel)) {
+                    r.masteryProgress -= MasterySystem.cost(r.masteryLevel)
+                    r.masteryLevel++
+                    state.log("Ustalık seviye ${r.masteryLevel}: bütün üretim ve bilgi +%${r.masteryLevel * 2}.", LogKind.RESEARCH)
+                    state.cityVersion++
+                }
+                return
+            }
             r.bankedPoints += points
             return
         }

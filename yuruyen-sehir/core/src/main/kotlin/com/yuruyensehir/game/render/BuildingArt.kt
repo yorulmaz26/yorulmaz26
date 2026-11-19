@@ -51,6 +51,8 @@ object BuildingArt {
         SHIELD_CENTER -> BuildingStyle(20f, c("E0F7FA"), c("4FC3F7"), Roof.DOME, 18f)
         BARRACKS -> BuildingStyle(20f, c("D7CCC8"), c("5C6BC0"), Roof.GABLE, 12f)
         EXPLORATION_CENTER -> BuildingStyle(20f, c("FFF3D6"), c("6DBE6A"), Roof.GABLE, 14f)
+        QUEST_CENTER -> BuildingStyle(22f, c("FFF7E8"), c("F6C445"), Roof.PYRAMID, 16f)
+        AIRSHIP_STATION -> BuildingStyle(12f, c("E3C59A"), c("B98B5E"), Roof.FLAT)
     }
 
     private val windowed = setOf(SMALL_HOUSE, LARGE_HOUSE, APARTMENTS, CITY_CENTER, TOWN_HALL, HEALTH_CENTER, CULTURE_CENTER)
@@ -243,6 +245,15 @@ object BuildingArt {
             sr.setColor(0.5f, 0.33f, 0.2f, alpha)
             sr.rectLine(pax, pay, pbx, pby + hgt, 2f); sr.rectLine(pbx, pby, pax, pay + hgt, 2f)
             sr.rectLine(pdx, pdy, pax, pay + hgt, 2f); sr.rectLine(pax, pay, pdx, pdy + hgt, 2f)
+        }
+        if (t == AIRSHIP_STATION) {
+            // Bağlı hava gemisi: süzülen balon ve sepet
+            val mx = (tax + tcx) / 2; val my = (tay + tcy) / 2
+            val bob = sin(time * 1.5f) * 4f
+            sr.setColor(0.45f, 0.32f, 0.2f, alpha); sr.rectLine(mx, my, mx, my + 34 + bob, 1.2f)
+            sr.setColor(0.72f, 0.52f, 0.3f, alpha); sr.rect(mx - 7, my + 30 + bob, 14f, 7f)
+            sr.setColor(0.93f, 0.42f, 0.3f, alpha); Draw.ellipseFan(sr, mx, my + 54 + bob, 26f, 15f, 20)
+            sr.setColor(1f, 0.95f, 0.85f, alpha); Draw.ellipseFan(sr, mx, my + 54 + bob, 26f, 4f, 16)
         }
         if (t == TRADE_MARKET) {
             // Çizgili tente ve sandıklar

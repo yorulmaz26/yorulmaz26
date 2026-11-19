@@ -14,6 +14,8 @@ import com.yuruyensehir.logic.PlacedBuilding
 import com.yuruyensehir.logic.BalanceReport
 import com.yuruyensehir.logic.CombatSystem
 import com.yuruyensehir.logic.EnemyType
+import com.yuruyensehir.logic.CarrierSpecies
+import com.yuruyensehir.logic.SideSpecialty
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.floor
@@ -27,6 +29,24 @@ data class Ghost(val type: BuildingType, val x: Int, val y: Int, val valid: Bool
  * Mantık ızgarasında +x taşıyıcının önü, +y solu. Ekranda ön = sağ-aşağı, sol = sağ-yukarı.
  */
 class CityRenderer {
+    /** Türlere göre görünüm. */
+    class Look(val skin: Color, val skinDark: Color, val rim: Color, val rimDark: Color, val rimLine: Color, val deck: Color, val legExtra: Float)
+
+    private val looks = HashMap<CarrierSpecies, Look>()
+    fun look(k: CarrierSpecies): Look = looks.getOrPut(k) {
+        fun c(h: String) = Color.valueOf(h)
+        when (k) {
+            CarrierSpecies.GIANT_TORTOISE -> Look(c("8CCBA4"), c("6AAE88"), c("C79A62"), c("A97C47"), c("8E6A3E"), c("B98B5E"), 0f)
+            CarrierSpecies.CRYSTAL_HORN -> Look(c("A9A4D9"), c("8A84C2"), c("9C8FD6"), c("7F72BE"), c("5E529C"), c("B7AEE3"), 0f)
+            CarrierSpecies.LONG_LEGS -> Look(c("E8C07A"), c("CFA35C"), c("D98E4E"), c("BF743A"), c("995A2A"), c("D9A96B"), 55f)
+            CarrierSpecies.ROCK_BACK -> Look(c("A8A29A"), c("8C877F"), c("8F8A83"), c("77726B"), c("5E5A54"), c("B3ADA4"), -10f)
+            CarrierSpecies.FOREST_GUARDIAN -> Look(c("6DBE6A"), c("4E9F45"), c("7A9E4E"), c("5F823A"), c("486628"), c("8DB45E"), 0f)
+            CarrierSpecies.DESERT_WANDERER -> Look(c("E5C28A"), c("CBA56C"), c("D6A35E"), c("BC8A47"), c("8F6632"), c("E3BD7D"), 15f)
+            CarrierSpecies.ICE_WALKER -> Look(c("BFE3F2"), c("9CCDE4"), c("D6EAF5"), c("B5D5E8"), c("8AB4CF"), c("E6F2F8"), 0f)
+            CarrierSpecies.ANCIENT_CARRIER -> Look(c("7FC7A8"), c("5FA98A"), c("D9B45A"), c("BF9940"), c("8F7128"), c("C9A962"), 10f)
+        }
+    }
+
     companion object {
         const val DECK_Y = 130f
         const val RIM = 30f
@@ -151,7 +171,7 @@ class CityRenderer {
     ) {
         val resting = state.carrier.resting || state.carrier.forcedRest
         val bob = if (moving) abs(sin(walkPhase)) * 3.5f else sin(time * 1.4f) * 1.6f
-        deckOffset = DECK_Y + bob - if (resting) 14f else 0f
+        deckOffset = DECK_Y + look(state.carrier.kind).legExtra + bob - if (resting) 14f else 0f
 
         drawGround(sr, cam, state, time, graphicsHigh)
         drawCarrier(sr, state, time, moving, resting)
@@ -173,6 +193,7 @@ class CityRenderer {
         }
 
         drawPeople(sr)
+        drawFleet(sr, state, time, moving)
         drawBattle(sr, state, time, selectedId)
         for (pf in puffs) if (pf.life > 0) {
             sr.setColor(0.95f, 0.95f, 0.95f, (pf.life / 2.2f) * 0.7f)
@@ -271,7 +292,8 @@ class CityRenderer {
     private fun drawCarrier(sr: ShapeRenderer, state: GameState, time: Float, moving: Boolean, resting: Boolean) {
         val cx = CityGrid.CENTER_X.toFloat(); val cy = CityGrid.CENTER_Y.toFloat()
         val rx = CityGrid.radiusX(state).toFloat() + 0.6f; val ry = CityGrid.radiusY(state).toFloat() + 0.6f
-        val skin = Color.valueOf("8CCBA4"); val skinDark = Color.valueOf("6AAE88"); val nail = Color.valueOf("FFF3DA")
+        val look = look(state.carrier.kind)
+        val skin = look.skin; val skinDark = look.skinDark; val nail = Color.valueOf("FFF3DA")
         val legH = deckOffset - RIM + 8f
 
         data class Leg(val x: Float, val y: Float, val phase: Float)
@@ -321,12 +343,37 @@ class CityRenderer {
         Draw.ellipseFan(sr, hx + 24f, hy - 8f, 24f, 16f, 18)
         sr.color = Color.valueOf("5B8F72")
         sr.circle(hx + 40f, hy - 6f, 3f, 8); sr.circle(hx + 32f, hy - 3f, 3f, 8)
-        // Küçük boynuz tomurcukları ve yaprak tutamı
-        sr.color = Color.valueOf("F3E3C3")
-        sr.triangle(hx - 14, hy + 32, hx - 4, hy + 36, hx - 12, hy + 50)
-        sr.triangle(hx + 6, hy + 36, hx + 16, hy + 32, hx + 12, hy + 48)
-        sr.color = Color.valueOf("7BC86C")
-        sr.triangle(hx - 4, hy + 38, hx + 4, hy + 38, hx - 10 + sin(time * 2) * 3, hy + 56)
+        // Türe özgü baş süsleri
+        when (state.carrier.kind) {
+            CarrierSpecies.CRYSTAL_HORN -> {
+                val g = 0.85f + 0.15f * sin(time * 2f)
+                sr.setColor(0.72f * g, 0.6f * g, 1f, 1f)
+                sr.triangle(hx - 16, hy + 30, hx - 4, hy + 36, hx - 18, hy + 70)
+                sr.triangle(hx + 4, hy + 36, hx + 16, hy + 30, hx + 18, hy + 66)
+                sr.setColor(1f, 1f, 1f, 0.6f); sr.triangle(hx - 12, hy + 36, hx - 9, hy + 36, hx - 16, hy + 58)
+            }
+            CarrierSpecies.ICE_WALKER -> {
+                sr.color = Color.valueOf("E3F2FD")
+                sr.triangle(hx - 14, hy + 32, hx - 2, hy + 38, hx - 10, hy + 54); sr.triangle(hx + 4, hy + 38, hx + 16, hy + 32, hx + 10, hy + 52)
+            }
+            CarrierSpecies.FOREST_GUARDIAN -> {
+                sr.color = Color.valueOf("4E9F45")
+                for (k in 0 until 4) sr.circle(hx - 12 + k * 8f, hy + 38 + (k % 2) * 6f + sin(time * 2 + k) * 1.5f, 8f, 10)
+                sr.setColor(1f, 0.75f, 0.85f, 1f); sr.circle(hx + 6, hy + 46, 3f, 8)
+            }
+            CarrierSpecies.ANCIENT_CARRIER -> {
+                sr.setColor(1f, 0.85f, 0.4f, 0.35f + 0.25f * sin(time * 2f)); sr.circle(hx, hy + 6, 52f, 24)
+                sr.color = Color.valueOf("F6C445")
+                sr.triangle(hx - 16, hy + 30, hx - 4, hy + 36, hx - 20, hy + 62); sr.triangle(hx + 4, hy + 36, hx + 16, hy + 30, hx + 20, hy + 60)
+            }
+            else -> {
+                sr.color = Color.valueOf("F3E3C3")
+                sr.triangle(hx - 14, hy + 32, hx - 4, hy + 36, hx - 12, hy + 50)
+                sr.triangle(hx + 6, hy + 36, hx + 16, hy + 32, hx + 12, hy + 48)
+                sr.color = Color.valueOf("7BC86C")
+                sr.triangle(hx - 4, hy + 38, hx + 4, hy + 38, hx - 10 + sin(time * 2) * 3, hy + 56)
+            }
+        }
         // Yanak
         sr.setColor(1f, 0.6f, 0.6f, 0.45f)
         sr.circle(hx + 8f, hy - 16f, 7f, 12)
@@ -358,23 +405,64 @@ class CityRenderer {
             top[i * 2] = worldX(gx, gy); top[i * 2 + 1] = worldY(gx, gy) + deckOffset
             bot[i * 2] = top[i * 2]; bot[i * 2 + 1] = top[i * 2 + 1] - RIM
         }
-        val rim = Color.valueOf("C79A62"); val rimDark = Color.valueOf("A97C47")
+        val rim = look.rim; val rimDark = look.rimDark
         for (i in 0 until seg) {
             val j = (i + 1) % seg
             sr.color = if ((i / 4) % 2 == 0) rim else rimDark
             Draw.quad(sr, bot[i * 2], bot[i * 2 + 1], bot[j * 2], bot[j * 2 + 1], top[j * 2], top[j * 2 + 1], top[i * 2], top[i * 2 + 1])
         }
         // Kabuk alt kenarındaki pul çizgisi
-        sr.color = Color.valueOf("8E6A3E")
+        sr.color = look.rimLine
         for (i in 0 until seg) {
             val j = (i + 1) % seg
             sr.rectLine(bot[i * 2], bot[i * 2 + 1], bot[j * 2], bot[j * 2 + 1], 3f)
         }
         val ccx = worldX(cx, cy); val ccy = worldY(cx, cy) + deckOffset
-        sr.color = Color.valueOf("B98B5E")
+        sr.color = look.deck
         for (i in 0 until seg) {
             val j = (i + 1) % seg
             sr.triangle(ccx, ccy, top[i * 2], top[i * 2 + 1], top[j * 2], top[j * 2 + 1])
+        }
+        if (state.carrier.kind == CarrierSpecies.ROCK_BACK) {
+            // Kaya çıkıntıları
+            sr.color = Color.valueOf("9E9A93")
+            for (i in 0 until seg step 6) Draw.ellipseFan(sr, top[i * 2], top[i * 2 + 1] - 6f, 14f, 9f, 10)
+        }
+    }
+
+    /** Göçebe filodaki yan şehirler: arkada yürüyen küçük taşıyıcılar. */
+    private fun drawFleet(sr: ShapeRenderer, state: GameState, time: Float, moving: Boolean) {
+        val base = Vector2(worldX(CityGrid.CENTER_X.toFloat(), CityGrid.CENTER_Y.toFloat()), worldY(CityGrid.CENTER_X.toFloat(), CityGrid.CENTER_Y.toFloat()))
+        // Filo ana şehrin önünde-solunda, kameranın gördüğü zeminde yürür.
+        val offsets = listOf(Vector2(-250f, -380f), Vector2(150f, -470f), Vector2(-500f, -230f), Vector2(-60f, -620f), Vector2(330f, -650f))
+        state.sideCities.forEachIndexed { i, c ->
+            val o = offsets[i % offsets.size]
+            val x = base.x + o.x; val y = base.y + o.y
+            val lk = look(c.species)
+            val ph = walkPhase + i * 1.3f
+            sr.setColor(0.2f, 0.25f, 0.15f, 0.2f); Draw.ellipseFan(sr, x, y - 4, 110f, 40f, 24)
+            for (k in 0 until 4) {
+                val lx = x - 60 + k * 38f
+                val lift = if (moving) maxOf(0f, sin(ph + k * MathUtils.PI / 2)) * 6f else 0f
+                sr.color = lk.skinDark; sr.rect(lx - 9, y + lift, 18f, 46f + lk.legExtra * 0.4f)
+            }
+            val dy = y + 46f + lk.legExtra * 0.4f + (if (moving) abs(sin(ph)) * 2f else 0f)
+            sr.color = lk.skin; sr.circle(x + 96, dy + 4, 18f, 16)
+            sr.color = Color.WHITE; sr.circle(x + 101, dy + 8, 5f, 10); sr.setColor(0.17f, 0.23f, 0.2f, 1f); sr.circle(x + 102, dy + 8, 2.6f, 8)
+            sr.color = lk.rimDark; Draw.ellipseFan(sr, x, dy, 98f, 36f, 24)
+            sr.color = lk.rim; Draw.ellipseFan(sr, x, dy + 8, 96f, 34f, 24)
+            sr.color = Color.valueOf("BFE59A"); Draw.ellipseFan(sr, x, dy + 12, 82f, 27f, 24)
+            // Uzmanlığa göre küçük yapılar
+            val col = when (c.specialty) {
+                SideSpecialty.FARMING -> Color.valueOf("B9DB6A"); SideSpecialty.MINING -> Color.valueOf("A0A4AA")
+                SideSpecialty.LUMBER -> Color.valueOf("A1724E"); SideSpecialty.TRADE -> Color.valueOf("F6C445")
+                SideSpecialty.RESEARCH -> Color.valueOf("8FD3F0"); SideSpecialty.GUARD -> Color.valueOf("5C6BC0")
+            }
+            for (k in 0 until (2 + c.level).coerceAtMost(6)) {
+                val bx = x - 50 + k * 20f; val by = dy + 10 + (k % 2) * 8f
+                sr.color = Color.valueOf("FFF1D6"); sr.rect(bx, by, 14f, 12f)
+                sr.color = col; sr.triangle(bx - 2, by + 12, bx + 16, by + 12, bx + 7, by + 22)
+            }
         }
     }
 

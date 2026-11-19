@@ -176,7 +176,7 @@ object Panels {
         val st = s.state
         val c = st.carrier
         val r = s.core.lastBalance
-        t.text(s, "${c.name} • ${c.species} • Seviye ${c.level}", width, "default")
+        t.text(s, "${c.name} • ${c.kind.title} (${c.kind.trait}) • Seviye ${c.level}", width, "default")
         val xp = Table()
         xp.add(s.ui.label("Deneyim ${c.xp.toInt()}/${CarrierSystem.xpForNext(c.level).toInt()}", "small")).width(240f).left()
         xp.add(s.bar((c.xp / CarrierSystem.xpForNext(c.level)).toFloat(), Palette.gold, width - 260f))
@@ -216,7 +216,7 @@ object Panels {
             val active = c.abilityActiveLeft[a] ?: 0.0
             val cd = c.abilityCooldown[a] ?: 0.0
             val state = when {
-                c.level < a.unlockLevel -> "${SOFT}Seviye ${a.unlockLevel}'de açılır[]"
+                c.level < CarrierSystem.unlockLevel(st, a) -> "${SOFT}Seviye ${CarrierSystem.unlockLevel(st, a)}'de açılır[]"
                 active > 0 -> "${GREEN}Etkin: ${active.toInt()} sn[]"
                 cd > 0 -> "${SOFT}Hazırlanıyor: ${cd.toInt()} sn[]"
                 else -> "${GREEN}Hazır[]" + if (a.energyCost > 0) " • Enerji ${a.energyCost.toInt()}" else ""
@@ -226,8 +226,43 @@ object Panels {
             left.add(s.ui.label(state, "small")).left()
             card.add(left).expandX().left()
             val b = s.ui.button("Kullan", "primary") { s.act(CarrierSystem.activateAbility(st, a)) }
-            b.isDisabled = c.level < a.unlockLevel || cd > 0 || c.energy < a.energyCost
+            b.isDisabled = c.level < CarrierSystem.unlockLevel(st, a) || cd > 0 || c.energy < a.energyCost
             card.add(b).width(140f)
+            t.cardRow(card, width)
+        }
+
+        t.section(s, "Taşıyıcı Koleksiyonu (${st.collection.species.size}/${CarrierSpecies.entries.size})", width)
+        t.text(s, "${SOFT}Yeni türler Keşif Merkezi'nin 'Yeni Taşıyıcı Türü Keşfi' göreviyle, türün yaşadığı biyomda bulunur. Şehri yeni bir taşıyıcıya aktarmak bütün binaları ve geliştirmeleri korur; binalar yeni sırta sığmalıdır. Boştaki türlerle yan şehir kurulabilir (Filo).[]", width)
+        for (sp in CarrierSpecies.entries) {
+            val known = sp in st.collection.species
+            val card = s.ui.card(if (c.kind == sp) Color.valueOf("E6F7F5") else Color.WHITE)
+            val l = Table()
+            if (known) {
+                val use = when {
+                    c.kind == sp -> "${GREEN}Ana şehri taşıyor[]"
+                    st.sideCities.any { it.species == sp } -> "${SOFT}Yan şehri taşıyor: ${st.sideCities.first { it.species == sp }.name}[]"
+                    else -> "${SOFT}Boşta[]"
+                }
+                l.add(s.ui.label("${sp.title} • ${sp.trait}", "default")).left().row()
+                l.add(s.ui.label(sp.description, "small", wrap = true)).width(width - 190f).left().row()
+                l.add(s.ui.label("Kapasite ×${fmt(sp.capacityMult)} • Hız ×${fmt(sp.speedMult)} • Hasar ×${fmt(sp.damageMult)} • İhtiyaç ×${fmt(sp.needMult)}" +
+                    (if (sp.backBonus != 0) " • Sırt ${if (sp.backBonus > 0) "geniş" else "dar"}" else "") +
+                    (if (sp.adapted.isNotEmpty()) " • Uyum: ${sp.adapted.joinToString { it.title }}" else "") + " • $use", "small", wrap = true)).width(width - 190f).left()
+                card.add(l).expandX().left()
+                if (c.kind != sp && st.sideCities.none { it.species == sp }) {
+                    val reason = CollectionSystem.switchReason(st, sp)
+                    val b = s.ui.button("Aktar", "primary") { s.act(CollectionSystem.switchCarrier(st, sp)) }
+                    b.isDisabled = reason != null
+                    card.add(b).width(140f)
+                    t.cardRow(card, width)
+                    if (reason != null) t.text(s, "$SOFT$reason[]", width)
+                    continue
+                }
+            } else {
+                l.add(s.ui.label("${SOFT}??? — keşfedilmedi[]", "default")).left().row()
+                l.add(s.ui.label("${SOFT}İpucu: ${sp.habitat.joinToString { it.title }} bölgelerinde aranabilir${if (sp.minStage > 0) " (en az ${StageSystem.title(sp.minStage)})" else ""}.[]", "small", wrap = true)).width(width - 40f).left()
+                card.add(l).expandX().left()
+            }
             t.cardRow(card, width)
         }
 
@@ -368,6 +403,16 @@ object Panels {
             row.add(s.bar((rs.progress / def.points).toFloat(), Palette.turquoise, width - 340f))
             t.add(row).width(width).padTop(6f).row()
             t.add(s.ui.button("Araştırmayı Durdur (puanlar saklanır)", "default") { s.act(ResearchSystem.cancel(st)) }).width(width).padTop(6f).row()
+        }
+        if (MasterySystem.available(st)) {
+            val card = s.ui.card(Color.valueOf("FFF1C9"))
+            val l = Table()
+            l.add(s.ui.label("Ustalık • Seviye ${rs.masteryLevel}", "default")).left().row()
+            l.add(s.ui.label("Bütün araştırmalar tamamlandı. Ustalık sınırsızdır: her seviye bütün üretim ve bilgiye +%2 ekler. Sonraki seviye: ${fmt(rs.masteryProgress)}/${fmt(MasterySystem.cost(rs.masteryLevel))} bilgi.", "small", wrap = true)).width(width - 190f).left()
+            card.add(l).expandX().left()
+            if (!rs.masteryActive) card.add(s.ui.button("Başlat", "primary") { s.act(MasterySystem.start(st)) }).width(140f)
+            else card.add(s.ui.label("${GREEN}Sürüyor[]", "small")).width(140f)
+            t.cardRow(card, width)
         }
         for (branch in ResearchBranch.entries) {
             t.section(s, branch.title, width)
@@ -520,6 +565,7 @@ object Panels {
             "Katedilen yol: ${st.travel.distanceTraveled} bölge • Keşfedilen bölge: ${st.travel.explored.size}",
             "Tamamlanan araştırma: ${st.research.completed.size}/${TechCatalog.all.size}",
             "Savaş: ${stats.battlesWon} zafer, ${stats.battlesLost} geri çekilme • Keşif görevi: ${stats.expeditionsDone}",
+            "Yan şehir: ${st.sideCities.size} • Taşıyıcı türü: ${st.collection.species.size} • Eser: ${st.collection.artifacts.size} • Başarım: ${st.achievements.size} • Tamamlanan hedef: ${stats.goalsCompleted}",
             "Ticaret işlemi: ${stats.trades} • Tanınan medeniyet: ${st.civs.count { it.met }} • İtibar %${st.reputation.toInt()}",
         )
         lines.forEach { t.text(s, it, width) }
@@ -527,7 +573,7 @@ object Panels {
         t.section(s, "Yeni Oyun", width)
         t.text(s, "${RED}Mevcut şehir ve bütün ilerleme silinir.[]", width)
         t.add(s.ui.button(if (s.newGameConfirm()) "Emin misiniz? Silmek için tekrar dokunun" else "Yeni Oyun Başlat", "danger") { s.requestNewGame() }).width(width).padTop(6f).row()
-        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.3.0 (Aşama 1-5)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.4.0 (Aşama 1-6)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
     }
 
     // ------------------------------------------------------------------ Ticaret
@@ -773,5 +819,138 @@ object Panels {
         }
         ExplorationSystem.reason(st, MissionType.RESOURCES, target)?.let { t.text(s, "$RED$it[]", width) }
         t.text(s, "${SOFT}Başarısız görevde ekip eli boş döner ve bazen bir keşifçi kaybolur. Keşif Merkezi seviyesi, Keşif Donanımı araştırması ve yakındaki müttefikler riski azaltır. Görevler siz yokken de sürer.[]", width)
+    }
+
+    // ------------------------------------------------------------------ Filo
+    fun fleet(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        t.text(s, "Yan şehir: ${st.sideCities.size}/${FleetSystem.maxSideCities(st)} • Filo hız çarpanı ×${fmt(FleetSystem.fleetSpeedFactor(st))} (en yavaş taşıyıcı belirler)", width, "default")
+        t.text(s, "${SOFT}Yan şehirler ana şehirle birlikte yürür, kendi uzmanlığında üretir ve her 30 saniyede bir konvoyla ana şehre mal gönderir. Yerleşimcileri önce kendi ürettiklerini, yetmezse ana şehrin yiyecek ve suyunu tüketir.[]", width)
+        for (c in st.sideCities) {
+            val card = s.ui.card(Color.WHITE)
+            val l = Table()
+            l.add(s.ui.label("${c.name} • ${c.specialty.title} • Sv${c.level}", "default")).left().row()
+            l.add(s.ui.label("${c.species.title} • Yerleşimci ${c.workers}/${c.capacity}", "small")).left().row()
+            val out = FleetSystem.output(c)
+            val outText = (out.entries.joinToString { "${it.key.title} ${fmt(it.value)}/dk" }).ifEmpty {
+                if (c.specialty == SideSpecialty.RESEARCH) "Bilgi ${fmt(c.specialty.researchPerWorker * c.workers * (1 + 0.5 * (c.level - 1)))}/dk" else "Savaşta ${c.workers / 2} muhafız"
+            }
+            l.add(s.ui.label("Üretim: $outText • Tüketim: yiyecek ve su ${fmt(c.workers * PopulationSystem.FOOD_PER_POP)}/dk", "small", wrap = true)).width(width - 40f).left().row()
+            val stock = c.stockpile.entries.filter { it.value >= 1 }.joinToString { "${it.key.title} ${fmt(it.value)}" }
+            if (stock.isNotEmpty()) l.add(s.ui.label("${SOFT}Konvoy bekleyen: $stock[]", "small", wrap = true)).width(width - 40f).left().row()
+            card.add(l).expandX().fillX().left().row()
+            val btns = Table()
+            btns.defaults().pad(3f).expandX().fillX()
+            btns.add(s.ui.button("+1 kişi", "default") { s.act(FleetSystem.moveWorkers(st, c.id, 1)) })
+            btns.add(s.ui.button("-1 kişi", "default") { s.act(FleetSystem.moveWorkers(st, c.id, -1)) })
+            btns.add(s.ui.button("Erzak", "green") { s.act(FleetSystem.sendSupplies(st, c.id)) }).row()
+            val up = s.ui.button(if (c.level < 5) "Geliştir (${FleetSystem.upgradeCost(c).describe()})" else "En yüksek seviye", "primary") { s.act(FleetSystem.upgrade(st, c.id)) }
+            up.isDisabled = c.level >= 5 || !st.store.canAfford(FleetSystem.upgradeCost(c))
+            btns.add(up).colspan(2)
+            btns.add(s.ui.button("Konvoy: ${if (c.autoSend) "Açık" else "Kapalı"}", "default") { c.autoSend = !c.autoSend; s.act(ActionResult.ok("Konvoy ${if (c.autoSend) "açıldı" else "kapandı"}")) }).row()
+            card.add(btns).expandX().fillX().row()
+            val spec = Table()
+            spec.add(s.ui.label("${SOFT}Uzmanlık (50 altın):[]", "small")).padRight(6f)
+            SideSpecialty.entries.forEachIndexed { i, sp ->
+                val b = s.ui.button(sp.title.substringBefore(' '), "chip") { s.act(FleetSystem.setSpecialty(st, c.id, sp)) }
+                b.pad(6f, 8f, 6f, 8f); b.isChecked = c.specialty == sp
+                spec.add(b).padRight(3f).padTop(3f)
+                if (i == 2) spec.row().padLeft(0f)
+            }
+            card.add(spec).left().padTop(4f)
+            t.cardRow(card, width)
+        }
+
+        t.section(s, "Yeni yan şehir kur", width)
+        val free = st.collection.species.filter { !CollectionSystem.inUse(st, it) }
+        if (free.isEmpty()) {
+            t.text(s, "${SOFT}Boşta taşıyıcı türü yok. Keşif ekipleriyle yeni bir tür keşfedin.[]", width)
+        } else {
+            if (s.foundSpecies !in free) s.foundSpecies = free.first()
+            val sr = Table()
+            for (sp in free) {
+                val b = s.ui.button(sp.title, "chip") { s.foundSpecies = sp; s.act(ActionResult.ok(sp.title)) }
+                b.pad(8f, 10f, 8f, 10f); b.isChecked = s.foundSpecies == sp
+                sr.add(b).padRight(4f).padTop(4f)
+            }
+            t.add(sr).left().row()
+            val pr = Table()
+            SideSpecialty.entries.forEachIndexed { i, sp ->
+                val b = s.ui.button(sp.title, "chip") { s.foundSpecialty = sp; s.act(ActionResult.ok(sp.title)) }
+                b.pad(8f, 10f, 8f, 10f); b.isChecked = s.foundSpecialty == sp
+                pr.add(b).padRight(4f).padTop(4f)
+                if (i == 2) pr.row()
+            }
+            t.add(pr).left().row()
+            t.text(s, "${s.foundSpecialty.description} Maliyet: " + s.ui.costText(FleetSystem.foundCost, st.store) + " • ${FleetSystem.FOUND_WORKERS} yerleşimci taşınır.", width)
+            val sp = s.foundSpecies!!
+            val reason = FleetSystem.foundReason(st, sp)
+            val b = s.ui.button("Yan Şehri Kur", "primary") { s.act(FleetSystem.found(st, sp, s.foundSpecialty)) }
+            b.isDisabled = reason != null
+            t.add(b).width(width).padTop(6f).row()
+            if (reason != null) t.text(s, "$RED$reason[]", width)
+        }
+    }
+
+    // ------------------------------------------------------------------ Hedefler
+    fun goals(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        t.section(s, "Medeniyet Uzmanlaşması (${st.specializations.size}/${SpecializationSystem.slots(st)})", width)
+        t.text(s, "${SOFT}Kalıcı bir yön seçin; ${StageSystem.title(4)} aşamasında ikinci bir yön seçerek hibrit strateji kurabilirsiniz.[]", width)
+        for (sp in Specialization.entries) {
+            val card = s.ui.card(if (SpecializationSystem.has(st, sp)) Color.valueOf("E8F6EA") else Color.WHITE)
+            val l = Table()
+            l.add(s.ui.label(sp.title, "default")).left().row()
+            l.add(s.ui.label(sp.description, "small", wrap = true)).width(width - 190f).left()
+            card.add(l).expandX().left()
+            if (SpecializationSystem.has(st, sp)) card.add(s.ui.label("${GREEN}Seçildi[]", "small")).width(140f)
+            else {
+                val b = s.ui.button("Seç", "primary") { s.act(SpecializationSystem.choose(st, sp)) }
+                b.isDisabled = SpecializationSystem.reason(st, sp) != null
+                card.add(b).width(140f)
+            }
+            t.cardRow(card, width)
+        }
+
+        fun goalList(weekly: Boolean) {
+            for ((i, g) in st.goals.withIndex()) {
+                if (g.weekly != weekly) continue
+                val card = s.ui.card(if (g.claimed) Color.valueOf("E8F6EA") else Color.WHITE)
+                val l = Table()
+                val p = GoalSystem.progress(st, g).coerceAtMost(g.target)
+                l.add(s.ui.label(g.kind.text(g.target), "default")).left().row()
+                val row = Table()
+                row.add(s.ui.label("${fmt(p.coerceAtLeast(0.0))}/${fmt(g.target)}", "small")).width(110f).left()
+                row.add(s.bar((p / g.target).toFloat(), Palette.turquoise, width - 330f))
+                l.add(row).left().row()
+                l.add(s.ui.label("${SOFT}Ödül: ${g.reward.describe()}${if (GoalSystem.questCenter(st)) " (+%25)" else ""}[]", "small")).left()
+                card.add(l).expandX().left()
+                if (g.claimed) card.add(s.ui.label("${GREEN}Alındı[]", "small")).width(140f)
+                else {
+                    val b = s.ui.button("Ödülü Al", "gold") { s.act(GoalSystem.claim(st, i)) }
+                    b.isDisabled = !GoalSystem.done(st, g)
+                    card.add(b).width(140f)
+                }
+                t.cardRow(card, width)
+            }
+        }
+        t.section(s, "Günlük Hedefler (Gün ${st.day})", width)
+        if (!GoalSystem.questCenter(st)) t.text(s, "${SOFT}Görev Merkezi kurarak +1 günlük hedef ve %25 fazla ödül kazanın.[]", width)
+        goalList(false)
+        t.section(s, "Haftalık Hedefler (Hafta ${(st.day - 1) / 7 + 1}, ${7 - (st.day - 1) % 7} gün kaldı)", width)
+        goalList(true)
+
+        t.section(s, "Başarımlar (${st.achievements.size}/${Achievement.entries.size})", width)
+        for (a in Achievement.entries) {
+            val day = st.achievements[a.name]
+            t.text(s, if (day != null) "$GREEN• ${a.title}[] — ${a.description} ${SOFT}(Gün $day)[]" else "$SOFT• ${a.title} — ${a.description} (+${a.rewardGold} altın)[]", width)
+        }
+
+        t.section(s, "Antik Eser Koleksiyonu (${st.collection.artifacts.size}/${Artifact.entries.size})", width)
+        t.text(s, "${SOFT}Eserler kalıntı kazılarında ve keşif görevlerinde bulunur; her biri kalıcı bir avantaj sağlar.[]", width)
+        for (a in Artifact.entries) {
+            t.text(s, if (a in st.collection.artifacts) "$GREEN• ${a.title}[] — ${a.description}" else "$SOFT• ??? — bulunmadı[]", width)
+        }
+        t.add(s.ui.button("Dünya Günlüğünü Aç", "default") { s.showPanel(PanelId.LOG) }).width(width).padTop(10f).row()
     }
 }

@@ -12,6 +12,7 @@ enum class MissionType(val title: String, val description: String, val baseRisk:
     CIVILIZATION("Yeni Medeniyet Bulma", "Hedefin ötesindeki bölgelerde henüz tanınmayan bir medeniyeti arar.", 0.15),
     DANGER("Tehlike Tespiti", "Çevreyi gözler: 10 dakika boyunca yol olayları daha seyrek olur.", 0.06),
     TECH("Nadir Teknoloji Arama", "Teknoloji bileşeni ve hafif malzeme arar. Kalıntı ve kristal vadilerinde verimlidir.", 0.22, amounts(TOOLS to 8)),
+    CARRIER_SEARCH("Yeni Taşıyıcı Türü Keşfi", "Hedef biyomda yaşayan bilinmeyen bir dev taşıyıcı arar (kristal vadisi, dağ, orman, çöl, kar, kalıntı…).", 0.25, amounts(FOOD to 30, CARE_ESSENCE to 2)),
 }
 
 @Serializable
@@ -28,12 +29,15 @@ data class Expedition(
 /** Keşif ekipleri: risk ve ödül içeren, çevrimdışı da ilerleyen görevler. */
 object ExplorationSystem {
     const val TEAM = 3
-    const val MAX_RANGE = 12
+    const val BASE_RANGE = 12
     const val MIN_RANGE = 2
 
     fun center(state: GameState) = state.buildings.firstOrNull { it.type == BuildingType.EXPLORATION_CENTER && CombatSystem.staffed(it) }
 
     fun slots(state: GameState) = center(state)?.level ?: 0
+
+    fun airship(state: GameState) = state.buildings.any { it.type == BuildingType.AIRSHIP_STATION && CombatSystem.staffed(it) }
+    fun maxRange(state: GameState) = BASE_RANGE + if (airship(state)) 6 else 0
 
     fun cost(type: MissionType): Amounts = (amounts(FOOD to 20, WATER to 20) + type.extraCost)
 
@@ -47,12 +51,14 @@ object ExplorationSystem {
         center(state)?.let { r -= 0.07 * (it.level - 1) }
         if (ResearchSystem.has(state, TechId.EXPEDITION_GEAR)) r -= 0.1
         if (CivSystem.met(state).any { it.status == Relation.ALLY && it.position.dist(target) <= 4 }) r -= 0.08
+        if (SpecializationSystem.has(state, Specialization.EXPLORATION)) r -= 0.08
         return r.coerceIn(0.03, 0.8)
     }
 
     fun duration(state: GameState, target: Cell): Double {
         var t = 50.0 + target.dist(state.travel.position) * 18.0
         if (ResearchSystem.has(state, TechId.EXPEDITION_GEAR)) t *= 0.8
+        if (airship(state)) t *= 0.6
         return t
     }
 
@@ -62,7 +68,7 @@ object ExplorationSystem {
             center(state) == null -> "Keşif ekibi göndermek için çalışan bir Keşif Merkezi gerekli."
             state.expeditions.size >= slots(state) -> "Bütün keşif ekipleri görevde (${slots(state)} ekip)."
             d < MIN_RANGE -> "Hedef çok yakın (en az $MIN_RANGE bölge)."
-            d > MAX_RANGE -> "Hedef çok uzak (en fazla $MAX_RANGE bölge)."
+            d > maxRange(state) -> "Hedef çok uzak (en fazla ${maxRange(state)} bölge)."
             PopulationSystem.freeWorkers(state) < TEAM -> "Ekip için $TEAM boşta yerleşimci gerekli."
             !state.store.canAfford(cost(type)) -> "Erzak yetersiz: ${cost(type).describe()}"
             else -> null
@@ -125,6 +131,7 @@ object ExplorationSystem {
                 val m = if (biome == Biome.RUINS) 2.0 else 1.0
                 give(ANCIENT_PART, rnd(state, 2, 5) * m)
                 ResearchSystem.addPoints(state, 15.0 * m); extra = " +${(15 * m).toInt()} bilgi"
+                CollectionSystem.tryFindArtifact(state, 0.5, offline)?.let { extra += " Antik eser: ${it.title}!" }
             }
             MissionType.TRADE_SCOUT -> {
                 revealAround(state, e.target, 3)
@@ -155,6 +162,12 @@ object ExplorationSystem {
                 give(TECH_PART, rnd(state, 1, 3) * m)
                 give(LIGHT_MATERIAL, rnd(state, 3, 6) * m)
                 give(CRYSTAL, rnd(state, 1, 4) * m)
+                CollectionSystem.tryFindArtifact(state, 0.2, offline)?.let { extra = " Antik eser: ${it.title}!" }
+            }
+            MissionType.CARRIER_SEARCH -> {
+                revealAround(state, e.target, 2)
+                val sp = CollectionSystem.searchSpecies(state, biome, offline)
+                extra = if (sp != null) " Yeni taşıyıcı türü: ${sp.title}!" else " Bu bölgede yeni bir taşıyıcı izine rastlanmadı."
             }
         }
         state.stats.gathered += gains.values.sum()

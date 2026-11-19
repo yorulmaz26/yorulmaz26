@@ -33,6 +33,7 @@ enum class PanelId(val title: String) {
     BUILD("İnşa Et"), BUILDING("Bina"), CARRIER("Taşıyıcı"), ECONOMY("Kaynak Ekonomisi"), POPULATION("Nüfus"),
     RESEARCH("Araştırma"), MAP("Dünya Haritası ve Rota"), LOG("Dünya Günlüğü"), SETTINGS("Ayarlar ve İstatistikler"),
     TRADE("Ticaret"), DIPLOMACY("Diplomasi"), DEFENSE("Savunma"), EXPLORATION("Keşif Ekipleri"),
+    FLEET("Göçebe Filo"), GOALS("Hedefler ve Başarımlar"),
 }
 
 enum class ViewMode { CITY, MAP }
@@ -104,6 +105,8 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     private lateinit var repairButton: TextButton
     private lateinit var tributeButton: TextButton
     var expDirection = 1
+    var foundSpecies: CarrierSpecies? = null
+    var foundSpecialty = SideSpecialty.FARMING
     var expDistance = 5
 
     init {
@@ -442,17 +445,17 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         nav.pad(8f)
         ui.blockTouches(nav)
         val items = listOf(
-            "İnşa Et" to { togglePanel(PanelId.BUILD) }, "Taşıyıcı" to { togglePanel(PanelId.CARRIER) },
+            "İnşa Et" to { togglePanel(PanelId.BUILD) }, "Taşıyıcı" to { togglePanel(PanelId.CARRIER) }, "Filo" to { togglePanel(PanelId.FLEET) },
             "Harita" to { if (mode == ViewMode.MAP) { setMode(ViewMode.CITY); closePanel() } else { setMode(ViewMode.MAP); showPanel(PanelId.MAP) } },
             "Ekonomi" to { togglePanel(PanelId.ECONOMY) }, "Ticaret" to { togglePanel(PanelId.TRADE) },
             "Savunma" to { togglePanel(PanelId.DEFENSE) },
             "Nüfus" to { togglePanel(PanelId.POPULATION) }, "Araştırma" to { togglePanel(PanelId.RESEARCH) },
-            "Diplomasi" to { togglePanel(PanelId.DIPLOMACY) }, "Keşif" to { togglePanel(PanelId.EXPLORATION) },
+            "Diplomasi" to { togglePanel(PanelId.DIPLOMACY) }, "Keşif" to { togglePanel(PanelId.EXPLORATION) }, "Hedefler" to { togglePanel(PanelId.GOALS) },
             "Günlük" to { togglePanel(PanelId.LOG) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
         )
         items.forEachIndexed { i, (t, f) ->
             nav.add(ui.button(t, "nav", f).apply { pad(12f, 1f, 12f, 1f) }).expandX().fillX().uniformX().pad(2f)
-            if (i == 5) nav.row()
+            if (i == 6) nav.row()
         }
 
         // Savaş çubuğu
@@ -734,6 +737,8 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             PanelId.DIPLOMACY -> Panels.diplomacy(this, content, width)
             PanelId.DEFENSE -> Panels.defense(this, content, width)
             PanelId.EXPLORATION -> Panels.exploration(this, content, width)
+            PanelId.FLEET -> Panels.fleet(this, content, width)
+            PanelId.GOALS -> Panels.goals(this, content, width)
         }
         scroll.layout()
         scroll.scrollY = keepY

@@ -64,7 +64,8 @@ enum class BuildingType {
     FOOD_STORAGE, WATER_STORAGE, MATERIAL_STORAGE,
     CARRIER_CARE, TECH_LAB, NAVIGATION_TOWER, GATHERER, SUPPORT_FRAME, CULTURE_CENTER,
     TRADE_MARKET, TRADE_DEPOT,
-    WATCHTOWER, DEFENSE_TOWER, ENERGY_TOWER, SHIELD_CENTER, BARRACKS, EXPLORATION_CENTER;
+    WATCHTOWER, DEFENSE_TOWER, ENERGY_TOWER, SHIELD_CENTER, BARRACKS, EXPLORATION_CENTER,
+    QUEST_CENTER, AIRSHIP_STATION;
 
     val def: BuildingDef get() = BuildingCatalog.get(this)
 }
@@ -99,6 +100,12 @@ object BuildingCatalog {
             "Haritacılar çevreyi daha uzağa kadar haritalar (+1 keşif menzili).",
             1, 1, 15.0, amounts(WOOD to 60, CLOTH to 20), 30.0,
             workers = 1, profession = Profession.NAVIGATOR, revealBonus = 1, unique = true, minStage = 1, maxLevel = 3,
+        ),
+        BuildingDef(
+            BuildingType.QUEST_CENTER, "Görev Merkezi", BuildingCategory.ADMIN,
+            "Günlük hedeflere +1 hedef ekler ve hedef ödüllerini %25 artırır.",
+            1, 1, 14.0, amounts(WOOD to 60, CLOTH to 15), 25.0,
+            workers = 1, profession = Profession.ADMINISTRATOR, unique = true, minStage = 1, maxLevel = 1,
         ),
         // ---------------- Nüfus ----------------
         BuildingDef(
@@ -316,6 +323,13 @@ object BuildingCatalog {
             "3 kişilik keşif ekipleri gönderir (seviye başına 1 ekip). Yüksek seviye görev riskini azaltır.",
             2, 1, 26.0, amounts(WOOD to 60, CLOTH to 20, TOOLS to 5), 35.0,
             workers = 1, profession = Profession.EXPLORER, unique = true, minStage = 1, maxLevel = 3,
+        ),
+        BuildingDef(
+            BuildingType.AIRSHIP_STATION, "Hava Gemisi İstasyonu", BuildingCategory.SPECIAL,
+            "Keşif ekipleri hava gemisiyle uçar: görev süresi %40 kısalır, menzil +6 bölge.",
+            2, 2, 40.0, amounts(WOOD to 120, CLOTH to 60, METAL to 40, LIGHT_MATERIAL to 20), 60.0,
+            workers = 2, profession = Profession.NAVIGATOR, upkeepGold = 0.4, unique = true, minStage = 4, maxLevel = 1,
+            requiresTech = TechId.EXPEDITION_GEAR,
         ),
         BuildingDef(
             BuildingType.SUPPORT_FRAME, "Destek İskelesi", BuildingCategory.SPECIAL,

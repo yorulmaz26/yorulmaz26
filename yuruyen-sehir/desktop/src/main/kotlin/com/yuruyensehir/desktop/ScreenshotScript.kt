@@ -19,6 +19,14 @@ import com.yuruyensehir.logic.TravelSystem
 import com.yuruyensehir.logic.CombatSystem
 import com.yuruyensehir.logic.EnemyType
 import com.yuruyensehir.logic.PopulationSystem
+import com.yuruyensehir.logic.CarrierSpecies
+import com.yuruyensehir.logic.Artifact
+import com.yuruyensehir.logic.FleetSystem
+import com.yuruyensehir.logic.SideSpecialty
+import com.yuruyensehir.logic.CollectionSystem
+import com.yuruyensehir.logic.SpecializationSystem
+import com.yuruyensehir.logic.Specialization
+import com.yuruyensehir.logic.GoalSystem
 
 /** Oyunu otomatik sürüp belirli anlarda ekran görüntüsü alır (görsel doğrulama için). */
 class ScreenshotScript(private val dir: String) : GameHook {
@@ -94,7 +102,30 @@ class ScreenshotScript(private val dir: String) : GameHook {
         735L to { shot(it, "17_savunma") },
         740L to { g -> g.gameScreen.togglePanel(PanelId.EXPLORATION) },
         765L to { shot(it, "18_kesif") },
-        770L to { Gdx.app.exit() },
+        770L to { g ->
+            val s = g.core.state
+            g.gameScreen.closePanel()
+            s.stage = 4
+            s.population.count = 30
+            listOf(Resource.WOOD, Resource.STONE, Resource.FOOD, Resource.WATER, Resource.CLOTH, Resource.CARE_ESSENCE).forEach { s.store.amounts[it] = 600.0 }
+            s.store.capacity.keys.forEach { s.store.capacity[it] = 2000.0 }
+            listOf(Resource.WOOD, Resource.STONE, Resource.FOOD, Resource.WATER, Resource.CLOTH).forEach { s.store.amounts[it] = 900.0 }
+            s.store.amounts[Resource.CARE_ESSENCE] = 50.0
+            s.collection.species += listOf(CarrierSpecies.ROCK_BACK, CarrierSpecies.FOREST_GUARDIAN, CarrierSpecies.CRYSTAL_HORN)
+            s.collection.artifacts += listOf(Artifact.SUN_COMPASS, Artifact.OLD_MAP)
+            FleetSystem.found(s, CarrierSpecies.ROCK_BACK, SideSpecialty.MINING)
+            FleetSystem.found(s, CarrierSpecies.FOREST_GUARDIAN, SideSpecialty.FARMING)
+            CollectionSystem.switchCarrier(s, CarrierSpecies.CRYSTAL_HORN)
+            SpecializationSystem.choose(s, Specialization.NATURE)
+            GoalSystem.refresh(s)
+            s.settings.gameSpeed = 1
+        },
+        830L to { shot(it, "19_filo_sehir") },
+        835L to { g -> g.gameScreen.togglePanel(PanelId.FLEET) },
+        860L to { shot(it, "20_filo") },
+        865L to { g -> g.gameScreen.togglePanel(PanelId.GOALS) },
+        890L to { shot(it, "21_hedefler") },
+        895L to { Gdx.app.exit() },
     )
 
     override fun onFrame(game: YuruyenSehirGame, frame: Long) {

@@ -30,7 +30,7 @@ object TravelSystem {
         var r = 2
         state.buildings.firstOrNull { it.type == BuildingType.MAP_CENTER && !it.underConstruction && it.workers > 0 }?.let { r += it.def.revealBonus * it.level }
         if (ResearchSystem.has(state, TechId.STAR_CHARTS)) r += 1
-        return r
+        return r + Bonuses.reveal(state)
     }
 
     fun reveal(state: GameState, center: Cell) {
@@ -227,7 +227,7 @@ object EventSystem {
         var m = 1.0 - 0.10 * state.carrier.upgrade(CarrierUpgrade.DEFENSE)
         if (ResearchSystem.has(state, TechId.STRONG_FOUNDATIONS)) m *= 0.7
         if (ResearchSystem.has(state, TechId.WATCHMEN)) m *= 0.75
-        return m.coerceAtLeast(0.2)
+        return (m * Bonuses.damage(state)).coerceAtLeast(0.15)
     }
 
     /**
@@ -337,7 +337,7 @@ object EventSystem {
                 ))
             }
             "ruins" -> PendingEvent(kind, "Antik Kalıntı", "Toprağın altından eski bir yapının kubbesi görünüyor.", listOf(
-                EventOption("Kazı yap", reward = amounts(ANCIENT_PART to rnd(3, 6), STONE to 30), effect = "research=25;fatigue=10"),
+                EventOption("Kazı yap", reward = amounts(ANCIENT_PART to rnd(3, 6), STONE to 30), effect = "research=25;fatigue=10;artifact=0.25"),
                 EventOption("Geç"),
             ))
             else -> PendingEvent("tech", "Nadir Teknoloji", "Eski bir makinenin parçaları kristallerin arasında parlıyor.", listOf(
@@ -369,6 +369,7 @@ object EventSystem {
                 "trust" -> state.carrier.trust = (state.carrier.trust + value.toDouble()).coerceIn(0.0, 100.0)
                 "health" -> state.carrier.health = (state.carrier.health + value.toDouble()).coerceIn(CarrierSystem.HEALTH_FLOOR, CarrierSystem.maxHealth(state))
                 "fatigue" -> state.carrier.fatigue = (state.carrier.fatigue + value.toDouble()).coerceIn(0.0, 100.0)
+                "artifact" -> CollectionSystem.tryFindArtifact(state, value.toDouble())?.let { notes += "Antik eser: ${it.title}" }
                 "battle" -> {
                     val spec = CombatSystem.parseSpec(value.substringBefore('@'))
                     val civId = if ('@' in value) value.substringAfter('@').toIntOrNull() ?: -1 else -1

@@ -11,8 +11,8 @@ object CityGrid {
     const val CENTER_X = GRID_W / 2.0
     const val CENTER_Y = GRID_H / 2.0
 
-    fun radiusX(state: GameState) = 5.6 + 1.15 * state.carrier.upgrade(CarrierUpgrade.BACK_EXPANSION)
-    fun radiusY(state: GameState) = 4.0 + 0.62 * state.carrier.upgrade(CarrierUpgrade.BACK_EXPANSION)
+    fun radiusX(state: GameState) = 5.6 + 1.15 * state.carrier.upgrade(CarrierUpgrade.BACK_EXPANSION) + 0.8 * state.carrier.kind.backBonus
+    fun radiusY(state: GameState) = 4.0 + 0.62 * state.carrier.upgrade(CarrierUpgrade.BACK_EXPANSION) + 0.45 * state.carrier.kind.backBonus
 
     fun usable(state: GameState, x: Int, y: Int): Boolean {
         if (x < 0 || y < 0 || x >= GRID_W || y >= GRID_H) return false

@@ -17,7 +17,8 @@ object StageSystem {
         return state.population.count * 2 + buildings * 3 + state.research.completed.size * 6 +
             state.travel.distanceTraveled / 2 + (state.carrier.level - 1) * 8 +
             state.civs.count { it.met } * 4 + state.civs.sumOf { it.treaties.size } * 3 +
-            state.stats.battlesWon * 3 + state.stats.expeditionsDone * 2
+            state.stats.battlesWon * 3 + state.stats.expeditionsDone * 2 +
+            state.sideCities.sumOf { 8 + it.level * 2 } + state.collection.species.size * 3 + state.collection.artifacts.size * 3 + state.research.masteryLevel * 4
     }
 
     fun nextThreshold(stage: Int): Int? = thresholds.getOrNull(stage + 1)
@@ -67,6 +68,9 @@ class GameCore(val state: GameState) {
         if (!offline) CombatSystem.step(state, dt)
         CivSystem.step(state, dt, offline)
         ExplorationSystem.step(state, dt, offline)
+        FleetSystem.step(state, dt, offline)
+        GoalSystem.refresh(state)
+        AchievementSystem.check(state, offline)
         state.eventCooldown = (state.eventCooldown - dt).coerceAtLeast(0.0)
         StageSystem.check(state)
     }

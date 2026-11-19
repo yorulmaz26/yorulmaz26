@@ -49,9 +49,10 @@ object TradeSystem {
         var rel = 1.0 - (c.relation / 100.0) * 0.2
         if (Treaty.TRADE in c.treaties) rel *= 0.9
         rel *= 1.0 - (state.reputation / 1000.0)
-        val buy = base * biomeFactor(biome, r) * stockFactor * culture * rel
-        val spread = if (hasMarket(state)) 0.78 else 0.65
-        return Quote(buy, buy * spread)
+        val boost = if (c.boostResource == r && c.boostSeconds > 0) 1.8 else 1.0
+        val buy = base * biomeFactor(biome, r) * stockFactor * culture * rel * boost
+        val spread = (if (hasMarket(state)) 0.78 else 0.65) * Bonuses.sellPrice(state)
+        return Quote(buy, buy * spread.coerceAtMost(0.95))
     }
 
     fun canTrade(state: GameState, c: Civilization): String? = when {

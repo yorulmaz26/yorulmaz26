@@ -93,7 +93,7 @@ object CombatSystem {
         val wr = if (b.def.workers == 0) 1.0 else b.workers.toDouble() / b.def.workers
         var d = b.def.towerDps * (1.0 + 0.4 * (b.level - 1)) * wr * (0.5 + 0.5 * b.hp / 100.0)
         if (ResearchSystem.has(state, TechId.REINFORCED_ARROWS)) d *= 1.25
-        return d
+        return d * Bonuses.towerDps(state)
     }
 
     fun shieldCapacity(state: GameState): Double {
@@ -136,6 +136,9 @@ object CombatSystem {
         for (r in listOf(GOLD, FOOD, WATER)) battle.stealCap[r] = state.store[r] * 0.2
         for (b in state.buildings.filter { it.def.guardCount > 0 && staffed(it) }) repeat(b.def.guardCount * b.level) { k ->
             battle.guards += Guard(b.id, b.centerX + (k % 2) * 0.4, b.centerY + (k / 2) * 0.4)
+        }
+        state.buildings.firstOrNull { it.type == BuildingType.CITY_CENTER }?.let { cc ->
+            repeat(FleetSystem.guards(state)) { k -> battle.guards += Guard(cc.id, cc.centerX + (k % 3) * 0.4 - 0.4, cc.centerY + (k / 3) * 0.4) }
         }
         state.battle = battle
         state.log("Savaş başladı: $title (${enemies.size} düşman). Savunma gücü ${defenseRating(state).toInt()}.", LogKind.BATTLE)

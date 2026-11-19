@@ -104,7 +104,9 @@ enum class CarrierAbility(val title: String, val description: String, val unlock
 
 @Serializable
 data class CarrierState(
+    /** Eski kayıtlarla uyum için tutulur; tür bilgisi [kind] alanındadır. */
     val species: String = "Dev Kara Kaplumbağası",
+    var kind: CarrierSpecies = CarrierSpecies.GIANT_TORTOISE,
     var name: String = "Bilge Tosun",
     var health: Double = 100.0,
     var hunger: Double = 10.0,
@@ -174,6 +176,8 @@ data class Stats(
     var battlesWon: Int = 0,
     var battlesLost: Int = 0,
     var expeditionsDone: Int = 0,
+    var goalsCompleted: Int = 0,
+    var convoyGoods: Double = 0.0,
 )
 
 @Serializable
@@ -208,6 +212,15 @@ data class GameState(
     var nextExpeditionId: Int = 1,
     /** Tehlike tespiti görevinden kalan süre: yol olayları seyrekleşir. */
     var scoutedSeconds: Double = 0.0,
+    val collection: CollectionState = CollectionState(),
+    val sideCities: MutableList<SideCity> = mutableListOf(),
+    var nextSideCityId: Int = 1,
+    val specializations: MutableList<Specialization> = mutableListOf(),
+    val goals: MutableList<Goal> = mutableListOf(),
+    var goalsDay: Int = -1,
+    var goalsWeek: Int = -1,
+    /** Başarım adı -> kazanıldığı gün. */
+    val achievements: MutableMap<String, Int> = mutableMapOf(),
 ) {
     /** Şehir yapısı değiştiğinde artar; önbellekli hesaplamalar bunu izler. */
     @Transient var cityVersion: Int = 0
