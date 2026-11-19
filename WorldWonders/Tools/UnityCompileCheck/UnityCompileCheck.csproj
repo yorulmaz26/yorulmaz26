@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Unity Editor olmadan Game katmanı için derleme denetimi.
+    UnityEngine.Modules 2021.3 referans derlemeleri + Input System'in kullanılan alt kümesi için küçük taslak (Stubs/).
+    Unity 6'ya özgü API'ler bu denetimde görünmez; gerçek derleme Unity Editor'de yapılmalıdır.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <NoWarn>CS0618;CS0414;CS0649;CS1701;CS1702</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Assets/_Project/Scripts/Game/**/*.cs" />
+    <Compile Include="Stubs/*.cs" />
+    <ProjectReference Include="../CoreLib/WorldWonders.Core.csproj" />
+    <PackageReference Include="UnityEngine.Modules" Version="2021.3.33" />
+  </ItemGroup>
+</Project>

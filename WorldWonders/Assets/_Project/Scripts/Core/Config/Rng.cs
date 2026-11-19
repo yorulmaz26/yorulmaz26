@@ -58,7 +58,7 @@ namespace WorldWonders.Core
         TimeSpan LocalOffset { get; }
     }
 
-    public sealed class SystemClock : IClock
+    public sealed class DeviceClock : IClock
     {
         public DateTime UtcNow { get { return DateTime.UtcNow; } }
         public TimeSpan LocalOffset { get { return TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow); } }

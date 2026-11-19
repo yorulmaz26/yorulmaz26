@@ -1,0 +1,14 @@
+{
+    "name": "WorldWonders.Editor",
+    "rootNamespace": "WorldWonders.EditorTools",
+    "references": [ "WorldWonders.Core", "WorldWonders.Game", "Unity.RenderPipelines.Universal.Runtime", "Unity.RenderPipelines.Core.Runtime" ],
+    "includePlatforms": [ "Editor" ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
