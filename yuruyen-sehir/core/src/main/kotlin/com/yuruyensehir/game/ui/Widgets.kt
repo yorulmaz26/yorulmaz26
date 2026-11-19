@@ -38,6 +38,9 @@ class Bar(private val theme: Theme, var fillTint: Color, private val prefW: Floa
 }
 
 class Ui(val theme: Theme) {
+    /** Düğmelere basıldığında çağrılır (tıklama sesi). */
+    var onClick: (() -> Unit)? = null
+
     val skin get() = theme.skin
 
     fun label(text: String, style: String = "default", wrap: Boolean = false, align: Int = Align.left): Label =
@@ -49,7 +52,7 @@ class Ui(val theme: Theme) {
             setProgrammaticChangeEvents(false)
             pad(10f, 18f, 10f, 18f)
             addListener(object : ChangeListener() {
-                override fun changed(event: ChangeEvent?, actor: Actor?) { if (!isDisabled) onClick() }
+                override fun changed(event: ChangeEvent?, actor: Actor?) { if (!isDisabled) { this@Ui.onClick?.invoke(); onClick() } }
             })
         }
 

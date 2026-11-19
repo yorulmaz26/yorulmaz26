@@ -16,8 +16,11 @@ import kotlin.math.sin
 class MapRenderer {
     companion object { const val SIZE = 52f }
 
-    private val fog = Color.valueOf("EFE6D2")
-    private val fogDot = Color.valueOf("E3D7BE")
+    /** Renk önbelleği: kare başına Color nesnesi ayırmayı önler. */
+    private val colorCache = HashMap<String, Color>()
+    private fun col(hex: String): Color = colorCache.getOrPut(hex) { Color.valueOf(hex) }
+    private val fog = col("EFE6D2")
+    private val fogDot = col("E3D7BE")
     private val tmp = Color()
 
     fun cellAt(wx: Float, wy: Float) = Cell(floor(wx / SIZE).toInt(), floor(wy / SIZE).toInt())
@@ -73,8 +76,8 @@ class MapRenderer {
             if (c.x < x0 || c.x > x1 || c.y < y0 || c.y > y1) continue
             val px = c.x * SIZE + SIZE / 2; val py = c.y * SIZE + SIZE / 2
             sr.setColor(0f, 0f, 0f, 0.18f); Draw.ellipseFan(sr, px, py - 12, 18f, 6f, 12)
-            sr.color = Color.valueOf("FFF1D6"); sr.triangle(px - 16, py - 12, px + 16, py - 12, px, py + 10)
-            sr.color = Color.valueOf("B98B5E"); sr.triangle(px - 5, py - 12, px + 5, py - 12, px, py)
+            sr.color = col("FFF1D6"); sr.triangle(px - 16, py - 12, px + 16, py - 12, px, py + 10)
+            sr.color = col("B98B5E"); sr.triangle(px - 5, py - 12, px + 5, py - 12, px, py)
             val col = Palette.relation(civ.status)
             sr.setColor(0.4f, 0.3f, 0.2f, 1f); sr.rectLine(px + 8, py - 12, px + 8, py + 22, 2f)
             sr.color = col; sr.triangle(px + 8, py + 22, px + 24, py + 17 + sin(time * 4 + civ.id) * 2, px + 8, py + 12)
@@ -96,9 +99,9 @@ class MapRenderer {
         val cx = pp.x * SIZE + SIZE / 2; val cy = pp.y * SIZE + SIZE / 2
         val pulse = 1f + 0.12f * sin(time * 3f)
         sr.setColor(1f, 1f, 1f, 0.7f); sr.circle(cx, cy, 22f * pulse, 20)
-        sr.color = Color.valueOf("C79A62"); sr.circle(cx, cy, 16f, 18)
-        sr.color = Color.valueOf("BFE59A"); sr.circle(cx, cy + 2, 11f, 16)
-        sr.color = Color.valueOf("8CCBA4"); sr.circle(cx + 17f, cy - 4f, 6f, 12)
+        sr.color = col("C79A62"); sr.circle(cx, cy, 16f, 18)
+        sr.color = col("BFE59A"); sr.circle(cx, cy + 2, 11f, 16)
+        sr.color = col("8CCBA4"); sr.circle(cx + 17f, cy - 4f, 6f, 12)
     }
 
     private fun drawPath(sr: ShapeRenderer, cells: List<Cell>, col: Color, time: Float) {

@@ -161,6 +161,10 @@ data class Settings(
     var showWeightOverlay: Boolean = true,
     var sound: Boolean = true,
     var gameSpeed: Int = 1,
+    var music: Boolean = true,
+    var soundVolume: Float = 0.8f,
+    var musicVolume: Float = 0.45f,
+    var showFps: Boolean = false,
 )
 
 @Serializable
@@ -178,6 +182,7 @@ data class Stats(
     var expeditionsDone: Int = 0,
     var goalsCompleted: Int = 0,
     var convoyGoods: Double = 0.0,
+    var purchases: Int = 0,
 )
 
 @Serializable
@@ -221,6 +226,8 @@ data class GameState(
     var goalsWeek: Int = -1,
     /** Başarım adı -> kazanıldığı gün. */
     val achievements: MutableMap<String, Int> = mutableMapOf(),
+    var cityName: String = "Gezgin Yuva",
+    val cosmetics: CosmeticState = CosmeticState(),
 ) {
     /** Şehir yapısı değiştiğinde artar; önbellekli hesaplamalar bunu izler. */
     @Transient var cityVersion: Int = 0

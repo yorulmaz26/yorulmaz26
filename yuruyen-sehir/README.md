@@ -7,12 +7,12 @@ Android (dikey 9:16), Kotlin, libGDX. Tamamen çevrimdışı, tek oyunculu. Böl
 
 <p>
 <img src="docs/screenshots/01_sehir.png" width="200"> <img src="docs/screenshots/02_yerlestirme.png" width="200">
-<img src="docs/screenshots/16_savas.png" width="200"> <img src="docs/screenshots/19_filo_sehir.png" width="200">
+<img src="docs/screenshots/16_savas.png" width="200"> <img src="docs/screenshots/22_ozellestirme.png" width="200">
 </p>
 
-## Bu sürümde (0.4.0) neler var
+## Bu sürümde (1.0.0) neler var
 
-Geliştirme aşamalarından **1, 2, 3 tamamlandı; 4 temel düzeyde** çalışıyor; **5. aşama (ticaret, diplomasi, savunma, düşman yapay zekâsı, keşif) ve 6. aşama (süreklilik) tamamlandı**. Hepsi gerçek kod ve gerçek hesaplamadır; arayüzde işlevi olmayan buton yoktur.
+Geliştirme aşamalarından **1, 2, 3 tamamlandı; 4 temel düzeyde** çalışıyor; **5. aşama (ticaret, diplomasi, savunma, düşman yapay zekâsı, keşif) 6. aşama (süreklilik) ve 7. aşama (yayın hazırlığı) tamamlandı**. Hepsi gerçek kod ve gerçek hesaplamadır; arayüzde işlevi olmayan buton yoktur.
 
 | Sistem | Durum |
 |---|---|
@@ -38,16 +38,22 @@ Geliştirme aşamalarından **1, 2, 3 tamamlandı; 4 temel düzeyde** çalışı
 | Hedefler ve başarımlar | Her oyun günü yenilenen günlük hedefler (Görev Merkezi ile +1 ve %25 fazla ödül), 7 günlük haftalık hedefler, 20 başarım |
 | Antik eserler | 10 eser; kalıntı kazıları ve keşif görevlerinde bulunur, her biri kalıcı avantaj verir |
 | Sonsuz gelişim | Bütün araştırmalar bitince sınırsız Ustalık seviyeleri (her seviye +%2 üretim ve bilgi); rastgele ticaret fırsatları; Hava Gemisi İstasyonu ile uzak keşifler |
+| Market ve özelleştirme | 17 kozmetik ve 2 indirimli paket: taşıyıcı derileri, çatı temaları, bayraklar, yolculuk izleri, özel ev tasarımları, şehir dekorasyonları, koleksiyon ürünleri; şehir ve taşıyıcı adı. Yalnızca oyun içi kaynaklarla, oynanışı değiştirmez. Satın alma `PurchaseProvider` arayüzünün arkasındadır: Google Play Billing ileride oyun mantığına dokunmadan eklenebilir |
+| Ses | 10 efekt ve döngü müziği kodla sentezlenir (harici dosya yok), oyun olaylarına bağlanır; ses/müzik açma-kapama ve düzey ayarı |
+| Performans | Düşük grafik modu, FPS göstergesi, sıralama ve renk önbellekleri; simülasyon adımı masaüstünde ~0,12 ms (68 bina, 89 medeniyet; testte sınırlanır) |
+| Yayın | R8 küçültmeli sürüm (APK ~4,8 MB, AAB ~3,2 MB), depo dışı anahtarla imzalama, mağaza metinleri ve görselleri, gizlilik politikası: [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md), [`docs/PRIVACY_POLICY.md`](docs/PRIVACY_POLICY.md) |
 | Medeniyet itibarı | Ticaret, yardım ve anlaşmalarla artar; fiyatları ve yeni medeniyetlerin ilk tavrını etkiler |
 | Medeniyet aşamaları | 7 unvan; aşamalar yeni binalar açar |
-| Kayıt | Otomatik (30 sn + arka plana alınınca), CRC32 sağlama, yedek dosya, bozuk kayıtta yedekten yükleme; kayıt sürümü 4 (eski kayıtlar otomatik taşınır, testli) |
+| Kayıt | Otomatik (30 sn + arka plana alınınca), CRC32 sağlama, yedek dosya, bozuk kayıtta yedekten yükleme; kayıt sürümü 5 (eski kayıtlar otomatik taşınır, testli) |
 | Çevrimdışı ilerleme | En fazla 8 saat; üretim/inşaat/araştırma sürer, yolculuk ve olaylar durur, taşıyıcı dinlenir; saat geri alınırsa ilerleme yok |
-| Ekranlar | Şehir (savaş çubuğu ve filoyla), Dünya haritası + rota (medeniyet ve keşif işaretleriyle), İnşa, Bina, Taşıyıcı (+gelişim, koleksiyon), Filo, Ekonomi (+zincirler, denge), Nüfus, Araştırma (+ustalık), Ticaret, Diplomasi, Savunma, Keşif, Hedefler ve Başarımlar (+uzmanlaşma, eserler), Dünya günlüğü, Ayarlar + İstatistikler |
+| Ekranlar | Market ve Özelleştirme, Şehir (savaş çubuğu ve filoyla), Dünya haritası + rota (medeniyet ve keşif işaretleriyle), İnşa, Bina, Taşıyıcı (+gelişim, koleksiyon), Filo, Ekonomi (+zincirler, denge), Nüfus, Araştırma (+ustalık), Ticaret, Diplomasi, Savunma, Keşif, Hedefler ve Başarımlar (+uzmanlaşma, eserler), Dünya günlüğü, Ayarlar + İstatistikler |
 | Diğer | Oyun hızı (Dur/1x/2x/3x), grafik kalitesi (düşük cihaz modu), Android geri tuşu, Türkçe karakter destekli yazı tipi |
 
-### Henüz yapılmayanlar (sonraki aşamalar)
+### Sınırlar ve sonraki adımlar
 
-7. aşama (yayın hazırlığı): market ve kozmetikler (şehir özelleştirme), ses ve müzik, profesyonel çizimler, performans profili, Google Play hazırlığı (imzalı sürüm, mağaza metinleri).
+- Görseller ve sesler kodla üretilir; bir sanatçının hazırlayacağı çizim ve ses dosyaları sonradan eklenebilir.
+- Gerçek parayla satın alma yoktur (istenirse `PurchaseProvider` üzerinden Google Play Billing eklenebilir).
+- Yayın anahtarını sizin oluşturmanız gerekir (bkz. `docs/PLAY_STORE.md`); oyun gerçek cihazlarda henüz denenmedi, yalnızca CI emülatöründe (API 34) açılış testinden geçti.
 
 ## Proje yapısı
 
@@ -71,8 +77,9 @@ ve düşük segment cihazlarda doku belleği sorunu yoktur.
 
 - **Android Studio:** `yuruyen-sehir` klasörünü proje olarak açın, `android` yapılandırmasını çalıştırın.
 - **Komut satırı (APK):** `cd yuruyen-sehir && ./gradlew :android:assembleDebug` → `android/build/outputs/apk/debug/android-debug.apk`
+- **Yayın paketi (AAB):** `./gradlew :android:bundleRelease` (imzalama için `docs/PLAY_STORE.md`)
 - **Masaüstünde dene:** `./gradlew :desktop:run`
-- **Testler:** `./gradlew :logic:test` (91 test: yerleşim, ağırlık/denge, üretim zinciri, nüfus, taşıyıcı, yolculuk, olaylar, araştırma, kayıt/yedek/sürüm geçişi, çevrimdışı, ticaret fiyatları, kervan, anlaşmalar, savaş/barış, kule/kalkan/muhafız, düşman hedef seçimi, yağma sınırı, keşif görevleri, taşıyıcı türleri ve aktarım, yan şehir/konvoy/filo hızı, uzmanlaşma, hedefler, başarımlar, eserler, ustalık)
+- **Testler:** `./gradlew :logic:test` (100 test: yerleşim, ağırlık/denge, üretim zinciri, nüfus, taşıyıcı, yolculuk, olaylar, araştırma, kayıt/yedek/sürüm geçişi, çevrimdışı, ticaret fiyatları, kervan, anlaşmalar, savaş/barış, kule/kalkan/muhafız, düşman hedef seçimi, yağma sınırı, keşif görevleri, taşıyıcı türleri ve aktarım, yan şehir/konvoy/filo hızı, uzmanlaşma, hedefler, başarımlar, eserler, ustalık, market, isim temizleme, ses sentezi, performans bütçesi)
 - **Ekran görüntüleri:** `xvfb-run ./gradlew :desktop:screenshots` → `screenshots-local/`
 
 Gereken: JDK 17+, Android SDK 35. `local.properties` içine `sdk.dir=...` yazın (Android Studio bunu kendisi yapar).

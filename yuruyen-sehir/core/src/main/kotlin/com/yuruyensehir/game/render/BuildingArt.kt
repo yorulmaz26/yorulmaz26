@@ -67,8 +67,10 @@ object BuildingArt {
     fun draw(
         sr: ShapeRenderer, t: BuildingType, gx: Int, gy: Int, w: Int, h: Int, level: Int, hp: Float,
         oy: Float, time: Float, build: Float = 1f, alpha: Float = 1f, active: Boolean = true, tint: Color? = null,
+        roofColor: Color? = null, roofKind: Roof? = null,
     ) {
-        val st = style(t)
+        val base = style(t)
+        val st = if (roofKind != null) base.copy(roofKind = roofKind, roofHeight = maxOf(base.roofHeight, 14f)) else base
         val inset = 0.09f
         val x0 = gx + inset; val y0 = gy + inset; val x1 = gx + w - inset; val y1 = gy + h - inset
         // Köşeler: A ön, B sağ, C arka, D sol
@@ -78,7 +80,7 @@ object BuildingArt {
         val dx = Iso.x(x0, y1); val dy = Iso.y(x0, y1) + oy
 
         val wall = tmp1.set(st.wall)
-        val roof = tmp2.set(st.roof)
+        val roof = tmp2.set(roofColor ?: st.roof)
         if (tint != null) { wall.lerp(tint, 0.55f); roof.lerp(tint, 0.55f) }
         if (hp < 60f) { wall.lerp(Color.GRAY, (60f - hp) / 120f); roof.lerp(Color.GRAY, (60f - hp) / 120f) }
         wall.a = alpha; roof.a = alpha

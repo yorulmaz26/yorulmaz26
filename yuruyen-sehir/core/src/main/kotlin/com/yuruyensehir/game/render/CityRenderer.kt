@@ -16,6 +16,9 @@ import com.yuruyensehir.logic.CombatSystem
 import com.yuruyensehir.logic.EnemyType
 import com.yuruyensehir.logic.CarrierSpecies
 import com.yuruyensehir.logic.SideSpecialty
+import com.yuruyensehir.logic.Cosmetic
+import com.yuruyensehir.logic.CosmeticSlot
+import com.yuruyensehir.logic.BuildingCategory
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.floor
@@ -29,12 +32,71 @@ data class Ghost(val type: BuildingType, val x: Int, val y: Int, val valid: Bool
  * Mantık ızgarasında +x taşıyıcının önü, +y solu. Ekranda ön = sağ-aşağı, sol = sağ-yukarı.
  */
 class CityRenderer {
+    private val sorted = ArrayList<PlacedBuilding>()
+    private var sortedVersion = -1
+    private val themeColors = HashMap<Cosmetic, Color>()
+    fun themeColor(c: Cosmetic): Color = themeColors.getOrPut(c) { col(c.colorHex.ifEmpty { "FFFFFF" }) }
+
+    private fun drawFlag(sr: ShapeRenderer, b: PlacedBuilding, col: Color, time: Float) {
+        val x = worldX(b.centerX.toFloat(), b.centerY.toFloat()); val y = worldY(b.centerX.toFloat(), b.centerY.toFloat()) + deckOffset
+        val top = y + 30f * (1f + 0.15f * (b.level - 1)) + 26f * (1f + 0.15f * (b.level - 1)) + 6f
+        sr.setColor(0.45f, 0.33f, 0.22f, 1f); sr.rectLine(x, top - 8, x, top + 30, 2.2f)
+        val wave = sin(time * 3.5f) * 3f
+        sr.color = col
+        Draw.quad(sr, x, top + 30, x + 26, top + 27 + wave, x + 26, top + 15 + wave, x, top + 18)
+        sr.setColor(1f, 1f, 1f, 0.7f); sr.circle(x + 13, top + 23 + wave * 0.5f, 3.5f, 10)
+    }
+
+    // Yolculuk izi (kozmetik)
+    private class Petal(var x: Float = 0f, var y: Float = 0f, var life: Float = 0f)
+    private val petals = Array(48) { Petal() }
+    private var lastTrailTime = 0f
+    private var petalTimer = 0f
+    private fun dtTrail(time: Float): Float { val d = (time - lastTrailTime).coerceIn(0f, 0.1f); lastTrailTime = time; return d }
+
+    private fun drawTrail(sr: ShapeRenderer, state: GameState, dt: Float, moving: Boolean) {
+        val trail = state.cosmetics.equipped[CosmeticSlot.TRAIL] ?: return
+        val col = themeColor(trail)
+        if (moving) {
+            petalTimer += dt
+            if (petalTimer > 0.12f) {
+                petalTimer = 0f
+                val gx = CityGrid.CENTER_X.toFloat() - CityGrid.radiusX(state).toFloat() * 0.55f
+                val gy = CityGrid.CENTER_Y.toFloat() + (MathUtils.random() - 0.5f) * CityGrid.radiusY(state).toFloat() * 1.6f
+                petals.firstOrNull { it.life <= 0 }?.let { it.x = worldX(gx, gy); it.y = worldY(gx, gy); it.life = 3f }
+            }
+        }
+        for (p in petals) {
+            if (p.life <= 0) continue
+            p.life -= dt
+            if (moving) { p.x -= dt * 22f; p.y += dt * 22f }
+            val a = (p.life / 3f).coerceIn(0f, 1f)
+            if (trail == Cosmetic.TRAIL_SPARKS) { sr.setColor(col.r, col.g, col.b, a); sr.circle(p.x, p.y + 3, 3f + 2f * sin(p.life * 8f), 8) }
+            else {
+                sr.setColor(col.r, col.g, col.b, a)
+                for (k in 0 until 4) sr.circle(p.x + cos(k * 1.57f) * 3f, p.y + 4 + sin(k * 1.57f) * 3f, 2.4f, 6)
+                sr.setColor(1f, 0.9f, 0.4f, a); sr.circle(p.x, p.y + 4, 1.8f, 6)
+            }
+        }
+    }
+
     /** Türlere göre görünüm. */
     class Look(val skin: Color, val skinDark: Color, val rim: Color, val rimDark: Color, val rimLine: Color, val deck: Color, val legExtra: Float)
 
     private val looks = HashMap<CarrierSpecies, Look>()
+    private val skinnedLooks = HashMap<Pair<CarrierSpecies, Cosmetic>, Look>()
+
+    /** Market derisi takılıysa türün görünümü o renge boyanır. */
+    fun skinned(state: GameState): Look {
+        val base = look(state.carrier.kind)
+        val skin = state.cosmetics.equipped[CosmeticSlot.CARRIER_SKIN] ?: return base
+        return skinnedLooks.getOrPut(state.carrier.kind to skin) {
+            val c = themeColor(skin)
+            Look(c, Color(c.r * 0.8f, c.g * 0.8f, c.b * 0.8f, 1f), base.rim, base.rimDark, base.rimLine, base.deck, base.legExtra)
+        }
+    }
     fun look(k: CarrierSpecies): Look = looks.getOrPut(k) {
-        fun c(h: String) = Color.valueOf(h)
+        fun c(h: String) = col(h)
         when (k) {
             CarrierSpecies.GIANT_TORTOISE -> Look(c("8CCBA4"), c("6AAE88"), c("C79A62"), c("A97C47"), c("8E6A3E"), c("B98B5E"), 0f)
             CarrierSpecies.CRYSTAL_HORN -> Look(c("A9A4D9"), c("8A84C2"), c("9C8FD6"), c("7F72BE"), c("5E529C"), c("B7AEE3"), 0f)
@@ -62,6 +124,9 @@ class CityRenderer {
     private class Person(var x: Float, var y: Float, var tx: Float, var ty: Float, var wait: Float, val color: Color)
     private class Puff(var x: Float = 0f, var y: Float = 0f, var life: Float = 0f, var size: Float = 0f)
 
+    /** Renk önbelleği: kare başına Color nesnesi ayırmayı önler. */
+    private val colorCache = HashMap<String, Color>()
+    private fun col(hex: String): Color = colorCache.getOrPut(hex) { Color.valueOf(hex) }
     private val people = ArrayList<Person>()
     private val puffs = Array(80) { Puff() }
     private var puffTimer = 0f
@@ -125,7 +190,7 @@ class CityRenderer {
     }
 
     private fun newPerson(state: GameState): Person {
-        val col = listOf(Color.valueOf("E9724C"), Color.valueOf("2EC4B6"), Color.valueOf("F6C445"), Color.valueOf("8E7CC3"), Color.valueOf("6DBE6A")).random()
+        val col = listOf(col("E9724C"), col("2EC4B6"), col("F6C445"), col("8E7CC3"), col("6DBE6A")).random()
         val p = Person(CityGrid.CENTER_X.toFloat(), CityGrid.CENTER_Y.toFloat(), 0f, 0f, MathUtils.random(0f, 2f), col)
         pickTarget(state, p)
         p.x = p.tx; p.y = p.ty
@@ -177,9 +242,17 @@ class CityRenderer {
         drawCarrier(sr, state, time, moving, resting)
         drawDeck(sr, state, time)
 
-        // Binalar uzaktan yakına
-        val list = state.buildings.sortedByDescending { b -> b.y + (GW - b.x - b.w) + (b.w + b.h) / 2f }
-        for (b in list) {
+        // Binalar uzaktan yakına (sıralama yalnızca şehir değişince yenilenir)
+        if (sortedVersion != state.cityVersion || sorted.size != state.buildings.size) {
+            sorted.clear(); sorted.addAll(state.buildings)
+            sorted.sortByDescending { b -> b.y + (GW - b.x - b.w) + (b.w + b.h) / 2f }
+            sortedVersion = state.cityVersion
+        }
+        val roofTheme = state.cosmetics.equipped[CosmeticSlot.ROOF_THEME]?.let { themeColor(it) }
+        val houseStyle = when (state.cosmetics.equipped[CosmeticSlot.HOUSE_STYLE]) {
+            Cosmetic.HOUSE_DOME -> Roof.DOME; Cosmetic.HOUSE_TALL -> Roof.TOWER; else -> null
+        }
+        for (b in sorted) {
             if (b.id == movingId) continue
             val build = if (b.underConstruction && b.constructionTotal > 0) (1f - (b.constructionLeft / b.constructionTotal).toFloat()) else 1f
             val active = !b.underConstruction && b.enabled && (b.def.workers == 0 || b.workers > 0)
@@ -187,12 +260,16 @@ class CityRenderer {
                 sr, b.type, b.y, (GW - b.x - b.w).toInt(), b.h, b.w, b.level, b.hp.toFloat(), deckOffset, time,
                 build = if (b.underConstruction && b.level == 1) build else 1f, active = active,
                 tint = if (!b.enabled) Color.LIGHT_GRAY else null,
+                roofColor = if (b.def.category == BuildingCategory.POPULATION || b.def.category == BuildingCategory.ADMIN || b.def.category == BuildingCategory.STORAGE) roofTheme else null,
+                roofKind = if (houseStyle != null && (b.type == BuildingType.SMALL_HOUSE || b.type == BuildingType.LARGE_HOUSE)) houseStyle else null,
             )
+            if (b.type == BuildingType.CITY_CENTER) state.cosmetics.equipped[CosmeticSlot.FLAG]?.let { drawFlag(sr, b, themeColor(it), time) }
             if (b.underConstruction) drawProgress(sr, b, build)
             if (b.id == selectedId) outline(sr, b.x, b.y, b.w, b.h, Palette.gold, 3f)
         }
 
         drawPeople(sr)
+        drawTrail(sr, state, dtTrail(time), moving)
         drawFleet(sr, state, time, moving)
         drawBattle(sr, state, time, selectedId)
         for (pf in puffs) if (pf.life > 0) {
@@ -292,8 +369,8 @@ class CityRenderer {
     private fun drawCarrier(sr: ShapeRenderer, state: GameState, time: Float, moving: Boolean, resting: Boolean) {
         val cx = CityGrid.CENTER_X.toFloat(); val cy = CityGrid.CENTER_Y.toFloat()
         val rx = CityGrid.radiusX(state).toFloat() + 0.6f; val ry = CityGrid.radiusY(state).toFloat() + 0.6f
-        val look = look(state.carrier.kind)
-        val skin = look.skin; val skinDark = look.skinDark; val nail = Color.valueOf("FFF3DA")
+        val look = skinned(state)
+        val skin = look.skin; val skinDark = look.skinDark; val nail = col("FFF3DA")
         val legH = deckOffset - RIM + 8f
 
         data class Leg(val x: Float, val y: Float, val phase: Float)
@@ -324,7 +401,7 @@ class CityRenderer {
         sr.triangle(tx + 30, ty + 12, tx + 30, ty - 12, tx - 18 + sin(time * 2f) * 4, ty - 2)
 
         // Karın
-        sr.color = Color.valueOf("E9DDB8")
+        sr.color = col("E9DDB8")
         Draw.ellipseFan(sr, worldX(cx, cy), worldY(cx, cy) + deckOffset * 0.42f, Iso.HW * (rx + ry) * 0.86f, Iso.HH * (rx + ry) * 0.7f, 32)
 
         drawLeg(sorted[2]); drawLeg(sorted[3])
@@ -341,7 +418,7 @@ class CityRenderer {
         Draw.ellipseFan(sr, hx + 26f, hy - 12f, 26f, 18f, 18) // burun
         sr.color = skin
         Draw.ellipseFan(sr, hx + 24f, hy - 8f, 24f, 16f, 18)
-        sr.color = Color.valueOf("5B8F72")
+        sr.color = col("5B8F72")
         sr.circle(hx + 40f, hy - 6f, 3f, 8); sr.circle(hx + 32f, hy - 3f, 3f, 8)
         // Türe özgü baş süsleri
         when (state.carrier.kind) {
@@ -353,24 +430,24 @@ class CityRenderer {
                 sr.setColor(1f, 1f, 1f, 0.6f); sr.triangle(hx - 12, hy + 36, hx - 9, hy + 36, hx - 16, hy + 58)
             }
             CarrierSpecies.ICE_WALKER -> {
-                sr.color = Color.valueOf("E3F2FD")
+                sr.color = col("E3F2FD")
                 sr.triangle(hx - 14, hy + 32, hx - 2, hy + 38, hx - 10, hy + 54); sr.triangle(hx + 4, hy + 38, hx + 16, hy + 32, hx + 10, hy + 52)
             }
             CarrierSpecies.FOREST_GUARDIAN -> {
-                sr.color = Color.valueOf("4E9F45")
+                sr.color = col("4E9F45")
                 for (k in 0 until 4) sr.circle(hx - 12 + k * 8f, hy + 38 + (k % 2) * 6f + sin(time * 2 + k) * 1.5f, 8f, 10)
                 sr.setColor(1f, 0.75f, 0.85f, 1f); sr.circle(hx + 6, hy + 46, 3f, 8)
             }
             CarrierSpecies.ANCIENT_CARRIER -> {
                 sr.setColor(1f, 0.85f, 0.4f, 0.35f + 0.25f * sin(time * 2f)); sr.circle(hx, hy + 6, 52f, 24)
-                sr.color = Color.valueOf("F6C445")
+                sr.color = col("F6C445")
                 sr.triangle(hx - 16, hy + 30, hx - 4, hy + 36, hx - 20, hy + 62); sr.triangle(hx + 4, hy + 36, hx + 16, hy + 30, hx + 20, hy + 60)
             }
             else -> {
-                sr.color = Color.valueOf("F3E3C3")
+                sr.color = col("F3E3C3")
                 sr.triangle(hx - 14, hy + 32, hx - 4, hy + 36, hx - 12, hy + 50)
                 sr.triangle(hx + 6, hy + 36, hx + 16, hy + 32, hx + 12, hy + 48)
-                sr.color = Color.valueOf("7BC86C")
+                sr.color = col("7BC86C")
                 sr.triangle(hx - 4, hy + 38, hx + 4, hy + 38, hx - 10 + sin(time * 2) * 3, hy + 56)
             }
         }
@@ -380,12 +457,12 @@ class CityRenderer {
         // Göz
         val blinking = resting || (blinkTimer % 4.2f) < 0.14f
         if (blinking) {
-            sr.color = Color.valueOf("3C4A40")
+            sr.color = col("3C4A40")
             sr.rectLine(hx + 2, hy + 6, hx + 20, hy + 6, 3f)
         } else {
             sr.color = Color.WHITE
             sr.circle(hx + 11f, hy + 8f, 11f, 16)
-            sr.color = Color.valueOf("2B3A33")
+            sr.color = col("2B3A33")
             sr.circle(hx + 14f, hy + 7f, 6.5f, 14)
             sr.color = Color.WHITE
             sr.circle(hx + 16f, hy + 10f, 2.4f, 8)
@@ -423,9 +500,20 @@ class CityRenderer {
             val j = (i + 1) % seg
             sr.triangle(ccx, ccy, top[i * 2], top[i * 2 + 1], top[j * 2], top[j * 2 + 1])
         }
+        if (state.cosmetics.equipped[CosmeticSlot.DECOR] == Cosmetic.DECOR_LANTERNS) {
+            // Kabuk kenarında fener dizisi
+            sr.setColor(0.45f, 0.33f, 0.22f, 1f)
+            for (i in 0 until seg step 3) { val j = (i + 3) % seg; sr.rectLine(top[i * 2], top[i * 2 + 1] + 10, top[j * 2], top[j * 2 + 1] + 10, 1.2f) }
+            for (i in 0 until seg step 3) {
+                val glow = 0.7f + 0.3f * sin(time * 3f + i)
+                val k = (i / 3) % 3
+                if (k == 0) sr.setColor(1f, 0.84f * glow, 0.3f, 1f) else if (k == 1) sr.setColor(1f, 0.55f, 0.6f * glow, 1f) else sr.setColor(0.4f, 0.8f * glow, 1f, 1f)
+                sr.circle(top[i * 2], top[i * 2 + 1] + 6, 4f, 8)
+            }
+        }
         if (state.carrier.kind == CarrierSpecies.ROCK_BACK) {
             // Kaya çıkıntıları
-            sr.color = Color.valueOf("9E9A93")
+            sr.color = col("9E9A93")
             for (i in 0 until seg step 6) Draw.ellipseFan(sr, top[i * 2], top[i * 2 + 1] - 6f, 14f, 9f, 10)
         }
     }
@@ -451,26 +539,36 @@ class CityRenderer {
             sr.color = Color.WHITE; sr.circle(x + 101, dy + 8, 5f, 10); sr.setColor(0.17f, 0.23f, 0.2f, 1f); sr.circle(x + 102, dy + 8, 2.6f, 8)
             sr.color = lk.rimDark; Draw.ellipseFan(sr, x, dy, 98f, 36f, 24)
             sr.color = lk.rim; Draw.ellipseFan(sr, x, dy + 8, 96f, 34f, 24)
-            sr.color = Color.valueOf("BFE59A"); Draw.ellipseFan(sr, x, dy + 12, 82f, 27f, 24)
+            sr.color = col("BFE59A"); Draw.ellipseFan(sr, x, dy + 12, 82f, 27f, 24)
             // Uzmanlığa göre küçük yapılar
             val col = when (c.specialty) {
-                SideSpecialty.FARMING -> Color.valueOf("B9DB6A"); SideSpecialty.MINING -> Color.valueOf("A0A4AA")
-                SideSpecialty.LUMBER -> Color.valueOf("A1724E"); SideSpecialty.TRADE -> Color.valueOf("F6C445")
-                SideSpecialty.RESEARCH -> Color.valueOf("8FD3F0"); SideSpecialty.GUARD -> Color.valueOf("5C6BC0")
+                SideSpecialty.FARMING -> col("B9DB6A"); SideSpecialty.MINING -> col("A0A4AA")
+                SideSpecialty.LUMBER -> col("A1724E"); SideSpecialty.TRADE -> col("F6C445")
+                SideSpecialty.RESEARCH -> col("8FD3F0"); SideSpecialty.GUARD -> col("5C6BC0")
             }
             for (k in 0 until (2 + c.level).coerceAtMost(6)) {
                 val bx = x - 50 + k * 20f; val by = dy + 10 + (k % 2) * 8f
-                sr.color = Color.valueOf("FFF1D6"); sr.rect(bx, by, 14f, 12f)
+                sr.color = col("FFF1D6"); sr.rect(bx, by, 14f, 12f)
                 sr.color = col; sr.triangle(bx - 2, by + 12, bx + 16, by + 12, bx + 7, by + 22)
             }
         }
     }
 
     private fun drawDeck(sr: ShapeRenderer, state: GameState, time: Float) {
-        val light = Color.valueOf("BFE59A"); val dark = Color.valueOf("AEDB8A")
+        val light = col("BFE59A"); val dark = col("AEDB8A")
         for (x in 0 until CityGrid.GRID_W) for (y in 0 until CityGrid.GRID_H) {
             if (!CityGrid.usable(state, x, y)) continue
             tile(sr, x, y, if ((x + y) % 2 == 0) light else dark, 0.0f)
+        }
+        if (state.cosmetics.equipped[CosmeticSlot.DECOR] == Cosmetic.DECOR_GARDENS) {
+            for (x in 0 until CityGrid.GRID_W) for (y in 0 until CityGrid.GRID_H) {
+                if (!CityGrid.usable(state, x, y) || state.buildingAt(x, y) != null || state.world.hash01(x, y, 881) > 0.4) continue
+                val cx = worldX(x + 0.5f, y + 0.5f); val cy = worldY(x + 0.5f, y + 0.5f) + deckOffset
+                sr.setColor(0.42f, 0.7f, 0.35f, 1f); Draw.ellipseFan(sr, cx, cy, 12f, 5f, 10)
+                sr.setColor(0.96f, 0.56f, 0.7f, 1f); sr.circle(cx - 5, cy + 2, 2.6f, 6)
+                sr.setColor(1f, 0.85f, 0.35f, 1f); sr.circle(cx + 4, cy + 1, 2.6f, 6)
+                sr.setColor(0.7f, 0.6f, 1f, 1f); sr.circle(cx, cy + 4, 2.4f, 6)
+            }
         }
     }
 

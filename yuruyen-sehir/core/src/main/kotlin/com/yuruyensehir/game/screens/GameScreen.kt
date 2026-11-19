@@ -33,7 +33,7 @@ enum class PanelId(val title: String) {
     BUILD("İnşa Et"), BUILDING("Bina"), CARRIER("Taşıyıcı"), ECONOMY("Kaynak Ekonomisi"), POPULATION("Nüfus"),
     RESEARCH("Araştırma"), MAP("Dünya Haritası ve Rota"), LOG("Dünya Günlüğü"), SETTINGS("Ayarlar ve İstatistikler"),
     TRADE("Ticaret"), DIPLOMACY("Diplomasi"), DEFENSE("Savunma"), EXPLORATION("Keşif Ekipleri"),
-    FLEET("Göçebe Filo"), GOALS("Hedefler ve Başarımlar"),
+    FLEET("Göçebe Filo"), GOALS("Hedefler ve Başarımlar"), MARKET("Market ve Özelleştirme"),
 }
 
 enum class ViewMode { CITY, MAP }
@@ -109,8 +109,12 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     var foundSpecialty = SideSpecialty.FARMING
     var expDistance = 5
 
+    private val fpsLabel = ui.label("", "small")
+
     init {
+        ui.onClick = { game.audio.play(state, SoundId.CLICK, 0.6f) }
         buildUi()
+        stage.addActor(fpsLabel)
         val gestures = GestureDetector(20f, 0.4f, 1.1f, 0.15f, WorldGestures())
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         Gdx.input.inputProcessor = InputMultiplexer(object : InputAdapter() {
@@ -139,6 +143,12 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
 
         val moving = state.travel.traveling && CarrierSystem.canMove(state) && state.pendingEvent == null && state.settings.gameSpeed > 0
         city.update(state, dt * maxOf(1, state.settings.gameSpeed), moving, CarrierSystem.speed(state, core.lastBalance).toFloat(), state.settings.graphicsHigh)
+        game.audio.update(state, dt, moving)
+        fpsLabel.isVisible = state.settings.showFps
+        if (state.settings.showFps) {
+            fpsLabel.setText("${Gdx.graphics.framesPerSecond} FPS")
+            fpsLabel.pack(); fpsLabel.setPosition(stage.width - fpsLabel.width - 16f, hud.y - fpsLabel.height - 4f)
+        }
 
         Gdx.gl.glClearColor(Palette.sky.r, Palette.sky.g, Palette.sky.b, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -451,7 +461,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             "Savunma" to { togglePanel(PanelId.DEFENSE) },
             "Nüfus" to { togglePanel(PanelId.POPULATION) }, "Araştırma" to { togglePanel(PanelId.RESEARCH) },
             "Diplomasi" to { togglePanel(PanelId.DIPLOMACY) }, "Keşif" to { togglePanel(PanelId.EXPLORATION) }, "Hedefler" to { togglePanel(PanelId.GOALS) },
-            "Günlük" to { togglePanel(PanelId.LOG) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
+            "Market" to { togglePanel(PanelId.MARKET) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
         )
         items.forEachIndexed { i, (t, f) ->
             nav.add(ui.button(t, "nav", f).apply { pad(12f, 1f, 12f, 1f) }).expandX().fillX().uniformX().pad(2f)
@@ -553,7 +563,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             val col = when { low -> "[#D84A2B]"; full -> "[#C07A10]"; else -> "" }
             resLabels[r]?.setText(if (r == Resource.GOLD) "$col${fmt(v)}${if (col.isNotEmpty()) "[]" else ""}" else "$col${fmt(v)}${if (col.isNotEmpty()) "[]" else ""}[#9A8670]/${fmt(cap)}[]")
         }
-        stageLabel.setText(StageSystem.title(s.stage))
+        stageLabel.setText("${s.cityName} • ${StageSystem.title(s.stage)}")
         dayLabel.setText("Gün ${s.day} • Nüfus ${s.population.count}/${PopulationSystem.housing(s)} • Mutluluk %${s.population.happiness.toInt()}")
         speedButtons.forEachIndexed { i, b -> b.isChecked = s.settings.gameSpeed == i }
         val r = core.lastBalance
@@ -602,6 +612,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     // ------------------------------------------------------------------ Bildirimler ve diyaloglar
 
     fun toast(msg: String, error: Boolean = false) {
+        if (error) game.audio.play(state, SoundId.ERROR, 0.6f)
         toast.setText(if (error) "[#FFB4A2]$msg[]" else msg)
         toastBox.pack()
         toastBox.setPosition((stage.width - toastBox.width) / 2, stage.height * 0.62f)
@@ -739,6 +750,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             PanelId.EXPLORATION -> Panels.exploration(this, content, width)
             PanelId.FLEET -> Panels.fleet(this, content, width)
             PanelId.GOALS -> Panels.goals(this, content, width)
+            PanelId.MARKET -> Panels.market(this, content, width)
         }
         scroll.layout()
         scroll.scrollY = keepY
@@ -807,6 +819,19 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     fun warPending(id: Int) = confirmWarId == id
     fun requestWar(id: Int) {
         if (confirmWarId == id) { confirmWarId = -1; act(DiplomacySystem.declareWar(state, id)) } else { confirmWarId = id; refreshPanel() }
+    }
+
+    /** Cihazın metin giriş penceresiyle isim değiştirme. */
+    fun askRename(city: Boolean) {
+        val current = if (city) state.cityName else state.carrier.name
+        Gdx.input.getTextInput(object : Input.TextInputListener {
+            override fun input(text: String) {
+                Gdx.app.postRunnable {
+                    act(if (city) ShopSystem.rename(state, text, null) else ShopSystem.rename(state, null, text))
+                }
+            }
+            override fun canceled() {}
+        }, if (city) "Şehrin adı" else "Taşıyıcının adı", current, "En fazla 24 harf")
     }
 
     fun newGameConfirm(): Boolean = confirmNewGame

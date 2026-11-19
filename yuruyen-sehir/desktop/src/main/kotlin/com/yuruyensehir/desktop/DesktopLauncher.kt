@@ -12,7 +12,9 @@ fun main() {
     val shots = System.getProperty("ys.shots")
     val config = Lwjgl3ApplicationConfiguration().apply {
         setTitle("Yürüyen Şehir: Göçebe Medeniyet")
-        setWindowedMode(450, 800)
+        // -Dys.size=1080x1920 ile mağaza ekran görüntüleri için yüksek çözünürlük
+        val size = System.getProperty("ys.size")?.split('x')?.mapNotNull { it.toIntOrNull() }
+        if (size != null && size.size == 2) setWindowedMode(size[0], size[1]) else setWindowedMode(450, 800)
         setForegroundFPS(60)
         useVsync(true)
         setBackBufferConfig(8, 8, 8, 8, 16, 0, 4)

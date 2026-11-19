@@ -3,7 +3,18 @@ plugins {
     id("org.jetbrains.kotlin.android")
 }
 
+import java.util.Properties
+
 val gdxVersion: String by rootProject.extra
+
+// Yayın imzası: anahtar bilgileri depoya girmez. yuruyen-sehir/keystore.properties dosyasından
+// (storeFile, storePassword, keyAlias, keyPassword) veya aynı adlı ortam değişkenlerinden okunur.
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+fun signingValue(key: String): String? = keystoreProps.getProperty(key) ?: System.getenv("YS_" + key.uppercase())
+val hasReleaseKey = signingValue("storeFile")?.let { rootProject.file(it).exists() } == true
 val natives: Configuration by configurations.creating
 
 android {
@@ -14,8 +25,8 @@ android {
         applicationId = "com.yuruyensehir.gocebe"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "0.4.0"
+        versionCode = 5
+        versionName = "1.0.0"
     }
 
     sourceSets {
@@ -27,9 +38,24 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = rootProject.file(signingValue("storeFile")!!)
+                storePassword = signingValue("storePassword")
+                keyAlias = signingValue("keyAlias")
+                keyPassword = signingValue("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            // Anahtar yoksa yalnızca yerel deneme için hata ayıklama anahtarıyla imzalanır (Play'e yüklenemez).
+            signingConfig = if (hasReleaseKey) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
         }
     }
 

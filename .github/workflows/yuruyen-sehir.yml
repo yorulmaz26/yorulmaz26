@@ -31,11 +31,18 @@ jobs:
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
       - name: Testler ve APK
-        run: ./gradlew :logic:test :desktop:compileKotlin :android:assembleDebug --stacktrace
+        run: ./gradlew :logic:test :desktop:compileKotlin :android:assembleDebug :android:assembleRelease :android:bundleRelease --stacktrace
       - uses: actions/upload-artifact@v4
         with:
           name: yuruyen-sehir-debug-apk
           path: yuruyen-sehir/android/build/outputs/apk/debug/*.apk
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yuruyen-sehir-release-apk-aab
+          path: |
+            yuruyen-sehir/android/build/outputs/apk/release/*.apk
+            yuruyen-sehir/android/build/outputs/bundle/release/*.aab
           retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()
@@ -55,6 +62,10 @@ jobs:
         with:
           name: yuruyen-sehir-debug-apk
           path: yuruyen-sehir/apk
+      - uses: actions/download-artifact@v4
+        with:
+          name: yuruyen-sehir-release-apk-aab
+          path: yuruyen-sehir/apk-release
       - name: KVM erişimi
         working-directory: .
         run: |
@@ -70,7 +81,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           working-directory: yuruyen-sehir
-          script: bash scripts/smoke-test.sh apk/android-debug.apk
+          script: bash scripts/smoke-test.sh apk/android-debug.apk debug && bash scripts/smoke-test.sh apk-release/apk/release/android-release.apk release
       - uses: actions/upload-artifact@v4
         if: always()
         with:

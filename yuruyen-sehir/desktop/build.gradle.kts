@@ -37,5 +37,6 @@ tasks.register<JavaExec>("screenshots") {
     workingDir = layout.buildDirectory.dir("run").get().asFile.also { it.mkdirs() }
     val out = rootProject.layout.projectDirectory.dir("screenshots-local").asFile
     systemProperty("ys.shots", out.absolutePath)
+    System.getProperty("ys.size")?.let { systemProperty("ys.size", it) }
     doFirst { out.mkdirs() }
 }

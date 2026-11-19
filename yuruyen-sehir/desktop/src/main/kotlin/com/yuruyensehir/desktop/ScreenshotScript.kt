@@ -27,6 +27,9 @@ import com.yuruyensehir.logic.CollectionSystem
 import com.yuruyensehir.logic.SpecializationSystem
 import com.yuruyensehir.logic.Specialization
 import com.yuruyensehir.logic.GoalSystem
+import com.yuruyensehir.logic.Cosmetic
+import com.yuruyensehir.logic.ShopSystem
+import com.yuruyensehir.logic.ResourceSystem
 
 /** Oyunu otomatik sürüp belirli anlarda ekran görüntüsü alır (görsel doğrulama için). */
 class ScreenshotScript(private val dir: String) : GameHook {
@@ -93,6 +96,7 @@ class ScreenshotScript(private val dir: String) : GameHook {
             BuildingSystem.place(s, BuildingType.EXPLORATION_CENTER, 11, 8, instant = true)
             PopulationSystem.autoAssign(s)
             s.settings.gameSpeed = 1
+            ResourceSystem.recalcCapacity(s); s.store.clampToCapacity(); s.population.count = minOf(s.population.count, PopulationSystem.housing(s))
             CombatSystem.start(s, "Haydut Çetesi", listOf(EnemyType.BANDIT to 4, EnemyType.BEAST to 2))
             s.battle!!.prep = 0.0
         },
@@ -119,13 +123,29 @@ class ScreenshotScript(private val dir: String) : GameHook {
             SpecializationSystem.choose(s, Specialization.NATURE)
             GoalSystem.refresh(s)
             s.settings.gameSpeed = 1
+            ResourceSystem.recalcCapacity(s); s.store.clampToCapacity(); s.population.count = minOf(s.population.count, PopulationSystem.housing(s))
         },
         830L to { shot(it, "19_filo_sehir") },
         835L to { g -> g.gameScreen.togglePanel(PanelId.FLEET) },
         860L to { shot(it, "20_filo") },
         865L to { g -> g.gameScreen.togglePanel(PanelId.GOALS) },
         890L to { shot(it, "21_hedefler") },
-        895L to { Gdx.app.exit() },
+        895L to { g ->
+            val s = g.core.state
+            g.gameScreen.closePanel()
+            s.sideCities.clear()
+            CollectionSystem.switchCarrier(s, CarrierSpecies.ROCK_BACK).let { if (!it.success) s.carrier.kind = CarrierSpecies.GIANT_TORTOISE }
+            s.carrier.kind = CarrierSpecies.GIANT_TORTOISE
+            s.store.amounts[Resource.GOLD] = 3000.0
+            listOf(Cosmetic.SKIN_SUNSET, Cosmetic.ROOF_TURQUOISE, Cosmetic.FLAG_SUN, Cosmetic.DECOR_LANTERNS, Cosmetic.HOUSE_DOME, Cosmetic.TRAIL_FLOWERS).forEach { ShopSystem.buy(s, it) }
+            ShopSystem.rename(s, "Mavi Kervan", null)
+            ResourceSystem.recalcCapacity(s); s.store.clampToCapacity(); s.population.count = minOf(s.population.count, PopulationSystem.housing(s))
+            s.cityVersion++
+        },
+        930L to { shot(it, "22_ozellestirme") },
+        935L to { g -> g.gameScreen.togglePanel(PanelId.MARKET) },
+        960L to { shot(it, "23_market") },
+        965L to { Gdx.app.exit() },
     )
 
     override fun onFrame(game: YuruyenSehirGame, frame: Long) {

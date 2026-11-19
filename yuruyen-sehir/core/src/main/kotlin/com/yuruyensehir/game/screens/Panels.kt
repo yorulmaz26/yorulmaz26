@@ -549,6 +549,27 @@ object Panels {
         }).row()
         t.add(g).width(width).row()
 
+        t.section(s, "Ses", width)
+        if (!s.game.audio.available) t.text(s, "${SOFT}Bu cihazda ses aygıtı bulunamadı.[]", width)
+        val a = Table()
+        a.defaults().expandX().fillX().pad(4f)
+        a.add(s.ui.button("Ses efektleri: ${if (set.sound) "Açık" else "Kapalı"}", "default") { set.sound = !set.sound; s.act(ActionResult.ok("Ses ${if (set.sound) "açıldı" else "kapandı"}")) })
+        a.add(s.ui.button("Müzik: ${if (set.music) "Açık" else "Kapalı"}", "default") { set.music = !set.music; s.act(ActionResult.ok("Müzik ${if (set.music) "açıldı" else "kapandı"}")) }).row()
+        t.add(a).width(width).row()
+        fun volRow(label: String, get: () -> Float, setv: (Float) -> Unit) {
+            val row = Table()
+            row.add(s.ui.label(label, "small")).width(170f).left()
+            for (v in listOf(0.2f, 0.45f, 0.7f, 1f)) {
+                val b = s.ui.button("%${(v * 100).toInt()}", "chip") { setv(v); s.act(ActionResult.ok("$label %${(v * 100).toInt()}")) }
+                b.pad(6f, 10f, 6f, 10f); b.isChecked = kotlin.math.abs(get() - v) < 0.01f
+                row.add(b).padRight(4f)
+            }
+            t.add(row).left().padTop(4f).row()
+        }
+        volRow("Efekt sesi", { set.soundVolume }, { set.soundVolume = it })
+        volRow("Müzik sesi", { set.musicVolume }, { set.musicVolume = it })
+        t.add(s.ui.button("FPS göstergesi: ${if (set.showFps) "Açık" else "Kapalı"}", "default") { set.showFps = !set.showFps; s.act(ActionResult.ok("FPS göstergesi")) }).width(width).padTop(6f).row()
+
         t.section(s, "Kayıt", width)
         t.text(s, "Oyun her 30 saniyede bir ve uygulama arka plana alındığında otomatik kaydedilir. Bozuk kayıtta yedekten yüklenir.", width)
         s.game.saveError?.let { t.text(s, "${RED}Son kayıt hatası: $it[]", width) }
@@ -566,6 +587,7 @@ object Panels {
             "Tamamlanan araştırma: ${st.research.completed.size}/${TechCatalog.all.size}",
             "Savaş: ${stats.battlesWon} zafer, ${stats.battlesLost} geri çekilme • Keşif görevi: ${stats.expeditionsDone}",
             "Yan şehir: ${st.sideCities.size} • Taşıyıcı türü: ${st.collection.species.size} • Eser: ${st.collection.artifacts.size} • Başarım: ${st.achievements.size} • Tamamlanan hedef: ${stats.goalsCompleted}",
+            "Market alışverişi: ${stats.purchases}",
             "Ticaret işlemi: ${stats.trades} • Tanınan medeniyet: ${st.civs.count { it.met }} • İtibar %${st.reputation.toInt()}",
         )
         lines.forEach { t.text(s, it, width) }
@@ -573,7 +595,7 @@ object Panels {
         t.section(s, "Yeni Oyun", width)
         t.text(s, "${RED}Mevcut şehir ve bütün ilerleme silinir.[]", width)
         t.add(s.ui.button(if (s.newGameConfirm()) "Emin misiniz? Silmek için tekrar dokunun" else "Yeni Oyun Başlat", "danger") { s.requestNewGame() }).width(width).padTop(6f).row()
-        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.4.0 (Aşama 1-6)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 1.0.0[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
     }
 
     // ------------------------------------------------------------------ Ticaret
@@ -952,5 +974,65 @@ object Panels {
             t.text(s, if (a in st.collection.artifacts) "$GREEN• ${a.title}[] — ${a.description}" else "$SOFT• ??? — bulunmadı[]", width)
         }
         t.add(s.ui.button("Dünya Günlüğünü Aç", "default") { s.showPanel(PanelId.LOG) }).width(width).padTop(10f).row()
+    }
+
+    // ------------------------------------------------------------------ Market
+    fun market(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        t.text(s, "Altın: ${fmt(st.store[Resource.GOLD])} • Satın alınan: ${st.cosmetics.owned.size}/${Cosmetic.entries.size}", width, "default")
+        t.text(s, "${SOFT}Market yalnızca oyun içi kaynaklarla çalışır; gerçek para gerekmez. Kozmetikler oynanışı değiştirmez (ağırlık ve üretim aynı kalır).[]", width)
+
+        t.section(s, "Şehir Özelleştirme", width)
+        val names = Table()
+        names.defaults().expandX().fillX().pad(4f)
+        names.add(s.ui.button("Şehir adı: ${st.cityName}", "default") { s.askRename(true) })
+        names.add(s.ui.button("Taşıyıcı adı: ${st.carrier.name}", "default") { s.askRename(false) }).row()
+        t.add(names).width(width).row()
+        for (slot in CosmeticSlot.entries.filter { it != CosmeticSlot.COLLECTIBLE }) {
+            val eq = st.cosmetics.equipped[slot]
+            val row = Table()
+            row.add(s.ui.label("${slot.title}: ${eq?.title ?: "${SOFT}varsayılan[]"}", "small")).expandX().left()
+            if (eq != null) row.add(s.ui.button("Çıkar", "default") { s.act(ShopSystem.unequip(st, slot)) }.apply { pad(6f, 12f, 6f, 12f) })
+            t.add(row).width(width).padTop(2f).row()
+        }
+
+        t.section(s, "Paketler", width)
+        for (p in CosmeticPack.entries) {
+            val card = s.ui.card(Color.valueOf("FFF1C9"))
+            val l = Table()
+            val sum = p.items.sumOf { it.price[Resource.GOLD] ?: 0.0 }
+            l.add(s.ui.label(p.title, "default")).left().row()
+            l.add(s.ui.label(p.items.joinToString { it.title } + " ${SOFT}(ayrı ayrı ${fmt(sum)} altın)[]", "small", wrap = true)).width(width - 190f).left().row()
+            l.add(s.ui.label("Fiyat: " + s.ui.costText(p.price, st.store), "small")).left()
+            card.add(l).expandX().left()
+            val done = p.items.all { ShopSystem.owned(st, it) }
+            val b = s.ui.button(if (done) "Sizde" else "Satın Al", "gold") { s.act(ShopSystem.buyPack(st, p)) }
+            b.isDisabled = done || !st.store.canAfford(p.price)
+            card.add(b).width(140f)
+            t.cardRow(card, width)
+        }
+
+        for (slot in CosmeticSlot.entries) {
+            t.section(s, slot.title, width)
+            for (c in Cosmetic.entries.filter { it.slot == slot }) {
+                val owned = ShopSystem.owned(st, c)
+                val on = st.cosmetics.equipped[slot] == c
+                val card = s.ui.card(if (on) Color.valueOf("E6F7F5") else Color.WHITE)
+                if (c.colorHex.isNotEmpty()) card.add(s.ui.dot(Color.valueOf(c.colorHex), 26f)).size(26f).padRight(10f)
+                val l = Table()
+                l.add(s.ui.label(c.title + if (on) "  ${GREEN}(takılı)[]" else "", "default")).left().row()
+                l.add(s.ui.label(c.description, "small", wrap = true)).width(width - 230f).left().row()
+                if (!owned) l.add(s.ui.label("Fiyat: " + s.ui.costText(c.price, st.store), "small", wrap = true)).width(width - 230f).left()
+                card.add(l).expandX().left()
+                val b = when {
+                    !owned -> s.ui.button("Satın Al", "gold") { s.act(ShopSystem.buy(st, c)) }.also { it.isDisabled = !st.store.canAfford(c.price) }
+                    slot == CosmeticSlot.COLLECTIBLE -> s.ui.button("Sergide", "default") {}.also { it.isDisabled = true }
+                    on -> s.ui.button("Takılı", "default") {}.also { it.isDisabled = true }
+                    else -> s.ui.button("Tak", "primary") { s.act(ShopSystem.equip(st, c)) }
+                }
+                card.add(b).width(140f)
+                t.cardRow(card, width)
+            }
+        }
     }
 }

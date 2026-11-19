@@ -34,9 +34,11 @@ class YuruyenSehirGame(private val hook: GameHook? = null) : Game() {
     private var frame = 0L
     lateinit var gameScreen: GameScreen
         private set
+    val audio = AudioManager()
 
     override fun create() {
         theme = Theme()
+        audio.init()
         saves = SaveManager(GdxSaveStorage())
         val loaded = try { saves.load() } catch (e: Exception) { Gdx.app.error("Kayit", "Yuklenemedi", e); null }
         core = if (loaded != null) {
@@ -66,6 +68,7 @@ class YuruyenSehirGame(private val hook: GameHook? = null) : Game() {
 
     override fun pause() {
         save()
+        audio.pause()
     }
 
     override fun resume() {
@@ -85,6 +88,7 @@ class YuruyenSehirGame(private val hook: GameHook? = null) : Game() {
     override fun dispose() {
         save()
         gameScreen.dispose()
+        audio.dispose()
         theme.dispose()
     }
 }

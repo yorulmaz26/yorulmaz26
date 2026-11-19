@@ -6,3 +6,6 @@ local.properties
 .idea/
 android/libs/
 screenshots-local/
+keystore.properties
+*.jks
+*.keystore
