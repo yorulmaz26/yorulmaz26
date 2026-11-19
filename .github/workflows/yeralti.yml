@@ -1,0 +1,51 @@
+name: Yeraltı İmparatorluğu
+
+on:
+  push:
+    paths: ["yeralti-imparatorlugu/**", ".github/workflows/yeralti.yml"]
+  pull_request:
+    paths: ["yeralti-imparatorlugu/**", ".github/workflows/yeralti.yml"]
+  workflow_dispatch:
+
+concurrency:
+  group: yeralti-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Simülasyon testleri + Android APK + masaüstü ekran görüntüleri
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: yeralti-imparatorlugu
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Simülasyon birim testleri
+        run: ./gradlew :sim:test --stacktrace
+      - name: Android APK (debug + release)
+        run: ./gradlew :android:assembleDebug :android:assembleRelease --stacktrace
+      - name: Masaüstü duman testi (Xvfb, ekran görüntüleri)
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1 > /dev/null
+          mkdir -p build/shots
+          xvfb-run -a -s "-screen 0 1280x1800x24" ./gradlew :desktop:run -Dyi.shots=$PWD/build/shots -Dyi.scale=1.6
+          ls build/shots/*.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yeralti-debug-apk
+          path: yeralti-imparatorlugu/android/build/outputs/apk/*/*.apk
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: yeralti-rapor-ve-goruntuler
+          path: |
+            yeralti-imparatorlugu/sim/build/reports/tests
+            yeralti-imparatorlugu/build/shots
+          if-no-files-found: ignore

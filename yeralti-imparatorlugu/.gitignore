@@ -1,0 +1,14 @@
+.gradle/
+build/
+local.properties
+*.iml
+.idea/
+.kotlin/
+/assets/save/
+
+keystore.properties
+*.jks
+*.keystore
+/assets/sfx/
+/tools/art/build/
+/tools/art/__pycache__/
