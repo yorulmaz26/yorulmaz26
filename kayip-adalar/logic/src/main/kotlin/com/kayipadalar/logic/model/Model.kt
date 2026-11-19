@@ -81,7 +81,7 @@ enum class UnitType { SWORD, ARCHER, SHIELD, MAGE, ENGINEER, SCOUT, FLYER, SIEGE
 enum class AiBehavior { AGGRESSIVE, DEFENSIVE, TRAPPER, RESOURCER, STRATEGIST }
 
 /** Oyuncunun kullanabileceği eylem türleri (kademeli açılır). */
-enum class Mechanic { SLIDE, ROTATE, SWAP, RAISE, JUMP, UNIT_MOVE, WAIT }
+enum class Mechanic { SLIDE, ROTATE, SWAP, RAISE, JUMP, UNIT_MOVE, WAIT, MERGE }
 
 /** Çalışma zamanı ada durumu. Kopyalanabilir olması arama/çözücü için önemlidir. */
 data class Island(
@@ -98,6 +98,8 @@ data class Island(
     var crumble: Int = -1,
     var alive: Boolean = true,
     var collected: Boolean = false,
+    /** Birleşik ada grubu (0 = bağımsız). Gruplar tek hamlede birlikte kayar. */
+    var group: Int = 0,
 ) {
     val movable get() = !fixed && frozen <= 0 && anchored <= 0 && !hidden && alive
 }

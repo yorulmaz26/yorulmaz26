@@ -109,7 +109,7 @@ class Board private constructor(
         for (i in islands) {
             if (!i.alive) { sb.append('x'); continue }
             sb.append(i.pos.x).append(',').append(i.pos.y).append(',').append(i.ports).append(',').append(i.height)
-                .append(if (i.hidden) 'h' else '.').append(i.type.ordinal).append(';')
+                .append(if (i.hidden) 'h' else '.').append(i.type.ordinal).append('g').append(i.group).append(';')
         }
         for (u in units) if (u.alive) sb.append(u.islandId).append(':').append(u.hp).append(';')
         sb.append(energy).append('|').append(castleHp)

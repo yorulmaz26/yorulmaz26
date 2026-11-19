@@ -291,7 +291,7 @@ object Combat {
     }
 
     private fun candidates(b: Board): List<Island> = b.islands.filter {
-        it.alive && it.movable && it.type != IslandType.CASTLE && it.owner != Owner.ENEMY && it.type != IslandType.ENEMY_FORT &&
+        it.alive && it.movable && it.group == 0 && it.type != IslandType.CASTLE && it.owner != Owner.ENEMY && it.type != IslandType.ENEMY_FORT &&
             b.units.none { u -> u.alive && u.owner == Owner.PLAYER && u.type == UnitType.GUARDIAN && u.islandId == it.id }
     }
 

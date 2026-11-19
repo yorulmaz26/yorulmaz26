@@ -48,9 +48,12 @@ object Rules {
                 if (j >= 0 && !b.islands[j].hidden) out.add(j)
             }
         } else out.addAll(physicalNeighbors(b, g, idx))
-        if (a.type == IslandType.PORTAL) {
+        // Portallar yalnızca en az bir fiziksel köprüye sahipken (enerjili) birbirine bağlanır.
+        if (a.type == IslandType.PORTAL && physicalNeighbors(b, g, idx).isNotEmpty()) {
             b.islands.forEachIndexed { j, o ->
-                if (j != idx && o.alive && !o.hidden && o.type == IslandType.PORTAL && j !in out) out.add(j)
+                if (j != idx && o.alive && !o.hidden && o.type == IslandType.PORTAL && j !in out &&
+                    physicalNeighbors(b, g, j).isNotEmpty()
+                ) out.add(j)
             }
         }
         return out
@@ -117,7 +120,23 @@ object Rules {
             is Action.Slide -> {
                 if (!b.has(Mechanic.SLIDE)) return "error.locked"
                 val i = movable(a.id) ?: return "error.notMovable"
-                if (!b.isFree(i.pos + a.dir)) return "error.blocked"
+                if (i.group != 0) {
+                    val members = groupOf(b, i)
+                    if (members.any { !it.movable }) return "error.notMovable"
+                    if (members.any { m -> val c = m.pos + a.dir; !(b.isFree(c) || members.any { it.pos == c }) }) return "error.blocked"
+                } else if (!b.isFree(i.pos + a.dir)) return "error.blocked"
+            }
+            is Action.Merge -> {
+                if (!b.has(Mechanic.MERGE)) return "error.locked"
+                val i = movable(a.a) ?: return "error.notMovable"
+                val j = movable(a.b) ?: return "error.notMovable"
+                if (i.pos.manhattan(j.pos) != 1) return "error.notAdjacent"
+                if (i.group != 0 && i.group == j.group) return "error.merged"
+            }
+            is Action.Split -> {
+                if (!b.has(Mechanic.MERGE)) return "error.locked"
+                val i = b.island(a.id) ?: return "error.invalid"
+                if (i.group == 0) return "error.notMerged"
             }
             is Action.Rotate -> {
                 if (!b.has(Mechanic.ROTATE)) return "error.locked"
@@ -127,6 +146,7 @@ object Rules {
                 if (!b.has(Mechanic.SWAP)) return "error.locked"
                 val i = movable(a.a) ?: return "error.notMovable"
                 val j = movable(a.b) ?: return "error.notMovable"
+                if (i.group != 0 || j.group != 0) return "error.merged"
                 if (i.pos.manhattan(j.pos) != 1) return "error.notAdjacent"
                 if (b.energy < b.cfg.rules.costs.swapEnergy) return "error.noEnergy"
             }
@@ -140,6 +160,7 @@ object Rules {
             is Action.Jump -> {
                 if (!b.has(Mechanic.JUMP)) return "error.locked"
                 val i = movable(a.id) ?: return "error.notMovable"
+                if (i.group != 0) return "error.merged"
                 if (!b.isFree(i.pos.step(a.dir, 2))) return "error.blocked"
                 if (b.energy < b.cfg.rules.costs.jumpEnergy) return "error.noEnergy"
             }
@@ -182,11 +203,36 @@ object Rules {
             is Action.Slide -> {
                 val i = b.island(a.id)!!
                 remember(b, i)
-                val from = i.pos
-                i.pos = i.pos + a.dir
-                ev.add(GameEvent.IslandMoved(i.id, from, i.pos))
-                applyWind(b, i, ev)
-                b.islandsMoved++
+                if (i.group != 0) {
+                    for (m in groupOf(b, i)) {
+                        val from = m.pos
+                        m.pos = m.pos + a.dir
+                        ev.add(GameEvent.IslandMoved(m.id, from, m.pos))
+                        b.islandsMoved++
+                    }
+                } else {
+                    val from = i.pos
+                    i.pos = i.pos + a.dir
+                    ev.add(GameEvent.IslandMoved(i.id, from, i.pos))
+                    applyWind(b, i, ev)
+                    b.islandsMoved++
+                }
+            }
+            is Action.Merge -> {
+                val i = b.island(a.a)!!; val j = b.island(a.b)!!
+                val target = if (i.group != 0) i.group else if (j.group != 0) j.group else (b.islands.maxOf { it.group } + 1)
+                val old = setOf(i.group, j.group).filter { it != 0 && it != target }
+                b.islands.forEach { if (it.group in old) it.group = target }
+                i.group = target; j.group = target
+                ev.add(GameEvent.Merged(i.id, j.id))
+            }
+            is Action.Split -> {
+                val i = b.island(a.id)!!
+                val g = i.group
+                i.group = 0
+                val rest = b.islands.filter { it.group == g }
+                if (rest.size < 2) rest.forEach { it.group = 0 }
+                ev.add(GameEvent.SplitOff(i.id))
             }
             is Action.Rotate -> {
                 val i = b.island(a.id)!!
@@ -237,6 +283,9 @@ object Rules {
         endTurn(b, ev)
         return ActionResult(true, null, ev)
     }
+
+    fun groupOf(b: Board, i: Island): List<Island> =
+        if (i.group == 0) listOf(i) else b.islands.filter { it.alive && it.group == i.group }
 
     private fun remember(b: Board, i: Island) {
         b.lastMovedId = i.id; b.lastMovedPrevPos = i.pos; b.lastMovedPrevPorts = i.ports
@@ -300,7 +349,7 @@ object Rules {
                     val c = gIsl.pos.step(d, k)
                     if (!b.inBounds(c) || c in b.blocked) break
                     val o = b.islandAt(c) ?: continue
-                    if (o.movable && o.type != IslandType.CASTLE && o.owner != Owner.ENEMY) {
+                    if (o.movable && o.group == 0 && o.type != IslandType.CASTLE && o.owner != Owner.ENEMY) {
                         val to = gIsl.pos.step(d, k - 1)
                         if (b.isFree(to)) {
                             o.pos = to
@@ -465,6 +514,7 @@ object Rules {
                 isl.crumble--
                 if (isl.crumble == 0) {
                     isl.alive = false
+                    isl.group = 0
                     ev.add(GameEvent.Collapsed(isl.id))
                     b.unitOn(isl.id)?.let { Combat.kill(b, it, ev) }
                 }
@@ -491,7 +541,14 @@ object Rules {
         val c = b.cfg.rules.costs
         for (i in b.islands) {
             if (!i.alive || !i.movable || i.owner == Owner.ENEMY || i.type == IslandType.ENEMY_FORT) continue
-            if (b.has(Mechanic.SLIDE)) for (d in Dir.entries) if (b.isFree(i.pos + d)) out.add(Action.Slide(i.id, d))
+            if (b.has(Mechanic.SLIDE)) for (d in Dir.entries) {
+                val a = Action.Slide(i.id, d)
+                if (if (i.group == 0) b.isFree(i.pos + d) else validate(b, a) == null) out.add(a)
+            }
+            if (b.has(Mechanic.MERGE)) {
+                for (d in listOf(Dir.E, Dir.S)) b.islandAt(i.pos + d)?.let { o -> val m = Action.Merge(i.id, o.id); if (validate(b, m) == null) out.add(m) }
+                if (i.group != 0) out.add(Action.Split(i.id))
+            }
             if (b.has(Mechanic.ROTATE) && i.ports != 0 && i.ports != 15) out.add(Action.Rotate(i.id))
             if (b.has(Mechanic.RAISE) && e >= c.raiseEnergy) {
                 if (i.height < b.cfg.rules.maxHeight) out.add(Action.Raise(i.id, true))

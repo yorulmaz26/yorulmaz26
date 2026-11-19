@@ -26,6 +26,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    androidResources {
+        // Masaüstünde geliştirme sırasında oluşabilecek kayıt dosyaları pakete girmez.
+        ignoreAssetsPattern = "!kayip_adalar_save.*:!*.tmp:!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~"
+    }
     buildTypes {
         release {
             isMinifyEnabled = false

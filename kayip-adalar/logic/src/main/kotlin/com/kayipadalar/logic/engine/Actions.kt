@@ -13,6 +13,8 @@ sealed class Action {
     data class Jump(val id: String, val dir: Dir) : Action()
     data class MoveUnit(val unitId: String, val islandId: String) : Action()
     data object Wait : Action()
+    data class Merge(val a: String, val b: String) : Action()
+    data class Split(val id: String) : Action()
 
     fun encode(): String = when (this) {
         is Slide -> "S:$id:${dir.name}"
@@ -22,6 +24,8 @@ sealed class Action {
         is Jump -> "J:$id:${dir.name}"
         is MoveUnit -> "U:$unitId:$islandId"
         Wait -> "W"
+        is Merge -> "M:$a:$b"
+        is Split -> "D:$id"
     }
 
     companion object {
@@ -36,6 +40,8 @@ sealed class Action {
                 "J" -> Jump(p[1], Dir.valueOf(p[2]))
                 "U" -> MoveUnit(p[1], p[2])
                 "W" -> Wait
+                "M" -> Merge(p[1], p[2])
+                "D" -> Split(p[1])
                 else -> throw IllegalArgumentException("Bilinmeyen eylem: $s")
             }
         }
@@ -47,6 +53,8 @@ sealed class GameEvent {
     data class IslandMoved(val id: String, val from: Cell, val to: Cell, val pushed: Boolean = false) : GameEvent()
     data class IslandRotated(val id: String) : GameEvent()
     data class IslandHeight(val id: String, val height: Int) : GameEvent()
+    data class Merged(val a: String, val b: String) : GameEvent()
+    data class SplitOff(val id: String) : GameEvent()
     data class BridgeFormed(val a: String, val b: String) : GameEvent()
     data class BridgeBroken(val a: String, val b: String) : GameEvent()
     data class Combo(val comboId: String, val a: String, val b: String) : GameEvent()
