@@ -1,0 +1,519 @@
+game.png
+size: 2048,2048
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+tile_SOFT_SOIL_0
+  bounds: 1700, 676, 64, 64
+tile_SOFT_SOIL_1
+  bounds: 1772, 676, 64, 64
+tile_SOFT_SOIL_2
+  bounds: 1844, 676, 64, 64
+tile_HARD_SOIL_0
+  bounds: 1916, 676, 64, 64
+tile_HARD_SOIL_1
+  bounds: 4, 780, 64, 64
+tile_HARD_SOIL_2
+  bounds: 76, 780, 64, 64
+tile_CLAY_0
+  bounds: 148, 780, 64, 64
+tile_CLAY_1
+  bounds: 220, 780, 64, 64
+tile_CLAY_2
+  bounds: 292, 780, 64, 64
+tile_SAND_0
+  bounds: 364, 780, 64, 64
+tile_SAND_1
+  bounds: 436, 780, 64, 64
+tile_SAND_2
+  bounds: 508, 780, 64, 64
+tile_ROCK_0
+  bounds: 580, 780, 64, 64
+tile_ROCK_1
+  bounds: 652, 780, 64, 64
+tile_ROCK_2
+  bounds: 724, 780, 64, 64
+tile_WATER_SOIL_0
+  bounds: 796, 780, 64, 64
+tile_WATER_SOIL_1
+  bounds: 868, 780, 64, 64
+tile_WATER_SOIL_2
+  bounds: 940, 780, 64, 64
+tile_FUNGUS_0
+  bounds: 1012, 780, 64, 64
+tile_FUNGUS_1
+  bounds: 1084, 780, 64, 64
+tile_FUNGUS_2
+  bounds: 1156, 780, 64, 64
+tile_MINERAL_0
+  bounds: 1228, 780, 64, 64
+tile_MINERAL_1
+  bounds: 1300, 780, 64, 64
+tile_MINERAL_2
+  bounds: 1372, 780, 64, 64
+tile_FOSSIL_0
+  bounds: 1444, 780, 64, 64
+tile_FOSSIL_1
+  bounds: 1516, 780, 64, 64
+tile_FOSSIL_2
+  bounds: 1588, 780, 64, 64
+tile_RUBBLE_0
+  bounds: 1660, 780, 64, 64
+tile_RUBBLE_1
+  bounds: 1732, 780, 64, 64
+tile_RUBBLE_2
+  bounds: 1804, 780, 64, 64
+tile_RARE_VEIN_0
+  bounds: 1876, 780, 64, 64
+tile_RARE_VEIN_1
+  bounds: 1948, 780, 64, 64
+tile_RARE_VEIN_2
+  bounds: 4, 852, 64, 64
+tile_ANCIENT_NEST_0
+  bounds: 76, 852, 64, 64
+tile_ANCIENT_NEST_1
+  bounds: 148, 852, 64, 64
+tile_ANCIENT_NEST_2
+  bounds: 220, 852, 64, 64
+tile_CREATURE_DEN_0
+  bounds: 292, 852, 64, 64
+tile_CREATURE_DEN_1
+  bounds: 364, 852, 64, 64
+tile_CREATURE_DEN_2
+  bounds: 436, 852, 64, 64
+tile_WATER_POCKET_0
+  bounds: 508, 852, 64, 64
+tile_WATER_POCKET_1
+  bounds: 580, 852, 64, 64
+tile_WATER_POCKET_2
+  bounds: 652, 852, 64, 64
+tile_FILL_0
+  bounds: 724, 852, 64, 64
+tile_FILL_1
+  bounds: 796, 852, 64, 64
+tile_FILL_2
+  bounds: 868, 852, 64, 64
+tile_UNEXPLORED_0
+  bounds: 940, 852, 64, 64
+tile_UNEXPLORED_1
+  bounds: 1012, 852, 64, 64
+tile_UNEXPLORED_2
+  bounds: 1084, 852, 64, 64
+tile_TUNNEL_0
+  bounds: 1156, 852, 64, 64
+tile_TUNNEL_1
+  bounds: 1228, 852, 64, 64
+tile_TUNNEL_2
+  bounds: 1300, 852, 64, 64
+pattern_dots
+  bounds: 1372, 852, 64, 64
+pattern_stripes
+  bounds: 1444, 852, 64, 64
+pattern_bricks
+  bounds: 1516, 852, 64, 64
+edge_top
+  bounds: 1458, 1140, 64, 20
+edge_side
+  bounds: 1588, 852, 14, 64
+edge_bottom
+  bounds: 1674, 1140, 64, 12
+corner_fill
+  bounds: 1100, 1140, 24, 24
+corner_rim
+  bounds: 1132, 1140, 24, 24
+lip_light
+  bounds: 1746, 1140, 64, 10
+rim_dark
+  bounds: 1906, 1140, 64, 6
+water
+  bounds: 1610, 852, 64, 64
+water_top
+  bounds: 1818, 1140, 64, 8
+glow
+  bounds: 1692, 4, 128, 128
+soft
+  bounds: 1828, 4, 128, 128
+disc
+  bounds: 4, 268, 128, 128
+ring
+  bounds: 140, 268, 128, 128
+white
+  bounds: 1890, 1140, 8, 8
+stripes
+  bounds: 1682, 852, 64, 64
+vignette
+  bounds: 4, 4, 256, 256
+shadow_blob
+  bounds: 1164, 1140, 64, 24
+sky
+  bounds: 268, 4, 8, 256
+drop
+  bounds: 1236, 1140, 6, 24
+snow
+  bounds: 1530, 1140, 16, 16
+ant_worker_0
+  bounds: 276, 268, 128, 128
+ant_soldier_0
+  bounds: 412, 268, 128, 128
+ant_scout_0
+  bounds: 548, 268, 128, 128
+ant_striped_0
+  bounds: 684, 268, 128, 128
+ant_worker_1
+  bounds: 820, 268, 128, 128
+ant_soldier_1
+  bounds: 956, 268, 128, 128
+ant_scout_1
+  bounds: 1092, 268, 128, 128
+ant_striped_1
+  bounds: 1228, 268, 128, 128
+ant_worker_2
+  bounds: 1364, 268, 128, 128
+ant_soldier_2
+  bounds: 1500, 268, 128, 128
+ant_scout_2
+  bounds: 1636, 268, 128, 128
+ant_striped_2
+  bounds: 1772, 268, 128, 128
+ant_worker_3
+  bounds: 1908, 268, 128, 128
+ant_soldier_3
+  bounds: 4, 404, 128, 128
+ant_scout_3
+  bounds: 140, 404, 128, 128
+ant_striped_3
+  bounds: 276, 404, 128, 128
+queen_0
+  bounds: 572, 4, 192, 192
+queen_1
+  bounds: 772, 4, 192, 192
+creature_SPIDER_0
+  bounds: 412, 404, 128, 128
+creature_SPIDER_1
+  bounds: 548, 404, 128, 128
+creature_CENTIPEDE_0
+  bounds: 684, 404, 128, 128
+creature_CENTIPEDE_1
+  bounds: 820, 404, 128, 128
+creature_WORM_0
+  bounds: 956, 404, 128, 128
+creature_WORM_1
+  bounds: 1092, 404, 128, 128
+creature_BEETLE_LARVA_0
+  bounds: 1228, 404, 128, 128
+creature_BEETLE_LARVA_1
+  bounds: 1364, 404, 128, 128
+creature_CAVE_HUNTER_0
+  bounds: 1500, 404, 128, 128
+creature_CAVE_HUNTER_1
+  bounds: 1636, 404, 128, 128
+creature_CAVE_SALAMANDER_0
+  bounds: 1772, 404, 128, 128
+creature_CAVE_SALAMANDER_1
+  bounds: 1908, 404, 128, 128
+creature_TERMITE_0
+  bounds: 4, 540, 128, 128
+creature_TERMITE_1
+  bounds: 140, 540, 128, 128
+egg
+  bounds: 292, 1140, 32, 40
+larva
+  bounds: 692, 1140, 56, 36
+pupa
+  bounds: 756, 1140, 56, 36
+corpse
+  bounds: 332, 1140, 64, 40
+res_FOOD
+  bounds: 1754, 852, 64, 64
+res_SEED
+  bounds: 1826, 852, 64, 64
+res_MUSHROOM
+  bounds: 1898, 852, 64, 64
+res_LEAF
+  bounds: 1970, 852, 64, 64
+res_WOOD
+  bounds: 4, 924, 64, 64
+res_SOIL
+  bounds: 76, 924, 64, 64
+res_WATER
+  bounds: 148, 924, 64, 64
+res_MINERAL
+  bounds: 220, 924, 64, 64
+res_FOSSIL
+  bounds: 292, 924, 64, 64
+res_RESIN
+  bounds: 364, 924, 64, 64
+res_ENZYME
+  bounds: 436, 924, 64, 64
+res_RARE_MINERAL
+  bounds: 508, 924, 64, 64
+res_GENETIC
+  bounds: 580, 924, 64, 64
+res_ROYAL_ESSENCE
+  bounds: 652, 924, 64, 64
+src_LEAF_BUSH
+  bounds: 1284, 540, 96, 96
+src_SEED_PILE
+  bounds: 1388, 540, 96, 96
+src_DEAD_INSECT
+  bounds: 1492, 540, 96, 96
+src_TWIGS
+  bounds: 1596, 540, 96, 96
+src_DEW
+  bounds: 1700, 540, 96, 96
+src_RESIN_DROP
+  bounds: 1804, 540, 96, 96
+src_CRUMBS
+  bounds: 1908, 540, 96, 96
+src_PEBBLES
+  bounds: 4, 676, 96, 96
+bed
+  bounds: 820, 1140, 64, 32
+queen_bed
+  bounds: 1508, 1068, 160, 48
+shelf
+  bounds: 1250, 1140, 128, 24
+desk
+  bounds: 1676, 1068, 96, 48
+anvil
+  bounds: 404, 1140, 64, 40
+trap_spikes
+  bounds: 1386, 1140, 64, 24
+banner
+  bounds: 620, 676, 48, 72
+flag
+  bounds: 676, 676, 48, 72
+fan
+  bounds: 724, 924, 64, 64
+cross
+  bounds: 1780, 1068, 48, 48
+scroll
+  bounds: 1836, 1068, 64, 48
+pedestal
+  bounds: 1908, 1068, 48, 48
+globe
+  bounds: 796, 924, 64, 64
+crown
+  bounds: 892, 1140, 48, 32
+crown_flower
+  bounds: 948, 1140, 48, 32
+crown_crystal
+  bounds: 1004, 1140, 48, 32
+statue
+  bounds: 108, 676, 64, 96
+lamp
+  bounds: 1964, 1068, 48, 48
+mound
+  bounds: 1220, 1068, 160, 56
+ic_dig
+  bounds: 868, 924, 64, 64
+ic_build
+  bounds: 940, 924, 64, 64
+ic_mark
+  bounds: 1012, 924, 64, 64
+ic_colony
+  bounds: 1084, 924, 64, 64
+ic_more
+  bounds: 1156, 924, 64, 64
+ic_army
+  bounds: 1228, 924, 64, 64
+ic_research
+  bounds: 1300, 924, 64, 64
+ic_close
+  bounds: 1372, 924, 64, 64
+ic_pause
+  bounds: 1444, 924, 64, 64
+ic_play
+  bounds: 1516, 924, 64, 64
+ic_fast
+  bounds: 1588, 924, 64, 64
+ic_faster
+  bounds: 1660, 924, 64, 64
+ic_erase
+  bounds: 1732, 924, 64, 64
+ic_fill
+  bounds: 1804, 924, 64, 64
+ic_check
+  bounds: 1876, 924, 64, 64
+ic_lock
+  bounds: 1948, 924, 64, 64
+ic_warning
+  bounds: 4, 996, 64, 64
+ic_up
+  bounds: 76, 996, 64, 64
+ic_down
+  bounds: 148, 996, 64, 64
+ic_plus
+  bounds: 220, 996, 64, 64
+ic_minus
+  bounds: 292, 996, 64, 64
+ic_star
+  bounds: 364, 996, 64, 64
+ic_people
+  bounds: 436, 996, 64, 64
+ic_gear
+  bounds: 508, 996, 64, 64
+ic_map
+  bounds: 580, 996, 64, 64
+ic_trophy
+  bounds: 652, 996, 64, 64
+ic_dna
+  bounds: 724, 996, 64, 64
+ic_bone
+  bounds: 796, 996, 64, 64
+ic_cart
+  bounds: 868, 996, 64, 64
+ic_bag
+  bounds: 940, 996, 64, 64
+ic_book
+  bounds: 1012, 996, 64, 64
+ic_chart
+  bounds: 1084, 996, 64, 64
+ic_target
+  bounds: 1156, 996, 64, 64
+ic_handshake
+  bounds: 1228, 996, 64, 64
+ic_sword
+  bounds: 1300, 996, 64, 64
+ic_leaf
+  bounds: 1372, 996, 64, 64
+ic_home
+  bounds: 1444, 996, 64, 64
+ic_eye
+  bounds: 1516, 996, 64, 64
+ic_info
+  bounds: 1588, 996, 64, 64
+ic_egg
+  bounds: 1660, 996, 64, 64
+ic_crown
+  bounds: 1732, 996, 64, 64
+ic_coin
+  bounds: 1804, 996, 64, 64
+ic_arrow
+  bounds: 1876, 996, 64, 64
+ic_food
+  bounds: 1948, 996, 64, 64
+coin
+  bounds: 4, 1068, 64, 64
+wx_CLEAR
+  bounds: 76, 1068, 64, 64
+wx_CLOUDY
+  bounds: 148, 1068, 64, 64
+wx_RAIN
+  bounds: 220, 1068, 64, 64
+wx_STORM
+  bounds: 292, 1068, 64, 64
+wx_DROUGHT
+  bounds: 364, 1068, 64, 64
+wx_SNOW
+  bounds: 436, 1068, 64, 64
+season_SPRING
+  bounds: 508, 1068, 64, 64
+season_SUMMER
+  bounds: 580, 1068, 64, 64
+season_AUTUMN
+  bounds: 652, 1068, 64, 64
+season_WINTER
+  bounds: 724, 1068, 64, 64
+ui_panel
+  bounds: 1180, 540, 96, 104
+  split: 36, 36, 34, 40
+ui_card
+  bounds: 796, 1068, 64, 64
+  split: 22, 22, 22, 22
+ui_card_hi
+  bounds: 868, 1068, 64, 64
+  split: 22, 22, 22, 22
+ui_card_warn
+  bounds: 940, 1068, 64, 64
+  split: 22, 22, 22, 22
+ui_btn_primary
+  bounds: 732, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_btn
+  bounds: 804, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_btn_down
+  bounds: 876, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_btn_danger
+  bounds: 948, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_btn_selected
+  bounds: 1020, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_btn_disabled
+  bounds: 1092, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_btn_gold
+  bounds: 1164, 676, 64, 72
+  split: 24, 24, 24, 30
+ui_chip
+  bounds: 4, 1140, 48, 48
+  split: 20, 20, 20, 20
+ui_bar_track
+  bounds: 1554, 1140, 32, 16
+  split: 8, 8, 7, 7
+ui_bar_fill
+  bounds: 1594, 1140, 32, 16
+  split: 8, 8, 7, 7
+ui_bar_warn
+  bounds: 1634, 1140, 32, 16
+  split: 8, 8, 7, 7
+ui_toast
+  bounds: 1236, 676, 96, 72
+  split: 34, 34, 30, 36
+ui_alert
+  bounds: 1340, 676, 96, 72
+  split: 34, 34, 30, 32
+ui_bottom
+  bounds: 180, 676, 96, 96
+  split: 38, 38, 38, 38
+ui_circle
+  bounds: 284, 676, 96, 96
+ui_circle_light
+  bounds: 388, 676, 96, 96
+ui_dot
+  bounds: 1060, 1140, 32, 32
+hills_far
+  bounds: 1172, 4, 512, 160
+hills_near
+  bounds: 276, 540, 512, 128
+grass_strip
+  bounds: 476, 1140, 64, 40
+snow_strip
+  bounds: 548, 1140, 64, 40
+sand_strip
+  bounds: 620, 1140, 64, 40
+tree
+  bounds: 284, 4, 160, 224
+pine
+  bounds: 452, 4, 112, 224
+bush
+  bounds: 1444, 676, 112, 72
+rock
+  bounds: 1012, 1068, 112, 64
+flower_0
+  bounds: 1388, 1068, 32, 56
+flower_1
+  bounds: 1428, 1068, 32, 56
+flower_2
+  bounds: 1468, 1068, 32, 56
+cactus
+  bounds: 796, 540, 72, 120
+reeds
+  bounds: 876, 540, 64, 120
+pond
+  bounds: 60, 1140, 224, 48
+bricks
+  bounds: 1564, 676, 128, 72
+can
+  bounds: 1132, 1068, 80, 64
+cloud
+  bounds: 948, 540, 224, 112
+sun
+  bounds: 972, 4, 192, 192
+rival_flag
+  bounds: 492, 676, 56, 88
+home_flag
+  bounds: 556, 676, 56, 88

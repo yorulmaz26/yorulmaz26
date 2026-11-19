@@ -126,6 +126,7 @@ data class GameSave(
     val coins: Int = 0,
     val knownLeft: Int = -Simulation.KNOWN_RANGE,
     val knownRight: Int = Simulation.KNOWN_RANGE,
+    val difficulty: Difficulty = Difficulty.NORMAL,
 )
 
 object SaveMapper {
@@ -187,7 +188,7 @@ object SaveMapper {
             sideColonies = sim.federation.colonies.map { SideColonySave(it.id, it.name, it.x, it.population, it.food, it.shipmentTimer, it.totalSent) },
             owned = sim.market.owned.toList(), equipped = sim.market.equipped.toMap(), decorations = sim.market.decorations.toList(),
             orders = sim.orders.map { OrderSave(it.kind, it.x, it.y, it.targetId) }, retreatWounded = sim.retreatWounded,
-            coins = sim.coins, knownLeft = sim.knownLeft, knownRight = sim.knownRight,
+            coins = sim.coins, knownLeft = sim.knownLeft, knownRight = sim.knownRight, difficulty = sim.difficulty,
         )
     }
 
@@ -269,6 +270,7 @@ object SaveMapper {
         s.orders.forEachIndexed { i, o -> if (i < 2) sim.orders[i].apply { kind = o.kind; x = o.x; y = o.y; targetId = o.targetId } }
         sim.retreatWounded = s.retreatWounded
         sim.coins = s.coins
+        sim.difficulty = s.difficulty
         sim.knownLeft = s.knownLeft
         sim.knownRight = s.knownRight
         sim.restoreInternal(s.lastDay, 0f, s.risky)

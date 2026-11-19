@@ -10,3 +10,5 @@ keystore.properties
 *.jks
 *.keystore
 /assets/sfx/
+/tools/art/build/
+/tools/art/__pycache__/

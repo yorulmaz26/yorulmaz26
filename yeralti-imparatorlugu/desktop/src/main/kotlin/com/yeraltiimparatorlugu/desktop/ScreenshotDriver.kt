@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.utils.ScreenUtils
 import com.yeraltiimparatorlugu.game.ToolMode
 import com.yeraltiimparatorlugu.game.YeraltiGame
+import com.yeraltiimparatorlugu.game.openAdvice
 import com.yeraltiimparatorlugu.game.openBuildMenu
 import com.yeraltiimparatorlugu.game.openColony
 import com.yeraltiimparatorlugu.game.openEcosystem
@@ -87,6 +88,7 @@ class ScreenshotDriver(private val game: YeraltiGame, private val outDir: String
         frame++
         val t = game.tools
         when (frame) {
+            2 -> shot("00_hosgeldiniz")
             3 -> { setup(); t.replaceSim(sim); t.hud.closeSheet(); t.camera.position.set(1f, -11f, 0f); t.camera.zoom = 2.3f; t.view.speed = 1 }
             8 -> shot("01_koloni")
             9 -> { t.camera.zoom = 0.9f; t.camera.position.set(14f, -16f, 0f) }
@@ -124,9 +126,13 @@ class ScreenshotDriver(private val game: YeraltiGame, private val outDir: String
             64 -> shot("15_insa_menusu")
             65 -> { t.hud.closeSheet(); t.hud.setMode(ToolMode.PHEROMONE) }
             68 -> shot("16_feromonlar")
-            69 -> t.hud.openColony(5)
-            72 -> shot("17_istatistik")
-            74 -> Gdx.app.exit()
+            69 -> t.hud.openColony(0)
+            72 -> shot("17_koloni_durum")
+            73 -> t.hud.openAdvice()
+            76 -> shot("18_oneriler")
+            77 -> { t.hud.closeSheet(); t.camera.zoom = 0.8f; t.camera.position.set(-1f, -9f, 0f) }
+            80 -> shot("19_yakin_cekim")
+            82 -> Gdx.app.exit()
         }
     }
 

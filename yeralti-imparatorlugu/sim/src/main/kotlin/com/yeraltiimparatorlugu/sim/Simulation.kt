@@ -111,6 +111,7 @@ class Simulation(val seed: Long) {
     var surfaceMound = 0
     val dumpX = 3
     var coins = 0
+    var difficulty = Difficulty.RELAXED
     var knownLeft = -KNOWN_RANGE
     var knownRight = KNOWN_RANGE
     var reputation = 0
@@ -279,7 +280,7 @@ class Simulation(val seed: Long) {
         }
         val military = ant.type.military
         val working = ant.activity != AntActivity.IDLE && ant.activity != AntActivity.RESTING && ant.activity != AntActivity.GUARDING
-        ant.hunger = (ant.hunger + dt * (100f / 260f) * (if (military) 1.3f else 1f)).coerceAtMost(100f)
+        ant.hunger = (ant.hunger + dt * (100f / 260f) * difficulty.hungerMult * (if (military) 1.3f else 1f)).coerceAtMost(100f)
         if (ant.activity != AntActivity.RESTING) ant.energy = (ant.energy - dt * (if (working) 0.33f else 0.12f)).coerceAtLeast(0f)
         ant.starving = ant.hunger >= 100f
         val water = environment.waterAt(ant.cellX, ant.cellY)
@@ -1087,7 +1088,7 @@ class Simulation(val seed: Long) {
         while (span < 14 && column(i)) { span++; i-- }
         i = x + 1
         while (span < 14 && column(i)) { span++; i++ }
-        return if (span > limit) ((span - limit) * 0.25f * mods.collapseMult).coerceIn(0f, 1f) else 0f
+        return if (span > limit) ((span - limit) * 0.25f * mods.collapseMult * difficulty.collapseMult).coerceIn(0f, 1f) else 0f
     }
 
     fun collapseCandidates(): List<Long> = riskyCells.filter { collapseRisk(keyX(it), keyY(it)) > 0f }
@@ -1298,6 +1299,30 @@ class Simulation(val seed: Long) {
         if (!connected) return Placement(false, "Bir tünele bağlı olmalı", dig)
         if (!resources.hasAll(type.cost)) return Placement(false, "Yetersiz kaynak", dig)
         return Placement(true, null, dig)
+    }
+
+    /**
+     * Oda için iyi bir yer önerir: kraliçe odasına yakın, az kazı gerektiren, komşuluk bonusu alan geçerli bir alan.
+     * Kaynak yetersizliği öneriyi engellemez (oyuncu yerini görebilsin diye).
+     */
+    fun suggestRoomPlacement(type: RoomType): Pair<Int, Int>? {
+        val q = rooms.first { it.type == RoomType.QUEEN_CHAMBER }
+        var best: Pair<Int, Int>? = null
+        var bestScore = Float.MAX_VALUE
+        val bonusTypes = type.adjacency.keys
+        for (y in 1..34) for (x in -34..34) {
+            val p = checkRoomPlacement(type, x, y)
+            if (!p.ok && p.reason != "Yetersiz kaynak") continue
+            var score = p.digCells * 1.2f + manhattan(x + type.width / 2, y, q.anchorX, q.anchorY) * 0.8f
+            val probe = Room(-1, type, x, y)
+            if (rooms.any { it.type in bonusTypes && it.isAdjacentTo(probe) }) score -= 25f
+            if (rooms.any { it.isAdjacentTo(probe) }) score -= 4f
+            var water = false
+            probe.forEachCell { xx, yy -> if (environment.waterAt(xx, yy) > 0.1f || DIRS4.any { world.get(xx + it[0], yy + it[1]) == Terrain.WATER_POCKET }) water = true }
+            if (water) score += 40f
+            if (score < bestScore) { bestScore = score; best = x to y }
+        }
+        return best
     }
 
     fun placeRoom(type: RoomType, x: Int, y: Int): Room? {

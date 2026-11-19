@@ -83,14 +83,10 @@ class YeraltiGame : ApplicationAdapter(), GameActions {
     }
 
     private fun welcomeLines() = listOf(
-        "Kraliçeniz ve 6 işçiniz yüzeyin altındaki küçük yuvada.",
-        "Kaz aracıyla hücreleri işaretleyin: işçiler gerçekten kazar, çıkan toprağı depoya ya da yüzeye taşır.",
-        "İnşa menüsünden oda planlayın: alan önce kazılır, sonra inşa edilir. Yerleşim önemlidir, komşu odalar bonus verir.",
-        "Toplayıcılar yüzeydeki yaprak, tohum ve böcek kalıntılarını besin deposuna getirir.",
-        "Koloni › Görevler ekranından öncelikleri ve uzman işçileri ayarlayın.",
-        "Feromonlarla karıncaları yönlendirin: uzak kaynaklar ancak Yiyecek feromonuyla fark edilir.",
-        "Araştırma Laboratuvarı kurup yeni odaları, sınıfları ve yetenekleri açın. Mevsimler, sel ve kuraklık koloniyi etkiler.",
-        "İlk günler sakindir; sonra rakip koloniler baskın yapabilir. Asker yetiştirin, tuzak kurun, gerekirse tüneli kapatın.",
+        "Kraliçeniz ve 6 işçiniz yeni yuvalarında. İşçiler yiyeceği kendiliğinden toplar.",
+        "Üstteki HEDEF kartı ne yapacağınızı söyler; \"Yap\" düğmesi sizi doğrudan oraya götürür.",
+        "Kaz: hücrelerin üzerinden parmağınızı sürükleyin. İnşa: bir oda seçin, en iyi yer önerilir.",
+        "Takıldığınızda \"Öneriler\" düğmesine dokunun. İlk günler sakindir; acele etmeyin.",
     )
 
     override fun saveNow() {

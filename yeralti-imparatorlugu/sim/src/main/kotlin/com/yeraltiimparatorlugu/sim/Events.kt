@@ -21,7 +21,7 @@ class EventSystem {
                 WorldEventKind.FOOD_BOOM -> if (season == Season.WINTER) 0.5f else 2f
                 WorldEventKind.DISEASE -> if (sim.population > 12) 1.2f + sim.corpses.size * 0.3f else 0.2f
                 WorldEventKind.QUAKE -> 0.8f
-                WorldEventKind.RIVAL_RAID -> if (sim.day > RivalSystem.GRACE_DAYS && sim.rivalSystem.rivals.any { it.hostile }) 1.5f else 0f
+                WorldEventKind.RIVAL_RAID -> if (sim.day > sim.difficulty.graceDays && sim.rivalSystem.rivals.any { it.hostile }) 1.5f else 0f
                 WorldEventKind.RARE_FIND -> 1.2f
                 WorldEventKind.MIGRATION -> if (season == Season.WINTER) 0.3f else 1.5f
             }

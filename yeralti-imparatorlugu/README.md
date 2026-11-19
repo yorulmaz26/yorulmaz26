@@ -5,15 +5,29 @@ Android için tek oyunculu, tamamen çevrimdışı, bölümsüz ve sürekli iler
 
 > Kaz, üret, geliştir, savun, keşfet ve imparatorluğunu büyüt.
 
-| Koloni | Savaş | Eğitim | Araştırma |
+| Hoş geldiniz | Koloni | Yakın çekim | Savaş |
 |---|---|---|---|
-| ![](docs/ekran/01_koloni.png) | ![](docs/ekran/02_savas.png) | ![](docs/ekran/03_egitim_odasi.png) | ![](docs/ekran/04_arastirma.png) |
-| **Ordu** | **Diplomasi** | **Keşif** | **İmparatorluk** |
-| ![](docs/ekran/05_ordu.png) | ![](docs/ekran/06_diplomasi.png) | ![](docs/ekran/07_kesif.png) | ![](docs/ekran/09_imparatorluk.png) |
-| **Menü** | **Sağanak ve sel** | **Kış** | **Feromonlar** |
-| ![](docs/ekran/10_menu.png) | ![](docs/ekran/12_saganak_sel.png) | ![](docs/ekran/14_kis.png) | ![](docs/ekran/16_feromonlar.png) |
+| ![](docs/ekran/00_hosgeldiniz.png) | ![](docs/ekran/01_koloni.png) | ![](docs/ekran/19_yakin_cekim.png) | ![](docs/ekran/02_savas.png) |
+| **Öneriler** | **İnşa** | **Araştırma** | **Ordu** |
+| ![](docs/ekran/18_oneriler.png) | ![](docs/ekran/15_insa_menusu.png) | ![](docs/ekran/04_arastirma.png) | ![](docs/ekran/05_ordu.png) |
+| **Diplomasi** | **Diğer** | **Sağanak** | **Kış** |
+| ![](docs/ekran/06_diplomasi.png) | ![](docs/ekran/10_menu.png) | ![](docs/ekran/12_saganak_sel.png) | ![](docs/ekran/14_kis.png) |
 
-Görüntüler masaüstü başlatıcısının sanal ekranda (Xvfb) çalıştırılmasıyla alınmıştır; tüm görseller ve sesler kodla üretilir.
+Görüntüler masaüstü başlatıcısının sanal ekranda (Xvfb) çalıştırılmasıyla alınmıştır.
+
+## Tasarım ve kolay oynanış
+
+- **Görseller:** 248 çizim `tools/art/` altındaki Python betiğiyle vektör (SVG) olarak üretilir: gradyanlı ve gölgeli
+  karıncalar (4 kareli yürüyüş), dikişsiz dokulu zemin karoları, yuvarlatılmış tünel köşeleri, desenli ve ışıklı
+  odalar, paralaks tepeler, biyom süsleri, ikonlar ve 9 parçalı arayüz zeminleri. Chromium bunları tek bir 2048×2048
+  doku atlasına (`assets/art/game.png` + `game.atlas`) dönüştürür. Yeniden üretmek için: `cd tools/art && python3 build_art.py`.
+- **Yazı tipi:** Nunito (SIL Open Font License, `assets/fonts/Nunito-OFL.txt`).
+- **Sade arayüz:** Üstte tek bilgi kapsülü ve 3 kaynak çipi; altta büyük ikonlu Kaz / İnşa / İşaret / (Ordu) /
+  Koloni / Diğer. Gelişmiş ekranlar ancak ilgili özellik açılınca "Diğer" menüsünde görünür.
+- **Rehberlik:** HEDEF kartındaki "Yap" düğmesi oyuncuyu doğrudan ilgili araca götürür; "Öneriler" danışmanı
+  (yiyecek, barınak, depo, sel, tehdit, araştırma…) tek dokunuşla uygulanabilir çözümler sunar.
+- **Otomatik yerleşim:** Oda seçilince komşuluk bonusunu, kazı miktarını ve su riskini gözeten en iyi yer önerilir.
+- **Zorluk:** Rahat (varsayılan: daha az açlık, ilk 6 gün baskın yok, küçük baskınlar, nadir çökme), Normal, Zor.
 
 ## Aşamalar
 
@@ -95,7 +109,8 @@ yeralti-imparatorlugu/
              WorldRenderer, Hud + Screens (22 ekran), WorldInput (dokun/sürükle/yakınlaştır)
   android/   Android başlatıcı (dikey, tam ekran, minSdk 24, targetSdk 35), release imzalama
   desktop/   Masaüstü başlatıcı + ekran görüntüsü betiği
-  assets/    DejaVu Sans fontları (lisans dosyası yanında)
+  assets/    Doku atlası (art/) ve Nunito yazı tipi (fonts/)
+  tools/art/ Çizim üreticisi (Python + Chromium/Playwright)
   docs/      Ekran görüntüleri, YAYIN.md (Google Play kontrol listesi)
 ```
 
@@ -109,7 +124,7 @@ Gereksinimler: JDK 17+, Android SDK 35 (Android Studio ile gelir).
 
 ```bash
 cd yeralti-imparatorlugu
-./gradlew :sim:test                 # 72 otomatik test
+./gradlew :sim:test                 # 75 otomatik test
 ./gradlew :android:assembleDebug    # android/build/outputs/apk/debug/android-debug.apk
 ./gradlew :android:assembleRelease  # R8 küçültmeli; keystore.properties varsa imzalı
 ./gradlew :android:bundleRelease    # Google Play için AAB
@@ -127,5 +142,4 @@ GitHub Actions (`.github/workflows/yeralti.yml`) testleri, APK'ları ve ekran g�
   çalışma zamanı (özellikle kayıt serileştirmesi) cihazda denenmeli.
 - Yayın imzası anahtarı depoda yoktur (`keystore.properties.example` şablonu var). Mağaza görselleri ve politika
   metinleri için `docs/YAYIN.md`'ye bakın.
-- Görseller ve sesler bilinçli olarak prosedüreldir (harici varlık yok); profesyonel çizimlerle değiştirilmeye uygundur.
 - Dengeleme otomatik testlerle ve kısa oyun oturumlarıyla yapıldı; uzun süreli oyuncu testleriyle ince ayar gerekir.

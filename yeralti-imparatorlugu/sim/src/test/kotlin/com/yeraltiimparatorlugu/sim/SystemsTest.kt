@@ -514,3 +514,36 @@ class EndlessGameTest {
         assertTrue(sim.creatures.all { it.x.isFinite() })
     }
 }
+
+class EaseTest {
+    @Test
+    fun odaYeriOnerisiGecerliVeKomsulukGozetir() {
+        val sim = Simulation.newGame(40)
+        val p = sim.suggestRoomPlacement(RoomType.EGG_ROOM)
+        kotlin.test.assertNotNull(p)
+        assertTrue(sim.checkRoomPlacement(RoomType.EGG_ROOM, p.first, p.second).ok)
+        val probe = Room(-1, RoomType.EGG_ROOM, p.first, p.second)
+        assertTrue(sim.rooms.any { it.type == RoomType.QUEEN_CHAMBER && it.isAdjacentTo(probe) }, "Kraliçe odasına komşu olmalı: $p")
+        // Önerilen yere gerçekten kurulabilir.
+        assertNotNull(sim.placeRoom(RoomType.EGG_ROOM, p.first, p.second))
+    }
+
+    @Test
+    fun danismanSorunlariOnerir() {
+        val sim = Simulation.newGame(41)
+        sim.resources.set(ResourceType.FOOD, 0); sim.resources.set(ResourceType.SEED, 0); sim.resources.set(ResourceType.MUSHROOM, 0)
+        val a = Advisor.advice(sim)
+        assertTrue(a.any { it.id == "food" && it.level == AdviceLevel.DANGER })
+        repeat(2) { sim.ants.add(Ant(sim.newId(), AntType.WORKER, 0.5f, 9.5f)) }
+        sim.resources.set(ResourceType.FOOD, 30)
+        assertTrue(Advisor.advice(sim).any { it.id == "housing" && it.action is AdviceAction.Build })
+    }
+
+    @Test
+    fun rahatZorlukBaskiniGeciktirir() {
+        val sim = Simulation.newGame(42)
+        assertEquals(Difficulty.RELAXED, sim.difficulty)
+        sim.run(Simulation.DAY_LENGTH.toFloat() * 4.5f)
+        assertTrue(sim.creatures.none { it.rivalId >= 0 }, "Rahat modda ilk 6 gün baskın yok")
+    }
+}

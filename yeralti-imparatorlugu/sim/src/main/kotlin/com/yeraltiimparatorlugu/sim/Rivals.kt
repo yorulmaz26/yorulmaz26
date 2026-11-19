@@ -97,7 +97,7 @@ class RivalSystem {
             r.raidTimer -= dt
             if (r.raidTimer <= 0f) {
                 r.raidTimer = r.personality.raidDays * Simulation.DAY_LENGTH.toFloat() * (0.7f + sim.rng.nextFloat() * 0.6f)
-                if (r.hostile && sim.day > GRACE_DAYS && !(sim.environment.season(sim.day) == Season.WINTER && r.personality != RivalPersonality.AGGRESSIVE)) {
+                if (r.hostile && sim.day > sim.difficulty.graceDays && !(sim.environment.season(sim.day) == Season.WINTER && r.personality != RivalPersonality.AGGRESSIVE)) {
                     launchRaid(sim, r)
                 }
             }
@@ -157,7 +157,7 @@ class RivalSystem {
     /** Baskın: sayısı oyuncunun savunmasıyla sınırlıdır; hiçbir baskın koloniyi bir anda silecek büyüklükte olmaz. */
     fun launchRaid(sim: Simulation, r: RivalColony, force: Boolean = false) {
         val defense = playerPower(sim)
-        val maxBySafety = (2 + defense / 7f).toInt()
+        val maxBySafety = ((2 + defense / 7f) * sim.difficulty.raidMult).toInt()
         var count = minOf(r.soldiers / 2 + 1, maxBySafety, 12)
         if (force) count = maxOf(count, 2)
         if (count < 2 && !force) return
