@@ -87,7 +87,19 @@ public final class MainActivity extends Activity {
             body.postDelayed(tick[0], 1000);
         };
         tick[0].run();
-        o.button("Günlük Bulmaca", Ui.GOLD, com.isikyolu.game.ui.Icon.CALENDAR, v -> { o.dismiss(); goDaily(); });
+        com.isikyolu.engine.Economy.Item life = com.isikyolu.engine.Economy.item("life1");
+        int lp = com.isikyolu.engine.Economy.price(Game.progress(), life, Game.shopDay());
+        o.button("+1 can al · " + lp + " kristal", Ui.GOLD, com.isikyolu.game.ui.Icon.CRYSTAL, v -> {
+            String why = com.isikyolu.engine.Economy.blockReason(Game.progress(), life, Game.shopDay());
+            if (why != null) { Game.audio().play(Audio.LOCKED); toast(why); return; }
+            com.isikyolu.engine.Economy.buy(Game.progress(), life, Game.shopDay(), Game.clock());
+            Game.save();
+            o.dismiss();
+            toast("+1 can alındı");
+            checkAchievements();
+        });
+        o.button("Market", Ui.PURPLE, com.isikyolu.game.ui.Icon.BAG, v -> { o.dismiss(); goMarket(2); });
+        o.button("Günlük Bulmaca", Ui.SECONDARY, com.isikyolu.game.ui.Icon.CALENDAR, v -> { o.dismiss(); goDaily(); });
         o.button("Tamam", Ui.SECONDARY, -1, v -> o.dismiss());
         o.setOnDismiss(() -> body.removeCallbacks(tick[0]));
         o.show(overlayLayer());
@@ -97,6 +109,24 @@ public final class MainActivity extends Activity {
     public void goDaily() { show(new DailyScreen(this), true); }
     public void goAchievements() { show(new AchievementsScreen(this), true); }
     public void goSettings() { show(new SettingsScreen(this), true); }
+    public void goMarket(int tab) { show(new com.isikyolu.game.screens.MarketScreen(this, tab), true); }
+
+    /** Yeni başarıları işaretler, ödüllerini verir ve sırayla gösterir. */
+    public void checkAchievements() {
+        java.util.List<com.isikyolu.engine.Achievements.Def> fresh = com.isikyolu.engine.Achievements.update(Game.progress());
+        if (fresh.isEmpty()) return;
+        long delay = 300;
+        for (com.isikyolu.engine.Achievements.Def d : fresh) {
+            com.isikyolu.engine.Economy.Reward r = com.isikyolu.engine.Economy.onAchievement(Game.progress(), d);
+            String gain = "+" + r.crystals + " kristal" + (r.gems > 0 ? " · +" + r.gems + " Prizma Taşı" : "");
+            root.postDelayed(() -> {
+                Game.audio().play(Audio.ACHIEVE);
+                banner(com.isikyolu.game.ui.Icon.TROPHY, "Başarı: " + d.title, d.description + "  " + gain);
+            }, delay);
+            delay += 3200;
+        }
+        Game.save();
+    }
 
     /** Üstten kayan bildirim (başarı kazanıldı vb.). */
     public void banner(int icon, String title, String subtitle) {

@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.3.0
+# Build Raporu — Işık Yolu 1.4.0
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -16,6 +16,35 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.4.0 değişiklikleri
+
+- **Market** (yalnızca oyun içi para; gerçek para yok). Sekmeler: Teklifler, Güçlendiriciler, Canlar, Görünüm,
+  Nasıl Kazanılır.
+- **İki para birimi:**
+  - Işık Kristali: başlangıçta 50.
+  - Prizma Taşı: nadir.
+- **Fiyatlar ve sınırlar:**
+  - Aynı gün tekrar alınan ürünün fiyatı her alımda artar (ör. ipucu 60 → 80 → 100…).
+  - Günlük alım sınırları vardır.
+  - Görünümlerin bölüm şartı vardır.
+  - Günlük 3 indirimli teklif (%20–40, tek adet).
+- **Güvenilir gün:** can sistemindeki en ileri görülen zamana göre belirlenir. Saati geri almak sınırları ve
+  teklifleri sıfırlamaz.
+- **Ürünler:** ipucu, ipucu paketi, ek hamle bileti, can kalkanı, kristali taşa çevirme, +1 can, canları doldur.
+- **Görünümler:** 4 ayna kaplaması, 4 tahta teması, 3 ışın efekti; önizlemeli, kalıcı, takılıp çıkarılabilir.
+- **Kazanç:**
+  - Bölümü ilk kez bitirmek: 4 + 2 × (dünya − 1) kristal.
+  - İlk kez 3 yıldız: +3 kristal.
+  - Grup 30/30: 1 taş.
+  - Günlük bulmaca: 20 + seri bonusu (en fazla +30).
+  - Başarılar: 30 kristal, büyük başarılar ayrıca taş.
+  - Tekrar oynamak kazandırmaz.
+- **Oyun içi:** hak bitince "+5 hak ile devam" (bilet ya da 80 → 160 → 320 kristal). İpucu kalmayınca ve can
+  kalmayınca pencereden doğrudan satın alma.
+- **Denge:** 500 bölümün bütün kazancı (5 500 kristal) bile kristalle satılan görünümlerin toplamına
+  (6 000) yetmez.
+- 2 yeni başarı: İlk Alışveriş, Koleksiyoncu (toplam 27).
 
 ## 1.3.0 değişiklikleri
 
@@ -52,10 +81,10 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.3.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 763 972 bayt | `df69d98baf56cff603bb99b31a4dfcd8026492bbabc801a60aea22996dda60bc` |
-| `teslimat/IsikYolu-1.3.0-debug.apk` | 1 862 535 bayt | `b630b001f98a86f0fc17b56728bbd9a72f88cc4de122a55d12ca42140a816ddb` |
+| `teslimat/IsikYolu-1.4.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 777 548 bayt | `d59025d08326740c709340feb2a6057a4c5c7d0fa28092131dc968d1095fbf07` |
+| `teslimat/IsikYolu-1.4.0-debug.apk` | 1 888 819 bayt | `58889657d14137b8948841b36b2b445b0bd4c0b1de3b0c66d18d685368ed18c1` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 4, sürüm adı 1.3.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 5, sürüm adı 1.4.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.

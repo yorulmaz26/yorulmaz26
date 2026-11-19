@@ -46,7 +46,15 @@ public final class MenuScreen extends Screen {
         TextView st = Ui.text(a, "  " + p.totalStars() + " / " + Progress.LEVEL_COUNT * 3 + "   ·   " + p.completedCount() + " / " + Progress.LEVEL_COUNT + " bölüm", 14, Palette.GOLD, Ui.MEDIUM);
         pill.addView(st);
         col.addView(pill, Ui.lpMargins(a, -2, -2, 0, 18, 0, 10));
-        col.addView(new com.isikyolu.game.ui.LivesBadge(a), Ui.lpMargins(a, -2, -2, 0, 0, 0, 20));
+        LinearLayout status = Ui.horizontal(a);
+        status.setGravity(Gravity.CENTER);
+        status.addView(new com.isikyolu.game.ui.LivesBadge(a));
+        LinearLayout.LayoutParams cl = new LinearLayout.LayoutParams(-2, -2);
+        cl.leftMargin = Ui.dp(a, 6);
+        com.isikyolu.game.ui.CurrencyBar cb = new com.isikyolu.game.ui.CurrencyBar(a);
+        Ui.clickable(cb, v -> a.goMarket(0));
+        status.addView(cb, cl);
+        col.addView(status, Ui.lpMargins(a, -2, -2, 0, 0, 0, 20));
 
         int next = p.nextLevel();
         String playLabel = p.completedCount() == 0 ? "Oyna" : (p.completedCount() >= Progress.LEVEL_COUNT ? "Oyna · Bölüm " + Progress.LEVEL_COUNT : "Devam Et · Bölüm " + next);
@@ -62,12 +70,13 @@ public final class MenuScreen extends Screen {
         row2.addView(tile(Icon.TROPHY, "Başarılar", Palette.PURPLE,
                 p.achievements.size() + "/" + Achievements.ALL.size(), () -> a.goAchievements()), weight(0, 6));
         row2.addView(tile(Icon.GEAR, "Ayarlar", Palette.TEXT_DIM, null, () -> a.goSettings()), weight(6, 0));
-        col.addView(row2, Ui.lpMargins(a, -1, -2, 0, 0, 0, 14));
+        col.addView(row2, Ui.lpMargins(a, -1, -2, 0, 0, 0, 12));
+        col.addView(Ui.button(a, "Market", Ui.GOLD, Icon.BAG, v -> a.goMarket(0)), Ui.lpMargins(a, -1, Ui.dp(a, 58), 0, 0, 0, 12));
 
         col.addView(Ui.button(a, "Nasıl Oynanır?", Ui.GHOST, Icon.HELP, v -> TutorialOverlay.full(a).show(a.overlayLayer())),
                 Ui.lpMargins(a, -1, -2, 0, 0, 0, 0));
         col.addView(Ui.space(a, 18));
-        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.3", 12, Palette.TEXT_FAINT, Ui.REGULAR);
+        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.4", 12, Palette.TEXT_FAINT, Ui.REGULAR);
         col.addView(foot);
         sv.addView(col, new ScrollView.LayoutParams(-1, -2));
         addView(sv, new LayoutParams(-1, -1));

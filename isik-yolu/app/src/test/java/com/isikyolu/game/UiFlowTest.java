@@ -254,6 +254,10 @@ public class UiFlowTest {
             assertEquals("tur " + round, 3 - round, p.lives);
             assertNotNull("hak bitti penceresi", topOverlay());
             if (round == 0) shot("13_hak_bitti");
+            View again = findByDescription(topOverlay(), "Bölümler");
+            assertNotNull(again);
+            again.performClick(); // devam etmeden bırak: can gider
+            idle(600);
             closeOverlays();
         }
         assertEquals(0, p.lives);
@@ -283,6 +287,77 @@ public class UiFlowTest {
         assertEquals(0, p.attemptLevel);
     }
 
+    private static View findByDescription(View v, String prefix) {
+        if (v.getContentDescription() != null && v.getContentDescription().toString().startsWith(prefix)) return v;
+        if (v instanceof ViewGroup) {
+            ViewGroup g = (ViewGroup) v;
+            for (int i = 0; i < g.getChildCount(); i++) { View f = findByDescription(g.getChildAt(i), prefix); if (f != null) return f; }
+        }
+        return null;
+    }
+
+    /** Market sekmeleri, önizleme, görünüm satın alma ve hak bitince kristalle devam. */
+    @Test public void marketFlow() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        p.crystals = 3000; p.gems = 10;
+        for (int i = 1; i <= 300; i++) p.stars[i] = 1;
+        for (int t = 0; t < 5; t++) {
+            act.goMarket(t);
+            idle(700);
+            shot("15_market_" + t);
+        }
+        // önizleme
+        act.goMarket(3);
+        idle(500);
+        Method prev = com.isikyolu.game.screens.MarketScreen.class.getDeclaredMethod("preview", com.isikyolu.engine.Economy.Item.class, int.class, String.class);
+        prev.setAccessible(true);
+        com.isikyolu.engine.Economy.Item gal = com.isikyolu.engine.Economy.item("board_galaxy");
+        prev.invoke(act.currentScreen(), gal, gal.basePrice, null);
+        idle(600);
+        shot("16_onizleme");
+        closeOverlays();
+        int day = Game.shopDay();
+        for (String id : new String[]{"mirror_gold", "board_galaxy", "beam_stardust"})
+            assertTrue(id, com.isikyolu.engine.Economy.buy(p, com.isikyolu.engine.Economy.item(id), day, Game.clock()));
+        assertEquals("mirror_gold", p.mirrorSkin);
+        assertEquals("board_galaxy", p.boardSkin);
+        assertEquals(3000 - 400 - 900, p.crystals);
+        assertEquals(5, p.gems);
+        act.goLevel(38);
+        idle(600);
+        closeOverlays();
+        shot("17_gorunum_oyunda");
+        // hak bitince 80 kristalle +5 hak
+        final int lvl = 12;
+        Level l = Game.levels().get(lvl);
+        java.util.Set<Integer> sol = new java.util.HashSet<>();
+        for (Move mv : Solver.solve(new Board(l), 100000).moves) sol.add(mv.cell);
+        int mx = -1, my = -1;
+        for (com.isikyolu.engine.Piece pc : l.pieces)
+            if (pc.type == com.isikyolu.engine.Cell.MIRROR && pc.rotatable && !sol.contains(pc.y * l.width + pc.x)) { mx = pc.x; my = pc.y; }
+        act.checkAchievements(); // testte verilen yıldızların başarı ödüllerini önceden işle
+        act.goLevel(lvl);
+        idle(500);
+        closeOverlays();
+        GameScreen gs = (GameScreen) act.currentScreen();
+        int budget = com.isikyolu.engine.Lives.moveBudget(l.optimal);
+        for (int i = 0; i < budget; i++) { assertTrue(gs.onRotate(mx, my)); idle(20); }
+        idle(900);
+        assertNotNull(topOverlay());
+        shot("18_devam_teklifi");
+        int kr = p.crystals, lives = p.lives;
+        View cont = findByDescription(topOverlay(), "+5 hak");
+        assertNotNull("devam butonu", cont);
+        cont.performClick();
+        idle(500);
+        assertEquals(kr - 80, p.crystals);
+        assertEquals("devam etmek can harcamaz", lives, p.lives);
+        assertTrue("devamdan sonra hamle yapılabilir", gs.onRotate(mx, my));
+        assertTrue(p.achievements.contains("alisveris"));
+    }
+
     @Test public void splashScreenRenders() throws Exception {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         idle(900);
@@ -308,6 +383,7 @@ public class UiFlowTest {
         assertEquals("başlangıç 3 + her 10 bölümde 1", 3 + 50, Game.progress().hints);
         assertTrue(Game.progress().achievements.contains("efsane"));
         assertEquals("kazanılan denemelerde can harcanmaz", com.isikyolu.engine.Lives.MAX, Game.progress().lives);
+        assertTrue("500 bölümün kazancı verilmeli", Game.progress().crystalsEarned >= com.isikyolu.engine.Economy.maxLevelIncome());
         assertTrue(Game.progress().achievements.contains("kusursuz"));
         act.goLevels();
         idle(800);

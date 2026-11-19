@@ -12,7 +12,8 @@ import android.graphics.drawable.Drawable;
 public final class Icon extends Drawable {
     public static final int BACK = 0, PAUSE = 1, UNDO = 2, RESET = 3, BULB = 4, STAR = 5, LOCK = 6, GEAR = 7,
             TROPHY = 8, CALENDAR = 9, SOUND = 10, MUSIC = 11, PLAY = 12, GRID = 13, HELP = 14, VIBRATE = 15,
-            CHECK = 16, FLAME = 17, NEXT = 18, HOME = 19, STAR_OUTLINE = 20, CLOSE = 21, HEART = 22;
+            CHECK = 16, FLAME = 17, NEXT = 18, HOME = 19, STAR_OUTLINE = 20, CLOSE = 21, HEART = 22,
+            CRYSTAL = 23, GEM = 24, BAG = 25, SHIELD = 26, TICKET = 27, BRUSH = 28, TAG = 29;
 
     private final int kind;
     private final Paint stroke = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -160,6 +161,66 @@ public final class Icon extends Drawable {
                 p.cubicTo(s * 0.92f, s * 0.12f, s * 0.9f, s * 0.5f, m, s * 0.86f);
                 p.close();
                 c.drawPath(p, fl);
+                break;
+            case CRYSTAL: // elmas biçimli ışık kristali
+                p.moveTo(s * 0.3f, s * 0.18f); p.lineTo(s * 0.7f, s * 0.18f); p.lineTo(s * 0.9f, s * 0.4f);
+                p.lineTo(m, s * 0.9f); p.lineTo(s * 0.1f, s * 0.4f); p.close();
+                c.drawPath(p, fl);
+                st.setStrokeWidth(s * 0.05f);
+                int oc = st.getColor();
+                st.setColor(0x66FFFFFF);
+                c.drawLine(s * 0.1f, s * 0.4f, s * 0.9f, s * 0.4f, st);
+                c.drawLine(s * 0.36f, s * 0.4f, m, s * 0.88f, st);
+                c.drawLine(s * 0.64f, s * 0.4f, m, s * 0.88f, st);
+                st.setColor(oc);
+                break;
+            case GEM: // altıgen prizma taşı
+                for (int i = 0; i < 6; i++) {
+                    double a = Math.PI / 6 + i * Math.PI / 3;
+                    float x = m + (float) Math.cos(a) * s * 0.42f, y = m + (float) Math.sin(a) * s * 0.42f;
+                    if (i == 0) p.moveTo(x, y); else p.lineTo(x, y);
+                }
+                p.close();
+                c.drawPath(p, fl);
+                p.reset();
+                p.moveTo(m, s * 0.3f); p.lineTo(s * 0.68f, s * 0.62f); p.lineTo(s * 0.32f, s * 0.62f); p.close();
+                int oc2 = fl.getColor();
+                fl.setColor(0x77FFFFFF);
+                c.drawPath(p, fl);
+                fl.setColor(oc2);
+                break;
+            case BAG:
+                r.set(s * 0.16f, s * 0.34f, s * 0.84f, s * 0.88f); c.drawRoundRect(r, s * 0.08f, s * 0.08f, fl);
+                r.set(s * 0.34f, s * 0.12f, s * 0.66f, s * 0.5f); c.drawArc(r, 180, 180, false, st);
+                break;
+            case SHIELD:
+                p.moveTo(m, s * 0.1f); p.lineTo(s * 0.84f, s * 0.24f); p.lineTo(s * 0.8f, s * 0.56f);
+                p.quadTo(s * 0.72f, s * 0.8f, m, s * 0.92f); p.quadTo(s * 0.28f, s * 0.8f, s * 0.2f, s * 0.56f);
+                p.lineTo(s * 0.16f, s * 0.24f); p.close();
+                c.drawPath(p, fl);
+                break;
+            case TICKET:
+                r.set(s * 0.1f, s * 0.28f, s * 0.9f, s * 0.72f); c.drawRoundRect(r, s * 0.06f, s * 0.06f, fl);
+                int oc3 = fl.getColor();
+                fl.setColor(0xFF1E2A48);
+                c.drawCircle(s * 0.1f, m, s * 0.08f, fl);
+                c.drawCircle(s * 0.9f, m, s * 0.08f, fl);
+                fl.setColor(oc3);
+                break;
+            case BRUSH:
+                c.drawLine(s * 0.78f, s * 0.16f, s * 0.42f, s * 0.56f, st);
+                p.moveTo(s * 0.4f, s * 0.52f); p.quadTo(s * 0.18f, s * 0.6f, s * 0.16f, s * 0.86f);
+                p.quadTo(s * 0.44f, s * 0.84f, s * 0.5f, s * 0.62f); p.close();
+                c.drawPath(p, fl);
+                break;
+            case TAG:
+                p.moveTo(s * 0.12f, s * 0.14f); p.lineTo(s * 0.5f, s * 0.14f); p.lineTo(s * 0.88f, s * 0.52f);
+                p.lineTo(s * 0.52f, s * 0.88f); p.lineTo(s * 0.12f, s * 0.5f); p.close();
+                c.drawPath(p, fl);
+                int oc4 = fl.getColor();
+                fl.setColor(0xFF1E2A48);
+                c.drawCircle(s * 0.3f, s * 0.32f, s * 0.07f, fl);
+                fl.setColor(oc4);
                 break;
             case CLOSE:
                 c.drawLine(s * 0.25f, s * 0.25f, s * 0.75f, s * 0.75f, st);

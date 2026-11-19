@@ -38,7 +38,7 @@ public final class Game {
             progress = Progress.deserialize(prefs.getString(KEY, null));
             clockSource = app;
             // uygulama bir bölümün ortasında kapatıldıysa o denemenin canı geri gelmez
-            if (progress.attemptLevel != 0) { Lives.loseAttempt(progress); abandonedAttempt = true; }
+            if (progress.attemptLevel != 0) { com.isikyolu.engine.Economy.loseAttempt(progress, clock()); abandonedAttempt = true; }
             Lives.update(progress, clock());
             save();
         }
@@ -84,6 +84,14 @@ public final class Game {
         boolean tamper = Lives.update(progress, clock());
         save();
         return tamper;
+    }
+
+    public static long zoneOffset() { return java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()); }
+
+    /** Market günü (saati geri almak günü geri götürmez). */
+    public static int shopDay() {
+        Lives.update(progress, clock()); // en ileri görülen zamanı günceller
+        return com.isikyolu.engine.Economy.trustedDay(progress, System.currentTimeMillis(), zoneOffset());
     }
 
     public static LevelPack levels() { return levels; }

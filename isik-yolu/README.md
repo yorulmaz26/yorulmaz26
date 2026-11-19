@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.3.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.3.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.4.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.4.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -40,6 +40,21 @@ Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` 
   Optimum, her bölüm için BFS çözücüyle hesaplanmıştır. Geri Al hamle sayısını da geri alır.
 - **İpucu:** 3 ipucuyla başlanır; **her 10 bölüm tamamlandığında +1 ipucu** kazanılır (aynı bölümü tekrar
   oynamak sayılmaz). İpucu, mevcut durumdan en kısa çözümün ilk hamlesini tahtada altın halkayla gösterir.
+
+## Market
+
+Oyun içi parayla çalışır; gerçek para yoktur. İki para birimi vardır:
+- **Işık Kristali:** bölümleri ilk kez bitirerek, 3 yıldız alarak, günlük bulmacayla ve başarılarla kazanılır.
+- **Prizma Taşı:** bir grubu 30/30 yıldızla bitirerek ve büyük başarılarla kazanılır.
+
+Ekonomi bilerek dar tutuldu:
+- Aynı gün tekrar alınan ürün pahalanır ve günlük sınırlar vardır.
+- Görünümler bölüm şartı ister.
+- Her gün 3 indirimli teklif gelir.
+- Bütün oyunun kazancı bile bütün görünümlere yetmez.
+
+Market günü saat hilesine karşı korumalıdır. Hak bitince bilet veya kristalle +5 hak ile devam edilebilir; her
+devam fiyatı ikiye katlar. Ayrıntılar: `engine/Economy.java`, `docs/BUILD_RAPORU.md`.
 
 ## Canlar (bölüm modu)
 
@@ -85,8 +100,9 @@ Bölüm seçme ekranında dünyalar sekme olarak gösterilir; yeni dünyaya giri
 | 6 | Bölüm tamamlandı (yıldız animasyonu, sonraki bölüm) | `GameScreen#showComplete` |
 | 7 | İpucu penceresi | `GameScreen#requestHint` |
 | 8 | Günlük bulmaca (tarih, seri, son 7 gün) | `screens/DailyScreen` |
-| 9 | Başarılar (25 başarı, ilerleme çubukları) | `screens/AchievementsScreen` |
+| 9 | Başarılar (27 başarı, ilerleme çubukları) | `screens/AchievementsScreen` |
 | 10 | Ayarlar (ses, müzik, titreşim, öğretici, ilerlemeyi sıfırla) | `screens/SettingsScreen` |
+| 11 | Market (teklifler, güçlendiriciler, canlar, görünümler, kazanç rehberi) | `screens/MarketScreen` |
 
 Ayrıca: Türkçe öğretici (ilk açılışta 3 sayfa, her yeni mekanikte canlı örnek tahtalı tanıtım kartı,
 menüde "Nasıl Oynanır?" ile 13 sayfa). Ekran görüntüleri: [`docs/ekranlar/`](docs/ekranlar).

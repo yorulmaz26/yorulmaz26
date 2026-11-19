@@ -1,8 +1,8 @@
-# Test Raporu — Işık Yolu 1.3.0
+# Test Raporu — Işık Yolu 1.4.0
 
 Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 
-**Sonuç: 57 testin 57'si geçti, 0 hata.** (1.3.0: can sistemi)
+**Sonuç: 72 testin 72'si geçti, 0 hata.** (1.4.0: market)
 
 | Test sınıfı | Test | Sonuç | Süre |
 |---|---|---|---|
@@ -17,7 +17,8 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 | `StarRatingTest` | 2 | ✅ | <0,01 sn |
 | `ProgressTest` | 9 | ✅ | <0,01 sn |
 | `LivesTest` (can sistemi, saat hilesi) | 10 | ✅ | <0,1 sn |
-| `UiFlowTest` (Robolectric, gerçek çizim) | 4 | ✅ | ~90 sn |
+| `EconomyTest` (market ve ekonomi) | 15 | ✅ | <0,1 sn |
+| `UiFlowTest` (Robolectric, gerçek çizim) | 5 | ✅ | ~130 sn |
 
 ## İstenen 10 kontrol
 
@@ -52,6 +53,33 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
   olayları `BoardView.Host` arayüzünden verildi; ham `MotionEvent` sürükleme hareketi otomatik test edilmedi.
 - 60 FPS hedefi cihazda ölçülmedi. Çizim döngüsü bellek ayırmayacak şekilde yazıldı (README › Performans).
 - Ses çalma Robolectric'te gölgelenir; seslerin cihazda duyulması elle denenmelidir.
+
+## Market ve ekonomi (1.4.0)
+
+| Senaryo | Sonuç |
+|---|---|
+| Başlangıç bakiyesi 50 kristal, 0 taş, varsayılan görünümler | ✅ |
+| İpucu fiyatı aynı gün 60 → 80 → 100 → 120 → 140, 6. alım günlük sınırda reddedilir; ertesi gün fiyat ve sınır sıfırlanır | ✅ |
+| Yetersiz bakiyede satın alma reddedilir, bakiye değişmez | ✅ |
+| Saat 3 gün geri alınınca market günü geri gitmez | ✅ |
+| Canlar doluyken can satılmaz; +1 can fiyatı her alımda +25; doldurma en fazla 4'e çıkarır | ✅ |
+| Görünüm bölüm şartı, bir kez satın alma, takma ve varsayılana dönme, sahip olunmayanı takamama, taşla ödeme | ✅ |
+| Günlük teklifler aynı gün aynı, ertesi gün farklı; %20–40 indirim; tek stok | ✅ |
+| Devam fiyatı 80 → 160 → 320; önce bilet kullanılır; yetersiz kristalde devam reddedilir; oturuma +5 hak eklenir | ✅ |
+| Can Kalkanı kaybedilen denemenin canını geri verir, deneme yokken harcanmaz | ✅ |
+| Bölüm ödülü yalnızca ilk kez; 3 yıldıza yükselme +3; 5. dünyada 12 kristal; grup 30/30 bir kez 1 taş | ✅ |
+| Günlük bulmaca ödülü seriyle artar (en fazla +30); büyük başarılar taş verir | ✅ |
+| Denge: 500 bölümden en fazla 5 500 kristal; kristalle satılan görünümler 6 000 kristal; taşla satılanlar 12 taş | ✅ |
+| Kaydet / yükle ve ilerlemeyi sıfırla ekonomiyi doğru işler | ✅ |
+
+`UiFlowTest.marketFlow` arayüzde şunları doğrular:
+- Market'in 5 sekmesi açılır.
+- Galaksi tahtası önizlenir.
+- Altın aynalar, Galaksi tahtası ve Yıldız Tozu ışını satın alınıp oyunda gösterilir.
+- Hak bitince "+5 hak · 80 kristal" butonuyla devam edilir: 80 kristal düşer, can harcanmaz, hamleye devam edilebilir.
+- "İlk Alışveriş" başarısı açılır.
+
+Tüm 500 bölümü oynayan test, kazanılan kristalin bölüm kazancının tamamına eşit ya da fazla olduğunu doğrular.
 
 ## Can sistemi (1.3.0)
 

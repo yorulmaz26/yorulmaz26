@@ -25,6 +25,8 @@ public final class Achievements {
                 case K_HINT: return p.hintsUsedTotal;
                 case K_UNDO: return p.undoCount;
                 case K_WORLD: return p.completedInWorld(goal);
+                case K_PURCHASE: return p.purchases;
+                case K_COSMETIC: return p.owned.size();
                 case K_CHAPTER: {
                     int n = 0;
                     for (int i = (goal - 1) * 10 + 1; i <= goal * 10; i++) if (p.stars[i] > 0) n++;
@@ -39,7 +41,7 @@ public final class Achievements {
         public boolean reached(Progress p) { return current(p) >= target(); }
     }
 
-    static final int K_COMPLETED = 0, K_STARS = 1, K_THREE = 2, K_DAILY = 3, K_NOHINT = 4, K_HINT = 5, K_UNDO = 6, K_CHAPTER = 7, K_WORLD = 8;
+    static final int K_COMPLETED = 0, K_STARS = 1, K_THREE = 2, K_DAILY = 3, K_NOHINT = 4, K_HINT = 5, K_UNDO = 6, K_CHAPTER = 7, K_WORLD = 8, K_PURCHASE = 9, K_COSMETIC = 10;
 
     public static final List<Def> ALL = Arrays.asList(
             new Def("ilk_isik", "İlk Işık", "İlk bölümü tamamla.", K_COMPLETED, 1),
@@ -66,7 +68,9 @@ public final class Achievements {
             new Def("aylik", "Ayın Işığı", "30 günlük bulmaca çöz.", K_DAILY, 30),
             new Def("kendi_yolum", "Kendi Yolum", "20 bölümü ipucu kullanmadan bitir.", K_NOHINT, 20),
             new Def("merakli", "Meraklı Zihin", "İlk ipucunu kullan.", K_HINT, 1),
-            new Def("zaman_yolcusu", "Zaman Yolcusu", "10 kez hamle geri al.", K_UNDO, 10)
+            new Def("zaman_yolcusu", "Zaman Yolcusu", "10 kez hamle geri al.", K_UNDO, 10),
+            new Def("alisveris", "İlk Alışveriş", "Marketten ilk alışverişini yap.", K_PURCHASE, 1),
+            new Def("koleksiyon", "Koleksiyoncu", "Marketteki 11 görünümün hepsine sahip ol.", K_COSMETIC, 11)
     );
 
     private Achievements() {}

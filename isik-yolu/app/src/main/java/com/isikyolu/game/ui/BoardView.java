@@ -89,6 +89,26 @@ public final class BoardView extends View {
     private final RectF rect = new RectF();
     private final Paint shaderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Shader glassShader, glassFixedShader, plateShader, mountShader, frameShader;
+    private final android.graphics.Matrix shaderMatrix = new android.graphics.Matrix();
+    private Skins.Mirror skinMirror;
+    private Skins.Board skinBoard;
+    private Skins.Beam skinBeam;
+    private String overMirror, overBoard, overBeam;
+
+    /** Önizleme için görünümü geçersiz kıl (null = oyuncunun seçimi). */
+    public void setSkinOverride(String mirror, String board, String beamFx) {
+        overMirror = mirror; overBoard = board; overBeam = beamFx;
+        loadSkins();
+        buildShaders();
+        invalidate();
+    }
+
+    private void loadSkins() {
+        com.isikyolu.engine.Progress p = Game.progress();
+        skinMirror = Skins.mirror(overMirror != null ? overMirror : p.mirrorSkin);
+        skinBoard = Skins.board(overBoard != null ? overBoard : p.boardSkin);
+        skinBeam = Skins.beam(overBeam != null ? overBeam : p.beamSkin);
+    }
 
     public BoardView(Context c) {
         super(c);
@@ -121,6 +141,7 @@ public final class BoardView extends View {
         pcount = 0;
         clearHint();
         refreshBeams(true);
+        loadSkins();
         if (getWidth() > 0) layoutBoard();
         requestLayout();
         invalidate();
@@ -240,16 +261,18 @@ public final class BoardView extends View {
     /** Çizimde ayırma yapmamak için gölgelendiriciler boyut değişince bir kez kurulur. */
     private void buildShaders() {
         if (cell <= 0) return;
+        if (skinMirror == null) loadSkins();
         float T = cell * 0.085f;
-        glassShader = new LinearGradient(0, -T, 0, T, new int[]{0xFFFFFFFF, 0xFFD6E6FA, 0xFF9DBBE6, 0xFF6F8FC4},
-                new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
+        if (skinMirror.rainbow)
+            glassShader = new LinearGradient(-cell * 0.43f, 0, cell * 0.43f, 0, skinMirror.glass, null, Shader.TileMode.MIRROR);
+        else
+            glassShader = new LinearGradient(0, -T, 0, T, skinMirror.glass, new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
         glassFixedShader = new LinearGradient(0, -T, 0, T, new int[]{0xFFF2F0EA, 0xFFC9CCD6, 0xFF8E95A8, 0xFF656C80},
                 new float[]{0f, 0.35f, 0.7f, 1f}, Shader.TileMode.CLAMP);
         plateShader = new RadialGradient(-cell * 0.1f, -cell * 0.12f, cell * 0.5f, new int[]{0xFF34466E, 0xFF394A74, 0xFF2B3658},
                 new float[]{0f, 0.6f, 1f}, Shader.TileMode.CLAMP);
         mountShader = new LinearGradient(0, -cell * 0.4f, 0, cell * 0.4f, 0xFF46526F, 0xFF455275, Shader.TileMode.CLAMP);
-        frameShader = new LinearGradient(ox, oy, ox + gw * cell, oy + gh * cell,
-                new int[]{0xFF20B8A6, 0xFF6D5DFB, 0xFFF5C542}, null, Shader.TileMode.CLAMP);
+        frameShader = new LinearGradient(ox, oy, ox + gw * cell, oy + gh * cell, skinBoard.frame, null, Shader.TileMode.CLAMP);
     }
 
     private final float[] tmp = new float[2];
@@ -313,8 +336,17 @@ public final class BoardView extends View {
         stroke.setStrokeWidth(cell * 0.22f);
         stroke.setColor(0x1420B8A6);
         c.drawRoundRect(rect, r, r, stroke);
-        fill.setColor(0xE61D2843);
+        fill.setColor(skinBoard.back);
         c.drawRoundRect(rect, r, r, fill);
+        if (skinBoard.stars) { // galaksi zemini: sabit desenli yıldızlar
+            for (int k = 0; k < 40; k++) {
+                float sx = rect.left + ((k * 73) % 97) / 97f * rect.width();
+                float sy = rect.top + ((k * 151) % 89) / 89f * rect.height();
+                float tw = 0.5f + 0.5f * (float) Math.sin(time * 2f + k);
+                fill.setColor(Palette.withAlpha(Palette.WHITE, (int) (60 + 120 * tw)));
+                c.drawCircle(sx, sy, cell * (0.012f + 0.01f * (k % 3)), fill);
+            }
+        }
         // renk geçişli çerçeve
         if (frameShader != null) {
             shaderPaint.setShader(frameShader);
@@ -329,7 +361,8 @@ public final class BoardView extends View {
         for (int y = 0; y < gh; y++) {
             for (int x = 0; x < gw; x++) {
                 rect.set(ox + x * cell + g, oy + y * cell + g, ox + (x + 1) * cell - g, oy + (y + 1) * cell - g);
-                fill.setColor(((x + y) & 1) == 0 ? 0xFF364971 : 0xFF324268);
+                fill.setColor(((x + y) & 1) == 0 ? skinBoard.tileA : skinBoard.tileB);
+                if (skinBoard.stars) fill.setAlpha(200);
                 c.drawRoundRect(rect, cell * 0.16f, cell * 0.16f, fill);
                 // üst kenar ışığı
                 stroke.setStrokeWidth(cell * 0.015f);
@@ -343,7 +376,8 @@ public final class BoardView extends View {
         if (shown == null) return;
         List<BeamTracer.Segment> segs = shown.segments;
         float half = cell / 2f;
-        float boost = winMode ? 1.35f : 1f;
+        float boost = (winMode ? 1.35f : 1f) * skinBeam.width;
+        int photon = skinBeam.photon;
         for (int pass = 0; pass < 3; pass++) {
             for (int i = 0; i < segs.size(); i++) {
                 BeamTracer.Segment s = segs.get(i);
@@ -362,7 +396,8 @@ public final class BoardView extends View {
                     beam.setStrokeWidth(cell * 0.36f * shimmer * boost);
                     beam.setColor(Palette.withAlpha(col, 42));
                 } else if (pass == 1) {
-                    beam.setStrokeWidth(cell * 0.17f * boost);
+                    float pl = photon == 2 ? 1f + 0.35f * (float) Math.sin(time * 14f + s.startDist) : 1f;
+                    beam.setStrokeWidth(cell * 0.17f * boost * pl);
                     beam.setColor(Palette.withAlpha(col, 150));
                 } else {
                     beam.setStrokeWidth(cell * 0.06f * boost);
@@ -371,12 +406,25 @@ public final class BoardView extends View {
                 c.drawLine(x1, y1, x2, y2, beam);
                 if (pass == 2 && frac >= 1f && len > 0) {
                     // akan foton noktaları
-                    float period = 5f;
-                    float s0 = ((time * 7f - s.startDist) % period + period) % period;
-                    fill.setColor(Palette.withAlpha(Palette.WHITE, 210));
+                    float period = photon == 1 ? 3f : 5f;
+                    float s0 = ((time * (photon == 2 ? 12f : 7f) - s.startDist) % period + period) % period;
+                    fill.setColor(photon == 1 ? Palette.withAlpha(0xFFFFE9A8, 230) : photon == 2 ? Palette.withAlpha(Palette.lighten(col, 0.3f), 240) : Palette.withAlpha(Palette.WHITE, 210));
                     for (float d = s0; d <= len; d += period) {
                         float t = d / len;
-                        c.drawCircle(x1 + (x2 - x1) * t, y1 + (y2 - y1) * t, cell * 0.035f, fill);
+                        float px = x1 + (x2 - x1) * t, py = y1 + (y2 - y1) * t;
+                        if (photon == 1) { // yıldız tozu: dönen küçük yıldızlar
+                            float rr = cell * 0.06f;
+                            c.save();
+                            c.rotate(time * 120f + d * 30f, px, py);
+                            path.reset();
+                            path.moveTo(px, py - rr); path.lineTo(px + rr * 0.25f, py - rr * 0.25f); path.lineTo(px + rr, py);
+                            path.lineTo(px + rr * 0.25f, py + rr * 0.25f); path.lineTo(px, py + rr); path.lineTo(px - rr * 0.25f, py + rr * 0.25f);
+                            path.lineTo(px - rr, py); path.lineTo(px - rr * 0.25f, py - rr * 0.25f); path.close();
+                            c.drawPath(path, fill);
+                            c.restore();
+                        } else {
+                            c.drawCircle(px, py, cell * (photon == 2 ? 0.05f : 0.035f), fill);
+                        }
                     }
                 }
             }
@@ -550,11 +598,15 @@ public final class BoardView extends View {
         c.drawRoundRect(rect, T, T, fill);
         // metal çerçeve
         rect.set(-L, -T, L, T);
-        fill.setColor(rot ? 0xFF4F6188 : 0xFF6E5B3E);
+        fill.setColor(rot ? skinMirror.frame : 0xFF6E5B3E);
         c.drawRoundRect(rect, T, T, fill);
         // cam yüzey
         float g = cell * 0.022f;
         rect.set(-L + g, -T + g, L - g, T - g);
+        if (rot && skinMirror.rainbow) {
+            shaderMatrix.setTranslate((time * cell * 0.6f) % (cell * 1.72f), 0);
+            glassShader.setLocalMatrix(shaderMatrix);
+        }
         shaderPaint.setShader(rot ? glassShader : glassFixedShader);
         c.drawRoundRect(rect, T - g, T - g, shaderPaint);
         if (lit != 0) {
@@ -568,7 +620,7 @@ public final class BoardView extends View {
         stroke.setColor(0x66FFFFFF);
         c.drawLine(L * 0.64f, -T * 0.38f, L * 0.74f, -T * 0.38f, stroke);
         // uç kapakları
-        fill.setColor(rot ? Palette.TURQUOISE : 0xFFC9A45A);
+        fill.setColor(rot ? skinMirror.cap : 0xFFC9A45A);
         c.drawCircle(-L + T * 0.55f, 0, T * 0.42f, fill);
         c.drawCircle(L - T * 0.55f, 0, T * 0.42f, fill);
         c.rotate(-mirrorAngle[i]);

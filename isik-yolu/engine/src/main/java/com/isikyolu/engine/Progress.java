@@ -35,6 +35,14 @@ public final class Progress {
     /** Canı düşülmüş, henüz bitmemiş deneme (0 = yok). */
     public int attemptLevel;
 
+    // ekonomi (bkz. Economy)
+    public int crystals = Economy.START_CRYSTALS, gems, tickets, shields, purchases, crystalsEarned;
+    public final Set<String> owned = new LinkedHashSet<>();
+    public String mirrorSkin = Economy.DEFAULT_MIRROR, boardSkin = Economy.DEFAULT_BOARD, beamSkin = Economy.DEFAULT_BEAM;
+    public int shopDay = -1;
+    public final Map<String, Integer> shopBuys = new LinkedHashMap<>();
+    public final Set<Integer> perfectChapters = new LinkedHashSet<>();
+
     public boolean isUnlocked(int level) {
         return level == 1 || (level >= 2 && level <= LEVEL_COUNT && stars[level - 1] > 0);
     }
@@ -110,6 +118,9 @@ public final class Progress {
         hints = START_HINTS; hintsUsedTotal = 0; levelsWithoutHint = 0; undoCount = 0;
         dailyDone.clear(); achievements.clear(); tutorialSeen = false; lastPlayed = 1;
         lives = Lives.MAX; attemptLevel = 0; lifeBaseElapsed = Long.MIN_VALUE;
+        crystals = Economy.START_CRYSTALS; gems = 0; tickets = 0; shields = 0; purchases = 0; crystalsEarned = 0;
+        owned.clear(); perfectChapters.clear(); shopBuys.clear(); shopDay = -1;
+        mirrorSkin = Economy.DEFAULT_MIRROR; boardSkin = Economy.DEFAULT_BOARD; beamSkin = Economy.DEFAULT_BEAM;
     }
 
     public String serialize() {
@@ -137,6 +148,19 @@ public final class Progress {
         m.put("lbn", lifeBaseNet);
         m.put("lmw", lifeMaxWall);
         m.put("att", attemptLevel);
+        m.put("kr", crystals);
+        m.put("gem", gems);
+        m.put("tik", tickets);
+        m.put("shd", shields);
+        m.put("buyN", purchases);
+        m.put("krE", crystalsEarned);
+        m.put("own", new ArrayList<Object>(owned));
+        m.put("skM", mirrorSkin);
+        m.put("skB", boardSkin);
+        m.put("skL", beamSkin);
+        m.put("shopDay", shopDay);
+        m.put("shopBuys", new LinkedHashMap<String, Object>(shopBuys));
+        m.put("perf", new ArrayList<Object>(perfectChapters));
         return Json.write(m);
     }
 
@@ -172,6 +196,23 @@ public final class Progress {
             p.lifeBaseNet = Json.getLong(m, "lbn", -1);
             p.lifeMaxWall = Json.getLong(m, "lmw", 0);
             p.attemptLevel = Json.getInt(m, "att", 0);
+            p.crystals = Math.max(0, Json.getInt(m, "kr", Economy.START_CRYSTALS));
+            p.gems = Math.max(0, Json.getInt(m, "gem", 0));
+            p.tickets = Math.max(0, Json.getInt(m, "tik", 0));
+            p.shields = Math.max(0, Json.getInt(m, "shd", 0));
+            p.purchases = Json.getInt(m, "buyN", 0);
+            p.crystalsEarned = Json.getInt(m, "krE", 0);
+            Object own = m.get("own");
+            if (own instanceof List) for (Object o : (List<Object>) own) p.owned.add(String.valueOf(o));
+            p.mirrorSkin = Json.getString(m, "skM", Economy.DEFAULT_MIRROR);
+            p.boardSkin = Json.getString(m, "skB", Economy.DEFAULT_BOARD);
+            p.beamSkin = Json.getString(m, "skL", Economy.DEFAULT_BEAM);
+            p.shopDay = Json.getInt(m, "shopDay", -1);
+            Object sb = m.get("shopBuys");
+            if (sb instanceof Map) for (Map.Entry<String, Object> e : ((Map<String, Object>) sb).entrySet())
+                if (e.getValue() instanceof Number) p.shopBuys.put(e.getKey(), ((Number) e.getValue()).intValue());
+            Object pf = m.get("perf");
+            if (pf instanceof List) for (Object o : (List<Object>) pf) if (o instanceof Number) p.perfectChapters.add(((Number) o).intValue());
             return p;
         } catch (RuntimeException e) {
             return new Progress();

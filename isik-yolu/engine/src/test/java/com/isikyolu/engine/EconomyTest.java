@@ -1,0 +1,218 @@
+package com.isikyolu.engine;
+
+import static org.junit.Assert.*;
+
+import java.util.List;
+import org.junit.Test;
+
+/** Market ve ekonomi: fiyat artışı, günlük sınırlar, teklifler, görünümler, kazançlar, hile koruması. */
+public class EconomyTest {
+    static final long DAY = 86_400_000L;
+    static final long T0 = 1_800_000_000_000L;
+
+    private static Progress rich(int kr, int gem) {
+        Progress p = new Progress();
+        p.crystals = kr; p.gems = gem;
+        return p;
+    }
+
+    private static Economy.Item it(String id) { return Economy.item(id); }
+
+    @Test public void startingBalance() {
+        Progress p = new Progress();
+        assertEquals(50, p.crystals);
+        assertEquals(0, p.gems);
+        assertEquals(Economy.DEFAULT_MIRROR, p.mirrorSkin);
+    }
+
+    @Test public void priceEscalatesAndDailyLimit() {
+        Progress p = rich(10_000, 0);
+        int day = 100;
+        Economy.Item h = it("hint1");
+        int[] expect = {60, 80, 100, 120, 140};
+        int hints = p.hints;
+        for (int k = 0; k < 5; k++) {
+            assertEquals(expect[k], Economy.price(p, h, day));
+            assertTrue(Economy.buy(p, h, day, null));
+        }
+        assertEquals(hints + 5, p.hints);
+        assertEquals(10_000 - 500, p.crystals);
+        assertEquals("Bugünlük sınır doldu", Economy.blockReason(p, h, day));
+        assertFalse(Economy.buy(p, h, day, null));
+        // ertesi gün sıfırlanır
+        assertEquals(60, Economy.price(p, h, day + 1));
+        assertNull(Economy.blockReason(p, h, day + 1));
+    }
+
+    @Test public void notEnoughMoney() {
+        Progress p = rich(59, 0);
+        assertEquals("Yetersiz kristal", Economy.blockReason(p, it("hint1"), 1));
+        assertFalse(Economy.buy(p, it("hint1"), 1, null));
+        assertEquals(59, p.crystals);
+        assertEquals("Yetersiz Prizma Taşı", Economy.blockReason(p, it("shield"), 1));
+    }
+
+    @Test public void trustedDayIgnoresClockGoingBack() {
+        Progress p = new Progress();
+        p.lifeMaxWall = T0 + 3 * DAY; // daha önce görülen en ileri zaman
+        int d1 = Economy.trustedDay(p, T0 + 3 * DAY, 0);
+        int dBack = Economy.trustedDay(p, T0, 0); // kullanıcı saati 3 gün geri aldı
+        assertEquals(d1, dBack);
+        assertEquals(d1 + 1, Economy.trustedDay(p, T0 + 4 * DAY, 0));
+        assertTrue(Economy.msUntilNextDay(p, T0, 0) <= DAY);
+    }
+
+    @Test public void livesPurchaseNeedsMissingLife() {
+        Progress p = rich(1000, 0);
+        assertEquals("Canların dolu", Economy.blockReason(p, it("life1"), 5));
+        p.lives = 1;
+        Lives.Clock c = new Lives.Clock(T0, 100_000, 3, -1);
+        Lives.update(p, c);
+        assertTrue(Economy.buy(p, it("life1"), 5, c));
+        assertEquals(2, p.lives);
+        assertEquals(70, Economy.price(p, it("life1"), 5));
+        assertTrue(Economy.buy(p, it("lifefull"), 5, c));
+        assertEquals(Lives.MAX, p.lives);
+        assertEquals("Canların dolu", Economy.blockReason(p, it("life1"), 5));
+    }
+
+    @Test public void cosmeticsOneTimeEquipAndUnlock() {
+        Progress p = rich(5000, 10);
+        Economy.Item gold = it("mirror_gold");
+        assertEquals("Bölüm 20'u bitir", Economy.blockReason(p, gold, 1));
+        for (int i = 1; i <= 20; i++) p.stars[i] = 1;
+        assertTrue(Economy.buy(p, gold, 1, null));
+        assertEquals("mirror_gold", p.mirrorSkin);
+        assertTrue(Economy.equipped(p, gold));
+        assertEquals("Sahipsin", Economy.blockReason(p, gold, 2));
+        Economy.equipDefault(p, Economy.Kind.MIRROR);
+        assertEquals(Economy.DEFAULT_MIRROR, p.mirrorSkin);
+        Economy.equip(p, gold);
+        assertEquals("mirror_gold", p.mirrorSkin);
+        // sahip olunmayan görünüm takılamaz
+        Economy.equip(p, it("board_ocean"));
+        assertEquals(Economy.DEFAULT_BOARD, p.boardSkin);
+        // taşla satılan görünüm
+        for (int i = 1; i <= 300; i++) p.stars[i] = 1;
+        assertTrue(Economy.buy(p, it("beam_plasma"), 1, null));
+        assertEquals(6, p.gems);
+        assertEquals("beam_plasma", p.beamSkin);
+    }
+
+    @Test public void dailyDealsDeterministicDiscountedSingleStock() {
+        List<Economy.Deal> a = Economy.deals(400), b = Economy.deals(400), c = Economy.deals(401);
+        assertEquals(3, a.size());
+        for (int i = 0; i < 3; i++) {
+            assertEquals(a.get(i).item.id, b.get(i).item.id);
+            assertTrue(a.get(i).price < a.get(i).item.basePrice);
+            assertTrue(a.get(i).discount >= 20 && a.get(i).discount <= 40);
+        }
+        boolean differs = false;
+        for (int i = 0; i < 3; i++) if (!a.get(i).item.id.equals(c.get(i).item.id)) differs = true;
+        assertTrue("teklifler günden güne değişir", differs);
+        Progress p = rich(100_000, 100);
+        for (int i = 1; i <= 500; i++) p.stars[i] = 1;
+        Economy.Deal d = a.get(0);
+        if (d.item.kind == Economy.Kind.LIFE) p.lives = 1;
+        assertTrue(Economy.buyDeal(p, d, 400, new Lives.Clock(T0, 100_000, 1, -1)));
+        assertEquals("Tükendi", Economy.dealBlockReason(p, d, 400));
+        // ertesi günün teklifleri yeni stokla gelir
+        Economy.Deal next = Economy.deals(401).get(0);
+        assertNotEquals("Tükendi", Economy.dealBlockReason(p, next, 401));
+    }
+
+    @Test public void continueCostsDoubleAndTicketsFirst() {
+        assertEquals(80, Economy.continuePrice(0));
+        assertEquals(160, Economy.continuePrice(1));
+        assertEquals(320, Economy.continuePrice(2));
+        Progress p = rich(200, 0);
+        p.tickets = 1;
+        assertTrue(Economy.payContinue(p, 0));
+        assertEquals(0, p.tickets);
+        assertEquals(200, p.crystals);
+        assertTrue(Economy.payContinue(p, 0));
+        assertEquals(120, p.crystals);
+        assertFalse(Economy.payContinue(p, 1)); // 160 gerekir
+    }
+
+    @Test public void continueExtendsSessionBudget() throws Exception {
+        Level l = TestUtil.pack().get(12);
+        GameSession g = new GameSession(l, true);
+        int b = g.budgetLeft();
+        g.addBudget(Economy.CONTINUE_MOVES);
+        assertEquals(b + 5, g.budgetLeft());
+    }
+
+    @Test public void shieldRefundsLostAttempt() {
+        Progress p = rich(0, 0);
+        Lives.Clock c = new Lives.Clock(T0, 100_000, 1, -1);
+        Lives.update(p, c);
+        p.shields = 1;
+        Lives.startAttempt(p, c, 7);
+        assertEquals(3, p.lives);
+        assertTrue(Economy.loseAttempt(p, c));
+        assertEquals(4, p.lives);
+        assertEquals(0, p.shields);
+        Lives.startAttempt(p, c, 7);
+        assertFalse(Economy.loseAttempt(p, c));
+        assertEquals(3, p.lives);
+        assertFalse("deneme yokken kalkan harcanmaz", Economy.loseAttempt(p, c));
+    }
+
+    @Test public void levelRewardsOnlyFirstTime() {
+        Progress p = rich(0, 0);
+        Economy.Reward r = Economy.onLevelComplete(p, 5, 0, 2);
+        assertEquals(4, r.crystals);
+        p.stars[5] = 2;
+        assertEquals("tekrar oynamak kazandırmaz", 0, Economy.onLevelComplete(p, 5, 2, 2).crystals);
+        assertEquals("3 yıldıza yükselmek 3 kristal", 3, Economy.onLevelComplete(p, 5, 2, 3).crystals);
+        assertEquals(12, Economy.onLevelComplete(p, 401, 0, 1).crystals); // 5. dünya: 4 + 2×4
+        // grup 30/30: bir kez 1 taş
+        for (int i = 11; i <= 20; i++) p.stars[i] = 3;
+        assertEquals(1, Economy.onLevelComplete(p, 20, 2, 3).gems);
+        assertEquals(0, Economy.onLevelComplete(p, 20, 3, 3).gems);
+    }
+
+    @Test public void dailyAndAchievementRewards() {
+        Progress p = rich(0, 0);
+        assertEquals(20, Economy.onDailyComplete(p, 1).crystals);
+        assertEquals(29, Economy.onDailyComplete(p, 4).crystals);
+        assertEquals(50, Economy.onDailyComplete(p, 40).crystals); // seri bonusu en fazla +30
+        Achievements.Def efsane = null, ilk = null;
+        for (Achievements.Def d : Achievements.ALL) { if (d.id.equals("efsane")) efsane = d; if (d.id.equals("ilk_isik")) ilk = d; }
+        assertEquals(0, Economy.onAchievement(p, ilk).gems);
+        assertEquals(3, Economy.onAchievement(p, efsane).gems);
+    }
+
+    /** "Zor" ekonomi: bütün oyunun bölüm kazancı bile görünümlerin hepsine yetmez. */
+    @Test public void economyIsTight() {
+        int income = Economy.maxLevelIncome();
+        int cosmetics = Economy.cosmeticCost(Economy.KR);
+        System.out.println("500 bölümden en fazla kristal: " + income + ", kristalle satılan görünümler: " + cosmetics
+                + ", taşla satılan görünümler: " + Economy.cosmeticCost(Economy.GEM) + " taş");
+        assertTrue(cosmetics > income * 0.8);
+        assertEquals(11, Economy.cosmeticCount());
+        // bir bölüm ortalama 6–14 kristal: bir ipucu ≈ 5–10 bölüm
+        assertTrue(Economy.item("hint1").basePrice >= 5 * 8);
+    }
+
+    @Test public void saveLoadKeepsEconomy() {
+        Progress p = rich(321, 4);
+        p.tickets = 2; p.shields = 1;
+        p.owned.add("board_ocean"); p.boardSkin = "board_ocean";
+        p.shopDay = 77; p.shopBuys.put("hint1", 2); p.perfectChapters.add(3);
+        Progress q = Progress.deserialize(p.serialize());
+        assertEquals(321, q.crystals);
+        assertEquals(4, q.gems);
+        assertEquals(2, q.tickets);
+        assertEquals(1, q.shields);
+        assertEquals("board_ocean", q.boardSkin);
+        assertTrue(q.owned.contains("board_ocean"));
+        assertEquals(Integer.valueOf(2), q.shopBuys.get("hint1"));
+        assertTrue(q.perfectChapters.contains(3));
+        assertEquals(p.serialize(), q.serialize());
+        p.resetAll();
+        assertEquals(50, p.crystals);
+        assertTrue(p.owned.isEmpty());
+    }
+}

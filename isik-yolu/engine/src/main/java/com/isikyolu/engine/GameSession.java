@@ -32,8 +32,15 @@ public final class GameSession {
     public int hintsUsed() { return hintsUsed; }
     public void markHintUsed() { hintsUsed++; }
 
+    private int bonusBudget, continues;
+
     /** Kalan hamle hakkı. */
-    public int budgetLeft() { return Lives.moveBudget(level.optimal) - actions; }
+    public int budgetLeft() { return Lives.moveBudget(level.optimal) + bonusBudget - actions; }
+
+    /** Marketten/biletle ek hak (bu denemede kaçıncı devam olduğu da sayılır). */
+    public void addBudget(int n) { bonusBudget += n; continues++; }
+
+    public int continues() { return continues; }
     public int actions() { return actions; }
     /** Hak bitti ve çözülmedi mi? */
     public boolean isOutOfMoves() { return limited && !result.solved && budgetLeft() <= 0; }
@@ -42,6 +49,8 @@ public final class GameSession {
         board = new Board(level);
         history.clear();
         actions = 0;
+        bonusBudget = 0;
+        continues = 0;
         retrace();
     }
 

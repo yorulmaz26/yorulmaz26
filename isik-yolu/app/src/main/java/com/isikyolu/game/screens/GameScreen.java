@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.isikyolu.engine.Achievements;
 import com.isikyolu.engine.Chapters;
 import com.isikyolu.engine.DailyPuzzle;
+import com.isikyolu.engine.Economy;
 import com.isikyolu.engine.GameSession;
 import com.isikyolu.engine.Level;
 import com.isikyolu.engine.Lives;
@@ -244,7 +245,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     @Override public void onHide() {
         // bölümden çıkıldı: denemenin canı geri gelmez
-        if (attemptActive() && !finished) { Lives.loseAttempt(Game.progress()); Game.save(); }
+        if (attemptActive() && !finished) giveUpAttempt();
     }
 
     @Override public void onBlockTapped() { act.toast("Altın bloğu sürükleyerek kaydır"); }
@@ -268,7 +269,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
             o.title("Yeniden başla?");
             o.body("Bu denemenin canı geri gelmez.\nKalan can: " + Game.progress().lives
                     + (Game.progress().lives == 0 ? "\nYeni deneme için can yenilenmesini beklemen gerekecek." : ""));
-            o.button("Yeniden Başla", Ui.GOLD, Icon.RESET, v -> { o.dismiss(); Lives.loseAttempt(Game.progress()); Game.save(); doReset(); });
+            o.button("Yeniden Başla", Ui.GOLD, Icon.RESET, v -> { o.dismiss(); giveUpAttempt(); doReset(); });
             o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
             o.show(act.overlayLayer());
             return;
@@ -289,31 +290,57 @@ public final class GameScreen extends Screen implements BoardView.Host {
         else if (session.isOutOfMoves()) outOfMoves();
     }
 
-    /** Hamle hakkı bitti: deneme kaybedildi, can geri gelmez. */
+    /** Deneme bırakıldı/kaybedildi: can geri gelmez (Can Kalkanı varsa korur). */
+    private void giveUpAttempt() {
+        if (!attemptActive()) return;
+        if (Economy.loseAttempt(Game.progress(), Game.clock())) act.toast("Can Kalkanı canını korudu!");
+        Game.save();
+    }
+
+    /** Hamle hakkı bitti: bilet veya kristalle +5 hak ile devam edilebilir; yoksa can gider. */
     private void outOfMoves() {
         if (finished) return;
         finished = true;
         board.setInputEnabled(false);
-        Lives.loseAttempt(Game.progress());
         Game.save();
         Game.audio().play(Audio.LOCKED, 0.8f);
         Game.haptics().error();
-        postDelayed(() -> {
-            Overlay o = new Overlay(act).setCancelable(false);
-            Context c = act;
-            FrameLayout ic = new FrameLayout(c);
-            ic.setBackground(Ui.round(0x33FF5C7A, Ui.dp(c, 34)));
-            ic.addView(Ui.icon(c, Icon.HEART, 0xFFFF5C7A, 38), new FrameLayout.LayoutParams(Ui.dp(c, 38), Ui.dp(c, 38), Gravity.CENTER));
-            o.cardView().addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 68), Ui.dp(c, 68)));
-            o.title("Hamle hakkın bitti");
-            Progress p = Game.progress();
-            o.body("Bu denemede 1 can kaybettin.\nKalan can: " + p.lives + "/" + Lives.MAX
-                    + (p.lives < Lives.MAX ? "\nSonraki can: " + Lives.format(Lives.msUntilNext(p, Game.clock())) : ""));
-            o.button("Tekrar Dene", Ui.PRIMARY, Icon.RESET, v -> { o.dismiss(); act.goLevel(level.id); });
-            o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); act.goLevels(); });
-            o.button("Ana Menü", Ui.SECONDARY, Icon.HOME, v -> { o.dismiss(); act.goMenu(); });
-            o.show(act.overlayLayer());
-        }, 500);
+        postDelayed(this::showOutOfMoves, 500);
+    }
+
+    private void showOutOfMoves() {
+        Overlay o = new Overlay(act).setCancelable(false);
+        Context c = act;
+        FrameLayout ic = new FrameLayout(c);
+        ic.setBackground(Ui.round(0x33FF5C7A, Ui.dp(c, 34)));
+        ic.addView(Ui.icon(c, Icon.HEART, 0xFFFF5C7A, 38), new FrameLayout.LayoutParams(Ui.dp(c, 38), Ui.dp(c, 38), Gravity.CENTER));
+        o.cardView().addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 68), Ui.dp(c, 68)));
+        o.title("Hamle hakkın bitti");
+        Progress p = Game.progress();
+        int price = Economy.continuePrice(session.continues());
+        o.body("Devam etmezsen bu denemenin canı gider.\nKalan can: " + p.lives + "/" + Lives.MAX
+                + (p.shields > 0 ? "\nCan Kalkanı: " + p.shields + " (canını korur)" : ""));
+        String contLabel = p.tickets > 0 ? "Bilet kullan · +" + Economy.CONTINUE_MOVES + " hak (" + p.tickets + ")"
+                : "+" + Economy.CONTINUE_MOVES + " hak · " + price + " kristal";
+        o.button(contLabel, Ui.GOLD, p.tickets > 0 ? Icon.TICKET : Icon.CRYSTAL, v -> {
+            if (!Economy.payContinue(Game.progress(), session.continues())) {
+                Game.audio().play(Audio.LOCKED);
+                act.toast("Yetersiz kristal (" + price + " gerekli, sende " + Game.progress().crystals + ")");
+                return;
+            }
+            o.dismiss();
+            session.addBudget(Economy.CONTINUE_MOVES);
+            finished = false;
+            board.setInputEnabled(true);
+            Game.save();
+            Game.audio().play(Audio.HINT);
+            updateHud();
+            act.checkAchievements();
+        });
+        o.button("Tekrar Dene", Ui.PRIMARY, Icon.RESET, v -> { o.dismiss(); giveUpAttempt(); act.goLevel(level.id); });
+        o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); giveUpAttempt(); act.goLevels(); });
+        o.button("Ana Menü", Ui.SECONDARY, Icon.HOME, v -> { o.dismiss(); giveUpAttempt(); act.goMenu(); });
+        o.show(act.overlayLayer());
     }
 
     private void updateHud() {
@@ -358,7 +385,18 @@ public final class GameScreen extends Screen implements BoardView.Host {
             o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
         } else {
             o.body("İpucun kalmadı.\nHer 10 bölüm tamamladığında +1 ipucu kazanırsın.\nSonraki ipucuna " + p.levelsUntilNextHint() + " bölüm kaldı.");
-            o.button("Tamam", Ui.PRIMARY, -1, v -> o.dismiss());
+            Economy.Item hi = Economy.item("hint1");
+            int hp = Economy.price(p, hi, Game.shopDay());
+            o.button("1 ipucu al · " + hp + " kristal", Ui.GOLD, Icon.CRYSTAL, v -> {
+                String why = Economy.blockReason(Game.progress(), hi, Game.shopDay());
+                if (why != null) { Game.audio().play(Audio.LOCKED); act.toast(why); return; }
+                Economy.buy(Game.progress(), hi, Game.shopDay(), Game.clock());
+                Game.save();
+                o.dismiss();
+                act.checkAchievements();
+                useHint();
+            });
+            o.button("Tamam", Ui.SECONDARY, -1, v -> o.dismiss());
         }
         o.show(act.overlayLayer());
     }
@@ -395,36 +433,29 @@ public final class GameScreen extends Screen implements BoardView.Host {
         int stars = session.stars();
         boolean first = false;
         int hintsBefore = p.hints;
+        Economy.Reward reward;
         if (daily) {
+            boolean firstToday = !p.dailyDone.contains(DailyPuzzle.keyFor(epochDay));
             p.dailyDone.add(DailyPuzzle.keyFor(epochDay));
+            reward = firstToday ? Economy.onDailyComplete(p, p.dailyStreak(DailyPuzzle.today())) : new Economy.Reward();
         } else {
+            int oldStars = p.stars[level.id];
             first = p.recordLevel(level.id, stars, session.moves(), session.hintsUsed() > 0);
             Lives.winAttempt(p, Game.clock(), level.id);
+            reward = Economy.onLevelComplete(p, level.id, oldStars, p.stars[level.id]);
         }
         boolean rewarded = p.hints > hintsBefore;
         Game.save();
         final boolean firstF = first;
         postDelayed(() -> {
-            showComplete(stars, firstF, rewarded);
+            showComplete(stars, firstF, rewarded, reward);
             checkAchievements();
         }, 1100);
     }
 
-    private void checkAchievements() {
-        List<Achievements.Def> fresh = Achievements.update(Game.progress());
-        if (fresh.isEmpty()) return;
-        Game.save();
-        long delay = 300;
-        for (Achievements.Def d : fresh) {
-            postDelayed(() -> {
-                Game.audio().play(Audio.ACHIEVE);
-                act.banner(Icon.TROPHY, "Başarı: " + d.title, d.description);
-            }, delay);
-            delay += 3200;
-        }
-    }
+    private void checkAchievements() { act.checkAchievements(); }
 
-    private void showComplete(int stars, boolean first, boolean rewarded) {
+    private void showComplete(int stars, boolean first, boolean rewarded, Economy.Reward reward) {
         Overlay o = new Overlay(act).setCancelable(false);
         Context c = act;
         String[] titles = {"", "Tamamlandı!", "Harika!", "Kusursuz!"};
@@ -442,6 +473,24 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (stars < 3) b.append("\n3 yıldız için ").append(level.optimal).append(" hamlede bitir.");
         if (daily) b.append("\nSeri: ").append(Game.progress().dailyStreak(DailyPuzzle.today())).append(" gün");
         o.body(b.toString());
+        if (reward.any()) {
+            LinearLayout gain = Ui.horizontal(c);
+            gain.setGravity(Gravity.CENTER);
+            gain.setBackground(Ui.round(0x3322C7B2, Ui.dp(c, 14)));
+            gain.setPadding(Ui.dp(c, 12), Ui.dp(c, 6), Ui.dp(c, 14), Ui.dp(c, 6));
+            if (reward.crystals > 0) {
+                gain.addView(Ui.icon(c, Icon.CRYSTAL, com.isikyolu.game.ui.CurrencyBar.CRYSTAL_COLOR, 18));
+                gain.addView(Ui.text(c, " +" + reward.crystals + "  ", 16, Palette.WHITE, Ui.BOLD));
+            }
+            if (reward.gems > 0) {
+                gain.addView(Ui.icon(c, Icon.GEM, com.isikyolu.game.ui.CurrencyBar.GEM_COLOR, 18));
+                gain.addView(Ui.text(c, " +" + reward.gems, 16, Palette.WHITE, Ui.BOLD));
+            }
+            o.cardView().addView(gain, Ui.lpMargins(c, -2, -2, 0, 0, 0, 4));
+            TextView why = Ui.text(c, String.join(" · ", reward.lines), 12, Palette.TEXT_DIM, Ui.MEDIUM);
+            why.setGravity(Gravity.CENTER);
+            o.cardView().addView(why, Ui.lpMargins(c, -2, -2, 0, 0, 0, 6));
+        }
         if (rewarded) {
             TextView r = Ui.text(c, "+1 ipucu kazandın! (" + Game.progress().completedCount() + " bölüm tamamlandı)", 15, Palette.GOLD, Ui.BOLD);
             r.setGravity(Gravity.CENTER);
