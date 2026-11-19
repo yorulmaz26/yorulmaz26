@@ -1,0 +1,2250 @@
+{
+  "Wonder": 1,
+  "Levels": [
+    {
+      "Id": 61,
+      "Wonder": 1,
+      "Local": 1,
+      "Difficulty": "Easy",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "....x....",
+        "....x....",
+        "....x....",
+        "ssss.ssss",
+        ".s.....ss",
+        ".ssc.css.",
+        ".........",
+        ".........",
+        ".c.....c."
+      ],
+      "Colors": 5,
+      "Moves": 35,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 15
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "Collect",
+          "Color": "Compass",
+          "Count": 16
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11385835830362714936,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 62,
+      "Wonder": 1,
+      "Local": 2,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "........",
+        ".lx..x..",
+        "........",
+        "c..xx..c",
+        "x.c..c.x",
+        "........",
+        "........",
+        ".x....x.",
+        "...ll..."
+      ],
+      "Colors": 5,
+      "Moves": 39,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 11385839128897599569,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 63,
+      "Wonder": 1,
+      "Local": 3,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "........",
+        "........",
+        "..x..x..",
+        "ss....ss",
+        "s.ss.s.s",
+        "ssxssxss",
+        "........",
+        "........"
+      ],
+      "Colors": 6,
+      "Moves": 56,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 15
+        },
+        {
+          "Type": "Collect",
+          "Color": "GoldCoin",
+          "Count": 21
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 16,
+      "Seed": 11385838029385971358,
+      "ShapeName": "Çerçeve",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 64,
+      "Wonder": 1,
+      "Local": 4,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "........",
+        "...ll...",
+        "........",
+        "........",
+        "........",
+        "........",
+        ".....l..",
+        "........"
+      ],
+      "Colors": 5,
+      "Moves": 25,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "Collect",
+          "Color": "Amphora",
+          "Count": 42
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11385841327920855991,
+      "ShapeName": "Tam",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 65,
+      "Wonder": 1,
+      "Local": 5,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "xx....xx",
+        "x......x",
+        "........",
+        "........",
+        ".l....l.",
+        "l..l...l",
+        "........",
+        "x......x",
+        "xx....xx"
+      ],
+      "Colors": 6,
+      "Moves": 29,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 5
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 8,
+      "Seed": 11385840228409227780,
+      "ShapeName": "Elmas",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 66,
+      "Wonder": 1,
+      "Local": 6,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "xx....xx",
+        "xx....xx",
+        "........",
+        "........",
+        "..c..c.c",
+        ".s.ss.s.",
+        "s......s",
+        "xxs..sxx",
+        "xx.ss.xx"
+      ],
+      "Colors": 5,
+      "Moves": 37,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 10
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11385843526944112413,
+      "ShapeName": "Haç",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 67,
+      "Wonder": 1,
+      "Local": 7,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "...sxS...",
+        "s...x..Ss",
+        "....x....",
+        "S..S.s..s",
+        "ss.s.s.sS",
+        ".........",
+        ".........",
+        "s.......S",
+        "...s.S..."
+      ],
+      "Colors": 5,
+      "Moves": 26,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 26
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11385842427432484202,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 68,
+      "Wonder": 1,
+      "Local": 8,
+      "Difficulty": "Hard",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "........",
+        ".x....x.",
+        "........",
+        "ssxSsxss",
+        "ssSSsssS",
+        "xsSSssSx",
+        "c......c",
+        "cxc..cxc",
+        ".c....c."
+      ],
+      "Colors": 5,
+      "Moves": 36,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 27
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 8
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11385828133781317459,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 69,
+      "Wonder": 1,
+      "Local": 9,
+      "Difficulty": "Easy",
+      "Width": 7,
+      "Height": 7,
+      "Layout": [
+        ".......",
+        ".......",
+        "..x.x..",
+        ".......",
+        "..xsx..",
+        "s.s.s.s",
+        "ss...s."
+      ],
+      "Colors": 5,
+      "Moves": 60,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 8
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 17,
+      "Seed": 11385827034269689248,
+      "ShapeName": "Çerçeve",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 70,
+      "Wonder": 1,
+      "Local": 10,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 7,
+      "Layout": [
+        "x.......x",
+        ".........",
+        "sSsscsssS",
+        "Ss.s...Ss",
+        "S.......s",
+        "....x....",
+        ".c.cxc.c."
+      ],
+      "Colors": 6,
+      "Moves": 43,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scarab",
+          "Count": 15
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 12,
+      "Seed": 11384845170385886050,
+      "ShapeName": "Kemer",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 71,
+      "Wonder": 1,
+      "Local": 11,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "x......x",
+        "........",
+        "........",
+        "........",
+        "...cc...",
+        ".c....c.",
+        "........",
+        "...xx...",
+        "...xx..."
+      ],
+      "Colors": 5,
+      "Moves": 12,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        }
+      ],
+      "Star2MovesLeft": 1,
+      "Star3MovesLeft": 3,
+      "Seed": 11384846269897514261,
+      "ShapeName": "Kemer",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 72,
+      "Wonder": 1,
+      "Local": 12,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 8,
+      "Layout": [
+        "x.....x",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "..l.l..",
+        "...x...",
+        "..lxl.."
+      ],
+      "Colors": 6,
+      "Moves": 39,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "Collect",
+          "Color": "Compass",
+          "Count": 21
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 11384842971362629628,
+      "ShapeName": "Kemer",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 73,
+      "Wonder": 1,
+      "Local": 13,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "x......x",
+        "........",
+        "........",
+        "........",
+        "........",
+        "s......s",
+        "sssccss.",
+        "cssxxssc",
+        "..sxxs.."
+      ],
+      "Colors": 5,
+      "Moves": 44,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 13
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "Collect",
+          "Color": "Amphora",
+          "Count": 16
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 12,
+      "Seed": 11384844070874257839,
+      "ShapeName": "Kemer",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 74,
+      "Wonder": 1,
+      "Local": 14,
+      "Difficulty": "Hard",
+      "Width": 7,
+      "Height": 7,
+      "Layout": [
+        ".......",
+        "s..s..S",
+        "s..l..S",
+        "Sllxlls",
+        "ccs.ssc",
+        "SS...ss",
+        ".c.s.cc"
+      ],
+      "Colors": 5,
+      "Moves": 25,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 6
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 5
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11384840772339373206,
+      "ShapeName": "Merkez Avlu",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 75,
+      "Wonder": 1,
+      "Local": 15,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "........",
+        "........",
+        "........",
+        "Ss.xx.ss",
+        "sSsxx.ss",
+        "sss..SSS",
+        "........",
+        "........"
+      ],
+      "Colors": 6,
+      "Moves": 47,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        }
+      ],
+      "Star2MovesLeft": 6,
+      "Star3MovesLeft": 13,
+      "Seed": 11384841871851001417,
+      "ShapeName": "Merkez Avlu",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 76,
+      "Wonder": 1,
+      "Local": 16,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "........",
+        "........",
+        "...l....",
+        "...xx..c",
+        "...cc...",
+        "...ll...",
+        "........"
+      ],
+      "Colors": 5,
+      "Moves": 33,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "Collect",
+          "Color": "Compass",
+          "Count": 26
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 11384838573316116784,
+      "ShapeName": "Merkez Avlu",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 77,
+      "Wonder": 1,
+      "Local": 17,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "........",
+        "........",
+        "........",
+        "...xx...",
+        "s.Sxxs.S",
+        "s.s..S.s",
+        ".s....ss",
+        "ss....SS"
+      ],
+      "Colors": 6,
+      "Moves": 53,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scarab",
+          "Count": 15
+        }
+      ],
+      "Star2MovesLeft": 6,
+      "Star3MovesLeft": 15,
+      "Seed": 11384839672827744995,
+      "ShapeName": "Merkez Avlu",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 78,
+      "Wonder": 1,
+      "Local": 18,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 8,
+      "Layout": [
+        "x......",
+        "......x",
+        "x.....c",
+        "...c..x",
+        "xlclcl.",
+        "......x",
+        "x..l...",
+        "......x"
+      ],
+      "Colors": 6,
+      "Moves": 32,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "Collect",
+          "Color": "GoldCoin",
+          "Count": 21
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 11384853966478911738,
+      "ShapeName": "Zikzak",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 79,
+      "Wonder": 1,
+      "Local": 19,
+      "Difficulty": "Hard",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "x......x",
+        ".l......",
+        "x......x",
+        "l..ll..l",
+        "xsSsSsSx",
+        "Sss..Sss",
+        "xs.s..sx"
+      ],
+      "Colors": 5,
+      "Moves": 25,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 5
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11384855065990539949,
+      "ShapeName": "Zikzak",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 80,
+      "Wonder": 1,
+      "Local": 20,
+      "Difficulty": "VeryHard",
+      "Width": 7,
+      "Height": 8,
+      "Layout": [
+        ".s.x.s.",
+        "s.Sxs.s",
+        ".s.x.s.",
+        "ls.l.Sl",
+        "cllcllc",
+        "cs.c.Sc",
+        "s.Scs.S",
+        "sS.c.sS"
+      ],
+      "Colors": 5,
+      "Moves": 27,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 27
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 8
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 7
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 8,
+      "Seed": 11395402681037886597,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 0.41666666
+    },
+    {
+      "Id": 81,
+      "Wonder": 1,
+      "Local": 21,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "........",
+        "........",
+        "........",
+        "l.x..x..",
+        "l......l",
+        "..x..x..",
+        "........",
+        "........"
+      ],
+      "Colors": 5,
+      "Moves": 60,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "Collect",
+          "Color": "GoldCoin",
+          "Count": 20
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 17,
+      "Seed": 11395401581526258386,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 82,
+      "Wonder": 1,
+      "Local": 22,
+      "Difficulty": "Easy",
+      "Width": 7,
+      "Height": 8,
+      "Layout": [
+        "...x...",
+        "...x...",
+        "..lxl..",
+        ".......",
+        ".......",
+        ".......",
+        ".....cl",
+        "c.....c"
+      ],
+      "Colors": 5,
+      "Moves": 25,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11395400482014630175,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 83,
+      "Wonder": 1,
+      "Local": 23,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 8,
+      "Layout": [
+        ".......",
+        "..x.x..",
+        "..l.l..",
+        ".......",
+        "l.x.x.l",
+        "cx.c.xc",
+        "..x.x..",
+        "...c..."
+      ],
+      "Colors": 4,
+      "Moves": 35,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 4
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11395399382503001964,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 84,
+      "Wonder": 1,
+      "Local": 24,
+      "Difficulty": "Easy",
+      "Width": 7,
+      "Height": 9,
+      "Layout": [
+        "xx...xx",
+        "x.....x",
+        ".......",
+        ".cs.sc.",
+        ".ss.ss.",
+        "ss.c.ss",
+        ".......",
+        "x.....x",
+        "xx...xx"
+      ],
+      "Colors": 5,
+      "Moves": 26,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 10
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11395398282991373753,
+      "ShapeName": "Elmas",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 85,
+      "Wonder": 1,
+      "Local": 25,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "xx....xx",
+        "xx....xx",
+        "........",
+        "c..cc..c",
+        "........",
+        "...c....",
+        "........",
+        "xx....xx",
+        "xx....xx"
+      ],
+      "Colors": 6,
+      "Moves": 15,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 5
+        }
+      ],
+      "Star2MovesLeft": 2,
+      "Star3MovesLeft": 4,
+      "Seed": 11395397183479745542,
+      "ShapeName": "Haç",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 86,
+      "Wonder": 1,
+      "Local": 26,
+      "Difficulty": "Easy",
+      "Width": 7,
+      "Height": 7,
+      "Layout": [
+        "xx...xx",
+        "xs...sx",
+        "..s.s..",
+        "s..s..s",
+        ".......",
+        "x.....x",
+        "xx...xx"
+      ],
+      "Colors": 5,
+      "Moves": 41,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 7
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scroll",
+          "Count": 20
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 11395396083968117331,
+      "ShapeName": "Elmas",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 87,
+      "Wonder": 1,
+      "Local": 27,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 9,
+      "Layout": [
+        "xx....xx",
+        "xx....xx",
+        ".S....s.",
+        ".s.cc.s.",
+        "..sc.S..",
+        "s......S",
+        "..c..c..",
+        "xxSsSsxx",
+        "xxs..sxx"
+      ],
+      "Colors": 6,
+      "Moves": 40,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 19
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scroll",
+          "Count": 15
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 11395394984456489120,
+      "ShapeName": "Haç",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 88,
+      "Wonder": 1,
+      "Local": 28,
+      "Difficulty": "Hard",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "..Sxxs..",
+        ".S.xx.s.",
+        ".s.xx.s.",
+        "Sl.sS.ls",
+        "clsllSlc",
+        "........",
+        "...ssc..",
+        "ssccccsS"
+      ],
+      "Colors": 5,
+      "Moves": 36,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 24
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 7
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 6
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11395411477130912285,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 89,
+      "Wonder": 1,
+      "Local": 29,
+      "Difficulty": "Easy",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        ".........",
+        "..x...x..",
+        ".........",
+        "..x.c.x..",
+        ".c....cc.",
+        ".........",
+        "..x...x..",
+        "........."
+      ],
+      "Colors": 5,
+      "Moves": 32,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "Collect",
+          "Color": "GoldCoin",
+          "Count": 26
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 11395410377619284074,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 90,
+      "Wonder": 1,
+      "Local": 30,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "xxx..xxx",
+        "xx....xx",
+        "x......x",
+        "...cc.c.",
+        "........",
+        "...cc...",
+        "........",
+        "........"
+      ],
+      "Colors": 6,
+      "Moves": 26,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "Collect",
+          "Color": "Amphora",
+          "Count": 21
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 11394410921549429500,
+      "ShapeName": "Basamaklı Piramit",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 91,
+      "Wonder": 1,
+      "Local": 31,
+      "Difficulty": "Easy",
+      "Width": 7,
+      "Height": 9,
+      "Layout": [
+        "xxx.xxx",
+        "xx...xx",
+        "x.....x",
+        ".......",
+        ".......",
+        ".......",
+        "..s.s..",
+        "s.s...s",
+        "ss.s.ss"
+      ],
+      "Colors": 5,
+      "Moves": 43,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 10
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 12,
+      "Seed": 11394412021061057711,
+      "ShapeName": "Basamaklı Piramit",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 92,
+      "Wonder": 1,
+      "Local": 32,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "x......x",
+        "..l..l..",
+        ".....l..",
+        ".c......",
+        "l..cc..l",
+        ".c....c.",
+        "........",
+        "x......x"
+      ],
+      "Colors": 6,
+      "Moves": 32,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scroll",
+          "Count": 22
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 11394413120572685922,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 93,
+      "Wonder": 1,
+      "Local": 33,
+      "Difficulty": "Easy",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        "xs.....sx",
+        ".s.....s.",
+        ".........",
+        "........s",
+        ".s.sss.s.",
+        ".........",
+        ".s.....s.",
+        "x...s...x"
+      ],
+      "Colors": 5,
+      "Moves": 38,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 13
+        },
+        {
+          "Type": "Collect",
+          "Color": "Compass",
+          "Count": 17
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 11394414220084314133,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 94,
+      "Wonder": 1,
+      "Local": 34,
+      "Difficulty": "Hard",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        "xxx...xxx",
+        "xxl...lxx",
+        "xl.....lx",
+        ".Ss.s.Ss.",
+        "Sss..Ssss",
+        "SslsSslSs",
+        "....l....",
+        "........."
+      ],
+      "Colors": 6,
+      "Moves": 36,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 26
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 7
+        },
+        {
+          "Type": "Collect",
+          "Color": "Compass",
+          "Count": 11
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11394406523502916656,
+      "ShapeName": "Basamaklı Piramit",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 95,
+      "Wonder": 1,
+      "Local": 35,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "xxx...xxx",
+        "xx.....xx",
+        "x.......x",
+        ".........",
+        "...l.l...",
+        ".........",
+        "....ll...",
+        ".........",
+        "l.......l"
+      ],
+      "Colors": 6,
+      "Moves": 38,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 6
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 11394407623014544867,
+      "ShapeName": "Basamaklı Piramit",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 96,
+      "Wonder": 1,
+      "Local": 36,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "x......x",
+        "........",
+        "........",
+        "........",
+        "..cssc..",
+        "...ss.c.",
+        "xssssssx"
+      ],
+      "Colors": 5,
+      "Moves": 23,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 10
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 6,
+      "Seed": 11394408722526173078,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 97,
+      "Wonder": 1,
+      "Local": 37,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "xss...SSx",
+        "s..s.S..S",
+        "s.S...s.s",
+        ".........",
+        "s.......S",
+        ".........",
+        ".........",
+        "s..s.s..S",
+        "x.s...s.x"
+      ],
+      "Colors": 6,
+      "Moves": 60,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 27
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scarab",
+          "Count": 6
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 17,
+      "Seed": 11394409822037801289,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 98,
+      "Wonder": 1,
+      "Local": 38,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 7,
+      "Layout": [
+        "xxx.xxx",
+        "xx...xx",
+        "x.....x",
+        ".......",
+        ".......",
+        ".......",
+        "ll...l."
+      ],
+      "Colors": 6,
+      "Moves": 37,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "Collect",
+          "Color": "Amphora",
+          "Count": 22
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11394419717642455188,
+      "ShapeName": "Basamaklı Piramit",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 99,
+      "Wonder": 1,
+      "Local": 39,
+      "Difficulty": "Hard",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "xxx...xxx",
+        "xx..s..xx",
+        "x.......x",
+        ".ss...sS.",
+        "...sss...",
+        "..sc.cS..",
+        "cS.c.c.sc",
+        "c.ssSSScc",
+        "S..sSs..s"
+      ],
+      "Colors": 6,
+      "Moves": 35,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 30
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 9
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scroll",
+          "Count": 27
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 11394420817154083399,
+      "ShapeName": "Basamaklı Piramit",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 100,
+      "Wonder": 1,
+      "Local": 40,
+      "Difficulty": "VeryHard",
+      "Width": 9,
+      "Height": 7,
+      "Layout": [
+        "x.......x",
+        ".........",
+        ".c.ccc.c.",
+        ".c.c.c.c.",
+        "sSssSsslS",
+        "sssssSssS",
+        "xSslSlSsx"
+      ],
+      "Colors": 5,
+      "Moves": 24,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 30
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 9
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 3944605598673993100,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.5
+    },
+    {
+      "Id": 101,
+      "Wonder": 1,
+      "Local": 41,
+      "Difficulty": "Easy",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        "x.......x",
+        ".........",
+        ".........",
+        ".sss.sss.",
+        ".ss...ss.",
+        "..s.s.s..",
+        ".........",
+        "x.......x"
+      ],
+      "Colors": 5,
+      "Moves": 20,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 13
+        }
+      ],
+      "Star2MovesLeft": 2,
+      "Star3MovesLeft": 6,
+      "Seed": 3944606698185621311,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 102,
+      "Wonder": 1,
+      "Local": 42,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "x..ss..x",
+        ".s.ss.s.",
+        "........",
+        "c......c",
+        "s......s",
+        ".s....s.",
+        "...ss...",
+        "x..cc..x"
+      ],
+      "Colors": 5,
+      "Moves": 31,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 12
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "Collect",
+          "Color": "GoldCoin",
+          "Count": 36
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 3944607797697249522,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 103,
+      "Wonder": 1,
+      "Local": 43,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "x.......x",
+        ".........",
+        ".........",
+        ".........",
+        ".........",
+        "Scsc.c.cs",
+        "sc.sss.cS",
+        "sSss.sSsS",
+        "xs.Scs.Sx"
+      ],
+      "Colors": 6,
+      "Moves": 60,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 27
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 7
+        },
+        {
+          "Type": "Collect",
+          "Color": "Crown",
+          "Count": 6
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 17,
+      "Seed": 3944608897208877733,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 104,
+      "Wonder": 1,
+      "Local": 44,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "x......x",
+        "l.l....l",
+        "........",
+        "........",
+        "...cc...",
+        "........",
+        "xc.....x"
+      ],
+      "Colors": 5,
+      "Moves": 41,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        },
+        {
+          "Type": "Collect",
+          "Color": "Scarab",
+          "Count": 17
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 11,
+      "Seed": 3944601200627480256,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 105,
+      "Wonder": 1,
+      "Local": 45,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 9,
+      "Layout": [
+        "x.....x",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "sS.s.sS",
+        "sSs.ssS",
+        "...s.s.",
+        "xS...sx"
+      ],
+      "Colors": 6,
+      "Moves": 47,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        },
+        {
+          "Type": "Collect",
+          "Color": "Crown",
+          "Count": 22
+        }
+      ],
+      "Star2MovesLeft": 6,
+      "Star3MovesLeft": 13,
+      "Seed": 3944602300139108467,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 106,
+      "Wonder": 1,
+      "Local": 46,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "x.ssss.x",
+        "........",
+        "...ss...",
+        ".s....s.",
+        "........",
+        ".c....c.",
+        "x.sc.s.x"
+      ],
+      "Colors": 6,
+      "Moves": 32,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 10
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 3944603399650736678,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.9166667
+    },
+    {
+      "Id": 107,
+      "Wonder": 1,
+      "Local": 47,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 9,
+      "Layout": [
+        "x.....x",
+        "..c.c..",
+        "..c.c..",
+        ".......",
+        ".......",
+        ".......",
+        "..c.c..",
+        ".......",
+        "x.....x"
+      ],
+      "Colors": 6,
+      "Moves": 12,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 6
+        }
+      ],
+      "Star2MovesLeft": 1,
+      "Star3MovesLeft": 3,
+      "Seed": 3944604499162364889,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 108,
+      "Wonder": 1,
+      "Local": 48,
+      "Difficulty": "Hard",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "x......x",
+        "........",
+        "..c..c..",
+        "lcc.lccl",
+        "sscSscSS",
+        "ssllllsS",
+        "sS.ss.ss",
+        "xS.sS..x"
+      ],
+      "Colors": 5,
+      "Moves": 26,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 26
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 8
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 7
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 3944614394767018788,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 109,
+      "Wonder": 1,
+      "Local": 49,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "x......x",
+        "........",
+        "........",
+        "..cccc..",
+        "........",
+        "........",
+        "........",
+        "x......x"
+      ],
+      "Colors": 6,
+      "Moves": 12,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        }
+      ],
+      "Star2MovesLeft": 1,
+      "Star3MovesLeft": 3,
+      "Seed": 3944615494278646999,
+      "ShapeName": "Kesik Köşe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 110,
+      "Wonder": 1,
+      "Local": 50,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        "xx.....xx",
+        "x.......x",
+        "........l",
+        ".........",
+        "l.......l",
+        ".........",
+        "x..l.l..x",
+        "xx.....xx"
+      ],
+      "Colors": 6,
+      "Moves": 31,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "Collect",
+          "Color": "Compass",
+          "Count": 22
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 3945597358162450197,
+      "ShapeName": "Elmas",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 111,
+      "Wonder": 1,
+      "Local": 51,
+      "Difficulty": "Easy",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        "xxs...sxx",
+        "xx.....xx",
+        ".........",
+        ".s..s..s.",
+        ".........",
+        "..s...s..",
+        "xx.....xx",
+        "xxss.ssxx"
+      ],
+      "Colors": 6,
+      "Moves": 44,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 11
+        }
+      ],
+      "Star2MovesLeft": 5,
+      "Star3MovesLeft": 12,
+      "Seed": 3945596258650821986,
+      "ShapeName": "Haç",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 112,
+      "Wonder": 1,
+      "Local": 52,
+      "Difficulty": "Medium",
+      "Width": 9,
+      "Height": 8,
+      "Layout": [
+        "....x....",
+        "....x....",
+        "....x....",
+        "l..l.l..l",
+        "l.......l",
+        ".........",
+        ".........",
+        "........."
+      ],
+      "Colors": 6,
+      "Moves": 37,
+      "Goals": [
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 6
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 10,
+      "Seed": 3945595159139193775,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 113,
+      "Wonder": 1,
+      "Local": 53,
+      "Difficulty": "Easy",
+      "Width": 8,
+      "Height": 8,
+      "Layout": [
+        "........",
+        "..xllx..",
+        ".......l",
+        "........",
+        "c......c",
+        ".xcxxcx.",
+        "........",
+        "........"
+      ],
+      "Colors": 6,
+      "Moves": 58,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 16,
+      "Seed": 3945594059627565564,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 114,
+      "Wonder": 1,
+      "Local": 54,
+      "Difficulty": "Hard",
+      "Width": 7,
+      "Height": 7,
+      "Layout": [
+        "xxsSsxx",
+        "x.ssS.x",
+        ".......",
+        "..S.s..",
+        "S.l.l.s",
+        "x.slslx",
+        "xx...xx"
+      ],
+      "Colors": 6,
+      "Moves": 28,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 16
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 4
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 8,
+      "Seed": 3945592960115937353,
+      "ShapeName": "Elmas",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 115,
+      "Wonder": 1,
+      "Local": 55,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "xx....xx",
+        "xxc..cxx",
+        "........",
+        "........",
+        "...cc...",
+        "xx.ll.xx",
+        "xx.l..xx"
+      ],
+      "Colors": 6,
+      "Moves": 22,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 3
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 6,
+      "Seed": 3945591860604309142,
+      "ShapeName": "Haç",
+      "BotWinRate": 0.75
+    },
+    {
+      "Id": 116,
+      "Wonder": 1,
+      "Local": 56,
+      "Difficulty": "Easy",
+      "Width": 7,
+      "Height": 7,
+      "Layout": [
+        "...x...",
+        "...x...",
+        ".......",
+        ".......",
+        "..s.s..",
+        "s.s.s.s",
+        ".s.s.s."
+      ],
+      "Colors": 6,
+      "Moves": 56,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 9
+        }
+      ],
+      "Star2MovesLeft": 7,
+      "Star3MovesLeft": 16,
+      "Seed": 3945590761092680931,
+      "ShapeName": "İkiz Kule",
+      "BotWinRate": 1.0
+    },
+    {
+      "Id": 117,
+      "Wonder": 1,
+      "Local": 57,
+      "Difficulty": "Medium",
+      "Width": 7,
+      "Height": 9,
+      "Layout": [
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        ".......",
+        "S.S.s.s",
+        ".sxsxSs",
+        ".xxSxx.",
+        "ssS.sss"
+      ],
+      "Colors": 4,
+      "Moves": 22,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 20
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 6,
+      "Seed": 3945589661581052720,
+      "ShapeName": "Simetrik Harabe",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 118,
+      "Wonder": 1,
+      "Local": 58,
+      "Difficulty": "Medium",
+      "Width": 8,
+      "Height": 7,
+      "Layout": [
+        "xx....xx",
+        "x......x",
+        ".l.cc.l.",
+        "l......l",
+        "........",
+        "x......x",
+        "xx.cc.xx"
+      ],
+      "Colors": 6,
+      "Moves": 26,
+      "Goals": [
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 4
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 4
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 7,
+      "Seed": 3945606154255475885,
+      "ShapeName": "Elmas",
+      "BotWinRate": 0.8333333
+    },
+    {
+      "Id": 119,
+      "Wonder": 1,
+      "Local": 59,
+      "Difficulty": "Hard",
+      "Width": 7,
+      "Height": 8,
+      "Layout": [
+        "xx...xx",
+        "xx...xx",
+        ".......",
+        ".ssSSs.",
+        "sSclcss",
+        ".sS.sSl",
+        "xxlclxx",
+        "xx.ccxx"
+      ],
+      "Colors": 6,
+      "Moves": 31,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 18
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 5
+        },
+        {
+          "Type": "ReleaseChains",
+          "Color": "None",
+          "Count": 4
+        }
+      ],
+      "Star2MovesLeft": 4,
+      "Star3MovesLeft": 9,
+      "Seed": 3945605054743847674,
+      "ShapeName": "Haç",
+      "BotWinRate": 0.5833333
+    },
+    {
+      "Id": 120,
+      "Wonder": 1,
+      "Local": 60,
+      "Difficulty": "VeryHard",
+      "Width": 9,
+      "Height": 9,
+      "Layout": [
+        "x.......x",
+        ".........",
+        "x.......x",
+        "ssSsSSsss",
+        "xsssSSSsx",
+        "ssSSssssS",
+        "xcccccccx",
+        "....c....",
+        "xcc...ccx"
+      ],
+      "Colors": 6,
+      "Moves": 27,
+      "Goals": [
+        {
+          "Type": "ClearSand",
+          "Color": "None",
+          "Count": 34
+        },
+        {
+          "Type": "BreakCrates",
+          "Color": "None",
+          "Count": 12
+        },
+        {
+          "Type": "Collect",
+          "Color": "Crown",
+          "Count": 13
+        }
+      ],
+      "Star2MovesLeft": 3,
+      "Star3MovesLeft": 8,
+      "Seed": 3946589117650907294,
+      "ShapeName": "Zikzak",
+      "BotWinRate": 0.41666666
+    }
+  ]
+}
