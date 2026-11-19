@@ -51,7 +51,7 @@ public class UiFlowTest {
     private void idle(long ms) { shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(ms)); }
 
     private void waitFor(String what, BooleanSupplier cond) throws InterruptedException {
-        for (int i = 0; i < 400 && !cond.getAsBoolean(); i++) { Thread.sleep(15); idle(20); }
+        for (int i = 0; i < 700 && !cond.getAsBoolean(); i++) { Thread.sleep(15); idle(20); }
         assertTrue("beklenen durum oluşmadı: " + what, cond.getAsBoolean());
     }
 
@@ -362,11 +362,12 @@ public class UiFlowTest {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         assertTrue("önce stüdyo açılışı", act.currentScreen() instanceof com.isikyolu.game.screens.StudioIntroScreen);
         idle(10);
-        shot("00a_studyo_isik");      // ≈0,7 sn: ışık noktası, logo açılmaya başlıyor
-        shot("00b_studyo_logo");      // ≈1,5 sn: logo açıldı, ışık süzülüyor
-        shot("00b2_studyo_parilti");  // ≈2,2 sn: ışık geçişi bitti, logo parlıyor
+        shot("00a_studyo_isik");      // ≈0,7 sn: ışık noktası yanıyor
+        shot("00b_studyo_acilis");    // ≈1,5 sn: logo ışıkla açılıyor, kıvılcımlar
         idle(400);
-        shot("00c_studyo_kapanis");   // ≈3,3 sn: kapanış ve oyuna geçiş
+        shot("00c_studyo_logo");      // ≈2,6 sn: logo tamamen açıldı, ışık süzülüyor
+        idle(1300);
+        shot("00d_studyo_parilti");   // ≈4,6 sn: logo parlıyor, kararmaya hazır
         waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
     }
 

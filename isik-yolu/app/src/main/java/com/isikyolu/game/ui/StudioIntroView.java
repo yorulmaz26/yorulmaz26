@@ -20,12 +20,14 @@ import com.isikyolu.game.R;
 import java.util.Random;
 
 /**
- * Magic Lumos Software stüdyo açılışı (≈3,2 sn): karanlıkta bir ışık noktası yanar, büyüyerek logoyu
+ * Magic Lumos Software stüdyo açılışı (≈5,8 sn): karanlıkta bir ışık noktası yanar, büyüyerek logoyu
  * daire biçiminde aydınlatır, kıvılcımlar saçılır, yazının üzerinden ışık süzülür, sonra sahne kararır.
  */
 public final class StudioIntroView extends View {
     public static final int BG = 0xFF06182D;
-    public static final long DURATION_MS = 3200;
+    /** Animasyon yavaşlatma katsayısı: tüm aşamalar bu oranda uzar. */
+    public static final float SLOW = 1.8f;
+    public static final long DURATION_MS = (long) (3200 * SLOW);
 
     private final Bitmap logo;
     private final Paint bmp = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
@@ -83,7 +85,7 @@ public final class StudioIntroView extends View {
     @Override protected void onDraw(Canvas c) {
         long now = SystemClock.uptimeMillis();
         if (start < 0) start = now;
-        float t = (now - start) / 1000f;
+        float t = (now - start) / 1000f / SLOW; // aşama zamanları 3,2 sn'lik ölçekte yazılıdır
         int w = getWidth(), h = getHeight();
         c.drawColor(BG);
         float cx = dst.centerX(), cy = dst.centerY();
@@ -144,6 +146,6 @@ public final class StudioIntroView extends View {
             fill.setAlpha((int) (255 * out));
             c.drawRect(0, 0, w, h, fill);
         }
-        if (t * 1000 < DURATION_MS + 100) postInvalidateOnAnimation();
+        if (t * 1000 * SLOW < DURATION_MS + 100) postInvalidateOnAnimation();
     }
 }

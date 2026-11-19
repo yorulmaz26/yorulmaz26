@@ -1,4 +1,4 @@
-# Test Raporu — Işık Yolu 1.5.0
+# Test Raporu — Işık Yolu 1.5.1
 
 Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 
@@ -57,7 +57,7 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 ## Stüdyo açılışı (1.5.0)
 
 - `UiFlowTest.splashScreenRenders`: uygulama Magic Lumos Software açılışıyla başlar; animasyon kareleri
-  kaydedilir (`docs/ekranlar/00a…00c`); ardından ana menüye geçilir.
+  kaydedilir (`docs/ekranlar/00a…00d`); ardından ana menüye geçilir.
 - `UiFlowTest.studioIntroCanBeSkipped`: açılışa dokununca oyunun açılış ekranına geçilir, oradan ana menüye.
 
 ## Market ve ekonomi (1.4.0)

@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.5.0
+# Build Raporu — Işık Yolu 1.5.1
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -16,6 +16,11 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.5.1 değişiklikleri
+
+- Stüdyo açılışı 1,8 kat yavaşlatıldı: toplam yaklaşık 5,8 sn. Tüm aşamalar aynı oranda uzar
+  (`StudioIntroView.SLOW`); dokununca atlama aynen çalışır.
 
 ## 1.5.0 değişiklikleri
 
@@ -97,10 +102,10 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.5.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 984 317 bayt | `e42dda1e18a5946b38783733e30b0eaafc65cd1f9cff351ec6d27507502ec50f` |
-| `teslimat/IsikYolu-1.5.0-debug.apk` | 2 098 078 bayt | `019740cdfba5dcf02ce4e605db33365aaa5b1fdceaf143506859d8d46d738859` |
+| `teslimat/IsikYolu-1.5.1.apk` (release, R8 küçültme + kaynak küçültme) | 1 984 317 bayt | `6a33dfcde603bd95c2d85d52bac2af3d80e7ca6de7a7ad534165ceb0d8057408` |
+| `teslimat/IsikYolu-1.5.1-debug.apk` | 2 098 086 bayt | `0bd8046675a9e8b99428a6eb1db266e92d13286ae0aa523cb3ea260740c12a91` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 6, sürüm adı 1.5.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 7, sürüm adı 1.5.1 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.

@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.5.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.5.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.5.1.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.5.1-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
