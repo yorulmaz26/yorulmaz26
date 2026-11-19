@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 /** Ömür boyu sayaçlar (olaylarla artar). */
 enum class Counter { WINS, FAILS, STARS_EARNED, THREE_STARS, ENEMIES, CARDS_PLACED, BUILD_UPGRADES, RESEARCH, TRADES,
-    QUESTS, DAILY_PUZZLES, ENDLESS_FLOORS, GOLD_EARNED, SKINS, BOSSES }
+    QUESTS, DAILY_PUZZLES, ENDLESS_FLOORS, GOLD_EARNED, SKINS, BOSSES, EXPEDITIONS, HARD_CLEARS, PRESTIGE }
 
 /** Başarım ve görevlerin ölçtüğü değerler. Bir kısmı kayıttan türetilir. */
 enum class Metric(val title: String) {
@@ -48,6 +48,14 @@ data class MetaState(
     var endless: EndlessState = EndlessState(),
     val ownedSkins: MutableSet<String> = mutableSetOf("classic"),
     var skin: String = "classic",
+    val expeditions: MutableList<Expedition> = mutableListOf(),
+    val collection: MutableSet<Int> = mutableSetOf(),
+    val setsRewarded: MutableSet<Int> = mutableSetOf(),
+    /** Zor kuralla (kart sınırı = par, çarpma yok) tamamlanan bölümler. */
+    val hardCleared: MutableSet<Int> = mutableSetOf(),
+    /** Yeni Komuta Çağı (prestij) seviyesi. */
+    var prestige: Int = 0,
+    val customLevels: MutableList<com.emirzinciri.robotkomutan.logic.level.LevelDef> = mutableListOf(),
 )
 
 data class Achievement(val id: String, val metric: Metric, val threshold: Long, val title: String, val gold: Long)

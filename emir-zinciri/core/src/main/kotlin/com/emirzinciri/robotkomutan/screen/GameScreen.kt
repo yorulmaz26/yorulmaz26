@@ -37,7 +37,7 @@ import com.emirzinciri.robotkomutan.ui.Theme
 
 /** Oynanış ekranı: Planla → Kartları yerleştir → Başlat → İzle → Düzelt. */
 /** Oyun modu: hikâye bölümleri, Sonsuz Fabrika katları veya günlük bulmaca. */
-enum class PlayMode { STORY, ENDLESS, DAILY }
+enum class PlayMode { STORY, ENDLESS, DAILY, CUSTOM, HARD }
 
 class GameScreen(
     game: EmirZinciriGame,
@@ -112,10 +112,11 @@ class GameScreen(
         val t = Table()
         t.add(ui.iconButton("back", size = 72f) { onBack() }).size(72f)
         val titles = Table()
-        val title = ui.label(if (story) "Bölüm ${def.id} · ${def.name}" else def.name, if (def.name.length > 16) assets.fontBold else assets.fontTitle, Theme.ink)
+        val title = ui.label(if (story || mode == PlayMode.HARD) "Bölüm ${def.id} · ${def.name}" else def.name, if (def.name.length > 16) assets.fontBold else assets.fontTitle, Theme.ink)
         title.setEllipsis(true)
         titles.add(title).left().growX().minWidth(0f).row()
-        titles.add(ui.label(when (mode) { PlayMode.STORY -> "Alan ${area.id}: ${area.name}"; PlayMode.ENDLESS -> "Sonsuz Fabrika · can harcanmaz"; PlayMode.DAILY -> "Bugünün bulmacası · can harcanmaz" }, assets.fontSmall, Theme.inkSoft).also { it.setEllipsis(true) }).left().growX().minWidth(0f)
+        titles.add(ui.label(when (mode) { PlayMode.STORY -> "Alan ${area.id}: ${area.name}"; PlayMode.ENDLESS -> "Sonsuz Fabrika · can harcanmaz"; PlayMode.DAILY -> "Bugünün bulmacası · can harcanmaz"
+            PlayMode.CUSTOM -> "Kendi haritan · test"; PlayMode.HARD -> "Zor kural: kart sınırı = par, çarpma yok" }, assets.fontSmall, Theme.inkSoft).also { it.setEllipsis(true) }).left().growX().minWidth(0f)
         t.add(titles).growX().minWidth(0f).left().padLeft(14f)
         val lives = Table()
         lives.background = assets.panel(Theme.white, 18, 3f)
@@ -797,7 +798,14 @@ class GameScreen(
     // ================================================================== geri / yaşam döngüsü
 
     override fun onBack() {
-        if (!story) { if (tutorial?.active == true) { tutorial?.dispose(); tutorial = null; return }; game.go(EndlessScreen(game)); return }
+        if (!story) {
+            if (tutorial?.active == true) { tutorial?.dispose(); tutorial = null; return }
+            game.go(when (mode) {
+                PlayMode.CUSTOM -> EditorScreen(game, com.emirzinciri.robotkomutan.logic.editor.EditorModel.from(def))
+                PlayMode.HARD -> LevelSelectScreen(game, def.area, hard = true)
+                else -> EndlessScreen(game)
+            }); return
+        }
         if (tutorial?.active == true) { tutorial?.dispose(); tutorial = null; return }
         saveDraft()
         services.persist()

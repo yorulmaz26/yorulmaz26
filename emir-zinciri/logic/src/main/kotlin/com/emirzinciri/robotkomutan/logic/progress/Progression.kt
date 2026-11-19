@@ -19,7 +19,8 @@ data class WinResult(
 /** Bölüm açma, ödül ve can kuralları. Saf mantık: arayüz ve kayıt dosyasından bağımsız test edilir. */
 class Progression(val save: SaveData, clock: GameClock) {
     val lives = LivesSystem(save.lives, clock)
-    val factory = com.emirzinciri.robotkomutan.logic.factory.Factory(save.factory, save.wallet, clock)
+    val factory = com.emirzinciri.robotkomutan.logic.factory.Factory(save.factory, save.wallet, clock) { save.meta.collection.size }
+    val expeditions = com.emirzinciri.robotkomutan.logic.meta.Expeditions(save, clock)
     val meta = com.emirzinciri.robotkomutan.logic.meta.Meta(save)
 
     fun isCompleted(levelId: Int) = save.stars(levelId) > 0

@@ -27,6 +27,10 @@ class SplashScreen(game: EmirZinciriGame, private val startup: StartupOptions) :
             startup.openScreen == "achievements" -> QuestsScreen(game, 2)
             startup.openScreen == "market" -> MarketScreen(game)
             startup.openScreen == "endless" -> EndlessScreen(game)
+            startup.openScreen == "editor" -> EditorScreen(game, com.emirzinciri.robotkomutan.logic.editor.EditorModel(6, 6).apply {
+                paint(0, 2, com.emirzinciri.robotkomutan.logic.editor.Brush.ROBOT); paint(5, 2, com.emirzinciri.robotkomutan.logic.editor.Brush.EXIT)
+                for (y in 0..3) paint(3, y, com.emirzinciri.robotkomutan.logic.editor.Brush.WALL); paint(2, 4, com.emirzinciri.robotkomutan.logic.editor.Brush.CONVEYOR) })
+            startup.openScreen == "levels_hard" -> LevelSelectScreen(game, null, true)
             startup.openScreen == "endless_play" -> com.emirzinciri.robotkomutan.logic.gen.Generator.generate(9, 42)?.let { GameScreen(game, it.def, startup, PlayMode.ENDLESS) }
             else -> null
         } ?: MenuScreen(game)

@@ -32,7 +32,7 @@ Masaüstü geliştirici argümanları: `--level 12 --solve --run --shot cikti.pn
 
 ## Mevcut durum
 
-Sürüm 1.0.0: 100 alan / 500 bölüm (1–50 elle tasarlandı, 51–500 doğrulanmış üretici), çoklu robot, savaş ve patronlar, kalıcı fabrika, görevler, 100 başarım, Sonsuz Fabrika, günlük bulmaca, market, müzik. 619 otomatik test.
+Sürüm 1.1.0: 100 alan / 500 bölüm (1–50 elle tasarlandı, 51–500 doğrulanmış üretici), çoklu robot, savaş ve patronlar, kalıcı fabrika, görevler, 100 başarım, Sonsuz Fabrika, günlük bulmaca, market, müzik. 619 otomatik test.
 Yayın adımları: [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md).
 
 Kampanya yeniden üretimi: `./gradlew :logic:campaignTool --args="11 100"` (deterministik; uzun sürer).

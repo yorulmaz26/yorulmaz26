@@ -48,9 +48,9 @@ enum class BuildingType(
     GARAGE("Robot Garajı", "Robot koleksiyonunu ve geliştirmeleri barındırır.", 10, 3, phase = 6),
     ACADEMY("Komut Akademisi", "Komut ustalığı eğitimleri.", 10, 4, phase = 7),
     DEFENSE("Savunma Merkezi", "Fabrika savunması.", 10, 4, phase = 6),
-    EXPLORATION("Keşif Merkezi", "Robot seferleri.", 10, 4, phase = 7),
+    EXPLORATION("Keşif Merkezi", "Robot seferleri: her seviye bir sefer yuvası ve daha uzak rotalar açar.", 5, 2, baseGold = 220, baseMetal = 60),
     REPAIR("Robot Tamir Atölyesi", "Hasarlı robotları onarır.", 10, 5, phase = 6),
-    MUSEUM("Koleksiyon Müzesi", "Toplanan robotları sergiler.", 10, 5, phase = 7),
+    MUSEUM("Koleksiyon Müzesi", "Koleksiyonu sergiler; her seviye sergilenen her parça için saatte altın getirir.", 5, 3, baseGold = 300, baseMetal = 80),
     AI_LAB("Merkezi Yapay Zekâ Laboratuvarı", "Son araştırmalar.", 10, 8, phase = 8);
 
     val available: Boolean get() = phase <= 5
@@ -124,7 +124,7 @@ sealed class FactoryResult {
  * (aynı açılışta monotonik saat, yeniden başlatmada duvar saati, negatif süre 0). Ayrıca:
  * çevrimdışı üretim [offlineHours] ile ve depo kapasitesiyle sınırlıdır; saat hilesinin kazancı sınırlı kalır.
  */
-class Factory(val state: FactoryState, val wallet: Wallet, private val clock: GameClock) {
+class Factory(val state: FactoryState, val wallet: Wallet, private val clock: GameClock, private val collectionSize: () -> Int = { 0 }) {
 
     fun level(b: BuildingType) = state.buildings[b] ?: 0
     fun has(r: Research) = r in state.research
@@ -146,7 +146,7 @@ class Factory(val state: FactoryState, val wallet: Wallet, private val clock: Ga
         Resource.METAL -> 12.0 * level(BuildingType.METAL_WORKS) * (100 + bonus(Effect.METAL_RATE)) / 100
         Resource.CHIPS -> 1.0 * level(BuildingType.CHIP_LAB) * (100 + bonus(Effect.CHIP_RATE)) / 100
         Resource.TECH -> 3.0 * level(BuildingType.RESEARCH_CENTER) * (100 + bonus(Effect.TECH_RATE)) / 100
-        Resource.GOLD -> 0.0
+        Resource.GOLD -> 0.5 * level(BuildingType.MUSEUM) * collectionSize()
     }
 
     fun consumptionPerHour(r: Resource): Double = when (r) {
@@ -191,7 +191,9 @@ class Factory(val state: FactoryState, val wallet: Wallet, private val clock: Ga
             val km = if (needM <= 0) 1.0 else (available(Resource.METAL) / needM).coerceIn(0.0, 1.0)
             if (needM > 0) spendFrac(Resource.METAL, needM * km, gained)
             capped = gain(Resource.CHIPS, ratePerHour(Resource.CHIPS) * h * km, gained) || capped
-            // 4) teknoloji
+            // 4) müze altını
+            gain(Resource.GOLD, ratePerHour(Resource.GOLD) * h, gained)
+            // 5) teknoloji
             capped = gain(Resource.TECH, ratePerHour(Resource.TECH) * h, gained) || capped
         }
         repeat(minutes.toInt()) { tick(stepH) }
@@ -206,7 +208,7 @@ class Factory(val state: FactoryState, val wallet: Wallet, private val clock: Ga
         if (amount <= 0) return false
         val cap = capacity(r)
         val total = (state.fraction[r] ?: 0.0) + amount
-        val whole = total.toLong()
+        val whole = (total + 1e-9).toLong()
         state.fraction[r] = total - whole
         var add = whole
         var full = false

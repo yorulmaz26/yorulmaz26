@@ -43,7 +43,7 @@ class FactoryScreen(game: EmirZinciriGame) : BaseScreen(game) {
         root.add(resources).growX().padLeft(12f).padRight(12f).row()
         root.add(view).growX().height(330f).row()
         val tabs = Table()
-        listOf("Binalar", "Araştırma", "Ticaret").forEachIndexed { i, t ->
+        listOf("Binalar", "Araştırma", "Ticaret", "Seferler", "Müze").forEachIndexed { i, t ->
             tabs.add(ui.button(t, if (tab == i) Theme.turquoise else Theme.white, if (tab == i) Theme.white else Theme.ink, null, assets.fontBold, 18) {
                 tab = i; rebuildTabs(tabs)
             }).growX().uniformX().pad(4f)
@@ -66,7 +66,7 @@ class FactoryScreen(game: EmirZinciriGame) : BaseScreen(game) {
 
     private fun rebuildTabs(tabs: Table) {
         tabs.clear()
-        listOf("Binalar", "Araştırma", "Ticaret").forEachIndexed { i, t ->
+        listOf("Binalar", "Araştırma", "Ticaret", "Seferler", "Müze").forEachIndexed { i, t ->
             tabs.add(ui.button(t, if (tab == i) Theme.turquoise else Theme.white, if (tab == i) Theme.white else Theme.ink, null, assets.fontBold, 18) {
                 tab = i; rebuildTabs(tabs)
             }).growX().uniformX().pad(4f)
@@ -112,7 +112,9 @@ class FactoryScreen(game: EmirZinciriGame) : BaseScreen(game) {
         when (tab) {
             0 -> buildBuildings()
             1 -> buildResearch()
-            else -> buildTrade()
+            2 -> buildTrade()
+            3 -> buildExpeditions()
+            else -> buildMuseum()
         }
         content.add().height(30f)
     }
@@ -243,12 +245,77 @@ class FactoryScreen(game: EmirZinciriGame) : BaseScreen(game) {
         }
     }
 
+    private fun fmt(ms: Long): String { val m = (ms + 59_999) / 60_000; return if (m >= 60) "${m / 60} sa ${m % 60} dk" else "$m dk" }
+
+    private fun buildExpeditions() {
+        val ex = services.progression.expeditions
+        ex.update()
+        content.add(ui.label("Robotlarını keşfe gönder: kaynak ve koleksiyon parçası getirirler. Yuva sayısı Keşif Merkezi seviyesine eşittir (${ex.slots()}).",
+            assets.fontSmall, Theme.inkSoft, wrap = true)).growX().pad(6f, 22f, 6f, 22f).row()
+        for (e in ex.active) {
+            val card = ui.panel(Theme.white, 24, 4f); card.pad(14f, 18f, 14f, 18f)
+            card.add(ui.label(e.route.title, assets.fontBold, Theme.ink)).left().growX()
+            if (ex.isDone(e)) card.add(ui.button("Topla", Theme.green, Theme.white, null, assets.fontBold, 18) {
+                val r = ex.claim(e)
+                if (r != null) {
+                    services.persist(); assets.play("win", 0.6f)
+                    val item = r.item?.let { if (r.duplicate) "\nKopya parça: ${it.title} (altına çevrildi)." else "\nYeni koleksiyon parçası: ${it.title}!" } ?: ""
+                    ui.dialog(stage, "Sefer döndü", "+${r.gold} altın, +${r.metal} metal, +${r.chips} çip.$item", "Harika" to {})
+                }
+                refreshResources(); buildContent()
+            }.also { it.pad(8f, 16f, 8f, 16f) }) else card.add(ui.label("Kalan ${fmt(ex.remainingMs(e))}", assets.fontSmall, Theme.inkSoft))
+            content.add(card).growX().pad(6f, 14f, 6f, 14f).row()
+        }
+        for (r in com.emirzinciri.robotkomutan.logic.meta.Route.entries) {
+            val card = ui.panel(Theme.white, 24, 4f); card.pad(14f, 18f, 14f, 18f)
+            val info = Table()
+            info.add(ui.label(r.title, assets.fontBold, Theme.ink)).left().row()
+            info.add(ui.label("${fmt(r.minutes * 60_000L)} · ${r.energyCost} enerji · ${r.gold.first}–${r.gold.last} altın · parça şansı %${r.itemChance}",
+                assets.fontSmall, Theme.inkSoft, wrap = true)).growX().left()
+            card.add(info).growX().left()
+            val lock = ex.canStart(r)
+            if (lock == null) card.add(ui.button("Gönder", Theme.turquoise, Theme.white, null, assets.fontSmall, 18) {
+                if (ex.start(r)) { assets.play("signal"); services.persist() }; refreshResources(); buildContent()
+            }.also { it.pad(6f, 14f, 6f, 14f) })
+            else card.add(ui.label(lock, assets.fontSmall, Theme.inkFaint, wrap = true)).width(220f)
+            content.add(card).growX().pad(6f, 14f, 6f, 14f).row()
+        }
+    }
+
+    private fun buildMuseum() {
+        val m = services.save.meta
+        val museum = factory.level(BuildingType.MUSEUM)
+        content.add(ui.label("Koleksiyon ${m.collection.size}/100 · Müze seviye $museum" +
+            (if (museum > 0) " · saatte ${"%.1f".format(factory.ratePerHour(Resource.GOLD))} altın" else " · müzeyi kurunca koleksiyon altın getirir"),
+            assets.fontBold, Theme.ink, wrap = true)).growX().pad(6f, 22f, 6f, 22f).row()
+        for ((si, set) in com.emirzinciri.robotkomutan.logic.meta.Collection.sets.withIndex()) {
+            val items = com.emirzinciri.robotkomutan.logic.meta.Collection.items.filter { it.set == si }
+            val have = items.count { it.id in m.collection }
+            val card = ui.panel(if (si in m.setsRewarded) Theme.mix(Theme.yellow, Theme.white, 0.75f) else Theme.white, 24, 4f)
+            card.pad(14f)
+            card.add(ui.label("$set · $have/20" + if (si in m.setsRewarded) " · tamamlandı" else " (set ödülü ${com.emirzinciri.robotkomutan.logic.meta.Collection.SET_REWARD_GOLD} altın)",
+                assets.fontBold, Theme.ink)).left().colspan(10).row()
+            items.forEachIndexed { i, it ->
+                val owned = it.id in m.collection
+                val col = when (it.rarity) { 3 -> Theme.purple; 2 -> Theme.blue; else -> Theme.turquoise }
+                card.add(ui.image(if (owned) "robot" else "lock", if (owned) col else Theme.line)).size(40f).pad(4f)
+                if ((i + 1) % 10 == 0) card.row()
+            }
+            content.add(card).growX().pad(6f, 14f, 6f, 14f).row()
+        }
+        content.add(ui.label("Parçalar seferlerden gelir; nadir (mavi) ve efsanevi (mor) parçalar uzak rotalarda çıkar.", assets.fontSmall, Theme.inkFaint, wrap = true))
+            .growX().pad(6f, 22f, 6f, 22f).row()
+    }
+
     override fun update(delta: Float) {
         tick -= delta; saveTick -= delta
         if (tick <= 0f) {
             tick = 1f
             val r = factory.update()
             if (r.gained.isNotEmpty()) refreshResources()
+            if (tab == 3) { val before = services.progression.expeditions.active.count { services.progression.expeditions.isDone(it) }
+                services.progression.expeditions.update()
+                if (services.progression.expeditions.active.count { services.progression.expeditions.isDone(it) } != before) buildContent() }
         }
         if (saveTick <= 0f) { saveTick = 15f; services.persist() }
     }

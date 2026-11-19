@@ -8,7 +8,7 @@ import com.emirzinciri.robotkomutan.logic.content.Areas
 import com.emirzinciri.robotkomutan.ui.Theme
 
 /** Alan ve bölüm seçimi. Kilitli bölümler açılamaz; içerik olmayan alanlar dürüstçe "geliştiriliyor" olarak gösterilir. */
-class LevelSelectScreen(game: EmirZinciriGame, private val focusArea: Int? = null) : BaseScreen(game) {
+class LevelSelectScreen(game: EmirZinciriGame, private val focusArea: Int? = null, private var hard: Boolean = false) : BaseScreen(game) {
     private val list = Table()
     private lateinit var scroll: ScrollPane
     private var focusActor: Table? = null
@@ -20,6 +20,23 @@ class LevelSelectScreen(game: EmirZinciriGame, private val focusArea: Int? = nul
         head.add(ui.label("Bölümler", assets.fontTitle, Theme.ink)).padLeft(16f).left().growX()
         head.add(ui.chip("star", "${services.save.totalStars}/${services.catalog.count * 3}", Theme.yellow))
         root.add(head).growX().pad(16f).row()
+        val hardRow = Table()
+        val meta = services.save.meta
+        hardRow.add(ui.button(if (hard) "Zor mod: AÇIK" else "Zor mod: kapalı", if (hard) Theme.red else Theme.white, if (hard) Theme.white else Theme.ink, null, assets.fontSmall, 18) {
+            game.go(LevelSelectScreen(game, focusArea, !hard)) }.also { it.pad(6f, 14f, 6f, 14f) })
+        hardRow.add(ui.label(if (hard) "Tamamlanan bölümleri kart sınırı = par ve çarpmadan bitir (${meta.hardCleared.size} tamam)." else
+            "Zor mod: tamamlanan bölümler için alternatif kurallar.", assets.fontSmall, Theme.inkSoft, wrap = true)).growX().padLeft(10f)
+        root.add(hardRow).growX().pad(0f, 16f, 8f, 16f).row()
+        val all = services.catalog.ids.all { services.progression.isCompleted(it) }
+        if (all) {
+            root.add(ui.button("Yeni Komuta Çağı · prestij ${meta.prestige}", Theme.purple, Theme.white, "star") {
+                ui.dialog(stage, "Yeni Komuta Çağı", "Bütün bölümleri tamamladın! Yeni çağa geçince ilerlemen korunur; zor mod ödülleri çağ başına artar ve zor mod listesi sıfırlanır.",
+                    "Vazgeç" to {}, "Çağa geç" to {
+                        meta.prestige++; meta.hardCleared.clear(); services.progression.meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.PRESTIGE)
+                        services.persist(); game.go(LevelSelectScreen(game, focusArea, true))
+                    }, color = Theme.purple)
+            }).growX().pad(0f, 16f, 8f, 16f).row()
+        }
         scroll = ScrollPane(list, assets.scrollStyle)
         scroll.setScrollingDisabled(true, false)
         root.add(scroll).grow()
@@ -62,7 +79,13 @@ class LevelSelectScreen(game: EmirZinciriGame, private val focusArea: Int? = nul
                 } else {
                     b.add(ui.image("lock", Theme.inkFaint)).size(34f)
                 }
-                if (open) ui.onTap(b) { game.go(GameScreen(game, d)) }
+                val hardDone = d.id in services.save.meta.hardCleared
+                if (hard && hardDone) b.background = assets.panel(Theme.mix(Theme.red, Theme.white, 0.75f), 22, 4f, Theme.red)
+                if (open) ui.onTap(b) {
+                    if (!hard) game.go(GameScreen(game, d))
+                    else if (s == 0) ui.dialog(stage, "Zor mod", "Zor mod yalnızca tamamlanan bölümlerde açılır.", "Tamam" to {})
+                    else game.go(GameScreen(game, d.copy(maxCommands = d.par, third = com.emirzinciri.robotkomutan.logic.level.StarRule(com.emirzinciri.robotkomutan.logic.level.StarRuleType.NO_BUMPS)), mode = PlayMode.HARD))
+                }
                 row.add(b).size(112f, 112f).pad(6f)
             }
             card.add(row).padTop(14f).row()

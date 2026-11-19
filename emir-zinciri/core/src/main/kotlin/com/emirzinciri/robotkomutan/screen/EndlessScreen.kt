@@ -105,7 +105,24 @@ object EndlessFlow {
         val c = ui.panel()
         c.pad(30f)
         val buttons = Table()
-        if (mode == PlayMode.ENDLESS) {
+        if (mode == PlayMode.CUSTOM || mode == PlayMode.HARD) {
+            val win = o is Outcome.Win
+            val hardOk = mode == PlayMode.HARD && win && o.stats.bumps == 0
+            if (hardOk && s.save.meta.hardCleared.add(def.id)) {
+                val gold = 20L * (1 + s.save.meta.prestige)
+                s.save.wallet.gold += gold
+                s.progression.meta.count(Counter.HARD_CLEARS); s.progression.meta.count(Counter.GOLD_EARNED, gold)
+            }
+            a.play(if (win) "win" else "fail")
+            c.add(ui.label(if (win) (if (mode == PlayMode.HARD) (if (hardOk) "Zor kural tamam!" else "Kazandın ama çarptın") else "Harita çözüldü!") else "Olmadı",
+                a.fontBig, if (win) Theme.green else Theme.orange, align = Align.center, wrap = true)).growX().row()
+            val detail = if (o is Outcome.Fail) o.detail else "${o.stats.cards} kart · ${o.stats.ticks} adım"
+            c.add(ui.label(detail + if (mode == PlayMode.HARD && !hardOk && win) "\nZor kural hiç çarpmadan bitirmeyi ister." else "", a.font, Theme.inkSoft, wrap = true, align = Align.center)).growX().padTop(10f).row()
+            buttons.add(ui.button(if (mode == PlayMode.CUSTOM) "Editör" else "Bölümler", Theme.panelAlt, Theme.ink) {
+                game.go(if (mode == PlayMode.CUSTOM) EditorScreen(game, com.emirzinciri.robotkomutan.logic.editor.EditorModel.from(def)) else LevelSelectScreen(game, def.area, hard = true))
+            }).growX().uniformX().pad(6f)
+            buttons.add(ui.button("Tekrar", Theme.turquoise, Theme.white, "reset") { retry() }).growX().uniformX().pad(6f)
+        } else if (mode == PlayMode.ENDLESS) {
             val floor = def.id - 10_000
             if (o is Outcome.Win) {
                 e.floor = floor

@@ -39,7 +39,11 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 - ✅ Doğrulanmış bölüm üretici: rastgele harita → çözücüyle doğrulama → çok kolay/çözümsüz olanı reddetme; kat arttıkça kutu, çukur, anahtar, plaka, enerji ve devriye eklenir. Aynı tohum = aynı bölüm.
 - ✅ Sonsuz Fabrika (kat kat koşu, rekor, can harcamaz) ve Günlük Komut Bulmacası (günlük ödül, en az kart rekoru).
 - ✅ Market: altınla 10 robot görünümü (yalnızca görsel). Gerçek para yok; Google Play Billing eklenmedi.
-- ⬜ Harita editörü, robot seferleri, fabrika savunması, koleksiyon/müze, komut ustalığı, rastgele fabrika olayları, alternatif bölüm kuralları, prestij.
+- ✅ Harita editörü (Kendi Fabrikanı Tasarla): 17 fırça, yön çevirme, boyut 4–10, çözücüyle "çözülebilir mi?", test etme, yerel kayıt/açma/silme. Harita biçimi bölüm JSON'uyla aynı (ileride çevrimiçi paylaşıma hazır).
+- ✅ Robot seferleri: Keşif Merkezi seviyesi kadar yuva, 3 rota (30 dk / 2 sa / 8 sa), enerji maliyeti, güvenilir süre ölçümü, başlangıçta belirlenen ödül.
+- ✅ Koleksiyon (5 set × 20 = 100 parça, 3 nadirlik) ve Koleksiyon Müzesi binası (parça başına saatlik altın, set ödülleri).
+- ✅ Alternatif bölüm kuralları (Zor mod: kart sınırı = par, çarpma yok) ve prestij (500 bölüm sonrası "Yeni Komuta Çağı": ilerleme korunur, zor mod ödülleri artar).
+- ⬜ Fabrika savunması, komut ustalığı seviyeleri, rastgele fabrika olayları, editör haritalarını çevrimiçi paylaşma.
 - Not: görev tarihi cihaz saatinden okunur; tarihi değiştirmek görevleri yeniler (ödüller küçük tutuldu). Canlar ve üretim bundan etkilenmez.
 
 ## Aşama 8 — İçerik genişletme ✅

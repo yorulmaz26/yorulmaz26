@@ -40,7 +40,7 @@ class SettingsScreen(game: EmirZinciriGame) : BaseScreen(game) {
         val about = ui.panel(Theme.panelAlt, 24, 0f)
         about.pad(18f)
         about.add(ui.label(EmirZinciriGame.TITLE, assets.fontBold, Theme.ink)).left().row()
-        about.add(ui.label("Sürüm 1.0.0 · Tamamen çevrimdışı oynanır, hesap gerekmez.", assets.fontSmall, Theme.inkSoft, wrap = true)).growX().left().row()
+        about.add(ui.label("Sürüm 1.1.0 · Tamamen çevrimdışı oynanır, hesap gerekmez.", assets.fontSmall, Theme.inkSoft, wrap = true)).growX().left().row()
         about.add(ui.label("Yazı tipi: Nunito (SIL Open Font License 1.1). Oyun altyapısı: libGDX (Apache 2.0). Müzik ve sesler oyun için sentezlendi.", assets.fontSmall, Theme.inkSoft, wrap = true))
             .growX().left().padTop(6f)
         body.add(about).growX()
