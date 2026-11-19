@@ -98,6 +98,8 @@ class WorldGenerator(private val seed: Long) {
     private val pockets = ValueNoise(seed, 2)
     private val ores = ValueNoise(seed, 3)
     private val band = ValueNoise(seed, 4)
+    private val lakes = ValueNoise(seed, 5)
+    private val rivalXs = RivalSystem.nestPositions(seed)
 
     fun generateChunk(cx: Int, cy: Int): ByteArray {
         val out = ByteArray(CHUNK_SIZE * CHUNK_SIZE)
@@ -132,6 +134,17 @@ class WorldGenerator(private val seed: Long) {
         if (y in 5..60 && o > 0.84 && t != Terrain.ROCK) t = Terrain.FUNGUS
         if (y > 9 && o < 0.1) t = Terrain.MINERAL
         if (y > 16 && Hash.unit(seed, x, y, 77) < 0.005) t = Terrain.FOSSIL
+        if (y > 40 && t == Terrain.ROCK && o > 0.8) t = Terrain.RARE_VEIN
+        if (!startArea && y > 8 && Hash.unit(seed, x, y, 78) < 0.003) t = Terrain.ANCIENT_NEST
+        if (!startArea && y > 14 && t != Terrain.ROCK && Hash.unit(seed, x, y, 79) < 0.0015) t = Terrain.CREATURE_DEN
+        if (!startArea && y > 28 && lakes.fbm(x / 7.0, y / 5.0, 2) > 0.8) t = Terrain.WATER_POCKET
+        // Rakip koloni tünelleri: yuvalarının altında kazılmış tünel ağları.
+        for ((i, rx) in rivalXs.withIndex()) {
+            val dx = x - rx
+            val reach = if (i % 3 == 0) 16 else 9
+            if (kotlin.math.abs(dx) > reach + 1 || y > 20) continue
+            if ((dx == 0 && y <= 12) || ((y == 6 || y == 12) && kotlin.math.abs(dx) <= reach) || (y in 13..18 && kotlin.math.abs(dx) <= 3)) t = Terrain.RIVAL_TUNNEL
+        }
         return t
     }
 }

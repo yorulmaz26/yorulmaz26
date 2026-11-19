@@ -88,6 +88,9 @@ class SaveManager(private val storage: SaveStorage, private val name: String = "
     private fun migrate(obj: JsonObject): JsonObject {
         val v = obj["version"]?.jsonPrimitive?.int ?: 1
         require(v <= SAVE_VERSION) { "Daha yeni bir sürümün kaydı" }
+        // 1 → 2: yeni sistemlerin alanları varsayılan değerlerle doldurulur (rakipler yüklemede yeniden kurulur).
+        // Burada yalnızca sürüm alanı güncellenir.
+        if (v < 2) return kotlinx.serialization.json.JsonObject(obj + ("version" to kotlinx.serialization.json.JsonPrimitive(2)))
         return obj
     }
 

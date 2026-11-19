@@ -25,11 +25,11 @@ class Pathfinder(private val world: World, private val pheromones: PheromoneFiel
      * (sx, sy) hücresinden (tx, ty) hücresine yol. Sonuç başlangıç hücresini içermez: [x0, y0, x1, y1, ...].
      * Yol yoksa null döner. Başlangıç ve hedef aynıysa boş dizi döner.
      */
-    fun find(sx: Int, sy: Int, tx: Int, ty: Int, maxNodes: Int = 12000): IntArray? {
+    fun find(sx: Int, sy: Int, tx: Int, ty: Int, maxNodes: Int = 12000, colony: Boolean = true): IntArray? {
         searches++
         if (sx == tx && sy == ty) return IntArray(0)
         if (!world.isWalkable(tx, ty)) return null
-        val avoid = pheromones.hasAvoid()
+        val avoid = colony && pheromones.hasAvoid()
         index.clear()
         open.clear()
         var count = 0
@@ -54,7 +54,7 @@ class Pathfinder(private val world: World, private val pheromones: PheromoneFiel
                 val ny = cy + d[1]
                 if (!world.isWalkable(nx, ny)) continue
                 var step = 10
-                if (avoid && pheromones.strengthAt(PheromoneType.AVOID, nx, ny) > 0f) step += 80
+                if (avoid && (pheromones.strengthAt(PheromoneType.AVOID, nx, ny) > 0f || pheromones.strengthAt(PheromoneType.DANGER, nx, ny) > 0f)) step += 80
                 val ng = cg + step
                 val key = cellKey(nx, ny)
                 val existing = index[key]

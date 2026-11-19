@@ -86,7 +86,7 @@ class SimulationTest {
     @Test
     fun feromonZamanlaSoner() {
         val sim = newSim()
-        val m = sim.placePheromone(PheromoneType.RALLY, 0, 8)
+        val m = sim.placePheromone(PheromoneType.RALLY, 0, 8)!!
         sim.run(60f)
         assertTrue(m.strength in 0.1f..0.9f)
         sim.run(PheromoneType.RALLY.duration)

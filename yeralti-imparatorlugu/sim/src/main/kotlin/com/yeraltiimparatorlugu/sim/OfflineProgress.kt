@@ -130,15 +130,43 @@ object OfflineProgress {
         }
         if (laid > 0) lines.add("Kraliçe $laid yumurta bıraktı.")
 
-        // 6) Yüzey kaynakları yenilenir, feromonlar söner, takvim ilerler.
+        // 6) Araştırma ve genetik: laboratuvarlar yarı verimle çalışmaya devam eder.
+        val labs = sim.rooms.filter { it.type == RoomType.RESEARCH_LAB && it.functional }
+        val def = sim.research.currentDef()
+        if (def != null && labs.isNotEmpty()) {
+            val researchers = minOf(labs.sumOf { it.stationCapacity }, maxOf(1, workers / 5))
+            sim.research.progress += researchers * eff * sim.mods.researchMult
+            if (sim.research.progress >= def.work) { sim.completeResearch(def); lines.add("Araştırma tamamlandı: ${def.title}") }
+            else lines.add("Araştırma ilerledi: ${def.title} %${(sim.research.progress / def.work * 100).toInt()}")
+        }
+        // 7) Rakipler ekonomilerini sürdürür ama oyuncu yokken baskın yapmaz; akıncılar geri döner.
+        sim.rivalSystem.offlineAdvance(sim, seconds)
+        for (c in sim.creatures.filter { it.rivalId >= 0 }) { sim.creatures.remove(c); sim.rivalSystem.raiderReturned(sim.rivalSystem.byId(c.rivalId), 0) }
+        // 8) Yan koloniler büyür ve kaynak gönderir.
+        if (sim.federation.colonies.isNotEmpty()) {
+            val before = sim.resources.edibleTotal()
+            var left = seconds
+            while (left > 0f) { sim.federation.update(sim, minOf(60f, left)); left -= 60f }
+            val got = sim.resources.edibleTotal() - before
+            if (got > 0) lines.add("Yan koloniler $got yiyecek gönderdi.")
+        }
+        sim.environment.drainAll()
+        sim.environment.weather = Weather.CLEAR
+
+        // 9) Yüzey kaynakları yenilenir, feromonlar söner, takvim ilerler; seferler tamamlanır.
         repeat(minOf(Simulation.MAX_SOURCES, (seconds / 60f).toInt())) { sim.refreshSources() }
         sim.pheromones.update(seconds)
         sim.time += seconds
         sim.restoreInternal(sim.day, 0f, sim.riskySnapshot())
+        sim.environment.weatherUntil = sim.time + 240.0
+        sim.events.nextAt = maxOf(sim.events.nextAt, sim.time + 180.0)
+        val expBefore = sim.expeditions.active.size
+        sim.expeditions.update(sim)
+        if (sim.expeditions.active.size < expBefore) lines.add("${expBefore - sim.expeditions.active.size} sefer döndü (ayrıntılar günlükte).")
         val hours = (seconds / 3600f)
         sim.addLog("Yokluğunuzda geçen ${"%.1f".format(hours)} saat değerlendirildi.")
         if (lines.isEmpty()) lines.add("Koloni sakin bir şekilde bekledi.")
-        lines.add("Kazı ve inşa işleri yalnızca oyun açıkken ilerler.")
+        lines.add("Kazı, inşa ve savaş yalnızca oyun açıkken olur; oyuncu yokken baskın yapılmaz.")
         return lines
     }
 }
