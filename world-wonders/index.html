@@ -111,7 +111,24 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 .pieceProg{display:flex;align-items:center;gap:5px}
 .pieceProg i{width:12px;height:12px;border-radius:4px;background:#d6ccb6;transform:rotate(45deg)}
 .pieceProg i.on{background:var(--gold);box-shadow:0 0 6px var(--gold)}
-.boardWrap{flex:1;width:100%;display:flex;align-items:center;justify-content:center;min-height:0;position:relative}
+.boardWrap{flex:0 0 auto;width:100%;display:flex;align-items:flex-start;justify-content:center;padding-top:10px;position:relative}
+.bottomArea{flex:1;width:100%;max-width:540px;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:6px 14px 0;position:relative}
+.wonderStrip{display:flex;align-items:center;gap:12px;padding:8px 14px 8px 8px;border-radius:16px;background:rgba(255,250,240,.75);box-shadow:0 2px 0 #d6c4a0;color:var(--ink);font-weight:800;font-size:14px}
+.wonderStrip canvas{width:64px;height:48px;border-radius:8px}
+.wonderStrip small{display:block;color:var(--muted);font-size:12px}
+.tipBubble{position:relative;max-width:460px;padding:12px 16px;border-radius:16px;background:var(--ink);color:#fff;font-size:15px;line-height:1.4;box-shadow:0 8px 20px rgba(16,38,59,.3);animation:pop .3s cubic-bezier(.2,1.5,.4,1);cursor:pointer}
+.tipBubble b{color:var(--gold)}
+.tipBubble::before{content:"";position:absolute;top:-8px;left:50%;margin-left:-8px;border:8px solid transparent;border-top:0;border-bottom-color:var(--ink)}
+#sky{position:absolute;left:0;top:0;width:100%;height:42%;pointer-events:none}
+.lvlGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:12px 0}
+.lvlBtn{aspect-ratio:1;border-radius:12px;background:#fffaf0;box-shadow:0 2px 0 #d6ccb6;color:var(--ink);font-weight:900;font-size:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:0}
+.lvlBtn small{font-size:10px;letter-spacing:-1px;color:var(--gold-2)}
+.lvlBtn.cur{background:var(--gold);box-shadow:0 2px 0 var(--gold-2)}
+.lvlBtn.piece{outline:2px dashed var(--terra);outline-offset:-4px}
+.cards{display:grid;gap:8px}
+.histCard{border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.1);font-size:14px;line-height:1.45;color:#e6eef6}
+.histCard.locked{opacity:.6;border:1px dashed rgba(255,255,255,.35);background:transparent}
+.histCard b{color:var(--gold)}
 #board{touch-action:none;display:block}
 .banner{position:absolute;left:50%;top:45%;translate:-50% -50%;width:min(92%,480px);text-align:center;font-family:var(--f-display);font-weight:800;font-size:40px;line-height:1.15;color:#fff;text-shadow:0 3px 0 #b9831b,0 0 24px rgba(232,178,58,.9),0 0 3px #10263b;pointer-events:none;text-wrap:balance;animation:banner 1.3s ease both}
 @keyframes banner{0%{scale:.3;opacity:0}20%{scale:1.1;opacity:1}80%{scale:1;opacity:1}100%{scale:1.2;opacity:0}}
@@ -181,6 +198,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 
   <!-- ===== HARİTA ===== -->
   <section id="mapScreen" class="screen active" aria-label="Dünya haritası">
+    <canvas id="sky" aria-hidden="true"></canvas>
     <div id="mapView"><div id="tilt"><div id="plane"><div class="waves"></div></div></div></div>
     <div class="mapTop">
       <div class="brand"><h1>World Wonders</h1><p>Yeni Dünyanın 7 Harikası</p></div>
@@ -207,7 +225,11 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
       <span class="pieceProg" id="pieceProg" title="Puzzle parçasına ilerleme"></span>
     </div>
     <div class="boardWrap" id="boardWrap"><canvas id="board"></canvas></div>
-    <div class="gameFoot" id="gameFoot"></div>
+    <div class="bottomArea">
+      <div class="tipBubble" id="tip" hidden></div>
+      <div class="wonderStrip" id="wonderStrip"></div>
+      <div class="gameFoot" id="gameFoot"></div>
+    </div>
   </section>
 
   <!-- ===== PUZZLE ===== -->
@@ -311,6 +333,19 @@ const WONDERS = [
     fact:'1931’de tamamlanan heykel, Corcovado Dağı’nın <b>700 metre</b> yüksekliğindeki zirvesinde durur. Betonarme gövdesi sabuntaşı mozaik parçalarıyla kaplıdır.' },
 ];
 const TOTAL_LEVELS = LEVELS_PER_WONDER * WONDERS.length;
+/* yıldızlar harika başına tarih kartı açar (para yok, harcama yok: eşik ödülü) */
+const CARD_STARS = [30, 90, 150];   // harika başına en fazla 60×3 = 180 yıldız
+const HISTORY = {
+  colosseum:['Asıl adı <b>Flavius Amfitiyatrosu</b>’dur. İnşaatı İmparator Vespasianus başlattı, oğlu Titus MS 80’de açtı.','Açılış oyunlarının <b>100 gün</b> sürdüğü anlatılır.','Arena zemininin altındaki <b>hypogeum</b> tünellerinden hayvanlar ve gladyatörler asansörlerle sahneye çıkarılırdı.'],
+  petra:['Nebatiler Petra’yı <b>baharat ve tütsü ticaretinin</b> merkezlerinden biri yaptı.','Kente, yer yer birkaç metre genişliğindeki yaklaşık <b>1,2 km</b> uzunluğunda <b>Siq</b> kanyonundan girilir.','Petra, 1812’de İsviçreli gezgin <b>Johann Ludwig Burckhardt</b>’ın ziyaretiyle Batı’da yeniden tanındı.'],
+  taj:['İnşaatında yaklaşık <b>20.000 işçi</b> ve binden fazla filin çalıştığı anlatılır.','Dört minare hafifçe <b>dışa eğik</b> yapılmıştır; bir depremde ana kubbenin üzerine devrilmesinler diye.','Mermer gün içinde ışığa göre renk değiştirir: sabah <b>pembe</b>, öğlen <b>beyaz</b>, ay ışığında <b>altın</b> gibi görünür.'],
+  wall:['İlk büyük bölümler MÖ 3. yüzyılda ilk imparator <b>Qin Shi Huang</b> döneminde birleştirildi.','Kulelerdeki nöbetçiler gündüz <b>duman</b>, gece <b>ateş</b> işaretleriyle haber iletirdi.','Seddin <b>uzaydan çıplak gözle görüldüğü</b> yaygın ama yanlış bir inanıştır.'],
+  machu:['İnka İmparatoru <b>Pachacuti</b> için 15. yüzyılın ortasında inşa edildiği düşünülür.','İspanyol fatihler kenti hiç bulamadı. 1911’de <b>Hiram Bingham</b> ile dünyaca tanındı.','Teraslar hem tarım alanıydı hem de dağı <b>kaymaya karşı koruyan</b> bir drenaj sistemiydi.'],
+  chichen:['El Castillo, tüylü yılan tanrısı <b>Kukulkan</b>’a adanmış bir tapınak-piramittir.','Kentteki <b>Büyük Top Sahası</b>, Mezoamerika’da bilinen en büyük top oyunu sahasıdır.','Adı “Itza’ların kuyusunun ağzında” anlamına gelir. Kaynağı kutsal <b>Cenote</b> kuyusudur.'],
+  christ:['Heykel yaklaşık <b>30 metre</b> boyundadır; kaidesiyle birlikte 38 metreye ulaşır.','Açık kollarının uçtan uca uzunluğu yaklaşık <b>28 metre</b>dir.','Sık sık <b>yıldırım</b> çarpar; bu yüzden üzerinde paratonerler bulunur.'],
+};
+const starsOf = w => { let n = 0; for (let g = w*LEVELS_PER_WONDER+1; g <= (w+1)*LEVELS_PER_WONDER; g++) n += save.stars[g] || 0; return n; };
+const cardsOf = w => CARD_STARS.filter(t => starsOf(w) >= t).length;
 
 /* ---------------- yardımcılar ---------------- */
 const $ = s => document.querySelector(s);
@@ -951,9 +986,11 @@ function startLevel(g){
         lotus: Array.from({length:ROWS},()=>Array(COLS).fill(false)), turn:0, raids:0, startMs: Date.now() };
   G.layerCap = G.layers.flat().filter(v=>v>0).length;
   L.lotus.forEach(([r,c])=>{ G.lotus[r][c] = true; });
+  G.replay = g < save.lvl;
   fillInitial();
   showScreen('gameScreen'); layoutBoard(); renderHUD();
   if (g === 1) setTimeout(()=>toast('Aynı türden 3 objeyi yan yana getir'), 400);
+  if (g === 3) setTimeout(()=>tip('four', '<b>İpucu:</b> 4 veya 5 taşı aynı anda eşleştirirsen özel güçler oluşur.'), 1200);
 }
 function randColor(){ return Math.floor(G.rnd() * G.L.colors); }
 function fillInitial(){
@@ -970,6 +1007,7 @@ function fillInitial(){
     G.L.locks.forEach(([r,c])=>{ const gm = G.grid[r][c]; if (gm && gm.kind==='gem') gm.lock = true; });
   } while ((findGroups().length || !findMove()) && ++tries < 50);
   const me = G; me.busy = true; setTimeout(()=>{ if (G === me) me.busy = false; }, 900);
+  hideTip(); $('#tip').onclick = hideTip; stripKey = '';
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){ const gm = G.grid[r][c]; if (gm){ gm.y = r - ROWS - 1 - (COLS-c)*.15; tween(gm, { y:r }, 520 + r*30, easeOutBack, c*25); } }
 }
 function sameCol(r,c,col){ const g = G.grid[r] && G.grid[r][c]; return g && g.kind === 'gem' && g.color === col; }
@@ -1130,7 +1168,10 @@ async function clearCells(cells, { adjacent=false, create=[], pre=new Set(), ext
   syncLayerGoal();
   for (const [k] of blockHits){ const r = Math.floor(k/COLS), c = k%COLS, b = G.blocks[r][c]; if (!b) continue; b.hp--; b.shake = 1; burst(c+.5,r+.5,'#b8b0a0',8,true);
     if (b.hp <= 0){ G.blocks[r][c] = null; goalTick('block',1); addScore(150,r,c); } }
-  create.forEach(cr=>{ const [r,c] = cr.pos; if (G.blocks[r][c]) return; const g = newGem(cr.kind==='disk'?-1:cr.color, r, c, cr.kind==='disk'?{kind:'disk'}:{ sp:cr.sp }); g.s = 0; G.grid[r][c] = g; tween(g,{ s:1 },260,easeOutBack); burst(c+.5,r+.5,'#fff3b0',14); });
+  create.forEach(cr=>{ const [r,c] = cr.pos; if (G.blocks[r][c]) return; const g = newGem(cr.kind==='disk'?-1:cr.color, r, c, cr.kind==='disk'?{kind:'disk'}:{ sp:cr.sp }); g.s = 0; G.grid[r][c] = g; tween(g,{ s:1 },260,easeOutBack); burst(c+.5,r+.5,'#fff3b0',14);
+    if (cr.kind === 'disk') tip('disk', '<b>Güneş Diski!</b> 5 taşı yan yana getirdin. Diski herhangi bir taşla yer değiştir: o türün hepsi yok olur.');
+    else if (cr.sp === 'b') tip('bomb', '<b>Tunç Bomba!</b> T veya L şeklinde eşleştirdin. Bombayı eşleştirince çevresindeki 3×3 alan temizlenir.');
+    else tip('line', '<b>Çizgi Taşı!</b> 4 taşı eşleştirdin. Bu taşı eşleştirince oklar yönündeki bütün sıra temizlenir.'); });
   renderHUD();
   await wait(60);
 }
@@ -1245,8 +1286,11 @@ async function sigTick(){
   }
   syncLayerGoal(); renderHUD(); await wait(450);
 }
+function adjacentSpecials(){ for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){ const a = G.grid[r][c]; if (!isSpecial(a) || a.lock) continue;
+  for (const [dr,dc] of [[0,1],[1,0]]){ const b = inB(r+dr,c+dc) && G.grid[r+dr][c+dc]; if (isSpecial(b) && !b.lock) return true; } } return false; }
 async function endTurn(){
   renderHUD();
+  if (!G.over && G.moves > 0 && adjacentSpecials()) tip('combo', '<b>Süper kombinasyon!</b> İki özel güç yan yana. Onları birbirleriyle yer değiştir: etkileri birleşir.');
   if (goalsDone()) return winLevel();
   if (G.L.sig && G.moves > 0 && !G.over){ await sigTick(); if (goalsDone()) return winLevel(); }
   if (G.moves <= 0){ G.over = true; await wait(300); return loseLevel(); }
@@ -1255,8 +1299,9 @@ async function endTurn(){
 
 /* ---- çizim ---- */
 function layoutBoard(){
-  const wrap = $('#boardWrap'); const W = wrap.clientWidth - 16, H = wrap.clientHeight - 8;
-  const size = Math.max(240, Math.min(W, H, 560));
+  // tahta HUD'un hemen altına yerleşir; altında ipucu ve harika şeridi için en az ~96px kalır
+  const wrap = $('#boardWrap'), scr = $('#gameScreen'); const W = wrap.clientWidth - 16, H = scr.clientHeight - wrap.offsetTop - 10 - 96;
+  const size = Math.max(240, Math.min(W, H, 600));
   cell = Math.floor((size - 12) / COLS); pad = Math.floor((size - cell*COLS)/2);
   const px = cell*COLS + pad*2; DPR = Math.min(2, window.devicePixelRatio || 1);
   boardCv.style.width = boardCv.style.height = px + 'px'; boardCv.width = boardCv.height = Math.round(px*DPR);
@@ -1331,9 +1376,26 @@ function renderHUD(){
   for (let i=0;i<LEVELS_PER_PIECE;i++) h += `<i class="${i<inCycle?'on':''}"></i>`;
   const SG = SIGS[W.id];
   $('#pieceProg').innerHTML = G.L.sig && SG.every ? `<b style="color:var(--terra)">${SG.name}: ${SG.every - (G.turn % SG.every)} hamle</b>` : `Parçaya ${LEVELS_PER_PIECE-inCycle} bölüm ${h}`;
+  renderStrip();
   $('#gameFoot').innerHTML = save.test && !G.over ? `<button class="btn small alt" id="btnAutoWin">⚡ Test: Bölümü Kazan</button>` : '';
   const aw = $('#btnAutoWin'); if (aw) aw.onclick = () => { if (G.busy) return; G.goals.forEach(g=>g.left=0); if (G.goals.some(g=>g.t==='score')) G.score = Math.max(G.score, ...G.goals.map(g=>g.n||0)); G.busy = true; endTurn(); };
 }
+let stripKey = '';
+function renderStrip(){
+  const w = G.L.w, k = piecesOf(w), key = w + ':' + k + ':' + G.g; if (key === stripKey) return; stripKey = key;
+  const cv = document.createElement('canvas'); cv.width = 128; cv.height = 96; drawPuzzle(cv, w, ownedSet(w,k), { complete: k >= PIECES_PER_WONDER });
+  const left = LEVELS_PER_PIECE - ((G.g-1) % LEVELS_PER_PIECE);
+  const el = $('#wonderStrip'); el.innerHTML = ''; el.append(cv);
+  el.insertAdjacentHTML('beforeend', `<div>${G.W.name} · ${k}/${PIECES_PER_WONDER} parça<small>${G.replay ? 'Tekrar oynanıyor: yıldızını yükselt' : G.L.hard ? 'Bu bölümü kazanırsan parça senin!' : `Sonraki parçaya ${left} bölüm`}</small></div>`);
+}
+/* ilk karşılaşmada kısa ipuçları (özel güçler, kombinasyon) */
+let tipTimer = null;
+function tip(key, html){
+  if (!save.tips) save.tips = {}; if (save.tips[key]) return; save.tips[key] = true; persist();
+  const t = $('#tip'); t.innerHTML = html; t.hidden = false; $('#wonderStrip').hidden = true;
+  clearTimeout(tipTimer); tipTimer = setTimeout(hideTip, 7000);
+}
+function hideTip(){ $('#tip').hidden = true; $('#wonderStrip').hidden = false; }
 function toast(text){ const b = document.createElement('div'); b.className='banner'; b.textContent = text; b.style.fontSize = text.length > 18 ? '24px' : '34px'; $('#boardWrap').appendChild(b); setTimeout(()=>b.remove(), text.length > 18 ? 2400 : 1400); if (text.length > 18) b.style.animationDuration = '2.4s'; }
 
 /* ---- kazan / kaybet ---- */
@@ -1348,7 +1410,8 @@ async function winLevel(){
   if (bonusMoves > 12){ addScore((bonusMoves-12)*250, 3.5, 3.5); G.moves = 0; }
   await wait(600); if (G !== me) return;
   logAttempt('win', stars);
-  const g = G.g; save.stars[g] = Math.max(save.stars[g] || 0, stars);
+  const cardsBefore = cardsOf(G.L.w);
+  const g = G.g; const prevBest = save.stars[g] || 0; save.stars[g] = Math.max(prevBest, stars);
   const prevPieces = piecesOf(G.L.w);
   if (save.lvl === g) save.lvl = g + 1;
   persist();
@@ -1357,11 +1420,21 @@ async function winLevel(){
   if (earnedPiece){ save.lives = MAX_LIVES; save.lifeTs = null; persist(); }
   const W = G.W;
   const finished = save.lvl > TOTAL_LEVELS;
+  const newCard = cardsOf(G.L.w) > cardsBefore ? cardsOf(G.L.w) : 0;
+  const cardHtml = newCard ? `<p style="text-align:center;background:#fffaf0;border-radius:12px;padding:8px 10px;margin:8px 0"><span class="hardTag" style="background:var(--gold-2)">YENİ TARİH KARTI</span><br>${HISTORY[W.id][newCard-1]}</p>` : '';
+  if (G.replay){
+    openModal(`<div class="kicker">${W.name} · Bölüm ${G.L.li} · tekrar</div><h2>Harika iş!</h2>
+      <div class="stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*.18}s">★</span>`).join('')}</div>
+      <p style="text-align:center;font-weight:800">${stars > prevBest ? `Yeni rekor! ${prevBest} → ${stars} yıldız` : `En iyi sonucun: ${save.stars[g]} yıldız`}</p>${cardHtml}
+      <div class="row"><button class="btn ghost" id="mLv">Bölümler</button><button class="btn" id="mNext">Kaldığın Yer</button></div>`);
+    $('#mLv').onclick = () => { closeModal(); openPuzzle(G.L.w); openLevelList(G.L.w); }; $('#mNext').onclick = () => { closeModal(); openLevelIntro(save.lvl); };
+    return;
+  }
   openModal(`
     <div class="kicker">${W.name} · Bölüm ${G.L.li}</div>
     <h2>Harika iş!</h2>
     <div class="stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*.18}s">★</span>`).join('')}</div>
-    <p style="text-align:center;font-weight:900;font-size:20px;margin:4px 0">${G.score.toLocaleString('tr-TR')} puan</p>
+    <p style="text-align:center;font-weight:900;font-size:20px;margin:4px 0">${G.score.toLocaleString('tr-TR')} puan</p>${cardHtml}
     ${earnedPiece ? `<p style="text-align:center"><b>Yeni bir ${W.name} puzzle parçası kazandın!</b><br><span style="color:var(--muted);font-weight:700;font-size:14px">Haritada ${W.name} çevresinde yeni bir süs açıldı.</span>${refilled ? `<br><span style="color:#c23b3b;font-weight:800">♥ Canların doldu!</span>` : ''}</p>` : `<p style="text-align:center;color:var(--muted);font-weight:700">Sonraki puzzle parçasına ${LEVELS_PER_PIECE - ((save.lvl-1)%LEVELS_PER_PIECE)} bölüm kaldı.</p>`}
     <div class="row">${earnedPiece ? `<button class="btn wide" id="mPiece">Parçayı Al</button>` : `<button class="btn ghost" id="mMap">Harita</button>${finished?'':'<button class="btn" id="mNext">Sonraki Bölüm</button>'}`}</div>`);
   if (earnedPiece) $('#mPiece').onclick = () => { closeModal(); openPuzzle(G.L.w, { reward:true }); };
@@ -1435,7 +1508,11 @@ async function openPuzzle(w, { reward=false } = {}){
       <div class="pbar"><i style="width:${k/PIECES_PER_WONDER*100}%"></i></div>
       ${k>=PIECES_PER_WONDER ? `<div class="factCard">✦ <b>${W.name}</b> koleksiyonunda. ${W.fact}</div>` : (w===currentWonder() ? `<div class="statRow"><span>Sonraki parça</span><b>${nextIn} bölüm sonra</b></div>` : `<div class="statRow"><span>Durum</span><b>${w<currentWonder()?'Tamamlandı':'Kilitli'}</b></div>`)}
       ${k>0 && k<PIECES_PER_WONDER ? `<div class="factCard">${W.fact}</div>` : ''}
+      ${w <= currentWonder() ? `<div class="statRow"><span>Tarih kartları · ★ ${starsOf(w)}/${LEVELS_PER_WONDER*3}</span><b>${cardsOf(w)} / ${CARD_STARS.length}</b></div>
+      <div class="cards">${CARD_STARS.map((t,i)=> starsOf(w) >= t ? `<div class="histCard">✦ ${HISTORY[W.id][i]}</div>` : `<div class="histCard locked">🔒 ★ ${t} yıldızda açılır (${Math.max(0, t - starsOf(w))} yıldız kaldı)</div>`).join('')}</div>
+      <button class="btn alt wide" id="pzLevels">Bölümler · yıldızlarını yükselt</button>` : ''}
       <div class="row" style="display:flex;gap:10px">${w===currentWonder() && save.lvl<=TOTAL_LEVELS ? `<button class="btn wide" id="pzPlay">Bölüm ${(save.lvl-1)%LEVELS_PER_WONDER+1} Oyna</button>` : `<button class="btn wide alt" id="pzMap">Haritaya Dön</button>`}</div>`;
+    const lv = $('#pzLevels'); if (lv) lv.onclick = () => openLevelList(w);
     const p = $('#pzPlay'); if (p) p.onclick = () => openLevelIntro(save.lvl); const m = $('#pzMap'); if (m) m.onclick = () => openMap(); };
   if (!reward){ drawPuzzle(cv, w, ownedSet(w,n), { complete: n>=PIECES_PER_WONDER }); info(); return; }
   // ödül animasyonu: yeni parça ekranın ortasından uçup yerine oturur
@@ -1556,6 +1633,21 @@ function renderDecor(animateFrom){
       else if (w === cur){ const s = document.createElement('div'); s.className = 'slot'; s.style.left = x+'px'; s.style.top = y+'px'; plane.insertBefore(s, plane.querySelector('.pin')); } } });
   return fresh;
 }
+function drawSky(){
+  const cv = $('#sky'); const d = Math.min(2, window.devicePixelRatio||1); const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return;
+  cv.width = W*d; cv.height = H*d; const c = cv.getContext('2d'); c.scale(d,d);
+  const r = mulberry32(2024);
+  for (let i=0;i<Math.round(W*H/1800);i++){ const y = r()*H*.8; c.globalAlpha = .25 + r()*.6*(1 - y/H); c.fillStyle = '#fff'; c.beginPath(); c.arc(r()*W, y, r()<.1 ? 1.6 : .9, 0, TAU); c.fill(); }
+  c.globalAlpha = 1;
+  // hilal
+  const mx = W*.84, my = H*.36; c.fillStyle = '#fff3c4'; c.beginPath(); c.arc(mx,my,16,0,TAU); c.fill();
+  c.globalCompositeOperation = 'destination-out'; c.beginPath(); c.arc(mx+7,my-4,14,0,TAU); c.fill(); c.globalCompositeOperation = 'source-over';
+  // ufuk ışıltısı ve uzak dağlar
+  c.fillStyle = grad(c,0,H*.55,0,H,[[0,'rgba(232,178,58,0)'],[1,'rgba(232,178,58,.28)']]); c.fillRect(0,H*.55,W,H*.45);
+  const ridge = (base, amp, col, seed) => { const q = mulberry32(seed); const ph = q()*6; c.fillStyle = col; c.beginPath(); c.moveTo(0,H);
+    for (let x=0;x<=W;x+=W/60) c.lineTo(x, base - amp*(.6*Math.sin(x/W*7+ph) + .4*Math.sin(x/W*17+ph*2))); c.lineTo(W,H); c.closePath(); c.fill(); };
+  ridge(H*.9, H*.07, 'rgba(26,60,92,.9)', 3); ridge(H*.97, H*.05, 'rgba(19,46,72,1)', 9);
+}
 let cam = { x:0, y:0 }, mapBuilt = false;
 function buildMap(){
   const plane = $('#plane'); plane.style.width = MW+'px'; plane.style.height = MH+'px';
@@ -1600,7 +1692,7 @@ function renderRoute(){
   g.innerHTML = h;
 }
 async function openMap({ celebrate=null } = {}){
-  G = null; showScreen('mapScreen'); if (!mapBuilt) buildMap();
+  G = null; showScreen('mapScreen'); if (!mapBuilt) buildMap(); drawSky();
   const cur = currentWonder();
   WONDERS.forEach((W,i)=>{ const pin = $('#pin'+i), ring = $('#ring'+i); const done = wonderDone(i), current = i === cur && !done;
     pin.className = 'pin ' + (done ? 'done' : current ? 'current' : 'locked'); ring.className = 'ring ' + (done ? 'done' : ''); ring.style.display = done || current ? '' : 'none';
@@ -1660,12 +1752,22 @@ function wonderInfo(i){
   const t = $('#mThumb').getContext('2d'); if (i <= cur){ const pc = document.createElement('canvas'); pc.width = 480; pc.height = 360; drawPuzzle(pc, i, ownedSet(i,k), { complete:done }); t.drawImage(pc,0,0); } else { t.filter = 'grayscale(1) brightness(.5) blur(3px)'; t.drawImage(sceneCanvas(W.id),0,0,480,360); t.filter = 'none'; t.fillStyle='#fff'; t.font='900 64px Nunito, sans-serif'; t.textAlign='center'; t.fillText('?',240,205); }
   $('#mClose').onclick = closeModal; const o = $('#mOpen'); if (o) o.onclick = () => { closeModal(); openPuzzle(i); };
 }
+function openLevelList(w){
+  const first = w*LEVELS_PER_WONDER + 1, last = Math.min((w+1)*LEVELS_PER_WONDER, save.lvl, TOTAL_LEVELS);
+  let h = ''; for (let g = first; g <= last; g++){ const st = save.stars[g] || 0, cur = g === save.lvl, li = g - first + 1;
+    h += `<button class="lvlBtn ${cur?'cur':''} ${li % LEVELS_PER_PIECE === 0 ? 'piece':''}" data-g="${g}" aria-label="Bölüm ${li}">${li}<small>${cur ? 'SIRADAKİ' : '★'.repeat(st) + '☆'.repeat(3-st)}</small></button>`; }
+  openModal(`<div class="kicker">${WONDERS[w].name}</div><h2>Bölümler</h2>
+    <p style="text-align:center;margin:6px 0;font-size:14px">Geçtiğin bölümleri tekrar oynayıp yıldızını yükselt. Yıldızlar tarih kartlarını açar. Kesik çizgili bölümler parça bölümüdür.</p>
+    <div class="lvlGrid">${h}</div><button class="btn ghost wide" id="mClose">Kapat</button>`);
+  document.querySelectorAll('.lvlBtn').forEach(b=>b.onclick = () => openLevelIntro(+b.dataset.g));
+  $('#mClose').onclick = closeModal;
+}
 function openCollection(){
   showScreen('collectionScreen'); const g = $('#collGrid'); g.innerHTML = '';
   WONDERS.forEach((W,i)=>{ const k = piecesOf(i), done = k>=PIECES_PER_WONDER, unlocked = i <= currentWonder();
     const b = document.createElement('button'); b.className = 'collCard' + (done?' done':''); const cv = document.createElement('canvas'); cv.width = 320; cv.height = 240;
     if (unlocked) drawPuzzle(cv, i, ownedSet(i,k), { complete:done }); else { const c = cv.getContext('2d'); c.fillStyle='#0d2236'; c.fillRect(0,0,320,240); c.globalAlpha=.25; c.drawImage(monumentIcon(W.id,208,192),56,24); }
-    b.append(cv); b.insertAdjacentHTML('beforeend', `<b>${W.name}</b><span>${done ? '✦ Tamamlandı' : unlocked ? `${k}/${PIECES_PER_WONDER} parça` : '🔒 Kilitli'}</span>`);
+    b.append(cv); b.insertAdjacentHTML('beforeend', `<b>${W.name}</b><span>${done ? '✦ Tamamlandı' : unlocked ? `${k}/${PIECES_PER_WONDER} parça` : '🔒 Kilitli'}${unlocked ? ` · ★ ${starsOf(i)} · kart ${cardsOf(i)}/3` : ''}</span>`);
     b.onclick = () => unlocked ? openPuzzle(i) : wonderInfo(i); g.append(b); });
   g.insertAdjacentHTML('beforeend', `<div class="collCard soon"><b>Antik Dünyanın 7 Harikası</b><span>Yeni dünya · yakında</span></div>`);
 }
@@ -1679,7 +1781,8 @@ function openLevelIntro(g){
   if (syncLives() <= 0) return noLivesModal();
   const L = makeLevel(g), W = WONDERS[L.w];
   const newTxt = L.introduces ? ({ block:()=>`Yeni engel: <b>${W.blocks.map(k=>BLOCKS[k].name).join(', ')}</b>. Yanında eşleşme yaparak kır.`, layer:()=>`Yeni engel: <b>${LAYERS[W.layer].name}</b>. Üzerindeki taşları eşleştirerek temizle.`, relic:()=>`Yeni görev: <b>${W.relic.name}</b>. Eseri tahtanın en altına indir.` })[L.primary]() : '';
-  openModal(`<div class="kicker">${W.name} · ${W.country}</div><h2>Bölüm ${L.li}</h2>
+  const rep = g < save.lvl ? `<p style="text-align:center;margin:0 0 6px;font-weight:800;color:var(--gold-2)">Tekrar oynanıyor · en iyi: ${'★'.repeat(save.stars[g]||0)}${'☆'.repeat(3-(save.stars[g]||0))}</p>` : '';
+  openModal(`<div class="kicker">${W.name} · ${W.country}</div><h2>Bölüm ${L.li}</h2>${rep}
     <canvas class="thumb" id="mThumb" width="480" height="360"></canvas>
     ${L.hard ? `<p style="text-align:center;margin:0 0 6px"><span class="hardTag">ZOR BÖLÜM</span> <b>Kazanırsan puzzle parçası senin!</b></p>` : ''}
     <p style="text-align:center;font-weight:800;margin:0 0 4px">Hedefler · ${L.moves} hamle</p>
@@ -1818,7 +1921,7 @@ function frame(now){
   renderFx(dt);
   requestAnimationFrame(frame);
 }
-window.addEventListener('resize', ()=>{ sizeFx(); if (G){ layoutBoard(); boardTex = null; } if ($('#mapScreen').classList.contains('active')) applyCam(); if ($('#puzzleScreen').classList.contains('active')) openPuzzle(pzView.w); });
+window.addEventListener('resize', ()=>{ sizeFx(); if ($('#mapScreen').classList.contains('active')) drawSky(); if (G){ layoutBoard(); boardTex = null; } if ($('#mapScreen').classList.contains('active')) applyCam(); if ($('#puzzleScreen').classList.contains('active')) openPuzzle(pzView.w); });
 sizeFx();
 requestAnimationFrame(frame);
 (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(()=>{ spriteCache.clear(); });

@@ -18,6 +18,8 @@ Match-3 + Jigsaw Puzzle + 3D dünya haritası. Tek dosyalık bir web prototipi. 
 - **İmza mekanikleri:** her harikanın 21. bölümünden itibaren kendine özgü bir kural (kalkan, kum fırtınası, lotus, akıncılar, sarmaşık kilidi, Kukulkan ışığı, rüzgâr)
 - **Erişilebilirlik:** renk körü modu (taş sembolleri), titreşim, azaltılmış hareket
 - **Oyuncu testi:** anonim deneme kaydı, anket, paylaşılan sonuçlar (bkz. [`TEST_PLANI.md`](TEST_PLANI.md))
+- **Tarih kartları:** yıldızlar harika başına 3 tarih kartı açar (30/90/150 yıldız); geçilmiş bölümler tekrar oynanabilir
+- **İpuçları:** özel güçler ve kombinasyon için ilk karşılaşmada kısa ipuçları
 - **Koleksiyon:** 7 harika ve "Antik Dünya: yakında" kartı
 
 ## Test modu
@@ -25,6 +27,9 @@ Ayarlar (⚙) → **Test modu** açıldığında oyun ekranına "Bölümü Kazan
 
 ## Unity çekirdeği
 [`unity/`](unity/README.md): prototiple birebir aynı çalışan saf C# oyun motoru. `dotnet run --project unity/Tests` ile doğrulanır.
+
+## İkinci dünya
+Antik Dünyanın 7 Harikası içerik planı: [`ANTIK_DUNYA.md`](ANTIK_DUNYA.md)
 
 ## Tasarım
 Konsept analizi ve öncelikli eksik kararlar: [`TASARIM.md`](TASARIM.md)

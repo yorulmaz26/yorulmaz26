@@ -145,8 +145,15 @@ Liderlik tablosu, takımlar ve etkinlikler ("Haftanın Harikası" gibi). Bunlar 
 ## 5. Oyuncu testi (HAZIR)
 Oyunun içinde bir test altyapısı var. Her deneme anonim olarak kaydediliyor; 10. bölümden sonra kısa bir anket çıkıyor. Testçilere yazma izni verilirse sonuçlar otomatik olarak toplanıyor ve oyunun sahibi "Tüm Testçiler" ekranında toplu sonuçları görüyor. Plan: `TEST_PLANI.md`.
 
-## 6. Sonraki adım
-Bütün tasarım kararları verildi. Bundan sonrası:
-1. **Oyuncu testini yapmak** (5–10 kişi, 2 gün) ve sonuçlara göre zorluğu ayarlamak.
-2. **Unity'de görsel üretim:** taş, engel ve harita modelleri; görünüm katmanının `Board.Events` ile canlandırılması.
-3. **Antik Dünyanın 7 Harikası** (ikinci dünya) için içerik planı.
+## 6. Aşama 3 eklemeleri (UYGULANDI)
+- **Yıldızlar artık bir işe yarıyor: tarih kartları.** Her harikada en fazla 180 yıldız toplanabiliyor. 30, 90 ve 150 yıldızda o harikayla ilgili birer tarih kartı açılıyor; toplam 21 kart var. Yıldız harcanmıyor, bir eşiği geçince kart açılıyor; para olmaması kararıyla uyumlu. Kartlar puzzle ekranında, ilerleme sayıları koleksiyonda görünüyor.
+- **Tekrar oynama.** Puzzle ekranındaki "Bölümler" listesinden geçilmiş her bölüm tekrar oynanabiliyor; yıldız rekoru kaydediliyor. Tekrar oynamak ilerlemeyi ya da parça sayısını değiştirmiyor. Kaybetmek yine 1 can götürüyor.
+- **Özel güç ipuçları.** Oyuncu çizgi taşını, Tunç Bombayı, Güneş Diskini ilk kez oluşturduğunda ve iki özel güç ilk kez yan yana geldiğinde tahtanın altında kısa bir ipucu çıkıyor. 3. bölümde "4–5 taş eşleştir" ipucu var. Her ipucu yalnızca bir kez gösteriliyor.
+- **Oyun ekranı düzeni.** Tahta, üst bilgilerin hemen altına yerleşip büyüdü. Altta harika şeridi (küçük puzzle önizlemesi ve parçaya kalan bölüm) ve ipucu alanı var. Uzun telefonlardaki boşluk artık kullanılıyor.
+- **Harita gökyüzü.** Haritanın üstündeki boş koyu alana yıldızlar, hilal, ufuk ışıltısı ve uzak dağ silüetleri eklendi.
+- **İkinci dünya planı.** Antik Dünyanın 7 Harikası için içerik planı hazır: `ANTIK_DUNYA.md`. İçinde harikalar, engeller, imza mekanikleri, harita ve kart örnekleri var.
+
+## 7. Sonraki adım
+1. Oyuncu testini yapmak (`TEST_PLANI.md`) ve sonuçlara göre zorluğu ve 3 can kararını gözden geçirmek.
+2. Unity'de görsel üretime başlamak.
+3. Antik Dünya planındaki iki yeni mekaniği (Piramit Basamakları, Sütunları Diz) prototipte denemek.
