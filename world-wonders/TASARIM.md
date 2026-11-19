@@ -55,21 +55,15 @@ Not: "60 bölüm boyunca aynı harika" riski hâlâ geçerli. Karar 4'teki ara �
 ### ✅ Karar 2: Can ve para (KARARLAŞTIRILDI)
 **3 can** olacak, **oyun içi para olmayacak**. Prototipte uygulandı: kaybedilen bölüm 1 can götürüyor, can bitince bölüme girilemiyor ve geri sayım gösteriliyor. Ek hamle ve mağaza kaldırıldı.
 
-#### Karar 2b: Can nasıl yenilenecek? (AÇIK, yeni öncelik 1)
-Para olmadığından canın geri gelme yolu oyunun tek "bekletme" mekaniği olacak.
+#### ✅ Karar 2b: Can yenilenmesi (KARARLAŞTIRILDI)
+- **20 dakikada 1 can.** 3 can 1 saatte dolar.
+- **Puzzle parçası kazanınca canlar tamamen dolar.** Para gerektirmiyor, puzzle ödülünü daha değerli kılıyor ve her 5 bölümde bir doğal "nefes alma" anı yaratıyor. Zorlanan oyuncuyu tam parçaya yaklaştığı anda kaybetmeyi de engelliyor.
 
-| Seçenek | Artı | Eksi |
-|---|---|---|
-| **Süreyle, 20 dk/can** (prototipte) | Sektörün tanıdık modeli, oturumları doğal olarak böler | 3 can azdır; oyuncu 3 kayıpta 1 saat bekler |
-| Süreyle, 10 dk/can | Daha az bekleme | Bekleme anlamsızlaşabilir |
-| Süre + **parça kazanınca canlar dolar** | Puzzle sistemiyle bağ kurar, para gerektirmez | Kolay bölüm serilerinde can sistemi hissedilmez |
-| Ödüllü reklamla +1 can | Parasız gelir modeli | Reklam istenmiyorsa uygun değil |
+#### ✅ Karar 2c: Güçlendiriciler (KARARLAŞTIRILDI)
+**Bölüm öncesi güçlendirici olmayacak.** Para olmadığı için satın alınamıyorlar; ödül olarak verilmeleri de yeni bir ekonomi katmanı (stok, denge, arayüz) açar. Oyunun derinliği tahtada oluşan özel güçlerden (çizgi, Tunç Bomba, Güneş Diski ve kombinasyonları) geliyor. Gerekirse ileride ödül olarak eklenebilir.
 
-**Öneri:** 20 dk/can + puzzle parçası kazanınca canların dolması. Gelir modeli (reklam, tek seferlik satın alma, premium sürüm) ayrıca konuşulmalı. Para olmaması bir gelir modelinin olmayacağı anlamına mı geliyor, netleşmesi gerekiyor.
-
-#### Karar 2c: Güçlendiriciler para olmadan nasıl kazanılacak? (AÇIK)
-Bölüm öncesi güçlendiriciler (Arkeolog Fırçası, Kazma, Kum Saati) satın alınamayacağı için ya tamamen kaldırılmalı ya da ödül olarak verilmeli: harika tamamlayınca, 3 yıldız serilerinde veya yıldız sandıklarında.
-**Öneri:** Lansmanda güçlendirici olmasın. Oyun tahtada oluşan özel güçlerle (çizgi, Tunç Bomba, Güneş Diski) yeterince derin.
+#### ✅ Gelir modeli (KARARLAŞTIRILDI: şimdilik yok)
+Bu aşamada gelir modeli tasarlanmayacak. Can sistemi ileride ödüllü reklam veya tek seferlik satın alma eklenecek olursa onları taşıyabilecek şekilde bağımsız tutuldu.
 
 ### Karar 3: Puzzle etkileşimi
 - (a) Otomatik yerleşme (prototip). Sıfır sürtünme, sinematik.
@@ -104,8 +98,7 @@ Siluetler zaten ayrışıyor. Ek olarak renk körü modu (taş üzerinde küçü
 
 ## 5. Önerilen sonraki adım
 
-1. **Karar 2b:** can yenilenme süresi ve parça kazanınca canların dolup dolmayacağı
-2. **Karar 2c:** güçlendiriciler olacak mı?
-3. Gelir modeli: para yoksa reklam veya tek seferlik satın alma olacak mı?
-
-Bunlar netleşince **Karar 3 (puzzle etkileşimi)** ve **Karar 4 (ara ödüller)** ile devam edebiliriz.
+Ekonomi kararları tamamlandı. Açık kalan sıradaki kararlar:
+1. **Karar 4: Ara ödüller.** 60 bölümlük harika döngüsünü desteklemek için en kritik konu. Öneri: her parçada haritada anıtın çevresinde küçük bir detay açılması.
+2. **Karar 3: Puzzle etkileşimi.** Öneri: hibrit, yani dokununca uçup yerine oturan parça.
+3. **Karar 6: Bölüm tasarımı ve zorluk eğrisi.**

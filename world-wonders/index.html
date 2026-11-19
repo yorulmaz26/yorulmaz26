@@ -225,11 +225,12 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
    WORLD WONDERS — oynanabilir prototip
    Kesin kararlar: 6 sabit taş, sade tahta, her 5 bölümde 1 puzzle parçası,
    parça yalnızca mevcut destinasyona gider, 7 harika sırası.
-   Kesin: 12 parça/harika, 3 can, para yok. ÖNERİ: can yenilenme süresi (bkz. TASARIM.md)
+   Kesin: 12 parça/harika, 3 can (20 dk/can, parça kazanınca dolar), para ve güçlendirici yok
    ===================================================================== */
 const PIECES_PER_WONDER = 12;            // kesin karar
 const MAX_LIVES = 3;                     // kesin karar: 3 can, oyun içi para yok
-const LIFE_REGEN_MS = 20 * 60 * 1000;    // ÖNERİ: 20 dakikada 1 can yenilenir
+const LIFE_REGEN_MS = 20 * 60 * 1000;    // karar: 20 dakikada 1 can yenilenir
+// karar: puzzle parçası kazanınca canlar tamamen dolar · bölüm öncesi güçlendirici yok · gelir modeli şimdilik yok
 const LEVELS_PER_PIECE = 5;              // kesin karar
 const LEVELS_PER_WONDER = PIECES_PER_WONDER * LEVELS_PER_PIECE;
 const ROWS = 8, COLS = 8;
@@ -1179,6 +1180,8 @@ async function winLevel(){
   if (save.lvl === g) save.lvl = g + 1;
   persist();
   const earnedPiece = piecesOf(G.L.w) > prevPieces;
+  const refilled = earnedPiece && syncLives() < MAX_LIVES;
+  if (earnedPiece){ save.lives = MAX_LIVES; save.lifeTs = null; persist(); }
   const W = G.W;
   const finished = save.lvl > TOTAL_LEVELS;
   openModal(`
@@ -1186,7 +1189,7 @@ async function winLevel(){
     <h2>Harika iş!</h2>
     <div class="stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*.18}s">★</span>`).join('')}</div>
     <p style="text-align:center;font-weight:900;font-size:20px;margin:4px 0">${G.score.toLocaleString('tr-TR')} puan</p>
-    ${earnedPiece ? `<p style="text-align:center"><b>Yeni bir ${W.name} puzzle parçası kazandın!</b></p>` : `<p style="text-align:center;color:var(--muted);font-weight:700">Sonraki puzzle parçasına ${LEVELS_PER_PIECE - ((save.lvl-1)%LEVELS_PER_PIECE)} bölüm kaldı.</p>`}
+    ${earnedPiece ? `<p style="text-align:center"><b>Yeni bir ${W.name} puzzle parçası kazandın!</b>${refilled ? `<br><span style="color:#c23b3b;font-weight:800">♥ Canların doldu!</span>` : ''}</p>` : `<p style="text-align:center;color:var(--muted);font-weight:700">Sonraki puzzle parçasına ${LEVELS_PER_PIECE - ((save.lvl-1)%LEVELS_PER_PIECE)} bölüm kaldı.</p>`}
     <div class="row">${earnedPiece ? `<button class="btn wide" id="mPiece">Parçayı Al</button>` : `<button class="btn ghost" id="mMap">Harita</button>${finished?'':'<button class="btn" id="mNext">Sonraki Bölüm</button>'}`}</div>`);
   if (earnedPiece) $('#mPiece').onclick = () => { closeModal(); openPuzzle(G.L.w, { reward:true }); };
   else { $('#mMap').onclick = () => { closeModal(); openMap(); }; const n = $('#mNext'); if (n) n.onclick = () => { closeModal(); openLevelIntro(save.lvl); }; }
@@ -1391,7 +1394,7 @@ setInterval(()=>{ if ($('#mapScreen').classList.contains('active')) updateLifeCh
 function noLivesModal(){
   openModal(`<div class="kicker">Canın kalmadı</div><h2>Biraz mola</h2>
     <div class="stars" style="font-size:38px">${heartsHTML()}</div>
-    <p style="text-align:center">Her ${LIFE_REGEN_MS/60000} dakikada 1 can yenilenir.<br>Sonraki can: <b id="mLifeTimer" data-wait="1">${nextLifeText()}</b></p>
+    <p style="text-align:center">Her ${LIFE_REGEN_MS/60000} dakikada 1 can yenilenir. Puzzle parçası kazanınca canların tamamen dolar.<br>Sonraki can: <b id="mLifeTimer" data-wait="1">${nextLifeText()}</b></p>
     ${save.test ? `<button class="btn alt wide" id="mFill">Test: Canları Doldur</button>` : ''}
     <div class="row"><button class="btn ghost" id="mMap">Haritaya Dön</button></div>`);
   $('#mMap').onclick = () => { closeModal(); openMap(); };
@@ -1459,7 +1462,7 @@ function showWelcome(){
       <div><em>1</em>Aynı türden 3 tarihî objeyi eşleştirerek bölümleri geç.</div>
       <div><em>5</em>Her 5 bölümde bulunduğun harikanın bir puzzle parçasını kazan.</div>
       <div><em>✦</em>Puzzle’ı tamamla, harika 3D dünya haritandaki koleksiyonuna eklensin.</div>
-      <div><em style="color:#ff6b7f">♥</em>3 canın var. Kaybedilen bir bölüm 1 can götürür; canlar zamanla yenilenir.</div>
+      <div><em style="color:#ff6b7f">♥</em>3 canın var. Kaybedilen bölüm 1 can götürür. 20 dakikada 1 can gelir, puzzle parçası kazanınca hepsi dolar.</div>
     </div>
     <div class="stoneList">${STONES.map((s,i)=>`<div><img alt="" src="${stoneIcon(i)}">${s.name}</div>`).join('')}</div>
     <button class="btn wide" id="mStart">Keşfe Başla</button>`);
@@ -1470,7 +1473,7 @@ function openSettings(){
   openModal(`<h2>Ayarlar</h2>
     <div class="toggle" id="tSound"><span>Ses</span>${sw(save.sound)}</div>
     <div class="toggle" id="tTest"><span>Test modu<small>Oyun ekranına “Bölümü Kazan” düğmesi ekler</small></span>${sw(save.test)}</div>
-    <div class="toggle"><span>Ekonomi<small>${PIECES_PER_WONDER} parça × ${LEVELS_PER_PIECE} bölüm = ${LEVELS_PER_WONDER} bölüm / harika · toplam ${TOTAL_LEVELS} · ${MAX_LIVES} can, ${LIFE_REGEN_MS/60000} dk'da 1 yenilenir · para yok</small></span></div>
+    <div class="toggle"><span>Ekonomi<small>${PIECES_PER_WONDER} parça × ${LEVELS_PER_PIECE} bölüm = ${LEVELS_PER_WONDER} bölüm / harika · toplam ${TOTAL_LEVELS} · ${MAX_LIVES} can, ${LIFE_REGEN_MS/60000} dk'da 1 yenilenir, parça kazanınca dolar · para ve güçlendirici yok</small></span></div>
     ${save.test ? `<div class="toggle" id="tFill"><span>Test: canları doldur</span><b style="color:var(--ink)">Doldur</b></div>` : ''}
     ${save.test ? `<div class="toggle" id="tJump"><span>Test: parçaya atla<small>Bir sonraki bölümü kazanınca puzzle parçası gelir</small></span><b style="color:var(--ink)">Atla</b></div>` : ''}
     <div class="toggle" id="tReset"><span>İlerlemeyi sıfırla<small>Tüm bölümler ve koleksiyon silinir</small></span><b style="color:var(--bad)">Sıfırla</b></div>
