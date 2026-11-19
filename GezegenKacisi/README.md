@@ -50,6 +50,13 @@ Oyundaki **2-4 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adım
 Notlar: Maç sırasında uygulamadan çıkan oyuncu yanmış sayılır. Bazı misafir/okul Wi-Fi ağları cihazların birbirini
 görmesini engeller; öyle bir ağda hotspot kullanın. Ağ kodu [`NetLink.kt`](app/src/main/java/com/example/gezegenkacisi/NetLink.kt) içinde.
 
+### 2.1: Açılış animasyonu
+
+Oyun açılırken **Magic Lumos Software** logosu oyuna özel bir animasyonla gösterilir: seçili araç karanlık uzaydan
+geçer, ışığı logoyu soldan sağa aydınlatarak ortaya çıkarır ("Lumos"), ardından ışık patlaması, harflerin üstünden
+geçen parıltı ve "sunar · GEZEGEN KAÇIŞI" yazısı gelir. Ekrana dokununca atlanır. Logo resmi
+`res/drawable-nodpi/splash_logo.jpg`, animasyon `GameView.kt` içindeki "Açılış" bölümündedir.
+
 ### 2.0: Bölümler, para, market ve canlar
 
 Ana ekranda **BÖLÜMLER**, **SONSUZ MOD**, **2-4 OYUNCU** ve **MARKET** var.

@@ -11,8 +11,8 @@ android {
         applicationId = "com.example.gezegenkacisi"
         minSdk = 26
         targetSdk = 35
-        versionCode = 9
-        versionName = "2.0"
+        versionCode = 10
+        versionName = "2.1"
     }
 
     // Sabit test imzası: her derlemede aynı anahtar kullanılır, böylece yeni sürüm eskisinin üstüne kurulur.

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.BlurMaskFilter
 import android.graphics.Canvas
 import android.graphics.Color
@@ -50,7 +51,7 @@ import kotlin.concurrent.thread
  */
 class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
-    private enum class State { HUB, MENU, LEVELS, MARKET, READY, PLAYING, DYING, OVER, LEVEL_DONE, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
+    private enum class State { SPLASH, HUB, MENU, LEVELS, MARKET, READY, PLAYING, DYING, OVER, LEVEL_DONE, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
 
     /** 2 oyuncu lobisinin aşamaları. */
     private enum class Lobby { CHOOSE, HOSTING, JOINING, CONNECTED }
@@ -114,6 +115,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val PULL_K = 2.4f          // kara delik çekiminin gücü
         private const val BOLT_W = 13f           // yıldırımın yarı genişliği
         private const val COIN_R = 15f           // paranın yarıçapı
+        // Açılış animasyonunun zaman çizelgesi (saniye)
+        private const val SPL_ROCKET_START = 0.45f
+        private const val SPL_ROCKET_END = 2.05f
+        private const val SPL_SHINE_START = 2.5f
+        private const val SPL_TITLE_START = 2.75f
+        private const val SPL_FADE_START = 4.1f
+        private const val SPL_END = 4.6f
         private const val LEVEL_LIST_TOP = 140f  // bölüm listesinin başladığı yer
         private const val LEVEL_ROW_H = 150f     // listede bir harita satırının yüksekliği
 
@@ -168,7 +176,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var artMap = -1
 
     // --- Oyun durumu ---
-    private var state = State.HUB
+    private var state = State.SPLASH
     private var paused = false
     private var running = false
     private var lastFrameNs = 0L
@@ -399,6 +407,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strBought = context.getString(R.string.market_bought)
     private val strLevelLocked = context.getString(R.string.level_locked)
     private val strNoLives = context.getString(R.string.lives_empty)
+    private val strPresents = context.getString(R.string.splash_presents)
+    private val strTapToSkip = context.getString(R.string.splash_skip)
     private val strLifeRule = context.getString(R.string.lives_rule)
     private val modNames = Mod.entries.map { context.getString(it.nameRes) }
     private val skinNames = Skin.entries.map { context.getString(it.nameRes) }
@@ -612,6 +622,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     /** Geri tuşu. true dönerse olay tüketildi; false ise uygulama kapanabilir. */
     fun onBack(): Boolean {
         when (state) {
+            State.SPLASH -> finishSplash()
             State.HUB -> return false
             State.MENU, State.LEVELS, State.MARKET -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
             State.PLAYING -> if (!paused) paused = true else leaveRun()
@@ -788,6 +799,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val dy = y - downY
         val moved = abs(dx) > 28f || abs(dy) > 28f
         when (state) {
+            State.SPLASH -> if (splashT > 0.6f) finishSplash()
             State.HUB -> if (!moved) hubTap(downX, downY)
             State.LEVELS -> if (!dragging) levelsTap(downX, downY)
             State.MARKET -> if (!moved) marketTap(downX, downY)
@@ -1004,6 +1016,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private fun update(dt: Float) {
         time += dt
+        if (state == State.SPLASH) {
+            updateStars(dt, 40f)
+            updateSplash(dt)
+            return
+        }
+        hubFade = max(0f, hubFade - dt)
         stateTimer += dt
         boost = max(0f, boost - dt * 3.5f)
         scorePulse = max(0f, scorePulse - dt * 4f)
@@ -1025,7 +1043,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             }
         }
         val worldSpeed = when (state) {
-            State.HUB, State.LEVELS, State.MARKET -> base * 0.45f
+            State.SPLASH, State.HUB, State.LEVELS, State.MARKET -> base * 0.45f
             State.LEVEL_DONE -> base * 0.25f
             State.MENU -> base * 0.5f
             State.READY -> base * 0.7f
@@ -1045,7 +1063,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         updateMotes(dt, worldSpeed)
 
         when (state) {
-            State.MENU, State.HUB, State.MARKET -> Unit
+            State.SPLASH, State.MENU, State.HUB, State.MARKET -> Unit
             State.LEVELS -> if (!dragging && abs(scrollVel) > 1f) {
                 levelScroll = (levelScroll + scrollVel * dt).coerceIn(0f, maxLevelScroll())
                 scrollVel *= exp(-dt * 4f)
@@ -2275,6 +2293,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+        if (state == State.SPLASH) {
+            drawSplash(canvas)
+            return
+        }
         val bg = bgBitmap
         if (bg != null) canvas.drawBitmap(bg, 0f, 0f, null) else canvas.drawColor(map.bgColors[0])
         curW = uiW
@@ -2305,6 +2327,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         canvas.restore()
 
         if (flash > 0f) canvas.drawColor(withAlpha(Color.WHITE, (flash / 0.2f * 140).toInt()))
+        // Açılıştan ana ekrana yumuşak geçiş
+        if (hubFade > 0f) canvas.drawColor(withAlpha(hex(0xFF020814), (hubFade / 0.5f * 255).toInt()))
     }
 
     private fun drawStars(cv: Canvas) {
@@ -3389,11 +3413,298 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
     }
 
+    // =====================================================================
+    // Açılış: Magic Lumos Software logosu
+    // =====================================================================
+    //
+    // Roket karanlık uzaydan geçer, ışığı logoyu soldan sağa aydınlatarak ortaya çıkarır ("Lumos").
+    // Ekrandan çıkınca logoda ışık patlaması olur, üstünden parıltı geçer, altında oyunun adı belirir.
+    // Dokununca atlanır. Yalnızca uygulama ilk açıldığında oynar.
+
+    private class Spark {
+        var x = 0f; var y = 0f; var vx = 0f; var vy = 0f
+        var life = 0f; var max = 1f; var size = 1f; var color = 0
+    }
+
+    private var splashT = 0f
+    private var logoBmp: Bitmap? = null
+    private val sparks = ArrayList<Spark>()
+    private var splashBurst = false
+    private var splashWhoosh = false
+    private var hubFade = 0f
+    private val logoRect = RectF()
+    private val logoSrc = android.graphics.Rect()
+    // Parıltı: koyu zemini sıfıra indirip harfleri parlatan renk süzgeci (yalnızca parlak yerler ışır)
+    private val shineFilter = android.graphics.ColorMatrixColorFilter(
+        android.graphics.ColorMatrix(
+            floatArrayOf(
+                2.4f, 0f, 0f, 0f, -95f,
+                0f, 2.4f, 0f, 0f, -95f,
+                0f, 0f, 2.4f, 0f, -95f,
+                0f, 0f, 0f, 1f, 0f
+            )
+        )
+    )
+    private val splashPaint = Paint(Paint.ANTI_ALIAS_FLAG or Paint.FILTER_BITMAP_FLAG)
+
+    private val splashBgTop = hex(0xFF0B223B)
+    private val splashBgBottom = hex(0xFF07182B)
+
+    private fun loadLogo(): Bitmap? {
+        if (logoBmp == null) {
+            logoBmp = runCatching {
+                BitmapFactory.decodeResource(resources, R.drawable.splash_logo, BitmapFactory.Options().apply { inScaled = false })
+            }.getOrNull()
+        }
+        return logoBmp
+    }
+
+    private fun easeInOut(t: Float): Float {
+        val k = t.coerceIn(0f, 1f)
+        return k * k * (3f - 2f * k)
+    }
+
+    /** Roketin piksel konumu (logo merkez çizgisinin biraz üstünden, hafif yay çizerek geçer). */
+    private fun splashRocketX(): Float {
+        val w = width.toFloat()
+        val k = easeInOut((splashT - SPL_ROCKET_START) / (SPL_ROCKET_END - SPL_ROCKET_START))
+        return -0.25f * w + k * 1.5f * w
+    }
+
+    private fun splashRocketY(): Float {
+        val k = ((splashT - SPL_ROCKET_START) / (SPL_ROCKET_END - SPL_ROCKET_START)).coerceIn(0f, 1f)
+        return logoRect.centerY() - logoRect.height() * 0.05f - sin(k * PI.toFloat()) * logoRect.height() * 0.08f
+    }
+
+    private fun updateSplash(dt: Float) {
+        splashT += dt
+        val w = width.toFloat()
+        val inFlight = splashT in SPL_ROCKET_START..SPL_ROCKET_END
+        if (inFlight && !splashWhoosh) {
+            splashWhoosh = true
+            sound.play(SoundManager.Sfx.SWIPE)
+        }
+        // Motor kıvılcımları
+        if (inFlight) {
+            val rx = splashRocketX()
+            val ry = splashRocketY()
+            val s = w / 330f
+            repeat(3) {
+                if (sparks.size < 400) sparks.add(Spark().apply {
+                    x = rx - 24f * s
+                    y = ry + rnd(-5f, 5f) * s
+                    vx = -rnd(120f, 320f) * s
+                    vy = rnd(-60f, 60f) * s
+                    life = rnd(0.3f, 0.7f); max = life
+                    size = rnd(2f, 5f) * s * 0.5f
+                    color = if (Random.nextInt(3) == 0) hex(0xFFFFFFFF) else if (Random.nextBoolean()) hex(0xFFFFB347) else hex(0xFFFFE08A)
+                })
+            }
+        }
+        // Işık patlaması: roket logoyu tamamen aydınlatıp çıkınca
+        if (!splashBurst && splashT >= SPL_ROCKET_END) {
+            splashBurst = true
+            sound.play(SoundManager.Sfx.START)
+            val cx = logoRect.centerX()
+            val cy = logoRect.centerY()
+            repeat(120) {
+                val a = rnd(0f, TWO_PI)
+                val sp = rnd(80f, 620f) * (w / 1080f)
+                sparks.add(Spark().apply {
+                    x = cx + rnd(-0.3f, 0.3f) * logoRect.width()
+                    y = cy + rnd(-0.12f, 0.12f) * logoRect.height()
+                    vx = cos(a) * sp
+                    vy = sin(a) * sp
+                    life = rnd(0.6f, 1.5f); max = life
+                    size = rnd(2f, 6f) * (w / 1080f)
+                    color = when (Random.nextInt(4)) {
+                        0 -> hex(0xFFE8D5A0)   // logonun altın tonu
+                        1 -> hex(0xFF8FC8FF)   // logonun mavi tonu
+                        2 -> Color.WHITE
+                        else -> hex(0xFF5FB8FF)
+                    }
+                })
+            }
+        }
+        val it = sparks.iterator()
+        while (it.hasNext()) {
+            val p = it.next()
+            p.life -= dt
+            if (p.life <= 0f) { it.remove(); continue }
+            val d = exp(-2.2f * dt)
+            p.vx *= d
+            p.vy *= d
+            p.x += p.vx * dt
+            p.y += p.vy * dt
+        }
+        if (splashT >= SPL_END) finishSplash()
+    }
+
+    private fun finishSplash() {
+        state = State.HUB
+        hubFade = 0.5f
+        sparks.clear()
+        logoBmp?.recycle()
+        logoBmp = null
+    }
+
+    private fun drawSplash(canvas: Canvas) {
+        val w = width.toFloat()
+        val h = height.toFloat()
+        val bmp = loadLogo()
+
+        // Arka plan: logonun kenar renkleriyle aynı lacivert
+        splashPaint.shader = LinearGradient(0f, 0f, 0f, h, splashBgTop, splashBgBottom, Shader.TileMode.CLAMP)
+        canvas.drawRect(0f, 0f, w, h, splashPaint)
+        splashPaint.shader = null
+
+        // Uzak yıldızlar (oyunun yıldızlarıyla aynı)
+        canvas.save()
+        canvas.scale(scale, scale)
+        drawStars(canvas)
+        canvas.restore()
+
+        // Resmin kenarlarındaki boşluk kırpılır, logo yazısı ekranda büyük görünür
+        if (bmp != null) logoSrc.set(
+            (bmp.width * 0.16f).toInt(), (bmp.height * 0.2f).toInt(),
+            (bmp.width * 0.84f).toInt(), (bmp.height * 0.8f).toInt()
+        )
+        val lw = w
+        val lh = if (bmp != null) lw * logoSrc.height() / logoSrc.width() else lw * 0.56f
+        val top = h * 0.42f - lh / 2f
+        logoRect.set(0f, top, lw, top + lh)
+
+        val rx = splashRocketX()
+        val ry = splashRocketY()
+        val revealX = if (splashT >= SPL_ROCKET_END) w * 2f else rx
+
+        if (bmp != null && revealX > 0f) {
+            // Logo yalnızca roketin geçtiği yere kadar görünür; ışık kenarı yumuşaktır
+            val layer = canvas.saveLayer(logoRect, null)
+            splashPaint.alpha = 255
+            canvas.drawBitmap(bmp, logoSrc, logoRect, splashPaint)
+            splashPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
+            val soft = w * 0.28f
+            splashPaint.shader = LinearGradient(
+                revealX - soft, 0f, revealX + w * 0.02f, 0f,
+                intArrayOf(Color.WHITE, Color.WHITE, Color.TRANSPARENT), floatArrayOf(0f, 0.6f, 1f), Shader.TileMode.CLAMP
+            )
+            canvas.drawRect(logoRect, splashPaint)
+            // Üst ve alt kenarları arka plana karıştır
+            splashPaint.shader = LinearGradient(
+                0f, logoRect.top, 0f, logoRect.bottom,
+                intArrayOf(Color.TRANSPARENT, Color.WHITE, Color.WHITE, Color.TRANSPARENT),
+                floatArrayOf(0f, 0.24f, 0.76f, 1f), Shader.TileMode.CLAMP
+            )
+            canvas.drawRect(logoRect, splashPaint)
+            splashPaint.shader = null
+            splashPaint.xfermode = null
+            canvas.restoreToCount(layer)
+
+            // Parıltı: logonun üstünden çapraz bir ışık bandı geçer; yalnızca harfler ve devre çizgileri ışır
+            val sk = (splashT - SPL_SHINE_START) / 0.8f
+            if (sk in 0f..1f) {
+                val bx = -0.3f * w + sk * 1.6f * w
+                val addPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.ADD) }
+                val l2 = canvas.saveLayer(logoRect, addPaint)
+                splashPaint.colorFilter = shineFilter
+                canvas.drawBitmap(bmp, logoSrc, logoRect, splashPaint)
+                splashPaint.colorFilter = null
+                splashPaint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DST_IN)
+                splashPaint.shader = LinearGradient(
+                    bx - w * 0.14f, logoRect.top, bx + w * 0.14f, logoRect.bottom,
+                    intArrayOf(Color.TRANSPARENT, withAlpha(Color.WHITE, 210), Color.TRANSPARENT), null, Shader.TileMode.CLAMP
+                )
+                canvas.drawRect(logoRect, splashPaint)
+                splashPaint.shader = null
+                splashPaint.xfermode = null
+                canvas.restoreToCount(l2)
+            }
+        }
+
+        // Roketin ışığı ve roket
+        if (splashT in SPL_ROCKET_START..SPL_ROCKET_END) {
+            val glowR = w * 0.3f
+            splashPaint.shader = RadialGradient(
+                rx, ry, glowR,
+                intArrayOf(withAlpha(hex(0xFFFFF2C8), 120), withAlpha(hex(0xFF8FC8FF), 40), 0),
+                floatArrayOf(0f, 0.4f, 1f), Shader.TileMode.CLAMP
+            )
+            canvas.drawCircle(rx, ry, glowR, splashPaint)
+            splashPaint.shader = null
+        }
+        for (p in sparks) {
+            val f = p.life / p.max
+            paint.color = withAlpha(p.color, (f * 240).toInt())
+            canvas.drawCircle(p.x, p.y, p.size * (0.4f + 0.6f * f), paint)
+        }
+        if (splashT in SPL_ROCKET_START..SPL_ROCKET_END) {
+            val s = w / 330f
+            canvas.save()
+            canvas.translate(rx, ry)
+            canvas.rotate(-6f + 10f * ((splashT - SPL_ROCKET_START) / (SPL_ROCKET_END - SPL_ROCKET_START)))
+            canvas.scale(s, s)
+            drawSkinBody(canvas, skin, 1f)
+            canvas.restore()
+        }
+
+        // Işık patlaması: parlama ve genişleyen halka
+        val bt = splashT - SPL_ROCKET_END
+        if (bt in 0f..0.7f) {
+            val k = bt / 0.7f
+            paint.style = Paint.Style.STROKE
+            paint.strokeWidth = w * 0.012f * (1f - k)
+            paint.color = withAlpha(hex(0xFFE8D5A0), ((1f - k) * 220).toInt())
+            canvas.drawCircle(logoRect.centerX(), logoRect.centerY(), w * (0.08f + 0.6f * (1f - (1f - k).pow(3))), paint)
+            paint.style = Paint.Style.FILL
+            val fr = w * 0.75f
+            splashPaint.shader = RadialGradient(
+                logoRect.centerX(), logoRect.centerY(), fr,
+                intArrayOf(withAlpha(Color.WHITE, ((1f - k).pow(2) * 170).toInt()), withAlpha(hex(0xFF8FC8FF), ((1f - k).pow(2) * 60).toInt()), 0),
+                floatArrayOf(0f, 0.45f, 1f), Shader.TileMode.CLAMP
+            )
+            canvas.drawCircle(logoRect.centerX(), logoRect.centerY(), fr, splashPaint)
+            splashPaint.shader = null
+        }
+
+        // Altta: "sunar" ve oyunun adı
+        canvas.save()
+        canvas.scale(scale, scale)
+        curW = uiW
+        val cx = uiW / 2f
+        val logoBottom = logoRect.bottom / scale
+        val ta = ((splashT - SPL_TITLE_START) / 0.5f).coerceIn(0f, 1f)
+        if (ta > 0f) {
+            labelPaint.textSize = 18f
+            labelPaint.color = withAlpha(hex(0xFF9AB8D8), (ta * 255).toInt())
+            drawFit(canvas, strPresents, cx, logoBottom + 30f, labelPaint)
+            val rise = (1f - ta) * 20f
+            titlePaint.textSize = 46f
+            titlePaint.color = withAlpha(Color.BLACK, (ta * 100).toInt())
+            drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 96f + rise, titlePaint)
+            titlePaint.color = withAlpha(colWarm, (ta * 255).toInt())
+            drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 92f + rise, titlePaint)
+        }
+        if (splashT > 0.8f && splashT < SPL_FADE_START) {
+            textPaint.textSize = 16f
+            textPaint.color = withAlpha(hex(0xFF6F8BB0), 160)
+            drawFit(canvas, strTapToSkip, cx, 960f, textPaint)
+        }
+        canvas.restore()
+
+        // Başta karanlıktan açılış, sonda karanlığa geçiş
+        val fadeIn = (1f - splashT / 0.4f).coerceIn(0f, 1f)
+        val fadeOut = ((splashT - SPL_FADE_START) / (SPL_END - SPL_FADE_START)).coerceIn(0f, 1f)
+        val dark = max(fadeIn, fadeOut)
+        if (dark > 0f) canvas.drawColor(withAlpha(hex(0xFF020814), (dark * 255).toInt()))
+    }
+
     // --- Arayüz ---
 
     private fun drawHud(cv: Canvas) {
         val cx = uiW / 2f
         when (state) {
+            State.SPLASH -> Unit
             State.HUB -> drawHub(cv, cx)
             State.LEVELS -> drawLevels(cv, cx)
             State.MARKET -> drawMarket(cv, cx)
