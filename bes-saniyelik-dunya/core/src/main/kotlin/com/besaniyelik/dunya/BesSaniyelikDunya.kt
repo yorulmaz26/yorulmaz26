@@ -12,7 +12,7 @@ import com.besaniyelik.dunya.progress.SaveManager
 import com.besaniyelik.dunya.progress.SaveStorage
 import com.besaniyelik.dunya.ui.UiKit
 import com.besaniyelik.dunya.ui.screens.BaseScreen
-import com.besaniyelik.dunya.ui.screens.SplashScreen
+import com.besaniyelik.dunya.ui.screens.IntroScreen
 
 /** Kayıtları Gdx.files.local altında tutar (uygulama güncellemelerinde silinmez). */
 class GdxSaveStorage : SaveStorage {
@@ -44,7 +44,7 @@ class BesSaniyelikDunya(val platform: Platform = Platform.NONE) : Game() {
         profile = ProfileService(SaveManager(GdxSaveStorage()))
         audio = AudioManager { profile.data.settings }
         kit = UiKit(assets, audio)
-        setScreen(SplashScreen(this))
+        setScreen(IntroScreen(this))
     }
 
     /** Ekran geçişi (eski ekran kararıp yenisi beliren yumuşak geçiş BaseScreen içinde yapılır). */

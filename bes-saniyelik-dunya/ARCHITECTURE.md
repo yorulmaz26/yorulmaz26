@@ -74,6 +74,10 @@ ui/         UiKit (UIManager: buton, panel, çubuk), screens/ (20 ekran), Assets
 * Dünya `ExtendViewport(12.5 × 22.2)`, arayüz `ExtendViewport(720 × 1280)` → bütün en-boy oranları desteklenir. Yazı tipleri ekran yoğunluğuna göre FreeType ile keskin üretilir (Türkçe karakterler dahil).
 * "Az efekt" ayarı parçacık sayısını düşürür (düşük segment cihazlar için).
 
+## Açılış animasyonu (Magic Lumos Software)
+
+`IntroScreen` uygulama açılışında ~4,3 sn oynar (dokununca geçilir). `tools/intro/extract_logo.py` şirket logosunu (`tools/intro/magic_lumos_logo.jpg`) parlaklık anahtarlamasıyla katmanlara ayırır: 10 harf, SOFTWARE'in 10 karakteri, köşeli parantezler, kod işaretleri ve kenarları yumuşatılmış devre çizgileri (`assets/intro/`, konumlar `layout.txt`). Animasyon oyunun diliyle kurgulanmıştır: devre çizgileri merkezden açılır → harfler zıplayarak düşer → oyunun karakteri harflerin üstünde zıplar → "Lumos" ışık patlaması → SOFTWARE ters yer çekimiyle baş aşağı gelip düzelir → ışık süzmesi ve "sunar".
+
 ## Grafik ve ses kaynakları
 
 Bütün grafikler `tools/art` betikleriyle programatik çizilir (4× süper örnekleme ile kenar yumuşatma); bütün sesler/müzikler `tools/audio` ile sentezlenir. Tek dış varlık Nunito yazı tipidir (SIL Open Font License, `assets/fonts/OFL-Nunito.txt`). Lisans sorunu yoktur.

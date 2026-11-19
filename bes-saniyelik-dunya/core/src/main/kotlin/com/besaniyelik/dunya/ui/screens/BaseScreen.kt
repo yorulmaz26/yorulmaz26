@@ -92,6 +92,8 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     val a get() = game.assets
     val root = Table().apply { setFillParent(true); top() }
     open val background: MenuBackground? by lazy { MenuBackground(game) }
+    /** Ekran açılırken hangi renkten belirdiği (çıkış her zaman beyaza). */
+    open val fadeInColor: Color = Color.WHITE
     private var fade = 1f
     private var fadeDir = -1f
     private var fadeDone: (() -> Unit)? = null
@@ -136,7 +138,8 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         stage.act(dt)
         fade = (fade + fadeDir * dt * 5f).coerceIn(0f, 1f)
         fadeImg.setBounds(-2000f, -2000f, 6000f, 6000f)
-        fadeImg.color.a = Interpolation.smooth.apply(fade)
+        val fc = if (fadeDir < 0) fadeInColor else Color.WHITE
+        fadeImg.color.set(fc.r, fc.g, fc.b, Interpolation.smooth.apply(fade))
         fadeImg.isVisible = fade > 0.001f
         stage.viewport.apply()
         stage.draw()

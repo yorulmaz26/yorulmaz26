@@ -63,6 +63,10 @@ Bölüm 500: TAMAMLANDI (yıldız 3/3, altın 275, ölüm 0)
 
 Her haritadan bir bölüm; tamamlanma ekranı, XP, başarı ve seviye bildirimleri görsel olarak kontrol edildi (`docs/screenshots/`).
 
+## Açılış animasyonu
+
+Masaüstünde (Xvfb + OpenGL) açılıştan oyunun splash ekranına kesintisiz geçiş doğrulandı; kare kare kayıt `docs/intro_animasyon.gif`. Gerilen beyaz bölgenin kenar yumuşaması nedeniyle oluşan açık renkli çerçeve ve portre ekranda devre katmanının boş kalması düzeltildi.
+
 ## Bulunan ve düzeltilen hatalar
 
 * (Geri bildirim) Kural değişim yazıları ekranda uzun kalıp oyunu zorlaştırıyordu → bildirim küçük bir etikete dönüştürüldü, ekranın üstünde (HUD altında) 0,55–0,9 sn kalıyor; ölüm yazısı 0,5 sn, ipuçları 1,8 sn, oyun içi bildirimler 1 sn.

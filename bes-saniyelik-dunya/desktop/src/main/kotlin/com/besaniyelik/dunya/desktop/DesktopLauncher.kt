@@ -43,7 +43,18 @@ class ScreenshotTour(private val dir: String) {
 
     init {
         fun screen(name: String, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(45)); steps.add(Step.Shot(name)) }
-        steps.add(Step.Wait(20)); steps.add(Step.Shot("01_splash"))
+        if (System.getProperty("introGif") != null) {
+            for (i in 0 until 70) { steps.add(Step.Wait(3)); steps.add(Step.Shot("gif_%03d".format(i))) }
+            steps.add(Step.Run { Gdx.app.exit() })
+        }
+        // açılış animasyonu kareleri (60 fps varsayımıyla zaman damgaları)
+        steps.add(Step.Wait(30)); steps.add(Step.Shot("00_intro_a"))
+        steps.add(Step.Wait(55)); steps.add(Step.Shot("00_intro_b"))
+        steps.add(Step.Wait(45)); steps.add(Step.Shot("00_intro_c"))
+        steps.add(Step.Wait(35)); steps.add(Step.Shot("00_intro_d"))
+        steps.add(Step.Wait(25)); steps.add(Step.Shot("00_intro_e"))
+        steps.add(Step.Wait(30)); steps.add(Step.Shot("00_intro_f"))
+        steps.add(Step.Wait(60)); steps.add(Step.Shot("01_splash"))
         screen("02_menu") { it.go(MainMenuScreen(it)) }
         if (System.getProperty("tourMenus") != "0") {
             screen("03_maps") { it.go(MapSelectScreen(it)) }

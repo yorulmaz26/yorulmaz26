@@ -5,6 +5,7 @@ Her 5 saniyede kuralların değiştiği, renkli ve sevimli bir dikey Android pla
 * 10 harita × 10 alan × 5 bölüm = **100 alan, 500 doğrulanmış bölüm**, **Sonsuz Dünya** modu
 * 10 dünya mekaniği ve dengeli kombinasyonları
 * XP/seviye, yıldızlar, 20 karakter, 9 iz efekti, günlük/haftalık görevler, 50 başarı, gizli koleksiyon, 7 günlük giriş ödülü, mağaza, 8 güçlendirme
+* Açılışta oyuna özel **Magic Lumos Software** logo animasyonu (önizleme: `docs/intro_animasyon.gif`)
 * Tamamen çevrimdışı, Türkçe, açık renkli tasarım; grafikler ve sesler programatik üretildi
 
 ## Hazır dosyalar (`dist/`)

@@ -1,0 +1,25 @@
+# ad x y w h  (kaynak logo koordinatları 1376x768)
+letter_0 302 328 88 96
+letter_1 392 328 87 96
+letter_2 475 328 77 96
+letter_3 560 328 22 96
+letter_4 589 328 76 96
+letter_5 696 328 58 96
+letter_6 754 328 71 96
+letter_7 835 328 86 96
+letter_8 927 328 85 96
+letter_9 1012 328 64 96
+soft_0 475 440 17 58
+soft_1 502 440 35 58
+soft_2 545 440 44 58
+soft_3 599 440 32 58
+soft_4 636 440 37 58
+soft_5 678 440 60 58
+soft_6 742 440 43 58
+soft_7 794 440 36 58
+soft_8 841 440 33 58
+soft_9 885 440 17 58
+bracket_l 266 304 30 146
+bracket_r 1078 304 28 146
+tags 541 284 223 54
+circuits 0 0 1376 768
