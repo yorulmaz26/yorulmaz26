@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Basit vektör ikon: toprak kesiti üzerinde bir karınca. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#9ED8F0" android:pathData="M0,0h108v40h-108z" />
+    <path android:fillColor="#6CC04A" android:pathData="M0,40h108v8h-108z" />
+    <path android:fillColor="#C98B52" android:pathData="M0,48h108v60h-108z" />
+    <path android:fillColor="#7A4A26" android:pathData="M50,48h8v26h22v8h-30z" />
+    <path android:fillColor="#3A2414" android:pathData="M38,30m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0" />
+    <path android:fillColor="#3A2414" android:pathData="M50,31m-5,0a5,5 0,1 1,10 0a5,5 0,1 1,-10 0" />
+    <path android:fillColor="#3A2414" android:pathData="M62,30m-8,0a8,6 0,1 1,16 0a8,6 0,1 1,-16 0" />
+</vector>
