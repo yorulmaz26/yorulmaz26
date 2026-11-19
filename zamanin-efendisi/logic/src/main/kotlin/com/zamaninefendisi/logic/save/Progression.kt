@@ -27,6 +27,9 @@ class Progression(private val saves: SaveSystem, clock: GameClock) {
 
     fun persist() = saves.save(data)
 
+    /** Yükleme sırasında kayıt sorunu yaşandıysa oyuncuya gösterilecek açıklama. */
+    fun lastProblem(): String? = saves.lastLoadProblem
+
     fun update(f: (SaveData) -> SaveData) { data = f(data); persist() }
 
     fun progress(levelId: Int): LevelProgress = data.levels[levelId] ?: LevelProgress()

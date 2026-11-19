@@ -27,4 +27,5 @@ application {
 tasks.named<JavaExec>("run") {
     workingDir = rootProject.file("assets")
     isIgnoreExitValue = true
+    listOf("zaman.start", "zaman.w", "zaman.h").forEach { k -> System.getProperty(k)?.let { systemProperty(k, it) } }
 }
