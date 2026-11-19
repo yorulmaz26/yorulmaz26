@@ -25,10 +25,10 @@ import java.io.InputStream;
  */
 public final class LogoScreen extends Screen {
     private static final int BG = 0xFF061729;           // logonun kenar rengi
-    private static final float T_ARRIVE = 1.35f;        // oyuncunun merkeze varışı
-    private static final float T_REVEAL = 1.0f;         // ışık halkasının yayılma süresi
-    private static final float SHADOW_DELAY = 0.42f;    // gölge gecikmesi (oyundaki gibi geçmişi tekrar eder)
-    private static final float DURATION = 4.0f;
+    private static final float T_ARRIVE = 2.6f;        // oyuncunun merkeze varışı
+    private static final float T_REVEAL = 1.9f;         // ışık halkasının yayılma süresi
+    private static final float SHADOW_DELAY = 0.75f;    // gölge gecikmesi (oyundaki gibi geçmişi tekrar eder)
+    private static final float DURATION = 7.2f;
 
     private Bitmap logo;
     private final Rect src = new Rect();
@@ -189,7 +189,7 @@ public final class LogoScreen extends Screen {
         }
 
         // 2) Yazı üzerinde süzülen ışık
-        float st = (time - (T_ARRIVE + T_REVEAL * 0.7f)) / 0.9f;
+        float st = (time - (T_ARRIVE + T_REVEAL * 0.7f)) / 1.6f;
         if (st > 0f && st < 1f) {
             float sx = dst.left + dst.width() * (0.15f + 0.75f * st);
             float a = (float) Math.sin(Math.PI * st);
@@ -220,14 +220,14 @@ public final class LogoScreen extends Screen {
             float sp = progressAt(time - SHADOW_DELAY);
             if (time > SHADOW_DELAY * 0.6f) {
                 pointAt(sp, tmp);
-                float appear = Math.min(1f, (time - SHADOW_DELAY * 0.6f) / 0.3f);
+                float appear = Math.min(1f, (time - SHADOW_DELAY * 0.6f) / 0.5f);
                 WorldRenderer.drawSkinPreview(c, skin, tmp[0], tmp[1], r, 0f, appear, true);
             }
         }
 
         // 5) Oyuncu: merkeze varınca ışığa dönüşür
         pointAt(pNow, tmp);
-        float pa = rt > 0f ? Math.max(0f, 1f - rt * 1.6f) : Math.min(1f, time / 0.25f);
+        float pa = rt > 0f ? Math.max(0f, 1f - rt * 1.6f) : Math.min(1f, time / 0.45f);
         if (pa > 0f) {
             float grow = rt > 0f ? 1f + rt * 1.5f : 1f;
             WorldRenderer.drawSkinPreview(c, skin, tmp[0], tmp[1], r * grow, 0f, pa, false);
@@ -242,7 +242,7 @@ public final class LogoScreen extends Screen {
         particles.draw(c, 1f);
 
         // 7) "sunar"
-        float ta = (time - (T_ARRIVE + T_REVEAL + 0.2f)) / 0.5f;
+        float ta = (time - (T_ARRIVE + T_REVEAL + 0.3f)) / 0.9f;
         if (ta > 0f) {
             float a = Math.min(1f, ta);
             Ui.text(c, "sunar", w / 2f, dst.bottom + 90f * u, 40f * u, Theme.alpha(0xFFB8C7E0, a), Paint.Align.CENTER, Ui.MEDIUM);
