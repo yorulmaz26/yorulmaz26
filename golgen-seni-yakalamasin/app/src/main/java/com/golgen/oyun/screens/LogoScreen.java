@@ -55,12 +55,13 @@ public final class LogoScreen extends Screen {
 
     @Override
     protected void layout() {
-        float k = logo != null ? w / logo.getWidth() : 1f;
+        // Dikey ekranda yazı büyük görünsün: logo genişliğin %130'u (kenarlar arka planla aynı renk)
+        float k = logo != null ? 1.3f * w / logo.getWidth() : 1f;
         float lw = logo != null ? logo.getWidth() * k : w, lh = logo != null ? logo.getHeight() * k : w * 0.56f;
         float cy = h * 0.44f;
-        dst.set(0, cy - lh / 2f, lw, cy + lh / 2f);
-        // Devre yolu (90° dönüşlü): ekranın altından logonun merkezine
-        float cx = w / 2f, endY = dst.top + lh * 0.5f;
+        dst.set(w / 2f - lw / 2f, cy - lh / 2f, w / 2f + lw / 2f, cy + lh / 2f);
+        // Devre yolu (90° dönüşlü): ekranın altından SOFTWARE yazısının hemen altına (yazının üstünden geçmez)
+        float cx = w / 2f, endY = dst.top + lh * 0.70f;
         px[0] = cx - 300f * u; py[0] = h + 60f * u;
         px[1] = cx - 300f * u; py[1] = h * 0.80f;
         px[2] = cx + 180f * u; py[2] = h * 0.80f;
@@ -181,7 +182,7 @@ public final class LogoScreen extends Screen {
 
         // 3) Devre izi (oyuncunun bıraktığı neon iz)
         float pNow = progressAt(time);
-        float fadeTrail = rt > 0f ? Math.max(0f, 1f - rt * 1.2f) : 1f;
+        float fadeTrail = rt > 0f ? Math.max(0f, 1f - rt * 2.2f) : 1f;
         if (fadeTrail > 0f && pNow > 0f) {
             float d = pNow * pathLen;
             Ui.stroke.setStrokeCap(Paint.Cap.ROUND);
