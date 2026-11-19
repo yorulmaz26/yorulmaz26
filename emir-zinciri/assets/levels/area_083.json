@@ -1,0 +1,309 @@
+{
+    "area": 83,
+    "levels": [
+        {
+            "id": 411,
+            "area": 83,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Bantlar üstündekileri taşır.",
+            "story": "Veri Okyanusu: veri paketleri taşıma. Kutuyu sarı hedefe it. Bantlar üstündekileri taşır.",
+            "map": [
+                "<<..#..",
+                ".......",
+                "....#..",
+                ". ..#E.",
+                "..B...x",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 412,
+            "area": 83,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Bantlar üstündekileri taşır.",
+            "map": [
+                "...#..#.",
+                ".# #.#.#",
+                ".......#",
+                ".B......",
+                "##E<#<<#",
+                "..x....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 22,
+            "par": 18,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH"
+                ]
+            }
+        },
+        {
+            "id": 413,
+            "area": 83,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Bantlar üstündekileri taşır.",
+            "map": [
+                "......^.",
+                ". .#.. .",
+                "......^.",
+                "...B.#^.",
+                "..E..x..",
+                "... ...#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 2,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 414,
+            "area": 83,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Bantlar üstündekileri taşır.",
+            "map": [
+                "##E...Bx",
+                ".....>#>",
+                "#.####.#",
+                ".......#",
+                "#.#..###",
+                "#.......",
+                "...#...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 415,
+            "area": 83,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Bantlar üstündekileri taşır.",
+            "map": [
+                " .#......",
+                "#....B.x.",
+                ".#.......",
+                ".#.#.....",
+                ".........",
+                ".#.<E<#..",
+                "..#.. ..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        }
+    ]
+}

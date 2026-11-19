@@ -8,6 +8,7 @@ import com.emirzinciri.robotkomutan.logic.grid.Pos
 import com.emirzinciri.robotkomutan.logic.level.LevelData
 import com.emirzinciri.robotkomutan.logic.level.ObjectiveType
 import com.emirzinciri.robotkomutan.logic.level.EnemyType
+import com.emirzinciri.robotkomutan.logic.level.RobotClass
 import com.emirzinciri.robotkomutan.logic.level.Tile
 
 /**
@@ -125,7 +126,8 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                 }
                 PULL -> {
                     val front = r.pos + r.dir
-                    if (front !in s.boxes) fail(r, pc, "Önünde çekilecek kutu yok.", events)
+                    if (front !in s.boxes && r.type == RobotClass.MAGNET) actions += r to pc
+                    else if (front !in s.boxes) fail(r, pc, "Önünde çekilecek kutu yok.", events)
                     else if (r.carrying) fail(r, pc, "Kutu taşırken çekilemez.", events)
                     else moves += MoveIntent(r, pc, r.pos + r.dir.opposite(), boxFrom = front, boxTo = r.pos)
                 }
@@ -304,7 +306,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             val from = r.pos
             r.pos = m.target
             events += SimEvent.Moved(r.id, from, m.target, m.jump)
-            if (isHole(m.target)) {
+            if (isHole(m.target) && r.type != RobotClass.FLYER) {
                 r.status = RobotStatus.LOST
                 events += SimEvent.RobotLost(r.id, m.target)
             }
@@ -366,6 +368,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         val front = r.pos + r.dir
         when (ins.type) {
             PICK -> when {
+                r.type == RobotClass.FLYER -> fail(r, pc, "Uçan robot kutu taşıyamaz.", events)
                 r.carrying -> fail(r, pc, "Robot zaten bir kutu taşıyor.", events)
                 front !in s.boxes -> fail(r, pc, "Önünde alınacak kutu yok.", events)
                 else -> { s.boxes.remove(front); r.carrying = true; events += SimEvent.BoxPicked(r.id, front) }
@@ -442,6 +445,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                 }
             }
             SEND -> { sentBy += r; events += SimEvent.MessageSent(r.id) }
+            PULL -> magnetPull(r, pc, events)
             ATTACK -> {
                 val e = s.enemyAt(front)
                 if (r.stats.attack == 0) fail(r, pc, "${r.type.title} saldıramaz; kalkanıyla korur.", events)
@@ -509,9 +513,30 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             } else {
                 r.pos = c.to
                 events += SimEvent.Moved(r.id, c.from, c.to, conveyor = true)
-                if (isHole(c.to)) { r.status = RobotStatus.LOST; events += SimEvent.RobotLost(r.id, c.to) }
+                if (isHole(c.to) && r.type != RobotClass.FLYER) { r.status = RobotStatus.LOST; events += SimEvent.RobotLost(r.id, c.to) }
             }
         }
+    }
+
+    /** Manyetik robot: 2–3 hücre ötedeki ilk kutuyu bir hücre kendine doğru çeker (robot yerinde kalır). */
+    private fun magnetPull(r: RobotState, pc: Int, events: MutableList<SimEvent>) {
+        val s = state
+        var p = r.pos + r.dir
+        for (i in 1..3) {
+            if (solidReason(p) != null || s.robotAt(p) != null || s.enemyAt(p) != null) break
+            if (p in s.boxes) {
+                val to = p + r.dir.opposite()
+                if (to == r.pos || solidReason(to) != null || to in s.boxes || s.robotAt(to) != null || s.enemyAt(to) != null) break
+                s.boxes.remove(p)
+                if (level.tile(to) == Tile.PIT && to !in s.filledPits) { s.filledPits += to; events += SimEvent.PitFilled(to) }
+                else if (level.tile(to) == Tile.VOID) events += SimEvent.BoxLost(to)
+                else s.boxes += to
+                events += SimEvent.BoxMoved(p, to)
+                return
+            }
+            p += r.dir
+        }
+        fail(r, pc, "Mıknatıs menzilinde çekilebilecek kutu yok.", events)
     }
 
     // ---------------------------------------------------------------- savaş
@@ -544,9 +569,12 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
     }
 
     /** Yanındaki robota döner ve saldırır (N, D, G, B sırasıyla ilk bulunan). */
+    /** Düşmanların görebildiği robot (görünmez robotlar hariç). */
+    private fun visibleRobotAt(p: Pos): RobotState? = state.robotAt(p)?.takeIf { it.type != RobotClass.GHOST }
+
     private fun attackAdjacent(e: EnemyState, dmg: Int, events: MutableList<SimEvent>): Boolean {
         for (d in com.emirzinciri.robotkomutan.logic.grid.Dir.entries) {
-            val r = state.robotAt(e.pos + d) ?: continue
+            val r = visibleRobotAt(e.pos + d) ?: continue
             e.dir = d
             damage(e, r, dmg, false, events)
             return true
@@ -556,7 +584,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
 
     /** En yakın robota bir adım (Manhattan; eşitlikte kimlik sırası; önce farkı büyük eksen, eşitse x). */
     private fun chaseStep(e: EnemyState, events: MutableList<SimEvent>) {
-        val target = state.robots.filter { it.alive }
+        val target = state.robots.filter { it.alive && it.type != RobotClass.GHOST }
             .minWithOrNull(compareBy({ kotlin.math.abs(it.pos.x - e.pos.x) + kotlin.math.abs(it.pos.y - e.pos.y) }, { it.id })) ?: return
         val dx = target.pos.x - e.pos.x; val dy = target.pos.y - e.pos.y
         val hx = if (dx > 0) com.emirzinciri.robotkomutan.logic.grid.Dir.E else com.emirzinciri.robotkomutan.logic.grid.Dir.W
@@ -580,7 +608,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             when (e.type) {
                 EnemyType.PATROL -> {
                     val front = e.pos + e.dir
-                    val r = state.robotAt(front)
+                    val r = visibleRobotAt(front)
                     when {
                         r != null -> damage(e, r, 1, false, events)
                         enemyBlocked(front) -> e.dir = e.dir.opposite()
@@ -590,7 +618,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                 EnemyType.TURRET -> {
                     var p = e.pos + e.dir
                     for (i in 1..e.range) {
-                        val r = state.robotAt(p)
+                        val r = visibleRobotAt(p)
                         if (r != null) { damage(e, r, 1, true, events); break }
                         val t = level.tile(p)
                         if (t == Tile.WALL || t.isConsole || (t.isDoor && p !in state.openDoors) || p in state.boxes || state.enemyAt(p) != null) break
@@ -603,7 +631,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                     if (phase2) {
                         if (!attackAdjacent(e, 2, events)) chaseStep(e, events)
                     } else {
-                        val r = state.robotAt(e.pos + e.dir)
+                        val r = visibleRobotAt(e.pos + e.dir)
                         if (r != null) damage(e, r, 2, false, events) else e.dir = e.dir.right()
                     }
                 }

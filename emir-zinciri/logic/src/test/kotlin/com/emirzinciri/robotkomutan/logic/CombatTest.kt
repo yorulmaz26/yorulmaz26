@@ -112,3 +112,32 @@ class CombatTest {
         while (a.outcome == null) { a.step(); b.step(); assertEquals(a.state.signature(), b.state.signature()) }
     }
 }
+
+class RobotClassTest {
+    private fun one(cls: com.emirzinciri.robotkomutan.logic.level.RobotClass, vararg map: String, enemies: List<EnemyDef> = emptyList(), obj: ObjectiveType = ObjectiveType.REACH_EXIT) =
+        LevelData(level(*map).def.copy(robots = listOf(RobotDef("A", 0, 0, Dir.E, cls)), enemies = enemies, objectives = listOf(ObjectiveDef(obj))))
+
+    @Test fun flyerCrossesVoidButCannotCarryOrPressPlates() {
+        assertIs<Outcome.Win>(Simulation.create(one(RobotClass.FLYER, ". oE"), mapOf("A" to listOf("FORWARD", "FORWARD", "FORWARD"))).getOrThrow().runToEnd())
+        val s = Simulation.create(one(RobotClass.FLYER, ".B."), mapOf("A" to listOf("PICK"))).getOrThrow()
+        assertTrue(s.step().events.any { it is SimEvent.CommandFailed })
+        val plate = Simulation.create(one(RobotClass.FLYER, ".pD"), mapOf("A" to listOf("FORWARD", "WAIT"))).getOrThrow()
+        plate.step()
+        assertTrue(Pos(2, 0) !in plate.state.openDoors)
+    }
+
+    @Test fun ghostIsIgnoredByEnemies() {
+        val l = one(RobotClass.GHOST, ".....", enemies = listOf(EnemyDef("T", EnemyType.TURRET, 4, 0, Dir.W)))
+        val s = Simulation.create(l, mapOf("A" to listOf("WAIT", "WAIT", "WAIT", "WAIT"))).getOrThrow()
+        s.runToEnd()
+        assertEquals(3, s.state.robot("A").hp)
+    }
+
+    @Test fun magnetPullsDistantBox() {
+        val l = one(RobotClass.MAGNET, "...B", obj = ObjectiveType.REACH_EXIT)
+        val s = Simulation.create(l, mapOf("A" to listOf("PULL", "PULL"))).getOrThrow()
+        s.step(); assertEquals(setOf(Pos(2, 0)), s.state.boxes)
+        s.step(); assertEquals(setOf(Pos(1, 0)), s.state.boxes)
+        assertEquals(Pos(0, 0), s.state.robot("A").pos)
+    }
+}

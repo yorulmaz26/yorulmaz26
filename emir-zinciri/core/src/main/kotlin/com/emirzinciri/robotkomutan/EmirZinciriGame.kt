@@ -23,6 +23,7 @@ open class EmirZinciriGame(private val platform: Platform, private val startup: 
         ui = Ui(assets)
         services = Services(platform)
         assets.soundOn = services.save.settings.sound
+        assets.musicOn = services.save.settings.music
         setScreen(SplashScreen(this, startup))
     }
 

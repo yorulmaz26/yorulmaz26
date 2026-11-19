@@ -1,0 +1,373 @@
+{
+    "area": 55,
+    "levels": [
+        {
+            "id": 271,
+            "area": 55,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "story": "Uydu Ağı: çok kanallı sinyaller. Anahtar paneli mavi kapıyı açar. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".#E.D..",
+                "...##..",
+                ".c#..#.",
+                ".... s#",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "S",
+                    "type": "WARRIOR",
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 11,
+            "par": 7,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 4
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "S",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "COLLECT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 272,
+            "area": 55,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "....c.#",
+                ".... ..",
+                ".....#.",
+                "#..###E",
+                ".....#.",
+                "#s. .D#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "W",
+                    "type": "WARRIOR",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 4,
+                    "y": 4,
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 273,
+            "area": 55,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "E.....",
+                ".....#",
+                "c#....",
+                "...E.D",
+                "#.sc#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "dir": "W",
+                    "type": "WARRIOR",
+                    "energy": 4
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 1,
+                    "dir": "W",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 4,
+                    "y": 0,
+                    "dir": "S",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 274,
+            "area": 55,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".#E..Ec",
+                "  .#...",
+                "......#",
+                " s.c#..",
+                ".##D..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 2,
+                    "dir": "N",
+                    "type": "WARRIOR",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 3,
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 6,
+                    "y": 1,
+                    "dir": "E",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 275,
+            "area": 55,
+            "name": "Patron: Yörünge Kaptanı",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Uydu Ağı: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "#######",
+                "#.....#",
+                ".D....#",
+                "#...#.#",
+                "####p##",
+                "####.##"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 15
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "S",
+                    "hp": 13
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 14,
+            "solution": {
+                "A": [
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

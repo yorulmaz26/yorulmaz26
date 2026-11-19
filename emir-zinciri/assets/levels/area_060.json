@@ -1,0 +1,366 @@
+{
+    "area": 60,
+    "levels": [
+        {
+            "id": 296,
+            "area": 60,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı · Kutuları hedeflere taşı",
+            "hint": "Manyetik robot 'Çek' ile uzaktaki kutuyu kendine çeker. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "story": "Manyetik Dev Yuvası: patron: manyetik dev. Manyetik robot 'Çek' ile uzaktaki kutuyu kendine çeker. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                ".E.....",
+                "..#....",
+                "x...B..",
+                "#.... #",
+                "....#s.",
+                ". .D##."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 1,
+                    "type": "MAGNET"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PULL",
+                "PRESS"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 297,
+            "area": 60,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı · Kutuları hedeflere taşı",
+            "hint": "Manyetik robot 'Çek' ile uzaktaki kutuyu kendine çeker. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                ". ..E..",
+                "..D#.#.",
+                "....xB.",
+                "......#",
+                "...#...",
+                ".s....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "S",
+                    "type": "MAGNET"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PULL",
+                "PRESS"
+            ],
+            "maxCommands": 21,
+            "par": 17,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "PULL",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 298,
+            "area": 60,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı · Kutuları hedeflere taşı",
+            "hint": "Manyetik robot 'Çek' ile uzaktaki kutuyu kendine çeker. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                ".#....E.",
+                ".#...#..",
+                " .#.....",
+                ".....xs ",
+                "..#..D. ",
+                "..#..B.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 5,
+                    "dir": "S",
+                    "type": "MAGNET"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PULL",
+                "PRESS"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "PULL",
+                    "PULL",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 299,
+            "area": 60,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı · Kutuları hedeflere taşı",
+            "hint": "Manyetik robot 'Çek' ile uzaktaki kutuyu kendine çeker. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "...#.#.",
+                "....#.E",
+                "B.. ...",
+                "x..s...",
+                "E#D.#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 4,
+                    "dir": "W",
+                    "type": "MAGNET"
+                },
+                {
+                    "id": "B",
+                    "x": 6,
+                    "y": 4,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "PULL",
+                "PRESS"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 11
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PULL"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 300,
+            "area": 60,
+            "name": "Patron: Manyetik Dev II",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Manyetik Dev Yuvası: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "########",
+                "#.#.#..#",
+                ".D.....#",
+                "#.#....#",
+                "##p#####",
+                "##.#####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 15
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "N",
+                    "hp": 14
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 15,
+            "solution": {
+                "A": [
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

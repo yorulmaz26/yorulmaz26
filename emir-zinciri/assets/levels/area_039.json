@@ -1,0 +1,338 @@
+{
+    "area": 39,
+    "levels": [
+        {
+            "id": 191,
+            "area": 39,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Taretin hattında kalkan aç.",
+            "story": "Koşullu Kapılar: robot türüne duyarlı kapılar. Anahtar paneli mavi kapıyı açar. Taretin hattında kalkan aç.",
+            "map": [
+                "......",
+                "#.E...",
+                ".#...s",
+                "D##.#.",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 4,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 2,
+                    "y": 4,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 192,
+            "area": 39,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Taretin hattında kalkan aç.",
+            "map": [
+                "..E#...",
+                ". ..##.",
+                ".#.D...",
+                "...s...",
+                ".###..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 3,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 5,
+                    "y": 3,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 193,
+            "area": 39,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Taretin hattında kalkan aç.",
+            "map": [
+                "......",
+                ".#....",
+                "#D....",
+                "...E.s",
+                "....E."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 194,
+            "area": 39,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Taretin hattında kalkan aç.",
+            "map": [
+                "..#..E",
+                "...sE.",
+                "......",
+                "..D.#.",
+                "#.#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 1,
+                    "y": 0,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 195,
+            "area": 39,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Taretin hattında kalkan aç.",
+            "map": [
+                ". ....#",
+                "#......",
+                "E...#..",
+                "......s",
+                "..D..E."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "TICKS",
+                "value": 4
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 4,
+                    "y": 1,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        }
+    ]
+}

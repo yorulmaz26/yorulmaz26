@@ -32,7 +32,11 @@ abstract class BaseScreen(val game: EmirZinciriGame) : ScreenAdapter() {
         stage.addActor(root)
     }
 
+    /** Bu ekranda çalacak müzik parçası. */
+    open val musicTrack: String = "menu"
+
     override fun show() {
+        game.assets.playMusic(musicTrack)
         Gdx.input.inputProcessor = InputMultiplexer(stage, object : InputAdapter() {
             override fun keyDown(keycode: Int): Boolean {
                 if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) { onBack(); return true }

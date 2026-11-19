@@ -1,0 +1,329 @@
+{
+    "area": 18,
+    "levels": [
+        {
+            "id": 86,
+            "area": 18,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Görünmez robotu düşmanlar fark etmez. Taretin hattında kalkan aç.",
+            "story": "Gizli Operasyon: görünmezlik. Görünmez robotu düşmanlar fark etmez. Taretin hattında kalkan aç.",
+            "map": [
+                "#...#.",
+                "......",
+                "....#.",
+                "#.#.E.",
+                "#..#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "type": "GHOST"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 87,
+            "area": 18,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Görünmez robotu düşmanlar fark etmez. Taretin hattında kalkan aç.",
+            "map": [
+                ". ..#.",
+                ".... .",
+                ".#..#.",
+                "......",
+                ".....E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 0,
+                    "type": "GHOST"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "S",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 88,
+            "area": 18,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Görünmez robotu düşmanlar fark etmez. Taretin hattında kalkan aç.",
+            "map": [
+                "E.....",
+                ". # ..",
+                ".#.##.",
+                "......",
+                "..#E#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 0,
+                    "type": "GHOST"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 4,
+                    "y": 0,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 89,
+            "area": 18,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Görünmez robotu düşmanlar fark etmez. Taretin hattında kalkan aç.",
+            "map": [
+                "E.... ",
+                ".E....",
+                "......",
+                "...#..",
+                ".#...#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "N",
+                    "type": "GHOST"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 0,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "S",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 90,
+            "area": 18,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Görünmez robotu düşmanlar fark etmez. Taretin hattında kalkan aç.",
+            "map": [
+                "#.E...",
+                "......",
+                "#.E ..",
+                "....#.",
+                "....# "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "W",
+                    "type": "GHOST"
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 4,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 4,
+                    "y": 0,
+                    "dir": "S",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,309 @@
+{
+    "area": 25,
+    "levels": [
+        {
+            "id": 121,
+            "area": 25,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla.",
+            "story": "Demir Muhafız Kalesi: patron: demir muhafız. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                ".....#",
+                "E..##.",
+                "....#.",
+                "..c...",
+                "c....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 4,
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT"
+            ],
+            "maxCommands": 11,
+            "par": 7,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 5
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 122,
+            "area": 25,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "..E...",
+                "... ..",
+                "......",
+                "....c.",
+                "..#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 3,
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "COLLECT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 123,
+            "area": 25,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla.",
+            "map": [
+                ".....E",
+                "...#.c",
+                "......",
+                "E.....",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 4,
+                    "dir": "W",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 3,
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 124,
+            "area": 25,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "...c.E",
+                ".. ...",
+                "..#...",
+                "......",
+                "E....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 2,
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 4,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 125,
+            "area": 25,
+            "name": "Patron: Demir Muhafız",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Demir Muhafız Kalesi: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "########",
+                "#.#.#..#",
+                ".D.....#",
+                "#..#...#",
+                "###p####",
+                "###.####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "third": {
+                "type": "TICKS",
+                "value": 14
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 6,
+                    "y": 2,
+                    "dir": "E",
+                    "hp": 10
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 8,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

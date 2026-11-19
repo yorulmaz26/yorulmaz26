@@ -1,0 +1,275 @@
+{
+    "area": 23,
+    "levels": [
+        {
+            "id": 111,
+            "area": 23,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır.",
+            "story": "Yankı Kulesi: komut yankısı. Bantlar üstündekileri taşır.",
+            "map": [
+                "..#.E.",
+                "..^...",
+                "..# # ",
+                "......",
+                "#....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 112,
+            "area": 23,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır.",
+            "map": [
+                "....E.",
+                "< ...#",
+                "..#...",
+                ". .#..",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 113,
+            "area": 23,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır.",
+            "map": [
+                "#.EE.#",
+                ".... .",
+                ".. ...",
+                "..#.. ",
+                "#.. .v"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 3,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 114,
+            "area": 23,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır.",
+            "map": [
+                ".^...#",
+                "E^....",
+                "..#...",
+                "......",
+                "..E. ."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 3,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 115,
+            "area": 23,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır.",
+            "map": [
+                "......",
+                "....#.",
+                "##.E..",
+                "..>>E.",
+                "...#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 0,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

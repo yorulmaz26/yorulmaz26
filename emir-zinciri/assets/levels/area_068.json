@@ -1,0 +1,311 @@
+{
+    "area": 68,
+    "levels": [
+        {
+            "id": 336,
+            "area": 68,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "story": "Vaha Pompaları: kaynak paylaşımı. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "#..o ..",
+                "..##...",
+                " .#c...",
+                ".......",
+                "...##..",
+                "#.cB.E#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 3,
+                    "dir": "W",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 337,
+            "area": 68,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                " .#...#",
+                "E#.o...",
+                "....c  ",
+                ".#..#.#",
+                " B#....",
+                "#....##"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 1,
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 338,
+            "area": 68,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "..#..#.",
+                "c...##.",
+                "o... .#",
+                "...EE..",
+                ".B.##. "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "S",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 0,
+                    "dir": "N",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 339,
+            "area": 68,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "E...#E.",
+                "..#....",
+                "..#B...",
+                ". .#..c",
+                "#..#o##"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "S",
+                    "energy": 4
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 3,
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 340,
+            "area": 68,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "..#.#..",
+                "...B..o",
+                "...#E#c",
+                ".#..##.",
+                ".#E...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 0,
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 1,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 10
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "WAIT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

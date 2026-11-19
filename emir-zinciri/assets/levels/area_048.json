@@ -1,0 +1,334 @@
+{
+    "area": 48,
+    "levels": [
+        {
+            "id": 236,
+            "area": 48,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "story": "Güneş Paneli Tarlası: zamanla dolan enerji. Enerji sınırlı: hücreleri topla. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "......#",
+                "..cD.#t",
+                "#.#.c#.",
+                "#.....E",
+                "#....#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 2,
+                    "dir": "W",
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 11,
+            "par": 7,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 4
+            },
+            "energy": true,
+            "channels": {
+                "3,1": 3,
+                "6,1": 3
+            },
+            "values": {
+                "6,1": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 237,
+            "area": 48,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "#...#..",
+                "D..#...",
+                ".......",
+                ".#. c..",
+                "...#...",
+                "...t..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 5
+            },
+            "energy": true,
+            "channels": {
+                "0,1": 3,
+                "3,5": 3
+            },
+            "values": {
+                "3,5": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 238,
+            "area": 48,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "t.....",
+                "##.#D.",
+                "E..#.E",
+                "c...#.",
+                "#..#.#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0,
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 1,
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "channels": {
+                "0,0": 3,
+                "4,1": 3
+            },
+            "values": {
+                "0,0": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 239,
+            "area": 48,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                ".t.#..#",
+                "#..#...",
+                "E...#..",
+                "#..#...",
+                "E.c..Dc"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 4,
+                    "dir": "N",
+                    "energy": 4
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "S",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "channels": {
+                "1,0": 3,
+                "5,4": 3
+            },
+            "values": {
+                "1,0": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 240,
+            "area": 48,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                ".D.#.#.",
+                "#.t....",
+                ".......",
+                ".ccE#..",
+                ". ....E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "N",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 6,
+                    "y": 1,
+                    "dir": "N",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "channels": {
+                "1,0": 3,
+                "2,1": 3
+            },
+            "values": {
+                "2,1": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

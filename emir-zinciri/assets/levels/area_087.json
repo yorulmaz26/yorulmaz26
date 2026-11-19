@@ -1,0 +1,315 @@
+{
+    "area": 87,
+    "levels": [
+        {
+            "id": 431,
+            "area": 87,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "story": "Bellek Sarayı: komut hafızası ustalığı. Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "...D ...",
+                "#..E.t #",
+                "...#..#.",
+                "#....p##",
+                "D.#.....",
+                "#.#....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 7,
+                    "y": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "REPEAT"
+            ],
+            "maxCommands": 9,
+            "par": 7,
+            "channels": {
+                "3,0": 3,
+                "0,4": 2,
+                "5,1": 3,
+                "5,3": 2
+            },
+            "values": {
+                "5,1": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "REPEAT:3",
+                    "BACK",
+                    "END",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "FORWARD",
+                    "END",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 432,
+            "area": 87,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "###.#...",
+                "...#....",
+                "#EpD#.##",
+                ". #.... ",
+                ". t....#",
+                "#.D.. .."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "REPEAT"
+            ],
+            "maxCommands": 12,
+            "par": 10,
+            "channels": {
+                "2,2": 2,
+                "3,2": 3,
+                "2,4": 3,
+                "2,5": 2
+            },
+            "values": {
+                "2,4": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "REPEAT:2",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "END",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "REPEAT:2",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "END"
+                ]
+            }
+        },
+        {
+            "id": 433,
+            "area": 87,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "...## ..",
+                "#..###..",
+                "#...E.#.",
+                ".....#..",
+                "...#.D.t",
+                " .p..#..",
+                "#.#..D.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 3,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "REPEAT"
+            ],
+            "maxCommands": 15,
+            "par": 13,
+            "channels": {
+                "2,5": 2,
+                "5,4": 2,
+                "7,4": 3,
+                "5,6": 3
+            },
+            "values": {
+                "7,4": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "REPEAT:2",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "END",
+                    "PRESS",
+                    "BACK",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "FORWARD",
+                    "END",
+                    "TURN_LEFT",
+                    "REPEAT:4",
+                    "BACK",
+                    "END"
+                ]
+            }
+        },
+        {
+            "id": 434,
+            "area": 87,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "...#...#.",
+                "D..#.....",
+                "...pD.#..",
+                "##t.. # .",
+                ".# #..##.",
+                ".........",
+                ".#....E.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "REPEAT"
+            ],
+            "maxCommands": 15,
+            "par": 13,
+            "channels": {
+                "0,1": 2,
+                "2,3": 3,
+                "3,2": 2,
+                "4,2": 3
+            },
+            "values": {
+                "2,3": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 8,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "REPEAT:4",
+                    "BACK",
+                    "END",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 435,
+            "area": 87,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "D...E.#..",
+                ".###..###",
+                "..t..#...",
+                "##..#..#.",
+                "....#.##.",
+                "........D",
+                ".....##.p"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "REPEAT"
+            ],
+            "maxCommands": 13,
+            "par": 11,
+            "channels": {
+                "8,5": 2,
+                "8,6": 2,
+                "0,0": 3,
+                "2,2": 3
+            },
+            "values": {
+                "2,2": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 8,
+            "solution": {
+                "A": [
+                    "REPEAT:2",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "END",
+                    "PRESS",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "REPEAT:4",
+                    "BACK",
+                    "END"
+                ]
+            }
+        }
+    ]
+}

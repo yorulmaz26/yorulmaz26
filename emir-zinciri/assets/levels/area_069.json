@@ -1,0 +1,315 @@
+{
+    "area": 69,
+    "levels": [
+        {
+            "id": 341,
+            "area": 69,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Taretin hattında kalkan aç.",
+            "story": "Kanyon Köprüleri: köprü inşası. Çukura itilen kutu çukuru doldurur. Taretin hattında kalkan aç.",
+            "map": [
+                "....E..",
+                "..#.#.B",
+                ".#.....",
+                ".......",
+                "#..o..#",
+                ".#....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "S",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 342,
+            "area": 69,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Taretin hattında kalkan aç.",
+            "map": [
+                ".#.o..B",
+                ".......",
+                "..... .",
+                "..#...#",
+                " .E....",
+                "#...##."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 0,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 4,
+                    "y": 3,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 343,
+            "area": 69,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Taretin hattında kalkan aç.",
+            "map": [
+                "....#.#B",
+                " ...E...",
+                "o.#..#.#",
+                "....#.#.",
+                "..  ...#",
+                "........"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 1,
+                    "y": 1,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 344,
+            "area": 69,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Taretin hattında kalkan aç.",
+            "map": [
+                "B.#. #. ",
+                ".#.#.#..",
+                " .. ....",
+                ".#......",
+                ".#.. .#.",
+                "E......o"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 6,
+                    "y": 3,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "SHIELD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 345,
+            "area": 69,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Taretin hattında kalkan aç.",
+            "map": [
+                "..o###.",
+                "#.##B.#",
+                "......#",
+                ".#E....",
+                ".. .E.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "S",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 6,
+                    "y": 0,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        }
+    ]
+}

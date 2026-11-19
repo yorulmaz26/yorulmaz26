@@ -1,0 +1,329 @@
+{
+    "area": 61,
+    "levels": [
+        {
+            "id": 301,
+            "area": 61,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Anahtar paneli mavi kapıyı açar. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "story": "Derin Deniz Laboratuvarı: basınç ve oksijen enerjisi. Enerji sınırlı: hücreleri topla. Anahtar paneli mavi kapıyı açar. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                "..s..# ",
+                "... .#.",
+                "s#..c .",
+                ".....#L",
+                ".#..D.#",
+                "#.#.E.#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 0,
+                    "dir": "N",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "channels": {
+                "0,2": 4,
+                "6,3": 4
+            },
+            "values": {
+                "6,3": 1
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "PRESS",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 302,
+            "area": 61,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Anahtar paneli mavi kapıyı açar. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                ".....#E",
+                "..scD..",
+                "..s.#..",
+                ".......",
+                "..#. ..",
+                "#L....#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "W",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "channels": {
+                "2,2": 4,
+                "1,5": 4
+            },
+            "values": {
+                "1,5": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PRESS",
+                    "COLLECT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 303,
+            "area": 61,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Anahtar paneli mavi kapıyı açar. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                ".L#..#.#",
+                "#..#E.  ",
+                "...s.c..",
+                "#...#...",
+                ".###..#.",
+                "csD....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 4,
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 11,
+            "par": 7,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 4
+            },
+            "energy": true,
+            "channels": {
+                "1,0": 4,
+                "3,2": 4
+            },
+            "values": {
+                "1,0": 0
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 304,
+            "area": 61,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Anahtar paneli mavi kapıyı açar. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                ".#s#...",
+                ".D..E#.",
+                "s..L...",
+                ".c.#...",
+                "E..... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "W",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "N",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "channels": {
+                "0,2": 4,
+                "3,2": 4
+            },
+            "values": {
+                "3,2": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 305,
+            "area": 61,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Anahtar paneli mavi kapıyı açar. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                ".c..#..",
+                ".#Dc ..",
+                ".##E...",
+                " .#.#..",
+                "s...sEL"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 1,
+                    "dir": "W",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 4,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "channels": {
+                "4,4": 4,
+                "6,4": 4
+            },
+            "values": {
+                "6,4": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

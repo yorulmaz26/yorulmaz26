@@ -1,0 +1,377 @@
+{
+    "area": 65,
+    "levels": [
+        {
+            "id": 321,
+            "area": 65,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "story": "Batık Fabrika: su basan hücreler. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "#....#.",
+                "#E...#.",
+                ".c...B.",
+                ".#####.",
+                ".c.....",
+                "..#.o.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "WARRIOR",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 322,
+            "area": 65,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "#  o...",
+                ".Bc#...",
+                "...#.c#",
+                ".......",
+                "...#.##",
+                "#.#...E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 1,
+                    "dir": "N",
+                    "type": "WARRIOR",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 5,
+                    "y": 0,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 323,
+            "area": 65,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "....E..",
+                "#...o..",
+                "E..... ",
+                "...c...",
+                "..Bc..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 1,
+                    "type": "WARRIOR",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 4,
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 324,
+            "area": 65,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".....cc",
+                "..E.#..",
+                ".....#.",
+                "o..B...",
+                ".#.E..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "N",
+                    "type": "WARRIOR",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2,
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 6,
+                    "y": 1,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 325,
+            "area": 65,
+            "name": "Patron: Akıntı Lordu",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Batık Fabrika: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "#######",
+                "#.....#",
+                ".D....#",
+                "#.#...#",
+                "##p####",
+                "##.####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 15
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "S",
+                    "hp": 14
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 16,
+            "solution": {
+                "A": [
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

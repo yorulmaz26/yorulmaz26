@@ -42,8 +42,21 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 - ⬜ Harita editörü, robot seferleri, fabrika savunması, koleksiyon/müze, komut ustalığı, rastgele fabrika olayları, alternatif bölüm kuralları, prestij.
 - Not: görev tarihi cihaz saatinden okunur; tarihi değiştirmek görevleri yeniler (ödüller küçük tutuldu). Canlar ve üretim bundan etkilenmez.
 
-## Aşama 8–9 ⬜
-500 bölüme genişleme (üretici + elle tasarım + çözücü doğrulaması), müzik, performans ve yayın hazırlığı.
+## Aşama 8 — İçerik genişletme ✅
+- ✅ 100 alan × 5 bölüm = **500 bölüm**. 1–50 elle tasarlandı; 51–500 kampanya üreticisiyle (`logic/gen/Campaign.kt`) üretildi.
+- ✅ Her alanın mekanik profili (alan adından/mekaniğinden): kutu, çukur, anahtar, plaka, zamanlı düğme, enerji, bant, lazer, devriye, taret, takipçi, döngü, uçan, görünmez, manyetik robot.
+- ✅ Kalite kuralları: her bölüm çözücüyle çözülür; çözüm alanın mekaniğini gerçekten kullanmak zorunda; çok kolay olanlar reddedilir; döngü alanlarında çözüm Tekrar bloklarıyla sıkıştırılır ve kart sınırı döngüyü gerektirir; her 25. bölüm patron savaşı (18 farklı patron adı, büyüyen can).
+- ✅ Robot sayısı kuralı: 1–25 tek robot, sonra alan aralığına göre üst sınır (üretimde en fazla 3 robot kullanılır; üretilemeyen çok robotlu bölümde sayı azaltılır — kural bir üst sınırdır).
+- ✅ Yeni sınıflar: Uçan (boşluktan düşmez, plakaya basmaz, kutu taşıyamaz), Görünmez (düşmanlar hedef almaz), Manyetik (3 hücreye kadar uzaktaki kutuyu çeker).
+- ✅ Doğrulama: 500 bölümün hepsi için çözüm/3 yıldız/determinizm/boş zincir testi; optimumluk testi 1–50'de tam, sonrasında örneklem.
+- Sınır: 51–500 üretilmiş bulmacalardır; elle tasarlanan 1–50 kadar "anlatılı" değildir. Bazı alan adlarındaki mekanikler (ayna, yankı, virüs, ışınlanma, klonlama, birleşim…) motorda henüz yoktur; o alanlar mevcut mekaniklerin birleşimiyle üretildi.
+
+## Aşama 9 — Yayın hazırlığı 🟡
+- ✅ Sentezlenmiş müzik (menü ve oyun döngüsü, OGG) ve ses efektleri; ikisi ayrı kapatılabilir.
+- ✅ Çizim performansı: izometrik çizicide kare başına nesne üretimi renk havuzuyla kaldırıldı.
+- ✅ İmzalı yayın yapılandırması (`keystore.properties`, depoya eklenmez), `bundleRelease` ile AAB, sürüm 1.0.0.
+- ✅ Play mağaza metinleri, veri güvenliği ve gizlilik metni: [`PLAY_STORE.md`](PLAY_STORE.md).
+- ⬜ Gerçek cihaz testleri (bu ortamda cihaz/emülatör yok), R8 küçültmesinin cihazda doğrulanması, mağaza görselleri, yerelleştirme (yalnızca Türkçe).
 
 ## Bilinen eksikler
 - Müzik yok (yalnızca ses efektleri); ayarlarda müzik seçeneği bu yüzden gösterilmiyor.

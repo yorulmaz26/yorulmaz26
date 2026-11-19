@@ -1,0 +1,319 @@
+{
+    "area": 44,
+    "levels": [
+        {
+            "id": 216,
+            "area": 44,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Lazer ışınına girme; anahtar lazeri kapatır. Bantlar üstündekileri taşır.",
+            "story": "Soğutma Kuleleri: isınan makineler. Lazer ışınına girme; anahtar lazeri kapatır. Bantlar üstündekileri taşır.",
+            "map": [
+                ".##..#.",
+                ".....#.",
+                ".....L ",
+                "v......",
+                "v....sE"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "channels": {
+                "5,2": 4,
+                "5,4": 4
+            },
+            "values": {
+                "5,2": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 217,
+            "area": 44,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Lazer ışınına girme; anahtar lazeri kapatır. Bantlar üstündekileri taşır.",
+            "map": [
+                "<#.. #.",
+                "s......",
+                "..L...#",
+                "......E",
+                ".......",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "channels": {
+                "0,1": 4,
+                "2,2": 4
+            },
+            "values": {
+                "2,2": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 218,
+            "area": 44,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Lazer ışınına girme; anahtar lazeri kapatır. Bantlar üstündekileri taşır.",
+            "map": [
+                "..E...",
+                "##E# #",
+                "#..##s",
+                "...^#.",
+                ".L...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 0,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "TICKS",
+                "value": 4
+            },
+            "channels": {
+                "1,4": 4,
+                "5,2": 4
+            },
+            "values": {
+                "1,4": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 219,
+            "area": 44,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Lazer ışınına girme; anahtar lazeri kapatır. Bantlar üstündekileri taşır.",
+            "map": [
+                "...#.^L",
+                ".#....#",
+                ". #..E.",
+                "....#..",
+                "...E.s."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 1,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "channels": {
+                "6,0": 4,
+                "5,4": 4
+            },
+            "values": {
+                "6,0": 1
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 220,
+            "area": 44,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Lazer ışınına girme; anahtar lazeri kapatır. Bantlar üstündekileri taşır.",
+            "map": [
+                ".......",
+                "E...#.#",
+                ".. s.. ",
+                "..#L.>>",
+                "#..#E.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "S"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "channels": {
+                "3,2": 4,
+                "3,3": 4
+            },
+            "values": {
+                "3,3": 1
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

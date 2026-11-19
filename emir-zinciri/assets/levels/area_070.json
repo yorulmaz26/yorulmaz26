@@ -1,0 +1,370 @@
+{
+    "area": 70,
+    "levels": [
+        {
+            "id": 346,
+            "area": 70,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "story": "Zaman Makinesi Odası: patron: zaman makinesi. Zamanlı düğme kapıyı birkaç adım açık tutar. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "###...x",
+                ".t...#B",
+                ".D.....",
+                "..##..E",
+                ".... .D",
+                "#s#...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "channels": {
+                "1,1": 3,
+                "6,4": 3
+            },
+            "values": {
+                "1,1": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "PRESS",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 347,
+            "area": 70,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                ".... #.",
+                "...#...",
+                ".#sE.##",
+                ".t#.. #",
+                ".....##",
+                "xB.D.D."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 21,
+            "par": 17,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "channels": {
+                "1,3": 3,
+                "5,5": 3
+            },
+            "values": {
+                "1,3": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 348,
+            "area": 70,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "##......",
+                ".#.D..t.",
+                "..E#....",
+                ".......D",
+                ".......s",
+                " . ..Bx "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 1
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "channels": {
+                "6,1": 3,
+                "7,3": 3
+            },
+            "values": {
+                "6,1": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 349,
+            "area": 70,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "... ....",
+                "..DE#t..",
+                "........",
+                "#D ...B.",
+                "....s...",
+                "#....#x#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 7,
+                    "y": 3,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "channels": {
+                "1,3": 3,
+                "5,1": 3
+            },
+            "values": {
+                "5,1": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 350,
+            "area": 70,
+            "name": "Patron: Zaman Makinesi",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Zaman Makinesi Odası: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "########",
+                "#......#",
+                ".D.....#",
+                "#.#.#..#",
+                "####p###",
+                "####.###"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 15
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "S",
+                    "hp": 11
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 17,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,346 @@
+{
+    "area": 58,
+    "levels": [
+        {
+            "id": 286,
+            "area": 58,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "story": "Kuyruklu Yıldız Rafinerisi: ham madde işleme. Kutuyu sarı hedefe it. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "......E",
+                "....BxB",
+                "..c..#.",
+                " ..#.o.",
+                "..###c.",
+                "#...#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "W",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 287,
+            "area": 58,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                ".E.....",
+                "#xB....",
+                ".......",
+                ".....c.",
+                "..c..#.",
+                "B.o...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "N",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 288,
+            "area": 58,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                ".......#",
+                "......B.",
+                "....Eo.#",
+                ".c.Bx...",
+                "........",
+                "#.#..c##"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 4,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 10
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "COLLECT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 289,
+            "area": 58,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "#.E....",
+                "##.x#cc",
+                "#.BE...",
+                "#..Bo.#",
+                "......#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 0,
+                    "dir": "W",
+                    "energy": 5
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 4,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH"
+                ]
+            }
+        },
+        {
+            "id": 290,
+            "area": 58,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Çukura itilen kutu çukuru doldurur. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "o..#x .#",
+                "  BE....",
+                "......#.",
+                " ...B.#.",
+                ".c..... ",
+                "..#.....",
+                ".c..#.#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 5,
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 13
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

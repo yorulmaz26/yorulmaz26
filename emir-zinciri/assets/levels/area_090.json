@@ -1,0 +1,331 @@
+{
+    "area": 90,
+    "levels": [
+        {
+            "id": 446,
+            "area": 90,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "story": "Sistem Bekçisi: patron: sistem bekçisi. Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "....#.#.",
+                ". DxB..#",
+                "##.....#",
+                "....#. #",
+                ".#.E... ",
+                "#..#..#s"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 447,
+            "area": 90,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "#..#...#",
+                "#.E.....",
+                "#......#",
+                "..#.BD..",
+                ".. .#...",
+                ".##x..s#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 22,
+            "par": 18,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "PRESS",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 448,
+            "area": 90,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "# .B.x..",
+                "...#..E.",
+                "....##..",
+                "#.##..##",
+                "#s..##.#",
+                ".#.D.#..",
+                ".##.#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 1,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 449,
+            "area": 90,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Anahtar paneli mavi kapıyı açar.",
+            "map": [
+                "..##D .#.",
+                ".#....#..",
+                ".#.#.###s",
+                "#....# ..",
+                "EB..x.#..",
+                "......##.",
+                "... .#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 5,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "PRESS"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 8,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 450,
+            "area": 90,
+            "name": "Patron: Sistem Bekçisi",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Sistem Bekçisi: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "########",
+                "#......#",
+                ".D.....#",
+                "#.##...#",
+                "##p#####",
+                "##.#####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 15
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "S",
+                    "hp": 12
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 21,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

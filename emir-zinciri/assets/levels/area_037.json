@@ -1,0 +1,323 @@
+{
+    "area": 37,
+    "levels": [
+        {
+            "id": 181,
+            "area": 37,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "story": "Klon Laboratuvarı: robot klonlama. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "t..#.#",
+                "..#...",
+                "..#.#.",
+                ".D...E",
+                "#....#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "channels": {
+                "0,0": 3,
+                "1,3": 3
+            },
+            "values": {
+                "0,0": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 182,
+            "area": 37,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                ". .....",
+                "E..#...",
+                "#.. #..",
+                ". .D..t",
+                "... . ."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "channels": {
+                "3,3": 3,
+                "6,3": 3
+            },
+            "values": {
+                "6,3": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "PRESS",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 183,
+            "area": 37,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "...E.#",
+                "...#..",
+                "...E.t",
+                "D#..#.",
+                ".#...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "channels": {
+                "0,3": 3,
+                "5,2": 3
+            },
+            "values": {
+                "5,2": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 184,
+            "area": 37,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "......",
+                "..tE..",
+                "..E.D.",
+                "#..#. ",
+                "#.# .."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 4,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 1
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "channels": {
+                "2,1": 3,
+                "4,2": 3
+            },
+            "values": {
+                "2,1": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 185,
+            "area": 37,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "#t.....",
+                ".D.###.",
+                "......E",
+                "..#..E.",
+                "..#...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 4,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "channels": {
+                "1,0": 3,
+                "1,1": 3
+            },
+            "values": {
+                "1,0": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        }
+    ]
+}

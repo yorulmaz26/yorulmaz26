@@ -1,0 +1,293 @@
+{
+    "area": 16,
+    "levels": [
+        {
+            "id": 76,
+            "area": 16,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "story": "Üçlü Komuta: üçüncü robot. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                ".# ...",
+                "#.#..#",
+                "....#.",
+                "p.#...",
+                "D. .E."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 9,
+            "par": 5,
+            "channels": {
+                "0,3": 2,
+                "0,4": 2
+            },
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 77,
+            "area": 16,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "......",
+                "......",
+                ".E...D",
+                "......",
+                ".p... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 0,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "channels": {
+                "1,4": 2,
+                "5,2": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 78,
+            "area": 16,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                ".pE...",
+                "#.D. .",
+                ".....E",
+                "...#..",
+                ".#...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "third": {
+                "type": "TICKS",
+                "value": 8
+            },
+            "channels": {
+                "1,0": 2,
+                "2,1": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 79,
+            "area": 16,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "......",
+                "E. ..p",
+                ".... #",
+                "D#..#.",
+                ".. ..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 0,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 8
+            },
+            "channels": {
+                "0,3": 2,
+                "5,1": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 80,
+            "area": 16,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "E..##p",
+                ".....D",
+                "#.....",
+                ".E.. .",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "channels": {
+                "5,0": 2,
+                "5,1": 2
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

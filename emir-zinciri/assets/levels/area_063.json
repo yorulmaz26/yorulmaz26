@@ -1,0 +1,351 @@
+{
+    "area": 63,
+    "levels": [
+        {
+            "id": 311,
+            "area": 63,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Bantlar üstündekileri taşır. Kutuyu sarı hedefe it.",
+            "story": "Mercan Ağı: dallanan enerji hatları. Enerji sınırlı: hücreleri topla. Bantlar üstündekileri taşır. Kutuyu sarı hedefe it.",
+            "map": [
+                "...E.c.",
+                "c.B....",
+                "..#x...",
+                "...####",
+                ">>>.#..",
+                "...#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 5,
+                    "energy": 8
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 12
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "COLLECT",
+                    "FORWARD",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 312,
+            "area": 63,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Bantlar üstündekileri taşır. Kutuyu sarı hedefe it.",
+            "map": [
+                "#......",
+                "...c.E.",
+                "c. ....",
+                "..B.x.#",
+                ".##....",
+                ".v....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 3,
+                    "energy": 7
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 313,
+            "area": 63,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Bantlar üstündekileri taşır. Kutuyu sarı hedefe it.",
+            "map": [
+                "#.#.x. .",
+                "c...>c>>",
+                "#..#B..#",
+                "#.....#.",
+                ".E......",
+                "..##.#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 4,
+                    "dir": "N",
+                    "energy": 9
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 21,
+            "par": 17,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 14
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 314,
+            "area": 63,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Bantlar üstündekileri taşır. Kutuyu sarı hedefe it.",
+            "map": [
+                ".c.<<<<.",
+                ".....B..",
+                "#E..#..#",
+                ".....x..",
+                ".c.#..##",
+                ".#......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 2,
+                    "energy": 9
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 11
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "BACK",
+                    "BACK",
+                    "WAIT",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 315,
+            "area": 63,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Bantlar üstündekileri taşır. Kutuyu sarı hedefe it.",
+            "map": [
+                "..#.#.#.",
+                ".#.>>>#.",
+                "..# ..#.",
+                ".xB... .",
+                "....c...",
+                ".##.....",
+                " .#.##.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 4,
+                    "dir": "N",
+                    "energy": 8
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 22,
+            "par": 18,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 12
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        }
+    ]
+}

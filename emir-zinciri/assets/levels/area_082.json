@@ -1,0 +1,354 @@
+{
+    "area": 82,
+    "levels": [
+        {
+            "id": 406,
+            "area": 82,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Plaka, üstünde biri durdukça kapıyı açık tutar. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "story": "Merkez Ağ Geçidi: ağ yönlendirme. Anahtar paneli mavi kapıyı açar. Plaka, üstünde biri durdukça kapıyı açık tutar. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                ".#.#.#.",
+                "......D",
+                "t...D..",
+                "..Ep#s.",
+                ".#.#.D.",
+                "#  ...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "channels": {
+                "0,2": 3,
+                "3,3": 2,
+                "6,1": 2,
+                "5,4": 3
+            },
+            "values": {
+                "0,2": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 407,
+            "area": 82,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Plaka, üstünde biri durdukça kapıyı açık tutar. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "......DE",
+                "...#..##",
+                "#..#D.#t",
+                " #s.....",
+                "..##..p#",
+                ".....#D."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "channels": {
+                "4,2": 2,
+                "7,2": 3,
+                "6,4": 2,
+                "6,5": 3
+            },
+            "values": {
+                "7,2": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "PRESS",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 408,
+            "area": 82,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Plaka, üstünde biri durdukça kapıyı açık tutar. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                "D#pE.#.",
+                ".t...#s",
+                " .##. .",
+                ".D#...D",
+                "#..E..#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 9
+            },
+            "channels": {
+                "2,0": 2,
+                "1,1": 3,
+                "1,3": 3,
+                "6,3": 2
+            },
+            "values": {
+                "1,1": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 409,
+            "area": 82,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Plaka, üstünde biri durdukça kapıyı açık tutar. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                ".D.E...",
+                "###....",
+                "....E..",
+                "#..#.p.",
+                "DsDt.#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 6,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 24,
+            "par": 20,
+            "third": {
+                "type": "TICKS",
+                "value": 10
+            },
+            "channels": {
+                "1,0": 3,
+                "2,4": 2,
+                "3,4": 3,
+                "5,3": 2
+            },
+            "values": {
+                "3,4": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 410,
+            "area": 82,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Anahtar paneli mavi kapıyı açar. Plaka, üstünde biri durdukça kapıyı açık tutar. Zamanlı düğme kapıyı birkaç adım açık tutar.",
+            "map": [
+                ".#.#...#",
+                ".tD....#",
+                "p.#.#..s",
+                " EE.D ##",
+                "..##D..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "S"
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 24,
+            "par": 20,
+            "third": {
+                "type": "TICKS",
+                "value": 11
+            },
+            "channels": {
+                "0,2": 2,
+                "1,1": 3,
+                "2,1": 3,
+                "4,3": 2
+            },
+            "values": {
+                "1,1": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "WAIT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

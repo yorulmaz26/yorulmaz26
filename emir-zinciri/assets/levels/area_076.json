@@ -1,0 +1,369 @@
+{
+    "area": 76,
+    "levels": [
+        {
+            "id": 376,
+            "area": 76,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat. Taretin hattında kalkan aç.",
+            "story": "Gece Vardiyası: işık alanları. Devriyeyi etkisiz bırak ya da atlat. Taretin hattında kalkan aç.",
+            "map": [
+                ".##....",
+                "....#..",
+                ".#.....",
+                "E##....",
+                ".#..###",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 3,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "E",
+                    "hp": 2
+                },
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 5,
+                    "y": 3,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 377,
+            "area": 76,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat. Taretin hattında kalkan aç.",
+            "map": [
+                "#.......",
+                "....#...",
+                "#.##....",
+                ".#. ....",
+                ".##....#",
+                ".E..##.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 7,
+                    "y": 3,
+                    "dir": "S",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 6,
+                    "y": 1,
+                    "dir": "N",
+                    "hp": 2
+                },
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 3,
+                    "y": 5,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 378,
+            "area": 76,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat. Taretin hattında kalkan aç.",
+            "map": [
+                "....##.E",
+                ".#... ..",
+                "........",
+                ".##.....",
+                ".#...#..",
+                "#......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 0,
+                    "y": 0,
+                    "dir": "E",
+                    "hp": 2
+                },
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 6,
+                    "y": 5,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 6,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 379,
+            "area": 76,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat. Taretin hattında kalkan aç.",
+            "map": [
+                "E.. ....",
+                " .....#.",
+                ".....# .",
+                "..#.....",
+                "# .. ..#",
+                ".... ...",
+                ".#...#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 4,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 4,
+                    "y": 1,
+                    "dir": "S",
+                    "hp": 2
+                },
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 4,
+                    "y": 3,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 380,
+            "area": 76,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat. Taretin hattında kalkan aç.",
+            "map": [
+                "....#..#.",
+                ".........",
+                "..#. ....",
+                ".##...#..",
+                "E#....#.#",
+                " ... ..#.",
+                ".....#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 4,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 6,
+                    "y": 6,
+                    "dir": "E",
+                    "hp": 2
+                },
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 3,
+                    "y": 1,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 7,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

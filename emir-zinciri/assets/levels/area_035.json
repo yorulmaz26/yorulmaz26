@@ -1,0 +1,314 @@
+{
+    "area": 35,
+    "levels": [
+        {
+            "id": 171,
+            "area": 35,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Enerji sınırlı: hücreleri topla.",
+            "story": "Komut Hafızası Arşivi: komut şablonları. Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                ".c. ##",
+                "...c..",
+                "....E.",
+                "..#...",
+                "...##."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT",
+                "REPEAT"
+            ],
+            "maxCommands": 12,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "COLLECT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "BACK",
+                    "END"
+                ]
+            }
+        },
+        {
+            "id": 172,
+            "area": 35,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "#c ....",
+                "...E.#.",
+                "......c",
+                " ...#.#",
+                "#......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 4,
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT",
+                "REPEAT"
+            ],
+            "maxCommands": 13,
+            "par": 11,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "COLLECT",
+                    "REPEAT:3",
+                    "FORWARD",
+                    "END",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 173,
+            "area": 35,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "#......",
+                ".#c....",
+                "....#..",
+                "......c",
+                "#....#.",
+                ".....E#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 0,
+                    "dir": "W",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT",
+                "REPEAT"
+            ],
+            "maxCommands": 12,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "FORWARD",
+                    "END",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "REPEAT:2",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "END",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 174,
+            "area": 35,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt. Enerji sınırlı: hücreleri topla.",
+            "map": [
+                "...c...",
+                ".#.....",
+                "....c .",
+                ".....E.",
+                ".#.. ..",
+                ".#.... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "W",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT",
+                "REPEAT"
+            ],
+            "maxCommands": 14,
+            "par": 12,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "FORWARD",
+                    "END",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "REPEAT:3",
+                    "BACK",
+                    "END",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 175,
+            "area": 35,
+            "name": "Patron: Kopya Lordu",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Komut Hafızası Arşivi: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "########",
+                "#......#",
+                ".D.....#",
+                "#.#.#..#",
+                "##p#####",
+                "##.#####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "third": {
+                "type": "TICKS",
+                "value": 14
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "E",
+                    "hp": 12
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 10,
+            "solution": {
+                "A": [
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

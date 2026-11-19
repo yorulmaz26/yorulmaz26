@@ -1,0 +1,326 @@
+{
+    "area": 17,
+    "levels": [
+        {
+            "id": 81,
+            "area": 17,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç.",
+            "story": "Savunma Fabrikası: kalkanlar. Taretin hattında kalkan aç.",
+            "map": [
+                ".#.. .",
+                "#.....",
+                "#.....",
+                ". E...",
+                "...# ."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 9,
+            "par": 5,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 82,
+            "area": 17,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç.",
+            "map": [
+                ". ....",
+                "......",
+                "......",
+                "......",
+                "E..#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 4,
+                    "dir": "S",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 3,
+                    "y": 3,
+                    "dir": "S",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_RIGHT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 83,
+            "area": 17,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç.",
+            "map": [
+                ".. ..#",
+                "......",
+                "..E##.",
+                "......",
+                "#E... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 0,
+                    "dir": "S",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 0,
+                    "y": 1,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 84,
+            "area": 17,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç.",
+            "map": [
+                " ..#..",
+                "...###",
+                ". ..E#",
+                "..#.#.",
+                "...E.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "S",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 2,
+                    "y": 4,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 85,
+            "area": 17,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç.",
+            "map": [
+                ".#....",
+                ".#...E",
+                "...##.",
+                "......",
+                "E....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 4,
+                    "dir": "S",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 5,
+                    "y": 0,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        }
+    ]
+}

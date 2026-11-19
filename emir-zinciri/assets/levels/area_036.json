@@ -1,0 +1,336 @@
+{
+    "area": 36,
+    "levels": [
+        {
+            "id": 176,
+            "area": 36,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat.",
+            "story": "Takas Pazarı: komut takası. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".... .",
+                "......",
+                "......",
+                "... .#",
+                "..#..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 4,
+                    "y": 4,
+                    "dir": "N",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 177,
+            "area": 36,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "E......",
+                ".#.....",
+                ".......",
+                "......#",
+                "... ..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "ATTACK"
+            ],
+            "maxCommands": 11,
+            "par": 7,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 3,
+                    "y": 2,
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 178,
+            "area": 36,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".E .E.",
+                "....#.",
+                " ... .",
+                "......",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "S",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 179,
+            "area": 36,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "..#...",
+                "....#.",
+                "#...#.",
+                "E.. ..",
+                "....E."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "N",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 180,
+            "area": 36,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".. ...E",
+                ".. .#..",
+                "E.... .",
+                ". ..#..",
+                ".#.##.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 4,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 8
+            },
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "S",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

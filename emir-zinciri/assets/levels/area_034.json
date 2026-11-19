@@ -1,0 +1,361 @@
+{
+    "area": 34,
+    "levels": [
+        {
+            "id": 166,
+            "area": 34,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "story": "Programlı Taretler: programlanabilir taretler. Taretin hattında kalkan aç. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                ".#....",
+                "E..L.s",
+                ".#.. .",
+                "......",
+                ". ... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 9,
+            "par": 5,
+            "channels": {
+                "3,1": 4,
+                "5,1": 4
+            },
+            "values": {
+                "3,1": 1
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 4,
+                    "y": 3,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 167,
+            "area": 34,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                "..L....",
+                "..E....",
+                " ..#...",
+                ".#.#.s.",
+                "#......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "W",
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 13,
+            "par": 9,
+            "channels": {
+                "2,0": 4,
+                "5,3": 4
+            },
+            "values": {
+                "2,0": 2
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 3,
+                    "y": 1,
+                    "dir": "S",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "PRESS",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 168,
+            "area": 34,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                "..E.##",
+                "#E...#",
+                "....#.",
+                "......",
+                "s....L"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 1,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 4,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "channels": {
+                "0,4": 4,
+                "5,4": 4
+            },
+            "values": {
+                "5,4": 1
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 0,
+                    "y": 0,
+                    "dir": "E",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 169,
+            "area": 34,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                "##s#..",
+                "......",
+                "..#...",
+                "...EE.",
+                "..L#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 3,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "TICKS",
+                "value": 4
+            },
+            "channels": {
+                "2,0": 4,
+                "2,4": 4
+            },
+            "values": {
+                "2,4": 3
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "N",
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 170,
+            "area": 34,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Taretin hattında kalkan aç. Lazer ışınına girme; anahtar lazeri kapatır.",
+            "map": [
+                ".#....s",
+                ".E#..#E",
+                "....#..",
+                "...#.L.",
+                ". #.#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 4,
+                    "dir": "N",
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "channels": {
+                "6,0": 4,
+                "5,3": 4
+            },
+            "values": {
+                "5,3": 3
+            },
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 3,
+                    "y": 0,
+                    "hp": 2
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,351 @@
+{
+    "area": 40,
+    "levels": [
+        {
+            "id": 196,
+            "area": 40,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Kutuyu sarı hedefe it.",
+            "story": "Enerji Yutucu Çekirdeği: patron: enerji yutucu. Enerji sınırlı: hücreleri topla. Kutuyu sarı hedefe it.",
+            "map": [
+                "#.....",
+                "..... ",
+                "..xBE#",
+                "......",
+                ".c#..#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 3,
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 10
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 197,
+            "area": 40,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Kutuyu sarı hedefe it.",
+            "map": [
+                "xBEc...",
+                "..#.#..",
+                ".......",
+                ".......",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 3,
+                    "dir": "W",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 8
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "COLLECT",
+                    "FORWARD",
+                    "PUSH",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 198,
+            "area": 40,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Kutuyu sarı hedefe it.",
+            "map": [
+                "......#",
+                ".c#....",
+                ".... ..",
+                "..#..##",
+                "....E..",
+                "..Bcx.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 0,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 11
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "COLLECT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 199,
+            "area": 40,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Enerji sınırlı: hücreleri topla. Kutuyu sarı hedefe it.",
+            "map": [
+                "##...#.",
+                ".....x.",
+                ". c..B.",
+                "......E",
+                ".#..#.#",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 4,
+                    "dir": "S",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH",
+                "COLLECT"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 10
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "energy": true,
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "COLLECT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 200,
+            "area": 40,
+            "name": "Patron: Enerji Yutucu",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Enerji Yutucu Çekirdeği: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "#######",
+                "#.....#",
+                ".D....#",
+                "#.#...#",
+                "##p####",
+                "##.####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 21,
+            "par": 17,
+            "third": {
+                "type": "TICKS",
+                "value": 16
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "E",
+                    "hp": 14
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 11,
+            "solution": {
+                "A": [
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

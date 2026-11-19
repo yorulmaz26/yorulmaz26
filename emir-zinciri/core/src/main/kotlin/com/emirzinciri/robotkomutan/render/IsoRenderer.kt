@@ -72,6 +72,7 @@ class IsoRenderer(private val assets: Assets) {
     private val list = ArrayList<Drawable>()
 
     fun draw(batch: Batch, f: Frame, parentAlpha: Float = 1f) {
+        poolIndex = 0
         batch.end()
         shapes.projectionMatrix = batch.projectionMatrix
         shapes.transformMatrix = batch.transformMatrix
@@ -88,9 +89,13 @@ class IsoRenderer(private val assets: Assets) {
         drawLabels(batch, f)
     }
 
-    private val tmp = Color()
+    /** Kare başına sıfırlanan renk havuzu: çizim sırasında yeni Color nesnesi üretilmez. */
+    private val pool = Array(1024) { Color() }
+    private var poolIndex = 0
+    private fun next(): Color = pool[poolIndex++ and 1023]
 
-    private fun c(color: Color, alpha: Float = 1f): Color = tmp.set(color).also { it.a = color.a * alpha }
+    private fun c(color: Color, alpha: Float = 1f): Color = next().set(color).also { it.a = color.a * alpha }
+    private fun mixP(a: Color, b: Color, t: Float): Color = next().set(a).lerp(b, t)
 
     private fun diamond(cx: Float, cy: Float, w: Float, h: Float, color: Color) {
         shapes.color = color
@@ -111,7 +116,7 @@ class IsoRenderer(private val assets: Assets) {
         diamond(cx, cy + z1, w, h, top)
     }
 
-    private fun shadeOf(color: Color, f: Float) = Color(color.r * f, color.g * f, color.b * f, color.a)
+    private fun shadeOf(color: Color, f: Float): Color = next().set(color.r * f, color.g * f, color.b * f, color.a)
 
     private fun drawFloors(f: Frame) {
         val lv = f.level
@@ -133,7 +138,7 @@ class IsoRenderer(private val assets: Assets) {
             when (tile) {
                 Tile.PIT -> {
                     if (p in f.to.filledPits) {
-                        diamond(cx, cy, tw * 0.86f, th * 0.86f, Theme.mix(Theme.boxColor, Theme.floorTop, 0.45f))
+                        diamond(cx, cy, tw * 0.86f, th * 0.86f, mixP(Theme.boxColor, Theme.floorTop, 0.45f))
                     } else {
                         diamond(cx, cy, tw * 0.78f, th * 0.78f, shadeOf(Theme.pitColor, 0.62f))
                         diamond(cx, cy - th * 0.08f, tw * 0.56f, th * 0.56f, shadeOf(Theme.pitColor, 0.45f))
@@ -141,9 +146,9 @@ class IsoRenderer(private val assets: Assets) {
                 }
                 Tile.EXIT -> {
                     val pulse = 0.5f + 0.5f * sin(f.time * 3f)
-                    diamond(cx, cy, tw * 0.9f, th * 0.9f, Theme.mix(Theme.exitColor, Theme.white, 0.55f))
+                    diamond(cx, cy, tw * 0.9f, th * 0.9f, mixP(Theme.exitColor, Theme.white, 0.55f))
                     diamond(cx, cy, tw * (0.62f + 0.08f * pulse), th * (0.62f + 0.08f * pulse), Theme.exitColor)
-                    diamond(cx, cy, tw * 0.3f, th * 0.3f, Theme.mix(Theme.exitColor, Theme.white, 0.6f))
+                    diamond(cx, cy, tw * 0.3f, th * 0.3f, mixP(Theme.exitColor, Theme.white, 0.6f))
                 }
                 Tile.TARGET -> {
                     diamond(cx, cy, tw * 0.82f, th * 0.82f, Theme.targetColor)
@@ -158,7 +163,7 @@ class IsoRenderer(private val assets: Assets) {
                 }
                 Tile.CONV_N, Tile.CONV_E, Tile.CONV_S, Tile.CONV_W -> drawConveyor(tile.conveyorDir!!, x, y, cx, cy, f.time)
                 Tile.CHARGER -> {
-                    diamond(cx, cy, tw * 0.8f, th * 0.8f, Theme.mix(Theme.energyColor, Theme.white, 0.5f))
+                    diamond(cx, cy, tw * 0.8f, th * 0.8f, mixP(Theme.energyColor, Theme.white, 0.5f))
                     diamond(cx, cy, tw * 0.5f, th * 0.5f, Theme.energyColor)
                     diamond(cx, cy, tw * 0.28f, th * 0.28f, Theme.white)
                 }
@@ -214,7 +219,7 @@ class IsoRenderer(private val assets: Assets) {
             when {
                 tile == Tile.WALL -> list += Drawable(depth, 0) {
                     block(cx, cy, 1f, 0f, tw * 0.42f, Theme.wallTop, Theme.wallSide, shadeOf(Theme.wallSide, 0.86f))
-                    diamond(cx, cy + tw * 0.42f, tw * 0.7f, th * 0.7f, Theme.mix(Theme.wallTop, Theme.white, 0.18f))
+                    diamond(cx, cy + tw * 0.42f, tw * 0.7f, th * 0.7f, mixP(Theme.wallTop, Theme.white, 0.18f))
                 }
                 tile.isDoor -> list += Drawable(depth, 0) { drawDoor(f, p, cx, cy) }
                 tile.isConsole -> list += Drawable(depth, 0) { drawConsole(f, p, tile, cx, cy) }
@@ -225,8 +230,8 @@ class IsoRenderer(private val assets: Assets) {
             val cx = sx(p.x.toFloat(), p.y.toFloat()); val cy = sy(p.x.toFloat(), p.y.toFloat())
             list += Drawable((p.x + p.y).toFloat(), 1) {
                 val bob = sin(f.time * 2.6f + p.x) * tw * 0.04f
-                diamond(cx, cy, tw * 0.36f, th * 0.36f, Color(0f, 0f, 0f, 0.1f))
-                block(cx, cy, 0.22f, tw * 0.16f + bob, tw * 0.36f + bob, Theme.mix(Theme.energyColor, Theme.white, 0.4f), Theme.energyColor, shadeOf(Theme.energyColor, 0.85f))
+                diamond(cx, cy, tw * 0.36f, th * 0.36f, next().set(0f, 0f, 0f, 0.1f))
+                block(cx, cy, 0.22f, tw * 0.16f + bob, tw * 0.36f + bob, mixP(Theme.energyColor, Theme.white, 0.4f), Theme.energyColor, shadeOf(Theme.energyColor, 0.85f))
             }
         }
         // Toplanmakta olan hücreler: kısa bir parlama
@@ -236,7 +241,7 @@ class IsoRenderer(private val assets: Assets) {
             val cx = sx(r.pos.x.toFloat(), r.pos.y.toFloat()); val cy = sy(r.pos.x.toFloat(), r.pos.y.toFloat())
             list += Drawable((r.pos.x + r.pos.y).toFloat(), 3) {
                 val k = 1f - f.t
-                block(cx, cy, 0.22f * k, tw * (0.4f + f.t * 0.6f), tw * (0.6f + f.t * 0.6f), Theme.mix(Theme.energyColor, Theme.white, 0.4f), Theme.energyColor, Theme.energyColor)
+                block(cx, cy, 0.22f * k, tw * (0.4f + f.t * 0.6f), tw * (0.6f + f.t * 0.6f), mixP(Theme.energyColor, Theme.white, 0.4f), Theme.energyColor, Theme.energyColor)
             }
         }
         // Kutular (hareket olaylarıyla ara değer)
@@ -270,11 +275,11 @@ class IsoRenderer(private val assets: Assets) {
     }
 
     private fun drawBox(cx: Float, cy: Float, z: Float, alpha: Float = 1f) {
-        val top = c(Theme.mix(Theme.boxColor, Theme.white, 0.25f), alpha).cpy()
-        val left = c(Theme.boxColor, alpha).cpy()
-        val right = c(shadeOf(Theme.boxColor, 0.82f), alpha).cpy()
+        val top = c(mixP(Theme.boxColor, Theme.white, 0.25f), alpha)
+        val left = c(Theme.boxColor, alpha)
+        val right = c(shadeOf(Theme.boxColor, 0.82f), alpha)
         block(cx, cy, 0.66f, z, z + tw * 0.36f, top, left, right)
-        diamond(cx, cy + z + tw * 0.36f, tw * 0.4f, th * 0.4f, c(Theme.mix(Theme.boxColor, Theme.white, 0.1f), alpha).cpy())
+        diamond(cx, cy + z + tw * 0.36f, tw * 0.4f, th * 0.4f, c(mixP(Theme.boxColor, Theme.white, 0.1f), alpha))
     }
 
     private fun drawDoor(f: Frame, p: Pos, cx: Float, cy: Float) {
@@ -289,38 +294,38 @@ class IsoRenderer(private val assets: Assets) {
         val color = if (f.level.tile(p) == Tile.DOOR) Theme.doorColor else Theme.doorInvColor
         val h = tw * 0.5f * (1f - open) + tw * 0.04f
         // Çerçeve
-        block(cx, cy, 1f, 0f, tw * 0.04f, Theme.mix(color, Theme.white, 0.55f), shadeOf(color, 0.8f), shadeOf(color, 0.7f))
+        block(cx, cy, 1f, 0f, tw * 0.04f, mixP(color, Theme.white, 0.55f), shadeOf(color, 0.8f), shadeOf(color, 0.7f))
         val a = 0.55f + 0.4f * (1f - open)
-        block(cx, cy, 0.8f, 0f, h, c(Theme.mix(color, Theme.white, 0.3f), a).cpy(), c(color, a).cpy(), c(shadeOf(color, 0.82f), a).cpy())
+        block(cx, cy, 0.8f, 0f, h, c(mixP(color, Theme.white, 0.3f), a), c(color, a), c(shadeOf(color, 0.82f), a))
         if (open < 0.5f) {
             // Yatay çizgiler: kapalı kapıyı belirginleştirir
             for (i in 1..2) {
                 val z = h * i / 3f
-                diamond(cx, cy + z, tw * 0.8f, th * 0.8f, c(Theme.white, 0.18f).cpy())
+                diamond(cx, cy + z, tw * 0.8f, th * 0.8f, c(Theme.white, 0.18f))
             }
         }
     }
 
     private fun drawConsole(f: Frame, p: Pos, tile: Tile, cx: Float, cy: Float) {
-        val base = Theme.mix(Theme.wallTop, Theme.white, 0.35f)
-        block(cx, cy, 0.72f, 0f, tw * 0.3f, base, Theme.mix(Theme.wallSide, Theme.white, 0.2f), Theme.mix(Theme.wallSide, Theme.white, 0.1f))
+        val base = mixP(Theme.wallTop, Theme.white, 0.35f)
+        block(cx, cy, 0.72f, 0f, tw * 0.3f, base, mixP(Theme.wallSide, Theme.white, 0.2f), mixP(Theme.wallSide, Theme.white, 0.1f))
         val ch = f.level.channel(p)
         val top = cy + tw * 0.3f
         when (tile) {
             Tile.SWITCH -> {
                 val on = ch in f.to.toggled
                 val col = if (on) Theme.green else Theme.red
-                block(cx, top - th * 0.02f, 0.34f, 0f, tw * 0.07f, Theme.mix(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
+                block(cx, top - th * 0.02f, 0.34f, 0f, tw * 0.07f, mixP(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
             }
             Tile.TIMER -> {
                 val left = f.to.timers[ch] ?: 0
                 val col = if (left > 0) Theme.yellow else Theme.orange
-                block(cx, top, 0.34f, 0f, tw * 0.07f, Theme.mix(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
+                block(cx, top, 0.34f, 0f, tw * 0.07f, mixP(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
             }
             Tile.LASER -> {
                 val on = !com.emirzinciri.robotkomutan.logic.sim.Environment.channelActive(f.level, f.to, ch)
                 val col = if (on) Theme.red else Theme.inkFaint
-                block(cx, top, 0.36f, 0f, tw * 0.12f, Theme.mix(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
+                block(cx, top, 0.36f, 0f, tw * 0.12f, mixP(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
                 val (dx, dy) = dirScreen(dirAngle(f.level.laserDir(p)))
                 shapes.color = col
                 shapes.circle(cx + dx * 0.36f, top + tw * 0.06f + dy * 0.36f, tw * 0.05f, 10)
@@ -329,7 +334,7 @@ class IsoRenderer(private val assets: Assets) {
                 val need = f.level.socketNeed(p)
                 val have = minOf(need, f.to.socketCharge[p] ?: 0)
                 val col = if (have >= need) Theme.green else Theme.energyColor
-                diamond(cx, top, tw * 0.5f, th * 0.5f, Theme.mix(Theme.ink, Theme.white, 0.55f))
+                diamond(cx, top, tw * 0.5f, th * 0.5f, mixP(Theme.ink, Theme.white, 0.55f))
                 val k = have.toFloat() / need
                 if (k > 0f) diamond(cx, top, tw * 0.5f * k, th * 0.5f * k, col)
             }
@@ -370,6 +375,11 @@ class IsoRenderer(private val assets: Assets) {
             else -> Unit
         }
         if (r.status == RobotStatus.LOST && evs.none { it is SimEvent.RobotLost }) return
+        when (r.type) {
+            com.emirzinciri.robotkomutan.logic.level.RobotClass.FLYER -> z += tw * (0.2f + 0.03f * sin(f.time * 3f + index))
+            com.emirzinciri.robotkomutan.logic.level.RobotClass.GHOST -> alpha *= 0.55f
+            else -> Unit
+        }
         val a0 = dirAngle(prev.dir)
         var a1 = dirAngle(r.dir)
         if (a1 - a0 > 180f) a1 -= 360f
@@ -418,12 +428,12 @@ class IsoRenderer(private val assets: Assets) {
             val shake = if (hit) sin(f.t * 40f) * tw * 0.03f * (1f - f.t) else 0f
             val cx = sx(gx, gy) + shake; val cy = sy(gx, gy)
             val big = if (e.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.BOSS) 1.25f else 1f
-            diamond(cx, cy, tw * 0.62f * big, th * 0.62f * big, Color(0.1f, 0.15f, 0.3f, 0.18f * alpha))
-            val top = c(Theme.mix(color, Theme.white, if (hit) 0.6f else 0.2f), alpha).cpy()
-            val left = c(color, alpha).cpy(); val right = c(shadeOf(color, 0.78f), alpha).cpy()
+            diamond(cx, cy, tw * 0.62f * big, th * 0.62f * big, next().set(0.1f, 0.15f, 0.3f, 0.18f * alpha))
+            val top = c(mixP(color, Theme.white, if (hit) 0.6f else 0.2f), alpha)
+            val left = c(color, alpha); val right = c(shadeOf(color, 0.78f), alpha)
             val bh = tw * (if (e.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.TURRET) 0.22f else 0.3f) * big
             block(cx, cy, 0.6f * big, tw * 0.03f, bh, top, left, right)
-            block(cx, cy, 0.42f * big, bh, bh + tw * 0.14f * big, c(Theme.ink, alpha).cpy(), c(Theme.mix(Theme.ink, color, 0.3f), alpha).cpy(), c(Theme.ink, alpha * 0.9f).cpy())
+            block(cx, cy, 0.42f * big, bh, bh + tw * 0.14f * big, c(Theme.ink, alpha), c(mixP(Theme.ink, color, 0.3f), alpha), c(Theme.ink, alpha * 0.9f))
             // Kırmızı göz bandı baktığı yöne
             val (fx, fy) = dirScreen(angle); val (px, py) = dirScreen(angle + 90f)
             val ey = cy + bh + tw * 0.07f * big
@@ -460,31 +470,31 @@ class IsoRenderer(private val assets: Assets) {
     }
 
     fun drawRobot(cx: Float, cy: Float, z: Float, angle: Float, color: Color, carrying: Boolean, alpha: Float, scale: Float, dim: Boolean, time: Float) {
-        val body = if (dim) Theme.mix(color, Theme.inkFaint, 0.6f) else color
+        val body = if (dim) mixP(color, Theme.inkFaint, 0.6f) else color
         // Gölge
-        diamond(cx, cy, tw * 0.62f * scale, th * 0.62f * scale, Color(0.1f, 0.15f, 0.3f, 0.16f * alpha))
+        diamond(cx, cy, tw * 0.62f * scale, th * 0.62f * scale, next().set(0.1f, 0.15f, 0.3f, 0.16f * alpha))
         // Yön oku (zeminde)
         val (dx, dy) = dirScreen(angle)
         val tipX = cx + dx * 0.62f; val tipY = cy + dy * 0.62f
         val (px, py) = dirScreen(angle + 90f)
-        shapes.color = c(Theme.mix(color, Theme.white, 0.25f), alpha * 0.9f)
+        shapes.color = c(mixP(color, Theme.white, 0.25f), alpha * 0.9f)
         shapes.triangle(tipX, tipY, cx + dx * 0.36f + px * 0.16f, cy + dy * 0.36f + py * 0.16f, cx + dx * 0.36f - px * 0.16f, cy + dy * 0.36f - py * 0.16f)
 
         val bob = sin(time * 4f) * tw * 0.012f
         val z0 = z + tw * 0.04f + bob
         val bh = tw * 0.23f * scale
-        val top = c(Theme.mix(body, Theme.white, 0.28f), alpha).cpy()
-        val left = c(body, alpha).cpy()
-        val right = c(shadeOf(body, 0.82f), alpha).cpy()
+        val top = c(mixP(body, Theme.white, 0.28f), alpha)
+        val left = c(body, alpha)
+        val right = c(shadeOf(body, 0.82f), alpha)
         // Tekerlek tabanı
-        block(cx, cy, 0.5f * scale, z0 - tw * 0.04f, z0, c(Theme.ink, alpha * 0.8f).cpy(), c(Theme.ink, alpha * 0.8f).cpy(), c(Theme.ink, alpha * 0.7f).cpy())
+        block(cx, cy, 0.5f * scale, z0 - tw * 0.04f, z0, c(Theme.ink, alpha * 0.8f), c(Theme.ink, alpha * 0.8f), c(Theme.ink, alpha * 0.7f))
         // Gövde
         block(cx, cy, 0.56f * scale, z0, z0 + bh, top, left, right)
         // Kafa
         val hz0 = z0 + bh + tw * 0.02f
         val hh = tw * 0.18f * scale
-        val headTop = c(Theme.mix(Theme.white, body, 0.12f), alpha).cpy()
-        block(cx, cy, 0.48f * scale, hz0, hz0 + hh, headTop, c(Theme.mix(Theme.white, body, 0.3f), alpha).cpy(), c(Theme.mix(Theme.white, body, 0.42f), alpha).cpy())
+        val headTop = c(mixP(Theme.white, body, 0.12f), alpha)
+        block(cx, cy, 0.48f * scale, hz0, hz0 + hh, headTop, c(mixP(Theme.white, body, 0.3f), alpha), c(mixP(Theme.white, body, 0.42f), alpha))
         // Gözler: baktığı yönün yüzüne
         val eyeZ = hz0 + hh * 0.52f
         val (fx, fy) = dirScreen(angle)
@@ -568,7 +578,7 @@ class IsoRenderer(private val assets: Assets) {
             val x = sx(p.x.toFloat(), p.y.toFloat()); val y = sy(p.x.toFloat(), p.y.toFloat()) + tw * 0.55f + bob
             if (f.energyOn) {
                 layout.setText(font, "+$v")
-                font.color = Theme.shade(Theme.energyColor, 0.7f)
+                font.color = shadeOf(Theme.energyColor, 0.7f)
                 font.draw(batch, "+$v", x - layout.width / 2, y + layout.height)
             }
         }

@@ -31,6 +31,7 @@ class LevelValidationTest {
 
     @Test fun idsAreContiguousAndAreasMatch() {
         assertTrue(catalog.count >= 25, "En az 25 bölüm olmalı")
+        if (catalog.count >= 500) assertEquals(100, catalog.all().map { it.area }.distinct().size)
         assertEquals((1..catalog.maxId).toList(), catalog.ids)
         for (d in catalog.all()) assertEquals(Areas.forLevel(d.id).id, d.area, "Bölüm ${d.id} yanlış alanda")
     }
@@ -69,6 +70,10 @@ class LevelValidationTest {
         assertIs<Outcome.Fail>(Simulation.create(level, emptyMap()).getOrThrow().runToEnd())
         // par, çözücünün bulduğu kesin optimum olmalı (yıldız 2 adil ve ulaşılabilir).
         val usesSignals = d.commands.any { it.isFlow || it == CommandType.SEND || it == CommandType.WAIT_MSG }
+        // Elle tasarlanan ilk 50 bölümün hepsi, üretilen bölümlerden ise bir örneklem çözücüyle yeniden doğrulanır
+        // (üretilen bölümlerin par değeri üretim sırasında zaten çözücüden gelir).
+        val deepCheck = d.id <= 50 || d.id % 23 == 0
+        if (!deepCheck) return
         if (!usesSignals) {
             val best = assertNotNull(Solver(level, maxNodes = 4_000_000).solve(d.par), "Çözücü çözüm bulamadı")
             assertEquals(d.par, best.cards.size, "par optimum değil")
@@ -86,6 +91,11 @@ class LevelValidationTest {
             seen = seen + d.commands
         }
         assertEquals(listOf(CommandType.FORWARD), catalog[1]!!.commands)
+    }
+
+    @Test fun everyAreaHasFiveLevelsAndBossesEvery25() {
+        for ((area, levels) in catalog.all().groupBy { it.area }) assertEquals(5, levels.size, "Alan $area")
+        for (d in catalog.all().filter { it.id % 25 == 0 && it.id >= 50 }) assertTrue(d.enemies.isNotEmpty(), "Bölüm ${d.id} patron bölümü olmalı")
     }
 
     @Test fun secondRobotArrivesAtLevel26() {

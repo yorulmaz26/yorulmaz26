@@ -1,0 +1,368 @@
+{
+    "area": 45,
+    "levels": [
+        {
+            "id": 221,
+            "area": 45,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "story": "Buz Fabrikası: kaygan zemin. Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "...c###",
+                "#....#.",
+                " ....#.",
+                ".. ..E.",
+                "......."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0,
+                    "dir": "W",
+                    "type": "WARRIOR",
+                    "energy": 5
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 9
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 1,
+                    "y": 2,
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "FORWARD",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 222,
+            "area": 45,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "#..#...",
+                "..#....",
+                "....E# ",
+                "....##.",
+                "..c....",
+                "#.#...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "WARRIOR",
+                    "energy": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 15,
+            "par": 11,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 7
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "E",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "ATTACK",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "COLLECT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 223,
+            "area": 45,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                ".c.#..",
+                ".c##.E",
+                "...# .",
+                "......",
+                " .E.#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 4,
+                    "dir": "N",
+                    "type": "WARRIOR",
+                    "energy": 4
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "S",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "E",
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 224,
+            "area": 45,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Enerji sınırlı: hücreleri topla. Devriyeyi etkisiz bırak ya da atlat.",
+            "map": [
+                "...#.#.",
+                ".## #.#",
+                ".E.#...",
+                ".....Ec",
+                "......c"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 4,
+                    "dir": "S",
+                    "type": "WARRIOR",
+                    "energy": 4
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 4,
+                    "dir": "S",
+                    "energy": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "COLLECT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "ENERGY_USED",
+                "value": 6
+            },
+            "energy": true,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 6,
+                    "y": 0,
+                    "hp": 1
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 225,
+            "area": 45,
+            "name": "Patron: Pres Ustası",
+            "goalText": "Patronu yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir; canı yarıya inince saldırganlaşır.",
+            "story": "Buz Fabrikası: bölgenin hâkimi seni bekliyor.",
+            "map": [
+                "########",
+                "#..#...#",
+                ".D.....#",
+                "#.#....#",
+                "##p#####",
+                "##.#####"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 21,
+            "par": 17,
+            "third": {
+                "type": "TICKS",
+                "value": 16
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 6,
+                    "y": 2,
+                    "hp": 14
+                }
+            ],
+            "maxTicks": 60,
+            "difficulty": 12,
+            "solution": {
+                "A": [
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

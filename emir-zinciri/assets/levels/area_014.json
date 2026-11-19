@@ -1,0 +1,235 @@
+{
+    "area": 14,
+    "levels": [
+        {
+            "id": 66,
+            "area": 14,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt.",
+            "story": "Karar Merkezi: koşullu komutlar. Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt.",
+            "map": [
+                "..#...",
+                " .....",
+                ". ....",
+                "#.... ",
+                ".E...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "REPEAT"
+            ],
+            "maxCommands": 9,
+            "par": 7,
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "FORWARD",
+                    "END",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 67,
+            "area": 14,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt.",
+            "map": [
+                "......",
+                ". ... ",
+                "#...#.",
+                " E..#.",
+                "#.. .."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "REPEAT"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 68,
+            "area": 14,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt.",
+            "map": [
+                "#......",
+                ".#.... ",
+                "......#",
+                "... ..#",
+                "....E.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "REPEAT"
+            ],
+            "maxCommands": 7,
+            "par": 5,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "REPEAT:3",
+                    "BACK",
+                    "END",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 69,
+            "area": 14,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt.",
+            "map": [
+                "......#",
+                "... ...",
+                ".......",
+                ". #.#..",
+                " ......",
+                "..###E."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "REPEAT"
+            ],
+            "maxCommands": 11,
+            "par": 9,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "REPEAT:2",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "END",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "BACK",
+                    "END"
+                ]
+            }
+        },
+        {
+            "id": 70,
+            "area": 14,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Tekrar eden hareketleri 'Tekrar et' bloğuyla kısalt.",
+            "map": [
+                "...... ",
+                ".... ..",
+                ". ...#.",
+                "... ...",
+                "....#.#",
+                "#.#.E ."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "REPEAT"
+            ],
+            "maxCommands": 12,
+            "par": 10,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "REPEAT:3",
+                    "BACK",
+                    "END",
+                    "TURN_LEFT",
+                    "BACK",
+                    "REPEAT:2",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "END"
+                ]
+            }
+        }
+    ]
+}

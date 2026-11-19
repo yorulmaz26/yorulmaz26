@@ -1,0 +1,274 @@
+{
+    "area": 12,
+    "levels": [
+        {
+            "id": 56,
+            "area": 12,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz. Çukura itilen kutu çukuru doldurur.",
+            "story": "Uçan Birlikler: uçan robot. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz. Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                ".E ##.",
+                " .. ##",
+                " . .o.",
+                "......",
+                ".....#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "S",
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "maxTicks": 80,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 57,
+            "area": 12,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz. Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                ".# ...",
+                "......",
+                " ....o",
+                "....#.",
+                ".#.#.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 3,
+                    "dir": "S",
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 58,
+            "area": 12,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz. Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                "..##.#",
+                "o ..E.",
+                " ... .",
+                ".#  .E",
+                " #...."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "W",
+                    "type": "FLYER"
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        },
+        {
+            "id": 59,
+            "area": 12,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz. Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                "#..E.#",
+                " . oE.",
+                "#. . .",
+                "##. ..",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 3,
+                    "dir": "W",
+                    "type": "FLYER"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 3,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 60,
+            "area": 12,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz. Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                "..o. .",
+                "...E..",
+                "E#.#..",
+                "... ..",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 0,
+                    "dir": "W",
+                    "type": "FLYER"
+                },
+                {
+                    "id": "B",
+                    "x": 2,
+                    "y": 3
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

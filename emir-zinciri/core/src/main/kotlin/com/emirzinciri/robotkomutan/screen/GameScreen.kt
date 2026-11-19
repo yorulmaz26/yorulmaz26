@@ -46,6 +46,7 @@ class GameScreen(
     private val mode: PlayMode = PlayMode.STORY,
 ) : BaseScreen(game) {
     private val story get() = mode == PlayMode.STORY
+    override val musicTrack = "game"
 
     private val level = LevelData(def)
     private val progression get() = services.progression

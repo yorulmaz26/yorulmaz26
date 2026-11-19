@@ -26,19 +26,22 @@ class SettingsScreen(game: EmirZinciriGame) : BaseScreen(game) {
         body.add(row("Ses efektleri", if (s.sound) "Açık" else "Kapalı", s.sound) {
             s.sound = !s.sound; assets.soundOn = s.sound; save()
         }).growX().padBottom(12f).row()
+        body.add(row("Müzik", if (s.music) "Açık" else "Kapalı", s.music) {
+            s.music = !s.music; assets.musicOn = s.music; save()
+        }).growX().padBottom(12f).row()
         body.add(row("Zemin deseni", if (s.showGrid) "Açık" else "Kapalı", s.showGrid) { s.showGrid = !s.showGrid; save() }).growX().padBottom(12f).row()
         body.add(row("Animasyon hızı", "${s.animSpeed}×", true) {
             s.animSpeed = when (s.animSpeed) { 1 -> 2; 2 -> 4; else -> 1 }; save()
         }).growX().padBottom(12f).row()
         body.add(row("Komutan adı", services.save.profileName, true) { askName() }).growX().padBottom(12f).row()
-        body.add(ui.label("Müzik henüz eklenmedi; yalnızca ses efektleri var. Simülasyon sonucu animasyon hızından etkilenmez.",
+        body.add(ui.label("Simülasyon sonucu animasyon hızından etkilenmez.",
             assets.fontSmall, Theme.inkFaint, wrap = true)).growX().padTop(4f).padBottom(18f).row()
         body.add(ui.button("İlerlemeyi sıfırla", Theme.white, Theme.red, "trash") { confirmReset() }).growX().padBottom(18f).row()
         val about = ui.panel(Theme.panelAlt, 24, 0f)
         about.pad(18f)
         about.add(ui.label(EmirZinciriGame.TITLE, assets.fontBold, Theme.ink)).left().row()
-        about.add(ui.label("Sürüm 0.3.0 · Tamamen çevrimdışı oynanır, hesap gerekmez.", assets.fontSmall, Theme.inkSoft, wrap = true)).growX().left().row()
-        about.add(ui.label("Yazı tipi: Nunito (SIL Open Font License 1.1). Oyun altyapısı: libGDX (Apache 2.0).", assets.fontSmall, Theme.inkSoft, wrap = true))
+        about.add(ui.label("Sürüm 1.0.0 · Tamamen çevrimdışı oynanır, hesap gerekmez.", assets.fontSmall, Theme.inkSoft, wrap = true)).growX().left().row()
+        about.add(ui.label("Yazı tipi: Nunito (SIL Open Font License 1.1). Oyun altyapısı: libGDX (Apache 2.0). Müzik ve sesler oyun için sentezlendi.", assets.fontSmall, Theme.inkSoft, wrap = true))
             .growX().left().padTop(6f)
         body.add(about).growX()
     }

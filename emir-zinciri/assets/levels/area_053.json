@@ -1,0 +1,310 @@
+{
+    "area": 53,
+    "levels": [
+        {
+            "id": 261,
+            "area": 53,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz.",
+            "story": "Yerçekimsiz Depo: süzülen kutular. Kutuyu sarı hedefe it. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz.",
+            "map": [
+                "#..##.#",
+                "#..#...",
+                ". .#xBE",
+                "##  . #",
+                "  . .# "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 0,
+                    "dir": "N",
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 19,
+            "par": 15,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "PUSH",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 262,
+            "area": 53,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz.",
+            "map": [
+                ".......",
+                " .. #. ",
+                "....#.#",
+                " B# .. ",
+                "Ex  ...",
+                " . #.#."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 5,
+                    "y": 2,
+                    "dir": "W",
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 263,
+            "area": 53,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz.",
+            "map": [
+                " ......",
+                "..  #..",
+                "..#.x..",
+                "  ....E",
+                "....B.#",
+                ".....  "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 2,
+                    "dir": "N",
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 264,
+            "area": 53,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz.",
+            "map": [
+                ".E   # .",
+                "... .#..",
+                ". .B....",
+                "...... .",
+                "#.x ... ",
+                " ...#   "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 2,
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 21,
+            "par": 17,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 265,
+            "area": 53,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş · Kutuları hedeflere taşı",
+            "hint": "Kutuyu sarı hedefe it. Uçan robot boşluk ve çukurların üstünden geçer ama plakaya basamaz.",
+            "map": [
+                "  ..##.#",
+                "##... # ",
+                "  . # ..",
+                ". .B. ..",
+                " #E.....",
+                "  x.. . "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 6,
+                    "y": 3,
+                    "dir": "W",
+                    "type": "FLYER"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "objectives": [
+                {
+                    "type": "REACH_EXIT"
+                },
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH"
+                ]
+            }
+        }
+    ]
+}

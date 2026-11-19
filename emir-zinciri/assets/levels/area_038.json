@@ -1,0 +1,281 @@
+{
+    "area": 38,
+    "levels": [
+        {
+            "id": 186,
+            "area": 38,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur.",
+            "story": "Gizli Sensör Bölgesi: görünmeyen engeller ve tarama. Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                "###..o",
+                "......",
+                "......",
+                "#B....",
+                ".E#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 1,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "maxTicks": 80,
+            "difficulty": 2,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_RIGHT",
+                    "PUSH",
+                    "PUSH"
+                ]
+            }
+        },
+        {
+            "id": 187,
+            "area": 38,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                ".# ...#",
+                "....B.#",
+                "....#.o",
+                ".... E#",
+                "..#.#.."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "PUSH"
+            ],
+            "maxCommands": 17,
+            "par": 13,
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 188,
+            "area": 38,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                "....#.",
+                "B....#",
+                ".###.o",
+                "..#...",
+                "E...#E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 2
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "WAIT",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 189,
+            "area": 38,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                ".... .",
+                "E.#...",
+                ".o .E.",
+                "...##.",
+                "B#. .."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 0,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 0,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 190,
+            "area": 38,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Çukura itilen kutu çukuru doldurur.",
+            "map": [
+                "E#.# ..",
+                ".....E#",
+                "..#B...",
+                ".o.#...",
+                "...#..."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 4,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 6,
+                    "y": 4,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ]
+            }
+        }
+    ]
+}

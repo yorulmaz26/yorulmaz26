@@ -13,7 +13,7 @@ object Environment {
         for (p in level.sockets) if (level.channel(p) == ch && (s.socketCharge[p] ?: 0) >= level.socketNeed(p)) return true
         val plates = level.plates.filter { level.channel(it) == ch }
         if (plates.isEmpty()) return false
-        val pressed = plates.count { p -> p in s.boxes || s.robotAt(p) != null }
+        val pressed = plates.count { p -> p in s.boxes || s.robotAt(p)?.let { it.type != com.emirzinciri.robotkomutan.logic.level.RobotClass.FLYER } == true }
         return if (ch in level.andChannels) pressed == plates.size else pressed > 0
     }
 

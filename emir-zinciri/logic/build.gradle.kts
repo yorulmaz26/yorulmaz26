@@ -20,6 +20,7 @@ tasks.test {
     useJUnitPlatform()
     // Bölüm doğrulama testleri assets/levels klasörünü okur.
     systemProperty("levels.dir", rootProject.file("assets/levels").absolutePath)
+    inputs.dir(rootProject.file("assets/levels"))
     testLogging { events("failed"); exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL }
 }
 
@@ -30,5 +31,15 @@ tasks.register<JavaExec>("levelTool") {
     mainClass.set("com.emirzinciri.robotkomutan.logic.tools.LevelToolKt")
     systemProperty("levels.dir", rootProject.file("assets/levels").absolutePath)
     maxHeapSize = "3g"
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dfile.encoding=UTF-8")
+}
+
+tasks.register<JavaExec>("campaignTool") {
+    group = "tools"
+    description = "11–100. alanların bölümlerini üretir ve doğrular."
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("com.emirzinciri.robotkomutan.logic.tools.CampaignToolKt")
+    systemProperty("levels.dir", rootProject.file("assets/levels").absolutePath)
+    maxHeapSize = "6g"
     jvmArgs("-Dstdout.encoding=UTF-8", "-Dfile.encoding=UTF-8")
 }

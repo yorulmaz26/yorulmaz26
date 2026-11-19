@@ -1,0 +1,335 @@
+{
+    "area": 47,
+    "levels": [
+        {
+            "id": 231,
+            "area": 47,
+            "name": "Tanışma",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "story": "Rüzgâr Türbinleri: rüzgâr itmesi. Bantlar üstündekileri taşır. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "# ...D^",
+                ". . ..#",
+                "..t..##",
+                ".D.. .#",
+                ".#p..E."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "channels": {
+                "2,2": 3,
+                "1,3": 3,
+                "5,0": 2,
+                "2,4": 2
+            },
+            "values": {
+                "2,2": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 3,
+            "solution": {
+                "A": [
+                    "BACK",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 232,
+            "area": 47,
+            "name": "Uygulama",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "..#t...",
+                "... D..",
+                "......#",
+                "..p..##",
+                ".....E.",
+                "D.....>"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 4,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "channels": {
+                "3,0": 3,
+                "4,1": 3,
+                "2,3": 2,
+                "0,5": 2
+            },
+            "values": {
+                "3,0": 5
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 233,
+            "area": 47,
+            "name": "Birleşim",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "..D..E",
+                ".#p#>>",
+                "#...E.",
+                ".D#t..",
+                "......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0,
+                    "dir": "S"
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "channels": {
+                "2,0": 3,
+                "2,1": 2,
+                "1,3": 2,
+                "3,3": 3
+            },
+            "values": {
+                "3,3": 3
+            },
+            "maxTicks": 80,
+            "difficulty": 4,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 234,
+            "area": 47,
+            "name": "Strateji",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "Et##...",
+                "....D. ",
+                "D..##<<",
+                ".... ..",
+                ".#p#.E#"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 3
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 1,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 8
+            },
+            "channels": {
+                "1,0": 3,
+                "0,2": 2,
+                "4,1": 3,
+                "2,4": 2
+            },
+            "values": {
+                "1,0": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 235,
+            "area": 47,
+            "name": "Alan Finali",
+            "goalText": "Çıkışa ulaş",
+            "hint": "Bantlar üstündekileri taşır. Zamanlı düğme kapıyı birkaç adım açık tutar. Plaka, üstünde biri durdukça kapıyı açık tutar.",
+            "map": [
+                "#..#...",
+                "...t#E#",
+                "^.ED.D#",
+                " ....p.",
+                "^... .."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 3,
+                    "y": 4,
+                    "dir": "S"
+                },
+                {
+                    "id": "B",
+                    "x": 5,
+                    "y": 4
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 18,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "channels": {
+                "3,1": 3,
+                "3,2": 2,
+                "5,2": 3,
+                "5,3": 2
+            },
+            "values": {
+                "3,1": 4
+            },
+            "maxTicks": 80,
+            "difficulty": 5,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

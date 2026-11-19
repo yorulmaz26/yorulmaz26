@@ -116,7 +116,28 @@ class Assets(density: Float) : Disposable {
         s?.play(volume, pitch, 0f)
     }
 
-    override fun dispose() = disposables.forEach { it.dispose() }
+    // ---------------------------------------------------------------- müzik
+
+    private var music: com.badlogic.gdx.audio.Music? = null
+    private var musicName: String? = null
+    var musicOn = true
+        set(v) { field = v; if (v) musicName?.let { val n = it; musicName = null; playMusic(n) } else music?.pause() }
+
+    /** Döngüsel müzik çalar; aynı parça zaten çalıyorsa dokunmaz. */
+    fun playMusic(name: String) {
+        if (musicName == name && (music?.isPlaying == true || !musicOn)) return
+        music?.stop(); music?.dispose(); music = null
+        musicName = name
+        if (!musicOn) return
+        val f = Gdx.files.internal("music/$name.ogg")
+        if (!f.exists()) return
+        music = runCatching { Gdx.audio.newMusic(f) }.getOrNull()?.apply { isLooping = true; volume = 0.32f; play() }
+    }
+
+    override fun dispose() {
+        music?.dispose()
+        disposables.forEach { it.dispose() }
+    }
 }
 
 class RoundDrawable(

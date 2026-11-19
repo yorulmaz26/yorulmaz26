@@ -23,4 +23,5 @@ dependencies {
 tasks.test {
     useJUnitPlatform()
     systemProperty("levels.dir", rootProject.file("assets/levels").absolutePath)
+    inputs.dir(rootProject.file("assets/levels"))
 }

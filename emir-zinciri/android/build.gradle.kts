@@ -3,8 +3,16 @@ plugins {
     kotlin("android")
 }
 
+import java.util.Properties
+
 val gdxVersion: String by project
 val natives: Configuration by configurations.creating
+
+// Yayın imzası: emir-zinciri/keystore.properties (depoya EKLENMEZ). Örnek: keystore.properties.example
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.isFile) f.inputStream().use { load(it) }
+}
 
 android {
     namespace = "com.emirzinciri.robotkomutan"
@@ -14,8 +22,17 @@ android {
         applicationId = "com.emirzinciri.robotkomutan"
         minSdk = 24
         targetSdk = 35
-        versionCode = 3
-        versionName = "0.3.0"
+        versionCode = 4
+        versionName = "1.0.0"
+    }
+
+    signingConfigs {
+        if (keystoreProps.getProperty("storeFile") != null) create("release") {
+            storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+            storePassword = keystoreProps.getProperty("storePassword")
+            keyAlias = keystoreProps.getProperty("keyAlias")
+            keyPassword = keystoreProps.getProperty("keyPassword")
+        }
     }
 
     sourceSets["main"].apply {
@@ -25,8 +42,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = true
+            // R8 küçültmesi, gerçek cihazda doğrulanana kadar kapalı (kotlinx.serialization kuralları proguard-rules.pro'da hazır).
+            isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfigs.findByName("release")?.let { signingConfig = it }
         }
     }
 
