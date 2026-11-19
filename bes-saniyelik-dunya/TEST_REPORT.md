@@ -28,21 +28,21 @@ Bütün sonuçlar bu ortamda **gerçekten çalıştırılmıştır**.
 | 19 | Menü geçişleri | ✅ | Masaüstü turu: 14 menü ekranı + oyun + sonsuz mod sırayla açıldı, ekran görüntüleri alındı |
 | 20 | Android derleme | ✅ | Debug APK, R8 küçültmeli release APK ve AAB üretildi; APK içeriği (4 ABI için libgdx/box2d/freetype .so, varlıklar) doğrulandı |
 
-**Otomatik birim/entegrasyon testleri: 38/38 geçti** (`./gradlew :core:test`, ~30 sn).
+**Otomatik birim/entegrasyon testleri: 39/39 geçti** (`./gradlew :core:test`, ~30 sn).
 
 | Test sınıfı | Test | Başarısız |
 |---|---|---|
 | SimulationTest | 19 | 0 |
-| LevelsTest | 8 | 0 |
+| LevelsTest | 9 | 0 |
 | ProgressTest | 11 | 0 |
 
 ## Bölüm üretimi ve doğrulama
 
-`./gradlew :core:generateLevels` → 500 bölüm 117 sn'de üretildi ve doğrulandı (rapor: `docs/level_report.tsv`).
+`./gradlew :core:generateLevels` → 500 bölüm 148 sn'de üretildi (100 alan × 5 bölüm) ve doğrulandı (rapor: `docs/level_report.tsv`).
 
 * Ortalama bölüm süresi 45 sn (en uzun: büyük final 105 sn), ortalama 89 altın.
 * Her bölüm: katı modda (engel isabet kutuları büyütülmüş) çözüldü → normal modda baştan oynatıldı → yıldız/altın/parça yerleştirildi → yeniden doğrulandı.
-* Zamanlama toleransı (bütün girişler ±2 tick, meydan okuma/finallerde ±1 tick kaydırıldığında hâlâ geçilebilir): **486/500**. Şu 14 bölüm çözülebilir ama zamanlama penceresi daha dardır: 8, 9, 49, 92, 131, 217, 236, 335, 359, 425, 435, 451, 454, 486.
+* Zamanlama toleransı (bütün girişler ±2 tick, meydan okuma/finallerde ±1 tick kaydırıldığında hâlâ geçilebilir): **488/500**. Şu 12 bölüm çözülebilir ama zamanlama penceresi daha dardır: 8, 9, 92, 131, 141, 231, 313, 339, 349, 421, 451, 454.
 
 ## Arayüzde uçtan uca oynatma (masaüstü)
 
@@ -64,6 +64,9 @@ Bölüm 500: TAMAMLANDI (yıldız 3/3, altın 275, ölüm 0)
 Her haritadan bir bölüm; tamamlanma ekranı, XP, başarı ve seviye bildirimleri görsel olarak kontrol edildi (`docs/screenshots/`).
 
 ## Bulunan ve düzeltilen hatalar
+
+* (Geri bildirim) Kural değişim yazıları ekranda uzun kalıp oyunu zorlaştırıyordu → bildirim küçük bir etikete dönüştürüldü, ekranın üstünde (HUD altında) 0,55–0,9 sn kalıyor; ölüm yazısı 0,5 sn, ipuçları 1,8 sn, oyun içi bildirimler 1 sn.
+* (Geri bildirim) Alanlar 10 değil 5 bölüm olmalı → 100 alan, her alanın son bölümü meydan okuma; testle doğrulanıyor.
 
 * Çözücü geri yüklemesi deterministik değildi (Box2D temas geçmişi) → geri yüklemede oyuncu gövdesi yeniden kuruluyor; hareketli platformlar tam hedef konumuna oturtuluyor.
 * Yüksekten düşerken yanlış "ezildin" ölümü → ezilme yalnızca 5 tick süren derin gömülmede.

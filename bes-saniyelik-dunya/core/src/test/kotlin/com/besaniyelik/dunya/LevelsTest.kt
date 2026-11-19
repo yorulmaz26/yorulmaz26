@@ -41,7 +41,7 @@ class LevelsTest {
         assertEquals(50, all.count { it.piece != null })
         assertEquals(LevelKind.GRAND_FINAL, all[499].kind)
         assertEquals(9, all.count { it.kind == LevelKind.FINAL })
-        assertEquals(40, all.count { it.kind == LevelKind.CHALLENGE })
+        assertEquals(90, all.count { it.kind == LevelKind.CHALLENGE })
     }
 
     @DisplayName("Mekanikler 1, 11, 21 ... 91. bölümlerde sırayla açılır; 101+ kombinasyon kullanır")
@@ -57,6 +57,19 @@ class LevelsTest {
         assertTrue(all.drop(350).any { l -> l.phases.any { it.rules.size == 3 } })
         val grand = all[499]
         assertTrue(Mechanic.entries.filter { it != Mechanic.NORMAL }.all { m -> grand.phases.any { m in it.rules } }, "büyük final bütün mekanikleri içermeli")
+    }
+
+    @DisplayName("100 farklı alan var; her alan 5 bölümden oluşur ve son bölümü meydan okuma ya da finaldir")
+    @Test fun hundredAreas() {
+        assertEquals(100, GameContent.stages.size)
+        assertEquals(100, GameContent.stages.map { it.title }.toSet().size, "alan adları benzersiz olmalı")
+        val byArea = all.groupBy { GameContent.areaNumber(it.id) }
+        assertEquals(100, byArea.size)
+        for ((no, lv) in byArea) {
+            assertEquals(5, lv.size)
+            assertTrue(lv.all { it.idea == GameContent.stages[no - 1].title })
+            assertTrue(lv.last().kind == LevelKind.CHALLENGE || lv.last().kind == LevelKind.FINAL || lv.last().kind == LevelKind.GRAND_FINAL, "alan $no")
+        }
     }
 
     @DisplayName("Bölümler birbirinin kopyası değildir")

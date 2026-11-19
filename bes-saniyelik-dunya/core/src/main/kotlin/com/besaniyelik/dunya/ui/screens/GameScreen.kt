@@ -27,6 +27,7 @@ import com.besaniyelik.dunya.ui.*
  */
 class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private val seed: Long?, private val boosts: List<PowerupType>) : BaseScreen(game) {
     override val background: MenuBackground? = null
+    override val toastTime = 1.0f
     private val endless = level == null
     private val d = game.profile.data
     private val generator = if (endless) EndlessGenerator(seed ?: 1L, Mechanic.unlockedAt(d.highestUnlocked).toSet()) else null
@@ -71,14 +72,14 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             override fun onLand(impact: Float) { if (impact > 0.4f) game.audio.play(Sfx.LAND); renderer.onLand(impact) }
             override fun onCoin(c: Collectible, value: Int) { game.audio.play(Sfx.COIN, 1f + (sim.coinCount % 5) * 0.04f); renderer.onCoin(c) }
             override fun onStar(c: Collectible) { game.audio.play(Sfx.STAR); renderer.onStar(c); game.vibrate(20) }
-            override fun onPiece(c: Collectible) { game.audio.play(Sfx.REWARD); renderer.onPiece(c); toast("Gizli parça bulundu!", "b_puzzle") }
-            override fun onPowerup(type: PowerupType) { game.audio.play(Sfx.POWERUP); renderer.onPowerup(); if (started) toast(type.title + ": " + type.desc, "b_" + type.icon) }
+            override fun onPiece(c: Collectible) { game.audio.play(Sfx.REWARD); renderer.onPiece(c); toast("Gizli parça!", "b_puzzle") }
+            override fun onPowerup(type: PowerupType) { game.audio.play(Sfx.POWERUP); renderer.onPowerup(); if (started) toast(type.title, "b_" + type.icon) }
             override fun onRuleWarning(next: List<Mechanic>) { game.audio.play(Sfx.WARN); showNext(next) }
             override fun onRuleChange(prev: List<Mechanic>, next: List<Mechanic>) { game.audio.play(Sfx.RULE); renderer.onRule(); ruleBanner(next); game.vibrate(25); checkEndlessTutorial(next) }
             override fun onSpring() { game.audio.play(Sfx.SPRING); renderer.onSpring() }
             override fun onBoost() { game.audio.play(Sfx.BOOST) }
             override fun onCheckpoint(x: Float) { game.audio.play(Sfx.CHECKPOINT); renderer.onCheckpoint(x) }
-            override fun onShieldSave() { game.audio.play(Sfx.SHIELD); toast("Kalkan seni korudu!", "b_p_shield") }
+            override fun onShieldSave() { game.audio.play(Sfx.SHIELD); toast("Kalkan korudu!", "b_p_shield") }
             override fun onDeath(cause: DeathCause) { game.audio.play(Sfx.DEATH); renderer.onDeath(); game.vibrate(60); deathText(cause) }
             override fun onRespawn() { refreshHearts() }
             override fun onComplete() { game.audio.play(Sfx.COMPLETE); renderer.celebrate(); completeTimer = 1.4f }
@@ -227,7 +228,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         hintBox.add(img).size(64f).padRight(14f)
         hintBox.add(kit.label(h.text, a.f28, Palette.INK, wrap = true)).width(440f)
         hintBox.color.a = 0f
-        hintBox.addAction(Actions.sequence(Actions.fadeIn(0.25f), Actions.delay(if (h.waitTap) 30f else 3.2f), Actions.fadeOut(0.4f)))
+        hintBox.addAction(Actions.sequence(Actions.fadeIn(0.25f), Actions.delay(if (h.waitTap) 30f else 1.8f), Actions.fadeOut(0.3f)))
     }
 
     private var lastHearts = -1
@@ -300,27 +301,35 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         next.forEach { val i = Image(a.ui("b_" + it.icon)); nextIcons.add(i).size(48f).pad(2f); i.addAction(Actions.forever(Actions.sequence(Actions.alpha(0.4f, 0.15f), Actions.alpha(1f, 0.15f)))) }
     }
 
+    /**
+     * Kural değişim bildirimi: küçük, ekranın üst kısmında (HUD'un altında) ve kısa süreli (~0,9 sn).
+     * Oyun alanının ortasını kapatmaz; ayrıntılı açıklama yalnızca bir kuralı ilk kez gördüğünde gösterilir.
+     */
+    private var activeBanner: Table? = null
+    private val bannerSeen = HashSet<Mechanic>()
     private fun ruleBanner(rules: List<Mechanic>) {
-        val b = Table().apply { background = kit.patch("banner"); pad(18f, 30f, 24f, 30f) }
-        val icons = Table(); rules.forEach { icons.add(Image(a.ui("b_" + it.icon))).size(96f).pad(4f) }
-        b.add(icons).row()
-        b.add(kit.label(rules.joinToString(" + ") { it.title }, a.f36, Palette.INK, wrap = true)).width(560f).padTop(4f).row()
-        if (rules.size == 1) b.add(kit.label(rules[0].hint, a.f22, Palette.INK_SOFT, wrap = true)).width(560f).padTop(2f)
+        activeBanner?.remove()
+        val first = rules.any { it !in bannerSeen }
+        bannerSeen.addAll(rules)
+        val b = Table().apply { background = kit.patch("chip"); pad(6f, 16f, 10f, 20f); touchable = Touchable.disabled }
+        rules.forEach { b.add(Image(a.ui("b_" + it.icon))).size(46f).padRight(4f) }
+        b.add(kit.label(rules.joinToString(" + ") { it.title }, a.f22, Palette.INK)).padLeft(6f)
         b.pack()
-        b.setPosition((stage.width - b.width) / 2, stage.height * 0.56f)
-        b.isTransform = true; b.setOrigin(Align.center)
-        b.setScale(0.5f); b.color.a = 0f
-        b.addAction(Actions.sequence(Actions.parallel(Actions.fadeIn(0.15f), Actions.scaleTo(1f, 1f, 0.35f, Interpolation.swingOut)), Actions.delay(1.3f), Actions.parallel(Actions.fadeOut(0.3f), Actions.moveBy(0f, 60f, 0.3f)), Actions.removeActor()))
+        b.setPosition((stage.width - b.width) / 2, stage.height - 330f)
+        b.color.a = 0f
+        val hold = if (first) 0.9f else 0.55f
+        b.addAction(Actions.sequence(Actions.fadeIn(0.1f), Actions.delay(hold), Actions.fadeOut(0.25f), Actions.removeActor()))
         stage.addActor(b)
+        activeBanner = b
         tint.clearActions()
-        tint.color.set(1f, 1f, 1f, 0.45f)
-        tint.addAction(Actions.alpha(0f, 0.4f))
+        tint.color.set(1f, 1f, 1f, 0.18f)
+        tint.addAction(Actions.alpha(0f, 0.25f))
     }
 
     private fun deathText(cause: DeathCause) {
-        val l = kit.label(cause.title, a.f48o, Color.WHITE)
-        l.pack(); l.setPosition((stage.width - l.width) / 2, stage.height * 0.45f)
-        l.addAction(Actions.sequence(Actions.delay(0.7f), Actions.fadeOut(0.3f), Actions.removeActor()))
+        val l = kit.label(cause.title, a.f36o, Color.WHITE)
+        l.pack(); l.setPosition((stage.width - l.width) / 2, stage.height - 400f)
+        l.addAction(Actions.sequence(Actions.delay(0.5f), Actions.fadeOut(0.2f), Actions.removeActor()))
         stage.addActor(l)
     }
 

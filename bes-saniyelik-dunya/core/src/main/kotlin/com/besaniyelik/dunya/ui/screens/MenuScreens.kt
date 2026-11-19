@@ -144,7 +144,7 @@ object LevelInfo {
             }
             p.add(kit.label("$kindText ${lv.id}", a.f28, Palette.INK_SOFT)).row()
             p.add(kit.label(lv.name, a.f48, Palette.INK, wrap = true)).width(560f).padTop(4f).row()
-            p.add(kit.label("“${lv.idea}”  •  Zorluk ${lv.difficulty}/10", a.f22, Palette.INK_SOFT)).padTop(6f).row()
+            p.add(kit.label("Alan ${GameContent.areaNumber(lv.id)}: ${lv.idea}  •  Zorluk ${lv.difficulty}/10", a.f22, Palette.INK_SOFT, wrap = true)).width(560f).padTop(6f).row()
             p.add(kit.stars(d.stars(lv.id), 64f)).padTop(16f).row()
             val mech = Table()
             val ms = if (lv.mechanics.isEmpty()) listOf(Mechanic.NORMAL) else lv.mechanics
@@ -208,7 +208,7 @@ class MapSelectScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             val stats = Table()
             stats.add(Image(a.ui("b_star"))).size(36f); stats.add(kit.label(" $stars/150", a.f22, Palette.INK)).padRight(16f)
             stats.add(Image(a.ui("b_puzzle"))).size(36f); stats.add(kit.label(" ${CollectionManager.piecesOf(d, m.id)}/5", a.f22, Palette.INK)).padRight(16f)
-            stats.add(kit.label("$done/50", a.f22, Palette.INK))
+            stats.add(kit.label("$done/50  •  10 alan", a.f22, Palette.INK))
             left.add(stats).left().padTop(8f).row()
             left.add(kit.bar(done / 50f, "bar_fill", 18f)).width(380f).height(18f).left().padTop(8f)
             card.add(left).expandX().left()
@@ -234,26 +234,27 @@ class LevelSelectScreen(game: BesSaniyelikDunya, private val map: Int) : BaseScr
         val m = GameContent.maps[map - 1]
         root.add(header(m.name)).growX().padTop(20f).row()
         val list = Table()
-        for (stage in 0 until 5) {
-            val first = m.firstLevel + stage * 10
+        for (area in 0 until 10) {
+            val first = m.firstLevel + area * GameContent.LEVELS_PER_AREA
             val idea = GameContent.stageOf(first)
+            val no = GameContent.areaNumber(first)
+            val stars = (first until first + 5).sumOf { d.stars(it) }
             val head = Table().apply { background = kit.patch("banner"); pad(10f, 24f, 14f, 24f) }
-            head.add(kit.label("${stage + 1}. Aşama: ${idea.title}", a.f28, Palette.INK)).row()
-            head.add(kit.label(idea.desc, a.f22, Palette.INK_SOFT, wrap = true)).width(560f)
-            list.add(head).width(640f).padTop(18f).padBottom(8f).row()
+            val ht = Table()
+            ht.add(kit.label("Alan $no: ${idea.title}", a.f28, Palette.INK, Align.left)).expandX().left()
+            ht.add(Image(a.ui("b_star"))).size(30f); ht.add(kit.label(" $stars/15", a.f22, Palette.INK_SOFT))
+            head.add(ht).width(580f).row()
+            head.add(kit.label(idea.desc, a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(580f).left()
+            list.add(head).width(640f).padTop(16f).padBottom(6f).row()
             val grid = Table()
-            for (i in 0 until 10) {
-                val id = first + i
-                grid.add(levelButton(id, d)).size(116f, 136f).pad(6f)
-                if (i == 4) grid.row()
-            }
+            for (i in 0 until GameContent.LEVELS_PER_AREA) grid.add(levelButton(first + i, d)).size(116f, 136f).pad(6f)
             list.add(grid).row()
         }
         val sp = scroll(list)
         root.add(sp).grow().padTop(8f)
         // açık olan son bölüme kaydır
-        val target = ((d.highestUnlocked - m.firstLevel) / 10).coerceIn(0, 4)
-        stage.addAction(Actions.delay(0.05f, Actions.run { sp.layout(); sp.scrollY = (target * 360f).coerceAtMost(sp.maxY) }))
+        val target = ((d.highestUnlocked - m.firstLevel) / GameContent.LEVELS_PER_AREA).coerceIn(0, 9)
+        stage.addAction(Actions.delay(0.05f, Actions.run { sp.layout(); sp.scrollY = (target * 262f).coerceAtMost(sp.maxY) }))
     }
 
     private fun levelButton(id: Int, d: SaveData): Actor {

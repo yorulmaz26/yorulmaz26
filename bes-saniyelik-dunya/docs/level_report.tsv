@@ -3,499 +3,499 @@ id	ad	tür	zorluk	aşama	deneme	düğüm	süre_sn	altın	yıldız	parça	zamanla
 2	Serin Koru	NORMAL	1	5	1	498	28.5	40	3	0	adil±2
 3	Rüzgârlı Bahçe	NORMAL	1	5	1	490	26.3	26	3	0	adil±2
 4	Yemyeşil Çimenlik	NORMAL	1	6	2	1461	31.8	41	3	0	adil±2
-5	Parlak Yamaç	NORMAL	1	6	1	609	31.3	75	3	0	adil±2
+5	Meydan Okuma: Parlak Yamaç	CHALLENGE	2	9	1	909	46.5	89	3	0	adil±1
 6	Çiçekli Patika	NORMAL	1	6	4	2843	32.2	97	3	0	adil±2
 7	Mis Kokulu Tepe	NORMAL	1	7	1	598	36.5	62	3	0	adil±2
 8	Rüzgârlı Vadi	NORMAL	1	7	1	672	31.0	84	3	1	dar
 9	Tatlı Koru	NORMAL	1	7	1	655	36.3	79	3	0	dar
-10	Meydan Okuma: Neşeli Çayır	CHALLENGE	2	9	2	2185	50.5	91	3	0	adil±1
+10	Meydan Okuma: Neşeli Çayır	CHALLENGE	2	9	2	1712	44.9	82	3	0	adil±1
 11	Serin Çimenlik	TUTORIAL	1	6	5	3423	31.9	66	3	0	adil±2
 12	Mis Kokulu Yamaç	NORMAL	1	7	4	3280	36.3	84	3	0	adil±2
 13	Yemyeşil Patika	NORMAL	1	8	1	874	42.1	90	3	0	adil±2
 14	Sakin Bayır	NORMAL	1	6	5	3662	30.8	74	3	0	adil±2
-15	Çiçekli Vadi	NORMAL	1	7	1	841	37.8	86	3	0	adil±2
-16	Çiçekli Bahçe	NORMAL	1	8	6	5286	44.4	88	3	0	adil±2
-17	Mis Kokulu Çimenlik	NORMAL	1	6	2	1226	32.6	54	3	0	adil±2
-18	Güneşli Bayır	NORMAL	1	8	2	1491	43.1	90	3	1	adil±2
-19	Sakin Dere	NORMAL	1	7	2	1520	37.2	82	3	0	adil±2
-20	Meydan Okuma: Neşeli Tepe	CHALLENGE	2	9	6	5678	47.6	99	3	0	adil±1
-21	Serin Vadi	TUTORIAL	1	6	7	48885	31.7	75	3	0	adil±2
-22	Yemyeşil Koru	NORMAL	1	6	7	5088	32.0	89	3	0	adil±2
-23	Parlak Bahçe	NORMAL	1	6	4	2885	31.1	85	3	0	adil±2
-24	Sakin Çimenlik	NORMAL	1	7	3	27914	37.0	75	3	0	adil±2
-25	Çiçekli Dere	NORMAL	1	6	5	3598	34.1	72	3	0	adil±2
-26	Rüzgârlı Patika	NORMAL	1	7	3	2336	35.7	89	3	0	adil±2
-27	Güneşli Tepe	NORMAL	1	6	1	574	32.8	84	3	0	adil±2
-28	Parlak Vadi	NORMAL	2	7	1	898	37.0	83	3	1	adil±2
-29	Neşeli Koru	NORMAL	2	6	3	2054	32.8	72	3	0	adil±2
-30	Meydan Okuma: Mis Kokulu Çayır	CHALLENGE	3	9	1	1005	46.6	94	3	0	adil±1
-31	Yemyeşil Çimenlik	TUTORIAL	1	6	1	885	31.7	90	3	0	adil±2
-32	Parlak Dere	NORMAL	1	7	6	5361	37.4	66	3	0	adil±2
-33	Neşeli Tepe	NORMAL	1	6	2	1943	34.2	59	3	0	adil±2
-34	Mis Kokulu Çayır	NORMAL	1	7	1	796	37.3	88	3	0	adil±2
-35	Yemyeşil Vadi	NORMAL	2	7	2	1800	38.6	79	3	0	adil±2
-36	Tatlı Bahçe	NORMAL	2	7	2	19170	41.1	79	3	0	adil±2
-37	Sakin Çimenlik	NORMAL	2	7	2	6091	38.3	86	3	0	adil±2
-38	Serin Bayır	NORMAL	2	6	3	2388	33.0	59	3	1	adil±2
-39	Rüzgârlı Dere	NORMAL	2	8	1	1240	42.5	86	3	0	adil±2
-40	Meydan Okuma: Yemyeşil Tepe	CHALLENGE	3	9	1	1003	48.0	90	3	0	adil±1
+15	Meydan Okuma: Çiçekli Vadi	CHALLENGE	2	9	1	861	46.7	88	3	0	adil±1
+16	Çiçekli Bahçe	NORMAL	1	8	3	2436	45.6	86	3	0	adil±2
+17	Mis Kokulu Çimenlik	NORMAL	1	6	1	613	31.5	72	3	0	adil±2
+18	Güneşli Bayır	NORMAL	1	6	1	555	33.2	69	3	1	adil±2
+19	Sakin Dere	NORMAL	1	7	4	2783	36.5	96	3	0	adil±2
+20	Meydan Okuma: Neşeli Tepe	CHALLENGE	2	9	1	827	52.4	88	3	0	adil±1
+21	Serin Vadi	TUTORIAL	1	6	1	798	33.8	89	3	0	adil±2
+22	Yemyeşil Koru	NORMAL	1	8	2	1681	41.7	108	3	0	adil±2
+23	Parlak Bahçe	NORMAL	1	6	4	2769	31.2	84	3	0	adil±2
+24	Sakin Çimenlik	NORMAL	1	7	1	776	37.9	83	3	0	adil±2
+25	Meydan Okuma: Çiçekli Dere	CHALLENGE	2	9	1	980	47.7	85	3	0	adil±1
+26	Rüzgârlı Patika	NORMAL	1	7	3	2597	35.7	86	3	0	adil±2
+27	Güneşli Tepe	NORMAL	1	6	1	1059	31.9	77	3	0	adil±2
+28	Parlak Vadi	NORMAL	1	6	19	368462	35.3	90	3	1	adil±2
+29	Neşeli Koru	NORMAL	1	6	14	14080	32.9	88	3	0	adil±2
+30	Meydan Okuma: Mis Kokulu Çayır	CHALLENGE	2	9	3	4182	51.8	100	3	0	adil±1
+31	Yemyeşil Çimenlik	TUTORIAL	1	6	1	646	32.2	85	3	0	adil±2
+32	Parlak Dere	NORMAL	1	6	7	6163	32.1	81	3	0	adil±2
+33	Neşeli Tepe	NORMAL	1	7	1	912	39.2	67	3	0	adil±2
+34	Mis Kokulu Çayır	NORMAL	1	8	2	1643	46.2	93	3	0	adil±2
+35	Meydan Okuma: Yemyeşil Vadi	CHALLENGE	3	9	2	2026	51.3	102	3	0	adil±1
+36	Tatlı Bahçe	NORMAL	1	8	16	139449	41.1	95	3	0	adil±2
+37	Sakin Çimenlik	NORMAL	1	8	1	1337	42.0	81	3	0	adil±2
+38	Serin Bayır	NORMAL	1	7	10	9989	38.4	82	3	1	adil±2
+39	Rüzgârlı Dere	NORMAL	2	8	1	37942	42.2	86	3	0	adil±2
+40	Meydan Okuma: Yemyeşil Tepe	CHALLENGE	3	9	1	1233	46.8	95	3	0	adil±1
 41	Parlak Vadi	TUTORIAL	1	6	3	2153	32.3	69	3	0	adil±2
-42	Güneşli Koru	NORMAL	2	8	3	2539	42.0	64	3	0	adil±2
+42	Güneşli Koru	NORMAL	1	6	4	3158	32.5	85	3	0	adil±2
 43	Mis Kokulu Bahçe	NORMAL	2	6	1	653	33.6	86	3	0	adil±2
 44	Rüzgârlı Çimenlik	NORMAL	2	7	6	5469	38.0	71	3	0	adil±2
-45	Tatlı Dere	NORMAL	1	7	10	86553	36.8	52	3	0	adil±2
-46	Neşeli Patika	NORMAL	2	8	3	2709	43.3	83	3	0	adil±2
-47	Serin Tepe	NORMAL	1	6	13	17317	31.3	49	3	0	adil±2
-48	Serin Bayır	NORMAL	2	6	7	5843	32.8	47	3	1	adil±2
-49	Rüzgârlı Bahçe	NORMAL	2	6	1	778	31.9	65	3	0	dar
-50	Yeşil Vadi Finali	FINAL	3	13	4	6206	67.0	113	3	0	adil±1
-51	Pembe Gökyolu	TUTORIAL	1	6	3	2049	32.6	84	3	0	adil±2
-52	Uçan Köprü	NORMAL	1	7	5	3811	37.9	91	3	0	adil±2
-53	Hafif Ada	NORMAL	1	7	11	16979	40.1	83	3	0	adil±2
-54	Sisli Bulut	NORMAL	2	8	1	884	43.8	87	3	0	adil±2
-55	Yüksek Yıldızlık	NORMAL	2	7	1	782	37.0	83	3	0	adil±2
-56	Pembe Rüzgâr	NORMAL	2	7	1	708	37.8	85	3	0	adil±2
-57	Dönen Gökyolu	NORMAL	2	7	1	856	37.1	85	3	0	adil±2
-58	Ters Esinti	NORMAL	2	6	3	2203	36.8	90	3	1	adil±2
-59	Mavi Köprü	NORMAL	2	8	5	4227	43.3	94	3	0	adil±2
-60	Meydan Okuma: Yüksek Ada	CHALLENGE	3	9	1	1098	51.5	92	3	0	adil±1
+45	Meydan Okuma: Tatlı Dere	CHALLENGE	3	9	3	3119	49.2	87	3	0	adil±1
+46	Neşeli Patika	NORMAL	1	8	11	9435	45.3	88	3	0	adil±2
+47	Serin Tepe	NORMAL	2	8	4	3562	42.1	72	3	0	adil±2
+48	Serin Bayır	NORMAL	2	8	3	2496	41.4	86	3	1	adil±2
+49	Rüzgârlı Bahçe	NORMAL	2	7	5	4966	37.2	67	3	0	adil±2
+50	Yeşil Vadi Finali	FINAL	3	13	9	15011	67.6	107	3	0	adil±1
+51	Pembe Gökyolu	TUTORIAL	1	6	2	1643	34.7	70	3	0	adil±2
+52	Uçan Köprü	NORMAL	1	6	14	185551	33.7	37	3	0	adil±2
+53	Hafif Ada	NORMAL	2	7	2	1656	39.1	85	3	0	adil±2
+54	Sisli Bulut	NORMAL	2	6	2	1583	33.4	60	3	0	adil±2
+55	Meydan Okuma: Yüksek Yıldızlık	CHALLENGE	3	9	1	976	48.0	86	3	0	adil±1
+56	Pembe Rüzgâr	NORMAL	1	6	3	2221	33.3	68	3	0	adil±2
+57	Dönen Gökyolu	NORMAL	2	7	1	681	38.9	103	3	0	adil±2
+58	Ters Esinti	NORMAL	2	8	1	697	43.9	77	3	1	adil±2
+59	Mavi Köprü	NORMAL	2	8	2	137059	44.0	88	3	0	adil±2
+60	Meydan Okuma: Yüksek Ada	CHALLENGE	3	9	1	914	51.9	90	3	0	adil±1
 61	Pamuk Balon	TUTORIAL	1	6	1	485	32.0	101	3	0	adil±2
 62	Süzülen Yıldızlık	NORMAL	2	7	2	1509	38.4	113	3	0	adil±2
 63	Sisli Rüzgâr	NORMAL	2	6	1	528	32.3	67	3	0	adil±2
 64	Yüksek Bulut	NORMAL	2	7	1	561	37.2	132	3	0	adil±2
-65	Pamuk Yıldızlık	NORMAL	2	6	4	2484	34.1	61	3	0	adil±2
-66	Süzülen Gökkuşağı	NORMAL	2	7	2	1376	36.8	117	3	0	adil±2
-67	Sisli Ada	NORMAL	2	8	4	3093	40.2	132	3	0	adil±2
-68	Mavi Balon	NORMAL	2	7	4	2795	35.7	162	3	1	adil±2
-69	Ters Rüzgâr	NORMAL	2	6	2	1345	31.5	51	3	0	adil±2
-70	Meydan Okuma: Hafif Gökkuşağı	CHALLENGE	3	9	1	784	46.3	106	3	0	adil±1
-71	Uçan Esinti	TUTORIAL	1	6	1	669	32.2	39	3	0	adil±2
-72	Sisli Köprü	NORMAL	2	6	1	505	30.9	65	3	0	adil±2
-73	Yüksek Ada	NORMAL	2	7	1	929	38.1	44	3	0	adil±2
-74	Dönen Bulut	NORMAL	2	7	1	612	35.9	24	3	0	adil±2
-75	Süzülen Yıldızlık	NORMAL	2	7	5	3656	36.4	33	3	0	adil±2
+65	Meydan Okuma: Pamuk Yıldızlık	CHALLENGE	3	9	1	986	45.8	44	3	0	adil±1
+66	Süzülen Gökkuşağı	NORMAL	2	8	4	15992	42.3	63	3	0	adil±2
+67	Sisli Ada	NORMAL	2	8	8	5635	44.8	33	3	0	adil±2
+68	Mavi Balon	NORMAL	2	7	8	6068	37.8	113	3	1	adil±2
+69	Ters Rüzgâr	NORMAL	2	6	7	4542	31.5	106	3	0	adil±2
+70	Meydan Okuma: Hafif Gökkuşağı	CHALLENGE	3	9	6	9989	46.1	96	3	0	adil±1
+71	Uçan Esinti	TUTORIAL	1	6	4	2378	32.9	109	3	0	adil±2
+72	Sisli Köprü	NORMAL	2	8	2	1307	44.4	64	3	0	adil±2
+73	Yüksek Ada	NORMAL	2	6	2	1279	32.2	115	3	0	adil±2
+74	Dönen Bulut	NORMAL	2	7	1	662	36.2	26	3	0	adil±2
+75	Meydan Okuma: Süzülen Yıldızlık	CHALLENGE	3	9	3	2840	47.3	92	3	0	adil±1
 76	Uçan Rüzgâr	NORMAL	2	7	1	652	37.3	32	3	0	adil±2
-77	Mavi Gökyolu	NORMAL	2	7	1	633	37.7	108	3	0	adil±2
-78	Pamuk Esinti	NORMAL	2	8	1	772	41.4	40	3	1	adil±2
-79	Hafif Köprü	NORMAL	2	6	1	612	30.5	88	3	0	adil±2
-80	Meydan Okuma: Hafif Ada	CHALLENGE	4	9	3	2774	48.0	101	3	0	adil±1
+77	Mavi Gökyolu	NORMAL	2	7	1	682	37.5	128	3	0	adil±2
+78	Pamuk Esinti	NORMAL	2	8	2	1610	42.0	39	3	1	adil±2
+79	Hafif Köprü	NORMAL	2	6	1	739	30.9	114	3	0	adil±2
+80	Meydan Okuma: Hafif Ada	CHALLENGE	3	9	2	1845	46.9	94	3	0	adil±1
 81	Uçan Esinti	TUTORIAL	1	6	9	123618	31.9	87	3	0	adil±2
 82	Yüksek Kule	NORMAL	2	7	2	1425	37.2	46	3	0	adil±2
 83	Pamuk Rüzgâr	NORMAL	2	8	2	351019	42.4	48	3	0	adil±2
 84	Dönen Gökyolu	NORMAL	2	6	1	585	33.0	26	3	0	adil±2
-85	Süzülen Yıldızlık	NORMAL	1	7	16	351802	37.5	46	3	0	adil±2
-86	Mavi Gökkuşağı	NORMAL	3	7	7	465496	36.6	103	3	0	adil±2
-87	Pembe Ada	NORMAL	3	7	2	40477	36.7	50	3	0	adil±2
-88	Pamuk Balon	NORMAL	3	8	8	51768	42.6	59	3	1	adil±2
-89	Hafif Kule	NORMAL	3	7	6	426233	37.1	82	3	0	adil±2
-90	Meydan Okuma: Sisli Bulut	CHALLENGE	4	9	9	90031	48.3	61	3	0	adil±1
-91	Yüksek Gökyolu	TUTORIAL	2	6	1	860	34.0	55	3	0	adil±2
+85	Meydan Okuma: Süzülen Yıldızlık	CHALLENGE	3	9	3	30699	47.4	91	3	0	adil±1
+86	Mavi Gökkuşağı	NORMAL	2	7	1	590	37.3	61	3	0	adil±2
+87	Pembe Ada	NORMAL	2	8	3	35088	41.1	77	3	0	adil±2
+88	Pamuk Balon	NORMAL	2	8	2	1870	40.9	71	3	1	adil±2
+89	Hafif Kule	NORMAL	2	6	1	3268	31.9	56	3	0	adil±2
+90	Meydan Okuma: Sisli Bulut	CHALLENGE	4	9	3	25357	46.6	71	3	0	adil±1
+91	Yüksek Gökyolu	TUTORIAL	1	6	1	851	34.0	52	3	0	adil±2
 92	Pembe Köprü	NORMAL	2	8	1	1294	42.3	73	3	0	dar
-93	Dönen Gökkuşağı	NORMAL	3	8	1	1170	42.7	85	3	0	adil±2
+93	Dönen Gökkuşağı	NORMAL	2	8	1	1235	42.5	83	3	0	adil±2
 94	Uçan Esinti	NORMAL	3	6	3	3094	33.6	49	3	0	adil±2
-95	Mavi Balon	NORMAL	3	6	1	872	33.9	66	3	0	adil±2
-96	Ters Rüzgâr	NORMAL	3	8	1	979	43.3	100	3	0	adil±2
-97	Dönen Gökyolu	NORMAL	3	6	2	1917	33.8	73	3	0	adil±2
-98	Uçan Yıldızlık	NORMAL	3	8	6	17491	41.4	72	3	1	adil±2
-99	Mavi Köprü	NORMAL	3	7	1	1100	37.4	92	3	0	adil±2
-100	Ters Gökyüzü Finali	FINAL	4	13	6	11359	67.8	115	3	0	adil±1
+95	Meydan Okuma: Mavi Balon	CHALLENGE	4	9	5	6613	49.2	60	3	0	adil±1
+96	Ters Rüzgâr	NORMAL	2	8	1	1004	43.6	96	3	0	adil±2
+97	Dönen Gökyolu	NORMAL	2	6	2	1854	33.1	64	3	0	adil±2
+98	Uçan Yıldızlık	NORMAL	3	6	4	3895	32.2	61	3	1	adil±2
+99	Mavi Köprü	NORMAL	3	7	1	1087	38.9	98	3	0	adil±2
+100	Ters Gökyüzü Finali	FINAL	4	13	5	9496	67.5	109	3	0	adil±1
 101	Sıcak Pist	NORMAL	2	6	2	1686	35.2	93	3	0	adil±2
 102	Uçsuz Tünel	NORMAL	2	8	6	5159	41.4	87	3	0	adil±2
 103	Parıltılı Serap	NORMAL	1	6	10	7937	32.7	88	3	0	adil±2
-104	Coşkulu Çöl	NORMAL	2	8	2	1630	45.6	88	3	0	adil±2
-105	Hızlı Kaktüs	NORMAL	3	6	2	1670	33.8	83	3	0	adil±2
-106	Rüzgârlı Kanyon	NORMAL	2	7	11	8464	34.8	78	3	0	adil±2
-107	Altın Vaha	NORMAL	3	6	5	67985	31.5	85	3	0	adil±2
-108	Parıltılı Kum Fırtınası	NORMAL	3	6	6	6254	32.7	91	3	1	adil±2
-109	Turuncu Tünel	NORMAL	3	8	2	1702	39.8	86	3	0	adil±2
-110	Meydan Okuma: Gizemli Kum Tepesi	CHALLENGE	4	9	7	126110	44.4	89	3	0	adil±1
+104	Coşkulu Çöl	NORMAL	3	8	2	1474	44.8	83	3	0	adil±2
+105	Meydan Okuma: Hızlı Kaktüs	CHALLENGE	4	9	3	3312	45.5	81	3	0	adil±1
+106	Rüzgârlı Kanyon	NORMAL	2	6	1	769	31.9	53	3	0	adil±2
+107	Altın Vaha	NORMAL	2	6	5	4080	30.7	91	3	0	adil±2
+108	Parıltılı Kum Fırtınası	NORMAL	3	6	6	5930	33.0	88	3	1	adil±2
+109	Turuncu Tünel	NORMAL	3	6	7	120247	32.8	33	3	0	adil±2
+110	Meydan Okuma: Gizemli Kum Tepesi	CHALLENGE	4	9	5	141568	46.2	89	3	0	adil±1
 111	Uçsuz Çöl	NORMAL	2	8	4	3008	42.1	66	3	0	adil±2
 112	Turuncu Kervan Yolu	NORMAL	2	6	11	162000	32.8	76	3	0	adil±2
 113	Parıltılı Vaha	NORMAL	3	7	3	150234	37.5	81	3	0	adil±2
 114	Hızlı Kum Tepesi	NORMAL	3	7	2	107439	42.0	63	3	0	adil±2
-115	Gizemli Kum Fırtınası	NORMAL	3	8	1	1056	42.3	94	3	0	adil±2
-116	Rüzgârlı Serap	NORMAL	3	6	3	4091	32.7	73	3	0	adil±2
-117	Altın Çöl	NORMAL	3	7	2	1457	35.6	37	3	0	adil±2
-118	Kızgın Pist	NORMAL	3	7	1	665	38.1	74	3	1	adil±2
-119	Sıcak Kervan Yolu	NORMAL	3	8	1	787	41.7	84	3	0	adil±2
-120	Meydan Okuma: Gizemli Vaha	CHALLENGE	4	9	4	4082	46.3	57	3	0	adil±1
+115	Meydan Okuma: Gizemli Kum Fırtınası	CHALLENGE	4	9	8	414195	54.0	84	3	0	adil±1
+116	Rüzgârlı Serap	NORMAL	3	6	3	2585	33.6	69	3	0	adil±2
+117	Altın Çöl	NORMAL	2	7	10	10010	37.0	88	3	0	adil±2
+118	Kızgın Pist	NORMAL	2	8	10	13550	47.3	77	3	1	adil±2
+119	Sıcak Kervan Yolu	NORMAL	3	8	1	1046	42.9	87	3	0	adil±2
+120	Meydan Okuma: Gizemli Vaha	CHALLENGE	4	9	4	12199	46.3	84	3	0	adil±1
 121	Uçsuz Kum Fırtınası	NORMAL	3	7	2	1830	47.2	85	3	0	adil±2
 122	Coşkulu Kaktüs	NORMAL	3	6	1	581	33.5	70	3	0	adil±2
 123	Hızlı Serap	NORMAL	3	7	2	3505	41.3	89	3	0	adil±2
 124	Sıcak Çöl	NORMAL	3	8	2	1726	52.0	83	3	0	adil±2
-125	Rüzgârlı Kervan Yolu	NORMAL	3	6	1	803	36.9	78	3	0	adil±2
-126	Parıltılı Kanyon	NORMAL	3	7	1	629	39.0	81	3	0	adil±2
-127	Kızgın Vaha	NORMAL	3	7	1	913	47.7	88	3	0	adil±2
-128	Parıltılı Kum Fırtınası	NORMAL	3	8	1	20258	49.7	82	3	1	adil±2
-129	Kızgın Serap	NORMAL	3	7	1	884	43.0	83	3	0	adil±2
-130	Meydan Okuma: Gizemli Kanyon	CHALLENGE	4	9	1	998	57.0	84	3	0	adil±1
+125	Meydan Okuma: Rüzgârlı Kervan Yolu	CHALLENGE	4	9	1	1163	60.9	95	3	0	adil±1
+126	Parıltılı Kanyon	NORMAL	3	7	1	769	39.5	94	3	0	adil±2
+127	Kızgın Vaha	NORMAL	3	7	4	3698	38.9	84	3	0	adil±2
+128	Parıltılı Kum Fırtınası	NORMAL	3	8	1	984	41.9	87	3	1	adil±2
+129	Kızgın Serap	NORMAL	3	8	2	2252	41.4	89	3	0	adil±2
+130	Meydan Okuma: Gizemli Kanyon	CHALLENGE	4	9	3	3877	48.7	96	3	0	adil±1
 131	Turuncu Çöl	NORMAL	3	8	1	1712	43.9	95	3	0	dar
 132	Altın Kervan Yolu	NORMAL	3	8	1	903	42.7	155	3	0	adil±2
 133	Coşkulu Vaha	NORMAL	3	7	5	5062	37.4	85	3	0	adil±2
 134	Sıcak Kum Tepesi	NORMAL	3	8	8	7198	45.5	86	3	0	adil±2
-135	Rüzgârlı Kum Fırtınası	NORMAL	3	6	5	4672	31.6	71	3	0	adil±2
-136	Turuncu Serap	NORMAL	3	7	6	5755	36.8	84	3	0	adil±2
-137	Parıltılı Çöl	NORMAL	3	8	6	6041	43.8	87	3	0	adil±2
-138	Hızlı Kaktüs	NORMAL	4	7	5	4372	39.1	68	3	1	adil±2
-139	Gizemli Kervan Yolu	NORMAL	4	8	8	8999	40.8	111	3	0	adil±2
-140	Meydan Okuma: Rüzgârlı Vaha	CHALLENGE	5	9	4	5948	50.7	101	3	0	adil±1
-141	Altın Kum Fırtınası	NORMAL	3	7	8	78507	36.5	70	3	0	adil±2
-142	Kızgın Tünel	NORMAL	3	6	2	1359	34.7	58	3	0	adil±2
-143	Sıcak Serap	NORMAL	3	7	9	103316	34.8	53	3	0	adil±2
-144	Sıcak Kum Tepesi	NORMAL	1	8	17	154878	41.1	100	3	0	adil±2
-145	Rüzgârlı Kaktüs	NORMAL	4	7	4	3719	33.8	95	3	0	adil±2
-146	Parıltılı Kanyon	NORMAL	4	8	3	91339	42.9	87	3	0	adil±2
-147	Kızgın Vaha	NORMAL	4	7	8	80640	35.1	87	3	0	adil±2
-148	Uçsuz Pist	NORMAL	4	6	3	64120	30.5	60	3	1	adil±2
-149	Gizemli Tünel	NORMAL	4	8	6	72070	42.8	65	3	0	adil±2
+135	Meydan Okuma: Rüzgârlı Kum Fırtınası	CHALLENGE	4	9	8	10335	54.2	106	3	0	adil±1
+136	Turuncu Serap	NORMAL	2	8	10	8573	41.9	78	3	0	adil±2
+137	Parıltılı Çöl	NORMAL	3	8	6	5334	43.1	85	3	0	adil±2
+138	Hızlı Kaktüs	NORMAL	3	6	4	3535	36.8	75	3	1	adil±2
+139	Gizemli Kervan Yolu	NORMAL	2	8	10	8412	42.5	85	3	0	adil±2
+140	Meydan Okuma: Rüzgârlı Vaha	CHALLENGE	4	9	6	6418	48.8	84	3	0	adil±1
+141	Altın Kum Fırtınası	NORMAL	3	6	1	940	30.8	58	3	0	dar
+142	Kızgın Tünel	NORMAL	3	6	4	3167	30.3	87	3	0	adil±2
+143	Sıcak Serap	NORMAL	3	6	1	605	28.8	74	3	0	adil±2
+144	Sıcak Kum Tepesi	NORMAL	3	6	9	7841	30.9	87	3	0	adil±2
+145	Meydan Okuma: Rüzgârlı Kaktüs	CHALLENGE	3	9	11	64494	49.6	84	3	0	adil±1
+146	Parıltılı Kanyon	NORMAL	2	8	13	315844	41.3	86	3	0	adil±2
+147	Kızgın Vaha	NORMAL	3	7	7	108085	35.5	93	3	0	adil±2
+148	Uçsuz Pist	NORMAL	3	8	4	3197	42.8	81	3	1	adil±2
+149	Gizemli Tünel	NORMAL	3	7	3	2203	36.5	39	3	0	adil±2
 150	Hız Çölü Finali	FINAL	5	14	1	1623	72.3	150	3	0	adil±1
-151	Masmavi Vadi	NORMAL	3	8	5	5194	42.3	97	3	0	adil±2
-152	Soğuk Çığ	NORMAL	2	9	10	29926	47.9	66	3	0	adil±2
-153	Buzlu Kar Tepesi	NORMAL	3	7	1	995	39.2	74	3	0	adil±2
-154	Kaygan Kule	NORMAL	2	7	11	10504	36.9	49	3	0	adil±2
-155	Işıltılı Kartopu	NORMAL	3	7	3	3622	36.2	102	3	0	adil±2
+151	Masmavi Vadi	NORMAL	3	9	2	1676	46.1	100	3	0	adil±2
+152	Soğuk Çığ	NORMAL	3	8	1	758	45.8	106	3	0	adil±2
+153	Buzlu Kar Tepesi	NORMAL	3	7	4	3344	38.1	84	3	0	adil±2
+154	Kaygan Kule	NORMAL	3	8	3	3114	41.4	80	3	0	adil±2
+155	Meydan Okuma: Işıltılı Kartopu	CHALLENGE	4	10	1	1070	58.5	89	3	0	adil±1
 156	Masmavi Mağara	NORMAL	2	9	11	11752	44.7	89	3	0	adil±2
-157	Karlı Vadi	NORMAL	4	7	7	8578	36.9	48	3	0	adil±2
-158	Beyaz Çığ	NORMAL	4	9	4	4981	46.0	82	3	1	adil±2
-159	Kristal Saray	NORMAL	4	7	2	1992	37.1	66	3	0	adil±2
+157	Karlı Vadi	NORMAL	3	7	7	6936	36.1	59	3	0	adil±2
+158	Beyaz Çığ	NORMAL	3	9	4	18230	44.9	83	3	1	adil±2
+159	Kristal Saray	NORMAL	3	7	2	1976	35.8	117	3	0	adil±2
 160	Meydan Okuma: Masmavi Kar Tepesi	CHALLENGE	5	10	4	4733	50.5	93	3	0	adil±1
 161	Karlı Kule	NORMAL	3	8	1	911	43.9	83	3	0	adil±2
 162	Beyaz Mağara	NORMAL	3	7	1	1040	40.3	94	3	0	adil±2
 163	Kristal Saray	NORMAL	3	7	4	2762	36.0	91	3	0	adil±2
 164	Işıltılı Buzul	NORMAL	3	8	10	9492	42.5	63	3	0	adil±2
-165	Kaygan Çığ	NORMAL	4	9	5	9529	46.2	87	3	0	adil±2
-166	Donmuş Kar Tepesi	NORMAL	4	7	4	21840	37.5	96	3	0	adil±2
-167	Parlak Kristal	NORMAL	4	7	1	900	35.8	87	3	0	adil±2
-168	Kristal Kule	NORMAL	4	7	7	6720	39.2	56	3	1	adil±2
-169	Masmavi Mağara	NORMAL	4	9	7	6383	45.8	99	3	0	adil±2
-170	Meydan Okuma: Buzlu Buzul	CHALLENGE	5	10	1	1050	52.3	89	3	0	adil±1
-171	Beyaz Vadi	NORMAL	4	9	1	864	49.3	69	3	0	adil±2
+165	Meydan Okuma: Kaygan Çığ	CHALLENGE	5	10	6	6846	51.3	85	3	0	adil±1
+166	Donmuş Kar Tepesi	NORMAL	3	7	1	645	35.1	85	3	0	adil±2
+167	Parlak Kristal	NORMAL	3	7	1	939	35.8	49	3	0	adil±2
+168	Kristal Kule	NORMAL	4	7	3	3509	38.1	47	3	1	adil±2
+169	Masmavi Mağara	NORMAL	4	8	4	9721	40.0	29	3	0	adil±2
+170	Meydan Okuma: Buzlu Buzul	CHALLENGE	5	10	1	1246	52.2	103	3	0	adil±1
+171	Beyaz Vadi	NORMAL	3	9	1	938	49.1	78	3	0	adil±2
 172	Parlak Çığ	NORMAL	4	7	6	5821	38.2	59	3	0	adil±2
 173	Işıltılı Kar Tepesi	NORMAL	3	8	13	51690	43.5	106	3	0	adil±2
 174	Karlı Kule	NORMAL	4	7	5	15453	40.7	98	3	0	adil±2
-175	Donmuş Kartopu	NORMAL	4	7	5	4549	38.0	68	3	0	adil±2
-176	Donmuş Saray	NORMAL	3	7	14	19961	37.7	98	3	0	adil±2
-177	Parlak Vadi	NORMAL	3	9	11	22443	46.3	89	3	0	adil±2
-178	Masmavi Çığ	NORMAL	4	7	1	740	40.1	65	3	1	adil±2
-179	Karlı Göl	NORMAL	4	9	3	2966	47.2	94	3	0	adil±2
-180	Meydan Okuma: Buzlu Kristal	CHALLENGE	5	10	4	5610	51.2	91	3	0	adil±1
+175	Meydan Okuma: Donmuş Kartopu	CHALLENGE	5	10	4	5051	51.3	88	3	0	adil±1
+176	Donmuş Saray	NORMAL	4	8	3	2513	41.7	86	3	0	adil±2
+177	Parlak Vadi	NORMAL	4	9	1	1279	50.5	119	3	0	adil±2
+178	Masmavi Çığ	NORMAL	4	7	1	1391	37.5	86	3	1	adil±2
+179	Karlı Göl	NORMAL	4	9	3	4039	49.2	92	3	0	adil±2
+180	Meydan Okuma: Buzlu Kristal	CHALLENGE	5	10	2	3442	56.4	116	3	0	adil±1
 181	Beyaz Kule	NORMAL	3	9	10	15914	46.5	100	3	0	adil±2
 182	Işıltılı Mağara	NORMAL	4	8	8	120992	39.0	89	3	0	adil±2
 183	Soğuk Saray	NORMAL	4	9	4	4352	46.5	91	3	0	adil±2
 184	Karlı Vadi	NORMAL	4	7	2	2045	38.3	42	3	0	adil±2
-185	Donmuş Çığ	NORMAL	4	8	1	1145	42.1	57	3	0	adil±2
-186	Kristal Kar Tepesi	NORMAL	4	7	5	5397	36.1	87	3	0	adil±2
-187	Masmavi Kristal	NORMAL	4	7	2	2235	35.4	48	3	0	adil±2
-188	Soğuk Kartopu	NORMAL	3	7	15	124878	36.2	36	3	1	adil±2
-189	Buzlu Mağara	NORMAL	4	8	8	18081	40.8	64	3	0	adil±2
-190	Meydan Okuma: Parlak Buzul	CHALLENGE	6	10	3	6767	51.3	92	3	0	adil±1
-191	Işıltılı Vadi	NORMAL	4	7	1	1000	39.7	78	3	0	adil±2
-192	Kaygan Göl	NORMAL	4	8	1	1224	41.2	89	3	0	adil±2
-193	Buzlu Kristal	NORMAL	4	9	6	7367	48.7	71	3	0	adil±2
-194	Parlak Kule	NORMAL	4	8	1	944	41.8	86	3	0	adil±2
-195	Işıltılı Kartopu	NORMAL	4	8	1	1581	46.7	81	3	0	adil±2
-196	Masmavi Saray	NORMAL	4	7	1	674	39.4	64	3	0	adil±2
-197	Karlı Vadi	NORMAL	5	8	1	1103	44.9	101	3	0	adil±2
-198	Soğuk Çığ	NORMAL	5	9	1	1412	50.2	86	3	1	adil±2
-199	Kristal Göl	NORMAL	5	8	1	1052	46.7	86	3	0	adil±2
-200	Buz Krallığı Finali	FINAL	6	14	4	9312	75.8	103	3	0	adil±1
+185	Meydan Okuma: Donmuş Çığ	CHALLENGE	5	10	5	26567	51.0	94	3	0	adil±1
+186	Kristal Kar Tepesi	NORMAL	4	8	9	8422	43.2	89	3	0	adil±2
+187	Masmavi Kristal	NORMAL	4	7	1	609	36.0	39	3	0	adil±2
+188	Soğuk Kartopu	NORMAL	4	7	2	24956	37.5	82	3	1	adil±2
+189	Buzlu Mağara	NORMAL	4	9	1	830	46.4	83	3	0	adil±2
+190	Meydan Okuma: Parlak Buzul	CHALLENGE	5	10	3	3393	52.0	90	3	0	adil±1
+191	Işıltılı Vadi	NORMAL	4	8	5	6260	47.8	94	3	0	adil±2
+192	Kaygan Göl	NORMAL	4	8	1	1052	43.4	83	3	0	adil±2
+193	Buzlu Kristal	NORMAL	4	9	1	20902	47.4	85	3	0	adil±2
+194	Parlak Kule	NORMAL	4	8	1	1321	42.8	94	3	0	adil±2
+195	Meydan Okuma: Işıltılı Kartopu	CHALLENGE	5	10	2	3619	59.8	119	3	0	adil±1
+196	Masmavi Saray	NORMAL	4	9	2	11340	47.3	91	3	0	adil±2
+197	Karlı Vadi	NORMAL	3	7	10	241936	37.3	101	3	0	adil±2
+198	Soğuk Çığ	NORMAL	4	7	9	8536	36.3	93	3	1	adil±2
+199	Kristal Göl	NORMAL	4	9	8	8714	47.5	91	3	0	adil±2
+200	Buz Krallığı Finali	FINAL	6	14	3	5235	74.2	116	3	0	adil±1
 201	Parıldayan Yaprak	NORMAL	3	9	13	12270	46.7	76	3	0	adil±2
 202	Saklı Ateş Böceği	NORMAL	4	9	2	1655	45.8	95	3	0	adil±2
 203	Mor Ağaç Evi	NORMAL	4	9	3	2574	45.8	56	3	0	adil±2
 204	Işıklı Kovuk	NORMAL	4	7	4	12571	36.1	84	3	0	adil±2
-205	Fısıldayan Sis	NORMAL	4	7	3	2340	38.0	49	3	0	adil±2
-206	Büyülü Patika	NORMAL	4	8	3	2817	47.1	97	3	0	adil±2
-207	Sessiz Koru	NORMAL	4	7	5	4252	38.0	46	3	0	adil±2
-208	Fısıldayan Pınar	NORMAL	4	9	5	4279	48.3	101	3	1	adil±2
-209	Işıklı Ağaç Evi	NORMAL	5	8	8	8401	41.6	34	3	0	adil±2
-210	Meydan Okuma: Parıldayan Mantar	CHALLENGE	4	10	17	44330	51.8	42	3	0	adil±1
-211	Büyülü Kovuk	NORMAL	3	9	16	16605	47.6	32	3	0	adil±2
-212	Saklı Çalı	NORMAL	4	9	3	8212	47.3	60	3	0	adil±2
-213	Mor Koru	NORMAL	2	9	24	27137	47.0	86	3	0	adil±2
-214	Renkli Mantar	NORMAL	4	8	7	16861	41.8	92	3	0	adil±2
-215	Gizemli Pınar	NORMAL	2	8	24	23213	41.4	32	3	0	adil±2
-216	Büyülü Ağaç Evi	NORMAL	5	8	9	9756	42.0	85	3	0	adil±2
-217	Sessiz Kovuk	NORMAL	5	9	1	1343	46.3	87	3	0	dar
-218	Rüya Yaprak	NORMAL	5	7	1	843	37.7	88	3	1	adil±2
-219	Parıldayan Çalı	NORMAL	5	7	2	59025	36.1	54	3	0	adil±2
-220	Meydan Okuma: Gizemli Koru	CHALLENGE	6	10	2	2920	54.2	88	3	0	adil±1
-221	Saklı Pınar	NORMAL	2	9	24	365690	47.4	105	3	0	adil±2
-222	Işıklı Sis	NORMAL	4	9	1	939	47.1	48	3	0	adil±2
-223	Renkli Ağaç Evi	NORMAL	5	8	3	58862	42.1	90	3	0	adil±2
-224	Gizemli Kovuk	NORMAL	4	9	10	9189	47.1	101	3	0	adil±2
-225	Renkli Çalı	NORMAL	5	7	1	692	36.4	46	3	0	adil±2
-226	Işıklı Patika	NORMAL	5	9	6	5581	45.3	115	3	0	adil±2
-227	Fısıldayan Koru	NORMAL	4	8	15	146721	43.1	90	3	0	adil±2
-228	Parıldayan Pınar	NORMAL	5	8	3	2923	41.6	79	3	1	adil±2
-229	Büyülü Ağaç Evi	NORMAL	5	9	1	844	46.7	30	3	0	adil±2
-230	Meydan Okuma: Mor Patika	CHALLENGE	6	10	3	3292	54.4	102	3	0	adil±1
-231	Rüya Kovuk	NORMAL	5	8	9	8280	41.6	63	3	0	adil±2
-232	Fısıldayan Çalı	NORMAL	4	9	16	52326	47.7	82	3	0	adil±2
-233	Gizemli Koru	NORMAL	4	7	14	17117	37.9	53	3	0	adil±2
-234	Sessiz Mantar	NORMAL	5	7	3	2426	35.0	115	3	0	adil±2
-235	Işıklı Pınar	NORMAL	5	9	8	15994	47.5	86	3	0	adil±2
-236	Rüya Ağaç Evi	NORMAL	5	9	1	1144	44.8	82	3	0	dar
-237	Parıldayan Kovuk	NORMAL	5	7	9	8683	41.2	97	3	0	adil±2
-238	Renkli Yaprak	NORMAL	5	8	7	11483	42.4	90	3	1	adil±2
-239	Mor Çalı	NORMAL	5	7	3	2376	40.2	110	3	0	adil±2
-240	Meydan Okuma: Mor Koru	CHALLENGE	6	10	5	6646	51.9	84	3	0	adil±1
+205	Meydan Okuma: Fısıldayan Sis	CHALLENGE	5	10	8	9627	53.5	39	3	0	adil±1
+206	Büyülü Patika	NORMAL	4	8	3	2945	47.1	97	3	0	adil±2
+207	Sessiz Koru	NORMAL	4	7	5	4723	38.0	44	3	0	adil±2
+208	Fısıldayan Pınar	NORMAL	4	8	1	780	41.1	67	3	1	adil±2
+209	Işıklı Ağaç Evi	NORMAL	4	8	7	7277	42.7	55	3	0	adil±2
+210	Meydan Okuma: Parıldayan Mantar	CHALLENGE	5	10	5	5967	51.3	88	3	0	adil±1
+211	Büyülü Kovuk	NORMAL	4	8	2	1732	45.4	67	3	0	adil±2
+212	Saklı Çalı	NORMAL	4	8	2	1557	43.0	40	3	0	adil±2
+213	Mor Koru	NORMAL	4	9	9	12089	46.8	84	3	0	adil±2
+214	Renkli Mantar	NORMAL	4	7	1	793	36.8	40	3	0	adil±2
+215	Meydan Okuma: Gizemli Pınar	CHALLENGE	6	10	2	2649	52.1	98	3	0	adil±1
+216	Büyülü Ağaç Evi	NORMAL	4	7	1	565	36.9	56	3	0	adil±2
+217	Sessiz Kovuk	NORMAL	4	9	1	1066	46.8	93	3	0	adil±2
+218	Rüya Yaprak	NORMAL	4	7	6	17981	36.5	88	3	1	adil±2
+219	Parıldayan Çalı	NORMAL	5	8	5	125726	42.1	85	3	0	adil±2
+220	Meydan Okuma: Gizemli Koru	CHALLENGE	6	10	2	2663	54.0	93	3	0	adil±1
+221	Saklı Pınar	NORMAL	2	7	17	14309	36.8	67	3	0	adil±2
+222	Işıklı Sis	NORMAL	4	7	4	3804	36.4	44	3	0	adil±2
+223	Renkli Ağaç Evi	NORMAL	5	9	7	7064	47.0	82	3	0	adil±2
+224	Gizemli Kovuk	NORMAL	5	8	6	5066	42.8	32	3	0	adil±2
+225	Meydan Okuma: Renkli Çalı	CHALLENGE	6	10	1	10560	51.7	112	3	0	adil±1
+226	Işıklı Patika	NORMAL	4	9	6	7249	45.8	84	3	0	adil±2
+227	Fısıldayan Koru	NORMAL	3	8	18	24654	41.4	71	3	0	adil±2
+228	Parıldayan Pınar	NORMAL	5	8	7	6408	41.1	75	3	1	adil±2
+229	Büyülü Ağaç Evi	NORMAL	4	8	11	10260	41.7	60	3	0	adil±2
+230	Meydan Okuma: Mor Patika	CHALLENGE	6	10	5	5924	51.9	86	3	0	adil±1
+231	Rüya Kovuk	NORMAL	5	8	1	780	41.9	69	3	0	dar
+232	Fısıldayan Çalı	NORMAL	5	9	7	7083	49.3	91	3	0	adil±2
+233	Gizemli Koru	NORMAL	5	9	1	1086	45.8	96	3	0	adil±2
+234	Sessiz Mantar	NORMAL	5	7	4	14723	36.9	37	3	0	adil±2
+235	Meydan Okuma: Işıklı Pınar	CHALLENGE	6	10	1	1399	54.0	106	3	0	adil±1
+236	Rüya Ağaç Evi	NORMAL	5	8	2	2423	45.6	96	3	0	adil±2
+237	Parıldayan Kovuk	NORMAL	5	7	7	6350	38.5	87	3	0	adil±2
+238	Renkli Yaprak	NORMAL	5	8	4	3950	41.7	67	3	1	adil±2
+239	Mor Çalı	NORMAL	5	9	4	3715	48.2	86	3	0	adil±2
+240	Meydan Okuma: Mor Koru	CHALLENGE	6	10	7	7991	53.2	91	3	0	adil±1
 241	Rüya Yaprak	NORMAL	5	8	2	49002	41.5	53	3	0	adil±2
 242	Gizemli Ateş Böceği	NORMAL	5	7	2	1984	36.8	81	3	0	adil±2
 243	Saklı Ağaç Evi	NORMAL	5	7	8	7760	36.1	93	3	0	adil±2
 244	Sessiz Kovuk	NORMAL	3	9	24	21754	46.3	54	3	0	adil±2
-245	Işıklı Sis	NORMAL	4	8	16	34265	43.5	89	3	0	adil±2
-246	Parıldayan Patika	NORMAL	5	8	1	1120	42.7	57	3	0	adil±2
-247	Büyülü Koru	NORMAL	4	8	11	11917	42.0	97	3	0	adil±2
-248	Saklı Yaprak	NORMAL	4	8	12	12782	43.1	94	3	1	adil±2
-249	Mor Ateş Böceği	NORMAL	4	7	23	22613	36.2	36	3	0	adil±2
-250	Hayalet Ormanı Finali	FINAL	5	15	19	52067	77.4	108	3	0	adil±1
+245	Meydan Okuma: Işıklı Sis	CHALLENGE	6	10	2	65368	52.2	107	3	0	adil±1
+246	Parıldayan Patika	NORMAL	5	9	7	154351	46.8	76	3	0	adil±2
+247	Büyülü Koru	NORMAL	5	7	2	2082	37.4	69	3	0	adil±2
+248	Saklı Yaprak	NORMAL	5	7	9	11016	39.5	65	3	1	adil±2
+249	Mor Ateş Böceği	NORMAL	5	7	2	2184	38.2	88	3	0	adil±2
+250	Hayalet Ormanı Finali	FINAL	6	15	7	13689	76.2	132	3	0	adil±1
 251	Hareketli Kule	NORMAL	5	7	2	1767	38.2	66	3	0	adil±2
 252	Yaylı Vinç	NORMAL	5	7	3	2875	40.4	87	3	0	adil±2
 253	Kalabalık Cadde	NORMAL	5	7	2	1957	40.6	85	3	0	adil±2
 254	Modern Sokak	NORMAL	5	7	1	1130	40.2	93	3	0	adil±2
-255	Neşeli Balkon	NORMAL	5	9	3	3487	49.2	97	3	0	adil±2
-256	Modern Gökdelen	NORMAL	5	7	1	896	36.3	90	3	0	adil±2
-257	Neşeli Çatı	NORMAL	5	8	1	1208	43.2	44	3	0	adil±2
-258	Şen Vinç	NORMAL	5	7	1	839	38.5	90	3	1	adil±2
-259	Yüksek Köprü	NORMAL	5	7	1	987	37.5	87	3	0	adil±2
-260	Meydan Okuma: Renkli Cadde	CHALLENGE	6	10	1	1048	55.1	133	3	0	adil±1
-261	Parlak Sokak	NORMAL	5	8	5	6075	43.8	90	3	0	adil±2
-262	Yaylı Park	NORMAL	5	9	1	1087	48.4	98	3	0	adil±2
-263	Kalabalık Gökdelen	NORMAL	4	9	10	12522	48.9	81	3	0	adil±2
-264	Yüksek Çatı	NORMAL	5	7	6	6598	36.8	91	3	0	adil±2
-265	Modern Vinç	NORMAL	5	9	1	1093	51.4	88	3	0	adil±2
-266	Hareketli Cadde	NORMAL	4	9	10	12466	49.2	92	3	0	adil±2
-267	Şen Meydan	NORMAL	5	7	3	47975	38.5	82	3	0	adil±2
-268	Kalabalık Sokak	NORMAL	4	9	17	19585	47.9	80	3	1	adil±2
-269	Renkli Park	NORMAL	5	9	11	13408	48.7	103	3	0	adil±2
-270	Meydan Okuma: Neşeli Çatı	CHALLENGE	7	10	2	2796	54.0	98	3	0	adil±1
-271	Yaylı Kule	NORMAL	5	7	9	11110	38.7	92	3	0	adil±2
-272	Yaylı Köprü	NORMAL	5	7	4	5353	39.0	89	3	0	adil±2
-273	Kalabalık Meydan	NORMAL	5	9	8	310072	46.2	100	3	0	adil±2
-274	Modern Sokak	NORMAL	4	9	13	28757	49.7	99	3	0	adil±2
-275	Neşeli Balkon	NORMAL	6	7	1	870	37.1	87	3	0	adil±2
-276	Hareketli Gökdelen	NORMAL	5	9	14	88000	47.8	90	3	0	adil±2
-277	Şen Kule	NORMAL	6	9	6	7736	51.0	115	3	0	adil±2
-278	Renkli Vinç	NORMAL	6	7	4	4636	38.4	74	3	1	adil±2
-279	Hızlı Köprü	NORMAL	6	8	5	5902	42.6	74	3	0	adil±2
-280	Meydan Okuma: Neşeli Meydan	CHALLENGE	7	10	3	4286	56.3	107	3	0	adil±1
-281	Yaylı Sokak	NORMAL	6	9	3	3759	49.2	90	3	0	adil±2
+255	Meydan Okuma: Neşeli Balkon	CHALLENGE	6	10	1	1113	53.1	108	3	0	adil±1
+256	Modern Gökdelen	NORMAL	5	8	5	5494	42.6	82	3	0	adil±2
+257	Neşeli Çatı	NORMAL	5	8	6	7262	42.2	85	3	0	adil±2
+258	Şen Vinç	NORMAL	5	9	3	3734	47.5	104	3	1	adil±2
+259	Yüksek Köprü	NORMAL	5	7	1	915	40.1	83	3	0	adil±2
+260	Meydan Okuma: Renkli Cadde	CHALLENGE	6	10	1	1630	53.3	131	3	0	adil±1
+261	Parlak Sokak	NORMAL	5	7	4	5185	37.0	90	3	0	adil±2
+262	Yaylı Park	NORMAL	5	8	2	2746	44.6	112	3	0	adil±2
+263	Kalabalık Gökdelen	NORMAL	5	8	4	5812	42.2	84	3	0	adil±2
+264	Yüksek Çatı	NORMAL	5	9	1	1407	50.0	100	3	0	adil±2
+265	Meydan Okuma: Modern Vinç	CHALLENGE	6	10	5	7813	55.0	111	3	0	adil±1
+266	Hareketli Cadde	NORMAL	5	9	2	2323	47.6	94	3	0	adil±2
+267	Şen Meydan	NORMAL	5	7	2	2496	38.3	87	3	0	adil±2
+268	Kalabalık Sokak	NORMAL	5	7	9	18984	36.9	93	3	1	adil±2
+269	Renkli Park	NORMAL	3	8	17	192054	43.2	48	3	0	adil±2
+270	Meydan Okuma: Neşeli Çatı	CHALLENGE	6	10	5	7276	54.0	135	3	0	adil±1
+271	Yaylı Kule	NORMAL	5	7	4	6738	39.1	86	3	0	adil±2
+272	Yaylı Köprü	NORMAL	4	9	14	40145	48.8	95	3	0	adil±2
+273	Kalabalık Meydan	NORMAL	5	9	2	2549	47.6	84	3	0	adil±2
+274	Modern Sokak	NORMAL	5	7	1	825	36.1	94	3	0	adil±2
+275	Meydan Okuma: Neşeli Balkon	CHALLENGE	7	10	2	2486	52.4	110	3	0	adil±1
+276	Hareketli Gökdelen	NORMAL	4	7	10	58199	38.6	85	3	0	adil±2
+277	Şen Kule	NORMAL	5	9	2	2475	46.9	97	3	0	adil±2
+278	Renkli Vinç	NORMAL	6	8	2	2392	41.8	86	3	1	adil±2
+279	Hızlı Köprü	NORMAL	6	7	2	2088	38.7	98	3	0	adil±2
+280	Meydan Okuma: Neşeli Meydan	CHALLENGE	7	10	1	1234	53.1	104	3	0	adil±1
+281	Yaylı Sokak	NORMAL	5	9	3	3846	48.2	96	3	0	adil±2
 282	Yüksek Park	NORMAL	6	8	8	9095	44.7	103	3	0	adil±2
 283	Modern Gökdelen	NORMAL	6	8	9	9915	46.2	91	3	0	adil±2
 284	Hızlı Kule	NORMAL	6	7	1	825	40.8	76	3	0	adil±2
-285	Hareketli Vinç	NORMAL	6	7	5	4651	37.4	84	3	0	adil±2
-286	Kalabalık Cadde	NORMAL	6	7	1	919	36.9	86	3	0	adil±2
-287	Renkli Meydan	NORMAL	6	7	2	2896	36.9	88	3	0	adil±2
-288	Parlak Balkon	NORMAL	6	8	5	14256	43.2	93	3	1	adil±2
-289	Hareketli Gökdelen	NORMAL	6	9	7	7740	50.1	100	3	0	adil±2
-290	Meydan Okuma: Kalabalık Çatı	CHALLENGE	7	10	4	5445	54.2	89	3	0	adil±1
+285	Meydan Okuma: Hareketli Vinç	CHALLENGE	7	10	5	6730	55.7	105	3	0	adil±1
+286	Kalabalık Cadde	NORMAL	6	9	2	2077	49.1	85	3	0	adil±2
+287	Renkli Meydan	NORMAL	6	7	2	2290	37.5	97	3	0	adil±2
+288	Parlak Balkon	NORMAL	6	9	1	1310	48.9	112	3	1	adil±2
+289	Hareketli Gökdelen	NORMAL	5	8	16	25262	43.2	97	3	0	adil±2
+290	Meydan Okuma: Kalabalık Çatı	CHALLENGE	7	10	4	6806	53.6	106	3	0	adil±1
 291	Renkli Kule	NORMAL	6	7	1	941	42.0	95	3	0	adil±2
 292	Modern Köprü	NORMAL	6	7	1	820	37.9	84	3	0	adil±2
 293	Neşeli Meydan	NORMAL	6	8	7	9808	42.3	82	3	0	adil±2
 294	Hızlı Sokak	NORMAL	6	8	2	12116	42.7	86	3	0	adil±2
-295	Yüksek Balkon	NORMAL	6	9	2	2865	49.2	101	3	0	adil±2
-296	Renkli Gökdelen	NORMAL	6	7	1	966	39.3	97	3	0	adil±2
-297	Parlak Kule	NORMAL	6	7	1	1113	39.6	83	3	0	adil±2
-298	Yaylı Vinç	NORMAL	6	7	2	2524	37.9	102	3	1	adil±2
-299	Kalabalık Köprü	NORMAL	6	9	1	1389	46.8	113	3	0	adil±2
-300	Zıplayan Şehir Finali	FINAL	7	15	11	372016	78.0	143	3	0	adil±1
+295	Meydan Okuma: Yüksek Balkon	CHALLENGE	7	10	1	1731	54.8	116	3	0	adil±1
+296	Renkli Gökdelen	NORMAL	5	9	10	86557	47.2	83	3	0	adil±2
+297	Parlak Kule	NORMAL	6	8	2	1715	45.6	64	3	0	adil±2
+298	Yaylı Vinç	NORMAL	4	9	23	24090	49.9	93	3	1	adil±2
+299	Kalabalık Köprü	NORMAL	6	9	2	2727	47.7	95	3	0	adil±2
+300	Zıplayan Şehir Finali	FINAL	6	15	12	25118	80.3	141	3	0	adil±1
 301	Dar Kök	NORMAL	6	9	5	15911	47.9	96	3	0	adil±2
 302	Pembe Damla	NORMAL	6	9	1	946	49.7	116	3	0	adil±2
 303	Yeşil Karınca Yolu	NORMAL	6	8	1	1020	44.7	85	3	0	adil±2
 304	Dar Çiçek	NORMAL	6	8	3	2852	47.0	80	3	0	adil±2
-305	Gizli Sap	NORMAL	6	10	3	5492	54.3	100	3	0	adil±2
-306	Sevimli Yaprak	NORMAL	6	8	1	1218	42.0	110	3	0	adil±2
-307	Pembe Mantar	NORMAL	6	9	1	1093	47.8	89	3	0	adil±2
-308	Dev Kök	NORMAL	6	10	1	1058	54.4	81	3	1	adil±2
-309	Kocaman Damla	NORMAL	6	10	2	2345	56.3	79	3	0	adil±2
-310	Meydan Okuma: Tatlı Çiçek	CHALLENGE	7	11	1	1765	59.4	94	3	0	adil±1
-311	Sarı Taş	NORMAL	6	9	6	6111	51.1	88	3	0	adil±2
-312	Pembe Sap	NORMAL	5	8	10	10209	44.4	82	3	0	adil±2
-313	Yeşil Yaprak	NORMAL	6	9	1	1043	47.5	96	3	0	adil±2
-314	Minik Kök	NORMAL	5	10	16	16697	55.3	104	3	0	adil±2
-315	Sevimli Polen	NORMAL	6	10	2	2081	53.6	85	3	0	adil±2
-316	Sarı Karınca Yolu	NORMAL	6	10	8	9420	53.5	106	3	0	adil±2
-317	Dev Böcek Köyü	NORMAL	6	8	1	983	42.6	86	3	0	adil±2
-318	Gizli Sap	NORMAL	6	8	4	4734	39.3	35	3	1	adil±2
-319	Tatlı Polen	NORMAL	6	8	6	6850	45.7	74	3	0	adil±2
-320	Meydan Okuma: Sarı Yaprak	CHALLENGE	8	11	3	4281	57.3	87	3	0	adil±1
-321	Tatlı Kök	NORMAL	6	9	4	4610	48.3	96	3	0	adil±2
-322	Gizli Damla	NORMAL	4	9	24	24756	45.7	95	3	0	adil±2
-323	Dar Karınca Yolu	NORMAL	6	9	2	1946	46.8	116	3	0	adil±2
-324	Sevimli Çiçek	NORMAL	6	8	1	1299	41.9	87	3	0	adil±2
-325	Pembe Sap	NORMAL	6	9	2	2352	46.0	95	3	0	adil±2
-326	Kocaman Yaprak	NORMAL	7	10	1	1329	56.5	103	3	0	adil±2
-327	Minik Mantar	NORMAL	7	10	3	3263	51.6	84	3	0	adil±2
-328	Dar Kök	NORMAL	7	10	3	3863	54.1	90	3	1	adil±2
-329	Sarı Damla	NORMAL	7	9	2	2105	49.0	88	3	0	adil±2
-330	Meydan Okuma: Yeşil Çiçek	CHALLENGE	8	11	1	1281	55.6	91	3	0	adil±1
-331	Gizli Taş	NORMAL	6	10	4	5332	55.3	86	3	0	adil±2
-332	Minik Polen	NORMAL	5	9	15	16918	51.2	96	3	0	adil±2
-333	Sevimli Mantar	NORMAL	6	8	10	10713	42.1	82	3	0	adil±2
-334	Tatlı Kök	NORMAL	6	8	11	12999	41.7	130	3	0	adil±2
-335	Kocaman Polen	NORMAL	7	10	1	1104	51.5	100	3	0	dar
-336	Kocaman Karınca Yolu	NORMAL	7	8	9	9637	43.3	70	3	0	adil±2
-337	Minik Çiçek	NORMAL	7	10	1	1080	55.6	85	3	0	adil±2
-338	Sarı Sap	NORMAL	7	10	2	2172	51.7	82	3	1	adil±2
-339	Dev Polen	NORMAL	6	8	12	26307	42.1	55	3	0	adil±2
-340	Meydan Okuma: Yeşil Mantar	CHALLENGE	8	11	8	11719	58.2	93	3	0	adil±1
-341	Gizli Kök	NORMAL	6	9	12	15192	47.5	87	3	0	adil±2
+305	Meydan Okuma: Gizli Sap	CHALLENGE	7	11	2	2875	59.3	90	3	0	adil±1
+306	Sevimli Yaprak	NORMAL	5	10	11	32382	53.5	100	3	0	adil±2
+307	Pembe Mantar	NORMAL	6	9	1	913	46.4	83	3	0	adil±2
+308	Dev Kök	NORMAL	6	9	5	5300	46.8	90	3	1	adil±2
+309	Kocaman Damla	NORMAL	4	10	21	404789	50.7	83	3	0	adil±2
+310	Meydan Okuma: Tatlı Çiçek	CHALLENGE	7	11	3	4519	58.8	97	3	0	adil±1
+311	Sarı Taş	NORMAL	5	10	10	11163	55.1	86	3	0	adil±2
+312	Pembe Sap	NORMAL	6	10	7	15674	52.1	124	3	0	adil±2
+313	Yeşil Yaprak	NORMAL	6	9	1	1246	46.4	86	3	0	dar
+314	Minik Kök	NORMAL	5	10	16	20383	53.3	118	3	0	adil±2
+315	Meydan Okuma: Sevimli Polen	CHALLENGE	7	11	4	5857	57.2	91	3	0	adil±1
+316	Sarı Karınca Yolu	NORMAL	6	9	6	6547	46.9	93	3	0	adil±2
+317	Dev Böcek Köyü	NORMAL	6	9	5	4752	45.8	88	3	0	adil±2
+318	Gizli Sap	NORMAL	6	10	6	7170	55.7	92	3	1	adil±2
+319	Tatlı Polen	NORMAL	6	8	6	6521	43.6	89	3	0	adil±2
+320	Meydan Okuma: Sarı Yaprak	CHALLENGE	7	11	2	2921	59.0	104	3	0	adil±1
+321	Tatlı Kök	NORMAL	6	10	1	1432	50.7	95	3	0	adil±2
+322	Gizli Damla	NORMAL	6	9	5	6966	48.3	92	3	0	adil±2
+323	Dar Karınca Yolu	NORMAL	5	8	12	15009	41.0	122	3	0	adil±2
+324	Sevimli Çiçek	NORMAL	6	9	2	2265	46.6	88	3	0	adil±2
+325	Meydan Okuma: Pembe Sap	CHALLENGE	7	11	4	6233	57.0	98	3	0	adil±1
+326	Kocaman Yaprak	NORMAL	5	10	11	13202	52.8	77	3	0	adil±2
+327	Minik Mantar	NORMAL	6	10	3	3494	54.2	95	3	0	adil±2
+328	Dar Kök	NORMAL	6	9	5	5941	48.3	84	3	1	adil±2
+329	Sarı Damla	NORMAL	6	9	9	10128	51.7	92	3	0	adil±2
+330	Meydan Okuma: Yeşil Çiçek	CHALLENGE	7	11	10	88448	60.0	86	3	0	adil±1
+331	Gizli Taş	NORMAL	6	10	4	5159	54.5	103	3	0	adil±2
+332	Minik Polen	NORMAL	5	8	10	10997	44.6	90	3	0	adil±2
+333	Sevimli Mantar	NORMAL	6	8	4	4229	41.8	85	3	0	adil±2
+334	Tatlı Kök	NORMAL	7	9	6	6698	46.3	109	3	0	adil±2
+335	Meydan Okuma: Kocaman Polen	CHALLENGE	8	11	2	2397	55.0	102	3	0	adil±1
+336	Kocaman Karınca Yolu	NORMAL	5	9	11	11823	47.3	86	3	0	adil±2
+337	Minik Çiçek	NORMAL	4	10	17	19560	54.8	96	3	0	adil±2
+338	Sarı Sap	NORMAL	7	9	7	7751	49.4	62	3	1	adil±2
+339	Dev Polen	NORMAL	7	8	1	943	42.8	143	3	0	dar
+340	Meydan Okuma: Yeşil Mantar	CHALLENGE	8	11	7	25118	56.9	110	3	0	adil±1
+341	Gizli Kök	NORMAL	6	8	5	5955	42.3	62	3	0	adil±2
 342	Sevimli Damla	NORMAL	7	8	1	1225	45.2	94	3	0	adil±2
-343	Pembe Karınca Yolu	NORMAL	5	10	22	48980	53.0	91	3	0	adil±2
-344	Dev Çiçek	NORMAL	7	10	7	7969	52.2	90	3	0	adil±2
-345	Kocaman Sap	NORMAL	7	9	4	5220	47.6	91	3	0	adil±2
-346	Dar Yaprak	NORMAL	6	9	10	62614	46.5	87	3	0	adil±2
-347	Sarı Mantar	NORMAL	7	10	2	2299	51.0	90	3	0	adil±2
-348	Pembe Kök	NORMAL	7	9	7	16865	46.3	92	3	1	adil±2
-349	Yeşil Damla	NORMAL	7	10	1	1462	54.5	103	3	0	adil±2
-350	Minik Dünya Finali	FINAL	8	16	12	27737	83.0	141	3	0	adil±1
+343	Pembe Karınca Yolu	NORMAL	7	8	1	1043	43.4	99	3	0	adil±2
+344	Dev Çiçek	NORMAL	7	10	7	7579	54.1	84	3	0	adil±2
+345	Meydan Okuma: Kocaman Sap	CHALLENGE	8	11	2	2692	57.3	90	3	0	adil±1
+346	Dar Yaprak	NORMAL	7	8	3	3750	42.2	97	3	0	adil±2
+347	Sarı Mantar	NORMAL	5	8	22	46597	41.5	64	3	0	adil±2
+348	Pembe Kök	NORMAL	7	9	1	1014	49.3	94	3	1	adil±2
+349	Yeşil Damla	NORMAL	7	10	1	1350	51.6	92	3	0	dar
+350	Minik Dünya Finali	FINAL	8	16	9	22197	83.1	96	3	0	adil±1
 351	Renkli Labirent	NORMAL	6	8	8	8448	42.8	69	3	0	adil±2
 352	Yansıyan Koridor	NORMAL	7	9	5	4956	46.0	110	3	0	adil±2
 353	Büyülü Kristal	NORMAL	7	8	2	27395	41.7	104	3	0	adil±2
 354	Parlak Gökkuşağı	NORMAL	7	8	4	3766	43.7	98	3	0	adil±2
-355	Renkli Kubbe	NORMAL	6	10	11	12216	52.8	151	3	0	adil±2
-356	Işıltılı Prizma	NORMAL	6	8	15	17100	41.9	126	3	0	adil±2
-357	Şeffaf Ayna	NORMAL	7	8	2	2028	42.3	84	3	0	adil±2
-358	Kristal Işık	NORMAL	6	9	13	14441	46.1	101	3	1	adil±2
-359	Sırlı Koridor	NORMAL	7	9	1	921	46.5	115	3	0	dar
-360	Meydan Okuma: Renkli Yansıma	CHALLENGE	8	11	1	1048	56.7	133	3	0	adil±1
-361	Ters Gökkuşağı	NORMAL	7	9	1	783	46.6	88	3	0	adil±2
-362	Gümüş Salon	NORMAL	7	10	2	2083	51.8	108	3	0	adil±2
-363	Parlak Prizma	NORMAL	7	9	6	24573	48.5	98	3	0	adil±2
-364	Sırlı Ayna	NORMAL	7	9	1	1331	47.1	90	3	0	adil±2
-365	Işıltılı Işık	NORMAL	7	10	2	2069	51.8	95	3	0	adil±2
-366	Büyülü Kristal	NORMAL	7	10	3	3278	51.9	134	3	0	adil±2
-367	Kristal Yansıma	NORMAL	7	8	1	1071	42.2	89	3	0	adil±2
-368	Kristal Kubbe	NORMAL	7	8	8	8190	41.9	127	3	1	adil±2
-369	Sırlı Prizma	NORMAL	6	8	10	11555	41.6	91	3	0	adil±2
-370	Meydan Okuma: Yansıyan Kristal	CHALLENGE	7	11	10	14384	60.7	105	3	0	adil±1
-371	Büyülü Labirent	NORMAL	7	8	3	3439	43.9	92	3	0	adil±2
-372	Gümüş Koridor	NORMAL	7	10	3	4041	52.8	90	3	0	adil±2
-373	Parlak Yansıma	NORMAL	6	8	11	52581	42.0	79	3	0	adil±2
-374	Işıltılı Gökkuşağı	NORMAL	7	9	1	1132	53.0	84	3	0	adil±2
-375	Şeffaf Kubbe	NORMAL	5	9	22	28106	47.3	116	3	0	adil±2
-376	Büyülü Prizma	NORMAL	7	10	2	2194	54.7	89	3	0	adil±2
-377	Kristal Labirent	NORMAL	7	8	2	2290	42.3	94	3	0	adil±2
-378	Renkli Işık	NORMAL	7	8	16	18602	40.5	58	3	1	adil±2
-379	Yansıyan Koridor	NORMAL	8	9	1	1082	46.1	85	3	0	adil±2
-380	Meydan Okuma: Şeffaf Yansıma	CHALLENGE	9	11	5	6811	58.0	78	3	0	adil±1
+355	Meydan Okuma: Renkli Kubbe	CHALLENGE	8	11	6	17490	60.3	130	3	0	adil±1
+356	Işıltılı Prizma	NORMAL	6	8	11	12789	45.3	87	3	0	adil±2
+357	Şeffaf Ayna	NORMAL	7	8	2	1858	42.2	89	3	0	adil±2
+358	Kristal Işık	NORMAL	7	8	3	3384	41.9	83	3	1	adil±2
+359	Sırlı Koridor	NORMAL	5	10	19	20810	54.1	122	3	0	adil±2
+360	Meydan Okuma: Renkli Yansıma	CHALLENGE	8	11	1	1152	57.6	128	3	0	adil±1
+361	Ters Gökkuşağı	NORMAL	7	9	1	831	46.3	92	3	0	adil±2
+362	Gümüş Salon	NORMAL	7	8	6	7276	43.9	115	3	0	adil±2
+363	Parlak Prizma	NORMAL	7	9	6	154806	48.5	98	3	0	adil±2
+364	Sırlı Ayna	NORMAL	6	9	10	11983	47.2	95	3	0	adil±2
+365	Meydan Okuma: Işıltılı Işık	CHALLENGE	8	11	3	18970	58.0	166	3	0	adil±1
+366	Büyülü Kristal	NORMAL	7	10	3	4235	53.0	116	3	0	adil±2
+367	Kristal Yansıma	NORMAL	7	10	4	70125	52.1	104	3	0	adil±2
+368	Kristal Kubbe	NORMAL	6	8	10	99602	42.1	75	3	1	adil±2
+369	Sırlı Prizma	NORMAL	7	8	6	5870	42.6	65	3	0	adil±2
+370	Meydan Okuma: Yansıyan Kristal	CHALLENGE	8	11	1	1141	57.1	106	3	0	adil±1
+371	Büyülü Labirent	NORMAL	7	10	2	54125	51.7	93	3	0	adil±2
+372	Gümüş Koridor	NORMAL	7	8	7	77610	42.0	103	3	0	adil±2
+373	Parlak Yansıma	NORMAL	7	8	1	922	41.8	114	3	0	adil±2
+374	Işıltılı Gökkuşağı	NORMAL	7	9	3	58442	48.6	102	3	0	adil±2
+375	Meydan Okuma: Şeffaf Kubbe	CHALLENGE	8	11	5	9112	57.3	133	3	0	adil±1
+376	Büyülü Prizma	NORMAL	6	9	15	18905	47.3	90	3	0	adil±2
+377	Kristal Labirent	NORMAL	6	10	10	11939	53.0	124	3	0	adil±2
+378	Renkli Işık	NORMAL	7	10	3	4052	52.8	109	3	1	adil±2
+379	Yansıyan Koridor	NORMAL	7	9	3	3176	49.2	96	3	0	adil±2
+380	Meydan Okuma: Şeffaf Yansıma	CHALLENGE	8	11	1	1120	56.6	135	3	0	adil±1
 381	Gümüş Kubbe	NORMAL	7	9	3	4938	46.9	109	3	0	adil±2
 382	Sırlı Salon	NORMAL	7	8	6	7296	42.8	101	3	0	adil±2
 383	Işıltılı Prizma	NORMAL	7	8	1	821	39.7	112	3	0	adil±2
 384	Sırlı Ayna	NORMAL	5	10	20	79240	51.9	105	3	0	adil±2
-385	Işıltılı Işık	NORMAL	8	9	2	2402	48.8	114	3	0	adil±2
-386	Büyülü Kristal	NORMAL	8	8	4	4607	41.4	96	3	0	adil±2
-387	Kristal Labirent	NORMAL	8	9	2	2711	48.6	132	3	0	adil±2
-388	Ters Gökkuşağı	NORMAL	8	8	1	1111	41.3	91	3	1	adil±2
-389	Renkli Salon	NORMAL	8	9	8	8980	47.4	83	3	0	adil±2
-390	Meydan Okuma: Şeffaf Yansıma	CHALLENGE	9	11	1	1139	56.2	133	3	0	adil±1
+385	Meydan Okuma: Işıltılı Işık	CHALLENGE	9	11	2	3081	56.3	104	3	0	adil±1
+386	Büyülü Kristal	NORMAL	7	10	1	1167	52.5	100	3	0	adil±2
+387	Kristal Labirent	NORMAL	7	10	1	1153	55.8	115	3	0	adil±2
+388	Ters Gökkuşağı	NORMAL	6	9	15	24420	45.7	104	3	1	adil±2
+389	Renkli Salon	NORMAL	8	9	1	1112	47.9	87	3	0	adil±2
+390	Meydan Okuma: Şeffaf Yansıma	CHALLENGE	9	11	2	2966	59.7	155	3	0	adil±1
 391	Gümüş Kubbe	NORMAL	7	9	4	4193	50.5	105	3	0	adil±2
-392	Kristal Koridor	NORMAL	7	9	13	41663	47.8	126	3	0	adil±2
+392	Kristal Koridor	NORMAL	6	9	13	15778	48.1	128	3	0	adil±2
 393	Sırlı Yansıma	NORMAL	7	10	10	12120	52.0	115	3	0	adil±2
 394	Yansıyan Labirent	NORMAL	8	8	8	20090	40.5	66	3	0	adil±2
-395	Büyülü Koridor	NORMAL	8	9	6	107051	46.5	115	3	0	adil±2
-396	Gümüş Prizma	NORMAL	8	8	1	961	41.3	84	3	0	adil±2
-397	Parlak Ayna	NORMAL	8	8	2	2410	43.3	99	3	0	adil±2
-398	Işıltılı Işık	NORMAL	6	10	18	45232	54.5	93	3	1	adil±2
-399	Şeffaf Koridor	NORMAL	7	10	10	35381	51.5	114	3	0	adil±2
-400	Ayna Diyarı Finali	FINAL	9	16	8	51191	82.4	214	3	0	adil±1
+395	Meydan Okuma: Büyülü Koridor	CHALLENGE	9	11	4	62341	61.5	159	3	0	adil±1
+396	Gümüş Prizma	NORMAL	5	10	21	143671	54.4	94	3	0	adil±2
+397	Parlak Ayna	NORMAL	8	9	3	3555	46.0	128	3	0	adil±2
+398	Işıltılı Işık	NORMAL	8	8	7	8510	41.4	73	3	1	adil±2
+399	Şeffaf Koridor	NORMAL	8	10	3	29125	55.7	124	3	0	adil±2
+400	Ayna Diyarı Finali	FINAL	9	16	5	11824	85.9	164	3	0	adil±1
 401	Altın Meydan	NORMAL	7	8	9	195798	44.3	109	3	0	adil±2
 402	Gizemli Kum Saati	NORMAL	7	10	1	1466	65.4	134	3	0	adil±2
-403	Dönen Mekanizma	NORMAL	7	10	4	5044	54.0	106	3	0	adil±2
+403	Dönen Mekanizma	NORMAL	7	8	16	538061	58.3	103	3	0	adil±2
 404	Eski Saat Kulesi	NORMAL	8	9	4	5709	52.7	104	3	0	adil±2
-405	Çalışkan Zemberek	NORMAL	8	9	2	2214	50.3	98	3	0	adil±2
-406	Bronz Sarkaç	NORMAL	8	9	1	850	52.5	43	3	0	adil±2
-407	Zamansız Atölye	NORMAL	8	9	4	7608	55.5	105	3	0	adil±2
-408	Dönen Meydan	NORMAL	8	10	3	4171	60.7	86	3	1	adil±2
-409	Parlak Kum Saati	NORMAL	8	9	2	2642	53.9	96	3	0	adil±2
-410	Meydan Okuma: Yavaş Saat Kulesi	CHALLENGE	9	11	2	5520	58.3	90	3	0	adil±1
-411	Gizemli Çark	NORMAL	8	9	9	221245	50.1	82	3	0	adil±2
-412	Zamansız Zemberek	NORMAL	7	9	11	372422	47.6	89	3	0	adil±2
-413	Eski Sarkaç	NORMAL	8	8	2	2539	42.6	90	3	0	adil±2
-414	Altın Meydan	NORMAL	7	9	10	112757	48.2	78	3	0	adil±2
-415	Bronz Takvim	NORMAL	7	8	10	832928	42.7	100	3	0	adil±2
-416	Zamansız Kum Saati	NORMAL	8	9	1	136696	50.7	87	3	0	adil±2
-417	Bronz Saat Kulesi	NORMAL	8	9	3	3901	48.7	102	3	0	adil±2
-418	Altın Zemberek	NORMAL	8	10	3	12633	52.1	87	3	1	adil±2
-419	Tik Taklı Takvim	NORMAL	7	10	10	31623	54.9	118	3	0	adil±2
-420	Meydan Okuma: Gizemli Sarkaç	CHALLENGE	9	11	8	165613	59.7	122	3	0	adil±1
-421	Dönen Meydan	NORMAL	7	9	10	34992	48.5	94	3	0	adil±2
-422	Çalışkan Kum Saati	NORMAL	8	9	9	19033	47.7	86	3	0	adil±2
-423	Yavaş Mekanizma	NORMAL	8	8	8	12049	49.4	85	3	0	adil±2
-424	Tik Taklı Saat Kulesi	NORMAL	8	9	4	5951	46.6	98	3	0	adil±2
-425	Zamansız Zemberek	NORMAL	8	8	1	1148	41.6	92	3	0	dar
-426	Parlak Sarkaç	NORMAL	7	8	12	19690	47.8	83	3	0	adil±2
-427	Altın Atölye	NORMAL	8	8	3	5588	41.0	87	3	0	adil±2
-428	Yavaş Meydan	NORMAL	8	8	1	839	42.8	86	3	1	adil±2
-429	Gizemli Kum Saati	NORMAL	7	8	15	104466	45.1	56	3	0	adil±2
-430	Meydan Okuma: Bronz Saat Kulesi	CHALLENGE	10	11	1	1598	63.5	116	3	0	adil±1
+405	Meydan Okuma: Çalışkan Zemberek	CHALLENGE	9	11	1	1310	60.8	109	3	0	adil±1
+406	Bronz Sarkaç	NORMAL	7	9	6	116277	48.2	101	3	0	adil±2
+407	Zamansız Atölye	NORMAL	7	9	11	138946	46.8	98	3	0	adil±2
+408	Dönen Meydan	NORMAL	8	9	5	86600	48.1	85	3	1	adil±2
+409	Parlak Kum Saati	NORMAL	8	8	1	2732	44.0	96	3	0	adil±2
+410	Meydan Okuma: Yavaş Saat Kulesi	CHALLENGE	9	11	9	28671	58.0	157	3	0	adil±1
+411	Gizemli Çark	NORMAL	7	10	11	367844	53.4	110	3	0	adil±2
+412	Zamansız Zemberek	NORMAL	8	10	1	1141	54.2	62	3	0	adil±2
+413	Eski Sarkaç	NORMAL	6	10	21	398870	54.0	101	3	0	adil±2
+414	Altın Meydan	NORMAL	7	8	16	455610	44.0	84	3	0	adil±2
+415	Meydan Okuma: Bronz Takvim	CHALLENGE	9	11	3	5593	59.3	132	3	0	adil±1
+416	Zamansız Kum Saati	NORMAL	7	8	13	16783	44.0	93	3	0	adil±2
+417	Bronz Saat Kulesi	NORMAL	7	10	12	18332	54.8	102	3	0	adil±2
+418	Altın Zemberek	NORMAL	7	8	13	366769	48.9	85	3	1	adil±2
+419	Tik Taklı Takvim	NORMAL	8	10	5	7349	51.8	97	3	0	adil±2
+420	Meydan Okuma: Gizemli Sarkaç	CHALLENGE	8	11	12	26322	56.8	108	3	0	adil±1
+421	Dönen Meydan	NORMAL	8	8	1	1041	42.0	84	3	0	dar
+422	Çalışkan Kum Saati	NORMAL	8	8	5	6449	43.5	90	3	0	adil±2
+423	Yavaş Mekanizma	NORMAL	7	10	14	22546	48.6	116	3	0	adil±2
+424	Tik Taklı Saat Kulesi	NORMAL	8	9	4	5267	47.0	88	3	0	adil±2
+425	Meydan Okuma: Zamansız Zemberek	CHALLENGE	9	11	4	7730	56.4	110	3	0	adil±1
+426	Parlak Sarkaç	NORMAL	8	9	5	19390	49.5	86	3	0	adil±2
+427	Altın Atölye	NORMAL	7	9	11	41289	46.2	94	3	0	adil±2
+428	Yavaş Meydan	NORMAL	8	8	9	40927	45.4	86	3	1	adil±2
+429	Gizemli Kum Saati	NORMAL	8	10	4	99098	50.5	85	3	0	adil±2
+430	Meydan Okuma: Bronz Saat Kulesi	CHALLENGE	9	11	1	1933	57.5	168	3	0	adil±1
 431	Çalışkan Çark	NORMAL	8	10	5	272519	53.6	84	3	0	adil±2
 432	Çalışkan Takvim	NORMAL	8	10	1	1209	51.8	94	3	0	adil±2
 433	Yavaş Sarkaç	NORMAL	8	10	5	64586	54.9	92	3	0	adil±2
 434	Zamansız Meydan	NORMAL	8	9	4	22062	47.2	86	3	0	adil±2
-435	Eski Çark	NORMAL	8	8	1	858	40.3	112	3	0	dar
-436	Parlak Mekanizma	NORMAL	8	8	3	4026	44.2	95	3	0	adil±2
-437	Altın Saat Kulesi	NORMAL	9	9	2	5911	46.7	98	3	0	adil±2
-438	Gizemli Zemberek	NORMAL	9	9	1	1299	47.5	49	3	1	adil±2
-439	Dönen Takvim	NORMAL	9	10	2	2208	54.1	85	3	0	adil±2
-440	Meydan Okuma: Eski Dişli	CHALLENGE	10	11	3	25997	62.8	130	3	0	adil±1
-441	Çalışkan Meydan	NORMAL	7	10	15	47189	52.2	96	3	0	adil±2
-442	Tik Taklı Kum Saati	NORMAL	8	9	3	18166	46.8	62	3	0	adil±2
-443	Zamansız Mekanizma	NORMAL	8	8	3	4958	42.3	86	3	0	adil±2
-444	Dönen Saat Kulesi	NORMAL	9	10	2	51024	52.8	90	3	0	adil±2
-445	Parlak Zemberek	NORMAL	9	9	5	31254	46.8	67	3	0	adil±2
-446	Yavaş Sarkaç	NORMAL	7	8	19	103229	42.5	97	3	0	adil±2
-447	Gizemli Dişli	NORMAL	9	9	7	358466	48.8	91	3	0	adil±2
-448	Dönen Çark	NORMAL	9	10	1	4920	52.7	98	3	1	adil±2
-449	Parlak Kum Saati	NORMAL	9	10	2	9418	54.0	86	3	0	adil±2
-450	Zaman Şehri Finali	FINAL	10	17	3	62784	91.4	151	3	0	adil±1
+435	Meydan Okuma: Eski Çark	CHALLENGE	8	11	14	517601	56.2	107	3	0	adil±1
+436	Parlak Mekanizma	NORMAL	8	10	4	6015	56.9	140	3	0	adil±2
+437	Altın Saat Kulesi	NORMAL	8	8	5	5656	44.1	75	3	0	adil±2
+438	Gizemli Zemberek	NORMAL	8	9	1	1131	52.4	98	3	1	adil±2
+439	Dönen Takvim	NORMAL	8	8	1	1501	42.5	86	3	0	adil±2
+440	Meydan Okuma: Eski Dişli	CHALLENGE	9	11	1	1567	60.5	114	3	0	adil±1
+441	Çalışkan Meydan	NORMAL	8	10	4	22841	51.8	97	3	0	adil±2
+442	Tik Taklı Kum Saati	NORMAL	8	10	1	108676	54.2	88	3	0	adil±2
+443	Zamansız Mekanizma	NORMAL	8	8	5	17505	44.6	87	3	0	adil±2
+444	Dönen Saat Kulesi	NORMAL	7	8	14	195463	42.1	96	3	0	adil±2
+445	Meydan Okuma: Parlak Zemberek	CHALLENGE	10	11	4	11865	56.5	103	3	0	adil±1
+446	Yavaş Sarkaç	NORMAL	8	10	1	1244	52.7	95	3	0	adil±2
+447	Gizemli Dişli	NORMAL	6	8	20	42415	41.7	75	3	0	adil±2
+448	Dönen Çark	NORMAL	8	8	6	8445	41.5	89	3	1	adil±2
+449	Parlak Kum Saati	NORMAL	9	8	5	14485	45.3	98	3	0	adil±2
+450	Zaman Şehri Finali	FINAL	10	17	1	8922	87.6	178	3	0	adil±1
 451	Destansı Son Durak	NORMAL	8	9	1	1114	47.5	89	3	0	dar
 452	Büyük Kıyı	NORMAL	8	11	4	23017	60.8	116	3	0	adil±2
 453	Renkli Kaos	NORMAL	6	9	17	101907	47.5	85	3	0	adil±2
 454	Coşkulu Liman	NORMAL	8	9	1	1051	47.0	97	3	0	dar
-455	Karışık Zirve	NORMAL	8	9	7	357674	49.8	98	3	0	adil±2
-456	Destansı Fırtına	NORMAL	7	11	19	89837	57.0	133	3	0	adil±2
-457	Uçan Ada	NORMAL	9	10	5	22742	50.6	83	3	0	adil±2
-458	Şaşırtıcı Portal	NORMAL	9	11	1	116849	57.8	117	3	1	adil±2
-459	Çılgın Kıyı	NORMAL	9	10	3	4346	52.0	134	3	0	adil±2
-460	Meydan Okuma: Karışık Girdap	CHALLENGE	10	12	3	6273	62.1	136	3	0	adil±1
+455	Meydan Okuma: Karışık Zirve	CHALLENGE	10	12	2	4101	62.5	110	3	0	adil±1
+456	Destansı Fırtına	NORMAL	8	9	8	362962	47.0	101	3	0	adil±2
+457	Uçan Ada	NORMAL	8	9	3	4091	45.4	121	3	0	adil±2
+458	Şaşırtıcı Portal	NORMAL	8	9	4	4883	52.0	89	3	1	adil±2
+459	Çılgın Kıyı	NORMAL	9	10	1	1364	51.5	111	3	0	adil±2
+460	Meydan Okuma: Karışık Girdap	CHALLENGE	10	12	7	19955	64.5	100	3	0	adil±1
 461	Büyük Liman	NORMAL	8	9	8	359704	49.6	122	3	0	adil±2
 462	Parlak Gökkuşağı	NORMAL	8	11	7	358317	57.7	89	3	0	adil±2
 463	Coşkulu Fırtına	NORMAL	7	11	22	36342	56.0	122	3	0	adil±2
 464	Coşkulu Ada	NORMAL	8	9	12	24570	46.2	109	3	0	adil±2
-465	Karışık Portal	NORMAL	9	11	3	4242	60.2	121	3	0	adil±2
-466	Efsane Kaos	NORMAL	9	9	8	326774	48.1	105	3	0	adil±2
-467	Parlak Son Durak	NORMAL	8	10	16	40766	51.2	85	3	0	adil±2
-468	Şaşırtıcı Liman	NORMAL	9	10	3	3233	49.9	96	3	1	adil±2
-469	Çılgın Gökkuşağı	NORMAL	9	11	8	10349	58.2	94	3	0	adil±2
-470	Meydan Okuma: Büyük Ada	CHALLENGE	10	12	5	7724	65.1	91	3	0	adil±1
+465	Meydan Okuma: Karışık Portal	CHALLENGE	9	12	13	20456	61.5	88	3	0	adil±1
+466	Efsane Kaos	NORMAL	8	9	3	3868	42.9	102	3	0	adil±2
+467	Parlak Son Durak	NORMAL	8	10	16	21338	49.7	97	3	0	adil±2
+468	Şaşırtıcı Liman	NORMAL	9	10	1	1032	52.7	94	3	1	adil±2
+469	Çılgın Gökkuşağı	NORMAL	8	9	10	361010	45.9	99	3	0	adil±2
+470	Meydan Okuma: Büyük Ada	CHALLENGE	10	12	5	356056	65.7	103	3	0	adil±1
 471	Renkli Zirve	NORMAL	7	10	22	412838	54.1	85	3	0	adil±2
 472	Parlak Portal	NORMAL	9	11	9	11751	55.7	92	3	0	adil±2
 473	Coşkulu Girdap	NORMAL	8	10	11	48080	54.8	88	3	0	adil±2
 474	Destansı Son Durak	NORMAL	8	9	12	49502	45.5	135	3	0	adil±2
-475	Efsane Kıyı	NORMAL	9	11	4	12022	55.9	118	3	0	adil±2
-476	Renkli Fırtına	NORMAL	9	9	1	1369	46.8	111	3	0	adil±2
-477	Şaşırtıcı Son Durak	NORMAL	9	9	6	8106	50.9	123	3	0	adil±2
-478	Karışık Portal	NORMAL	9	10	9	710154	51.3	138	3	1	adil±2
-479	Büyük Kıyı	NORMAL	9	9	3	4448	47.0	92	3	0	adil±2
-480	Meydan Okuma: Renkli Kaos	CHALLENGE	10	12	1	1632	63.1	174	3	0	adil±1
+475	Meydan Okuma: Efsane Kıyı	CHALLENGE	10	12	3	9856	60.2	106	3	0	adil±1
+476	Renkli Fırtına	NORMAL	9	10	3	3987	51.3	122	3	0	adil±2
+477	Şaşırtıcı Son Durak	NORMAL	9	9	3	25072	48.7	89	3	0	adil±2
+478	Karışık Portal	NORMAL	9	10	9	79825	50.5	124	3	1	adil±2
+479	Büyük Kıyı	NORMAL	9	9	3	133490	46.2	96	3	0	adil±2
+480	Meydan Okuma: Renkli Kaos	CHALLENGE	10	12	9	272392	61.4	170	3	0	adil±1
 481	Şaşırtıcı Liman	NORMAL	9	11	6	8304	55.2	89	3	0	adil±2
 482	Karışık Gökkuşağı	NORMAL	9	11	7	707151	57.2	98	3	0	adil±2
 483	Büyük Girdap	NORMAL	9	9	5	355085	45.5	89	3	0	adil±2
 484	Uçan Ada	NORMAL	9	9	1	1402	47.9	145	3	0	adil±2
-485	Parlak Portal	NORMAL	8	11	15	22673	57.8	86	3	0	adil±2
-486	Çılgın Kaos	NORMAL	9	9	1	939	45.6	103	3	0	dar
-487	Destansı Son Durak	NORMAL	8	9	12	16509	45.6	94	3	0	adil±2
-488	Büyük Liman	NORMAL	9	11	6	8646	57.3	118	3	1	adil±2
-489	Renkli Gökkuşağı	NORMAL	10	11	8	359245	54.9	134	3	0	adil±2
-490	Meydan Okuma: Efsane Ada	CHALLENGE	10	12	1	1701	60.7	119	3	0	adil±1
-491	Karışık Zirve	NORMAL	9	11	1	1960	56.2	155	3	0	adil±2
-492	Destansı Kıyı	NORMAL	8	11	13	52311	55.7	147	3	0	adil±2
-493	Uçan Girdap	NORMAL	9	9	4	9136	45.4	94	3	0	adil±2
-494	Şaşırtıcı Liman	NORMAL	9	9	4	5939	49.2	137	3	0	adil±2
-495	Çılgın Zirve	NORMAL	9	9	2	2400	49.8	112	3	0	adil±2
-496	Çılgın Gökkuşağı	NORMAL	9	10	12	22791	53.1	93	3	0	adil±2
-497	Destansı Ada	NORMAL	10	9	1	1613	48.2	102	3	0	adil±2
-498	Renkli Portal	NORMAL	10	11	2	2933	58.0	153	3	1	adil±2
-499	Şaşırtıcı Kıyı	NORMAL	10	10	4	10830	51.5	100	3	0	adil±2
+485	Meydan Okuma: Parlak Portal	CHALLENGE	9	12	16	721560	60.5	121	3	0	adil±1
+486	Çılgın Kaos	NORMAL	9	9	3	4300	48.2	108	3	0	adil±2
+487	Destansı Son Durak	NORMAL	9	9	1	928	50.5	88	3	0	adil±2
+488	Büyük Liman	NORMAL	9	10	1	4706	52.8	125	3	1	adil±2
+489	Renkli Gökkuşağı	NORMAL	9	9	1	931	49.0	140	3	0	adil±2
+490	Meydan Okuma: Efsane Ada	CHALLENGE	10	12	3	325855	66.6	185	3	0	adil±1
+491	Karışık Zirve	NORMAL	9	11	2	3290	57.1	100	3	0	adil±2
+492	Destansı Kıyı	NORMAL	9	9	3	4087	46.0	132	3	0	adil±2
+493	Uçan Girdap	NORMAL	9	9	3	4572	47.0	86	3	0	adil±2
+494	Şaşırtıcı Liman	NORMAL	8	10	11	18987	53.9	108	3	0	adil±2
+495	Meydan Okuma: Çılgın Zirve	CHALLENGE	10	12	2	3757	61.8	130	3	0	adil±1
+496	Çılgın Gökkuşağı	NORMAL	8	9	15	27083	51.2	105	3	0	adil±2
+497	Destansı Ada	NORMAL	9	9	1	1478	48.9	98	3	0	adil±2
+498	Renkli Portal	NORMAL	9	11	2	3504	57.6	154	3	1	adil±2
+499	Şaşırtıcı Kıyı	NORMAL	9	9	1	732	46.7	94	3	0	adil±2
 500	Büyük Final: Kaosun Kalbi	GRAND_FINAL	10	20	7	477215	104.9	275	3	0	adil±1

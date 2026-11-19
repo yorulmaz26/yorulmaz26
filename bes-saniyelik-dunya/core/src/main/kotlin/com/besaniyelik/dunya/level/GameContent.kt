@@ -68,76 +68,141 @@ object GameContent {
             listOf("Karışık", "Renkli", "Çılgın", "Uçan", "Efsane", "Coşkulu", "Büyük", "Şaşırtıcı", "Destansı", "Parlak")),
     )
 
+    /** 100 alan: her harita 10 alandan, her alan 5 bölümden oluşur. Her alanın kendi fikri ve engel karışımı vardır. */
     val stages: List<StageIdea> = listOf(
         // Harita 1
-        StageIdea("Temel Koşu", "Zıplamayı, uzun zıplamayı ve engelleri öğren.", listOf(Pattern.GAP, Pattern.SPIKES, Pattern.STEP)),
-        StageIdea("Ters Dönüş", "Yer çekimi tersine dönüyor!", listOf(Pattern.GAP, Pattern.SPIKES), listOf(Mechanic.REVERSE_GRAVITY)),
-        StageIdea("Hız Kazan", "Hızlı dünyada erken zıpla.", listOf(Pattern.GAP, Pattern.SAW, Pattern.SPIKES), listOf(Mechanic.FAST)),
-        StageIdea("Kaygan Yollar", "Buzda hızın yavaşça artar.", listOf(Pattern.GAP, Pattern.STEP, Pattern.FLOATING), listOf(Mechanic.ICE)),
-        StageIdea("Kaybolan Köprüler", "Mor platformlar kaybolmadan geç.", listOf(Pattern.GHOST_BRIDGE, Pattern.GAP), listOf(Mechanic.GHOST)),
+        area("İlk Adımlar", "Dokun ve zıpla, boşlukları geç.", "G ST", "", 0),
+        area("Engel Tepesi", "Dikenler, testereler ve yaylar.", "SP SA SW", "", 0),
+        area("Ters Dönüş", "Yer çekimi ilk kez tersine dönüyor.", "G SP", "REVERSE_GRAVITY", 0),
+        area("Tavan Yürüyüşü", "Tavanda koşmaya alış.", "G ST SP", "REVERSE_GRAVITY", 0),
+        area("Hız Kazan", "Hızlı dünyada erken zıpla.", "G SA", "FAST", 0),
+        area("Rüzgâr Gibi", "Hızlı dünyada dikenler sıklaşıyor.", "SP SG", "FAST", 0),
+        area("Kaygan Yollar", "Buzda hızın yavaşça artar.", "G ST", "ICE", 0),
+        area("Buzlu Tepeler", "Buzlu platformlarda dengede kal.", "F G", "ICE", 0),
+        area("Kaybolan Köprüler", "Mor platformlar kaybolmadan geç.", "GB G", "GHOST", 0),
+        area("Vadi Kapısı", "Yeşil Vadi'de öğrendiğin her şey.", "GB SP F", "GHOST", 0),
         // Harita 2
-        StageIdea("Yaylı Bulutlar", "Yüksek duvarları zıplayan dünyayla aş.", listOf(Pattern.BOUNCY_WALL, Pattern.GAP, Pattern.SPRING_WALL), listOf(Mechanic.BOUNCY)),
-        StageIdea("Minik Adımlar", "Küçülünce dar geçitlerden geç.", listOf(Pattern.LOW_TUNNEL, Pattern.OVERHEAD), listOf(Mechanic.SMALL)),
-        StageIdea("Ayna Kontrol", "Karakter kendi zıplar, basılı tutarak dur.", listOf(Pattern.OVERHEAD, Pattern.GAP, Pattern.SPIKES), listOf(Mechanic.REVERSE_CONTROL)),
-        StageIdea("Ağır Çekim", "Yavaş zamanda hareketli engelleri izle.", listOf(Pattern.MOVING_SAW, Pattern.MOVING_PLATFORM), listOf(Mechanic.SLOW)),
-        StageIdea("Kayan Adalar", "Oklu platformlar yukarı aşağı kayıyor.", listOf(Pattern.SHIFT_BRIDGE, Pattern.FLOATING), listOf(Mechanic.SHIFTING)),
+        area("Yaylı Bulutlar", "Yüksek duvarları zıplayarak aş.", "BW G", "BOUNCY", 0),
+        area("Bulut Sıçrayışı", "Geniş boşluklar ve yaylar.", "BW SW", "BOUNCY", 0),
+        area("Minik Adımlar", "Küçülünce dar geçitlerden geç.", "LT OH", "SMALL", 0),
+        area("Bulut Tünelleri", "Bulutların altındaki dar yollar.", "LT G", "SMALL", 0),
+        area("Ayna Kontrol", "Karakter kendi zıplar, basılı tutarak dur.", "OH G", "REVERSE_CONTROL", 0),
+        area("Ters Esinti", "Dikenlerin altında basılı tut.", "OH SP", "REVERSE_CONTROL", 0),
+        area("Ağır Çekim", "Yavaş zamanda hareketli engelleri izle.", "MS MP", "SLOW", 0),
+        area("Sakin Rüzgâr", "Yavaş zamanda dönen testereler.", "MS SA", "SLOW", 0),
+        area("Kayan Adalar", "Oklu platformlar yukarı aşağı kayar.", "SB F", "SHIFTING", 0),
+        area("Gökyüzü Kapısı", "Kayan adalar ve büyük boşluklar.", "SB G", "SHIFTING", 0),
         // Harita 3
-        StageIdea("Hız Tünelleri", "Hız oklarıyla geniş boşlukları geç.", listOf(Pattern.BOOST_GAP, Pattern.GAP), listOf(Mechanic.FAST)),
-        StageIdea("Testere Kanyonu", "Dönen testerelerin ritmini yakala.", listOf(Pattern.SAW, Pattern.MOVING_SAW), listOf(Mechanic.FAST)),
-        StageIdea("Kum Basamakları", "Basamaklarda doğru yükseklikte zıpla.", listOf(Pattern.STAIRS, Pattern.STEP), listOf(Mechanic.FAST, Mechanic.REVERSE_GRAVITY)),
-        StageIdea("Çifte Kural", "İki kural aynı anda etkin!", listOf(Pattern.SPIKE_GAP, Pattern.GAP), listOf(Mechanic.FAST), combo = 2),
-        StageIdea("Çöl Fırtınası", "Hız, testere ve dikenler bir arada.", listOf(Pattern.MOVING_SAW, Pattern.BOOST_GAP, Pattern.SPIKES), listOf(Mechanic.FAST), combo = 2),
+        area("Kum Pisti", "Hız oklarıyla uzun boşluklar.", "BG G", "FAST", 0),
+        area("Hız Tünelleri", "Arka arkaya hız okları.", "BG SP", "FAST", 0),
+        area("Testere Kanyonu", "Dönen testerelerin ritmini yakala.", "SA MS", "FAST", 0),
+        area("Serap Vadisi", "Hareketli platformlar ve serap.", "MP F", "FAST REVERSE_GRAVITY", 0),
+        area("Kum Basamakları", "Basamaklarda doğru yükseklikte zıpla.", "STA ST", "FAST", 0),
+        area("Kaktüs Bahçesi", "Dikenli kaktüs yolları.", "SP SG CG", "FAST", 0),
+        area("Çifte Kural", "İki kural aynı anda etkin!", "SG G", "FAST REVERSE_GRAVITY", 2),
+        area("Ters Kervan", "Ters yer çekimi ve hız birlikte.", "G SP", "REVERSE_GRAVITY FAST", 2),
+        area("Vaha Koşusu", "Kaygan vaha ve hız okları.", "F BG", "FAST ICE", 2),
+        area("Çöl Fırtınası", "Hız, testere ve dikenler bir arada.", "MS BG SP", "FAST", 2),
         // Harita 4
-        StageIdea("Buz Köprüleri", "Kaygan platformlarda dengeni koru.", listOf(Pattern.FLOATING, Pattern.GAP), listOf(Mechanic.ICE)),
-        StageIdea("Kristal Dikenler", "Tavandaki kristallere dikkat.", listOf(Pattern.SPIKES, Pattern.CEILING_GAP), listOf(Mechanic.ICE)),
-        StageIdea("Kaygan Tavan", "Buz ve ters yer çekimi birlikte.", listOf(Pattern.GAP, Pattern.SPIKES), listOf(Mechanic.ICE, Mechanic.REVERSE_GRAVITY), combo = 2),
-        StageIdea("Donmuş Saatler", "Buz ve yavaş zaman birlikte.", listOf(Pattern.MOVING_PLATFORM, Pattern.MOVING_SAW), listOf(Mechanic.ICE, Mechanic.SLOW), combo = 2),
-        StageIdea("Çığ Yolu", "Basamaklar ve dikenler arasında kay.", listOf(Pattern.SPIKE_GAP, Pattern.STAIRS), listOf(Mechanic.ICE)),
+        area("Kar Patikası", "Karlı yollarda kaymaya alış.", "G ST", "ICE", 0),
+        area("Buz Köprüleri", "Kaygan platformlarda dengeni koru.", "F G", "ICE", 0),
+        area("Kristal Dikenler", "Tavandaki kristallere dikkat.", "SP CG", "ICE", 0),
+        area("Buzul Mağarası", "Alçak buz tavanların altından geç.", "OH LT", "ICE SMALL", 0),
+        area("Kaygan Tavan", "Buz ve ters yer çekimi birlikte.", "G SP", "ICE REVERSE_GRAVITY", 2),
+        area("Kartopu Tepesi", "Buzlu merdivenler ve dikenler.", "STA SG", "ICE", 0),
+        area("Donmuş Saatler", "Buz ve yavaş zaman birlikte.", "MP MS", "ICE SLOW", 2),
+        area("Buz Sarayı", "Kristal salonlarda zıpla.", "F SW", "ICE SLOW", 0),
+        area("Çığ Yolu", "Basamaklar ve dikenler arasında kay.", "SG STA", "ICE", 2),
+        area("Kraliçenin Kapısı", "Buz Krallığı'nın son sınavı.", "MP CG SP", "ICE SLOW", 2),
         // Harita 5
-        StageIdea("Işıklı Mantarlar", "Yaylı mantarlar ve hayalet köprüler.", listOf(Pattern.SPRING_WALL, Pattern.GHOST_BRIDGE), listOf(Mechanic.GHOST)),
-        StageIdea("Gölge Köprüler", "Uzun hayalet köprülerde ritmi yakala.", listOf(Pattern.GHOST_BRIDGE, Pattern.FLOATING), listOf(Mechanic.GHOST)),
-        StageIdea("Büyülü Testereler", "Testereler ve kaybolan zeminler.", listOf(Pattern.MOVING_SAW, Pattern.GHOST_BRIDGE), listOf(Mechanic.GHOST, Mechanic.SLOW)),
-        StageIdea("Hayalet Hızı", "Hızlı dünyada hayalet platformlar.", listOf(Pattern.GHOST_BRIDGE, Pattern.BOOST_GAP), listOf(Mechanic.GHOST, Mechanic.FAST), combo = 2),
-        StageIdea("Orman Labirenti", "Dar geçitler ve gizli yollar.", listOf(Pattern.OVERHEAD, Pattern.LOW_TUNNEL, Pattern.GHOST_BRIDGE), listOf(Mechanic.GHOST, Mechanic.SMALL), combo = 2),
+        area("Işıklı Mantarlar", "Yaylı mantarlar ve hayalet köprüler.", "SW GB", "GHOST", 0),
+        area("Gölge Köprüler", "Uzun hayalet köprülerde ritmi yakala.", "GB F", "GHOST", 0),
+        area("Ateş Böceği Yolu", "Hayalet platformlar ve dikenler.", "GB SP", "GHOST", 0),
+        area("Büyülü Testereler", "Testereler ve kaybolan zeminler.", "MS GB", "GHOST SLOW", 0),
+        area("Sisli Koru", "Sisin içindeki dar yollar.", "LT OH", "GHOST SMALL", 0),
+        area("Hayalet Hızı", "Hızlı dünyada hayalet platformlar.", "GB BG", "GHOST FAST", 2),
+        area("Kovuk Geçidi", "Ağaç kovuklarından geç.", "LT G", "SMALL GHOST", 2),
+        area("Fısıltı Bayırı", "Ters dünyada hayalet köprüler.", "GB G", "GHOST REVERSE_GRAVITY", 2),
+        area("Orman Labirenti", "Dar geçitler ve gizli yollar.", "OH LT GB", "GHOST SMALL", 2),
+        area("Ormanın Kalbi", "Hayalet Ormanı'nın bütün sırları.", "GB MS SG", "GHOST", 2),
         // Harita 6
-        StageIdea("Yaylı Çatılar", "Yaylarla çatıdan çatıya.", listOf(Pattern.SPRING_WALL, Pattern.STEP), listOf(Mechanic.BOUNCY)),
-        StageIdea("Gökdelen Atlayışı", "Dev duvarları zıplayarak aş.", listOf(Pattern.BOUNCY_WALL, Pattern.GAP), listOf(Mechanic.BOUNCY)),
-        StageIdea("Hareketli Vinçler", "Hareketli platformlara zamanında bin.", listOf(Pattern.MOVING_PLATFORM, Pattern.FLOATING), listOf(Mechanic.BOUNCY, Mechanic.SHIFTING)),
-        StageIdea("Ters Çatılar", "Zıplayan ve ters dünya birlikte.", listOf(Pattern.SPRING_WALL, Pattern.GAP), listOf(Mechanic.BOUNCY, Mechanic.REVERSE_GRAVITY), combo = 2),
-        StageIdea("Şehir Koşusu", "Şehrin bütün engelleri.", listOf(Pattern.STAIRS, Pattern.SPIKE_GAP, Pattern.BOUNCY_WALL), listOf(Mechanic.BOUNCY), combo = 2),
+        area("Yaylı Çatılar", "Yaylarla çatıdan çatıya.", "SW ST", "BOUNCY", 0),
+        area("Gökdelen Atlayışı", "Dev duvarları zıplayarak aş.", "BW G", "BOUNCY", 0),
+        area("Balkon Sırası", "Yüzen balkonlar arasında zıpla.", "F BW", "BOUNCY", 0),
+        area("Hareketli Vinçler", "Hareketli platformlara zamanında bin.", "MP F", "BOUNCY SHIFTING", 0),
+        area("Kayan Asansörler", "Kayan platformlarla yüksel.", "SB MP", "SHIFTING", 0),
+        area("Yaylı Meydan", "Yaylar ve testereler.", "SW SA", "BOUNCY FAST", 0),
+        area("Ters Çatılar", "Zıplayan ve ters dünya birlikte.", "SW G", "BOUNCY REVERSE_GRAVITY", 2),
+        area("Gece Pazarı", "Hızlı dünyada kayan tezgâhlar.", "SB BG", "SHIFTING FAST", 2),
+        area("Neon Cadde", "Merdivenler, dikenler ve dev duvarlar.", "STA SG BW", "BOUNCY", 2),
+        area("Şehir Koşusu", "Şehrin bütün engelleri.", "BW SB SP", "BOUNCY SHIFTING", 2),
         // Harita 7
-        StageIdea("Dev Çiçekler", "Çiçeklerin altındaki dar yollardan geç.", listOf(Pattern.LOW_TUNNEL, Pattern.STEP), listOf(Mechanic.SMALL)),
-        StageIdea("Mantar Geçitleri", "Mantarların altında eğil.", listOf(Pattern.LOW_TUNNEL, Pattern.OVERHEAD), listOf(Mechanic.SMALL)),
-        StageIdea("Karınca Yolu", "Minik ve dikkatli ol.", listOf(Pattern.LOW_TUNNEL, Pattern.SPIKES), listOf(Mechanic.SMALL, Mechanic.REVERSE_GRAVITY)),
-        StageIdea("Minik Hız", "Küçük ve hızlı!", listOf(Pattern.LOW_TUNNEL, Pattern.GAP), listOf(Mechanic.SMALL, Mechanic.FAST), combo = 2),
-        StageIdea("Kayan Yapraklar", "Kayan yapraklar ve dar geçitler.", listOf(Pattern.SHIFT_BRIDGE, Pattern.LOW_TUNNEL), listOf(Mechanic.SMALL, Mechanic.SHIFTING), combo = 2),
+        area("Dev Çiçekler", "Çiçeklerin altındaki dar yollardan geç.", "LT ST", "SMALL", 0),
+        area("Mantar Geçitleri", "Mantarların altında küçül.", "LT OH", "SMALL", 0),
+        area("Çiy Damlası", "Damlaların arasında zıpla.", "F LT", "SMALL", 0),
+        area("Karınca Yolu", "Minik ve dikkatli ol.", "LT SP", "SMALL REVERSE_GRAVITY", 0),
+        area("Yaprak Köprüsü", "Kayan yapraklar ve dar geçitler.", "SB LT", "SMALL SHIFTING", 0),
+        area("Polen Fırtınası", "Küçük ve hızlı!", "LT G", "SMALL FAST", 2),
+        area("Uğur Böceği", "Testereler ve dar geçitler.", "LT SA", "SMALL SLOW", 2),
+        area("Kök Tüneli", "Ters dünyada dar geçitler.", "LT G", "SMALL REVERSE_GRAVITY", 2),
+        area("Gizli Bahçe", "Hayalet yapraklar arasında.", "GB LT", "SMALL GHOST", 2),
+        area("Minik Kraliyet", "Minik Dünya'nın büyük sınavı.", "LT SB SG", "SMALL", 2),
         // Harita 8
-        StageIdea("Ayna Yolu", "Ters kontrolle yol al.", listOf(Pattern.OVERHEAD, Pattern.GAP), listOf(Mechanic.REVERSE_CONTROL)),
-        StageIdea("Yansıyan Dikenler", "Dikenlerin altında basılı tut.", listOf(Pattern.SPIKES, Pattern.OVERHEAD), listOf(Mechanic.REVERSE_CONTROL)),
-        StageIdea("Kristal Köprü", "Kristal platformlarda ters kontrol.", listOf(Pattern.FLOATING, Pattern.OVERHEAD), listOf(Mechanic.REVERSE_CONTROL, Mechanic.SLOW)),
-        StageIdea("Ters Ayna", "Ters kontrol ve ters yer çekimi!", listOf(Pattern.OVERHEAD, Pattern.SPIKES), listOf(Mechanic.REVERSE_CONTROL, Mechanic.REVERSE_GRAVITY), combo = 2),
-        StageIdea("Ayna Labirenti", "Yansımaların arasında kaybolma.", listOf(Pattern.OVERHEAD, Pattern.MOVING_SAW, Pattern.GAP), listOf(Mechanic.REVERSE_CONTROL), combo = 2),
+        area("Ayna Yolu", "Ters kontrolle yol al.", "OH G", "REVERSE_CONTROL", 0),
+        area("Yansıyan Dikenler", "Dikenlerin altında basılı tut.", "SP OH", "REVERSE_CONTROL", 0),
+        area("Prizma Salonu", "Işık kırılır, sen dikkatli ol.", "SA OH", "REVERSE_CONTROL", 0),
+        area("Kristal Köprü", "Kristal platformlarda ters kontrol.", "F OH", "REVERSE_CONTROL SLOW", 0),
+        area("Gümüş Koridor", "Yavaş zaman ve ters kontrol.", "OH MS", "REVERSE_CONTROL SLOW", 2),
+        area("Gökkuşağı Kırığı", "Hızlı aynalar.", "G SP", "REVERSE_CONTROL FAST", 2),
+        area("Ters Ayna", "Ters kontrol ve ters yer çekimi!", "OH SP", "REVERSE_CONTROL REVERSE_GRAVITY", 2),
+        area("Sırlı Kubbe", "Buzlu aynalar.", "G OH", "REVERSE_CONTROL ICE", 2),
+        area("Ayna Labirenti", "Yansımaların arasında kaybolma.", "OH MS G", "REVERSE_CONTROL", 2),
+        area("Aynanın Ötesi", "Ayna Diyarı'nın son sınavı.", "OH SG MS", "REVERSE_CONTROL REVERSE_GRAVITY", 2),
         // Harita 9
-        StageIdea("Saat Kuleleri", "Kulelerin ritmine uy.", listOf(Pattern.MOVING_PLATFORM, Pattern.STAIRS), listOf(Mechanic.SLOW)),
-        StageIdea("Dişli Testereler", "Dönen dişlilerden kaç.", listOf(Pattern.MOVING_SAW, Pattern.SAW), listOf(Mechanic.SLOW, Mechanic.FAST)),
-        StageIdea("Zaman Köprüleri", "Kayan köprülerde zamanlama.", listOf(Pattern.SHIFT_BRIDGE, Pattern.MOVING_PLATFORM), listOf(Mechanic.SHIFTING, Mechanic.SLOW)),
-        StageIdea("Yavaş Ters", "Yavaş zaman ve ters yer çekimi.", listOf(Pattern.GAP, Pattern.MOVING_SAW), listOf(Mechanic.SLOW, Mechanic.REVERSE_GRAVITY), combo = 2),
-        StageIdea("Saat Mekanizması", "Bütün dişliler dönüyor!", listOf(Pattern.SHIFT_BRIDGE, Pattern.MOVING_SAW, Pattern.SPIKE_GAP), listOf(Mechanic.SHIFTING, Mechanic.SLOW), combo = 2),
+        area("Saat Kuleleri", "Kulelerin ritmine uy.", "MP STA", "SLOW", 0),
+        area("Dişli Testereler", "Dönen dişlilerden kaç.", "MS SA", "SLOW", 0),
+        area("Sarkaç Köprüsü", "Sallanan platformlar.", "MP F", "SLOW SHIFTING", 0),
+        area("Zaman Köprüleri", "Kayan köprülerde zamanlama.", "SB MP", "SHIFTING SLOW", 0),
+        area("Kum Saati", "Hızlı ve yavaş sırayla.", "SG BG", "FAST SLOW", 0),
+        area("Zemberek Atölyesi", "Yaylar ve dişliler.", "SW MS", "SHIFTING FAST", 2),
+        area("Yavaş Ters", "Yavaş zaman ve ters yer çekimi.", "G MS", "SLOW REVERSE_GRAVITY", 2),
+        area("Takvim Meydanı", "Merdivenler ve kayan basamaklar.", "STA SB", "SHIFTING SLOW", 2),
+        area("Çark Ustası", "Dişliler ve dar geçitler.", "MS LT", "SLOW SMALL", 2),
+        area("Saat Mekanizması", "Bütün dişliler dönüyor!", "SB MS SG", "SHIFTING SLOW", 3),
         // Harita 10
-        StageIdea("Kaos Başlıyor", "Bütün dünyalar karışıyor.", listOf(Pattern.GAP, Pattern.SPIKES, Pattern.FLOATING), combo = 2),
-        StageIdea("Karışık Kurallar", "Her aşamada farklı bir sürpriz.", listOf(Pattern.GHOST_BRIDGE, Pattern.LOW_TUNNEL, Pattern.OVERHEAD), combo = 2),
-        StageIdea("Üçlü Kaos", "Üç kural aynı anda!", listOf(Pattern.SPIKE_GAP, Pattern.MOVING_SAW), combo = 3),
-        StageIdea("Fırtına Adaları", "Kayan adalar ve dev duvarlar.", listOf(Pattern.SHIFT_BRIDGE, Pattern.BOUNCY_WALL, Pattern.BOOST_GAP), combo = 3),
-        StageIdea("Son Kaos", "Öğrendiğin her şeyi kullan!", Pattern.entries.toList(), combo = 3),
+        area("Kaos Başlıyor", "Bütün dünyalar karışıyor.", "G SP F", "", 2),
+        area("Renkli Kıyı", "Yaylar ve hayalet köprüler.", "SW GB", "", 2),
+        area("Karışık Kurallar", "Her aşamada farklı bir sürpriz.", "GB LT OH", "", 2),
+        area("Portal Adası", "Kayan adalar ve hız okları.", "SB BG", "", 2),
+        area("Üçlü Kaos", "Üç kural aynı anda!", "SG MS", "", 3),
+        area("Girdap", "Hızlı dönen testereler.", "MS SA BG", "", 3),
+        area("Fırtına Adaları", "Kayan adalar ve dev duvarlar.", "SB BW BG", "", 3),
+        area("Efsane Zirve", "Merdivenler ve dikenler.", "STA SG CG", "", 3),
+        area("Son Durak", "Her şeyden biraz.", "GB LT MP", "", 3),
+        area("Kaosun Kalbi", "Öğrendiğin her şeyi kullan!", "ALL", "", 3),
     )
 
+    private fun area(title: String, desc: String, pats: String, fav: String, combo: Int): StageIdea {
+        val map = mapOf("G" to Pattern.GAP, "SP" to Pattern.SPIKES, "ST" to Pattern.STEP, "F" to Pattern.FLOATING, "SA" to Pattern.SAW,
+            "MS" to Pattern.MOVING_SAW, "MP" to Pattern.MOVING_PLATFORM, "SW" to Pattern.SPRING_WALL, "BG" to Pattern.BOOST_GAP,
+            "GB" to Pattern.GHOST_BRIDGE, "SB" to Pattern.SHIFT_BRIDGE, "LT" to Pattern.LOW_TUNNEL, "BW" to Pattern.BOUNCY_WALL,
+            "OH" to Pattern.OVERHEAD, "CG" to Pattern.CEILING_GAP, "STA" to Pattern.STAIRS, "SG" to Pattern.SPIKE_GAP)
+        val patterns = if (pats == "ALL") Pattern.entries.toList() else pats.split(" ").map { map.getValue(it) }
+        val favored = fav.split(" ").filter { it.isNotBlank() }.map { Mechanic.valueOf(it) }
+        return StageIdea(title, desc, patterns, favored, combo)
+    }
+
+    const val LEVELS_PER_AREA = 5
+    const val AREA_COUNT = 100
+    fun areaNumber(levelId: Int): Int = (levelId - 1) / LEVELS_PER_AREA + 1
+
     fun mapOf(levelId: Int): MapDef = maps[(levelId - 1) / LEVELS_PER_MAP]
-    fun stageOf(levelId: Int): StageIdea = stages[(levelId - 1) / 10]
+    fun stageOf(levelId: Int): StageIdea = stages[(levelId - 1) / LEVELS_PER_AREA]
 
     fun kindOf(levelId: Int): LevelKind = when {
         levelId == 500 -> LevelKind.GRAND_FINAL
         levelId % 50 == 0 -> LevelKind.FINAL
-        levelId % 10 == 0 -> LevelKind.CHALLENGE
+        levelId % LEVELS_PER_AREA == 0 -> LevelKind.CHALLENGE // her alanın son bölümü meydan okuma
         levelId == 1 || (levelId <= 100 && levelId % 10 == 1) -> LevelKind.TUTORIAL
         else -> LevelKind.NORMAL
     }
@@ -154,9 +219,9 @@ object GameContent {
     fun difficulty(levelId: Int): Int {
         val map = (levelId - 1) / 50
         val inMap = (levelId - 1) % 50
-        val stage = inMap / 10
-        val inStage = inMap % 10
-        val base = 1.0 + map * 0.85 + stage * 0.25 + inStage * 0.08
+        val area = inMap / LEVELS_PER_AREA
+        val inArea = inMap % LEVELS_PER_AREA
+        val base = 1.0 + map * 0.85 + area * 0.11 + inArea * 0.1
         val bonus = when (kindOf(levelId)) {
             LevelKind.CHALLENGE -> 1.0
             LevelKind.FINAL, LevelKind.GRAND_FINAL -> 1.2

@@ -10,7 +10,7 @@
 - [x] 8 güçlendirme (kalkan, mıknatıs, çift zıplama, dokunulmazlık, ekstra can, altın çarpanı, yıldız algılayıcı, kontrol noktası koruması)
 - [x] 20 ekran, programatik grafikler ve sesler
 - [x] Güvenilir kayıt (CRC, atomik yazma, yedek, sürüm göçü)
-- [x] Otomatik testler (38 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
+- [x] Otomatik testler (39 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
 - [x] Debug APK, release APK, release AAB
 
 ## Kullanıcı onayı / erişimi gerektiren
@@ -19,5 +19,5 @@
 - [ ] Gerçek Android cihazda test (bu ortamda cihaz/emülatör yok).
 
 ## İyileştirme fikirleri
-- [ ] 14 bölümde (bkz. `docs/level_report.tsv`, "dar") zamanlama penceresi ±2 tick hedefinin altında kalıyor; bölümler çözülebilir ama dardır.
+- [ ] 12 bölümde (bkz. `docs/level_report.tsv`, "dar") zamanlama penceresi ±2 tick hedefinin altında kalıyor; bölümler çözülebilir ama dardır.
 - [ ] İsteğe bağlı bulut kaydı / liderlik tablosu (ilk sürümde çevrimdışı kalması istendi).

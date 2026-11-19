@@ -169,6 +169,8 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     }
 
     private var toastY = 0f
+    /** Bildirim süresi (oyun ekranı kısaltır). */
+    open val toastTime = 2.4f
     fun toast(text: String, icon: String? = null) {
         val t = Table().apply {
             background = kit.patch("banner"); pad(16f, 26f, 20f, 26f)
@@ -179,7 +181,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         t.setPosition((stage.width - t.width) / 2, stage.height - 220f - toastY)
         toastY += t.height + 10f
         t.color.a = 0f
-        t.addAction(Actions.sequence(Actions.fadeIn(0.2f), Actions.delay(2.4f), Actions.fadeOut(0.3f), Actions.run { toastY = (toastY - t.height - 10f).coerceAtLeast(0f) }, Actions.removeActor()))
+        t.addAction(Actions.sequence(Actions.fadeIn(0.2f), Actions.delay(toastTime), Actions.fadeOut(0.3f), Actions.run { toastY = (toastY - t.height - 10f).coerceAtLeast(0f) }, Actions.removeActor()))
         stage.addActor(t)
     }
 
