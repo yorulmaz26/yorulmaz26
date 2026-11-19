@@ -28,8 +28,8 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - name: Simülasyon birim testleri
         run: ./gradlew :sim:test --stacktrace
-      - name: Android debug APK
-        run: ./gradlew :android:assembleDebug --stacktrace
+      - name: Android APK (debug + release)
+        run: ./gradlew :android:assembleDebug :android:assembleRelease --stacktrace
       - name: Masaüstü duman testi (Xvfb, ekran görüntüleri)
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq xvfb libgl1 > /dev/null
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: yeralti-debug-apk
-          path: yeralti-imparatorlugu/android/build/outputs/apk/debug/*.apk
+          path: yeralti-imparatorlugu/android/build/outputs/apk/*/*.apk
           retention-days: 30
       - uses: actions/upload-artifact@v4
         if: always()

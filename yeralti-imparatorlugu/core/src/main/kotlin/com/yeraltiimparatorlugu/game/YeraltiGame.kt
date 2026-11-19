@@ -23,6 +23,7 @@ class YeraltiGame : ApplicationAdapter(), GameActions {
     private lateinit var hud: Hud
     private lateinit var input: WorldInput
     private lateinit var saves: SaveManager
+    private lateinit var sounds: SoundFx
     private val view = ViewState()
 
     /** Masaüstü araçları (ekran görüntüsü betiği) için erişim. */
@@ -66,7 +67,8 @@ class YeraltiGame : ApplicationAdapter(), GameActions {
             welcome = welcomeLines()
         }
 
-        hud = Hud(ui, view, this, renderer, settings)
+        sounds = SoundFx(settings)
+        hud = Hud(ui, view, this, renderer, settings, sounds)
         input = WorldInput(view, hud, renderer, this)
         Gdx.input.inputProcessor = InputMultiplexer(hud.stage, input.keysAndScroll, input.detector)
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
@@ -87,6 +89,8 @@ class YeraltiGame : ApplicationAdapter(), GameActions {
         "Toplayıcılar yüzeydeki yaprak, tohum ve böcek kalıntılarını besin deposuna getirir.",
         "Koloni › Görevler ekranından öncelikleri ve uzman işçileri ayarlayın.",
         "Feromonlarla karıncaları yönlendirin: uzak kaynaklar ancak Yiyecek feromonuyla fark edilir.",
+        "Araştırma Laboratuvarı kurup yeni odaları, sınıfları ve yetenekleri açın. Mevsimler, sel ve kuraklık koloniyi etkiler.",
+        "İlk günler sakindir; sonra rakip koloniler baskın yapabilir. Asker yetiştirin, tuzak kurun, gerekirse tüneli kapatın.",
     )
 
     override fun saveNow() {
@@ -119,6 +123,7 @@ class YeraltiGame : ApplicationAdapter(), GameActions {
         sim.update(delta, view.speed)
         autosave += delta
         if (autosave >= 30f) { autosave = 0f; saveNow() }
+        while (true) { val cue = sim.sounds.removeFirstOrNull() ?: break; sounds.play(cue) }
         hud.update(delta)
         val bg = Palette.unexplored
         Gdx.gl.glClearColor(bg.r, bg.g, bg.b, 1f)
@@ -132,6 +137,7 @@ class YeraltiGame : ApplicationAdapter(), GameActions {
     override fun dispose() {
         saveNow()
         hud.dispose()
+        sounds.dispose()
         batch.dispose()
         art.dispose()
     }

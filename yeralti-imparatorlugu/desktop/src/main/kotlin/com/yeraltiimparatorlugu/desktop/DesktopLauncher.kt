@@ -12,6 +12,7 @@ fun main() {
         setWindowedMode((450 * scale).toInt(), (800 * scale).toInt())
         setForegroundFPS(60)
         useVsync(true)
+        if (System.getProperty("yi.shots") != null) disableAudio(true)
     }
     val shots = System.getProperty("yi.shots")
     val game = YeraltiGame()

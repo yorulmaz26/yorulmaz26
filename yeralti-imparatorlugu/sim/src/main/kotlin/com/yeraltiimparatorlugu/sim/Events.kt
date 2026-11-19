@@ -17,7 +17,7 @@ class EventSystem {
         val weights = WorldEventKind.entries.associateWith { k ->
             when (k) {
                 WorldEventKind.FLOOD -> if (season == Season.SPRING || season == Season.AUTUMN) 3f else 1f
-                WorldEventKind.DROUGHT -> if (season == Season.SUMMER) 3f else 0.3f
+                WorldEventKind.DROUGHT -> when (season) { Season.SUMMER -> 3f; Season.WINTER -> 0f; else -> 0.3f }
                 WorldEventKind.FOOD_BOOM -> if (season == Season.WINTER) 0.5f else 2f
                 WorldEventKind.DISEASE -> if (sim.population > 12) 1.2f + sim.corpses.size * 0.3f else 0.2f
                 WorldEventKind.QUAKE -> 0.8f

@@ -64,6 +64,20 @@ class WorldInput(
             ToolMode.VIEW -> hud.selectCell(cx, cy)
             ToolMode.DIG -> designate(cx, cy, true)
             ToolMode.CANCEL -> sim.cancelDig(cx, cy)
+            ToolMode.FILL -> sim.designateFill(cx, cy)?.let { hud.showToast(it) }
+            ToolMode.ORDER_POINT -> {
+                sim.setOrder(view.pendingSquad, view.pendingOrder, cx, maxOf(cy, -1))
+                hud.showToast("Birlik ${if (view.pendingSquad == 0) "A" else "B"}: ${view.pendingOrder.title} (${cx}, ${cy})")
+                hud.setMode(ToolMode.VIEW)
+            }
+            ToolMode.TARGET -> {
+                val c = sim.creatures.filter { it.kind.hostile }.minByOrNull { (it.x - (cx + 0.5f)) * (it.x - (cx + 0.5f)) + (it.y - (cy + 0.5f)) * (it.y - (cy + 0.5f)) }
+                if (c != null && kotlin.math.abs(c.x - (cx + 0.5f)) < 2.5f && kotlin.math.abs(c.y - (cy + 0.5f)) < 2.5f) {
+                    sim.setOrder(view.pendingSquad, com.yeraltiimparatorlugu.sim.OrderKind.TARGET, targetId = c.id)
+                    hud.showToast("Hedef: ${c.kind.title}")
+                    hud.setMode(ToolMode.VIEW)
+                } else hud.showToast("Yakında düşman yok — düşmanın üzerine dokunun")
+            }
             ToolMode.BUILD -> {
                 val t = view.ghostType ?: return true
                 view.ghostX = cx - t.width / 2
@@ -85,7 +99,7 @@ class WorldInput(
 
     override fun pan(x: Float, y: Float, deltaX: Float, deltaY: Float): Boolean {
         if (pinching || Gdx.input.isTouched(1)) return true
-        if (view.mode == ToolMode.DIG || view.mode == ToolMode.CANCEL) {
+        if (view.mode == ToolMode.DIG || view.mode == ToolMode.CANCEL || view.mode == ToolMode.FILL) {
             val (cx, cy) = cellAt(x, y)
             val (px, py) = lastPaint ?: cellAt(x - deltaX, y - deltaY)
             // Hızlı sürüklemede boşluk kalmasın diye iki hücre arası doldurulur.
@@ -93,7 +107,11 @@ class WorldInput(
             for (i in 0..steps) {
                 val ix = px + (cx - px) * i / steps
                 val iy = py + (cy - py) * i / steps
-                if (view.mode == ToolMode.DIG) designate(ix, iy, false) else actions.sim.cancelDig(ix, iy)
+                when (view.mode) {
+                    ToolMode.DIG -> designate(ix, iy, false)
+                    ToolMode.FILL -> actions.sim.designateFill(ix, iy)
+                    else -> actions.sim.cancelDig(ix, iy)
+                }
             }
             lastPaint = cx to cy
             return true

@@ -11,6 +11,14 @@ class Settings {
         get() = prefs.getBoolean("lowQuality", false)
         set(v) { prefs.putBoolean("lowQuality", v); prefs.flush() }
 
+    var soundOn: Boolean
+        get() = prefs.getBoolean("soundOn", true)
+        set(v) { prefs.putBoolean("soundOn", v); prefs.flush() }
+
+    var volume: Float
+        get() = prefs.getFloat("volume", 0.75f)
+        set(v) { prefs.putFloat("volume", v.coerceIn(0f, 1f)); prefs.flush() }
+
     var showHints: Boolean
         get() = prefs.getBoolean("showHints", true)
         set(v) { prefs.putBoolean("showHints", v); prefs.flush() }

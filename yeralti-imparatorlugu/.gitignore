@@ -5,3 +5,8 @@ local.properties
 .idea/
 .kotlin/
 /assets/save/
+
+keystore.properties
+*.jks
+*.keystore
+/assets/sfx/

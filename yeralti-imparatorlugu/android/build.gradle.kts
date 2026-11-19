@@ -4,7 +4,14 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
+import java.util.Properties
+
 val natives: Configuration by configurations.creating
+// Yayın imzası: proje kökünde keystore.properties varsa kullanılır (depoya konmaz). Örnek: keystore.properties.example
+val keystoreProps = Properties().apply {
+    val f = rootProject.file("keystore.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
 val abis = listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
 val nativesDir = layout.buildDirectory.dir("gdx-natives")
 
@@ -16,8 +23,19 @@ android {
         applicationId = "com.yeraltiimparatorlugu"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.2.0"
+        versionCode = 2
+        versionName = "1.0.0"
+    }
+
+    signingConfigs {
+        if (keystoreProps.getProperty("storeFile") != null) {
+            create("release") {
+                storeFile = rootProject.file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
     }
 
     sourceSets["main"].apply {
@@ -30,6 +48,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfigs.findByName("release")?.let { signingConfig = it }
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
