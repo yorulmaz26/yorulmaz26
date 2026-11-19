@@ -33,8 +33,17 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 - ✅ Alan 10 (46–50): ilk düşman, taret koridoru, takipçiyi lazere çekme, kalkan+savaş takımı, patron. 50 bölümün hepsi çözücüyle doğrulanır.
 - ⬜ Kalan 4 düşman davranışı (tuzak kuran, kaynak koruyan, komut bozan, takım saldırısı), diğer 12 robot sınıfının yetenekleri, kombinasyonlar, Askerî araştırma dalı.
 
-## Aşama 7–9 ⬜
-Günlük/haftalık görevler, sonsuz mod, market, harita editörü, koleksiyon, başarımlar; 500 bölüme genişleme; müzik ve yayın hazırlığı.
+## Aşama 7 — Süreklilik 🟡 (çekirdek ✅)
+- ✅ Günlük (3) ve haftalık (3) görevler: tarihe göre belirlenir (aynı gün herkes için aynı), çevrimdışı, ödül elle toplanır.
+- ✅ 100 başarım (17 ölçüt, kademeli), altın ödüllü.
+- ✅ Doğrulanmış bölüm üretici: rastgele harita → çözücüyle doğrulama → çok kolay/çözümsüz olanı reddetme; kat arttıkça kutu, çukur, anahtar, plaka, enerji ve devriye eklenir. Aynı tohum = aynı bölüm.
+- ✅ Sonsuz Fabrika (kat kat koşu, rekor, can harcamaz) ve Günlük Komut Bulmacası (günlük ödül, en az kart rekoru).
+- ✅ Market: altınla 10 robot görünümü (yalnızca görsel). Gerçek para yok; Google Play Billing eklenmedi.
+- ⬜ Harita editörü, robot seferleri, fabrika savunması, koleksiyon/müze, komut ustalığı, rastgele fabrika olayları, alternatif bölüm kuralları, prestij.
+- Not: görev tarihi cihaz saatinden okunur; tarihi değiştirmek görevleri yeniler (ödüller küçük tutuldu). Canlar ve üretim bundan etkilenmez.
+
+## Aşama 8–9 ⬜
+500 bölüme genişleme (üretici + elle tasarım + çözücü doğrulaması), müzik, performans ve yayın hazırlığı.
 
 ## Bilinen eksikler
 - Müzik yok (yalnızca ses efektleri); ayarlarda müzik seçeneği bu yüzden gösterilmiyor.

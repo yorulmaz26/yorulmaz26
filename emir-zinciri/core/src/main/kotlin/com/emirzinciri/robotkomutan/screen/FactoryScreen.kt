@@ -162,7 +162,10 @@ class FactoryScreen(game: EmirZinciriGame) : BaseScreen(game) {
 
     private fun doUpgrade(b: BuildingType) {
         when (val r = factory.upgrade(b)) {
-            FactoryResult.Ok -> { assets.play("win", 0.5f); services.persist(); view.pulse(b) }
+            FactoryResult.Ok -> {
+                services.progression.meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.BUILD_UPGRADES)
+                assets.play("win", 0.5f); services.persist(); view.pulse(b)
+            }
             is FactoryResult.Missing -> { assets.play("bump", 0.6f); ui.dialog(stage, "Kaynak yetersiz", missingText(r.cost), "Tamam" to {}) }
             is FactoryResult.Locked -> ui.dialog(stage, b.title, r.reason, "Tamam" to {})
         }

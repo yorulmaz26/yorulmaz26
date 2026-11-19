@@ -23,6 +23,11 @@ class SplashScreen(game: EmirZinciriGame, private val startup: StartupOptions) :
             startup.openScreen == "book" -> EncyclopediaScreen(game)
             startup.openScreen == "stats" -> StatsScreen(game)
             startup.openScreen == "factory" -> FactoryScreen(game)
+            startup.openScreen == "quests" -> QuestsScreen(game)
+            startup.openScreen == "achievements" -> QuestsScreen(game, 2)
+            startup.openScreen == "market" -> MarketScreen(game)
+            startup.openScreen == "endless" -> EndlessScreen(game)
+            startup.openScreen == "endless_play" -> com.emirzinciri.robotkomutan.logic.gen.Generator.generate(9, 42)?.let { GameScreen(game, it.def, startup, PlayMode.ENDLESS) }
             else -> null
         } ?: MenuScreen(game)
         startup.screenshotPath?.let { (next as BaseScreen).scheduleScreenshot(it, startup.screenshotAfter) }

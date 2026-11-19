@@ -20,6 +20,7 @@ data class WinResult(
 class Progression(val save: SaveData, clock: GameClock) {
     val lives = LivesSystem(save.lives, clock)
     val factory = com.emirzinciri.robotkomutan.logic.factory.Factory(save.factory, save.wallet, clock)
+    val meta = com.emirzinciri.robotkomutan.logic.meta.Meta(save)
 
     fun isCompleted(levelId: Int) = save.stars(levelId) > 0
 
@@ -46,6 +47,7 @@ class Progression(val save: SaveData, clock: GameClock) {
     /** Başarısız sonuç görüldüğünde çağrılır. Can düştüyse true. */
     fun onFail(def: LevelDef, ticks: Int): Boolean {
         save.stats.fails++
+        meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.FAILS)
         save.stats.ticksSimulated += ticks
         val costs = costsLife(def)
         if (costs && lives.loseLife()) { save.stats.livesLost++; return true }
@@ -63,6 +65,7 @@ class Progression(val save: SaveData, clock: GameClock) {
         if (newBest) rec.bestCards = st.cards
         if (rec.bestTicks == 0 || st.ticks < rec.bestTicks) rec.bestTicks = st.ticks
         save.stats.wins++
+        meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.WINS)
         save.stats.ticksSimulated += st.ticks
 
         var reward = Reward()
@@ -79,6 +82,7 @@ class Progression(val save: SaveData, clock: GameClock) {
     }
 
     fun apply(r: Reward) {
+        meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.GOLD_EARNED, r.gold)
         save.wallet.gold += r.gold
         save.wallet.metal += r.metal
         save.wallet.chips += r.chips

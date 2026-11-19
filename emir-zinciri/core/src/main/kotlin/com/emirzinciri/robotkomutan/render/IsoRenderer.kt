@@ -26,6 +26,8 @@ import kotlin.math.sin
 class IsoRenderer(private val assets: Assets) {
 
     private val shapes = ShapeRenderer()
+    /** Oyuncunun seçtiği robot görünümü (ilk robot için). */
+    var primaryColor: Color? = null
     private val layout = GlyphLayout()
 
     // Yerleşim
@@ -374,7 +376,7 @@ class IsoRenderer(private val assets: Assets) {
         if (a0 - a1 > 180f) a1 += 360f
         val angle = MathUtils.lerp(a0, a1, e)
         val carrying = r.carrying || (prev.carrying && f.t < 0.5f)
-        val color = Theme.robotColors[index % Theme.robotColors.size]
+        val color = if (index == 0 && primaryColor != null) primaryColor!! else Theme.robotColors[index % Theme.robotColors.size]
         val dim = r.status == RobotStatus.NO_ENERGY
         val focus = f.focusRobot == null || f.focusRobot == r.id
         val shielded = r.shield > 0 || f.events.any { it is SimEvent.ShieldUp && it.robot == r.id }

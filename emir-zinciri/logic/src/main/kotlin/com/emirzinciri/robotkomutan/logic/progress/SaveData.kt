@@ -61,6 +61,7 @@ data class SaveData(
     val tutorialsSeen: MutableSet<String> = mutableSetOf(),
     var stats: PlayerStats = PlayerStats(),
     var factory: com.emirzinciri.robotkomutan.logic.factory.FactoryState = com.emirzinciri.robotkomutan.logic.factory.FactoryState(),
+    var meta: com.emirzinciri.robotkomutan.logic.meta.MetaState = com.emirzinciri.robotkomutan.logic.meta.MetaState(),
 ) {
     fun record(levelId: Int): LevelRecord = levels.getOrPut(levelId) { LevelRecord() }
     fun stars(levelId: Int): Int = levels[levelId]?.stars ?: 0

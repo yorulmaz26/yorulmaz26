@@ -36,11 +36,20 @@ import com.emirzinciri.robotkomutan.ui.CardActor
 import com.emirzinciri.robotkomutan.ui.Theme
 
 /** Oynanış ekranı: Planla → Kartları yerleştir → Başlat → İzle → Düzelt. */
-class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val startup: StartupOptions? = null) : BaseScreen(game) {
+/** Oyun modu: hikâye bölümleri, Sonsuz Fabrika katları veya günlük bulmaca. */
+enum class PlayMode { STORY, ENDLESS, DAILY }
+
+class GameScreen(
+    game: EmirZinciriGame,
+    private val def: LevelDef,
+    private val startup: StartupOptions? = null,
+    private val mode: PlayMode = PlayMode.STORY,
+) : BaseScreen(game) {
+    private val story get() = mode == PlayMode.STORY
 
     private val level = LevelData(def)
     private val progression get() = services.progression
-    private val session = PlaySession(level, progression.draft(def.id).ifEmpty {
+    private val session = PlaySession(level, (if (mode == PlayMode.STORY) progression.draft(def.id) else emptyMap()).ifEmpty {
         if (startup?.applySolution == true) def.solution else emptyMap()
     })
     private var selectedRobot = session.robotIds.first()
@@ -70,10 +79,10 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
     private lateinit var speedLabel: Label
     private var paletteVisible = true
     private var infoTimer = 0f
-    private var resultOverlay: Table? = null
+    var resultOverlay: Table? = null
     private var tutorial: TutorialHint? = null
     private val newCommands: Set<CommandType> = run {
-        val prev = services.catalog[def.id - 1]?.commands?.toSet() ?: emptySet()
+        val prev = if (mode != PlayMode.STORY) def.commands.toSet() else services.catalog[def.id - 1]?.commands?.toSet() ?: emptySet()
         def.commands.filter { it !in prev }.toSet()
     }
 
@@ -90,6 +99,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         root.top()
         root.add(buildTopBar()).growX().pad(16f, 16f, 6f, 16f).row()
         map = MapView(assets, session) { services.save.settings.showGrid }
+        map.renderer.primaryColor = Theme.rgb(com.emirzinciri.robotkomutan.logic.meta.Skins.of(services.save.meta.skin).color)
         map.focusRobot = if (session.robotIds.size > 1) selectedRobot else null
         map.onRobotTapped = { id -> if (id != selectedRobot) { selectedRobot = id; selectedCard = -1; map.focusRobot = id; assets.play("click", 0.5f); refreshAll() } }
         root.add(map).grow().row()
@@ -101,10 +111,10 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         val t = Table()
         t.add(ui.iconButton("back", size = 72f) { onBack() }).size(72f)
         val titles = Table()
-        val title = ui.label("Bölüm ${def.id} · ${def.name}", if (def.name.length > 16) assets.fontBold else assets.fontTitle, Theme.ink)
+        val title = ui.label(if (story) "Bölüm ${def.id} · ${def.name}" else def.name, if (def.name.length > 16) assets.fontBold else assets.fontTitle, Theme.ink)
         title.setEllipsis(true)
         titles.add(title).left().growX().minWidth(0f).row()
-        titles.add(ui.label("Alan ${area.id}: ${area.name}", assets.fontSmall, Theme.inkSoft).also { it.setEllipsis(true) }).left().growX().minWidth(0f)
+        titles.add(ui.label(when (mode) { PlayMode.STORY -> "Alan ${area.id}: ${area.name}"; PlayMode.ENDLESS -> "Sonsuz Fabrika · can harcanmaz"; PlayMode.DAILY -> "Bugünün bulmacası · can harcanmaz" }, assets.fontSmall, Theme.inkSoft).also { it.setEllipsis(true) }).left().growX().minWidth(0f)
         t.add(titles).growX().minWidth(0f).left().padLeft(14f)
         val lives = Table()
         lives.background = assets.panel(Theme.white, 18, 3f)
@@ -224,7 +234,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         }
         session.robotIds.forEachIndexed { i, id ->
             val sel = id == selectedRobot
-            val col = Theme.robotColors[i % Theme.robotColors.size]
+            val col = map.renderer.primaryColor?.takeIf { i == 0 } ?: Theme.robotColors[i % Theme.robotColors.size]
             val cls = def.robots.first { it.id == id }.type
             val name = if (cls == com.emirzinciri.robotkomutan.logic.level.RobotClass.BASIC) "Robot $id" else "$id · ${cls.title.substringBefore(' ')}"
             val b = ui.button(name, if (sel) col else Theme.panelAlt, if (sel) Theme.white else Theme.ink, "robot", assets.fontBold, 18) {
@@ -408,7 +418,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
     }
 
     private fun afterEdit() {
-        progression.saveDraft(def.id, session.tokens())
+        saveDraft()
         services.save.stats.cardsPlaced++
         refreshAll()
     }
@@ -449,7 +459,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
             assets.play("bump", 0.6f)
             return false
         }
-        if (!progression.canStart(def)) { showNoLives(); return false }
+        if (story && !progression.canStart(def)) { showNoLives(); return false }
         return true
     }
 
@@ -477,9 +487,11 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         refreshAll()
     }
 
+    private fun saveDraft() { if (story) progression.saveDraft(def.id, session.tokens()) }
+
     private fun onRunStarted() {
-        progression.onRunStarted(def)
-        progression.saveDraft(def.id, session.tokens())
+        if (story) progression.onRunStarted(def) else services.save.stats.runs++
+        saveDraft()
         services.persist()
         map.clearPopups()
         status.setText("")
@@ -546,6 +558,16 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
 
     private fun showOutcome(o: Outcome) {
         refreshAll()
+        val beaten = session.current.enemies.count { !it.alive }
+        if (beaten > 0) progression.meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.ENEMIES, beaten.toLong())
+        if (o is Outcome.Win && session.current.enemies.any { it.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.BOSS && !it.alive })
+            progression.meta.count(com.emirzinciri.robotkomutan.logic.meta.Counter.BOSSES)
+        if (!story) {
+            val stars = Stars.count(def, o)
+            resultOverlay = EndlessFlow.showResult(this, game, def, mode, o, stars,
+                retry = { closeResult(); session.backToEdit(); refreshAll() })
+            return
+        }
         when (o) {
             is Outcome.Win -> showWin(o)
             is Outcome.Fail -> showFail(o)
@@ -661,7 +683,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         FailReason.INVALID_PROGRAM -> ""
     }
 
-    private fun closeResult() { resultOverlay?.let { ui.close(it) }; resultOverlay = null }
+    fun closeResult() { resultOverlay?.let { ui.close(it) }; resultOverlay = null }
 
     private fun showNoLives() {
         val next = progression.lives.msToNext()?.let { LivesSystem.format(it) } ?: "—"
@@ -695,7 +717,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
 
     override fun show() {
         super.show()
-        if (startup?.applySolution != true) startTutorial(force = false)
+        if (startup?.applySolution != true && story) startTutorial(force = false)
     }
 
     private fun startTutorial(force: Boolean) {
@@ -774,14 +796,15 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
     // ================================================================== geri / yaşam döngüsü
 
     override fun onBack() {
+        if (!story) { if (tutorial?.active == true) { tutorial?.dispose(); tutorial = null; return }; game.go(EndlessScreen(game)); return }
         if (tutorial?.active == true) { tutorial?.dispose(); tutorial = null; return }
-        progression.saveDraft(def.id, session.tokens())
+        saveDraft()
         services.persist()
         game.go(LevelSelectScreen(game, def.area))
     }
 
     override fun onPause() {
-        progression.saveDraft(def.id, session.tokens())
+        saveDraft()
     }
 
     override fun dispose() {

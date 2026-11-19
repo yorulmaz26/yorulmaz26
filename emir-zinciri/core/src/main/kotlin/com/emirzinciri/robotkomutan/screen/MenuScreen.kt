@@ -30,7 +30,7 @@ class MenuScreen(game: EmirZinciriGame) : BaseScreen(game) {
 
         root.add(ui.label("EMİR ZİNCİRİ", assets.fontHuge, Theme.ink)).padTop(30f).row()
         root.add(ui.label("ROBOT KOMUTAN", assets.fontTitle, Theme.orange)).row()
-        root.add(diorama).grow().minHeight(380f).padTop(10f).row()
+        root.add(diorama).grow().minHeight(300f).padTop(6f).row()
 
         val nextId = services.nextLevelId()
         val allDone = services.catalog.ids.all { p.isCompleted(it) }
@@ -43,11 +43,19 @@ class MenuScreen(game: EmirZinciriGame) : BaseScreen(game) {
         row0.add(ui.button("Bölümler", Theme.turquoise, Theme.white, "map") { game.go(LevelSelectScreen(game)) }).growX().uniformX().padRight(7f)
         row0.add(ui.button("Fabrika", Theme.orange, Theme.white, "gear") { game.go(FactoryScreen(game)) }).growX().uniformX().padLeft(7f)
         root.add(row0).width(560f).padTop(14f).row()
+        p.meta.refresh(DateKeys.day(), DateKeys.week())
+        val claim = p.meta.claimable
+        val rowA = com.badlogic.gdx.scenes.scene2d.ui.Table()
+        rowA.add(ui.button("Sonsuz", Theme.purple, Theme.white, "speed") { game.go(EndlessScreen(game)) }).growX().uniformX().padRight(7f)
+        rowA.add(ui.button(if (claim > 0) "Görevler ($claim)" else "Görevler", if (claim > 0) Theme.yellow else Theme.white, Theme.ink, "check") {
+            game.go(QuestsScreen(game)) }).growX().uniformX().padLeft(7f)
+        root.add(rowA).width(560f).padTop(14f).row()
         val row = com.badlogic.gdx.scenes.scene2d.ui.Table()
-        row.add(ui.button("Komutlar", Theme.white, Theme.ink, "book") { game.go(EncyclopediaScreen(game)) }).growX().uniformX().padRight(7f)
-        row.add(ui.button("Profil", Theme.white, Theme.ink, "chart") { game.go(StatsScreen(game)) }).growX().uniformX().padLeft(7f)
+        row.add(ui.button("Market", Theme.white, Theme.ink, "coin") { game.go(MarketScreen(game)) }).growX().uniformX().padRight(5f)
+        row.add(ui.button("Komutlar", Theme.white, Theme.ink, "book") { game.go(EncyclopediaScreen(game)) }).growX().uniformX().padLeft(5f).padRight(5f)
+        row.add(ui.iconButton("chart", Theme.white, Theme.ink, 72f) { game.go(StatsScreen(game)) }).size(72f).padLeft(5f).padRight(5f)
+        row.add(ui.iconButton("gear", Theme.white, Theme.ink, 72f) { game.go(SettingsScreen(game)) }).size(72f).padLeft(5f)
         root.add(row).width(560f).padTop(14f).row()
-        root.add(ui.button("Ayarlar", Theme.white, Theme.ink, "gear") { game.go(SettingsScreen(game)) }).width(560f).padTop(14f).row()
         root.add(ui.label(EmirZinciriGame.SLOGAN, assets.fontSmall, Theme.inkFaint, wrap = true, align = Align.center)).width(560f).padTop(24f).padBottom(20f)
         services.loadMessage?.let { msg ->
             services.loadMessage = null
