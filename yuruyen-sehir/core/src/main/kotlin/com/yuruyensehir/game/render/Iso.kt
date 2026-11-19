@@ -38,6 +38,12 @@ object Draw {
         }
     }
 
+    /** Dikey renk geçişli dörtgen: (x1,y1)-(x2,y2) alt kenar [bottom], (x3,y3)-(x4,y4) üst kenar [top]. */
+    fun quadGradient(sr: ShapeRenderer, x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float, x4: Float, y4: Float, bottom: Color, top: Color) {
+        sr.triangle(x1, y1, x2, y2, x3, y3, bottom, bottom, top)
+        sr.triangle(x1, y1, x3, y3, x4, y4, bottom, top, top)
+    }
+
     fun thickLine(sr: ShapeRenderer, x1: Float, y1: Float, x2: Float, y2: Float, w: Float) = sr.rectLine(x1, y1, x2, y2, w)
 
     fun shade(c: Color, f: Float, out: Color = Color()): Color = out.set(c.r * f, c.g * f, c.b * f, c.a)

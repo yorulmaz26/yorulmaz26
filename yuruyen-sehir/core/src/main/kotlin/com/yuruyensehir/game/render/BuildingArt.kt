@@ -56,6 +56,8 @@ object BuildingArt {
     }
 
     private val windowed = setOf(SMALL_HOUSE, LARGE_HOUSE, APARTMENTS, CITY_CENTER, TOWN_HALL, HEALTH_CENTER, CULTURE_CENTER)
+    private val gA = Color(); private val gB = Color(); private val edge = Color(); private val shadowC = Color(0.15f, 0.2f, 0.1f, 0.18f)
+    private val aoTop = Color(0f, 0f, 0f, 0f); private val aoBottom = Color(0.1f, 0.08f, 0.05f, 0.22f)
     private val tmp1 = Color()
     private val tmp2 = Color()
     private val tmp3 = Color()
@@ -85,8 +87,12 @@ object BuildingArt {
         if (hp < 60f) { wall.lerp(Color.GRAY, (60f - hp) / 120f); roof.lerp(Color.GRAY, (60f - hp) / 120f) }
         wall.a = alpha; roof.a = alpha
 
-        // Zemin gölgesi / taban
-        sr.setColor(0.35f, 0.3f, 0.2f, 0.25f * alpha)
+        // Düşen gölge (ışık sol-yukarıdan): taban dörtgeni sağ-aşağı kaydırılır
+        val sh = (st.height.coerceAtLeast(6f)) * 0.45f
+        shadowC.a = 0.20f * alpha
+        sr.color = shadowC
+        Draw.quad(sr, ax, ay - 1, bx + sh, by - sh * 0.45f, cx + sh, cy - sh * 0.45f, dx, dy)
+        sr.setColor(0.3f, 0.26f, 0.18f, 0.22f * alpha)
         Draw.quad(sr, ax, ay - 2, bx + 2, by - 1, cx, cy, dx - 2, dy - 1)
 
         if (build < 1f) {
@@ -106,19 +112,25 @@ object BuildingArt {
         }
         if (st.roofKind == Roof.FIELD) hgt = st.height
 
-        // Yan duvarlar
-        sr.color = Draw.shade(wall, 0.78f, tmp3).also { it.a = alpha }
-        Draw.quad(sr, pdx, pdy, pax, pay, pax, pay + hgt, pdx, pdy + hgt)
-        sr.color = Draw.shade(wall, 0.92f, tmp3).also { it.a = alpha }
-        Draw.quad(sr, pax, pay, pbx, pby, pbx, pby + hgt, pax, pay + hgt)
+        // Yan duvarlar: ışık sol-yukarıdan; sol yüz gölgede, sağ yüz aydınlık, aşağıya doğru koyulaşır
+        Draw.quadGradient(sr, pdx, pdy, pax, pay, pax, pay + hgt, pdx, pdy + hgt,
+            Draw.shade(wall, 0.66f, gA).also { it.a = alpha }, Draw.shade(wall, 0.82f, gB).also { it.a = alpha })
+        Draw.quadGradient(sr, pax, pay, pbx, pby, pbx, pby + hgt, pax, pay + hgt,
+            Draw.shade(wall, 0.86f, gA).also { it.a = alpha }, Draw.shade(wall, 1.0f, gB).also { it.a = alpha })
+        // Ortam kapanması: duvar dibinde yumuşak koyuluk
+        if (hgt > 6) {
+            aoBottom.a = 0.22f * alpha
+            val ao = minOf(7f, hgt * 0.4f)
+            Draw.quadGradient(sr, pdx, pdy, pax, pay, pax, pay + ao, pdx, pdy + ao, aoBottom, aoTop)
+            Draw.quadGradient(sr, pax, pay, pbx, pby, pbx, pby + ao, pax, pay + ao, aoBottom, aoTop)
+        }
 
         val tax = pax; val tay = pay + hgt; val tbx = pbx; val tby = pby + hgt
         val tcx = pcx; val tcy = pcy + hgt; val tdx = pdx; val tdy = pdy + hgt
 
         when (st.roofKind) {
             Roof.FLAT -> {
-                sr.color = roof
-                Draw.quad(sr, tax, tay, tbx, tby, tcx, tcy, tdx, tdy)
+                Draw.quadGradient(sr, tax, tay, tbx, tby, tcx, tcy, tdx, tdy, roof, Draw.shade(roof, 0.9f, gA).also { it.a = alpha })
                 sr.color = Draw.shade(roof, 0.85f, tmp3).also { it.a = alpha }
                 // parapet
                 sr.rectLine(tax, tay, tbx, tby, 2f); sr.rectLine(tax, tay, tdx, tdy, 2f)
@@ -144,10 +156,13 @@ object BuildingArt {
             }
             Roof.PYRAMID, Roof.TOWER -> {
                 val apx = (tax + tcx) / 2; val apy = (tay + tcy) / 2 + st.roofHeight * levelBoost
-                sr.color = Draw.shade(roof, 0.82f, tmp3).also { it.a = alpha }
-                sr.triangle(tdx, tdy, tax, tay, apx, apy)
-                sr.color = roof
-                sr.triangle(tax, tay, tbx, tby, apx, apy)
+                val r1 = Draw.shade(roof, 0.72f, gA).also { it.a = alpha }; val r2 = Draw.shade(roof, 0.9f, gB).also { it.a = alpha }
+                sr.triangle(tdx, tdy, tax, tay, apx, apy, r1, r1, r2)
+                val r3 = Draw.shade(roof, 0.92f, tmp3).also { it.a = alpha }
+                sr.triangle(tax, tay, tbx, tby, apx, apy, r3, r3, roof)
+                Draw.shade(roof, 0.5f, edge).also { it.a = 0.5f * alpha }; sr.color = edge
+                sr.rectLine(tdx, tdy, apx, apy, 1.1f); sr.rectLine(tax, tay, apx, apy, 1.3f); sr.rectLine(tbx, tby, apx, apy, 1.1f)
+                sr.rectLine(tdx, tdy, tax, tay, 1.1f); sr.rectLine(tax, tay, tbx, tby, 1.1f)
                 if (tower) {
                     // bayrak / ışık
                     sr.setColor(0.45f, 0.35f, 0.25f, alpha); sr.rectLine(apx, apy, apx, apy + 12, 1.6f)
@@ -171,11 +186,13 @@ object BuildingArt {
                 val rh = st.roofHeight * levelBoost
                 val rax = (tax + tdx) / 2; val ray = (tay + tdy) / 2 + rh
                 val rbx = (tbx + tcx) / 2; val rby = (tby + tcy) / 2 + rh
-                sr.color = roof
-                Draw.quad(sr, tax, tay, tbx, tby, rbx, rby, rax, ray)
+                Draw.quadGradient(sr, tax, tay, tbx, tby, rbx, rby, rax, ray,
+                    Draw.shade(roof, 0.82f, gA).also { it.a = alpha }, Draw.shade(roof, 1.05f, gB).also { it.a = alpha })
                 sr.color = Draw.shade(wall, 0.72f, tmp3).also { it.a = alpha }
                 sr.triangle(tdx, tdy, tax, tay, rax, ray)
-                sr.color = Draw.shade(roof, 0.75f, tmp3).also { it.a = alpha }
+                Draw.shade(roof, 0.5f, edge).also { it.a = 0.55f * alpha }; sr.color = edge
+                sr.rectLine(tax, tay, tbx, tby, 1.2f); sr.rectLine(tax, tay, rax, ray, 1.1f); sr.rectLine(tdx, tdy, rax, ray, 1.1f)
+                sr.setColor(1f, 1f, 1f, 0.45f * alpha)
                 sr.rectLine(rax, ray, rbx, rby, 2f)
             }
             Roof.DOME -> {
@@ -191,6 +208,19 @@ object BuildingArt {
                 sr.setColor(1f, 1f, 1f, 0.55f * alpha)
                 sr.circle(mx - rx * 0.35f, my + rx * 0.45f, rx * 0.16f, 8)
             }
+        }
+
+        // Kenar çizgileri (silüet): ince ve yarı saydam
+        if (hgt > 4) {
+            Draw.shade(wall, 0.45f, edge).also { it.a = 0.55f * alpha }
+            sr.color = edge
+            sr.rectLine(pax, pay, pax, pay + hgt, 1.3f)
+            sr.rectLine(pdx, pdy, pdx, pdy + hgt, 1.1f)
+            sr.rectLine(pbx, pby, pbx, pby + hgt, 1.1f)
+            sr.rectLine(pdx, pdy, pax, pay, 1.1f); sr.rectLine(pax, pay, pbx, pby, 1.1f)
+            if (st.roofKind == Roof.FLAT || st.roofKind == Roof.DOME) { sr.rectLine(tax, tay, tbx, tby, 1.1f); sr.rectLine(tax, tay, tdx, tdy, 1.1f) }
+            // Üst kenarda ışık çizgisi
+            sr.setColor(1f, 1f, 1f, 0.35f * alpha); sr.rectLine(pax + 1, pay + hgt - 0.5f, pbx, pby + hgt - 0.5f, 1.2f)
         }
 
         // Pencereler / kapı (konutlar ve yönetim)

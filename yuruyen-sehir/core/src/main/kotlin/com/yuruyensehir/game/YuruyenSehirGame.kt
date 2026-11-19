@@ -21,7 +21,7 @@ fun interface GameHook {
     fun onFrame(game: YuruyenSehirGame, frame: Long)
 }
 
-class YuruyenSehirGame(private val hook: GameHook? = null) : Game() {
+class YuruyenSehirGame(private val hook: GameHook? = null, val store: PlatformStore = NoStore) : Game() {
     lateinit var theme: Theme
         private set
     lateinit var saves: SaveManager
@@ -48,12 +48,21 @@ class YuruyenSehirGame(private val hook: GameHook? = null) : Game() {
         }
         gameScreen = GameScreen(this)
         setScreen(gameScreen)
+        connectStore()
         save()
     }
 
     override fun render() {
         super.render()
         hook?.onFrame(this, frame++)
+    }
+
+    /** Play mağazasından sahip olunan ürünleri geri yükler (iadeler dahil). */
+    fun connectStore() {
+        store.connect { owned ->
+            com.yuruyensehir.logic.PremiumSystem.sync(core.state, owned)
+            save()
+        }
     }
 
     fun save() {
@@ -89,6 +98,7 @@ class YuruyenSehirGame(private val hook: GameHook? = null) : Game() {
         save()
         gameScreen.dispose()
         audio.dispose()
+        store.dispose()
         theme.dispose()
     }
 }

@@ -193,7 +193,34 @@ class Theme : Disposable {
         }
     }
 
+    /** Yumuşak gölgeli panel arka planı (gölge aşağıya düşer, iç boşluklar korunur). */
+    fun panel(color: Color, shadow: Float = 6f): Drawable {
+        val base = tinted("round", color)
+        val sh = tinted("round", Color(0.25f, 0.2f, 0.12f, 0.16f))
+        val sh2 = tinted("round", Color(0.25f, 0.2f, 0.12f, 0.08f))
+        return object : com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable(base) {
+            override fun draw(batch: com.badlogic.gdx.graphics.g2d.Batch, x: Float, y: Float, width: Float, height: Float) {
+                sh2.draw(batch, x - 2f, y - shadow - 2f, width + 4f, height + 2f)
+                sh.draw(batch, x, y - shadow * 0.6f, width, height)
+                base.draw(batch, x, y, width, height)
+            }
+        }
+    }
+
     fun tinted(patch: String, color: Color): Drawable = NinePatchDrawable(skin.get(patch, NinePatch::class.java)).tint(color)
+    private val icons = HashMap<String, Drawable>()
+
+    /** assets/ui/<ad>.png simgesi (mipmap'li, küçültmede keskin kalır). Bulunamazsa beyaz daire. */
+    fun icon(name: String): Drawable = icons.getOrPut(name) {
+        val f = Gdx.files.internal("ui/$name.png")
+        if (!f.exists()) return@getOrPut circle(Color.WHITE)
+        val t = Texture(f, true).also { textures += it }
+        t.setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear)
+        TextureRegionDrawable(TextureRegion(t))
+    }
+
+    fun resIcon(r: Resource): Drawable = icon("res_" + r.name.lowercase())
+
     fun circle(color: Color): Drawable = (skin.getDrawable("circle") as TextureRegionDrawable).tint(color)
     fun solid(color: Color): Drawable = (skin.getDrawable("white") as TextureRegionDrawable).tint(color)
 

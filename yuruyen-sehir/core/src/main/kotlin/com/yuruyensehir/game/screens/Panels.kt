@@ -324,7 +324,7 @@ object Panels {
             val p = flow.produced[res] ?: 0.0; val c = flow.consumed[res] ?: 0.0
             if (st.store[res] < 0.5 && p == 0.0 && c == 0.0 && res.advanced) continue
             val name = Table()
-            name.add(s.ui.dot(Palette.resource(res), 14f)).size(14f).padRight(6f)
+            name.add(s.ui.resIcon(res, 22f)).size(22f).padRight(6f)
             name.add(s.ui.label(res.title, "small"))
             tbl.add(name).left()
             tbl.add(s.ui.label(if (res == Resource.GOLD) fmt(st.store[res]) else "${fmt(st.store[res])}/${fmt(st.store.cap(res))}", "small")).left()
@@ -595,7 +595,7 @@ object Panels {
         t.section(s, "Yeni Oyun", width)
         t.text(s, "${RED}Mevcut şehir ve bütün ilerleme silinir.[]", width)
         t.add(s.ui.button(if (s.newGameConfirm()) "Emin misiniz? Silmek için tekrar dokunun" else "Yeni Oyun Başlat", "danger") { s.requestNewGame() }).width(width).padTop(6f).row()
-        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 1.0.0[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 1.1.0[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
     }
 
     // ------------------------------------------------------------------ Ticaret
@@ -646,7 +646,7 @@ object Panels {
         for (r in Resource.entries.filter { TradeSystem.tradable(it) }) {
             val q = TradeSystem.quote(st, c, r)
             val name = Table()
-            name.add(s.ui.dot(Palette.resource(r), 14f)).size(14f).padRight(6f)
+            name.add(s.ui.resIcon(r, 22f)).size(22f).padRight(6f)
             val tag = when (r) { in c.culture.offers -> " ${GREEN}ucuz[]"; in c.culture.wants -> " [#C07A10]aranan[]"; else -> "" }
             name.add(s.ui.label(r.title + tag, "small"))
             tbl.add(name).left()
@@ -980,7 +980,7 @@ object Panels {
     fun market(s: GameScreen, t: Table, width: Float) {
         val st = s.state
         t.text(s, "Altın: ${fmt(st.store[Resource.GOLD])} • Satın alınan: ${st.cosmetics.owned.size}/${Cosmetic.entries.size}", width, "default")
-        t.text(s, "${SOFT}Market yalnızca oyun içi kaynaklarla çalışır; gerçek para gerekmez. Kozmetikler oynanışı değiştirmez (ağırlık ve üretim aynı kalır).[]", width)
+        t.text(s, "${SOFT}Kozmetikler oyun içi altınla alınır; isteğe bağlı iki paket Google Play'den de alınabilir. Hiçbiri oynanışı değiştirmez (ağırlık ve üretim aynı kalır) ve oyunun tamamı parasız oynanabilir.[]", width)
 
         t.section(s, "Şehir Özelleştirme", width)
         val names = Table()
@@ -995,6 +995,25 @@ object Panels {
             if (eq != null) row.add(s.ui.button("Çıkar", "default") { s.act(ShopSystem.unequip(st, slot)) }.apply { pad(6f, 12f, 6f, 12f) })
             t.add(row).width(width).padTop(2f).row()
         }
+
+        t.section(s, "Google Play (gerçek para, yalnızca kozmetik)", width)
+        val store = s.game.store
+        if (!store.ready) t.text(s, "${SOFT}${store.unavailableReason ?: "Mağazaya bağlanılıyor…"}[]", width)
+        t.text(s, "${SOFT}Bu ürünler oynanışa hiçbir avantaj vermez; bütün oyun parasız oynanabilir. Satın alımlar Google hesabınıza bağlıdır ve yeniden kurulumda geri yüklenir.[]", width)
+        for (p in PremiumProduct.entries) {
+            val card = s.ui.card(Color.valueOf("EEF0FF"))
+            val l = Table()
+            val price = store.products().firstOrNull { it.productId == p.productId }?.price
+            l.add(s.ui.label(p.title + if (PremiumSystem.owned(st, p)) "  ${GREEN}(sizde)[]" else "", "default")).left().row()
+            l.add(s.ui.label(p.description, "small", wrap = true)).width(width - 190f).left().row()
+            l.add(s.ui.label("İçerik: " + PremiumSystem.grants(p).joinToString { it.title }.let { if (it.length > 90) it.take(90) + "…" else it }, "small", wrap = true)).width(width - 190f).left()
+            card.add(l).expandX().left()
+            val b = s.ui.button(if (PremiumSystem.owned(st, p)) "Sizde" else price ?: "—", "primary") { s.buyPremium(p) }
+            b.isDisabled = PremiumSystem.owned(st, p) || !store.ready || price == null
+            card.add(b).width(160f)
+            t.cardRow(card, width)
+        }
+        if (store.ready) t.add(s.ui.button("Satın alımları geri yükle", "default") { s.game.connectStore(); s.act(ActionResult.ok("Satın alımlar sorgulanıyor…")) }).width(width).padTop(4f).row()
 
         t.section(s, "Paketler", width)
         for (p in CosmeticPack.entries) {

@@ -138,3 +138,50 @@ class ReleaseTest {
         assertTrue(perStep < 2.0, "adım başına $perStep ms")
     }
 }
+
+class PremiumTest {
+    private fun state() = GameCore.newGame(51L).state.also { it.store.amounts[Resource.GOLD] = 5000.0 }
+
+    @Test
+    fun premiumOnlyItemsCannotBeBoughtWithGold() {
+        val s = state()
+        assertFalse(ShopSystem.buy(s, Cosmetic.SKIN_AURORA).success)
+        assertFalse(ShopSystem.owned(s, Cosmetic.SKIN_AURORA))
+        assertEquals(5000.0, s.store[Resource.GOLD], 1e-9)
+    }
+
+    @Test
+    fun grantIsIdempotentAndCosmeticOnly() {
+        val s = state()
+        val cap = WeightBalanceSystem.capacity(s); val gold = s.store[Resource.GOLD]
+        PremiumSystem.grant(s, PremiumProduct.SUPPORTER_PACK)
+        PremiumSystem.grant(s, PremiumProduct.SUPPORTER_PACK)
+        assertTrue(ShopSystem.owned(s, Cosmetic.SKIN_AURORA))
+        assertEquals(Cosmetic.FLAG_STAR, ShopSystem.equipped(s, CosmeticSlot.FLAG))
+        assertEquals(1, s.log.count { it.text.contains("Destekçi Paketi etkinleştirildi") })
+        assertEquals(cap, WeightBalanceSystem.capacity(s), 1e-9)
+        assertEquals(gold, s.store[Resource.GOLD], 1e-9)
+    }
+
+    @Test
+    fun syncRestoresAndRevokesRefundedWithoutTouchingGoldPurchases() {
+        val s = state()
+        ShopSystem.buy(s, Cosmetic.SKIN_OCEAN) // altınla
+        PremiumSystem.sync(s, listOf("tum_kozmetikler", "destekci_paketi"))
+        assertTrue(Cosmetic.entries.all { ShopSystem.owned(s, it) })
+        PremiumSystem.sync(s, emptyList()) // iki ürün de iade edildi
+        assertFalse(ShopSystem.owned(s, Cosmetic.SKIN_AURORA))
+        assertFalse(ShopSystem.owned(s, Cosmetic.ROOF_LAVENDER))
+        assertTrue(ShopSystem.owned(s, Cosmetic.SKIN_OCEAN), "altınla alınan korunmalı")
+        assertTrue(s.premium.isEmpty())
+    }
+
+    @Test
+    fun unknownProductIdsAreIgnoredAndStateSaves() {
+        val s = state()
+        PremiumSystem.sync(s, listOf("bilinmeyen_urun", "destekci_paketi"))
+        assertEquals(setOf(PremiumProduct.SUPPORTER_PACK), s.premium)
+        val st = MemoryStorage(); SaveManager(st).save(s, 1L)
+        assertEquals(s.premium, SaveManager(st).load()!!.premium)
+    }
+}

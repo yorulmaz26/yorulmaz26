@@ -228,6 +228,8 @@ data class GameState(
     val achievements: MutableMap<String, Int> = mutableMapOf(),
     var cityName: String = "Gezgin Yuva",
     val cosmetics: CosmeticState = CosmeticState(),
+    /** Google Play üzerinden alınmış (kozmetik) ürünler. */
+    val premium: MutableSet<PremiumProduct> = mutableSetOf(),
 ) {
     /** Şehir yapısı değiştiğinde artar; önbellekli hesaplamalar bunu izler. */
     @Transient var cityVersion: Int = 0

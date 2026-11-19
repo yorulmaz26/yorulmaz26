@@ -415,13 +415,13 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         stage.addActor(root)
 
         // Üst bilgi paneli
-        hud.background = theme.tinted("round", Color(1f, 0.98f, 0.93f, 0.93f))
+        hud.background = theme.panel(Color(1f, 0.98f, 0.93f, 0.93f))
         hud.pad(10f, 12f, 10f, 12f)
         ui.blockTouches(hud)
         val resTable = Table()
         Resource.basic.forEachIndexed { i, r ->
             val cell = Table()
-            cell.add(ui.dot(Palette.resource(r), 16f)).size(16f).padRight(5f)
+            cell.add(ui.resIcon(r, 26f)).size(26f).padRight(5f)
             val l = ui.label("0", "small")
             resLabels[r] = l
             cell.add(l).left().expandX()
@@ -451,9 +451,10 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         hud.add(carrierLabel).expandX().fillX().colspan(2).padTop(2f)
 
         // Alt gezinme
-        nav.background = theme.tinted("round", Color(1f, 0.98f, 0.93f, 0.95f))
+        nav.background = theme.panel(Color(1f, 0.98f, 0.93f, 0.95f))
         nav.pad(8f)
         ui.blockTouches(nav)
+        val navIcons = listOf("build", "carrier", "fleet", "map", "economy", "trade", "defense", "population", "research", "diplomacy", "exploration", "goals", "market", "settings")
         val items = listOf(
             "İnşa Et" to { togglePanel(PanelId.BUILD) }, "Taşıyıcı" to { togglePanel(PanelId.CARRIER) }, "Filo" to { togglePanel(PanelId.FLEET) },
             "Harita" to { if (mode == ViewMode.MAP) { setMode(ViewMode.CITY); closePanel() } else { setMode(ViewMode.MAP); showPanel(PanelId.MAP) } },
@@ -464,12 +465,12 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             "Market" to { togglePanel(PanelId.MARKET) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
         )
         items.forEachIndexed { i, (t, f) ->
-            nav.add(ui.button(t, "nav", f).apply { pad(12f, 1f, 12f, 1f) }).expandX().fillX().uniformX().pad(2f)
+            nav.add(ui.navButton("nav_" + navIcons[i], t, f)).expandX().fillX().uniformX().pad(2f)
             if (i == 6) nav.row()
         }
 
         // Savaş çubuğu
-        battleBar.background = theme.tinted("round", Color(1f, 0.93f, 0.9f, 0.97f))
+        battleBar.background = theme.panel(Color(1f, 0.93f, 0.9f, 0.97f))
         battleBar.pad(12f)
         ui.blockTouches(battleBar)
         battleBar.add(battleLabel).expandX().fillX().colspan(2).row()
@@ -489,7 +490,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         battleBar.isVisible = false
 
         // Yerleştirme çubuğu
-        placeBar.background = theme.tinted("round", Color(1f, 0.98f, 0.93f, 0.97f))
+        placeBar.background = theme.panel(Color(1f, 0.98f, 0.93f, 0.97f))
         placeBar.pad(14f)
         ui.blockTouches(placeBar)
         placeBar.add(placeTitle).left().colspan(2).row()
@@ -500,7 +501,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         placeBar.isVisible = false
 
         // Alt sayfa (paneller)
-        sheet.background = theme.tinted("round", Palette.panel)
+        sheet.background = theme.panel(Palette.panel)
         sheet.pad(16f, 16f, 12f, 16f)
         ui.blockTouches(sheet)
         val head = Table()
@@ -832,6 +833,12 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             }
             override fun canceled() {}
         }, if (city) "Şehrin adı" else "Taşıyıcının adı", current, "En fazla 24 harf")
+    }
+
+    fun buyPremium(p: PremiumProduct) {
+        game.store.purchase(p.productId, onPurchased = { id ->
+            PremiumProduct.byId(id)?.let { act(PremiumSystem.grant(state, it)); game.save() }
+        }, onMessage = { toast(it, true) })
     }
 
     fun newGameConfirm(): Boolean = confirmNewGame

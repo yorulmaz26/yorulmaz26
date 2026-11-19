@@ -56,10 +56,23 @@ class Ui(val theme: Theme) {
             })
         }
 
+    fun resIcon(r: Resource, size: Float = 22f): Image = Image(theme.resIcon(r)).apply { setSize(size, size) }
+
+    /** Simgeli gezinme düğmesi: simge üstte, yazı altta. */
+    fun navButton(icon: String, text: String, onClick: () -> Unit): TextButton {
+        val b = button(text, "nav", onClick)
+        val lbl = b.label
+        b.clearChildren()
+        b.add(Image(theme.icon(icon))).size(34f).padTop(2f).row()
+        b.add(lbl).padTop(2f)
+        b.pad(8f, 1f, 6f, 1f)
+        return b
+    }
+
     fun dot(color: Color, size: Float = 18f): Image = Image(theme.circle(color)).apply { setSize(size, size) }
 
     fun card(color: Color = Color.WHITE): Table = Table().apply {
-        background = theme.tinted("round", color)
+        background = theme.panel(color, 3f)
         pad(14f)
     }
 

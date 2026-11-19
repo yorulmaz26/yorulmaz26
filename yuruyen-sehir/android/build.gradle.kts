@@ -25,8 +25,8 @@ android {
         applicationId = "com.yuruyensehir.gocebe"
         minSdk = 24
         targetSdk = 35
-        versionCode = 5
-        versionName = "1.0.0"
+        versionCode = 6
+        versionName = "1.1.0"
     }
 
     sourceSets {
@@ -74,6 +74,7 @@ kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarg
 dependencies {
     implementation(project(":core"))
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    implementation("com.android.billingclient:billing-ktx:7.1.1")
     for (abi in listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")) {
         natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-$abi")
         natives("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-$abi")

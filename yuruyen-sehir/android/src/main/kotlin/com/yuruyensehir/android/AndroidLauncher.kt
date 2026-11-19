@@ -14,7 +14,7 @@ class AndroidLauncher : AndroidApplication() {
             useCompass = false
             numSamples = 2
         }
-        initialize(YuruyenSehirGame(), config)
+        initialize(YuruyenSehirGame(store = PlayBillingStore(this)), config)
     }
 
     /**

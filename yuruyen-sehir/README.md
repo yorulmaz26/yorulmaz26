@@ -38,10 +38,10 @@ Geliştirme aşamalarından **1, 2, 3 tamamlandı; 4 temel düzeyde** çalışı
 | Hedefler ve başarımlar | Her oyun günü yenilenen günlük hedefler (Görev Merkezi ile +1 ve %25 fazla ödül), 7 günlük haftalık hedefler, 20 başarım |
 | Antik eserler | 10 eser; kalıntı kazıları ve keşif görevlerinde bulunur, her biri kalıcı avantaj verir |
 | Sonsuz gelişim | Bütün araştırmalar bitince sınırsız Ustalık seviyeleri (her seviye +%2 üretim ve bilgi); rastgele ticaret fırsatları; Hava Gemisi İstasyonu ile uzak keşifler |
-| Market ve özelleştirme | 17 kozmetik ve 2 indirimli paket: taşıyıcı derileri, çatı temaları, bayraklar, yolculuk izleri, özel ev tasarımları, şehir dekorasyonları, koleksiyon ürünleri; şehir ve taşıyıcı adı. Yalnızca oyun içi kaynaklarla, oynanışı değiştirmez. Satın alma `PurchaseProvider` arayüzünün arkasındadır: Google Play Billing ileride oyun mantığına dokunmadan eklenebilir |
+| Market ve özelleştirme | 19 kozmetik ve 2 indirimli paket: taşıyıcı derileri, çatı temaları, bayraklar, yolculuk izleri, özel ev tasarımları, şehir dekorasyonları, koleksiyon ürünleri; şehir ve taşıyıcı adı. Yalnızca oyun içi kaynaklarla, oynanışı değiştirmez. İsteğe bağlı **Google Play Billing**: `destekci_paketi` ve `tum_kozmetikler` tek seferlik ürünleri (yalnızca kozmetik); onaylama, bekleyen ödeme, geri yükleme ve iade işleme |
 | Ses | 10 efekt ve döngü müziği kodla sentezlenir (harici dosya yok), oyun olaylarına bağlanır; ses/müzik açma-kapama ve düzey ayarı |
 | Performans | Düşük grafik modu, FPS göstergesi, sıralama ve renk önbellekleri; simülasyon adımı masaüstünde ~0,12 ms (68 bina, 89 medeniyet; testte sınırlanır) |
-| Yayın | R8 küçültmeli sürüm (APK ~5,4 MB, AAB ~4 MB), depo dışı anahtarla imzalama, mağaza metinleri ve görselleri, gizlilik politikası: [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md), [`docs/PRIVACY_POLICY.md`](docs/PRIVACY_POLICY.md) |
+| Yayın | R8 küçültmeli sürüm (APK ~5,9 MB, AAB ~4,8 MB), depo dışı anahtarla imzalama, mağaza metinleri ve görselleri, gizlilik politikası: [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md), [`docs/PRIVACY_POLICY.md`](docs/PRIVACY_POLICY.md) |
 | Medeniyet itibarı | Ticaret, yardım ve anlaşmalarla artar; fiyatları ve yeni medeniyetlerin ilk tavrını etkiler |
 | Medeniyet aşamaları | 7 unvan; aşamalar yeni binalar açar |
 | Kayıt | Otomatik (30 sn + arka plana alınınca), CRC32 sağlama, yedek dosya, bozuk kayıtta yedekten yükleme; kayıt sürümü 5 (eski kayıtlar otomatik taşınır, testli) |
@@ -51,8 +51,8 @@ Geliştirme aşamalarından **1, 2, 3 tamamlandı; 4 temel düzeyde** çalışı
 
 ### Sınırlar ve sonraki adımlar
 
-- Görseller ve sesler kodla üretilir; bir sanatçının hazırlayacağı çizim ve ses dosyaları sonradan eklenebilir.
-- Gerçek parayla satın alma yoktur (istenirse `PurchaseProvider` üzerinden Google Play Billing eklenebilir).
+- Görseller kodla çizilir (ışık geçişli duvarlar, kenar çizgileri, düşen gölgeler, kabuk plakaları) ve arayüz simgeleri `tools/generate_icons.py` ile üretilen kenar yumuşatmalı PNG'lerdir; sesler sentezlenir. Bir sanatçının hazırlayacağı çizim ve ses dosyaları sonradan eklenebilir.
+- Google Play Billing ancak ürünler Play Console'da tanımlanıp uygulama Play'den (dahili test kanalı) kurulunca çalışır; burada yalnızca derleme ve emülatörde çökmeden açılış doğrulandı, gerçek satın alma denenmedi.
 - Yayın anahtarını sizin oluşturmanız gerekir (bkz. `docs/PLAY_STORE.md`); oyun gerçek cihazlarda henüz denenmedi, yalnızca CI emülatöründe (API 34) açılış testinden geçti.
 
 ## Proje yapısı
@@ -79,7 +79,7 @@ ve düşük segment cihazlarda doku belleği sorunu yoktur.
 - **Komut satırı (APK):** `cd yuruyen-sehir && ./gradlew :android:assembleDebug` → `android/build/outputs/apk/debug/android-debug.apk`
 - **Yayın paketi (AAB):** `./gradlew :android:bundleRelease` (imzalama için `docs/PLAY_STORE.md`)
 - **Masaüstünde dene:** `./gradlew :desktop:run`
-- **Testler:** `./gradlew :logic:test` (100 test: yerleşim, ağırlık/denge, üretim zinciri, nüfus, taşıyıcı, yolculuk, olaylar, araştırma, kayıt/yedek/sürüm geçişi, çevrimdışı, ticaret fiyatları, kervan, anlaşmalar, savaş/barış, kule/kalkan/muhafız, düşman hedef seçimi, yağma sınırı, keşif görevleri, taşıyıcı türleri ve aktarım, yan şehir/konvoy/filo hızı, uzmanlaşma, hedefler, başarımlar, eserler, ustalık, market, isim temizleme, ses sentezi, performans bütçesi)
+- **Testler:** `./gradlew :logic:test` (104 test: yerleşim, ağırlık/denge, üretim zinciri, nüfus, taşıyıcı, yolculuk, olaylar, araştırma, kayıt/yedek/sürüm geçişi, çevrimdışı, ticaret fiyatları, kervan, anlaşmalar, savaş/barış, kule/kalkan/muhafız, düşman hedef seçimi, yağma sınırı, keşif görevleri, taşıyıcı türleri ve aktarım, yan şehir/konvoy/filo hızı, uzmanlaşma, hedefler, başarımlar, eserler, ustalık, market, isim temizleme, ses sentezi, performans bütçesi)
 - **Ekran görüntüleri:** `xvfb-run ./gradlew :desktop:screenshots` → `screenshots-local/`
 
 Gereken: JDK 17+, Android SDK 35. `local.properties` içine `sdk.dir=...` yazın (Android Studio bunu kendisi yapar).

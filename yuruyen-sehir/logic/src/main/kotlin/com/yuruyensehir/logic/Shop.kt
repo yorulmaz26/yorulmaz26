@@ -28,6 +28,8 @@ enum class Cosmetic(val title: String, val slot: CosmeticSlot, val description: 
     HOUSE_TALL("Kule Evler", CosmeticSlot.HOUSE_STYLE, "Evler sivri kule çatılı görünür.", amounts(GOLD to 180), "E9724C"),
     DECOR_LANTERNS("Fener Dizileri", CosmeticSlot.DECOR, "Şehrin kenarına renkli fenerler.", amounts(GOLD to 90, CLOTH to 20), "FFD54F"),
     DECOR_GARDENS("Çiçek Bahçeleri", CosmeticSlot.DECOR, "Boş karelere çiçek tarhları.", amounts(GOLD to 90, WOOD to 30), "F48FB1"),
+    SKIN_AURORA("Kutup Işığı Derisi", CosmeticSlot.CARRIER_SKIN, "Destekçi Paketi'ne özel: yeşil-mor kutup ışığı tonları.", emptyMap(), "7FE0C8"),
+    FLAG_STAR("Yıldız Sancağı", CosmeticSlot.FLAG, "Destekçi Paketi'ne özel lacivert-altın sancak.", emptyMap(), "3F51B5"),
     STATUE_CARRIER("Taşıyıcı Heykelciği", CosmeticSlot.COLLECTIBLE, "Koleksiyonluk minyatür (görsel ve başarım puanı).", amounts(GOLD to 250, ANCIENT_PART to 2)),
     MAP_GLOBE("Gezgin Küresi", CosmeticSlot.COLLECTIBLE, "Koleksiyonluk minyatür küre.", amounts(GOLD to 250, TECH_PART to 2)),
 }
@@ -43,6 +45,8 @@ enum class CosmeticPack(val title: String, val items: List<Cosmetic>, val price:
 data class CosmeticState(
     val owned: MutableSet<Cosmetic> = mutableSetOf(),
     val equipped: MutableMap<CosmeticSlot, Cosmetic> = mutableMapOf(),
+    /** Oyun içi kaynakla satın alınanlar (iadede korunur). */
+    val boughtWithGold: MutableSet<Cosmetic> = mutableSetOf(),
 )
 
 /**
@@ -73,9 +77,11 @@ object ShopSystem {
 
     fun buy(state: GameState, c: Cosmetic): ActionResult {
         if (owned(state, c)) return ActionResult.fail("Zaten sizde.")
+        if (PremiumSystem.premiumOnly(c)) return ActionResult.fail("Bu öğe yalnızca ${PremiumProduct.SUPPORTER_PACK.title} ile açılır.")
         if (!provider.canPay(state, c.price)) return ActionResult.fail("Yetersiz kaynak: ${c.price.describe()}")
         if (!provider.pay(state, c.price)) return ActionResult.fail("Satın alma tamamlanamadı.")
         state.cosmetics.owned += c
+        state.cosmetics.boughtWithGold += c
         if (c.slot != CosmeticSlot.COLLECTIBLE) state.cosmetics.equipped[c.slot] = c
         state.stats.purchases++
         state.log("Marketten alındı: ${c.title}.", LogKind.INFO)
@@ -87,7 +93,7 @@ object ShopSystem {
         if (p.items.all { owned(state, it) }) return ActionResult.fail("Paketteki her şey sizde.")
         if (!provider.canPay(state, p.price)) return ActionResult.fail("Yetersiz kaynak: ${p.price.describe()}")
         provider.pay(state, p.price)
-        p.items.forEach { state.cosmetics.owned += it; if (it.slot != CosmeticSlot.COLLECTIBLE) state.cosmetics.equipped[it.slot] = it }
+        p.items.forEach { state.cosmetics.owned += it; state.cosmetics.boughtWithGold += it; if (it.slot != CosmeticSlot.COLLECTIBLE) state.cosmetics.equipped[it.slot] = it }
         state.stats.purchases++
         state.log("Marketten paket alındı: ${p.title}.", LogKind.INFO)
         state.cityVersion++

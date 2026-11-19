@@ -54,36 +54,57 @@ cd yuruyen-sehir
 > • Büyüyün: yeni taşıyıcı türleri, yan şehirlerden oluşan göçebe filo, uzmanlaşma, hedefler, başarımlar ve antik eserler.
 > • Tamamen çevrimdışı oynanır; siz yokken şehriniz 8 saate kadar üretmeye devam eder.
 >
-> Reklam yok, gerçek parayla satın alma yok; market yalnızca oyun içi kaynaklarla çalışır.
+> Reklam yok. İsteğe bağlı iki kozmetik paket Google Play üzerinden satın alınabilir; bunlar oynanışa
+> hiçbir avantaj vermez ve bütün oyun parasız oynanabilir.
 
 **Kategori:** Oyun › Strateji (ikincil: Simülasyon) • **Etiketler:** şehir kurma, strateji, simülasyon, çevrimdışı
 
-## 4. Görseller (`docs/play/`)
+## 4. Uygulama içi ürünler (Google Play Billing)
+
+Play Console › Para kazanma › Ürünler › Uygulama içi ürünler bölümünde şu **tek seferlik** ürünleri oluşturun
+(kimlikler koddaki `PremiumProduct` ile birebir aynı olmalı):
+
+| Ürün kimliği | Ad | İçerik | Önerilen fiyat |
+|---|---|---|---|
+| `destekci_paketi` | Destekçi Paketi | Kutup Işığı Derisi + Yıldız Sancağı (yalnızca bu pakette) | düşük kademe |
+| `tum_kozmetikler` | Tüm Kozmetikler | Marketteki bütün kozmetikler (oyun içi altınla da tek tek alınabilir) | orta kademe |
+
+- Satın alma, Play `PURCHASED` bildirdikten ve uygulama onayladıktan (acknowledge) sonra işlenir; bekleyen (PENDING) ödemeler onaylanınca açılır.
+- Market açılışında ve "Satın alımları geri yükle" düğmesinde sahip olunanlar sorgulanır; iade edilen ürünün öğeleri kapanır (altınla alınanlar korunur). Sorgu başarısızsa (çevrimdışı) hiçbir şey geri alınmaz.
+- Sunucu tarafı doğrulama yoktur: ürünler yalnızca kozmetik olduğu için kabul edilebilir bir risktir. Değerli içerik satılacaksa Play Developer API ile sunucuda doğrulama eklenmelidir.
+- **Deneme:** Play Console › Ayarlar › Lisans testi'ne test hesaplarınızı ekleyin, uygulamayı dahili test kanalına yükleyip Play'den kurun. Billing yalnızca Play'den kurulan, aynı uygulama kimliği ve imzalı sürümle çalışır; emülatördeki Google Play'siz görüntüde market "mağaza kullanılamıyor" der (CI bunu çökmeden geçtiğini doğrular).
+
+## 5. Görseller (`docs/play/`)
 
 | Dosya | Kullanım |
 |---|---|
 | `icon-512.png` | Yüksek çözünürlüklü simge (512×512) |
 | `feature-graphic-1024x500.png` | Öne çıkan görsel |
-| `telefon-*.png` | Telefon ekran görüntüleri (1080×1920), `xvfb-run ./gradlew :desktop:screenshots -Dys.size=1080x1920` ile yeniden üretilir |
+| `telefon-*.png` | Telefon ekran görüntüleri (1080×1920; market ekranı bilerek yok: masaüstünde Play mağazası görünmez), `xvfb-run ./gradlew :desktop:screenshots -Dys.size=1080x1920` ile yeniden üretilir |
 
-## 5. Veri güvenliği formu
+## 6. Veri güvenliği formu
 
-- Uygulama **hiçbir kullanıcı verisi toplamaz ve paylaşmaz**. İnternet izni yoktur (manifestte `INTERNET` yok).
+- Uygulamanın kendi sunucusu yoktur; geliştirici **hiçbir kullanıcı verisi toplamaz, saklamaz veya paylaşmaz**.
+- Google Play Billing kütüphanesi manifeste `INTERNET`, `ACCESS_NETWORK_STATE` ve `com.android.vending.BILLING` izinlerini ekler;
+  bu bağlantı yalnızca satın alma için Google Play ile yapılır. Ödeme bilgisi uygulamaya hiç gelmez.
 - Oyun kaydı yalnızca cihazın uygulamaya özel depolamasında tutulur; Android yedeklemesine dahildir (`allowBackup`).
-- Hesap, reklam kimliği, konum, analiz veya çökme raporu SDK'sı yoktur.
-- Formda: "Veri toplanmıyor", "Veri paylaşılmıyor" seçilebilir.
+- Reklam kimliği, konum, analiz veya çökme raporu SDK'sı yoktur.
+- Formu doldururken Google'ın Play Billing ile ilgili güncel veri güvenliği rehberine bakın (satın alma işlemleri Google tarafından işlenir).
 
-## 6. İçerik derecelendirmesi (IARC) notları
+## 7. İçerik derecelendirmesi (IARC) notları
 
 Çizgi film tarzında, kansız savaş (kuleler haydut/canlı/mekanik düşmanlara ateş eder, yenilen düşman kaybolur).
-Kumar, gerçek para, sohbet, kullanıcı içeriği yoktur. Beklenen derece: PEGI 7 / ESRB Everyone 10+ civarı (anket sonucu belirler).
+Kumar, sohbet ve kullanıcı içeriği yoktur. **Uygulama içi satın alma vardır** (yalnızca kozmetik); ankette ve mağaza kaydında
+"Uygulama içi satın alma içerir" işaretlenmelidir. Beklenen derece: PEGI 7 / ESRB Everyone 10+ civarı (anket sonucu belirler).
 
-## 7. Yayın kontrol listesi
+## 8. Yayın kontrol listesi
 
 - [ ] Yükleme anahtarı oluşturuldu ve yedeklendi
 - [ ] `versionCode` / `versionName` güncellendi
 - [ ] `./gradlew :logic:test :android:bundleRelease` başarılı, CI yeşil (emülatör testi dahil)
 - [ ] Gerçek bir düşük segment cihazda 10 dakika oynandı (FPS göstergesi Ayarlar'da)
 - [ ] Gizlilik politikası bir web adresinde yayımlandı (`docs/PRIVACY_POLICY.md`)
+- [ ] `destekci_paketi` ve `tum_kozmetikler` ürünleri Play Console'da oluşturuldu ve etkinleştirildi
+- [ ] Lisans test hesabıyla dahili test kanalında satın alma, iptal ve geri yükleme denendi
 - [ ] Mağaza metinleri, görseller, veri güvenliği ve içerik derecelendirmesi dolduruldu
 - [ ] Önce dahili test kanalına, sonra kapalı teste yüklendi

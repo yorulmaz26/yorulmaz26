@@ -27,7 +27,7 @@ class MemoryStorage : SaveStorage {
 class SaveCorruptException(msg: String) : Exception(msg)
 
 object SaveCodec {
-    const val CURRENT_VERSION = 5
+    const val CURRENT_VERSION = 6
 
     val json = Json {
         ignoreUnknownKeys = true
@@ -71,6 +71,8 @@ object SaveCodec {
                 3 -> obj
                 // 4 -> 5: market/kozmetikler, şehir adı, ses ayarları.
                 4 -> obj
+                // 5 -> 6: Google Play kozmetik ürünleri.
+                5 -> obj
                 else -> obj
             }
             v++

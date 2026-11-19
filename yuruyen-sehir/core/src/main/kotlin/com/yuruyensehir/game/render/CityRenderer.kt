@@ -134,6 +134,7 @@ class CityRenderer {
     private var scroll = 0f
     private var blinkTimer = 0f
     private val tmpColor = Color()
+    private val legA = Color(); private val legB = Color()
     private val tmpColor2 = Color()
     private val tmpV = Vector2()
     var deckOffset = DECK_Y
@@ -287,6 +288,22 @@ class CityRenderer {
 
         if (showWeight) drawBalanceMarker(sr, state, balance)
         if (graphicsHigh) drawWeather(sr, cam, state, time)
+        drawVignette(sr, cam)
+    }
+
+    private val patch = Color()
+    private val vigIn = Color(0.12f, 0.18f, 0.24f, 0f)
+    private val vigOut = Color(0.12f, 0.18f, 0.24f, 0.16f)
+
+    /** Kenar karartması: bakışı şehre toplar. */
+    private fun drawVignette(sr: ShapeRenderer, cam: OrthographicCamera) {
+        val w = cam.viewportWidth * cam.zoom; val h = cam.viewportHeight * cam.zoom
+        val l = cam.position.x - w / 2; val b = cam.position.y - h / 2
+        val ew = w * 0.16f; val eh = h * 0.12f
+        sr.rect(l, b, ew, h, vigOut, vigIn, vigIn, vigOut)
+        sr.rect(l + w - ew, b, ew, h, vigIn, vigOut, vigOut, vigIn)
+        sr.rect(l, b, w, eh, vigOut, vigOut, vigIn, vigIn)
+        sr.rect(l, b + h - eh, w, eh, vigIn, vigIn, vigOut, vigOut)
     }
 
     private fun drawGround(sr: ShapeRenderer, cam: OrthographicCamera, state: GameState, time: Float, high: Boolean) {
@@ -296,6 +313,22 @@ class CityRenderer {
         sr.color = base
         sr.rect(left - 10, bottom - 10, w + 20, h + 20)
         val biome = state.world.biomeAt(state.travel.position)
+        // Büyük ölçekli renk lekeleri: düz zemin yerine doğal, yumuşak bir doku
+        run {
+            val big = 300f
+            val ox = -scroll * 0.7071f * 0.9f; val oy = scroll * 0.7071f * 0.9f
+            val a0 = floor((left - ox) / big).toInt() - 1; val a1 = floor((left + w - ox) / big).toInt() + 1
+            val b0 = floor((bottom - oy) / big).toInt() - 1; val b1 = floor((bottom + h - oy) / big).toInt() + 1
+            for (i in a0..a1) for (j in b0..b1) {
+                val hh = state.world.hash01(i, j, 17).toFloat()
+                val f = if (hh < 0.5f) 0.94f else 1.05f
+                patch.set(base.r * f, base.g * f, base.b * f, 0.55f)
+                sr.color = patch
+                val px = i * big + ox + (state.world.hash01(i, j, 18) * big).toFloat()
+                val py = j * big + oy + (state.world.hash01(i, j, 19) * big).toFloat()
+                Draw.ellipseFan(sr, px, py, 120f + hh * 110f, 60f + hh * 55f, 22)
+            }
+        }
         // Zemin dokusu: kaydırılan karo deseni (ön = sağ-aşağı, zemin sola-yukarı kayar)
         val tile = 96f
         val sx = -scroll * 0.7071f; val sy = scroll * 0.7071f
@@ -317,8 +350,11 @@ class CityRenderer {
         }
         // Taşıyıcı gölgesi
         val gx = worldX(CityGrid.CENTER_X.toFloat(), CityGrid.CENTER_Y.toFloat()); val gy = worldY(CityGrid.CENTER_X.toFloat(), CityGrid.CENTER_Y.toFloat())
-        sr.setColor(0.2f, 0.25f, 0.15f, 0.22f)
-        Draw.ellipseFan(sr, gx + 20, gy - 30, 300f, 130f, 32)
+        // Yumuşak, iki katmanlı gölge (ışık sol-yukarıdan)
+        sr.setColor(0.2f, 0.25f, 0.15f, 0.12f)
+        Draw.ellipseFan(sr, gx + 50, gy - 45, 340f, 150f, 36)
+        sr.setColor(0.2f, 0.25f, 0.15f, 0.16f)
+        Draw.ellipseFan(sr, gx + 35, gy - 35, 290f, 120f, 36)
     }
 
     private fun decoration(sr: ShapeRenderer, biome: Biome, h: Float, x: Float, y: Float, time: Float, base: Color) {
@@ -347,10 +383,14 @@ class CityRenderer {
     }
 
     private fun tree(sr: ShapeRenderer, x: Float, y: Float, mystic: Boolean, time: Float) {
-        sr.setColor(0.55f, 0.38f, 0.22f, 1f); sr.rectLine(x, y, x, y + 18, 5f)
+        sr.setColor(0.1f, 0.15f, 0.05f, 0.2f); Draw.ellipseFan(sr, x + 8, y - 2, 16f, 6f, 12)
+        sr.setColor(0.48f, 0.32f, 0.19f, 1f); sr.rectLine(x, y, x, y + 18, 5f)
         val sway = sin(time * 1.2f + x * 0.05f) * 1.5f
+        if (mystic) sr.setColor(0.33f, 0.62f, 0.56f, 1f) else sr.setColor(0.28f, 0.55f, 0.28f, 1f)
+        sr.circle(x + 2 + sway, y + 24, 14f, 16); sr.circle(x - 7 + sway, y + 18, 10f, 14); sr.circle(x + 10 + sway, y + 18, 10f, 14)
         if (mystic) sr.setColor(0.45f, 0.78f, 0.7f, 1f) else sr.setColor(0.38f, 0.68f, 0.36f, 1f)
-        sr.circle(x + sway, y + 26, 13f, 14); sr.circle(x - 8 + sway, y + 20, 9f, 12); sr.circle(x + 8 + sway, y + 20, 9f, 12)
+        sr.circle(x + sway, y + 26, 12f, 16); sr.circle(x - 8 + sway, y + 20, 8f, 12); sr.circle(x + 7 + sway, y + 21, 8f, 12)
+        sr.setColor(1f, 1f, 1f, 0.18f); sr.circle(x - 4 + sway, y + 30, 5f, 10)
         if (mystic) { sr.setColor(0.85f, 1f, 0.9f, 0.6f + 0.4f * sin(time * 2 + y)); sr.circle(x + 5, y + 30, 2.2f, 8) }
     }
 
@@ -384,14 +424,21 @@ class CityRenderer {
             val gx = worldX(l.x + fwd, l.y); val gy = worldY(l.x + fwd, l.y)
             val top = worldY(l.x, l.y) + legH
             val restDrop = if (resting) 0.55f else 1f
+            val lh = (top - gy - lift) * restDrop + 4f
+            sr.setColor(0.1f, 0.15f, 0.08f, 0.25f); Draw.ellipseFan(sr, gx + 6f, gy - 4f, 30f, 11f, 16) // ayak gölgesi
             sr.color = skinDark
             Draw.ellipseFan(sr, gx, gy + lift, 26f, 12f, 16)
-            sr.color = skin
-            sr.rect(gx - 24f, gy + lift, 48f, (top - gy - lift) * restDrop + 4f)
+            // Silindir hissi: sol kenar gölgede, sağ kenar ışıkta
+            Draw.shade(skinDark, 0.85f, legA); Draw.shade(skin, 1.06f, legB)
+            sr.rect(gx - 24f, gy + lift, 24f, lh, legA, skin, skin, legA)
+            sr.rect(gx, gy + lift, 24f, lh, skin, legB, legB, skin)
+            sr.setColor(0f, 0f, 0f, 0.18f); sr.rectLine(gx - 24f, gy + lift, gx - 24f, gy + lift + lh, 1.6f); sr.rectLine(gx + 24f, gy + lift, gx + 24f, gy + lift + lh, 1.2f)
             sr.color = skinDark
             Draw.ellipseFan(sr, gx, gy + lift, 24f, 10f, 16)
             sr.color = nail
-            for (k in -1..1) sr.circle(gx + k * 11f, gy + lift - 6f, 4.5f, 8)
+            for (k in -1..1) { sr.circle(gx + k * 11f, gy + lift - 6f, 4.5f, 8) }
+            sr.setColor(1f, 1f, 1f, 0.6f)
+            for (k in -1..1) sr.circle(gx + k * 11f - 1.2f, gy + lift - 4.8f, 1.6f, 6)
         }
         drawLeg(sorted[0]); drawLeg(sorted[1])
 
@@ -400,9 +447,12 @@ class CityRenderer {
         sr.color = skin
         sr.triangle(tx + 30, ty + 12, tx + 30, ty - 12, tx - 18 + sin(time * 2f) * 4, ty - 2)
 
-        // Karın
+        // Karın (alt kısmı gölgeli)
+        val bx0 = worldX(cx, cy); val by0 = worldY(cx, cy) + deckOffset * 0.42f
+        sr.color = col("CDBE93")
+        Draw.ellipseFan(sr, bx0 + 8f, by0 - 8f, Iso.HW * (rx + ry) * 0.86f, Iso.HH * (rx + ry) * 0.7f, 32)
         sr.color = col("E9DDB8")
-        Draw.ellipseFan(sr, worldX(cx, cy), worldY(cx, cy) + deckOffset * 0.42f, Iso.HW * (rx + ry) * 0.86f, Iso.HH * (rx + ry) * 0.7f, 32)
+        Draw.ellipseFan(sr, bx0, by0, Iso.HW * (rx + ry) * 0.84f, Iso.HH * (rx + ry) * 0.66f, 32)
 
         drawLeg(sorted[2]); drawLeg(sorted[3])
 
@@ -411,9 +461,17 @@ class CityRenderer {
         val headLift = if (resting) -34f else sin(time * 1.4f) * 3f
         val nbx = worldX(cx + rx - 0.8f, cy - 0.4f); val nby = worldY(cx + rx - 0.8f, cy - 0.4f) + deckOffset * 0.55f
         val hx = worldX(cx + rx + 1.6f, cy - 0.6f) + nodX; val hy = worldY(cx + rx + 1.6f, cy - 0.6f) + deckOffset * 0.62f + headLift
+        sr.color = skinDark
+        sr.rectLine(nbx, nby - 4f, hx, hy - 4f, 46f)
         sr.color = skin
-        sr.rectLine(nbx, nby, hx, hy, 44f)
-        sr.circle(hx, hy, 40f, 24)
+        sr.rectLine(nbx, nby + 2f, hx, hy + 2f, 38f)
+        // Baş: gölge tarafı sağ-alt, ışık sol-üst
+        sr.color = skinDark
+        sr.circle(hx + 3f, hy - 4f, 40f, 28)
+        sr.color = skin
+        sr.circle(hx - 1.5f, hy + 1.5f, 37f, 28)
+        sr.setColor(1f, 1f, 1f, 0.09f)
+        Draw.ellipseFan(sr, hx - 10f, hy + 18f, 14f, 9f, 16)
         sr.color = skinDark
         Draw.ellipseFan(sr, hx + 26f, hy - 12f, 26f, 18f, 18) // burun
         sr.color = skin
@@ -460,12 +518,20 @@ class CityRenderer {
             sr.color = col("3C4A40")
             sr.rectLine(hx + 2, hy + 6, hx + 20, hy + 6, 3f)
         } else {
+            sr.color = Draw.shade(skinDark, 0.8f, legA)
+            sr.circle(hx + 11f, hy + 8f, 12.5f, 18)
             sr.color = Color.WHITE
-            sr.circle(hx + 11f, hy + 8f, 11f, 16)
+            sr.circle(hx + 11f, hy + 8f, 11f, 18)
             sr.color = col("2B3A33")
-            sr.circle(hx + 14f, hy + 7f, 6.5f, 14)
+            sr.circle(hx + 14f, hy + 7f, 6.5f, 16)
+            sr.color = col("4A6B5C")
+            sr.circle(hx + 14f, hy + 7f, 3.2f, 10)
             sr.color = Color.WHITE
-            sr.circle(hx + 16f, hy + 10f, 2.4f, 8)
+            sr.circle(hx + 16.5f, hy + 10.5f, 2.6f, 8)
+            sr.circle(hx + 12f, hy + 4f, 1.1f, 6)
+            // Göz kapağı: gözün yalnızca üst kenarını örten ince bant
+            sr.color = skin
+            Draw.ellipseFan(sr, hx + 11f, hy + 19.5f, 13f, 4.2f, 14)
         }
         if (resting) {
             sr.setColor(0.4f, 0.5f, 0.7f, 0.5f + 0.5f * sin(time * 2))
@@ -483,11 +549,19 @@ class CityRenderer {
             bot[i * 2] = top[i * 2]; bot[i * 2 + 1] = top[i * 2 + 1] - RIM
         }
         val rim = look.rim; val rimDark = look.rimDark
+        // Kabuk plakaları: her 4 dilim bir plaka; üstü aydınlık, altı koyu; sağ-ön taraf ışıkta
         for (i in 0 until seg) {
             val j = (i + 1) % seg
-            sr.color = if ((i / 4) % 2 == 0) rim else rimDark
-            Draw.quad(sr, bot[i * 2], bot[i * 2 + 1], bot[j * 2], bot[j * 2 + 1], top[j * 2], top[j * 2 + 1], top[i * 2], top[i * 2 + 1])
+            val a = (i + 0.5f) / seg * MathUtils.PI2
+            val lit = 0.86f + 0.16f * cos(a + 0.8f)
+            val alt = if ((i / 4) % 2 == 0) 1f else 0.93f
+            Draw.shade(rim, lit * alt * 1.08f, legA); Draw.shade(rimDark, lit * alt * 0.92f, legB)
+            Draw.quadGradient(sr, bot[i * 2], bot[i * 2 + 1], bot[j * 2], bot[j * 2 + 1], top[j * 2], top[j * 2 + 1], top[i * 2], top[i * 2 + 1], legB, legA)
         }
+        // Plaka dikişleri
+        Draw.shade(look.rimLine, 1f, legA).a = 0.55f
+        sr.color = legA
+        for (i in 0 until seg step 4) sr.rectLine(bot[i * 2], bot[i * 2 + 1] + 2, top[i * 2], top[i * 2 + 1] - 2, 1.6f)
         // Kabuk alt kenarındaki pul çizgisi
         sr.color = look.rimLine
         for (i in 0 until seg) {
@@ -495,10 +569,15 @@ class CityRenderer {
             sr.rectLine(bot[i * 2], bot[i * 2 + 1], bot[j * 2], bot[j * 2 + 1], 3f)
         }
         val ccx = worldX(cx, cy); val ccy = worldY(cx, cy) + deckOffset
-        sr.color = look.deck
+        Draw.shade(look.deck, 1.06f, legB)
         for (i in 0 until seg) {
             val j = (i + 1) % seg
-            sr.triangle(ccx, ccy, top[i * 2], top[i * 2 + 1], top[j * 2], top[j * 2 + 1])
+            sr.triangle(ccx, ccy, top[i * 2], top[i * 2 + 1], top[j * 2], top[j * 2 + 1], legB, look.deck, look.deck)
+        }
+        // Kabuk ağzının ışık çizgisi (ön yarı) ve iç gölge
+        for (i in 0 until seg) {
+            val j = (i + 1) % seg
+            if (top[i * 2 + 1] < ccy) { sr.setColor(1f, 1f, 1f, 0.35f); sr.rectLine(top[i * 2], top[i * 2 + 1], top[j * 2], top[j * 2 + 1], 2.2f) }
         }
         if (state.cosmetics.equipped[CosmeticSlot.DECOR] == Cosmetic.DECOR_LANTERNS) {
             // Kabuk kenarında fener dizisi
