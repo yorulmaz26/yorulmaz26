@@ -15,10 +15,16 @@ Match-3 + Jigsaw Puzzle + 3D dünya haritası. Tek dosyalık bir web prototipi. 
 - **Zorluk:** testere dişi eğri. Döngünün 1. bölümü nefes, 5. bölümü "ZOR · PARÇA" bölümü; bot testleriyle ayarlandı (bkz. TASARIM.md)
 - **3D Harita:** eğimli dünya düzlemi, ayakta duran anıtlar, rota, sürükleyerek gezinme, tamamlanan harikanın "yükselme" animasyonu
 - **Can:** 3 can, para ve güçlendirici yok. Kaybedilen bölüm 1 can götürür, 20 dakikada 1 can yenilenir, puzzle parçası kazanınca hepsi dolar
+- **İmza mekanikleri:** her harikanın 21. bölümünden itibaren kendine özgü bir kural (kalkan, kum fırtınası, lotus, akıncılar, sarmaşık kilidi, Kukulkan ışığı, rüzgâr)
+- **Erişilebilirlik:** renk körü modu (taş sembolleri), titreşim, azaltılmış hareket
+- **Oyuncu testi:** anonim deneme kaydı, anket, paylaşılan sonuçlar (bkz. [`TEST_PLANI.md`](TEST_PLANI.md))
 - **Koleksiyon:** 7 harika ve "Antik Dünya: yakında" kartı
 
 ## Test modu
 Ayarlar (⚙) → **Test modu** açıldığında oyun ekranına "Bölümü Kazan" düğmesi, ayarlara da "parçaya atla" ve "canları doldur" seçenekleri ekleniyor.
+
+## Unity çekirdeği
+[`unity/`](unity/README.md): prototiple birebir aynı çalışan saf C# oyun motoru. `dotnet run --project unity/Tests` ile doğrulanır.
 
 ## Tasarım
 Konsept analizi ve öncelikli eksik kararlar: [`TASARIM.md`](TASARIM.md)

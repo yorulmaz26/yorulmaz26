@@ -266,6 +266,18 @@ const BLOCKS = {
   seal:      { name:'Taş Mühür',       hp:3 },
   mountain:  { name:'Dağ Kayası',      hp:1 },
   granite2:  { name:'Granit Kaya',     hp:2 },
+  shield:    { name:'Gladyatör Kalkanı', hp:1 },
+};
+/* harikaya özel imza mekanikleri: her destinasyonun 21. bölümünde tanıtılır */
+const SIG_INTRO_LI = 21;
+const SIGS = {
+  colosseum: { id:'shield',    name:'Gladyatör Kalkanı', desc:'Kalkanlar 3’lü eşleşmeyle kırılmaz. Yanında 4’lü veya daha büyük eşleşme yap ya da özel güç kullan.' },
+  petra:     { id:'sandstorm', name:'Kum Fırtınası',     every:4, desc:'Her 4 hamlede temizlediğin kum yanındaki bir hücreye geri savrulur. Kumu hızlı temizle!' },
+  taj:       { id:'lotus',     name:'Lotus Havuzu',      desc:'Lotus üzerindeki taşı eşleştirdiğinde +1 hamle kazanırsın.' },
+  wall:      { id:'raid',      name:'Akıncı Saldırısı',  every:4, desc:'Her 4 hamlede akıncılar üst sıralara yeni bir ahşap bariyer kurar.' },
+  machu:     { id:'lock',      name:'Sarmaşık Kilidi',   desc:'Sarmaşıkla kilitli taşlar kaydırılamaz ve düşmez. Onları eşleştirerek kurtar.' },
+  chichen:   { id:'sunlight',  name:'Kukulkan Işığı',    every:5, desc:'Her 5 hamlede güneş ışığı bir taşı çizgi gücüne dönüştürür.' },
+  christ:    { id:'wind',      name:'Rüzgâr',            every:3, desc:'Her 3 hamlede bulutlar bir sütun sağa kayar.' },
 };
 const LAYERS = {
   sand:   { name:'Kum Katmanı' },
@@ -317,7 +329,7 @@ function rgrad(c,x0,y0,r0,x1,y1,r1,stops){ const g = c.createRadialGradient(x0,y
 
 /* ---------------- kayıt ---------------- */
 const SAVE_KEY = 'ww_save_v1';
-let save = { lvl:1, stars:{}, sound:true, test:false, seenIntro:false, lives:MAX_LIVES, lifeTs:null };
+let save = { lvl:1, stars:{}, sound:true, test:false, seenIntro:false, lives:MAX_LIVES, lifeTs:null, cb:false, vib:true };
 try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s && typeof s.lvl === 'number') save = Object.assign(save, s); } catch(e){}
 function persist(){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch(e){} }
 /* ---- can sistemi: 3 can, kaybedince 1 gider, zamanla yenilenir ---- */
@@ -338,6 +350,46 @@ function piecesOf(w){ return clamp(Math.floor((completedLevels() - w*LEVELS_PER_
 const wonderDone = w => piecesOf(w) >= PIECES_PER_WONDER;
 const totalStars = () => Object.values(save.stars).reduce((a,b)=>a+b,0);
 
+function vibrate(p){ if (!save.vib) return; try { navigator.vibrate && navigator.vibrate(p); } catch(e){} }
+/* ---------------- oyuncu testi: anonim kayıt + anket + paylaşılan sonuçlar ---------------- */
+if (!save.tele) save.tele = { attempts:[] };
+if (!save.fb) save.fb = null;
+function logAttempt(res, stars=0){
+  if (!G) return; const L = G.L;
+  save.tele.attempts.push({ g:L.g, w:L.w, li:L.li, t:L.primary, sig:!!L.sig, hard:!!L.hard, r:res, used:L.moves - (G.endMoves ?? G.moves), total:L.moves,
+    goalsLeft: G.goals.reduce((a,gl)=>a + (gl.t==='score' ? (G.score>=gl.n?0:1) : gl.left), 0), s: stars, sec: Math.round((Date.now()-G.startMs)/1000), ts: Date.now() });
+  if (save.tele.attempts.length > 300) save.tele.attempts.splice(0, save.tele.attempts.length - 300);
+  persist(); queueSync();
+}
+function teleSummary(list = save.tele.attempts){
+  const fin = list.filter(a=>a.r!=='quit'), wins = fin.filter(a=>a.r==='win');
+  const firstTry = {}; list.forEach(a=>{ if (!(a.g in firstTry)) firstTry[a.g] = a.r === 'win'; });
+  const ft = Object.values(firstTry); const byG = {};
+  list.forEach(a=>{ byG[a.g] = byG[a.g] || { tries:0, won:false }; byG[a.g].tries++; if (a.r==='win') byG[a.g].won = true; });
+  const hardest = Object.entries(byG).sort((a,b)=>b[1].tries-a[1].tries).slice(0,5).filter(([,v])=>v.tries>1).map(([g,v])=>`${g} (${v.tries} deneme)`);
+  return { attempts:list.length, wins:wins.length, losses:fin.length-wins.length, quits:list.length-fin.length,
+    firstTryRate: ft.length ? Math.round(ft.filter(Boolean).length/ft.length*100) : null,
+    avgSec: fin.length ? Math.round(fin.reduce((a,b)=>a+b.sec,0)/fin.length) : null, maxLevel: save.lvl - 1, hardest };
+}
+function reportText(){
+  const S = teleSummary(), fb = save.fb;
+  return [`World Wonders · oyuncu testi raporu`, `Ulaşılan bölüm: ${S.maxLevel} · deneme: ${S.attempts} (kazanma ${S.wins}, kaybetme ${S.losses}, çıkış ${S.quits})`,
+    `İlk denemede kazanma: ${S.firstTryRate ?? '-'}% · ortalama bölüm süresi: ${S.avgSec ?? '-'} sn`, `En çok denenen: ${S.hardest.join(', ') || '-'}`,
+    fb ? `Anket → eğlence ${fb.fun ?? '–'}/5 · zorluk ${fb.diff ?? '–'}/5 · puzzle motivasyonu ${fb.puzzle ?? '–'}/5 · harita ${fb.map ?? '–'}/5` : 'Anket doldurulmadı',
+    fb && fb.best ? `En sevdiğim: ${fb.best}` : '', fb && fb.worst ? `Değişmesini istediğim: ${fb.worst}` : '',
+    `Ham veri: ${JSON.stringify(save.tele.attempts.slice(-60).map(a=>[a.g,a.r[0],a.used,a.total,a.sec]))}`].filter(Boolean).join('\n');
+}
+// paylaşılan sonuçlar (yayınlanan sayfada; yerel dosyada sessizce devre dışı)
+const PT = { db:null, user:null, id:null, owner:false, state:'off', busy:false, again:false, timer:null };
+(async()=>{ try { if (!window.claude || !window.claude.use) return; PT.user = await window.claude.use('user'); PT.db = await window.claude.use('db');
+  if (PT.user) PT.owner = PT.user.isOwner(); if (PT.db && PT.user){ PT.id = await PT.user.id(); PT.state = 'ready'; queueSync(); } } catch(e){ PT.state = 'off'; } })();
+function queueSync(){ if (!PT.db || !PT.id || !save.tele.attempts.length) return; clearTimeout(PT.timer); PT.timer = setTimeout(doSync, 1500); }
+async function doSync(){
+  if (PT.busy){ PT.again = true; return; } PT.busy = true;
+  try { const S = teleSummary(); await PT.db.doc('playtests/' + PT.id).set({ summary:S, fb:save.fb, attempts: save.tele.attempts.slice(-150), lvl: save.lvl, updatedAt: Date.now() }); PT.state = 'ok'; }
+  catch(e){ PT.state = 'err'; }
+  PT.busy = false; if (PT.again){ PT.again = false; queueSync(); }
+}
 /* ---------------- ses (WebAudio, sentez) ---------------- */
 const Sound = {
   ctx:null,
@@ -352,9 +404,9 @@ const Sound = {
   swap(){ this.tone(520,.08,'triangle',.08,1.4); },
   bad(){ this.tone(220,.15,'square',.05,.7); },
   match(n){ const b = 440*Math.pow(1.1225, Math.min(n,8)); this.tone(b,.14,'triangle',.11); this.tone(b*1.5,.12,'sine',.06,1,.03); },
-  special(){ this.tone(180,.35,'sawtooth',.06,3); this.tone(880,.25,'triangle',.07,.5,.05); },
-  boom(){ this.tone(90,.45,'sawtooth',.12,.4); },
-  piece(){ [523,659,784,1046].forEach((f,i)=>this.tone(f,.25,'triangle',.1,1,i*.09)); },
+  special(){ vibrate(20); this.tone(180,.35,'sawtooth',.06,3); this.tone(880,.25,'triangle',.07,.5,.05); },
+  boom(){ vibrate(40); this.tone(90,.45,'sawtooth',.12,.4); },
+  piece(){ vibrate([30,40,30]); [523,659,784,1046].forEach((f,i)=>this.tone(f,.25,'triangle',.1,1,i*.09)); },
   win(){ [523,659,784,659,784,1046].forEach((f,i)=>this.tone(f,.3,'triangle',.11,1,i*.11)); },
   lose(){ [392,330,262].forEach((f,i)=>this.tone(f,.35,'sine',.1,1,i*.16)); },
   fanfare(){ [392,523,659,784,1046,1318].forEach((f,i)=>{ this.tone(f,.5,'triangle',.1,1,i*.12); this.tone(f/2,.5,'sine',.06,1,i*.12); }); },
@@ -479,6 +531,27 @@ function drawRelic(c, shape){
   starPath(c,22,-24,7,1.6,4); c.fillStyle='#fff'; c.fill();
 }
 
+function drawLock(c){
+  c.save(); c.lineCap='round'; c.strokeStyle='#2f6a25'; c.lineWidth=7;
+  c.beginPath(); c.moveTo(-44,-30); c.bezierCurveTo(-10,-50,10,10,44,-20); c.moveTo(-44,30); c.bezierCurveTo(-10,0,14,46,44,24); c.stroke();
+  c.strokeStyle='#5aa83c'; c.lineWidth=3.5; c.stroke();
+  c.fillStyle='#3f8a2e'; [[-24,-34],[16,-12],[-20,24],[26,30],[0,-4]].forEach(([x,y],i)=>{ c.beginPath(); c.ellipse(x,y,8,4.5,i*.9,0,TAU); c.fill(); });
+  c.restore();
+}
+function drawLotus(c){
+  c.save(); c.fillStyle='rgba(90,170,190,.45)'; rrect(c,-48,-48,96,96,14); c.fill();
+  c.fillStyle='#3f8f5a'; c.beginPath(); c.ellipse(0,26,34,12,0,0,TAU); c.fill();
+  for (let i=0;i<7;i++){ c.save(); c.rotate((i-3)*.42); c.beginPath(); c.ellipse(0,-16,9,26,0,0,TAU); c.fillStyle = i%2?'#f6a6c1':'#fbc8d9'; c.fill(); c.restore(); }
+  c.restore();
+}
+const CB_MARK = ['circle','square','triangle','plus','diamond','star'];
+function drawCbMark(c, i){
+  c.save(); c.translate(28,28); c.beginPath(); c.arc(0,0,15,0,TAU); c.fillStyle='#fff'; c.fill(); c.lineWidth=3; c.strokeStyle='#10263b'; c.stroke(); c.fillStyle='#10263b';
+  const m = CB_MARK[i]; c.beginPath();
+  if (m==='circle') c.arc(0,0,7,0,TAU); else if (m==='square') c.rect(-6.5,-6.5,13,13); else if (m==='triangle'){ c.moveTo(0,-8); c.lineTo(8,6); c.lineTo(-8,6); c.closePath(); }
+  else if (m==='plus'){ c.rect(-2.5,-8,5,16); c.rect(-8,-2.5,16,5); } else if (m==='diamond'){ c.moveTo(0,-9); c.lineTo(7,0); c.lineTo(0,9); c.lineTo(-7,0); c.closePath(); } else starPath(c,0,0,9,4);
+  c.fill(); c.restore();
+}
 /* ---- engeller (hücreyi kaplar) ---- */
 function drawBlock(c, kind, hp, max){
   const S = 47;
@@ -510,6 +583,12 @@ function drawBlock(c, kind, hp, max){
     for (let i=0;i<6;i++){ c.save(); c.rotate(i/6*TAU); c.beginPath(); c.ellipse(0,-16,6,13,0,0,TAU); c.fillStyle = i%2?'#c0304a':'#2f7a8c'; c.fill(); c.restore(); }
     c.beginPath(); c.arc(0,0,6,0,TAU); c.fillStyle='#e8b23a'; c.fill();
     c.strokeStyle='#3f7a4a'; c.lineWidth=3; c.beginPath(); c.moveTo(-36,36); c.quadraticCurveTo(-30,20,-20,24); c.moveTo(36,36); c.quadraticCurveTo(30,20,20,24); c.stroke();
+  } else if (kind==='shield'){
+    bevel('#c9bfa8','#968b73');
+    c.beginPath(); c.arc(0,0,34,0,TAU); c.fillStyle = rgrad(c,-10,-12,3,0,0,36,[[0,'#ffe3a0'],[.5,'#c98a2e'],[1,'#7a4a12']]); c.fill(); c.lineWidth=4; c.strokeStyle='#5e3812'; c.stroke();
+    c.beginPath(); c.arc(0,0,22,0,TAU); c.lineWidth=2.5; c.strokeStyle='rgba(255,236,180,.8)'; c.stroke();
+    c.fillStyle='#b3262b'; c.beginPath(); c.arc(0,0,9,0,TAU); c.fill(); c.fillStyle='#ffe3a0'; c.beginPath(); c.arc(-2,-2,3,0,TAU); c.fill();
+    c.strokeStyle='#5e3812'; c.lineWidth=3; [0,1,2,3].forEach(i=>{ c.save(); c.rotate(i*Math.PI/2+Math.PI/4); c.beginPath(); c.moveTo(0,-24); c.lineTo(0,-32); c.stroke(); c.restore(); });
   } else if (kind==='seal'){
     bevel('#d6ccaf','#a0957a');
     c.strokeStyle='#6f6550'; c.lineWidth=3.5; rrect(c,-36,-36,72,72,6); c.stroke();
@@ -530,7 +609,7 @@ function drawLayer(c, kind, hp){
   else if (kind==='garden'){ c.fillStyle = deep?'#4e9a5b':'#86c98f'; c.fillRect(-S,-S,S*2,S*2); c.fillStyle = deep?'#2f7040':'#5aa868'; for(let i=0;i<8;i++){ const x = -40 + (i%4)*26, y = -36 + Math.floor(i/4)*60; c.beginPath(); c.ellipse(x,y,5,10,.6,0,TAU); c.fill(); c.beginPath(); c.ellipse(x+8,y+3,5,10,-.6,0,TAU); c.fill(); } }
   else if (kind==='vine'){ c.fillStyle = deep?'#3c7a33':'#78b65d'; c.fillRect(-S,-S,S*2,S*2); c.strokeStyle = deep?'#1f4d1a':'#3f7c2e'; c.lineWidth = deep?5:3.5; c.beginPath(); c.moveTo(-S,-30); c.bezierCurveTo(-10,-50,10,0,S,-20); c.moveTo(-S,25); c.bezierCurveTo(-20,0,20,50,S,20); c.stroke(); c.fillStyle='#2f6a25'; [[-20,-34],[18,-14],[-26,22],[24,30]].forEach(([x,y])=>{ c.beginPath(); c.ellipse(x,y,6,3.5,.7,0,TAU); c.fill(); }); }
   else if (kind==='glyph'){ c.fillStyle = deep?'#a99a6c':'#d4c69c'; c.fillRect(-S,-S,S*2,S*2); c.strokeStyle='rgba(90,75,40,.55)'; c.lineWidth=3; rrect(c,-38,-38,76,76,8); c.stroke(); c.beginPath(); c.moveTo(-24,-24); c.lineTo(24,-24); c.lineTo(24,12); c.lineTo(-10,12); c.lineTo(-10,-8); c.lineTo(8,-8); c.stroke(); c.beginPath(); c.arc(-20,26,5,0,TAU); c.arc(20,26,5,0,TAU); c.stroke(); }
-  else if (kind==='cloud'){ c.fillStyle = deep?'#c8d6e6':'#e8f0f8'; c.fillRect(-S,-S,S*2,S*2); c.fillStyle='rgba(255,255,255,.9)'; [[-24,-26,18],[0,-34,16],[24,-22,18],[-30,24,16],[6,30,20],[30,22,14]].forEach(([x,y,r])=>{ c.beginPath(); c.arc(x,y,r,0,TAU); c.fill(); }); }
+  else if (kind==='cloud'){ c.fillStyle = deep?'#7f9cbf':'#a9c1dc'; c.fillRect(-S,-S,S*2,S*2); c.fillStyle='rgba(255,255,255,.95)'; [[-24,-26,18],[0,-34,16],[24,-22,18],[-30,24,16],[6,30,20],[30,22,14]].forEach(([x,y,r])=>{ c.beginPath(); c.arc(x,y,r,0,TAU); c.fill(); }); }
   c.restore();
 }
 
@@ -544,14 +623,16 @@ function sprite(key, size, draw){
 function gemSprite(g, size){
   if (g.kind === 'disk') return sprite('disk', size, drawDisk);
   if (g.kind === 'relic') return sprite('relic-'+g.shape, size, c=>drawRelic(c,g.shape));
-  return sprite('g'+g.color+(g.sp||''), size, c=>{
+  const cb = save.cb ? 'c' : '';
+  return sprite('g'+g.color+(g.sp||'')+cb, size, c=>{
     if (g.sp === 'b'){ c.save(); c.scale(.8,.8); STONE_DRAW[g.color](c); c.restore(); drawBombOverlay(c); }
     else { STONE_DRAW[g.color](c); if (g.sp === 'h' || g.sp === 'v') drawLineOverlay(c, g.sp); }
+    if (cb) drawCbMark(c, g.color);
   });
 }
 const iconCache = {};
 function iconURL(key, draw){ if (iconCache[key]) return iconCache[key]; const cv = document.createElement('canvas'); cv.width = cv.height = 96; const c = cv.getContext('2d'); c.translate(48,48); c.scale(.9,.9); draw(c); return iconCache[key] = cv.toDataURL(); }
-const stoneIcon = i => iconURL('s'+i, c=>STONE_DRAW[i](c));
+const stoneIcon = i => iconURL('s'+i+(save.cb?'c':''), c=>{ STONE_DRAW[i](c); if (save.cb) drawCbMark(c,i); });
 
 /* =====================================================================
    SANAT: DÜNYA HARİKALARI (puzzle görselleri ve harita ikonları)
@@ -782,6 +863,20 @@ function makeLevel(g){
       const cols = shuffleArr([1,2,3,4,5,6], rnd).slice(0, Math.min(3, L.relicTotal)); cols.forEach(c=>{ if (!L.blocks[0][c]) L.relics.push([0,c]); }); break; }
   }
   L.primary = primary;
+  // imza mekaniği (ayrı tohum: temel bölüm düzeni değişmez)
+  const r2 = mulberry32(g*131 + 7), SG = SIGS[W.id];
+  L.sig = li === SIG_INTRO_LI || (li > SIG_INTRO_LI && r2() < .45);
+  L.sigIntro = li === SIG_INTRO_LI; L.locks = []; L.lotus = [];
+  const countBlocks = () => L.blocks.flat().filter(Boolean).length, countLayers = () => L.layers.flat().filter(v=>v>0).length;
+  const ensureGoal = (t, n) => { const gl = L.goals.find(x=>x.t===t); if (gl) gl.n = n; else L.goals.push({ t, n }); };
+  if (L.sig){
+    const free = (r,c) => L.blocks[r][c] || L.relics.some(([y,x])=>y===r&&x===c);
+    if (SG.id === 'shield'){ mirrorPick(2 + 2*Math.floor(r2()*2), [2,6], free).forEach(k=>{ L.blocks[Math.floor(k/COLS)][k%COLS] = { kind:'shield', hp:1, max:1 }; }); ensureGoal('block', countBlocks()); L.moves += 7; }
+    else if (SG.id === 'sandstorm' || SG.id === 'wind'){ if (!countLayers()) placeLayers(7); ensureGoal('layer', countLayers()); L.moves += SG.id === 'sandstorm' ? 8 : 4; }
+    else if (SG.id === 'raid'){ if (!countBlocks()) placeBlocks(4); ensureGoal('block', countBlocks()); L.moves += 3; }
+    else if (SG.id === 'lock'){ L.locks = mirrorPick(4 + Math.floor(diff*4), [2,6], free).map(k=>[Math.floor(k/COLS), k%COLS]); L.goals.push({ t:'lock', n:L.locks.length }); L.moves += 6; }
+    else if (SG.id === 'lotus'){ L.lotus = mirrorPick(6, [1,7], (r,c)=>L.blocks[r][c]).map(k=>[Math.floor(k/COLS), k%COLS]); }
+  }
   // testere dişi: 5'li döngünün 1. bölümü "nefes", 5. bölümü parça taşıyan "zor bölüm"
   const pos = (g-1) % LEVELS_PER_PIECE;
   L.hard = g > LEVELS_PER_PIECE && pos === LEVELS_PER_PIECE-1;
@@ -797,10 +892,11 @@ function goalIcon(goal, W){
   if (goal.t === 'block') return iconURL('b'+W.blocks[0], c=>{ c.scale(.85,.85); drawBlock(c, W.blocks[0], BLOCKS[W.blocks[0]].hp, BLOCKS[W.blocks[0]].hp); });
   if (goal.t === 'layer') return iconURL('l'+W.layer, c=>{ c.scale(.85,.85); drawLayer(c, W.layer, 1); });
   if (goal.t === 'relic') return iconURL('r'+W.relic.shape, c=>drawRelic(c, W.relic.shape));
+  if (goal.t === 'lock') return iconURL('lock', c=>{ STONE_DRAW[3](c); drawLock(c); });
   return iconURL('score', c=>{ starPath(c,0,0,40,17); c.fillStyle = grad(c,0,-40,0,40,[[0,'#ffe58a'],[1,'#d69a1a']]); c.fill(); c.strokeStyle='#8f5f0e'; c.lineWidth=3; c.stroke(); });
 }
 function goalLabel(goal, W){
-  return ({ color: STONES[goal.c]?.name, block: W.blocks.map(k=>BLOCKS[k].name).join(' / '), layer: W.layer && LAYERS[W.layer].name, relic: W.relic && W.relic.name, score:'Puan' })[goal.t];
+  return ({ color: STONES[goal.c]?.name, block: W.blocks.map(k=>BLOCKS[k].name).join(' / '), layer: W.layer && LAYERS[W.layer].name, relic: W.relic && W.relic.name, lock:'Sarmaşık Kilidi', score:'Puan' })[goal.t];
 }
 
 /* =====================================================================
@@ -827,7 +923,10 @@ function startLevel(g){
   const L = makeLevel(g), W = WONDERS[L.w];
   G = { L, W, g, grid: Array.from({length:ROWS},()=>Array(COLS).fill(null)), blocks: L.blocks.map(r=>r.map(b=>b?{...b}:null)), layers: L.layers.map(r=>r.slice()),
         moves: L.moves, score:0, goals: L.goals.map(x=>({...x, left:x.n})), relicSpawned:0, relicCollected:0, busy:false, over:false,
-        rnd: mulberry32(L.seed), sel:null, hint:null, idle:0, combo:0 };
+        rnd: mulberry32(L.seed), sel:null, hint:null, idle:0, combo:0,
+        lotus: Array.from({length:ROWS},()=>Array(COLS).fill(false)), turn:0, raids:0, startMs: Date.now() };
+  G.layerCap = G.layers.flat().filter(v=>v>0).length;
+  L.lotus.forEach(([r,c])=>{ G.lotus[r][c] = true; });
   fillInitial();
   showScreen('gameScreen'); layoutBoard(); renderHUD();
   if (g === 1) setTimeout(()=>toast('Aynı türden 3 objeyi yan yana getir'), 400);
@@ -844,6 +943,7 @@ function fillInitial(){
     }
     G.relicSpawned = 0;
     G.L.relics.forEach(([r,c])=>{ G.grid[r][c] = newGem(-1, r, c, { kind:'relic', shape:G.W.relic.shape }); G.relicSpawned++; });
+    G.L.locks.forEach(([r,c])=>{ const gm = G.grid[r][c]; if (gm && gm.kind==='gem') gm.lock = true; });
   } while ((findGroups().length || !findMove()) && ++tries < 50);
   const me = G; me.busy = true; setTimeout(()=>{ if (G === me) me.busy = false; }, 900);
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){ const gm = G.grid[r][c]; if (gm){ gm.y = r - ROWS - 1 - (COLS-c)*.15; tween(gm, { y:r }, 520 + r*30, easeOutBack, c*25); } }
@@ -875,7 +975,7 @@ function matchAt(r,c){
 function findMove(){
   for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){
     for (const [dr,dc] of [[0,1],[1,0]]){ const r2 = r+dr, c2 = c+dc; if (!inB(r2,c2)) continue;
-      const a = G.grid[r][c], b = G.grid[r2][c2]; if (!a || !b) continue;
+      const a = G.grid[r][c], b = G.grid[r2][c2]; if (!a || !b || a.lock || b.lock) continue;
       if ((a.kind==='disk' && b.kind!=='relic') || (b.kind==='disk' && a.kind!=='relic')) return [[r,c],[r2,c2]];
       if (isSpecial(a) && isSpecial(b)) return [[r,c],[r2,c2]];
       G.grid[r][c] = b; G.grid[r2][c2] = a; const ok = matchAt(r,c) || matchAt(r2,c2); G.grid[r][c] = a; G.grid[r2][c2] = b;
@@ -905,6 +1005,7 @@ boardCv.addEventListener('pointerup', ()=>{
 async function trySwap(a, b){
   const A = G.grid[a[0]][a[1]], B = G.grid[b[0]][b[1]];
   if (!A || !B || G.busy || G.over) return;
+  if (A.lock || B.lock){ Sound.bad(); [A,B].forEach(g=>{ if (g.lock){ const x = g.x; tween(g,{ x:x+.12 },60).then(()=>tween(g,{ x:x-.12 },80)).then(()=>tween(g,{ x },60)); } }); toast('Sarmaşık kilidi! Eşleştirerek kurtar'); return; }
   G.busy = true; G.combo = 0; Sound.swap();
   G.grid[a[0]][a[1]] = B; G.grid[b[0]][b[1]] = A;
   await Promise.all([tween(A,{x:b[1],y:b[0]},150,easeInOut), tween(B,{x:a[1],y:a[0]},150,easeInOut)]);
@@ -984,7 +1085,7 @@ async function clearCells(cells, { adjacent=false, create=[], pre=new Set(), ext
     addScore(200, r, c);
   }
   // normal eşleşmelerin komşusundaki engeller hasar alır
-  if (adjacent){ cells.forEach(([r,c])=>[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ const y=r+dr, x=c+dc; if (inB(y,x) && G.blocks[y][x]){ const k=y*COLS+x; if (!blockHits.has(k)) blockHits.set(k, 0); } })); }
+  if (adjacent){ cells.forEach(([r,c])=>[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ const y=r+dr, x=c+dc; if (inB(y,x) && G.blocks[y][x] && (G.blocks[y][x].kind !== 'shield' || create.length)){ const k=y*COLS+x; if (!blockHits.has(k)) blockHits.set(k, 0); } })); }
 
   // animasyon
   let maxD = 0; const anims = [];
@@ -998,8 +1099,11 @@ async function clearCells(cells, { adjacent=false, create=[], pre=new Set(), ext
   // mantıksal temizlik
   for (const [k] of depth){ const r = Math.floor(k/COLS), c = k%COLS, g = G.grid[r][c]; if (!g) continue;
     if (g.kind === 'gem') goalTick('color', 1, g.color);
+    if (g.lock){ goalTick('lock', 1); burst(c+.5,r+.5,'#5aa83c',10); }
     G.grid[r][c] = null;
-    if (G.layers[r][c] > 0){ G.layers[r][c]--; if (G.layers[r][c] === 0){ goalTick('layer',1); burst(c+.5,r+.5,'#e7cf9a',6); } } }
+    if (G.lotus[r][c]){ G.lotus[r][c] = false; G.moves++; popups.push({ text:'+1 Hamle', x:c, y:r-.4, life:0, max:1100 }); burst(c+.5,r+.5,'#f6a6c1',14); }
+    if (G.layers[r][c] > 0){ G.layers[r][c]--; if (G.layers[r][c] === 0) burst(c+.5,r+.5,'#e7cf9a',6); } }
+  syncLayerGoal();
   for (const [k] of blockHits){ const r = Math.floor(k/COLS), c = k%COLS, b = G.blocks[r][c]; if (!b) continue; b.hp--; b.shake = 1; burst(c+.5,r+.5,'#b8b0a0',8,true);
     if (b.hp <= 0){ G.blocks[r][c] = null; goalTick('block',1); addScore(150,r,c); } }
   create.forEach(cr=>{ const [r,c] = cr.pos; if (G.blocks[r][c]) return; const g = newGem(cr.kind==='disk'?-1:cr.color, r, c, cr.kind==='disk'?{kind:'disk'}:{ sp:cr.sp }); g.s = 0; G.grid[r][c] = g; tween(g,{ s:1 },260,easeOutBack); burst(c+.5,r+.5,'#fff3b0',14); });
@@ -1054,7 +1158,8 @@ async function settle(){
   if (!findMove() && !goalsDone()) await reshuffle();
 }
 function bottomOf(r,c){ for (let y=r+1;y<ROWS;y++) if (!G.blocks[y][c]) return false; return true; }
-function fillableFromAbove(r,c){ for (let y=r; y>=0; y--) if (G.blocks[y][c]) return false; return true; }
+const isFixed = (r,c) => G.blocks[r][c] || (G.grid[r][c] && G.grid[r][c].lock);
+function fillableFromAbove(r,c){ for (let y=r; y>=0; y--) if (isFixed(y,c)) return false; return true; }
 function spawnGem(c){
   const rel = G.W.relic && G.relicSpawned < G.L.relicTotal && relicsOnBoard() < 3 && G.rnd() < .25;
   if (rel){ G.relicSpawned++; return newGem(-1,-1,c,{ kind:'relic', shape:G.W.relic.shape }); }
@@ -1068,13 +1173,13 @@ async function gravity(){
       if (G.blocks[r][c] || G.grid[r][c]) continue;
       if (r === 0){ const g = spawnGem(c); G.grid[0][c] = g; g.y = -1; moved.add(g.id); moves.push(tween(g,{ y:0 },85,linear)); continue; }
       const above = G.grid[r-1][c];
-      if (above && !moved.has(above.id) && !G.blocks[r-1][c]){ G.grid[r][c] = above; G.grid[r-1][c] = null; moved.add(above.id); moves.push(tween(above,{ y:r },85,linear)); }
+      if (above && !above.lock && !moved.has(above.id) && !G.blocks[r-1][c]){ G.grid[r][c] = above; G.grid[r-1][c] = null; moved.add(above.id); moves.push(tween(above,{ y:r },85,linear)); }
     }
     if (!moves.length){
       for (let r=ROWS-1;r>0;r--) for (let c=0;c<COLS;c++){
         if (G.blocks[r][c] || G.grid[r][c] || fillableFromAbove(r-1,c)) continue;
         for (const dc of [-1,1]){ const x = c+dc; if (!inB(r-1,x)) continue; const g = G.grid[r-1][x];
-          if (g && !moved.has(g.id) && !G.blocks[r-1][x]){ G.grid[r][c] = g; G.grid[r-1][x] = null; moved.add(g.id); moves.push(tween(g,{ x:c, y:r },95,linear)); break; } }
+          if (g && !g.lock && !moved.has(g.id) && !G.blocks[r-1][x]){ G.grid[r][c] = g; G.grid[r-1][x] = null; moved.add(g.id); moves.push(tween(g,{ x:c, y:r },95,linear)); break; } }
       }
     }
     if (!moves.length) break;
@@ -1084,17 +1189,42 @@ async function gravity(){
 async function reshuffle(){
   toast('Taşlar karıştırılıyor…');
   const spots = [], gems = [];
-  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){ const g = G.grid[r][c]; if (g && g.kind==='gem' && !g.sp){ spots.push([r,c]); gems.push(g); } }
+  for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){ const g = G.grid[r][c]; if (g && g.kind==='gem' && !g.sp && !g.lock){ spots.push([r,c]); gems.push(g); } }
   for (let t=0;t<80;t++){ shuffleArr(gems, G.rnd); spots.forEach(([r,c],i)=>G.grid[r][c]=gems[i]); if (!findGroups().length && findMove()) break; if (t>40) gems.forEach(g=>g.color = randColor()); }
   await Promise.all(spots.map(([r,c])=>tween(G.grid[r][c],{ x:c, y:r },420,easeInOut)));
 }
 
+function syncLayerGoal(){ const n = G.layers.flat().filter(v=>v>0).length; G.goals.forEach(gl=>{ if (gl.t==='layer') gl.left = n; }); }
 function goalTick(t, n, color){ G.goals.forEach(gl=>{ if (gl.t===t && (t!=='color' || gl.c===color) && gl.left>0) gl.left = Math.max(0, gl.left-n); }); }
 function goalsDone(){ return G.goals.every(gl => gl.t==='score' ? G.score >= gl.n : gl.left <= 0); }
 
+async function sigTick(){
+  const SG = SIGS[G.W.id]; G.turn++;
+  if (!SG.every || G.turn % SG.every !== 0) return;
+  const R = G.rnd;
+  if (SG.id === 'sandstorm'){
+    const cand = []; for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++) if (G.layers[r][c] > 0) [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr,dc])=>{ const y=r+dr, x=c+dc; if (inB(y,x) && !G.blocks[y][x] && G.layers[y][x] === 0) cand.push([y,x]); });
+    if (!cand.length || G.layers.flat().filter(v=>v>0).length >= G.layerCap) return; const [y,x] = cand[Math.floor(R()*cand.length)]; G.layers[y][x] = 1; burst(x+.5,y+.5,'#e9c98e',16); toast('Kum fırtınası!');
+  } else if (SG.id === 'wind'){
+    if (!G.layers.flat().some(v=>v>0)) return;
+    for (let r=0;r<ROWS;r++){ const cols = [...Array(COLS).keys()].filter(c=>!G.blocks[r][c]); const vals = cols.map(c=>G.layers[r][c]); cols.forEach((c,i)=>{ G.layers[r][c] = vals[(i-1+vals.length)%vals.length]; }); }
+    toast('Rüzgâr bulutları sürükledi');
+  } else if (SG.id === 'raid'){
+    if (G.raids >= 4) return;
+    const cand = []; for (let r=1;r<=3;r++) for (let c=0;c<COLS;c++){ const g = G.grid[r][c]; if (g && g.kind==='gem' && !g.sp && !g.lock) cand.push([r,c]); }
+    if (!cand.length) return; const [y,x] = cand[Math.floor(R()*cand.length)]; G.grid[y][x] = null; G.blocks[y][x] = { kind:'wood', hp:1, max:1, shake:1 }; G.raids++;
+    G.goals.forEach(gl=>{ if (gl.t==='block') gl.left++; }); burst(x+.5,y+.5,'#b07a42',16,true); Sound.boom(); toast('Akıncılar barikat kurdu!');
+  } else if (SG.id === 'sunlight'){
+    const cand = []; for (let r=0;r<ROWS;r++) for (let c=0;c<COLS;c++){ const g = G.grid[r][c]; if (g && g.kind==='gem' && !g.sp && !g.lock) cand.push(g); }
+    if (!cand.length) return; const g = cand[Math.floor(R()*cand.length)]; g.sp = R() < .5 ? 'h' : 'v';
+    effects.push({ t:'rays', r:g.y, c:g.x, color:'#ffd45a', life:0, max:800 }); tween(g,{ s:1.3 },220,easeOutBack).then(()=>tween(g,{ s:1 },180)); Sound.special(); toast('Kukulkan’ın ışığı!');
+  }
+  syncLayerGoal(); renderHUD(); await wait(450);
+}
 async function endTurn(){
   renderHUD();
   if (goalsDone()) return winLevel();
+  if (G.L.sig && G.moves > 0 && !G.over){ await sigTick(); if (goalsDone()) return winLevel(); }
   if (G.moves <= 0){ G.over = true; await wait(300); return loseLevel(); }
   G.busy = false; G.idle = 0;
 }
@@ -1126,6 +1256,7 @@ function renderBoard(t){
   const S = Math.round(cell*DPR);
   // katmanlar
   for (let r=0;r<ROWS;r++) for (let x=0;x<COLS;x++){ const L = G.layers[r][x]; if (L>0 && !G.blocks[r][x]){ c.drawImage(sprite('L'+G.W.layer+L, S, cc=>drawLayer(cc,G.W.layer,L)), pad+x*cell, pad+r*cell, cell, cell); } }
+  for (let r=0;r<ROWS;r++) for (let x=0;x<COLS;x++) if (G.lotus[r][x] && !G.blocks[r][x]) c.drawImage(sprite('lotus', S, drawLotus), pad+x*cell, pad+r*cell, cell, cell);
   // seçim
   if (G.sel){ const [r,x] = G.sel; c.save(); c.strokeStyle='#e8b23a'; c.lineWidth=3; c.shadowColor='#e8b23a'; c.shadowBlur=10; rrect(c,pad+x*cell+2,pad+r*cell+2,cell-4,cell-4,cell*.18); c.stroke(); c.restore(); }
   // engeller
@@ -1139,7 +1270,7 @@ function renderBoard(t){
     if (hintIds.includes(g.id)) { s *= 1 + Math.sin(t*.012)*.07; }
     if (g.kind === 'disk') rot = t*.0015;
     if (g.sp === 'b'){ c.save(); c.globalAlpha = .35 + .25*Math.sin(t*.008); c.fillStyle = STONES[g.color].color; c.beginPath(); c.arc(cx,cy,cell*.48,0,TAU); c.fill(); c.restore(); }
-    c.save(); c.globalAlpha = g.a; c.translate(cx,cy); if (rot) c.rotate(rot); c.drawImage(gemSprite(g,S), -cell*s/2, -cell*s/2, cell*s, cell*s); c.restore(); }
+    c.save(); c.globalAlpha = g.a; c.translate(cx,cy); if (rot) c.rotate(rot); c.drawImage(gemSprite(g,S), -cell*s/2, -cell*s/2, cell*s, cell*s); if (g.lock) c.drawImage(sprite('lockOv', S, drawLock), -cell*s/2, -cell*s/2, cell*s, cell*s); c.restore(); }
   c.restore();
   // efektler
   for (let i=effects.length-1;i>=0;i--){ const e = effects[i]; const p = e.life/e.max; const cx = pad+(e.c+.5)*cell, cy = pad+(e.r+.5)*cell;
@@ -1174,7 +1305,8 @@ function renderHUD(){
     return `<div class="goal ${done?'done':''}" title="${goalLabel(gl,W)}"><img alt="" src="${goalIcon(gl,W)}">${done?'✓':(gl.t==='score'?left.toLocaleString('tr-TR'):left)}</div>`; }).join('');
   const inCycle = (G.g-1) % LEVELS_PER_PIECE; let h = '';
   for (let i=0;i<LEVELS_PER_PIECE;i++) h += `<i class="${i<inCycle?'on':''}"></i>`;
-  $('#pieceProg').innerHTML = `Parçaya ${LEVELS_PER_PIECE-inCycle} bölüm ${h}`;
+  const SG = SIGS[W.id];
+  $('#pieceProg').innerHTML = G.L.sig && SG.every ? `<b style="color:var(--terra)">${SG.name}: ${SG.every - (G.turn % SG.every)} hamle</b>` : `Parçaya ${LEVELS_PER_PIECE-inCycle} bölüm ${h}`;
   $('#gameFoot').innerHTML = save.test && !G.over ? `<button class="btn small alt" id="btnAutoWin">⚡ Test: Bölümü Kazan</button>` : '';
   const aw = $('#btnAutoWin'); if (aw) aw.onclick = () => { if (G.busy) return; G.goals.forEach(g=>g.left=0); if (G.goals.some(g=>g.t==='score')) G.score = Math.max(G.score, ...G.goals.map(g=>g.n||0)); G.busy = true; endTurn(); };
 }
@@ -1183,7 +1315,7 @@ function toast(text){ const b = document.createElement('div'); b.className='bann
 /* ---- kazan / kaybet ---- */
 function starsFor(){ const ratio = G.moves / G.L.moves; return ratio >= .3 ? 3 : ratio >= .12 ? 2 : 1; }
 async function winLevel(){
-  G.over = true; G.busy = true; const me = G; await wait(250); if (G !== me) return;
+  G.over = true; G.busy = true; G.endMoves = G.moves; const me = G; await wait(250); if (G !== me) return;
   toast('Bölüm Tamamlandı!'); Sound.win();
   const stars = starsFor();
   // kalan hamle bonusu: her hamle rastgele bir taşı parlatır
@@ -1191,6 +1323,7 @@ async function winLevel(){
   for (let i=0; i<Math.min(bonusMoves, 12); i++){ const cand = G.grid.flat().filter(g=>g && g.kind==='gem'); const g = cand[Math.floor(Math.random()*cand.length)]; if (g){ burst(g.x+.5,g.y+.5,'#fff1b0',10); addScore(250, g.y, g.x); } G.moves--; renderHUD(); await wait(90); if (G !== me) return; }
   if (bonusMoves > 12){ addScore((bonusMoves-12)*250, 3.5, 3.5); G.moves = 0; }
   await wait(600); if (G !== me) return;
+  logAttempt('win', stars);
   const g = G.g; save.stars[g] = Math.max(save.stars[g] || 0, stars);
   const prevPieces = piecesOf(G.L.w);
   if (save.lvl === g) save.lvl = g + 1;
@@ -1211,7 +1344,7 @@ async function winLevel(){
   else { $('#mMap').onclick = () => { closeModal(); openMap(); }; const n = $('#mNext'); if (n) n.onclick = () => { closeModal(); openLevelIntro(save.lvl); }; }
 }
 function loseLevel(){
-  Sound.lose(); loseLife();
+  Sound.lose(); logAttempt('lose'); loseLife();
   const lives = save.lives;
   const remaining = G.goals.map(gl=>`<div class="goal"><img alt="" src="${goalIcon(gl,G.W)}">${gl.t==='score'?Math.max(0,gl.n-G.score).toLocaleString('tr-TR'):gl.left}</div>`).join('');
   openModal(`<div class="kicker">${G.W.name} · Bölüm ${G.L.li}</div><h2>Hamle bitti</h2>
@@ -1462,6 +1595,9 @@ async function openMap({ celebrate=null } = {}){
     if (celebrate < WONDERS.length-1){ await focusWonder(celebrate+1); } }
   else focusWonder(Math.min(cur, WONDERS.length-1), false);
   if (!save.seenIntro) showWelcome();
+  else if (save.lvl > 10 && !save.fbAsked && celebrate === null){ save.fbAsked = true; persist();
+    openModal(`<div class="kicker">1 dakikanı alır</div><h2>Nasıl gidiyor?</h2><p style="text-align:center">10 bölümü geçtin! Kısa bir anketle oyunu geliştirmemize yardım eder misin?</p><div class="row"><button class="btn ghost" id="mLater">Sonra</button><button class="btn" id="mSurvey">Ankete Git</button></div>`);
+    $('#mLater').onclick = closeModal; $('#mSurvey').onclick = openPlaytest; }
 }
 function mapNote(text){ const n = document.createElement('div'); n.className = 'chip'; n.textContent = text; n.style.cssText = 'position:absolute;z-index:6;left:50%;top:120px;translate:-50% 0;font-size:15px;padding:10px 16px;background:rgba(16,38,59,.9);animation:pop .4s cubic-bezier(.2,1.5,.4,1)'; $('#mapScreen').appendChild(n); setTimeout(()=>n.remove(), 3200); }
 function updateLifeChip(){ const l = syncLives(); $('#lifeCount').textContent = l; $('#lifeTimer').textContent = l < MAX_LIVES ? ' · ' + nextLifeText() : ''; }
@@ -1525,6 +1661,7 @@ function openLevelIntro(g){
     <p style="text-align:center;font-weight:800;margin:0 0 4px">Hedefler · ${L.moves} hamle</p>
     <div class="goalsRow">${L.goals.map(gl=>`<div class="goal" title="${goalLabel(gl,W)}"><img alt="" src="${goalIcon(gl,W)}">${gl.t==='score'?gl.n.toLocaleString('tr-TR'):gl.n}</div>`).join('')}</div>
     ${newTxt ? `<p style="text-align:center">${newTxt}</p>` : ''}
+    ${L.sig ? `<p style="text-align:center;background:#fffaf0;border-radius:12px;padding:8px 10px">${L.sigIntro ? '<span class="hardTag" style="background:var(--terra)">YENİ MEKANİK</span><br>' : ''}<b>${SIGS[W.id].name}:</b> ${SIGS[W.id].desc}</p>` : ''}
     <p style="text-align:center;margin:6px 0 0;font-weight:800;font-size:22px;letter-spacing:4px" title="Canlar">${heartsHTML()}</p>
     <div class="row"><button class="btn ghost" id="mBack">Harita</button><button class="btn" id="mGo">Başla</button></div>`);
   const t = $('#mThumb').getContext('2d'); t.drawImage(sceneCanvas(W.id),0,0,480,360); t.fillStyle = grad(t,0,220,0,360,[[0,'rgba(0,0,0,0)'],[1,'rgba(0,0,0,.55)']]); t.fillRect(0,0,480,360);
@@ -1548,6 +1685,9 @@ function openSettings(){
   const sw = on => `<span class="sw ${on?'on':''}"></span>`;
   openModal(`<h2>Ayarlar</h2>
     <div class="toggle" id="tSound"><span>Ses</span>${sw(save.sound)}</div>
+    <div class="toggle" id="tCb"><span>Renk körü modu<small>Taşlara ek sembol koyar (●■▲✚◆★)</small></span>${sw(save.cb)}</div>
+    <div class="toggle" id="tVib"><span>Titreşim<small>Özel güç ve ödüllerde (destekleyen cihazlarda)</small></span>${sw(save.vib)}</div>
+    <div class="toggle" id="tPlay"><span>Oyuncu testi<small>Sonuçların ve kısa anket</small></span><b style="color:var(--ink)">Aç ›</b></div>
     <div class="toggle" id="tTest"><span>Test modu<small>Oyun ekranına “Bölümü Kazan” düğmesi ekler</small></span>${sw(save.test)}</div>
     <div class="toggle"><span>Ekonomi<small>${PIECES_PER_WONDER} parça × ${LEVELS_PER_PIECE} bölüm = ${LEVELS_PER_WONDER} bölüm / harika · toplam ${TOTAL_LEVELS} · ${MAX_LIVES} can, ${LIFE_REGEN_MS/60000} dk'da 1 yenilenir, parça kazanınca dolar · para ve güçlendirici yok</small></span></div>
     ${save.test ? `<div class="toggle" id="tFill"><span>Test: canları doldur</span><b style="color:var(--ink)">Doldur</b></div>` : ''}
@@ -1555,6 +1695,9 @@ function openSettings(){
     <div class="toggle" id="tReset"><span>İlerlemeyi sıfırla<small>Tüm bölümler ve koleksiyon silinir</small></span><b style="color:var(--bad)">Sıfırla</b></div>
     <button class="btn wide" id="mClose" style="margin-top:14px">Kapat</button>`);
   $('#tSound').onclick = () => { save.sound = !save.sound; persist(); openSettings(); };
+  $('#tPlay').onclick = openPlaytest;
+  $('#tCb').onclick = () => { save.cb = !save.cb; persist(); spriteCache.clear(); Object.keys(iconCache).forEach(k=>delete iconCache[k]); openSettings(); };
+  $('#tVib').onclick = () => { save.vib = !save.vib; persist(); if (save.vib) vibrate(30); openSettings(); };
   $('#tTest').onclick = () => { save.test = !save.test; persist(); openSettings(); };
   const tfl = $('#tFill'); if (tfl) tfl.onclick = () => { save.lives = MAX_LIVES; save.lifeTs = null; persist(); openSettings(); };
   const tj = $('#tJump'); if (tj) tj.onclick = () => { if (save.lvl <= TOTAL_LEVELS){ save.lvl = Math.max(save.lvl, Math.ceil(save.lvl/LEVELS_PER_PIECE)*LEVELS_PER_PIECE); persist(); } closeModal(); openMap(); };
@@ -1563,6 +1706,58 @@ function openSettings(){
   $('#mClose').onclick = () => { closeModal(); renderPanel(); };
 }
 
+function openPlaytest(){
+  const S = teleSummary(), fb = save.fb || {};
+  const rate = (key, label, lo, hi) => `<div style="margin:8px 0"><div style="font-weight:800;font-size:14px">${label}</div><div style="display:flex;gap:6px;margin-top:4px">${[1,2,3,4,5].map(v=>`<button class="btn small ${fb[key]===v?'':'ghost'}" data-k="${key}" data-v="${v}" style="flex:1;padding:8px 0">${v}</button>`).join('')}</div><div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:700"><span>${lo}</span><span>${hi}</span></div></div>`;
+  const syncMsg = PT.state === 'ok' ? '✓ Sonuçların otomatik olarak oyunun sahibine iletiliyor.' : PT.state === 'ready' ? 'Sonuçların oyunun sahibine iletilecek.' : PT.state === 'err' ? 'Otomatik gönderim yapılamadı (yazma izni yok olabilir). Raporu kopyalayıp gönder.' : 'Bu görünümde otomatik gönderim yok. Raporu kopyalayıp gönder.';
+  openModal(`<div class="kicker">Oyuncu testi</div><h2>Senin oyunun</h2>
+    <div class="steps" style="grid-template-columns:1fr 1fr;display:grid">
+      <div style="display:block"><b style="font-size:22px">${S.maxLevel}</b><br><small>ulaşılan bölüm</small></div>
+      <div style="display:block"><b style="font-size:22px">${S.firstTryRate ?? '–'}%</b><br><small>ilk denemede kazanma</small></div>
+      <div style="display:block"><b style="font-size:22px">${S.attempts}</b><br><small>deneme (${S.losses} kayıp, ${S.quits} çıkış)</small></div>
+      <div style="display:block"><b style="font-size:22px">${S.avgSec ?? '–'} sn</b><br><small>ortalama bölüm süresi</small></div>
+    </div>
+    <h2 style="font-size:19px;margin-top:6px">Kısa anket</h2>
+    ${rate('fun','Oyun ne kadar eğlenceli?','Hiç','Çok')}
+    ${rate('diff','Bölümler ne kadar zordu?','Çok kolay','Çok zor')}
+    ${rate('puzzle','Puzzle parçası seni oynamaya ne kadar teşvik etti?','Hiç','Çok')}
+    ${rate('map','Harita ve koleksiyon ne kadar ilgini çekti?','Hiç','Çok')}
+    <label for="fbBest" style="font-weight:800;font-size:14px">En çok neyi sevdin?</label>
+    <textarea id="fbBest" rows="2" style="width:100%;border-radius:10px;border:1px solid #d6ccb6;padding:8px;font:inherit;margin:4px 0 8px;background:#fffaf0;color:var(--text)">${fb.best||''}</textarea>
+    <label for="fbWorst" style="font-weight:800;font-size:14px">Neyin değişmesini isterdin?</label>
+    <textarea id="fbWorst" rows="2" style="width:100%;border-radius:10px;border:1px solid #d6ccb6;padding:8px;font:inherit;margin:4px 0 8px;background:#fffaf0;color:var(--text)">${fb.worst||''}</textarea>
+    <button class="btn wide" id="fbSave">Anketi Kaydet</button>
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin:8px 0">${syncMsg}<br>İsim kaydedilmez; yalnızca bölüm sonuçları, süreler ve anket cevapları paylaşılır.</p>
+    <div class="row"><button class="btn ghost" id="fbCopy">Raporu Kopyala</button>${PT.owner ? '<button class="btn alt" id="fbAll">Tüm Testçiler</button>' : ''}</div>
+    <button class="btn ghost wide" id="mClose" style="margin-top:10px">Kapat</button>
+    <textarea id="fbReport" readonly hidden rows="6" style="width:100%;margin-top:8px;font-size:11px"></textarea>`);
+  const draft = { ...fb };
+  document.querySelectorAll('[data-k]').forEach(b=>b.onclick = () => { draft[b.dataset.k] = +b.dataset.v; document.querySelectorAll(`[data-k="${b.dataset.k}"]`).forEach(x=>x.classList.toggle('ghost', +x.dataset.v !== draft[b.dataset.k])); });
+  $('#fbSave').onclick = () => { draft.best = $('#fbBest').value.slice(0,500); draft.worst = $('#fbWorst').value.slice(0,500); draft.ts = Date.now(); save.fb = draft; save.fbAsked = true; persist(); queueSync(); $('#fbSave').textContent = 'Kaydedildi ✓'; };
+  $('#fbCopy').onclick = async () => { const t = reportText(); try { await navigator.clipboard.writeText(t); $('#fbCopy').textContent = 'Kopyalandı ✓'; } catch(e){ const ta = $('#fbReport'); ta.hidden = false; ta.value = t; ta.select(); $('#fbCopy').textContent = 'Metni seçip kopyala'; } };
+  const all = $('#fbAll'); if (all) all.onclick = openAllTesters;
+  $('#mClose').onclick = closeModal;
+}
+async function openAllTesters(){
+  openModal(`<div class="kicker">Oyunun sahibi</div><h2>Tüm testçiler</h2><p style="text-align:center" id="atBody">Yükleniyor…</p><button class="btn ghost wide" id="mBack2">Geri</button>`);
+  $('#mBack2').onclick = openPlaytest;
+  const to = setTimeout(()=>{ const b = $('#atBody'); if (b && b.textContent === 'Yükleniyor…') b.textContent = 'Sonuçlar alınamadı. Daha sonra tekrar dene.'; }, 10000);
+  try {
+    const snap = await PT.db.collection('playtests').get(); clearTimeout(to);
+    const rows = snap.docs.map(d=>d.data()).filter(Boolean);
+    if (!rows.length){ $('#atBody').textContent = 'Henüz sonuç yok. Linki testçilerle paylaştığında sonuçlar burada görünür.'; return; }
+    const all = rows.flatMap(r=>Array.isArray(r.attempts) ? r.attempts : []); const S = teleSummary(all);
+    const fbs = rows.map(r=>r.fb).filter(f=>f && typeof f === 'object'); const avg = k => { const v = fbs.map(f=>+f[k]).filter(x=>x>=1&&x<=5); return v.length ? (v.reduce((a,b)=>a+b,0)/v.length).toFixed(1) : '–'; };
+    const byType = {}; all.filter(a=>a.r!=='quit').forEach(a=>{ const k = a.sig ? 'imza' : a.t; byType[k] = byType[k] || [0,0]; byType[k][1]++; if (a.r==='win') byType[k][0]++; });
+    const esc = t => String(t).replace(/[&<>"]/g, ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+    $('#atBody').outerHTML = `<div style="text-align:left;font-size:14px;line-height:1.6">
+      <p><b>${rows.length}</b> testçi · <b>${S.attempts}</b> deneme · ilk denemede kazanma <b>${S.firstTryRate ?? '–'}%</b> · ort. süre <b>${S.avgSec ?? '–'} sn</b></p>
+      <p>Anket ortalaması (${fbs.length} kişi): eğlence <b>${avg('fun')}</b> · zorluk <b>${avg('diff')}</b> · puzzle <b>${avg('puzzle')}</b> · harita <b>${avg('map')}</b></p>
+      <p>Hedef tipine göre kazanma: ${Object.entries(byType).map(([k,[w,n]])=>`${k} <b>${Math.round(w/n*100)}%</b> (${n})`).join(' · ')}</p>
+      <p>Ulaşılan bölümler: ${rows.map(r=>r.lvl ? r.lvl-1 : 0).sort((a,b)=>b-a).join(', ')}</p>
+      ${fbs.filter(f=>f.best||f.worst).slice(0,12).map(f=>`<div style="background:#fffaf0;border-radius:10px;padding:8px;margin:6px 0">${f.best?`👍 ${esc(f.best)}<br>`:''}${f.worst?`✎ ${esc(f.worst)}`:''}</div>`).join('')}</div>`;
+  } catch(e){ clearTimeout(to); const b = $('#atBody'); if (b) b.textContent = 'Sonuçlar alınamadı. Daha sonra tekrar dene.'; }
+}
 /* ---- ekran / modal ---- */
 function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active', s.id===id)); }
 function openModal(html){ $('#modalCard').innerHTML = html; $('#modal').hidden = false; $('#modalCard').style.animation = 'none'; void $('#modalCard').offsetWidth; $('#modalCard').style.animation = ''; }
@@ -1570,7 +1765,7 @@ function closeModal(){ $('#modal').hidden = true; }
 $('#btnSettings').onclick = openSettings;
 $('#btnQuit').onclick = () => { if (!G || G.over) return; const costs = !G.over && G.moves < G.L.moves;
   openModal(`<h2>Bölümden çık?</h2><p style="text-align:center">${costs ? '<b>1 can kaybedeceksin.</b> ' : ''}Bu bölümdeki ilerlemen kaydedilmez.</p><div class="row"><button class="btn ghost" id="mStay">Oyuna Dön</button><button class="btn" id="mLeave">Haritaya Dön</button></div>`);
-  $('#mStay').onclick = closeModal; $('#mLeave').onclick = () => { if (costs) loseLife(); closeModal(); openMap(); }; };
+  $('#mStay').onclick = closeModal; $('#mLeave').onclick = () => { if (costs){ logAttempt('quit'); loseLife(); } closeModal(); openMap(); }; };
 $('#btnPuzzleBack').onclick = () => openMap();
 $('#btnCollBack').onclick = () => openMap();
 

@@ -75,11 +75,22 @@ Yeni parça ekranın ortasında büyük ve süzülerek belirir ve "Parçaya doku
 - Haritaya dönüldüğünde yeni süs zıplayarak belirir, konfeti çıkar ve "Yeni süs: Fener · Kolezyum" bildirimi görünür.
 - Puzzle parçası kazanınca canlar da dolduğu için 5 bölümde bir üç ödül birlikte gelir: **parça + süs + dolu can.**
 
-### Karar 5: Teknoloji ve platform
-- Unity (C#): sektör standardı, 3D harita için güçlü, build boyutu büyük.
-- Cocos Creator / Defold: hafif, 2D Match-3 için verimli, 3D harita sınırlı.
-- Web tabanlı (bu prototip) + Capacitor ile paketleme: en hızlı yineleme, düşük maliyet, performans sınırlı.
-**Öneri:** Mekanik ve ekonomi testleri bu web prototipiyle yapılsın. Üretim için Unity kullanılsın, 3D harita ayrı bir sahne olsun ve yalnızca harita ekranında yüklensin.
+### ✅ Karar 5: Teknoloji ve platform (KARARLAŞTIRILDI: Unity 6 LTS)
+**Neden Unity:**
+- 3D harita ile 2D Match-3'ü aynı motorda en rahat taşıyan seçenek.
+- iOS ve Android'e tek koddan çıkıyor.
+- Addressables ile her harika ayrı bir içerik paketi olarak indirilebiliyor; Antik Dünya gibi genişlemeler için önemli.
+- Casual oyun pazarında en çok deneyimli geliştirici bu motorda.
+
+**Elenenler:**
+- Cocos: 3D harita zayıf.
+- Unreal: mobil casual için ağır.
+- Web + paketleme: 3D harita ve düşük seviye Android performansı riskli.
+
+**Yapılan iş:** `unity/` klasöründe oyunun kurallarını içeren saf C# çekirdek hazır: bölüm üretimi ve tahta motoru, imza mekanikleri dahil.
+- Çekirdek, web prototipiyle **420/420 bölümde** ve **2.516 hamle adımında birebir aynı** sonucu veriyor; bu, otomatik testle kanıtlanıyor.
+- Prototip, kuralların "doğru kaynağı" olarak kalıyor. Unity tarafı aynı kuralları kullanan bir sunum katmanı olacak.
+- Ayrıntılar `unity/README.md` dosyasında.
 
 ### ✅ Karar 6: Bölüm tasarımı ve zorluk eğrisi (KARARLAŞTIRILDI)
 **Yaklaşım:** Bölümler tohumlu prosedürel üretimle oluşuyor (her oyuncuda aynı bölüm). Üretim aşamasında her destinasyonun ilk birkaç bölümü elle cilalanabilir.
@@ -106,22 +117,36 @@ Ek kurallar: ilk 10 bölüm öğrenme dönemi (cömert hamle), her destinasyonun
 
 Gerçek oyuncu, ileriyi düşündüğü ve eserleri bilerek aşağı indirdiği için bottan biraz daha başarılı olur. Bu oranlar, casual Match-3 için hedeflenen "ilk denemede çoğunlukla kazanılır, parça bölümleri biraz terletir" hissine uygun. Sayılar ilk gerçek oyuncu testinde yeniden ayarlanmalı.
 
-### Karar 7: Destinasyona özgü "imza" mekaniği
-Prototip 3 genel engel tipini farklı görünümlerle kullanıyor. Her harikaya bir tane benzersiz mekanik eklemek tazeliği artırır ama karmaşıklık da getirir. Örnek: Çin Seddi için "savunma" (her 3 hamlede bir ilerleyen ve durdurulması gereken bir engel), Chichen Itza için "gölge yılanı" (merdiven deseninde katman).
-**Öneri:** Lansmanda genel 3 tip yeterli. İmza mekanikleri canlı operasyon güncellemeleri için saklanabilir.
+### ✅ Karar 7: Destinasyona özgü imza mekanikleri (KARARLAŞTIRILDI ve UYGULANDI)
+Her harika, **21. bölümünde** kendine özgü bir kural tanıtır. Bu kural sonraki bölümlerin yaklaşık yarısında tekrar çıkar. Hepsi mevcut sistemlerin (blok, katman, özel güç) üzerine kurulu; yeni bir kavram yükü getirmiyor.
+
+| Harika | Mekanik | Kural | Bot kazanma oranı |
+|---|---|---|---|
+| Kolezyum | Gladyatör Kalkanı | 3'lü eşleşmeyle kırılmaz; yanında 4'lü veya daha büyük eşleşme ya da özel güç gerekir. Büyük eşleşme yapmayı öğretir | %65 |
+| Petra | Kum Fırtınası | Her 4 hamlede temizlenen kum, bir komşu hücreye geri savrulur | %54 (mekaniksiz %67) |
+| Tac Mahal | Lotus Havuzu | Lotus üzerindeki taşı eşleştirmek +1 hamle verir (olumlu mekanik) | %89 |
+| Çin Seddi | Akıncı Saldırısı | Her 4 hamlede üst sıralara yeni ahşap bariyer kurulur (en fazla 4). Brief'teki "savunma" fikri | %79 |
+| Machu Picchu | Sarmaşık Kilidi | Kilitli taş kaydırılamaz ve düşmez; eşleştirilerek kurtarılır | %53 |
+| Chichen Itza | Kukulkan Işığı | Her 5 hamlede güneş bir taşı çizgi gücüne çevirir (olumlu mekanik) | %79 |
+| Kurtarıcı İsa | Rüzgâr | Her 3 hamlede bulutlar bir sütun sağa kayar | %70 |
+
+Periyodik mekaniklerde oyun ekranında geri sayım görünür ("Kum Fırtınası: 2 hamle"). İlk karşılaşmada bölüm girişinde "YENİ MEKANİK" kartı çıkar. Olumsuz ve olumlu mekanikler bilinçli olarak dönüşümlü sıralandı.
 
 ### Karar 8: Sosyal ve canlı operasyon (lansman sonrası)
 Liderlik tablosu, takımlar ve etkinlikler ("Haftanın Harikası" gibi). Bunlar şimdilik kapsam dışı ama kayıt yapısını etkiler (sunucu tarafı ilerleme).
 
-### Karar 9: Erişilebilirlik ayrıntıları
-Siluetler zaten ayrışıyor. Ek olarak renk körü modu (taş üzerinde küçük sembol), titreşim ayarları ve animasyon azaltma seçeneği. Prototip `prefers-reduced-motion` ayarını dikkate alıyor.
+### ✅ Karar 9: Erişilebilirlik (KARARLAŞTIRILDI ve UYGULANDI)
+- **Renk körü modu** (Ayarlar): her taşın köşesine ayrı bir sembol eklenir: ● sikke, ■ parşömen, ▲ amfora, ✚ skarabe, ◆ pusula, ★ taç. Taşların siluetleri zaten farklı; sembol ikinci bir güvence. Hedef simgelerine de yansır.
+- **Titreşim** (Ayarlar, varsayılan açık): özel güç, patlama ve puzzle parçasında kısa titreşim (destekleyen cihazlarda).
+- **Azaltılmış hareket:** cihazın "hareketi azalt" ayarı dikkate alınır.
 
 ---
 
-## 5. Önerilen sonraki adım
+## 5. Oyuncu testi (HAZIR)
+Oyunun içinde bir test altyapısı var. Her deneme anonim olarak kaydediliyor; 10. bölümden sonra kısa bir anket çıkıyor. Testçilere yazma izni verilirse sonuçlar otomatik olarak toplanıyor ve oyunun sahibi "Tüm Testçiler" ekranında toplu sonuçları görüyor. Plan: `TEST_PLANI.md`.
 
-Oynanış, ekonomi, ödül ve zorluk kararları tamamlandı. Açık kalan konular:
-1. **Karar 5: Teknoloji ve platform.** Prototipten üretime geçiş (öneri: Unity).
-2. **Karar 7: Destinasyona özgü imza mekanikleri.** Lansman sonrası güncellemeler için.
-3. **Karar 9: Erişilebilirlik.** Renk körü modu, titreşim.
-4. **İlk gerçek oyuncu testi.** 5–10 kişiye prototip oynatılıp bot oranlarıyla karşılaştırılması.
+## 6. Sonraki adım
+Bütün tasarım kararları verildi. Bundan sonrası:
+1. **Oyuncu testini yapmak** (5–10 kişi, 2 gün) ve sonuçlara göre zorluğu ayarlamak.
+2. **Unity'de görsel üretim:** taş, engel ve harita modelleri; görünüm katmanının `Board.Events` ile canlandırılması.
+3. **Antik Dünyanın 7 Harikası** (ikinci dünya) için içerik planı.
