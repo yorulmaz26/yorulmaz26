@@ -72,6 +72,18 @@ class EncyclopediaScreen(game: EmirZinciriGame) : BaseScreen(game) {
             row.add(ui.label(desc, assets.fontSmall, Theme.inkSoft, wrap = true)).growX()
             list.add(row).growX().pad(5f, 16f, 5f, 16f).row()
         }
+        list.add(ui.label("Düşmanlar", assets.fontTitle, Theme.ink)).left().pad(20f, 24f, 8f, 24f).row()
+        val seenEnemies = services.catalog.all().filter { p.isUnlocked(it.id) }.flatMap { d -> d.enemies.map { it.type } }.toSet()
+        for (e in com.emirzinciri.robotkomutan.logic.level.EnemyType.entries) {
+            val known = e in seenEnemies
+            val row = ui.panel(Theme.white, 22, 3f)
+            row.pad(14f, 18f, 14f, 18f)
+            row.add(ui.label(if (known) e.title else "???", assets.fontBold, Theme.ink)).left().width(230f)
+            row.add(ui.label(if (known) "${e.description} (${e.defaultHp} can)" else "Henüz karşılaşılmadı.", assets.fontSmall, Theme.inkSoft, wrap = true)).growX()
+            list.add(row).growX().pad(5f, 16f, 5f, 16f).row()
+        }
+        list.add(ui.label("Robot sınıfları (bulmacalarda standart değerler): Temel 3 can/1 hasar · Savaş 4 can/2 hasar · Kalkan 5 can, saldıramaz, 3 adımlık kalkan.",
+            assets.fontSmall, Theme.inkFaint, wrap = true)).growX().pad(10f, 24f, 8f, 24f).row()
         list.add().height(30f)
     }
 

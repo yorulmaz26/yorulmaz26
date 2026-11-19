@@ -131,6 +131,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         ObjectiveType.REACH_EXIT, ObjectiveType.SYNC_EXIT -> "map"
         ObjectiveType.BOXES_ON_TARGETS -> "check"
         ObjectiveType.COLLECT_ALL_ENERGY, ObjectiveType.POWER_SOCKETS -> "bolt"
+        ObjectiveType.DEFEAT_ENEMIES -> "close"
     }
 
     private fun objectivesText() = def.objectives.joinToString(" · ") { it.type.title }
@@ -224,7 +225,9 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         session.robotIds.forEachIndexed { i, id ->
             val sel = id == selectedRobot
             val col = Theme.robotColors[i % Theme.robotColors.size]
-            val b = ui.button("Robot $id", if (sel) col else Theme.panelAlt, if (sel) Theme.white else Theme.ink, "robot", assets.fontBold, 18) {
+            val cls = def.robots.first { it.id == id }.type
+            val name = if (cls == com.emirzinciri.robotkomutan.logic.level.RobotClass.BASIC) "Robot $id" else "$id · ${cls.title.substringBefore(' ')}"
+            val b = ui.button(name, if (sel) col else Theme.panelAlt, if (sel) Theme.white else Theme.ink, "robot", assets.fontBold, 18) {
                 selectedRobot = id; selectedCard = -1; map.focusRobot = id; refreshAll()
             }
             b.pad(6f, 12f, 6f, 14f)
@@ -511,6 +514,11 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
                 is SimEvent.SocketPowered -> { sound = "energy"; msg = "Soket doldu!" }
                 is SimEvent.MessageSent -> { sound = "signal"; msg = msg ?: "${robot}sinyal gönderdi." }
                 is SimEvent.OutOfEnergy -> { sound = "bump"; msg = "$robot${e.pc + 1}. kart için enerji yetmedi." }
+                is SimEvent.EnemyHit -> sound = "hit"
+                is SimEvent.EnemyDefeated -> { sound = "defeat"; msg = "Düşman etkisiz hâle getirildi!" }
+                is SimEvent.EnemyAttack -> { sound = if (e.blocked) "shield" else "hurt"; msg = msg ?: if (e.blocked) "Kalkan saldırıyı engelledi." else "Robot ${e.robot} ${e.damage} hasar aldı!" }
+                is SimEvent.ShieldUp -> sound = sound ?: "shield"
+                is SimEvent.RobotDestroyed -> { sound = "fall"; msg = "Robot ${e.robot} yok edildi!" }
                 is SimEvent.RobotLost -> { sound = "fall"; msg = if (e.laser) "${robot}lazere yakalandı!" else "${robot}boşluğa düştü!" }
                 else -> Unit
             }
@@ -634,6 +642,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
     private fun failTitle(r: FailReason) = when (r) {
         FailReason.ROBOT_LOST -> "Robot düştü!"
         FailReason.LASER -> "Lazere yakalandı!"
+        FailReason.DESTROYED -> "Robot yok edildi!"
         FailReason.NO_ENERGY -> "Enerji bitti!"
         FailReason.PROGRAM_ENDED -> "Hedefe ulaşılamadı"
         FailReason.DEADLOCK -> "Robotlar takıldı"
@@ -644,6 +653,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
     private fun failTip(r: FailReason) = when (r) {
         FailReason.ROBOT_LOST -> "İpucu: boşluk ve çukurlara dikkat. Tek adım düğmesiyle hareketi adım adım izleyebilirsin."
         FailReason.LASER -> "İpucu: kırmızı ışın açıkken geçme. Anahtarla kapat, kutuyla kes ya da doğru anı bekle."
+        FailReason.DESTROYED -> "İpucu: düşmanların davranışını adım adım izle. Kalkan aç, kutuyla siper al ya da önce saldır."
         FailReason.NO_ENERGY -> "İpucu: enerji hücresi ya da şarj istasyonu kullan, gereksiz hamlelerden kaçın."
         FailReason.PROGRAM_ENDED -> "İpucu: kırmızı kartlar çarpmaları gösterir. Robotun yönünü takip et."
         FailReason.DEADLOCK -> "İpucu: 'Mesaj bekle' kartı bir sinyal gelene kadar bekler."
@@ -747,6 +757,13 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
             "conveyor" -> listOf(TutorialHint.Step(map, "Sarı oklu bantlar, üstündeki kutu ve robotları her adım bir hücre taşır. Programlar bitse de bant çalışmaya devam eder.") { session.totalCards >= 1 })
             "laser" -> listOf(TutorialHint.Step(map, "Kırmızı ışına giren robot kaybolur. Anahtar lazeri kapatır, kutu ışını keser.") { session.totalCards >= 1 })
             "and_lock" -> listOf(TutorialHint.Step(map, "Mor çerçeveli plakalar birlikte çalışır: kilit ancak hepsine aynı anda basılınca açılır.") { session.totalCards >= 1 })
+            "combat" -> listOf(
+                TutorialHint.Step(map, "Kırmızı robotlar düşman! Üstlerindeki sayı canları. Devriye önündekine saldırır, engele gelince döner.") { session.totalCards >= 1 },
+                TutorialHint.Step(card(CommandType.ATTACK), "Saldır: önündeki düşmana vurur. Düşman sırası robotlardan sonra gelir; önce vuran kazanır.") { count(CommandType.ATTACK) >= 1 },
+            )
+            "shield" -> listOf(TutorialHint.Step(card(CommandType.SHIELD), "Kalkan aç: bu adım ve sonraki adım hasar almazsın. Taretin önünden geçerken kullan.") { count(CommandType.SHIELD) >= 1 })
+            "chaser" -> listOf(TutorialHint.Step(map, "Turuncu takipçi en yakın robota yürür. Onu lazere ya da tuzağa çekebilirsin.") { session.totalCards >= 1 })
+            "boss" -> listOf(TutorialHint.Step(map, "İsyan Lideri her adım döner ve önündekine 2 hasar verir. Canı yarıya inince kovalamaya başlar!") { session.totalCards >= 1 })
             "sync" -> listOf(TutorialHint.Step(map, "Bu bölümde robotlar çıkışlara aynı adımda varmalı. Erken varan robot kazanmaz.") { session.totalCards >= 1 })
             else -> emptyList()
         }

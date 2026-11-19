@@ -110,6 +110,14 @@ class Icons(private val size: Int) : com.badlogic.gdx.utils.Disposable {
                 rect(0.14f, 0.26f, 0.72f, 0.48f); setColor(0f, 0f, 0f, 0f); rect(0.2f, 0.32f, 0.6f, 0.36f); setColor(1f, 1f, 1f, 1f)
                 thick(0.18f, 0.3f, 0.5f, 0.54f, 0.07f); thick(0.82f, 0.3f, 0.5f, 0.54f, 0.07f)
             }
+            CommandType.ATTACK -> {
+                thick(0.2f, 0.8f, 0.72f, 0.28f, 0.12f); tri(0.66f, 0.12f, 0.9f, 0.12f, 0.9f, 0.36f)
+                thick(0.24f, 0.56f, 0.46f, 0.78f, 0.1f)
+            }
+            CommandType.SHIELD -> {
+                rect(0.2f, 0.14f, 0.6f, 0.4f); tri(0.2f, 0.52f, 0.8f, 0.52f, 0.5f, 0.9f)
+                setColor(0f, 0f, 0f, 0f); rect(0.44f, 0.24f, 0.12f, 0.46f); setColor(1f, 1f, 1f, 1f)
+            }
             CommandType.REPEAT -> {
                 arc(0.5f, 0.5f, 0.3f, 100f, 350f, 0.12f); tri(0.62f, 0.12f, 0.88f, 0.26f, 0.6f, 0.4f)
             }

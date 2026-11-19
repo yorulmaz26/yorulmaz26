@@ -94,7 +94,7 @@ class Solver(private val level: LevelData, private val maxNodes: Int = 400_000) 
         val ended = BooleanArray(ids.size) { node.ended[it] || choice[it] == null }
         val child = Node(sim.state, ended, node, choice, node.cost + choice.count { it != null })
         if (out is Outcome.Win) return child to true
-        if (out is Outcome.Fail && (out.reason == FailReason.ROBOT_LOST || out.reason == FailReason.LASER)) return null
+        if (out is Outcome.Fail && (out.reason == FailReason.ROBOT_LOST || out.reason == FailReason.LASER || out.reason == FailReason.DESTROYED)) return null
         if (ended.all { it }) {
             // Bütün programlar bitti: bantlar hâlâ taşıyorsa sonuç ortaya çıkana kadar sürdür.
             if (out != null || !level.hasConveyors) return null
@@ -107,10 +107,11 @@ class Solver(private val level: LevelData, private val maxNodes: Int = 400_000) 
     private fun key(s: WorldState, ended: BooleanArray): String = buildString {
         s.robots.forEachIndexed { i, r ->
             append(r.pos.x).append(',').append(r.pos.y).append(r.dir).append(r.energy).append(r.carrying).append(r.status)
-            append(if (ended[i]) 'E' else 'R').append(if (r.arrivedTick >= 0) 'A' else '-').append('|')
+            append(if (ended[i]) 'E' else 'R').append(if (r.arrivedTick >= 0) 'A' else '-').append(r.hp).append(r.shield).append('|')
         }
         append(s.boxes.sortedWith(WorldState.posOrder)).append(s.cells.keys.sortedWith(WorldState.posOrder))
         append(s.filledPits.sortedWith(WorldState.posOrder)).append(s.toggled.sorted()).append(s.timers.toSortedMap())
         append(s.socketCharge.toSortedMap(WorldState.posOrder)).append(s.openDoors.sortedWith(WorldState.posOrder))
+        for (e in s.enemies) append(e.signature())
     }
 }

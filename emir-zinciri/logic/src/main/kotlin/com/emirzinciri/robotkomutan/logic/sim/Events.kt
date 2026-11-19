@@ -24,11 +24,18 @@ sealed class SimEvent {
     data class RobotLost(val robot: String, val at: Pos, val laser: Boolean = false) : SimEvent()
     data class OutOfEnergy(val robot: String, val pc: Int) : SimEvent()
     data class ProgramFinished(val robot: String) : SimEvent()
+    data class ShieldUp(val robot: String) : SimEvent()
+    data class EnemyHit(val enemy: String, val at: Pos, val damage: Int, val by: String?) : SimEvent()
+    data class EnemyDefeated(val enemy: String, val at: Pos) : SimEvent()
+    data class EnemyMoved(val enemy: String, val from: Pos, val to: Pos) : SimEvent()
+    data class EnemyAttack(val enemy: String, val robot: String, val damage: Int, val blocked: Boolean, val ranged: Boolean) : SimEvent()
+    data class RobotDestroyed(val robot: String, val at: Pos) : SimEvent()
 }
 
 enum class FailReason(val title: String) {
     ROBOT_LOST("Robot kayboldu"),
     LASER("Robot lazere yakalandı"),
+    DESTROYED("Robot yok edildi"),
     NO_ENERGY("Enerji bitti"),
     PROGRAM_ENDED("Komutlar bitti ama hedef tamamlanmadı"),
     DEADLOCK("Robotlar birbirini bekliyor"),

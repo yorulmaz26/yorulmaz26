@@ -83,6 +83,36 @@ enum class ObjectiveType(val title: String) {
     COLLECT_ALL_ENERGY("Bütün enerjiyi topla"),
     POWER_SOCKETS("Enerji soketlerini doldur"),
     SYNC_EXIT("Robotlar çıkışlara aynı anda ulaşsın"),
+    DEFEAT_ENEMIES("Bütün düşmanları etkisizleştir"),
+}
+
+/** Düşman davranışları. */
+enum class EnemyType(val title: String, val description: String, val defaultHp: Int) {
+    PATROL("Devriye", "Baktığı yönde yürür, engele gelince geri döner. Önüne gelen robota saldırır.", 2),
+    TURRET("Nöbetçi Taret", "Yerinden kıpırdamaz; önündeki hattaki ilk robota uzaktan ateş eder. Duvar ve kutu atışı keser.", 2),
+    CHASER("Takipçi", "En yakın robota doğru ilerler; yanına gelince ona dönüp saldırır.", 2),
+    BOSS("İsyan Lideri", "Patron. 1. aşamada her adım döner ve önündekine 2 hasar verir; canı yarıya inince robotları kovalar.", 6),
+}
+
+@Serializable
+data class EnemyDef(
+    val id: String,
+    val type: EnemyType,
+    val x: Int,
+    val y: Int,
+    val dir: Dir = Dir.W,
+    val hp: Int = 0,
+    /** Taretin menzili. */
+    val range: Int = 4,
+)
+
+/** Bulmaca bölümlerinde kullanılan standart sınıf değerleri (kalıcı geliştirmeler bunları değiştirmez). */
+data class ClassStats(val hp: Int, val attack: Int, val shieldTicks: Int)
+
+fun RobotClass.stats(): ClassStats = when (this) {
+    RobotClass.WARRIOR -> ClassStats(hp = 4, attack = 2, shieldTicks = 2)
+    RobotClass.SHIELD -> ClassStats(hp = 5, attack = 0, shieldTicks = 3)
+    else -> ClassStats(hp = 3, attack = 1, shieldTicks = 2)
 }
 
 @Serializable
@@ -126,6 +156,7 @@ data class LevelDef(
     val boxes: List<String> = emptyList(),
     /** Bu kanallardaki plakaların HEPSİ aynı anda basılı olmalı (koordinasyon kilitleri). */
     val andChannels: List<Int> = emptyList(),
+    val enemies: List<EnemyDef> = emptyList(),
     val cells: List<String> = emptyList(),
     val maxTicks: Int = 200,
     val tutorial: String? = null,

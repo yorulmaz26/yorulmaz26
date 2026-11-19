@@ -2,7 +2,7 @@ package com.emirzinciri.robotkomutan.logic.command
 
 /** Komut kartı kategorileri; arayüzde renk ve gruplama için kullanılır. */
 enum class CommandCategory(val title: String) {
-    MOVE("Hareket"), ACTION("Eylem"), ENERGY("Enerji"), SIGNAL("Sinyal"), FLOW("Akış")
+    MOVE("Hareket"), ACTION("Eylem"), ENERGY("Enerji"), SIGNAL("Sinyal"), COMBAT("Savaş"), FLOW("Akış")
 }
 
 /**
@@ -55,6 +55,10 @@ enum class CommandType(
         "Diğer bütün robotlara bir sinyal gönderir. Sinyal bir sonraki adımda alınır."),
     WAIT_MSG("Mesaj bekle", "Mesaj?", CommandCategory.SIGNAL, 0, 1,
         "Bir sinyal gelene kadar bekler; sinyal gelince onu tüketip devam eder."),
+    ATTACK("Saldır", "Saldır", CommandCategory.COMBAT, 1, 1,
+        "Robotun önündeki düşmana saldırır. Hasar robot sınıfına bağlıdır (Temel 1, Savaş robotu 2; Kalkan robotu saldıramaz)."),
+    SHIELD("Kalkan aç", "Kalkan", CommandCategory.COMBAT, 1, 1,
+        "Bu adım ve sonraki adım boyunca bütün hasarı engeller (Kalkan robotunda 3 adım)."),
     REPEAT("Tekrar et", "Tekrar", CommandCategory.FLOW, 0, 0,
         "Kendisiyle 'Blok sonu' arasındaki komutları seçilen sayı kadar tekrarlar.",
         hasArg = true, argRange = 2..9, defaultArg = 2, opensBlock = true),

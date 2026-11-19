@@ -63,6 +63,10 @@ class MapView(private val assets: Assets, private val session: PlaySession, priv
                 is SimEvent.PitFilled -> Triple("Doldu", Theme.green, e.at)
                 is SimEvent.OutOfEnergy -> Triple("Enerji yok!", Theme.red, at(e.robot))
                 is SimEvent.RobotLost -> Triple(if (e.laser) "Lazer!" else "Düştü!", Theme.red, e.at)
+                is SimEvent.EnemyHit -> Triple("−${e.damage}", Theme.orange, e.at)
+                is SimEvent.EnemyDefeated -> Triple("Etkisiz!", Theme.green, e.at)
+                is SimEvent.EnemyAttack -> Triple(if (e.blocked) "Engellendi" else "−${e.damage}", if (e.blocked) Theme.blue else Theme.red, at(e.robot))
+                is SimEvent.ShieldUp -> Triple("Kalkan", Theme.blue, at(e.robot))
                 else -> continue
             }
             if (p != null) popups += Popup(text, color, p.x.toFloat(), p.y.toFloat())

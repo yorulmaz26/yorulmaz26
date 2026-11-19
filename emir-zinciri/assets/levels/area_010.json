@@ -1,0 +1,336 @@
+{
+    "area": 10,
+    "levels": [
+        {
+            "id": 46,
+            "area": 10,
+            "name": "İlk Düşman",
+            "goalText": "Devriyeyi aş ve çıkışa ulaş.",
+            "hint": "Yeni kart: Saldır. Robotlar düşmanlardan önce hareket eder; önce vuran avantajlıdır.",
+            "story": "İsyan başladı! Bazı robotlar merkezi yapay zekânın kontrolüne geçti. Onları etkisiz hâle getir ama kendi robotlarını koru.",
+            "map": [
+                "......E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 8,
+            "enemies": [
+                {
+                    "id": "P",
+                    "type": "PATROL",
+                    "x": 3,
+                    "y": 0
+                }
+            ],
+            "maxTicks": 60,
+            "tutorial": "combat",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 47,
+            "area": 10,
+            "name": "Taret Koridoru",
+            "goalText": "Taretin önünden geçip çıkışa ulaş.",
+            "hint": "Yeni kart: Kalkan aç. Taret hattındaki ilk robota her adım ateş eder.",
+            "map": [
+                "   E  ",
+                "......",
+                "..    "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "SHIELD"
+            ],
+            "maxCommands": 12,
+            "par": 11,
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 5,
+                    "y": 1,
+                    "range": 6
+                }
+            ],
+            "maxTicks": 60,
+            "tutorial": "shield",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "SHIELD",
+                    "BACK",
+                    "SHIELD",
+                    "BACK",
+                    "SHIELD",
+                    "BACK",
+                    "SHIELD",
+                    "TURN_LEFT",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 48,
+            "area": 10,
+            "name": "Takipçi",
+            "goalText": "Takipçiyi etkisiz hâle getir ve çıkışa ulaş.",
+            "hint": "Takipçi en yakın robota yürür. Lazeri zamanlı düğmeyle kapatıp geç; peşindeki takipçi ışına yakalansın.",
+            "map": [
+                "...E..",
+                "L.....",
+                "......",
+                "t....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "ATTACK"
+            ],
+            "maxCommands": 14,
+            "par": 8,
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                },
+                {
+                    "type": "REACH_EXIT"
+                }
+            ],
+            "values": {
+                "0,3": 4
+            },
+            "enemies": [
+                {
+                    "id": "C",
+                    "type": "CHASER",
+                    "x": 5,
+                    "y": 3,
+                    "hp": 3
+                }
+            ],
+            "maxTicks": 60,
+            "tutorial": "chaser",
+            "solution": {
+                "A": [
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 49,
+            "area": 10,
+            "name": "İkili Savunma",
+            "goalText": "Tareti etkisiz hâle getir.",
+            "hint": "Kalkan robotu (mavi, 5 can, 3 adımlık kalkan) önde atışları karşılar; savaş robotu (2 hasar) taret dibine ulaşmalı.",
+            "map": [
+                "#########",
+                ".........",
+                "######.##"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 1,
+                    "type": "SHIELD"
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 1,
+                    "type": "WARRIOR"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 20,
+            "par": 19,
+            "third": {
+                "type": "TICKS",
+                "value": 11
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "T",
+                    "type": "TURRET",
+                    "x": 8,
+                    "y": 1,
+                    "hp": 4,
+                    "range": 8
+                }
+            ],
+            "maxTicks": 60,
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "SHIELD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK"
+                ]
+            }
+        },
+        {
+            "id": 50,
+            "area": 10,
+            "name": "Robot İsyanı",
+            "goalText": "İsyan Lideri'ni yen!",
+            "hint": "Kalkan robotu plakada durdukça arena kapısı açık kalır. Patron önündekine 2 hasar verir ve döner; canı yarıya inince en yakın robota saldırır!",
+            "story": "İsyanın lideri karşında. Bu zaferle ilk büyük bölge kurtulacak!",
+            "map": [
+                "#######",
+                "#.....#",
+                ".D....#",
+                "#.....#",
+                "####p##",
+                "####.##"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "type": "WARRIOR"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 5,
+                    "dir": "N",
+                    "type": "SHIELD"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "ATTACK",
+                "SHIELD"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 11
+            },
+            "objectives": [
+                {
+                    "type": "DEFEAT_ENEMIES"
+                }
+            ],
+            "enemies": [
+                {
+                    "id": "Z",
+                    "type": "BOSS",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "N",
+                    "hp": 10
+                }
+            ],
+            "maxTicks": 60,
+            "tutorial": "boss",
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "ATTACK",
+                    "ATTACK",
+                    "ATTACK",
+                    "SHIELD",
+                    "ATTACK",
+                    "ATTACK"
+                ],
+                "B": [
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

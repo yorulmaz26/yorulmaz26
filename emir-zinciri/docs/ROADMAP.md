@@ -16,7 +16,7 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 - ✅ Mesaj gönder / Mesaj bekle (29 ve 43. bölümlerde kart sınırı sinyal kullanmayı zorunlu kılar).
 - ✅ Hareketli bantlar (bant üstünde dönmek/beklemek taşınır; programlar bitse de bant çalışır), lazerler (kanalla kapanır, kutu ışını keser), VE-kilitleri (bütün plakalar aynı anda), senkron varış hedefi.
 - ✅ Çok robotlu çözücü (Dijkstra, toplam kart maliyeti); 45 bölümün tamamında par = optimum doğrulanır.
-- ⬜ Alan 10 (46–50, Robot İsyanı patronu) düşman yapay zekâsı gerektirir.
+- ✅ Alan 10 (46–50) Aşama 6'da tamamlandı.
 
 ## Aşama 5 — Kalıcı fabrika 🟡 (çekirdek ✅)
 - ✅ 15 bina kataloğu; 7'si kurulabilir ve gerçek etkili: Komuta Merkezi (seviye sınırı, bina açma), Enerji Santrali, Metal İşleme (enerji harcar), Kaynak Deposu (kapasite), Mikroçip Laboratuvarı (metal harcar), Araştırma Merkezi (TP + kademe), Ticaret Merkezi (metal/enerji → altın).
@@ -26,8 +26,15 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 - ⬜ Diğer 8 bina (robot üretimi, garaj, akademi, savunma, keşif, tamir, müze, yapay zekâ lab.) bağlı oldukları sistemlerle gelecek; arayüzde kilitli ve nedeni yazılı.
 - ⬜ Robot geliştirme ve programlanabilir üretim hatları (fabrika otomasyonu) — Aşama 6 robot sınıflarıyla birlikte.
 
-## Aşama 6–9 ⬜
-Robot sınıfları, savaş, düşman yapay zekâsı, patronlar; günlük/haftalık görevler, sonsuz mod, market, harita editörü, koleksiyon, başarımlar; 500 bölüme genişleme; müzik ve yayın hazırlığı.
+## Aşama 6 — Strateji ve savaş 🟡 (çekirdek ✅)
+- ✅ Savaş kartları: Saldır, Kalkan aç. Robotlar düşmanlardan önce hareket eder (önce vuran avantajlı), deterministik.
+- ✅ 4 düşman davranışı: Devriye, Nöbetçi Taret (menzilli; duvar/kutu/robot atışı keser), Takipçi (en yakın robot, sabit eşitlik kuralı), İsyan Lideri patronu (2 aşama: dönen ön saldırı → kovalama). Lazerler düşmanları da etkisiz bırakır.
+- ✅ Robot sınıflarının bulmaca değerleri: Temel, Savaş (2 hasar), Kalkan (5 can, saldıramaz, 3 adım kalkan). Kalıcı geliştirmeler bulmaca kurallarını değiştirmez.
+- ✅ Alan 10 (46–50): ilk düşman, taret koridoru, takipçiyi lazere çekme, kalkan+savaş takımı, patron. 50 bölümün hepsi çözücüyle doğrulanır.
+- ⬜ Kalan 4 düşman davranışı (tuzak kuran, kaynak koruyan, komut bozan, takım saldırısı), diğer 12 robot sınıfının yetenekleri, kombinasyonlar, Askerî araştırma dalı.
+
+## Aşama 7–9 ⬜
+Günlük/haftalık görevler, sonsuz mod, market, harita editörü, koleksiyon, başarımlar; 500 bölüme genişleme; müzik ve yayın hazırlığı.
 
 ## Bilinen eksikler
 - Müzik yok (yalnızca ses efektleri); ayarlarda müzik seçeneği bu yüzden gösterilmiyor.

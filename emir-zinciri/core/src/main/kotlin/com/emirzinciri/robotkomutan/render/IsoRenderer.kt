@@ -263,6 +263,8 @@ class IsoRenderer(private val assets: Assets) {
         // Bırakılan kutular yerine "iniyor" görünümü ekleme: kutu zaten f.to.boxes'ta.
         // Robotlar
         f.to.robots.forEachIndexed { i, r -> collectRobot(f, i, r) }
+        // Düşmanlar
+        for (e in f.to.enemies) collectEnemy(f, e)
     }
 
     private fun drawBox(cx: Float, cy: Float, z: Float, alpha: Float = 1f) {
@@ -375,8 +377,77 @@ class IsoRenderer(private val assets: Assets) {
         val color = Theme.robotColors[index % Theme.robotColors.size]
         val dim = r.status == RobotStatus.NO_ENERGY
         val focus = f.focusRobot == null || f.focusRobot == r.id
+        val shielded = r.shield > 0 || f.events.any { it is SimEvent.ShieldUp && it.robot == r.id }
+        val hurt = f.events.any { it is SimEvent.EnemyAttack && it.robot == r.id && !it.blocked }
         list += Drawable(gx + gy + 0.01f, 5) {
-            drawRobot(sx(gx, gy), sy(gx, gy), z, angle, color, carrying, alpha * (if (focus) 1f else 0.85f), scale, dim, f.time + index)
+            val ox = if (hurt) sin(f.t * 40f) * tw * 0.03f * (1f - f.t) else 0f
+            drawRobot(sx(gx, gy) + ox, sy(gx, gy), z, angle, if (hurt && f.t < 0.5f) Theme.red else color, carrying, alpha * (if (focus) 1f else 0.85f), scale, dim, f.time + index)
+            if (shielded) {
+                val cx = sx(gx, gy); val cy = sy(gx, gy)
+                shapes.color = c(Theme.blue, 0.22f + 0.08f * sin(f.time * 6f))
+                shapes.ellipse(cx - tw * 0.42f, cy - th * 0.2f, tw * 0.84f, tw * 0.95f, 24)
+            }
+        }
+    }
+
+    private val enemyColors = mapOf(
+        com.emirzinciri.robotkomutan.logic.level.EnemyType.PATROL to Theme.rgb(0xD9485F),
+        com.emirzinciri.robotkomutan.logic.level.EnemyType.TURRET to Theme.rgb(0x8B5CC7),
+        com.emirzinciri.robotkomutan.logic.level.EnemyType.CHASER to Theme.rgb(0xE5652E),
+        com.emirzinciri.robotkomutan.logic.level.EnemyType.BOSS to Theme.rgb(0x5B3A8C),
+    )
+
+    private fun collectEnemy(f: Frame, e: com.emirzinciri.robotkomutan.logic.sim.EnemyState) {
+        val prev = f.from.enemies.firstOrNull { it.id == e.id } ?: e
+        val k = Interpolation.smooth.apply(f.t)
+        val gx = MathUtils.lerp(prev.pos.x.toFloat(), e.pos.x.toFloat(), k)
+        val gy = MathUtils.lerp(prev.pos.y.toFloat(), e.pos.y.toFloat(), k)
+        val dying = !e.alive && prev.alive
+        if (!e.alive && !dying) return
+        val a0 = dirAngle(prev.dir); var a1 = dirAngle(e.dir)
+        if (a1 - a0 > 180f) a1 -= 360f
+        if (a0 - a1 > 180f) a1 += 360f
+        val angle = MathUtils.lerp(a0, a1, k)
+        val hit = f.events.any { it is SimEvent.EnemyHit && it.enemy == e.id }
+        val attack = f.events.firstOrNull { it is SimEvent.EnemyAttack && it.enemy == e.id } as SimEvent.EnemyAttack?
+        val color = enemyColors.getValue(e.type)
+        list += Drawable(gx + gy + 0.01f, 5) {
+            val alpha = if (dying) 1f - k else 1f
+            val shake = if (hit) sin(f.t * 40f) * tw * 0.03f * (1f - f.t) else 0f
+            val cx = sx(gx, gy) + shake; val cy = sy(gx, gy)
+            val big = if (e.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.BOSS) 1.25f else 1f
+            diamond(cx, cy, tw * 0.62f * big, th * 0.62f * big, Color(0.1f, 0.15f, 0.3f, 0.18f * alpha))
+            val top = c(Theme.mix(color, Theme.white, if (hit) 0.6f else 0.2f), alpha).cpy()
+            val left = c(color, alpha).cpy(); val right = c(shadeOf(color, 0.78f), alpha).cpy()
+            val bh = tw * (if (e.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.TURRET) 0.22f else 0.3f) * big
+            block(cx, cy, 0.6f * big, tw * 0.03f, bh, top, left, right)
+            block(cx, cy, 0.42f * big, bh, bh + tw * 0.14f * big, c(Theme.ink, alpha).cpy(), c(Theme.mix(Theme.ink, color, 0.3f), alpha).cpy(), c(Theme.ink, alpha * 0.9f).cpy())
+            // Kırmızı göz bandı baktığı yöne
+            val (fx, fy) = dirScreen(angle); val (px, py) = dirScreen(angle + 90f)
+            val ey = cy + bh + tw * 0.07f * big
+            shapes.color = c(Theme.yellow, alpha)
+            shapes.rectLine(cx + fx * 0.3f * big - px * 0.14f, ey + fy * 0.3f * big - py * 0.14f, cx + fx * 0.3f * big + px * 0.14f, ey + fy * 0.3f * big + py * 0.14f, tw * 0.035f)
+            if (e.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.BOSS) {
+                // Taç
+                val tz = cy + bh + tw * 0.14f * big
+                shapes.color = c(Theme.yellow, alpha)
+                for (i in -1..1) shapes.triangle(cx + i * tw * 0.1f - tw * 0.05f, tz, cx + i * tw * 0.1f + tw * 0.05f, tz, cx + i * tw * 0.1f, tz + tw * 0.1f)
+            }
+            if (e.type == com.emirzinciri.robotkomutan.logic.level.EnemyType.TURRET) {
+                shapes.color = c(Theme.ink, alpha)
+                shapes.rectLine(cx, cy + bh * 0.7f, cx + fx * 0.55f, cy + bh * 0.7f + fy * 0.55f, tw * 0.06f)
+            }
+        }
+        // Taret atış izi
+        if (attack != null && attack.ranged) {
+            val r = f.to.robots.firstOrNull { it.id == attack.robot }
+            if (r != null) list += Drawable(999f, 0) {
+                val x1 = sx(e.pos.x.toFloat(), e.pos.y.toFloat()); val y1 = sy(e.pos.x.toFloat(), e.pos.y.toFloat()) + tw * 0.2f
+                val x2 = sx(r.pos.x.toFloat(), r.pos.y.toFloat()); val y2 = sy(r.pos.x.toFloat(), r.pos.y.toFloat()) + tw * 0.3f
+                val a = (1f - f.t)
+                shapes.color = c(Theme.purple, a)
+                shapes.rectLine(x1, y1, MathUtils.lerp(x1, x2, minOf(1f, f.t * 3f)), MathUtils.lerp(y1, y2, minOf(1f, f.t * 3f)), tw * 0.04f)
+            }
         }
     }
 
@@ -464,6 +535,16 @@ class IsoRenderer(private val assets: Assets) {
                 val gy = MathUtils.lerp(prev.pos.y.toFloat(), r.pos.y.toFloat(), e)
                 val x = sx(gx, gy); val y = sy(gx, gy) + tw * 0.95f
                 pill(batch, x, y, "${r.energy}", if (r.energy <= 1) Theme.red else Theme.ink, "bolt", Theme.energyColor)
+            }
+        }
+        if (f.level.def.enemies.isNotEmpty()) {
+            for (r in f.to.robots) if (r.alive) {
+                val x = sx(r.pos.x.toFloat(), r.pos.y.toFloat()); val y = sy(r.pos.x.toFloat(), r.pos.y.toFloat()) + tw * (if (f.energyOn) 1.25f else 0.95f)
+                pill(batch, x, y, "${r.hp}", if (r.hp <= 1) Theme.red else Theme.ink, "heart", Theme.red)
+            }
+            for (e in f.to.enemies) if (e.alive) {
+                val x = sx(e.pos.x.toFloat(), e.pos.y.toFloat()); val y = sy(e.pos.x.toFloat(), e.pos.y.toFloat()) + tw * 0.85f
+                pill(batch, x, y, "${e.hp}", Theme.red, "heart", Theme.purple)
             }
         }
         for (p in f.level.allPositions) {

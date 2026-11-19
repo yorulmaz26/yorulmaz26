@@ -7,6 +7,7 @@ import com.emirzinciri.robotkomutan.logic.command.Program
 import com.emirzinciri.robotkomutan.logic.grid.Pos
 import com.emirzinciri.robotkomutan.logic.level.LevelData
 import com.emirzinciri.robotkomutan.logic.level.ObjectiveType
+import com.emirzinciri.robotkomutan.logic.level.EnemyType
 import com.emirzinciri.robotkomutan.logic.level.Tile
 
 /**
@@ -39,6 +40,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
 
     private val history = ArrayList<WorldState>()
     private val lostByLaser = HashSet<String>()
+    private val destroyed = HashSet<String>()
     /** Bu adımda bant bir şey taşıdı mı (programlar bitse de dünya hareket ediyor demektir). */
     private var envMoved = false
     private val totalCards = this.programs.values.sumOf { it.cardCount }
@@ -145,6 +147,10 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         envMoved = false
         if (level.hasConveyors) conveyors(startPos, startBoxes, events)
 
+        // 7c. Düşmanlar (kimlik sırasıyla), ardından kalkanlar bir adım azalır.
+        if (s.enemies.isNotEmpty()) enemyTurn(events)
+        for (r in s.robots) if (r.shield > 0) r.shield--
+
         // 8. Mesaj teslimi ve ortam
         for (sender in sentBy) for (o in s.robots) if (o !== sender && o.alive) o.inbox++
         updateDoors(events)
@@ -172,6 +178,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         state = history.removeAt(history.lastIndex)
         outcome = null
         lostByLaser.clear()
+        destroyed.clear()
         return true
     }
 
@@ -315,11 +322,13 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         }
         solidReason(m.target)?.let { return it }
         if (m.target in s.boxes && m.boxFrom != m.target) return "Önünde kutu var. 'İt' veya 'Nesne al' kullan."
+        if (s.enemyAt(m.target) != null) return "Önünde düşman var. 'Saldır' kullan."
         if (m.boxTo != null) {
             val bt = level.tile(m.boxTo)
             if (bt == Tile.WALL || bt.isConsole) return "Kutu duvara dayandı."
             if (bt.isDoor && m.boxTo !in s.openDoors) return "Kutu kapalı kapıya dayandı."
             if (m.boxTo in s.boxes) return "Kutunun arkasında başka bir kutu var."
+            if (s.enemyAt(m.boxTo) != null) return "Kutunun arkasında düşman var."
             val atBoxTo = s.robotAt(m.boxTo)
             if (atBoxTo != null && atBoxTo !== m.robot) return "Kutunun arkasında bir robot var."
         }
@@ -344,7 +353,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
 
     /** "Önü boşsa" koşulu: hücreye güvenle girilebilir mi (çukur ve boşluk güvenli sayılmaz). */
     private fun canEnter(p: Pos): Boolean =
-        solidReason(p) == null && p !in state.boxes && state.robotAt(p) == null && !isHole(p)
+        solidReason(p) == null && p !in state.boxes && state.robotAt(p) == null && state.enemyAt(p) == null && !isHole(p)
 
     // ---------------------------------------------------------------- eylemler
 
@@ -433,6 +442,13 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                 }
             }
             SEND -> { sentBy += r; events += SimEvent.MessageSent(r.id) }
+            ATTACK -> {
+                val e = s.enemyAt(front)
+                if (r.stats.attack == 0) fail(r, pc, "${r.type.title} saldıramaz; kalkanıyla korur.", events)
+                else if (e == null) fail(r, pc, "Önünde saldırılacak düşman yok.", events)
+                else hitEnemy(e, r.stats.attack, r.id, events)
+            }
+            SHIELD -> { r.shield = r.stats.shieldTicks; events += SimEvent.ShieldUp(r.id) }
             else -> error("Beklenmeyen eylem: ${ins.type}")
         }
     }
@@ -466,7 +482,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         }
         if (list.isEmpty()) return
         val moversFrom = list.associateBy { it.from }
-        for (c in list) if (solidReason(c.to) != null) c.blocked = true
+        for (c in list) if (solidReason(c.to) != null || s.enemyAt(c.to) != null) c.blocked = true
         val claims = list.filter { !it.blocked }.groupingBy { it.to }.eachCount()
         for (c in list) if (!c.blocked && claims.getValue(c.to) > 1) c.blocked = true
         var changed = true
@@ -498,6 +514,103 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         }
     }
 
+    // ---------------------------------------------------------------- savaş
+
+    private fun hitEnemy(e: EnemyState, dmg: Int, by: String?, events: MutableList<SimEvent>) {
+        e.hp = (e.hp - dmg).coerceAtLeast(0)
+        events += SimEvent.EnemyHit(e.id, e.pos, dmg, by)
+        if (!e.alive) events += SimEvent.EnemyDefeated(e.id, e.pos)
+    }
+
+    private fun damage(e: EnemyState, r: RobotState, dmg: Int, ranged: Boolean, events: MutableList<SimEvent>) {
+        val blocked = r.shield > 0
+        events += SimEvent.EnemyAttack(e.id, r.id, dmg, blocked, ranged)
+        if (blocked) return
+        r.hp -= dmg
+        if (r.hp <= 0) {
+            r.hp = 0
+            r.status = RobotStatus.LOST
+            destroyed += r.id
+            events += SimEvent.RobotDestroyed(r.id, r.pos)
+        }
+    }
+
+    private fun enemyBlocked(p: Pos): Boolean =
+        solidReason(p) != null || p in state.boxes || isHole(p) || state.robotAt(p) != null || state.enemyAt(p) != null
+
+    private fun moveEnemy(e: EnemyState, to: Pos, events: MutableList<SimEvent>) {
+        events += SimEvent.EnemyMoved(e.id, e.pos, to)
+        e.pos = to
+    }
+
+    /** Yanındaki robota döner ve saldırır (N, D, G, B sırasıyla ilk bulunan). */
+    private fun attackAdjacent(e: EnemyState, dmg: Int, events: MutableList<SimEvent>): Boolean {
+        for (d in com.emirzinciri.robotkomutan.logic.grid.Dir.entries) {
+            val r = state.robotAt(e.pos + d) ?: continue
+            e.dir = d
+            damage(e, r, dmg, false, events)
+            return true
+        }
+        return false
+    }
+
+    /** En yakın robota bir adım (Manhattan; eşitlikte kimlik sırası; önce farkı büyük eksen, eşitse x). */
+    private fun chaseStep(e: EnemyState, events: MutableList<SimEvent>) {
+        val target = state.robots.filter { it.alive }
+            .minWithOrNull(compareBy({ kotlin.math.abs(it.pos.x - e.pos.x) + kotlin.math.abs(it.pos.y - e.pos.y) }, { it.id })) ?: return
+        val dx = target.pos.x - e.pos.x; val dy = target.pos.y - e.pos.y
+        val hx = if (dx > 0) com.emirzinciri.robotkomutan.logic.grid.Dir.E else com.emirzinciri.robotkomutan.logic.grid.Dir.W
+        val hy = if (dy > 0) com.emirzinciri.robotkomutan.logic.grid.Dir.S else com.emirzinciri.robotkomutan.logic.grid.Dir.N
+        val order = when {
+            dx == 0 -> listOf(hy)
+            dy == 0 -> listOf(hx)
+            kotlin.math.abs(dx) >= kotlin.math.abs(dy) -> listOf(hx, hy)
+            else -> listOf(hy, hx)
+        }
+        for (d in order) {
+            val to = e.pos + d
+            if (!enemyBlocked(to)) { e.dir = d; moveEnemy(e, to, events); return }
+        }
+    }
+
+    /** Düşman yapay zekâsı: her düşman tanımlı, deterministik bir kurala göre bir eylem yapar. */
+    private fun enemyTurn(events: MutableList<SimEvent>) {
+        for (e in state.enemies) {
+            if (!e.alive) continue
+            when (e.type) {
+                EnemyType.PATROL -> {
+                    val front = e.pos + e.dir
+                    val r = state.robotAt(front)
+                    when {
+                        r != null -> damage(e, r, 1, false, events)
+                        enemyBlocked(front) -> e.dir = e.dir.opposite()
+                        else -> moveEnemy(e, front, events)
+                    }
+                }
+                EnemyType.TURRET -> {
+                    var p = e.pos + e.dir
+                    for (i in 1..e.range) {
+                        val r = state.robotAt(p)
+                        if (r != null) { damage(e, r, 1, true, events); break }
+                        val t = level.tile(p)
+                        if (t == Tile.WALL || t.isConsole || (t.isDoor && p !in state.openDoors) || p in state.boxes || state.enemyAt(p) != null) break
+                        p += e.dir
+                    }
+                }
+                EnemyType.CHASER -> if (!attackAdjacent(e, 1, events)) chaseStep(e, events)
+                EnemyType.BOSS -> {
+                    val phase2 = e.hp * 2 <= e.maxHp
+                    if (phase2) {
+                        if (!attackAdjacent(e, 2, events)) chaseStep(e, events)
+                    } else {
+                        val r = state.robotAt(e.pos + e.dir)
+                        if (r != null) damage(e, r, 2, false, events) else e.dir = e.dir.right()
+                    }
+                }
+            }
+        }
+    }
+
     /** Işın içinde kalan robotlar kaybolur. */
     private fun lasers(events: MutableList<SimEvent>) {
         if (level.lasers.isEmpty()) return
@@ -506,6 +619,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             r.status = RobotStatus.LOST
             events += SimEvent.RobotLost(r.id, r.pos, laser = true)
         }
+        for (e in state.enemies) if (e.alive && e.pos in hit) { e.hp = 0; events += SimEvent.EnemyDefeated(e.id, e.pos) }
     }
 
     private fun updateDoors(events: MutableList<SimEvent>) {
@@ -544,6 +658,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             ObjectiveType.COLLECT_ALL_ENERGY -> s.cells.isEmpty()
             ObjectiveType.POWER_SOCKETS -> sockets.all { (s.socketCharge[it] ?: 0) >= level.socketNeed(it) }
             ObjectiveType.SYNC_EXIT -> s.robots.all { it.alive && it.pos in exits } && s.robots.map { it.arrivedTick }.distinct().size == 1
+            ObjectiveType.DEFEAT_ENEMIES -> s.enemies.none { it.alive }
         }
     }
 
@@ -552,6 +667,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         if (objectivesMet()) return Outcome.Win(stats())
         s.robots.firstOrNull { it.status == RobotStatus.LOST }?.let {
             val byLaser = lostByLaser.contains(it.id)
+            if (it.id in destroyed) return Outcome.Fail(FailReason.DESTROYED, "${it.id} robotu düşman saldırısıyla yok edildi.", stats(), it.id, it.activePc)
             return if (byLaser) Outcome.Fail(FailReason.LASER, "${it.id} robotu lazer ışınına girdi.", stats(), it.id, it.activePc)
             else Outcome.Fail(FailReason.ROBOT_LOST, "${it.id} robotu düştü.", stats(), it.id, it.activePc)
         }
@@ -588,6 +704,10 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                 ObjectiveType.POWER_SOCKETS -> {
                     val left = sockets.count { (s.socketCharge[it] ?: 0) < level.socketNeed(it) }
                     if (left > 0) return "$left soket dolmadı."
+                }
+                ObjectiveType.DEFEAT_ENEMIES -> {
+                    val left = s.enemies.count { it.alive }
+                    if (left > 0) return "$left düşman hâlâ ayakta."
                 }
                 ObjectiveType.SYNC_EXIT -> {
                     if (s.robots.all { it.pos in exits }) return "Robotlar çıkışlara farklı adımlarda vardı; aynı anda varmalılar."

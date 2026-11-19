@@ -46,6 +46,7 @@ object Theme {
         CommandCategory.ACTION -> orange
         CommandCategory.ENERGY -> rgb(0xF2B630)
         CommandCategory.SIGNAL -> blue
+        CommandCategory.COMBAT -> rgb(0xE5566B)
         CommandCategory.FLOW -> purple
     }
 
