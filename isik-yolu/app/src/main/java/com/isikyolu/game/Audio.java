@@ -7,10 +7,10 @@ import android.media.SoundPool;
 
 /** Ses efektleri (SoundPool) ve döngüsel arka plan müziği (MediaPlayer). */
 public final class Audio {
-    public static final int CLICK = 0, ROTATE = 1, PUSH = 2, TARGET = 3, WIN = 4, STAR = 5, UNDO = 6, HINT = 7, LOCKED = 8, ACHIEVE = 9;
+    public static final int CLICK = 0, ROTATE = 1, PUSH = 2, TARGET = 3, WIN = 4, STAR = 5, UNDO = 6, HINT = 7, LOCKED = 8, ACHIEVE = 9, INTRO = 10;
     private static final int[] RES = {R.raw.click, R.raw.rotate, R.raw.push, R.raw.target, R.raw.win, R.raw.star,
-            R.raw.undo, R.raw.hint, R.raw.locked, R.raw.achieve};
-    private static final float[] VOL = {0.45f, 0.7f, 0.8f, 0.8f, 0.9f, 0.8f, 0.6f, 0.7f, 0.6f, 0.9f};
+            R.raw.undo, R.raw.hint, R.raw.locked, R.raw.achieve, R.raw.intro};
+    private static final float[] VOL = {0.45f, 0.7f, 0.8f, 0.8f, 0.9f, 0.8f, 0.6f, 0.7f, 0.6f, 0.9f, 0.85f};
 
     private final Context ctx;
     private SoundPool pool;

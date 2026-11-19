@@ -36,7 +36,7 @@ public final class MainActivity extends Activity {
         stage = new FrameLayout(this);
         root.addView(stage, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
-        show(new SplashScreen(this), true);
+        show(new com.isikyolu.game.screens.StudioIntroScreen(this), true);
     }
 
     public FrameLayout overlayLayer() { return root; }

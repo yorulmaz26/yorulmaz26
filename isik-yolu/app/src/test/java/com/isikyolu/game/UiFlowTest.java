@@ -360,8 +360,25 @@ public class UiFlowTest {
 
     @Test public void splashScreenRenders() throws Exception {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
-        idle(900);
-        shot("01_acilis");
+        assertTrue("önce stüdyo açılışı", act.currentScreen() instanceof com.isikyolu.game.screens.StudioIntroScreen);
+        idle(10);
+        shot("00a_studyo_isik");      // ≈0,7 sn: ışık noktası, logo açılmaya başlıyor
+        shot("00b_studyo_logo");      // ≈1,5 sn: logo açıldı, ışık süzülüyor
+        shot("00b2_studyo_parilti");  // ≈2,2 sn: ışık geçişi bitti, logo parlıyor
+        idle(400);
+        shot("00c_studyo_kapanis");   // ≈3,3 sn: kapanış ve oyuna geçiş
+        waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
+    }
+
+    @Test public void studioIntroCanBeSkipped() throws Exception {
+        act = Robolectric.buildActivity(MainActivity.class).setup().get();
+        idle(200);
+        View root = act.currentScreen();
+        long t = android.os.SystemClock.uptimeMillis();
+        root.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, 100, 100, 0));
+        root.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 50, android.view.MotionEvent.ACTION_UP, 100, 100, 0));
+        assertTrue("dokununca atlanır", act.currentScreen() instanceof com.isikyolu.game.screens.SplashScreen);
+        waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
     }
 
     @Test public void allLevelsPlayableThroughUi() throws Exception {

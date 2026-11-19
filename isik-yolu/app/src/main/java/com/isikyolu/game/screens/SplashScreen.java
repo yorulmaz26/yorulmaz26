@@ -45,7 +45,7 @@ public final class SplashScreen extends Screen {
     @Override public void onShow() {
         GameLoader.load(act, ok -> {
             if (!ok) { status.setText("Bölümler yüklenemedi. Uygulamayı yeniden başlatın."); return; }
-            long wait = Math.max(0, 1900 - (SystemClock.uptimeMillis() - start));
+            long wait = Math.max(0, 1500 - (SystemClock.uptimeMillis() - start));
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (Game.levels() != null) act.goMenu();
             }, wait);

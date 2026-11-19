@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.4.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.4.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.5.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.5.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -92,6 +92,7 @@ Bölüm seçme ekranında dünyalar sekme olarak gösterilir; yeni dünyaya giri
 
 | # | Ekran | Sınıf |
 |---|---|---|
+| 0 | Magic Lumos Software stüdyo açılışı (ışıkla açılan logo, dokununca atlanır) | `screens/StudioIntroScreen`, `ui/StudioIntroView` |
 | 1 | Açılış (animasyonlu amblem, bölümler arka planda yüklenir) | `screens/SplashScreen` |
 | 2 | Ana menü (devam et, yıldız sayacı, kutucuklar) | `screens/MenuScreen` |
 | 3 | Bölüm seçme (5 dünya sekmesi, her dünyada 10 grup × 10, yıldızlar, kilitler) | `screens/LevelSelectScreen` |

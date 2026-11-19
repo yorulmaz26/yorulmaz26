@@ -1,8 +1,8 @@
-# Test Raporu — Işık Yolu 1.4.0
+# Test Raporu — Işık Yolu 1.5.0
 
 Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 
-**Sonuç: 72 testin 72'si geçti, 0 hata.** (1.4.0: market)
+**Sonuç: 73 testin 73'ü geçti, 0 hata.** (1.5.0: stüdyo açılışı)
 
 | Test sınıfı | Test | Sonuç | Süre |
 |---|---|---|---|
@@ -18,7 +18,7 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
 | `ProgressTest` | 9 | ✅ | <0,01 sn |
 | `LivesTest` (can sistemi, saat hilesi) | 10 | ✅ | <0,1 sn |
 | `EconomyTest` (market ve ekonomi) | 15 | ✅ | <0,1 sn |
-| `UiFlowTest` (Robolectric, gerçek çizim) | 5 | ✅ | ~130 sn |
+| `UiFlowTest` (Robolectric, gerçek çizim) | 6 | ✅ | ~140 sn |
 
 ## İstenen 10 kontrol
 
@@ -53,6 +53,12 @@ Tarih: 18 Kasım 2026 · Komut: `./gradlew :engine:test :app:testDebugUnitTest`
   olayları `BoardView.Host` arayüzünden verildi; ham `MotionEvent` sürükleme hareketi otomatik test edilmedi.
 - 60 FPS hedefi cihazda ölçülmedi. Çizim döngüsü bellek ayırmayacak şekilde yazıldı (README › Performans).
 - Ses çalma Robolectric'te gölgelenir; seslerin cihazda duyulması elle denenmelidir.
+
+## Stüdyo açılışı (1.5.0)
+
+- `UiFlowTest.splashScreenRenders`: uygulama Magic Lumos Software açılışıyla başlar; animasyon kareleri
+  kaydedilir (`docs/ekranlar/00a…00c`); ardından ana menüye geçilir.
+- `UiFlowTest.studioIntroCanBeSkipped`: açılışa dokununca oyunun açılış ekranına geçilir, oradan ana menüye.
 
 ## Market ve ekonomi (1.4.0)
 

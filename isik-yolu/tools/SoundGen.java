@@ -21,6 +21,7 @@ public class SoundGen {
         write(new File(dir, "hint.wav"), arp(new double[]{783.99, 1174.66, 1567.98}, 0.09, 0.45, 0.4));
         write(new File(dir, "locked.wav"), tone(new double[]{196, 207}, 0.16, 0.003, 18, 0.35));
         write(new File(dir, "achieve.wav"), arp(new double[]{659.25, 830.61, 987.77, 1318.5, 1661.2}, 0.08, 1.0, 0.38));
+        write(new File(dir, "intro.wav"), intro());
         write(new File(dir, "music.wav"), music());
         System.out.println("Sesler üretildi: " + dir);
     }
@@ -126,6 +127,37 @@ public class SoundGen {
             for (int i = 0; i < n; i++) out[i] += out[(i - d + n) % n] * 0.28;
         normalize(out, 0.6);
         return out;
+    }
+
+    /** Stüdyo açılışı: yükselen parıltı + yumuşak çan akoru ("lumos"). */
+    static double[] intro() {
+        double dur = 2.6;
+        int n = (int) (dur * SR);
+        double[] s = new double[n];
+        Random r = new Random(3);
+        // yükselen kristal parıltılar
+        for (int k = 0; k < 18; k++) {
+            double t0 = 0.02 + k * 0.022;
+            double f = 1200 + k * 95 + r.nextInt(60);
+            int off = (int) (t0 * SR);
+            for (int i = 0; off + i < n && i < (int) (0.6 * SR); i++) {
+                double t = i / (double) SR;
+                s[off + i] += Math.sin(2 * Math.PI * f * t) * Math.exp(-7 * t) * Math.min(1, t / 0.003) * 0.05;
+            }
+        }
+        // çan akoru (Re majör + oktav)
+        double[] ch = {587.33, 739.99, 880.0, 1174.66};
+        int off = (int) (0.38 * SR);
+        for (int i = 0; off + i < n; i++) {
+            double t = i / (double) SR;
+            double env = Math.min(1, t / 0.01) * Math.exp(-1.6 * t);
+            double v = 0;
+            for (int q = 0; q < ch.length; q++) v += Math.sin(2 * Math.PI * ch[q] * t) / (q + 1.5) + 0.3 * Math.sin(2 * Math.PI * ch[q] * 2.005 * t) * Math.exp(-4 * t) / (q + 1.5);
+            s[off + i] += v * env * 0.28;
+        }
+        fadeOut(s, 0.3);
+        normalize(s, 0.7);
+        return s;
     }
 
     static double[] mixAll(double[]... parts) {

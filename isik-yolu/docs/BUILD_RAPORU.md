@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.4.0
+# Build Raporu — Işık Yolu 1.5.0
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -16,6 +16,22 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.5.0 değişiklikleri
+
+- **Magic Lumos Software stüdyo açılışı** (yaklaşık 3,2 sn, dokununca atlanır). Animasyon sırası:
+  1. Karanlıkta bir ışık noktası yanar.
+  2. Logo daire biçiminde aydınlanarak açılır ve hafifçe yakınlaşır.
+  3. Kıvılcımlar saçılır.
+  4. Yazının üzerinden ışık süzülür.
+  5. Sahne kararır ve oyunun açılışına geçilir.
+- **Logo:** kullanıcının verdiği görsel kullanıldı. Yazı ve devre çizgilerinin olduğu orta bölüm kesildi,
+  kenarları şeffaflaştırılıp arka plan rengine (#06182D) eritildi.
+  `res/drawable-nodpi/studio_logo.webp`: 1136×550, 90 KB.
+- **Ses:** ışık logoya vurduğunda çalan, sentezlenmiş "lumos" sesi (`res/raw/intro.wav`).
+- **Bekleme:** bölümler animasyon sırasında yüklendiği için oyun açılış ekranının bekleme süresi 1,9'dan
+  1,5 saniyeye indirildi.
+- **Sistem rengi:** pencere arka planı ve sistem çubukları açılışta logonun lacivert rengindedir.
 
 ## 1.4.0 değişiklikleri
 
@@ -81,10 +97,10 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.4.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 777 548 bayt | `d59025d08326740c709340feb2a6057a4c5c7d0fa28092131dc968d1095fbf07` |
-| `teslimat/IsikYolu-1.4.0-debug.apk` | 1 888 819 bayt | `58889657d14137b8948841b36b2b445b0bd4c0b1de3b0c66d18d685368ed18c1` |
+| `teslimat/IsikYolu-1.5.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 984 317 bayt | `e42dda1e18a5946b38783733e30b0eaafc65cd1f9cff351ec6d27507502ec50f` |
+| `teslimat/IsikYolu-1.5.0-debug.apk` | 2 098 078 bayt | `019740cdfba5dcf02ce4e605db33365aaa5b1fdceaf143506859d8d46d738859` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 5, sürüm adı 1.4.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 6, sürüm adı 1.5.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.
