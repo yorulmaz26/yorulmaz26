@@ -74,7 +74,6 @@ class Program
         var zero = Enumerable.Range(0, 420).Where(i => verify[i] == 0).Select(i => all[i].Id).ToList();
         sb.AppendLine("Bot tarafından doğrulamada hiç kazanılamayan bölümler: " + (zero.Count == 0 ? "yok" : string.Join(", ", zero)));
         sb.AppendLine();
-        sb.AppendLine($"Üretim süresi: {sw.Elapsed.TotalSeconds:0} sn");
         File.WriteAllText(Path.Combine(root, "Docs/LEVEL_REPORT.md"), sb.ToString());
         Console.WriteLine(sb.ToString());
         return 0;

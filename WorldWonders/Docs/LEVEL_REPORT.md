@@ -15,4 +15,3 @@ Doğrulama, dengelemede kullanılmayan tohumlarla, bölümün gerçek hamle sın
 
 Bot tarafından doğrulamada hiç kazanılamayan bölümler: yok
 
-Üretim süresi: 4 sn

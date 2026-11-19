@@ -1,0 +1,4 @@
+<linker>
+  <!-- Newtonsoft.Json yansıma ile oluşturduğu kayıt ve bölüm veri tiplerinin IL2CPP'de silinmemesi için. -->
+  <assembly fullname="WorldWonders.Core" preserve="all" />
+</linker>

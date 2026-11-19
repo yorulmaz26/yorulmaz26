@@ -107,13 +107,15 @@ namespace WorldWonders.Game
         {
             if (I != null && I != this) { Destroy(gameObject); return; }
             I = this;
-            Application.targetFrameRate = 60;
+            var settings = GameSettings.Load();
+            Application.targetFrameRate = settings.TargetFrameRate;
             Screen.sleepTimeout = SleepTimeout.SystemSetting;
             Screen.orientation = ScreenOrientation.Portrait;
 
             Saves = new SaveGameService();
             var load = Saves.Load();
             Session = new GameSession(load.Data, new DeviceClock());
+            Session.Lives.SetRegenMinutes(settings.LifeRegenMinutes);
             bool abandoned = Session.OnBoot();
             Levels = new LevelRepository();
 
@@ -225,6 +227,7 @@ namespace WorldWonders.Game
         public void ReplaceSave(SaveData data)
         {
             Session = new GameSession(data, new DeviceClock());
+            Session.Lives.SetRegenMinutes(GameSettings.Load().LifeRegenMinutes);
             Session.OnBoot();
             HookEvents();
             Session.Events.Dirty += () => _dirty = true;

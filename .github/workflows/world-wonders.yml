@@ -1,0 +1,25 @@
+name: World Wonders
+
+on:
+  push:
+    paths: [ "WorldWonders/**", ".github/workflows/world-wonders.yml" ]
+  pull_request:
+    paths: [ "WorldWonders/**", ".github/workflows/world-wonders.yml" ]
+
+jobs:
+  core:
+    name: Çekirdek testleri + Unity katmanı derleme denetimi
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+      - name: Çekirdek testleri (NUnit)
+        run: dotnet test WorldWonders/Tests/CoreTests/CoreTests.csproj
+      - name: Bölüm verisi güncel mi (LevelBuilder deterministik)
+        run: |
+          dotnet run -c Release --project WorldWonders/Tools/LevelBuilder -- WorldWonders
+          git diff --exit-code -- WorldWonders/Assets/_Project/Resources/Levels
+      - name: Unity katmanı derleme denetimi (UnityEngine 2021.3 referansları)
+        run: dotnet build WorldWonders/Tools/UnityCompileCheck/UnityCompileCheck.csproj
