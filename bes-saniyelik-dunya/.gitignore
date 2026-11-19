@@ -7,5 +7,4 @@ keystore.properties
 *.keystore
 .idea/
 *.iml
-/dist/
 assets/save/

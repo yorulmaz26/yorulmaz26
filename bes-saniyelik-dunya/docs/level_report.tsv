@@ -60,17 +60,17 @@ id	ad	tür	zorluk	aşama	deneme	düğüm	süre_sn	altın	yıldız	parça	zamanla
 59	Mavi Köprü	NORMAL	2	8	5	4227	43.3	94	3	0	adil±2
 60	Meydan Okuma: Yüksek Ada	CHALLENGE	3	9	1	1098	51.5	92	3	0	adil±1
 61	Pamuk Balon	TUTORIAL	1	6	1	485	32.0	101	3	0	adil±2
-62	Süzülen Yıldızlık	NORMAL	2	7	2	1509	38.4	19	3	0	adil±2
+62	Süzülen Yıldızlık	NORMAL	2	7	2	1509	38.4	113	3	0	adil±2
 63	Sisli Rüzgâr	NORMAL	2	6	1	528	32.3	67	3	0	adil±2
 64	Yüksek Bulut	NORMAL	2	7	1	561	37.2	132	3	0	adil±2
 65	Pamuk Yıldızlık	NORMAL	2	6	4	2484	34.1	61	3	0	adil±2
-66	Süzülen Gökkuşağı	NORMAL	2	7	2	1376	36.8	18	3	0	adil±2
+66	Süzülen Gökkuşağı	NORMAL	2	7	2	1376	36.8	117	3	0	adil±2
 67	Sisli Ada	NORMAL	2	8	4	3093	40.2	132	3	0	adil±2
 68	Mavi Balon	NORMAL	2	7	4	2795	35.7	162	3	1	adil±2
-69	Ters Rüzgâr	NORMAL	2	6	2	1345	31.5	9	3	0	adil±2
+69	Ters Rüzgâr	NORMAL	2	6	2	1345	31.5	51	3	0	adil±2
 70	Meydan Okuma: Hafif Gökkuşağı	CHALLENGE	3	9	1	784	46.3	106	3	0	adil±1
 71	Uçan Esinti	TUTORIAL	1	6	1	669	32.2	39	3	0	adil±2
-72	Sisli Köprü	NORMAL	2	6	1	505	30.9	18	3	0	adil±2
+72	Sisli Köprü	NORMAL	2	6	1	505	30.9	65	3	0	adil±2
 73	Yüksek Ada	NORMAL	2	7	1	929	38.1	44	3	0	adil±2
 74	Dönen Bulut	NORMAL	2	7	1	612	35.9	24	3	0	adil±2
 75	Süzülen Yıldızlık	NORMAL	2	7	5	3656	36.4	33	3	0	adil±2
@@ -79,7 +79,7 @@ id	ad	tür	zorluk	aşama	deneme	düğüm	süre_sn	altın	yıldız	parça	zamanla
 78	Pamuk Esinti	NORMAL	2	8	1	772	41.4	40	3	1	adil±2
 79	Hafif Köprü	NORMAL	2	6	1	612	30.5	88	3	0	adil±2
 80	Meydan Okuma: Hafif Ada	CHALLENGE	4	9	3	2774	48.0	101	3	0	adil±1
-81	Uçan Esinti	TUTORIAL	1	6	9	123618	31.9	14	3	0	adil±2
+81	Uçan Esinti	TUTORIAL	1	6	9	123618	31.9	87	3	0	adil±2
 82	Yüksek Kule	NORMAL	2	7	2	1425	37.2	46	3	0	adil±2
 83	Pamuk Rüzgâr	NORMAL	2	8	2	351019	42.4	48	3	0	adil±2
 84	Dönen Gökyolu	NORMAL	2	6	1	585	33.0	26	3	0	adil±2

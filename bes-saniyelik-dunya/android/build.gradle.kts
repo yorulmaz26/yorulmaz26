@@ -56,6 +56,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
+    androidResources { ignoreAssetsPatterns.add("!save") }
     packaging { resources.excludes += setOf("META-INF/*.kotlin_module", "META-INF/versions/**") }
 }
 

@@ -11,7 +11,7 @@
    void    preSolve(long, long);
    void    postSolve(long, long);
    boolean reportFixture(long);
-   float/**/reportRayFixture(long, float, float, float, float, float);
+   float   reportRayFixture(long, float, float, float, float, float);
 }
 -keep class com.badlogic.gdx.graphics.g2d.freetype.** { *; }
 # kotlinx.serialization
@@ -25,3 +25,8 @@
 -keep,includedescriptorclasses class com.besaniyelik.dunya.**$$serializer { *; }
 -keepclassmembers class com.besaniyelik.dunya.** { *** Companion; }
 -keepclasseswithmembers class com.besaniyelik.dunya.** { kotlinx.serialization.KSerializer serializer(...); }
+-keep class com.badlogic.gdx.physics.box2d.** { native <methods>; }
+# Cihazda test edilemeyen sürümde yansıma/JNI riskini sıfırlamak için oyun ve libGDX sınıfları korunur.
+-keep class com.besaniyelik.dunya.** { *; }
+-keep class com.badlogic.gdx.** { *; }
+-dontwarn com.badlogic.gdx.**

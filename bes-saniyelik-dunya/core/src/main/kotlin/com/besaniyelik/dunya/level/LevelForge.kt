@@ -113,14 +113,16 @@ object LevelForge {
                 if (p.x - lastX >= 0.95f) { addCoin(p.x, p.y); lastX = p.x }
             }
         }
-        // Zemin koşuları: uzun düz bölümlere altın dizisi
+        // Zemin koşuları: uzun düz bölümlere altın dizisi (az altınlı bölümlerde daha sık)
+        for (pass in 0 until 2) {
+        if (pass == 1 && coins.size >= 30) break
         var runStart = -1
         for (i in traj.indices) {
             val p = traj[i]
             if (p.grounded && runStart < 0) runStart = i
             if ((!p.grounded || i == traj.size - 1) && runStart >= 0) {
                 val a = traj[runStart]; val b = traj[i]
-                if (b.x - a.x > 4.5f && rng.nextFloat() < 0.25f && coins.size < 90) {
+                if (b.x - a.x > (if (pass == 0) 4.5f else 2.5f) && rng.nextFloat() < (if (pass == 0) 0.25f else 0.7f) && coins.size < 90) {
                     var x = a.x + 1f
                     var j = runStart
                     while (x < b.x - 1f) {
@@ -131,6 +133,7 @@ object LevelForge {
                 }
                 runStart = -1
             }
+        }
         }
         // Yıldızlar: yolun %25, %55, %85'inde en yakın yüksek yayın tepesi
         val x0 = traj.first().x; val x1 = traj.last().x

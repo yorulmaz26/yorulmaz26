@@ -96,8 +96,10 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
     private fun press(v: Boolean) {
         if (v && !started && !finished && startOverlay != null) { begin(); return }
         pressed = v
-        if (v && waitHint != null) { waitHint = null; hintBox.clearActions(); hintBox.addAction(Actions.fadeOut(0.3f)) }
+        if (v && waitHint != null) clearWait()
     }
+
+    private fun clearWait() { waitHint = null; hintBox.clearActions(); hintBox.addAction(Actions.sequence(Actions.delay(0.6f), Actions.fadeOut(0.3f))) }
 
     override fun build() {
         game.audio.music(if (endless) "endless" else "map_%02d".format(map))
@@ -190,7 +192,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
                 var steps = 0
                 while (acc >= Physics.TICK && steps < 5) {
                     val ap = autoplay
-                    if (ap != null) { pressed = ap.at(sim.tick); if (pressed && waitHint != null) waitHint = null }
+                    if (ap != null) { pressed = ap.at(sim.tick); if (pressed && waitHint != null) clearWait() }
                     sim.step(pressed)
                     acc -= Physics.TICK; steps++
                 }
