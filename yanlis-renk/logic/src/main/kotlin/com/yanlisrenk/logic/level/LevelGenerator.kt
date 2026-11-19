@@ -125,6 +125,8 @@ object LevelGenerator {
         val r0 = LevelValidator.validate(lvl, startColors = starts, startLastGate = lasts)
         if (!r0.ok) return null
         if (p.endless) return lvl
+        // önemsiz bölüm olmasın: en az kapıların dörtte biri kadar dokunuş gereksin
+        if (r0.minTaps < maxOf(2, lvl.gates.size / 4)) return null
         val maxCoins = r0.maxCoins
         val target = if (maxCoins <= 1) maxCoins else ceil(maxCoins * 0.7f).toInt()
         val r = LevelValidator.validate(lvl, coinTargetRequired = target)

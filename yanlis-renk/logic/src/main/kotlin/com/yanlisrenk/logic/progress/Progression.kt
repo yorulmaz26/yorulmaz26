@@ -43,7 +43,7 @@ object Missions {
         MissionTemplate("coins", "%d renkli altın topla", "m_coins", 15, 0.5f, icon = "coin"),
         MissionTemplate("endless_runs", "Sonsuz modda %d koşu yap", "m_endless_runs", 2, 0.03f, icon = "infinity"),
         MissionTemplate("endless_score", "Sonsuz modda tek koşuda %d puan yap", "m_endless_score", 150, 8f, max = true, icon = "trophy"),
-        MissionTemplate("perfect", "%d bölümü ★★★ ile bitir", "m_perfect", 2, 0.05f, icon = "crown"),
+        MissionTemplate("perfect", "%d bölümü 3 yıldızla bitir", "m_perfect", 2, 0.05f, icon = "crown"),
         MissionTemplate("taps", "%d kez renk değiştir", "m_taps", 60, 3f, icon = "palette"),
         MissionTemplate("combo", "Sonsuz modda %d kombo yap", "m_combo", 15, 0.6f, max = true, icon = "bolt"),
         MissionTemplate("flawless", "%d bölümü ilk denemede bitir", "m_flawless", 2, 0.04f, icon = "shield"),
@@ -108,7 +108,7 @@ object Achievements {
         list += tier("gold", "Altın Biriktirici", "Toplam %d altın kazan.", Stat.GOLD_EARNED, "coin", listOf(500, 2000, 5000, 10000, 25000, 50000, 100000), 0)
         list += tier("chars", "Karakter Koleksiyoncusu", "%d karaktere sahip ol.", Stat.CHARACTERS, "character", listOf(3, 5, 10, 15, 20, 25, 30), 90)
         list += tier("gates", "Kapı Geçici", "Toplam %d kapıdan geç.", Stat.GATES, "check", listOf(100, 500, 1000, 2500, 5000, 10000, 25000), 50)
-        list += tier("perfect", "Mükemmeliyetçi", "%d bölümü ★★★ ile bitir.", Stat.PERFECT, "crown", listOf(10, 50, 100, 250, 500), 100)
+        list += tier("perfect", "Mükemmeliyetçi", "%d bölümü 3 yıldızla bitir.", Stat.PERFECT, "crown", listOf(10, 50, 100, 250, 500), 100)
         list += tier("missions", "Görev Adamı", "%d görev tamamla.", Stat.MISSIONS_DONE, "missions", listOf(5, 25, 50, 100), 80)
         list += tier("mastery", "Ustalık Yolu", "%d ustalık yıldızı kazan.", Stat.MASTERY_STARS, "medal", listOf(5, 25, 100, 250), 120)
         list += tier("login", "Sadık Oyuncu", "%d gün oyuna gir.", Stat.LOGIN_DAYS, "calendar", listOf(3, 7, 30), 60)

@@ -131,8 +131,11 @@ class LevelTests {
         // hiç dokunmayan oyuncu bölümlerin çoğunda kaybetmeli (bölümler önemsiz değil)
         val r = repo()
         var lost = 0
-        for (id in 1..500 step 5) if (autoplay(r.level(id), emptyList()).failed) lost++
-        assertTrue("dokunmadan geçilen bölüm çok: ${100 - lost}", lost >= 95)
+        for (id in 1..500) {
+            if (autoplay(r.level(id), emptyList()).failed) lost++
+            assertTrue("bölüm $id çok az dokunuşla geçiliyor", r.level(id).minTaps >= maxOf(2, r.level(id).gates.size / 4))
+        }
+        assertEquals("dokunmadan geçilebilen bölüm var", 500, lost)
     }
 
     @Test fun ustalikSurumleriCozulebilir() {

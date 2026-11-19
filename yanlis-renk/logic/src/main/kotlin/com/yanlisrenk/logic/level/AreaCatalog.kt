@@ -90,7 +90,7 @@ object AreaCatalog {
     private val defs: List<A> = listOf(
         // Dünya 1 — Renk Bahçesi
         A("Renk Bahçesi", "Dokun, rengini değiştir ve aynı renkli kapılardan geç.", listOf(SAME), "Bahçe Kapısı", "Gülümseyen Lale", gapMul = 1.25f),
-        A("Ters Kapılar", "≠ kapıları farklı renk ister. Bazen hiç dokunmamak en iyisidir!", listOf(DIFF), "Ters Çit", "Ters Papatya", gapMul = 1.2f),
+        A("Ters Kapılar", "Eşit değil kapıları farklı renk ister. Bazen hiç dokunmamak en iyisidir!", listOf(DIFF), "Ters Çit", "Ters Papatya", gapMul = 1.2f),
         A("Çift Kapılar", "Kapılar ikişer ikişer geliyor.", listOf(DOUBLE), "İkiz Kemer", "İkiz Kiraz", gapMul = 1.1f),
         A("Hız Yolu", "Hız bölgelerinde kapılar çok daha çabuk yaklaşır.", listOf(SPEED), "Rüzgâr Patikası", "Hızlı Salyangoz"),
         A("Renk Hafızası", "Kapıların rengi yaklaşınca kaybolur.", listOf(MEMORY), "Unutma Beni", "Hafıza Çiçeği"),
@@ -114,9 +114,9 @@ object AreaCatalog {
         A("Büyük Renk Sınavı", "İlk 19 alanda öğrendiğin her şey.", listOf(EXAM, SAME, DIFF, DOUBLE, SPEED, MEMORY, LOCK, ROTATE, RAINBOW, TIMED, MIRROR, HIDDEN, STROOP, TRIPLE, AUTOSHIFT, SLIDE, CHAIN, MIX, QUICK), "Buz Sarayı Sınavı", "Sınav Madalyası"),
         // Dünya 5 — Çiçek Ormanı
         A("Yasak Çiçekler", "Üstü çizili renklerin hiçbiriyle geçme.", listOf(NONE), "Yasak Bahçe", "Dikenli Gül"),
-        A("Sıradaki Yaprak", "→ kapısı gösterilen rengin bir sonrakini ister.", listOf(NEXT), "Yaprak Sırası", "Altın Yaprak", gapMul = 1.25f),
-        A("Geri Sarmaşık", "← kapısı gösterilen rengin bir öncekini ister.", listOf(PREV), "Sarmaşık Kemer", "Kıvrık Sarmaşık", gapMul = 1.2f),
-        A("Yankı Korusu", "↺ kapısı önceki kapıdaki rengini tekrar ister.", listOf(REPEAT), "Yankı Ağacı", "Yankı Mantarı", gapMul = 1.15f),
+        A("Sıradaki Yaprak", "İleri ok kapısı gösterilen rengin bir sonrakini ister.", listOf(NEXT), "Yaprak Sırası", "Altın Yaprak", gapMul = 1.25f),
+        A("Geri Sarmaşık", "Geri ok kapısı gösterilen rengin bir öncekini ister.", listOf(PREV), "Sarmaşık Kemer", "Kıvrık Sarmaşık", gapMul = 1.2f),
+        A("Yankı Korusu", "Dönen ok kapısı önceki kapıdaki rengini tekrar ister.", listOf(REPEAT), "Yankı Ağacı", "Yankı Mantarı", gapMul = 1.15f),
         A("Orman Bilmecesi", "Yasak, sıradaki, önceki ve yankı kapıları bir arada.", listOf(NONE, NEXT, PREV, REPEAT), "Bilge Meşe", "Bilge Baykuş"),
         // Dünya 6 — Kristal Mağarası
         A("Sahte Kristaller", "Kesik çizgili sahte kapılar seni kandırmasın.", listOf(DECOY, SAME, DIFF), "Sahte Hazine", "Parlak Ametist"),

@@ -1,0 +1,104 @@
+package com.yanlisrenk.android
+
+import android.content.Context
+import android.os.Build
+import android.os.Bundle
+import android.os.SystemClock
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.provider.Settings
+import com.badlogic.gdx.backends.android.AndroidApplication
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
+import com.yanlisrenk.game.PlatformServices
+import com.yanlisrenk.game.YanlisRenkGame
+import com.yanlisrenk.logic.save.SaveStorage
+import com.yanlisrenk.logic.time.PlatformClock
+import java.io.File
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.TimeZone
+import java.util.UUID
+import java.util.concurrent.Executors
+
+class AndroidLauncher : AndroidApplication() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val cfg = AndroidApplicationConfiguration()
+        cfg.useImmersiveMode = true
+        cfg.numSamples = 4 // kenar yumuşatma
+        cfg.useAccelerometer = false
+        cfg.useCompass = false
+        cfg.useGyroscope = false
+        initialize(YanlisRenkGame(AndroidPlatform(this)), cfg)
+    }
+}
+
+/** Android platform hizmetleri. */
+class AndroidPlatform(private val ctx: Context) : PlatformServices {
+    private val io = Executors.newSingleThreadExecutor()
+
+    override val clock = object : PlatformClock {
+        override fun wallMillis() = System.currentTimeMillis()
+        /** Uyku dahil, kullanıcı tarafından değiştirilemeyen monoton saat. */
+        override fun elapsedMillis() = SystemClock.elapsedRealtime()
+        override fun bootCount(): Int = runCatching { Settings.Global.getInt(ctx.contentResolver, Settings.Global.BOOT_COUNT) }.getOrDefault(-1)
+    }
+
+    override val storage: SaveStorage = AtomicFileStorage(ctx.filesDir)
+
+    override fun tzOffsetMillis() = TimeZone.getDefault().getOffset(System.currentTimeMillis()).toLong()
+
+    /**
+     * Güvenilir zaman: önce yapılandırılmış arka uç (server modülü, /time), sonra HTTPS "Date" başlığı.
+     * TLS sayesinde yanıtı aradaki biri değiştiremez.
+     */
+    override fun fetchServerTime(onResult: (Long?) -> Unit) {
+        io.execute {
+            val t = backendUrl?.let { fetchJson(it) } ?: fetchDate("https://www.google.com/generate_204") ?: fetchDate("https://www.cloudflare.com/cdn-cgi/trace")
+            onResult(t)
+        }
+    }
+
+    private fun fetchDate(url: String): Long? = runCatching {
+        val c = URL(url).openConnection() as HttpURLConnection
+        c.requestMethod = "HEAD"; c.connectTimeout = 5000; c.readTimeout = 5000; c.useCaches = false
+        c.connect(); val d = c.date; c.disconnect()
+        if (d > 0) d else null
+    }.getOrNull()
+
+    private fun fetchJson(url: String): Long? = runCatching {
+        val c = URL("$url/time").openConnection() as HttpURLConnection
+        c.connectTimeout = 5000; c.readTimeout = 5000
+        val body = c.inputStream.bufferedReader().readText(); c.disconnect()
+        Regex("\"now\"\\s*:\\s*(\\d+)").find(body)?.groupValues?.get(1)?.toLong()
+    }.getOrNull()
+
+    override fun vibrate(ms: Int) {
+        runCatching {
+            @Suppress("DEPRECATION")
+            val v = ctx.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            if (Build.VERSION.SDK_INT >= 26) v.vibrate(VibrationEffect.createOneShot(ms.toLong(), VibrationEffect.DEFAULT_AMPLITUDE))
+        }
+    }
+
+    override fun newInstallId() = UUID.randomUUID().toString()
+    override val platformName = "Android ${Build.VERSION.RELEASE}"
+    override val versionName: String = runCatching { ctx.packageManager.getPackageInfo(ctx.packageName, 0).versionName ?: "1.0.0" }.getOrDefault("1.0.0")
+
+    companion object {
+        /** Kendi zaman sunucunuzu kurduğunuzda adresini buraya yazın (ör. "https://zaman.ornek.com"). */
+        var backendUrl: String? = null
+    }
+}
+
+/** Atomik dosya yazımı: geçici dosya + yeniden adlandırma; yarım yazılmış kayıt oluşmaz. */
+class AtomicFileStorage(private val dir: File) : SaveStorage {
+    override fun read(name: String): String? = runCatching { File(dir, name).takeIf { it.exists() }?.readText() }.getOrNull()
+    override fun write(name: String, content: String) {
+        val f = File(dir, name)
+        val tmp = File(dir, "$name.tmp")
+        tmp.outputStream().use { out -> out.write(content.toByteArray()); out.fd.sync() }
+        if (!tmp.renameTo(f)) { f.delete(); tmp.renameTo(f) }
+    }
+    override fun delete(name: String) { File(dir, name).delete() }
+}
