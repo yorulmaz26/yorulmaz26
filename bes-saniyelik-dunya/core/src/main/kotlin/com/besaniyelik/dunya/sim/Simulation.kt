@@ -60,11 +60,11 @@ class SimSnapshot(
     val chaserX: Float, val px: Float, val py: Float, val vx: Float, val vy: Float, val scale: Float,
     val grounded: Boolean, val coyote: Float, val buffer: Float, val prevInput: Boolean, val cutAllowed: Boolean,
     val autoTimer: Float, val airJumps: Int, val blocked: Float, val boost: Float, val vxCur: Float, val jumpLock: Int,
-    val invuln: Float, val inactiveGhosts: IntArray, val distance: Float,
+    val invuln: Float, val inactiveGhosts: IntArray, val distance: Float, val speedMul: Float,
 )
 
 class Simulation(
-    level: LevelData?,
+    val level: LevelData?,
     val config: SimConfig = SimConfig(),
     val provider: ContentProvider? = null,
 ) : Disposable {
@@ -76,6 +76,8 @@ class Simulation(
     val pads = ArrayList<PadEntity>()
     val collectibles = ArrayList<Collectible>()
     val phases = ArrayList<PhaseDef>()
+    /** Aşama başına hız çarpanı (yalnızca Sonsuz Dünya). */
+    val phaseSpeed = ArrayList<Float>()
     val checkpoints = ArrayList<Float>()
     private val ghostSolids = ArrayList<SolidEntity>()
     private val movingSolids = ArrayList<SolidEntity>()
@@ -92,6 +94,10 @@ class Simulation(
     var startY = 0.4f
     val chaserEnabled = level?.chaser == true
 
+    /** Sonsuz modda zamanla artan hız çarpanı. */
+    var speedMul = config.speedMul
+    /** Sonsuz mod: geçilen kural aşamalarından toplanan bonus puan. */
+    var ruleBonus = 0
     var tick = 0
     var time = 0f
     var shiftClock = 0f
@@ -245,7 +251,7 @@ class Simulation(
     /** Bir sonraki kural değişimine kalan süre (saniye, mevcut hızla). */
     fun secondsToNextRule(): Float {
         val n = nextPhase ?: return Float.POSITIVE_INFINITY
-        val sp = max(0.5f, Physics.realSpeed(effects, config.speedMul))
+        val sp = max(0.5f, Physics.realSpeed(effects, speedMul))
         return max(0f, (n.x - player.x) / sp)
     }
 
@@ -259,6 +265,7 @@ class Simulation(
     private fun applyPhase(idx: Int, initial: Boolean = false) {
         val prev = activeRules
         phaseIdx = idx
+        phaseSpeed.getOrNull(idx)?.let { speedMul = it }
         activeRules = RuleCompatibility.resolve(phases.getOrNull(idx)?.rules ?: listOf(Mechanic.NORMAL))
         val old = effects
         effects = RuleEffects.of(activeRules)
@@ -267,6 +274,8 @@ class Simulation(
         if (!initial) {
             rulesChanged++
             phasesPassed++
+            val n = activeRules.count { it != Mechanic.NORMAL }.coerceAtLeast(1)
+            ruleBonus += (25 * n * (1f + phasesPassed * 0.05f)).toInt()
             listener.onRuleChange(prev, activeRules)
         }
     }
@@ -329,10 +338,12 @@ class Simulation(
 
         player.preStep(input, dt)
         world.step(dt, 8, 4)
+        // Hareketli platformları tam hedef konumlarına oturt (kayan nokta birikimi olmasın; geri yükleme ile birebir aynı)
         for (s in solidsNear(wx0, wx1)) {
             if (!s.moving || s.removed) continue
             val b = s.body ?: continue
-            s.x = b.position.x - s.w / 2f; s.y = b.position.y - s.h / 2f
+            s.x = s.targetX(time + dt); s.y = s.targetY(time + dt, shiftClock, shiftAmp)
+            b.setTransform(s.x + s.w / 2f, s.y + s.h / 2f, 0f)
         }
         time += dt
         tick++
@@ -434,7 +445,7 @@ class Simulation(
         }
         // Kovalayan duvar
         if (chaserEnabled) {
-            chaserX += dt * Physics.RUN_SPEED * 0.9f * (if (effects.ice) 1.15f else 1f) * config.speedMul
+            chaserX += dt * Physics.RUN_SPEED * 0.9f * (if (effects.ice) 1.15f else 1f) * speedMul
             chaserX = max(chaserX, px - 12f)
             if (px - hw < chaserX + 0.3f) { kill(DeathCause.CHASER); return }
         }
@@ -532,15 +543,16 @@ class Simulation(
         return SimSnapshot(
             tick, time, shiftClock, shiftAmp, phaseIdx, warnedPhase, chaserX,
             p.x, p.y, p.vx, p.vy, p.scale, p.grounded, p.coyote, p.buffer, p.prevInput, p.cutAllowed,
-            p.autoTimer, p.airJumps, p.blocked, p.boost, p.vxCur, p.jumpLock, p.invuln, inactive, distance,
+            p.autoTimer, p.airJumps, p.blocked, p.boost, p.vxCur, p.jumpLock, p.invuln, inactive, distance, speedMul,
         )
     }
 
     fun restore(s: SimSnapshot) {
-        tick = s.tick; time = s.time; shiftClock = s.shiftClock; shiftAmp = s.shiftAmp
+        tick = s.tick; time = s.time; shiftClock = s.shiftClock; shiftAmp = s.shiftAmp; speedMul = s.speedMul
         warnedPhase = s.warnedPhase; chaserX = s.chaserX; distance = s.distance
         if (s.phaseIdx != phaseIdx) {
             phaseIdx = s.phaseIdx
+            phaseSpeed.getOrNull(phaseIdx)?.let { speedMul = it }
             activeRules = RuleCompatibility.resolve(phases.getOrNull(phaseIdx)?.rules ?: listOf(Mechanic.NORMAL))
             effects = RuleEffects.of(activeRules)
             world.gravity = Vector2(0f, -Physics.GRAVITY * effects.gravitySign)

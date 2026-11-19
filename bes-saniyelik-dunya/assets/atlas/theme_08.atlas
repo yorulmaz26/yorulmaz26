@@ -1,0 +1,104 @@
+
+theme_08.png
+size: 2048, 512
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+decor_0
+  rotate: false
+  xy: 3, 3
+  size: 160, 260
+  orig: 160, 260
+  offset: 0, 0
+  index: -1
+decor_4
+  rotate: false
+  xy: 166, 3
+  size: 160, 260
+  orig: 160, 260
+  offset: 0, 0
+  index: -1
+sky
+  rotate: false
+  xy: 329, 3
+  size: 4, 256
+  orig: 4, 256
+  offset: 0, 0
+  index: -1
+decor_1
+  rotate: false
+  xy: 336, 3
+  size: 180, 220
+  orig: 180, 220
+  offset: 0, 0
+  index: -1
+decor_3
+  rotate: false
+  xy: 519, 3
+  size: 180, 220
+  orig: 180, 220
+  offset: 0, 0
+  index: -1
+decor_2
+  rotate: false
+  xy: 702, 3
+  size: 200, 200
+  orig: 200, 200
+  offset: 0, 0
+  index: -1
+decor_5
+  rotate: false
+  xy: 905, 3
+  size: 300, 170
+  orig: 300, 170
+  offset: 0, 0
+  index: -1
+top
+  rotate: false
+  xy: 1210, 5
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+fill
+  rotate: false
+  xy: 1345, 5
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+ceil
+  rotate: false
+  xy: 1480, 5
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+low
+  rotate: false
+  xy: 1615, 5
+  size: 128, 128
+  orig: 128, 128
+  offset: 0, 0
+  index: -1
+block_l
+  rotate: false
+  xy: 1749, 4
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+block_m
+  rotate: false
+  xy: 1882, 4
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1
+block_r
+  rotate: false
+  xy: 4, 267
+  size: 128, 96
+  orig: 128, 96
+  offset: 0, 0
+  index: -1

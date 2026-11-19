@@ -189,7 +189,7 @@ class PlayerController(private val sim: Simulation) {
 
         // Yatay hız
         boost = max(0f, boost - dt)
-        val target = Physics.RUN_SPEED * sim.config.speedMul * (if (boost > 0f) Physics.BOOST_MUL else 1f) * (if (e.ice) Physics.ICE_SPEED_MUL else 1f)
+        val target = Physics.RUN_SPEED * sim.speedMul * (if (boost > 0f) Physics.BOOST_MUL else 1f) * (if (e.ice) Physics.ICE_SPEED_MUL else 1f)
         val accel = when {
             boost > 0f -> 30f
             e.ice && grounded -> Physics.ICE_ACCEL
@@ -233,7 +233,7 @@ class PlayerController(private val sim: Simulation) {
         val expected = vxCur * dt
         if (dx < expected * 0.3f) {
             blocked += Physics.TICK
-            if (sim.effects.ice) vxCur = min(vxCur, Physics.RUN_SPEED * sim.config.speedMul)
+            if (sim.effects.ice) vxCur = min(vxCur, Physics.RUN_SPEED * sim.speedMul)
         } else blocked = max(0f, blocked - Physics.TICK * 2f)
         invuln = max(0f, invuln - Physics.TICK)
         if (blocked > Physics.STUCK_TIME) { sim.kill(DeathCause.STUCK); return }
