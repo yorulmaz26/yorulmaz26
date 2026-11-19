@@ -13,6 +13,8 @@ class EvolutionRules(private val desertSpeed: Int) {
 
     fun evolve(prev: EraGrid, p: Pos, memo: SandMemo): CellState {
         val old = prev[p]
+        // Zaman dondurma: nesne ve zemini sonraki çağlara olduğu gibi aktarılır.
+        if (old.frozen) return old
         val terrain = terrainAfter(prev, p, memo)
         val sandNear = sandWithin1(prev, p, memo)
         val (feature, grew) = when (old.feature) {
@@ -34,6 +36,8 @@ class EvolutionRules(private val desertSpeed: Int) {
             Feature.STONE_WALL -> Feature.ENERGY_WALL to true
             Feature.ENEMY_CAMP -> Feature.ENEMY_FORT to true
             Feature.ENEMY_RUINS -> Feature.NONE to false
+            Feature.WATCHTOWER -> Feature.STONE_TOWER to true
+            Feature.STONE_TOWER -> Feature.ENERGY_TURRET to true
             else -> old.feature to false
         }
         // Kumlaşan çayırda yaşayan bitki kalmaz (bitki zaten kumlaşmayı engeller; bu yalnızca güvence).
@@ -113,6 +117,11 @@ class EvolutionRules(private val desertSpeed: Int) {
                 if (s.feature == Feature.SHRINE) s.copy(feature = Feature.SHRINE_ACTIVE) else null
             BuildKind.COLLECT ->
                 if (s.feature == Feature.CRYSTAL) s.copy(feature = Feature.NONE, level = 0) else null
-        }?.let { it.copy(durability = it.feature.baseDurability) }
+            BuildKind.TOWER ->
+                if ((s.terrain == Terrain.GRASS || s.terrain == Terrain.SAND || s.terrain == Terrain.ROAD) && s.feature == Feature.NONE)
+                    s.copy(feature = if (era == Era.FUTURE) Feature.ENERGY_TURRET else Feature.WATCHTOWER, level = 0) else null
+            BuildKind.FREEZE ->
+                if (s.feature != Feature.NONE && !s.frozen && s.feature != Feature.CRYSTAL) s.copy(frozen = true) else null
+        }?.let { if (kind == BuildKind.FREEZE) it else it.copy(durability = it.feature.baseDurability, frozen = false) }
     }
 }

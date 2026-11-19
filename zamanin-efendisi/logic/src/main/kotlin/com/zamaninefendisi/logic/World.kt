@@ -65,15 +65,24 @@ enum class Feature(
     ENERGY_WALL("Enerji Kalkanı", blocks = true, baseDurability = UNBREAKABLE),
     CASTLE("Zaman Kalesi"),
     ENEMY_CAMP("Düşman Kampı", blocks = true),
-    ENEMY_FORT("Düşman Kalesi", blocks = true),
+    ENEMY_FORT("Düşman Kalesi", blocks = true, baseDurability = 4),
     ENEMY_RUINS("Yıkık Kamp"),
     SHRINE("Zaman Mührü", blocks = true),
     SHRINE_ACTIVE("Uyanmış Mühür", blocks = true),
     /** Toplanınca zaman enerjisi verir. Geçmiş'te toplanan kristal sonraki çağlarda da yok olur. */
     CRYSTAL("Zaman Kristali"),
+    /** Savunma kuleleri: düşman çağında her tur menzildeki en yakın düşmana ateş eder. */
+    WATCHTOWER("Gözcü Kulesi", blocks = true, baseDurability = 3),
+    STONE_TOWER("Taş Kule", blocks = true, baseDurability = UNBREAKABLE),
+    ENERGY_TURRET("Enerji Topu", blocks = true, baseDurability = UNBREAKABLE),
     ;
 
     val isWall: Boolean get() = this == PALISADE || this == STONE_WALL || this == ENERGY_WALL
+    val isTower: Boolean get() = this == WATCHTOWER || this == STONE_TOWER || this == ENERGY_TURRET
+    /** Saldırıyla hasar alabilen yapılar. */
+    val damageable: Boolean get() = (isWall || isTower || this == ENEMY_FORT) && baseDurability < UNBREAKABLE
+    val towerDamage: Int get() = when (this) { WATCHTOWER -> 1; STONE_TOWER -> 2; ENERGY_TURRET -> 2; else -> 0 }
+    val towerRange: Int get() = when (this) { WATCHTOWER -> 2; STONE_TOWER -> 2; ENERGY_TURRET -> 3; else -> 0 }
 }
 
 const val UNBREAKABLE = 99
@@ -89,6 +98,8 @@ data class CellState(
     val level: Int = 0,
     val durability: Int = feature.baseDurability,
     val causeId: Int = -1,
+    /** Zamanı dondurulmuş nesne sonraki çağlarda evrilmez, olduğu gibi kalır. */
+    val frozen: Boolean = false,
 ) {
     val walkable: Boolean get() = (terrain.walkable || feature.bridge) && !feature.blocks
     val displayName: String get() = if (feature == Feature.NONE) terrain.title else feature.title

@@ -4,7 +4,15 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /** Oyuncunun hücrelere uyguladığı inşa/değişiklik türleri. [woodCost] negatifse odun kazandırır. */
-enum class BuildKind(val title: String, val woodCost: Int, val verb: String, val energyGain: Int = 0, val playerChoosable: Boolean = true) {
+enum class BuildKind(
+    val title: String,
+    val woodCost: Int,
+    val verb: String,
+    val energyGain: Int = 0,
+    val playerChoosable: Boolean = true,
+    /** Harcanan dondurma hakkı. */
+    val freezeCost: Int = 0,
+) {
     PLANT("Fidan Dik", 0, "fidan diktin"),
     CUT("Ağacı Kes", -2, "ağaç kestin"),
     BRIDGE("Köprü Kur", 2, "köprü kurdun"),
@@ -14,6 +22,8 @@ enum class BuildKind(val title: String, val woodCost: Int, val verb: String, val
     ACTIVATE("Mührü Uyandır", 0, "zaman mührünü uyandırdın"),
     /** Kristalin üstüne gelince kendiliğinden gerçekleşir. */
     COLLECT("Kristal Topla", 0, "zaman kristali topladın", energyGain = 1, playerChoosable = false),
+    TOWER("Kule Kur", 2, "gözcü kulesi kurdun"),
+    FREEZE("Zamanı Dondur", 0, "bir nesnenin zamanını dondurdun", freezeCost = 1),
 }
 
 @Serializable
@@ -32,6 +42,14 @@ sealed class Action {
 
     @Serializable @SerialName("wait")
     data object Wait : Action()
+
+    /** Müttefik birliği hareket ettir (hareket menzili içinde). */
+    @Serializable @SerialName("unit_move")
+    data class UnitMove(val unit: Int, val to: Pos) : Action()
+
+    /** Müttefik birlikle menzildeki düşmana ya da düşman kalesine saldır. */
+    @Serializable @SerialName("unit_attack")
+    data class UnitAttack(val unit: Int, val at: Pos) : Action()
 }
 
 /** Oyuncunun bir çağda yaptığı kalıcı değişiklik. Nedensellik motorunun girdisidir. */

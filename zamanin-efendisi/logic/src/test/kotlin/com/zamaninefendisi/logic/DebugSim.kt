@@ -16,11 +16,12 @@ class DebugSim {
                     val ch = when {
                         s.heroEra == era && s.heroPos == p -> '@'
                         era == s.level.enemyEra && s.enemyAt(p) != null -> 'e'
+                        era == s.level.enemyEra && s.unitAt(p) != null -> 'u'
                         else -> when (c.feature) {
                             Feature.NONE -> when (c.terrain) { Terrain.GRASS -> '.'; Terrain.SAND -> ':'; Terrain.WATER -> '~'; Terrain.MOUNTAIN -> '^'; Terrain.ROAD -> '=' }
                             Feature.TREE -> 'T'; Feature.FOREST -> 'O'; Feature.SAPLING -> 't'; Feature.FIELD -> 'F'; Feature.STUMP -> ','
                             Feature.BRIDGE_WOOD -> 'b'; Feature.BRIDGE_STONE -> 'B'; Feature.HUT -> 'h'; Feature.TOWN -> 'V'; Feature.RUINS -> 'r'
-                            Feature.PALISADE -> 'p'; Feature.STONE_WALL -> '#'; Feature.CASTLE -> 'C'; Feature.ENEMY_CAMP -> 'E'; Feature.ENEMY_FORT -> 'K'; Feature.BRIDGE_TECH -> 'L'; Feature.ENERGY_WALL -> '%'; Feature.CITY -> 'Y'; Feature.CRYSTAL -> '*'
+                            Feature.PALISADE -> 'p'; Feature.STONE_WALL -> '#'; Feature.CASTLE -> 'C'; Feature.ENEMY_CAMP -> 'E'; Feature.ENEMY_FORT -> 'K'; Feature.BRIDGE_TECH -> 'L'; Feature.ENERGY_WALL -> '%'; Feature.CITY -> 'Y'; Feature.CRYSTAL -> '*'; Feature.WATCHTOWER -> 'w'; Feature.STONE_TOWER -> 'W'; Feature.ENERGY_TURRET -> '!'
                             else -> '?'
                         }
                     }
@@ -43,7 +44,7 @@ class DebugSim {
             println(">> $a  ${err ?: ""}")
             if (err != null) break
             val ev = s.perform(a)
-            println("turn=${s.turn} wood=${s.wood} hp=${s.heroHp} status=${s.status} ${s.failReason ?: ""} enemies=${s.enemies.map { it.pos }}")
+            println("turn=${s.turn} wood=${s.wood} hp=${s.heroHp} status=${s.status} ${s.failReason ?: ""} enemies=${s.enemies.map { "${it.kind.name.take(3)}${it.pos}${it.hp}" }} units=${s.units.map { "${it.type.name.take(3)}${it.pos}${it.hp}" }}")
             ev.filterNot { it is GameEvent.CellsChanged }.forEach { println("   $it") }
             println(dump(s))
         }

@@ -28,8 +28,10 @@ class CausalityEngine(val level: LevelDef) {
     val changes: List<ChangeRecord> get() = _changes
     private val changesAt = HashMap<EraPos, MutableList<ChangeRecord>>()
 
-    /** Düşman saldırılarının duvarlara verdiği hasar (yalnızca düşman çağında). */
+    /** Saldırıların yapılara verdiği hasar (yalnızca düşman çağında). */
     private val damage = HashMap<Pos, Int>()
+    /** Yağmalanan/sabote edilen hücreler (yalnızca düşman çağında; sonraki çağlara evrilerek yansır). */
+    private val razed = HashSet<Pos>()
 
     private val linksByTarget: Map<EraPos, List<CausalLink>> = level.links.groupBy { EraPos(it.targetEra, it.target) }
     private val linksBySource: Map<EraPos, List<CausalLink>> = level.links.groupBy { EraPos(it.sourceEra, it.source) }
@@ -56,7 +58,7 @@ class CausalityEngine(val level: LevelDef) {
         val rec = ChangeRecord(_changes.size, era, pos, kind, turn)
         _changes += rec
         changesAt.getOrPut(EraPos(era, pos)) { ArrayList() } += rec
-        if (era == level.enemyEra) damage.remove(pos)
+        if (era == level.enemyEra) { damage.remove(pos); razed.remove(pos) }
         return rec to recompute(era, setOf(pos))
     }
 
@@ -65,6 +67,14 @@ class CausalityEngine(val level: LevelDef) {
         damage[pos] = (damage[pos] ?: 0) + amount
         return recompute(level.enemyEra, setOf(pos))
     }
+
+    /** Düşman yağması/sabotajı: hücredeki yapı yıkılır. */
+    fun addRaze(pos: Pos): RecomputeResult {
+        razed += pos
+        return recompute(level.enemyEra, setOf(pos))
+    }
+
+    fun damageAt(pos: Pos): Int = damage[pos] ?: 0
 
     class RecomputeResult(val changed: Map<Era, Set<Pos>>, val voided: List<ChangeRecord>) {
         val any: Boolean get() = changed.values.any { it.isNotEmpty() }
@@ -134,13 +144,29 @@ class CausalityEngine(val level: LevelDef) {
             } else s = r.copy(causeId = c.id)
         }
         if (era == level.enemyEra) {
+            if (p in razed) s = razedState(s)
             val d = damage[p]
-            if (d != null && s.feature.isWall && s.feature.baseDurability < UNBREAKABLE) {
+            if (d != null && s.feature.damageable) {
                 val left = s.feature.baseDurability - d
-                s = if (left <= 0) s.copy(feature = Feature.NONE, durability = 0, level = 0) else s.copy(durability = left)
+                s = if (left <= 0) s.copy(feature = destroyedForm(s.feature), durability = 0, level = 0, frozen = false) else s.copy(durability = left)
             }
         }
         return s
+    }
+
+    private fun destroyedForm(f: Feature): Feature = when {
+        f == Feature.ENEMY_FORT -> Feature.ENEMY_RUINS
+        f.isTower -> Feature.RUINS
+        else -> Feature.NONE
+    }
+
+    private fun razedState(s: CellState): CellState = when (s.feature) {
+        Feature.HUT, Feature.TOWN, Feature.CITY, Feature.WATCHTOWER, Feature.STONE_TOWER, Feature.ENERGY_TURRET -> s.copy(feature = Feature.RUINS, level = 0, frozen = false)
+        Feature.FIELD, Feature.SAPLING, Feature.TREE, Feature.PALISADE, Feature.STONE_WALL, Feature.ENERGY_WALL,
+        Feature.BRIDGE_WOOD, Feature.BRIDGE_STONE, Feature.BRIDGE_TECH, Feature.SHRINE_ACTIVE -> s.copy(
+            feature = if (s.feature == Feature.SHRINE_ACTIVE) Feature.SHRINE else Feature.NONE, level = 0, frozen = false,
+        )
+        else -> s
     }
 
     fun rebuildAll() {

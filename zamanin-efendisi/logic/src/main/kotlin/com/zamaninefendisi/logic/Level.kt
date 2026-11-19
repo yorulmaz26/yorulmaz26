@@ -19,6 +19,11 @@ sealed class Goal {
         override val markers get() = cells.map { era to it }
     }
 
+    /** Belirtilen hücrelerin hiçbirinde bu nesne bulunmamalı (ör. geçidi açık tut). */
+    data class NotFeatureAt(val era: Era, val cells: List<Pos>, val feature: Feature, override val text: String) : Goal() {
+        override fun met(s: LevelSession) = cells.none { s.timeline.grid(era)[it].feature == feature }
+    }
+
     /** Çağda bu nesneden en az [count] adet bulunmalı. */
     data class FeatureCount(val era: Era, val feature: Feature, val count: Int, override val text: String) : Goal() {
         override fun met(s: LevelSession) = s.timeline.grid(era).count(feature) >= count
@@ -27,6 +32,11 @@ sealed class Goal {
     /** Çağda bu nesne hiç bulunmamalı. */
     data class NoFeature(val era: Era, val feature: Feature, override val text: String) : Goal() {
         override fun met(s: LevelSession) = s.timeline.grid(era).count(feature) == 0
+    }
+
+    /** Belirtilen sayıda müttefik birlik hayatta kalmalı. */
+    data class KeepUnits(val count: Int, override val text: String) : Goal() {
+        override fun met(s: LevelSession) = s.units.size >= count
     }
 
     /** Bütün düşman birlikleri yenilmeli ve düşman kalesi kalmamalı. */
@@ -56,12 +66,67 @@ data class CausalLink(
     val description: String,
 )
 
-enum class EnemyKind(val title: String, val hp: Int, val attack: Int) {
+/** Düşman yapay zekâsı stratejileri. Zorluk can artırarak değil, davranışla yükselir. */
+enum class EnemyStrategy(val title: String, val description: String) {
+    AGGRESSIVE("Saldırgan", "Korunan hedefe en kısa yoldan saldırır; yolundaki herkese vurur."),
+    DEFENSIVE("Savunmacı", "Kalesinin çevresini korur; kalesi yıkılırsa öfkelenip saldırgan olur."),
+    RESOURCE("Kaynak Odaklı", "Tarla, köy ve kasabaları yağmalar."),
+    TIME_MANIPULATOR("Zaman Manipülatörü", "Yolu kapanınca duvarların üstünden faz atlar; sen başka çağdayken iki kat hızlanır."),
+    PARADOX("Paradoks Yaratıcısı", "Senin inşa ettiğin yapıları sabote ederek zaman çizgini bozar."),
+    TECH("Teknoloji Uzmanı", "Uzaktan ateş eder, arayı açar ve her 3 turda bir güçlenir."),
+}
+
+enum class EnemyKind(
+    val title: String,
+    val hp: Int,
+    val attack: Int,
+    val defense: Int = 0,
+    val range: Int = 1,
+    val strategy: EnemyStrategy = EnemyStrategy.AGGRESSIVE,
+) {
     RAIDER("Akıncı", 1, 1),
     ROBOT("Robot Muhafız", 1, 1),
+    BRUTE("Ağır Muhafız", 3, 2, defense = 1),
+    ARCHER("Düşman Okçu", 2, 1, range = 2, strategy = EnemyStrategy.DEFENSIVE),
+    PLUNDERER("Yağmacı", 2, 1, strategy = EnemyStrategy.RESOURCE),
+    PHASER("Zaman Hırsızı", 2, 1, strategy = EnemyStrategy.TIME_MANIPULATOR),
+    SABOTEUR("Paradoks Ajanı", 2, 1, strategy = EnemyStrategy.PARADOX),
+    TECHNICIAN("Teknoloji Uzmanı", 2, 1, range = 2, strategy = EnemyStrategy.TECH),
 }
 
 data class EnemySpawn(val pos: Pos, val kind: EnemyKind? = null)
+
+enum class UnitAbility(val title: String, val description: String) {
+    SHIELD("Kalkan", "Aldığı her hasar 1 azalır."),
+    SIEGE("Kuşatma", "Düşman kalesine ve yapılara 3 kat hasar verir."),
+    GUARD("Koruma", "Yanındaki müttefikler 1 daha az hasar alır."),
+    FREEZE_SHOT("Zaman Kilidi", "Vurduğu düşmanı 2 tur dondurur."),
+}
+
+/** Müttefik birlik türleri. [eras]: birliğin bulunabileceği çağlar (çağ uyumluluğu). */
+enum class UnitType(
+    val title: String,
+    val hp: Int,
+    val attack: Int,
+    val defense: Int,
+    val minRange: Int,
+    val maxRange: Int,
+    val move: Int,
+    val eras: Set<Era>,
+    val ability: UnitAbility? = null,
+) {
+    WARRIOR("İlkel Savaşçı", 3, 2, 0, 1, 1, 2, setOf(Era.PAST)),
+    KNIGHT("Şövalye", 5, 2, 2, 1, 1, 2, setOf(Era.PAST, Era.PRESENT), UnitAbility.SHIELD),
+    ARCHER("Okçu", 2, 2, 0, 2, 3, 2, setOf(Era.PAST, Era.PRESENT)),
+    ENGINEER("Kuşatma Mühendisi", 3, 1, 1, 1, 1, 1, setOf(Era.PRESENT), UnitAbility.SIEGE),
+    SOLDIER("Modern Asker", 3, 3, 1, 1, 2, 2, setOf(Era.PRESENT, Era.FUTURE)),
+    MECH("Mekanik Koruyucu", 6, 1, 3, 1, 1, 1, setOf(Era.FUTURE), UnitAbility.GUARD),
+    ROBOT("Robot Savaşçı", 4, 3, 1, 1, 1, 2, setOf(Era.FUTURE)),
+    ENERGY("Enerji Birliği", 2, 4, 0, 2, 3, 1, setOf(Era.FUTURE)),
+    MAGE("Zaman Büyücüsü", 2, 1, 0, 1, 2, 2, setOf(Era.PAST, Era.PRESENT, Era.FUTURE), UnitAbility.FREEZE_SHOT),
+}
+
+data class UnitSpawn(val type: UnitType, val pos: Pos)
 
 /** Oyun içi öğretici ipucu: koşul sağlanmadığı sürece gösterilir; sıradaki ilk sağlanmamış ipucu görünür. */
 class TutorialHint(val text: String, val done: (LevelSession) -> Boolean)
@@ -89,12 +154,18 @@ class LevelDef(
     val enemyEra: Era = Era.PRESENT,
     /** Düşman kalesi her kaç turda bir akıncı üretir (0 = üretmez). */
     val spawnEvery: Int = 0,
+    /** Kalenin ürettiği düşman türü (null: çağa göre akıncı/robot). */
+    val enemyKindOverride: EnemyKind? = null,
     val maxEnemies: Int = 3,
     /** Düşmanların ulaşmaya çalıştığı korunacak hücreler. Ulaşırlarsa bölüm kaybedilir. */
     val protect: List<Pos> = emptyList(),
     val heroHp: Int = 3,
     /** Çağ geçişi için zaman enerjisi (null = sınırsız). */
     val energy: Int? = null,
+    /** Müttefik birlikler (düşman çağında). */
+    val units: List<UnitSpawn> = emptyList(),
+    /** Zamanı dondurma hakkı sayısı. */
+    val freezes: Int = 0,
     val hints: List<TutorialHint> = emptyList(),
     /** Doğrulanmış çözüm. Otomatik testler her bölümün bununla kazanıldığını kontrol eder. */
     val solution: List<Action>,
@@ -105,7 +176,7 @@ class LevelDef(
     val heroStart get() = parsed.heroStart
     val hasEnemies: Boolean by lazy {
         val hostile = { c: CellState -> c.feature == Feature.ENEMY_CAMP || c.feature == Feature.ENEMY_FORT }
-        enemies.isNotEmpty() || parsed.cells.any(hostile) || parsed.overrides.values.any { m -> m.values.any(hostile) }
+        enemies.isNotEmpty() || units.isNotEmpty() || parsed.cells.any(hostile) || parsed.overrides.values.any { m -> m.values.any(hostile) }
     }
 }
 
