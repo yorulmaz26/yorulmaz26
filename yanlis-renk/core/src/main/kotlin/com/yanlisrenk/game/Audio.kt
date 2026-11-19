@@ -8,6 +8,7 @@ class Audio(private val assets: Assets, private val settings: () -> Settings) {
     private var current: Music? = null
     private var currentName = ""
     private var fadingOut: Music? = null
+    private var fadingOutName: String? = null
     private var fade = 0f
 
     fun play(name: String, pitch: Float = 1f, volume: Float = 1f) {
@@ -21,8 +22,12 @@ class Audio(private val assets: Assets, private val settings: () -> Settings) {
         fadingOut?.stop()
         fadingOut = current
         fade = 1f
+        val prevName = currentName
+        fadingOutName = prevName
         currentName = name
-        current = assets.music[name]?.also { it.volume = 0f; if (settings().musicVolume > 0.001f) it.play() }
+        current = assets.music(name)?.also { it.volume = 0f; if (settings().musicVolume > 0.001f) it.play() }
+        assets.releaseMusic(setOfNotNull(name, fadingOutName))
+        fadingOutName = prevName
     }
 
     fun update(dt: Float) {

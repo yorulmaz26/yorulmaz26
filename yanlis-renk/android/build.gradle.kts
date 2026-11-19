@@ -19,8 +19,8 @@ android {
         applicationId = "com.yanlisrenk.oyun"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "1.0.1"
     }
     sourceSets["main"].apply {
         manifest.srcFile("AndroidManifest.xml")
@@ -41,8 +41,10 @@ android {
     }
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = true
-            isShrinkResources = true
+            // R8 kapalı: libGDX yansıma ile sınıf oluşturur (Pools, Actions, InputEvent);
+            // küçültme bu kurucuları silip açılışta çökmeye yol açmıştı. Boyut farkı ~3 MB.
+            isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.findByName("release") ?: signingConfigs.getByName("debug")
         }

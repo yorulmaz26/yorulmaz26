@@ -2,7 +2,14 @@
 
 Tarih: 2026-11-19 · Ortam: Linux bulut konteyneri, OpenJDK 21, Gradle 8.14.3, Android SDK 35, Mesa (yazılımsal OpenGL) + Xvfb.
 
-> **Önemli:** Testler gerçek bir Android cihazda ya da emülatörde **yapılmadı** (konteynerde KVM yok, emülatör çalışmaz, bağlı cihaz yok). Aşağıda her testin **nerede** çalıştığı açıkça yazılıdır.
+> **Önemli:** Gerçek bir telefonda test **yapılmadı**. 1.0.1 sürümü, donanım hızlandırması olmayan bir **Android 11 (API 30, x86_64) emülatöründe** kuruldu ve elle oynandı. Aşağıda her testin **nerede** çalıştığı açıkça yazılıdır.
+
+## 1.0.0 açılış çökmesi (kullanıcı bildirimi) ve düzeltmesi
+
+* **Belirti:** 1.0.0 sürüm APK telefonda açılmıyordu; önbellek temizlemek işe yaramıyordu.
+* **Neden (emülatörde yeniden üretildi):** `FATAL EXCEPTION: GLThread … Class cannot be created (missing no-arg constructor)`. R8 küçültmesi, libGDX'in yansıma ile oluşturduğu sınıfların (Actions, InputEvent havuzları) kurucularını silmişti. Masaüstü testleri küçültülmemiş kodla çalıştığı için yakalanmadı.
+* **Düzeltme (1.0.1):** sürüm derlemesinde R8 kapatıldı (sürüm APK artık test edilen kodla aynı); ProGuard kurallarına libGDX'i tamamen koruyan satır eklendi; büyük yazı tipleri 1024'lük sayfalara paketlendi (bellek); müzikler gerektiğinde yükleniyor; çökme olursa bir sonraki açılışta kopyalanabilir hata penceresi çıkıyor.
+* **Doğrulama:** 1.0.1 emülatörde açıldı ve şu akış elle oynandı: açılış → 5 sayfalık öğretici → alan girişi → bölüm seçimi → Bölüm 1 → oyun → yanlış kapıda "YANLIŞ RENK! Bu kapı YEŞİL istiyordu" ekranı ve can düşmesi. Çökme görülmedi.
 
 ## Özet
 
@@ -12,7 +19,8 @@ Tarih: 2026-11-19 · Ortam: Linux bulut konteyneri, OpenJDK 21, Gradle 8.14.3, A
 | `logic` MetaTests | 22 | 22 | 0 | JVM (JUnit) |
 | `server` TimeServerTest | 1 | 1 | 0 | JVM, gerçek HTTP soketi |
 | `desktop` görsel QA | 36 ekran/durum | 36 | 0 | lwjgl3 + Mesa OpenGL (Xvfb), gerçek çizim |
-| Android derleme | debug APK, release APK (R8), AAB | 3 | 0 | Android Gradle Plugin 8.7.3 |
+| Android derleme | debug APK, release APK, AAB | 3 | 0 | Android Gradle Plugin 8.7.3 |
+| Android emülatör | kurulum + açılış + menü/oyun akışı | ✅ | 0 | Android 11 x86_64 emülatör (hızlandırmasız) |
 
 Komutlar: `./gradlew :logic:test :server:test`, `xvfb-run ./gradlew :desktop:screenshots`, `./gradlew :android:assembleDebug :android:assembleRelease :android:bundleRelease`.
 
@@ -41,10 +49,10 @@ Komutlar: `./gradlew :logic:test :server:test`, `xvfb-run ./gradlew :desktop:scr
 | 19 | Sonsuz mod | ✅ | `sonsuzMod`: 30 parça her başlangıç rengi için doğrulanır, hız ≥1,8× artar, can harcanmaz, haftalık ödül basamakları; `sonsuzModKombo` |
 | 20 | Menü geçişleri | ✅ (masaüstü GL) | Görsel QA çalıştırıcısı 25 ekranın tamamını + oyun içi durumları gerçek OpenGL ile açtı, her birini ~45 kare çalıştırdı: **0 hata**. Görüntüler: `docs/screenshots/` |
 | 21 | Düşük performans senaryosu | ✅ (simülasyon) | `dusukPerformansSimulasyonu`: 15/30/144 FPS kare süreleriyle aynı bölümler aynı sonucu verir (sabit adımlı simülasyon). Masaüstü QA'da ortalama kare süresi yazılımsal GL'de ~1–2,5 ms. **Düşük donanımlı gerçek Android cihazda ölçüm yapılmadı.** |
-| 22 | APK/AAB derleme | ✅ | `assembleRelease` (R8 küçültme açık) + `bundleRelease` başarılı; R8 sonrası kotlinx.serialization sınıflarının korunduğu `dexdump` ile doğrulandı; `apksigner verify` geçti |
+| 22 | APK/AAB derleme | ✅ | `assembleRelease` + `bundleRelease` başarılı; 1.0.1 APK emülatöre kuruldu ve açıldı. (1.0.0'daki R8 çökmesi yukarıda) |
 
 ## Bilinen sınırlamalar
 
-* Gerçek cihaz/emülatör testi yok. Dokunmatik giriş, titreşim, Android yaşam döngüsü (arka plana alma), ses gecikmesi ve farklı ekran oranları cihazda doğrulanmalıdır.
+* Gerçek telefon testi yok; emülatör yazılımsal grafikle ve çok yavaş çalıştığından akıcılık (FPS), titreşim, ses ve arka plana alma emülatörde değerlendirilemedi.
 * Ses dosyaları sayısal olarak doğrulandı (sessiz değil, kırpılma yok, döngü noktası tıklamasız) ancak **dinlenmedi**.
 * Ekran görüntüleri 540×1080 masaüstü penceresindendir; çok uzun (20:9) ve tablet oranları `ExtendViewport` ile desteklenir ama görsel olarak cihazda denenmedi.

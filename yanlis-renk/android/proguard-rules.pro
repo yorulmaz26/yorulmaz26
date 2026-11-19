@@ -1,3 +1,6 @@
+# libGDX yansıma ile nesne oluşturur (ReflectionPool, Actions, InputEvent) → tamamen koru
+-keep class com.badlogic.gdx.** { *; }
+-keep class com.yanlisrenk.** { *; }
 -verbose
 -dontwarn com.badlogic.gdx.backends.android.AndroidFragmentApplication
 -dontwarn com.badlogic.gdx.utils.GdxBuild

@@ -23,6 +23,7 @@ import java.util.concurrent.Executors
 class AndroidLauncher : AndroidApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installCrashReporter()
         val cfg = AndroidApplicationConfiguration()
         cfg.useImmersiveMode = true
         cfg.numSamples = 4 // kenar yumuşatma
@@ -30,6 +31,40 @@ class AndroidLauncher : AndroidApplication() {
         cfg.useCompass = false
         cfg.useGyroscope = false
         initialize(YanlisRenkGame(AndroidPlatform(this)), cfg)
+        showPreviousCrash()
+    }
+
+    private val crashFile get() = File(filesDir, "son_hata.txt")
+
+    /** Yakalanmamış hatayı dosyaya yazar; bir sonraki açılışta gösterilir. */
+    private fun installCrashReporter() {
+        val prev = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+            runCatching {
+                val sw = java.io.StringWriter()
+                e.printStackTrace(java.io.PrintWriter(sw))
+                crashFile.writeText("Yanlış Renk 1.0.1 · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
+            }
+            prev?.uncaughtException(t, e)
+        }
+    }
+
+    private fun showPreviousCrash() {
+        val f = crashFile
+        if (!f.exists()) return
+        val text = runCatching { f.readText() }.getOrDefault("")
+        f.delete()
+        runOnUiThread {
+            android.app.AlertDialog.Builder(this)
+                .setTitle("Önceki açılışta hata oluştu")
+                .setMessage("Bu metni kopyalayıp geliştiriciye gönderebilirsin:\n\n" + text.take(3000))
+                .setPositiveButton("Kopyala") { _, _ ->
+                    val cm = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    cm.setPrimaryClip(android.content.ClipData.newPlainText("Yanlış Renk hata", text))
+                }
+                .setNegativeButton("Kapat", null)
+                .show()
+        }
     }
 }
 

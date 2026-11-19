@@ -20,6 +20,16 @@ class Assets : Disposable {
     val sounds = HashMap<String, Sound>()
     val music = HashMap<String, Music>()
 
+    /** Müzik gerektiğinde yüklenir (Android'de her Music bir MediaPlayer açar). */
+    fun music(name: String): Music? = music[name] ?: runCatching {
+        Gdx.audio.newMusic(Gdx.files.internal("music/$name.ogg")).also { it.isLooping = true; music[name] = it }
+    }.getOrNull()
+
+    fun releaseMusic(keep: Set<String>) {
+        val drop = music.keys.filter { it !in keep }
+        drop.forEach { music.remove(it)?.dispose() }
+    }
+
     lateinit var fontS: BitmapFont
     lateinit var fontM: BitmapFont
     lateinit var fontL: BitmapFont
@@ -27,6 +37,7 @@ class Assets : Disposable {
     lateinit var fontHuge: BitmapFont
     /** Dünya içinde (kapı yazıları) kullanılan yazı tipi. */
     lateinit var fontWorld: BitmapFont
+    private var fontPacker: com.badlogic.gdx.graphics.g2d.PixmapPacker? = null
 
     companion object {
         val ICONS = listOf("heart_full", "heart_empty", "coin", "diamond", "star_full", "star_empty", "lock", "play", "pause", "settings",
@@ -46,7 +57,6 @@ class Assets : Disposable {
         for (n in ICONS) loadTex(n, "icons/$n.png")
         for (n in UI) loadTex(n, "ui/$n.png")
         for (n in SFX) runCatching { sounds[n] = Gdx.audio.newSound(Gdx.files.internal("sfx/$n.ogg")) }
-        for (n in MUSIC) runCatching { music[n] = Gdx.audio.newMusic(Gdx.files.internal("music/$n.ogg")).also { it.isLooping = true } }
         buildFonts()
     }
 
@@ -64,11 +74,15 @@ class Assets : Disposable {
     /** UI sanal çözünürlüğü 720x1280; yazı tipleri gerçek piksel yoğunluğunda üretilip ölçeklenir. */
     private fun buildFonts() {
         val gen = FreeTypeFontGenerator(Gdx.files.internal("fonts/Nunito-ExtraBold.ttf"))
-        val scale = (maxOf(Gdx.graphics.height / 1280f, Gdx.graphics.width / 720f)).coerceIn(0.5f, 3f)
-        fun make(size: Int, border: Float = 0f, borderColor: Color = Color.WHITE): BitmapFont {
+        val scale = (maxOf(Gdx.graphics.height / 1280f, Gdx.graphics.width / 720f)).coerceIn(0.5f, 2.5f)
+        // Tüm boyutlar 1024'lük sayfalara paketlenir (aksi hâlde büyük yazı tipleri 4096'lık doku ister)
+        val packer = com.badlogic.gdx.graphics.g2d.PixmapPacker(1024, 1024, com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888, 2, false)
+        fontPacker = packer
+        fun make(size: Int, border: Float = 0f, borderColor: Color = Color.WHITE, chars: String = CHARS): BitmapFont {
             val p = FreeTypeFontGenerator.FreeTypeFontParameter()
             p.size = (size * scale).toInt().coerceAtLeast(8)
-            p.characters = CHARS
+            p.characters = chars
+            p.packer = packer
             p.minFilter = Texture.TextureFilter.Linear
             p.magFilter = Texture.TextureFilter.Linear
             p.kerning = true
@@ -83,7 +97,7 @@ class Assets : Disposable {
         fontM = make(32)
         fontL = make(44)
         fontXL = make(64)
-        fontHuge = make(96, 4f, Color.WHITE)
+        fontHuge = make(96, 4f, Color.WHITE, "\u0000ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZXWQ0123456789!?.,:-+×%/ ")
         fontWorld = make(40)
         gen.dispose()
     }
@@ -104,5 +118,6 @@ class Assets : Disposable {
         sounds.values.forEach { it.dispose() }
         music.values.forEach { it.dispose() }
         listOf(fontS, fontM, fontL, fontXL, fontHuge, fontWorld).forEach { it.dispose() }
+        fontPacker?.dispose()
     }
 }

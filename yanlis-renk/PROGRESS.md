@@ -23,3 +23,6 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 * Kayıt: DataStore yerine atomik dosya + HMAC + yedek (gerekçe ARCHITECTURE.md'de).
 * Yazı tipinde olmayan simgeler (ok, eşit değil, yıldız) metinde kelimeyle, oyunda ise çizilmiş simgelerle gösterilir.
 * Görsel QA sırasında bir bölümün dokunmadan geçildiği görüldü; asıl neden QA çalıştırıcısındaki bir hataydı (otomatik oyuncu kapalı sanılırken açıktı) ve düzeltildi. Güvence olarak üreticiye "en az max(2, kapı/4) dokunuş" kısıtı ve 500 bölümün tamamının dokunmadan **geçilemediğini** denetleyen test eklendi (kısıt mevcut bölümlerin hiçbirini değiştirmedi).
+
+## 1.0.1 (açılış çökmesi düzeltmesi)
+* Kullanıcı 1.0.0'ın açılmadığını bildirdi. Android 11 emülatöründe yeniden üretildi: R8 libGDX'in yansıma ile kullandığı kurucuları silmişti. R8 kapatıldı, yazı tipi paketleme ve müzik yükleme iyileştirildi, çökme raporu penceresi eklendi. 1.0.1 emülatörde açıldı ve oynandı.
