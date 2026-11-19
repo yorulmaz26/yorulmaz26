@@ -156,7 +156,10 @@ class IsoRenderer(private val sr: ShapeRenderer) {
                 // Bu hücredeki varlıklar
                 if (viewEra == s.level.enemyEra) for (e in s.enemies) {
                     val v = anim.enemyVis[e.id] ?: continue
-                    if (v[0].roundToInt() == x && v[1].roundToInt() == y) drawRaider(L.cx(v[0], v[1]), L.cy(v[0], v[1]), anim.time + e.id, k)
+                    if (v[0].roundToInt() == x && v[1].roundToInt() == y) {
+                        if (e.kind == com.zamaninefendisi.logic.EnemyKind.ROBOT) drawRobot(L.cx(v[0], v[1]), L.cy(v[0], v[1]), anim.time + e.id, k)
+                        else drawRaider(L.cx(v[0], v[1]), L.cy(v[0], v[1]), anim.time + e.id, k)
+                    }
                 }
                 if (s.heroEra == viewEra && anim.heroX.roundToInt() == x && anim.heroY.roundToInt() == y) {
                     val hx = L.cx(anim.heroX, anim.heroY); val hy = L.cy(anim.heroX, anim.heroY)
@@ -311,6 +314,13 @@ class IsoRenderer(private val sr: ShapeRenderer) {
                 box(cx + u * 0.2f, cy + u * 0.02f, 0.2f, 0.2f, u * 0.5f, C.enemyStone, C.enemyDark, C.enemyStoneDark)
                 flagPole(cx, cy + u * 0.32f, u * 0.32f, C.enemy, time)
             }
+            Feature.CRYSTAL -> {
+                val fy = cy + u * 0.22f + sin(time * 2.5f + p.x) * u * 0.04f
+                sr.color = tmp.set(0f, 0f, 0f, 0.12f); sr.ellipse(cx - u * 0.1f, cy - u * 0.03f, u * 0.2f, u * 0.07f, 12)
+                tri(cx - u * 0.09f, fy, cx, fy - u * 0.14f, cx, fy + u * 0.16f, C.crystalDark)
+                tri(cx, fy - u * 0.14f, cx + u * 0.09f, fy, cx, fy + u * 0.16f, C.crystal)
+                sr.color = tmp.set(1f, 1f, 1f, 0.7f); sr.circle(cx - u * 0.02f, fy + u * 0.05f, u * 0.02f, 6)
+            }
             Feature.SHRINE, Feature.SHRINE_ACTIVE -> {
                 box(cx, cy, 0.34f, 0.34f, u * 0.32f, C.stone, C.stoneDark, C.stoneMid)
                 val active = f == Feature.SHRINE_ACTIVE
@@ -384,6 +394,18 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         tri(cx - u * 0.05f, cy + u * 0.14f + bob, cx + u * 0.05f, cy + u * 0.14f + bob, cx, cy + u * 0.2f + bob, Theme.gold)
     }
 
+    private fun drawRobot(cx: Float, cy: Float, time: Float, k: Float) {
+        val u = L.tw * k
+        val hover = sin(time * 3f) * u * 0.03f
+        sr.color = tmp.set(0f, 0f, 0f, 0.18f); sr.ellipse(cx - u * 0.13f, cy - u * 0.05f, u * 0.26f, u * 0.1f, 14)
+        box(cx, cy + u * 0.06f + hover, 0.32f, 0.32f, u * 0.24f, C.robotTop, C.robotDark, C.robotMid)
+        box(cx, cy + u * 0.32f + hover, 0.22f, 0.22f, u * 0.12f, C.robotTop, C.robotDark, C.robotMid)
+        val blink = if ((time * 1.3f) % 3f < 0.15f) 0.2f else 1f
+        sr.color = tmp.set(1f, 0.35f, 0.35f, blink); sr.circle(cx + u * 0.04f, cy + u * 0.38f + hover, u * 0.025f, 8)
+        sr.color = C.enemy; sr.rectLine(cx, cy + u * 0.44f + hover, cx, cy + u * 0.54f + hover, 2f)
+        sr.circle(cx, cy + u * 0.55f + hover, u * 0.02f, 8)
+    }
+
     private fun drawRaider(cx: Float, cy: Float, time: Float, k: Float) {
         val u = L.tw * k
         val bob = abs(sin(time * 5f)) * u * 0.02f
@@ -442,6 +464,8 @@ class IsoRenderer(private val sr: ShapeRenderer) {
         val castle = c("F3EAFF"); val castleMid = c("DCCCF6"); val castleDark = c("BFA8EA")
         val enemy = c("E2574C"); val enemyDark = c("9E3A3A"); val enemyStone = c("C9A79A"); val enemyStoneDark = c("A88476")
         val skin = c("FFD7B0"); val hood = c("FFFFFF"); val levelDot = c("FFFFFF")
+        val robotTop = c("F2F4FA"); val robotMid = c("C9CEDF"); val robotDark = c("9EA5BF")
+        val crystal = c("7FE3F0"); val crystalDark = c("4FB8D9")
     }
 }
 

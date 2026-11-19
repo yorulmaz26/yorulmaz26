@@ -49,7 +49,8 @@ enum class Feature(
     NONE(""),
     SAPLING("Fidan", vegetation = true),
     TREE("Ağaç", vegetation = true),
-    FOREST("Kadim Orman", vegetation = true),
+    /** Yaşlı ağaçlar kümelenince oluşur; geçilmezdir (kahraman ve düşman için doğal sur). */
+    FOREST("Kadim Orman", blocks = true, vegetation = true),
     STUMP("Kütük"),
     FIELD("Tarla"),
     BRIDGE_WOOD("Ahşap Köprü", bridge = true),
@@ -68,6 +69,8 @@ enum class Feature(
     ENEMY_RUINS("Yıkık Kamp"),
     SHRINE("Zaman Mührü", blocks = true),
     SHRINE_ACTIVE("Uyanmış Mühür", blocks = true),
+    /** Toplanınca zaman enerjisi verir. Geçmiş'te toplanan kristal sonraki çağlarda da yok olur. */
+    CRYSTAL("Zaman Kristali"),
     ;
 
     val isWall: Boolean get() = this == PALISADE || this == STONE_WALL || this == ENERGY_WALL

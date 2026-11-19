@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /** Oyuncunun hücrelere uyguladığı inşa/değişiklik türleri. [woodCost] negatifse odun kazandırır. */
-enum class BuildKind(val title: String, val woodCost: Int, val verb: String) {
+enum class BuildKind(val title: String, val woodCost: Int, val verb: String, val energyGain: Int = 0, val playerChoosable: Boolean = true) {
     PLANT("Fidan Dik", 0, "fidan diktin"),
     CUT("Ağacı Kes", -2, "ağaç kestin"),
     BRIDGE("Köprü Kur", 2, "köprü kurdun"),
@@ -12,6 +12,8 @@ enum class BuildKind(val title: String, val woodCost: Int, val verb: String) {
     WALL("Çit Kur", 1, "çit kurdun"),
     DISMANTLE("Kampı Dağıt", 0, "düşman kampını dağıttın"),
     ACTIVATE("Mührü Uyandır", 0, "zaman mührünü uyandırdın"),
+    /** Kristalin üstüne gelince kendiliğinden gerçekleşir. */
+    COLLECT("Kristal Topla", 0, "zaman kristali topladın", energyGain = 1, playerChoosable = false),
 }
 
 @Serializable

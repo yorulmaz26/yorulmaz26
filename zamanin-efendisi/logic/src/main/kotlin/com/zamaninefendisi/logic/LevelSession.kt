@@ -18,6 +18,7 @@ sealed class GameEvent {
     data class WallDamaged(val at: Pos) : GameEvent()
     data class Paradox(val text: String) : GameEvent()
     data class WoodChanged(val delta: Int) : GameEvent()
+    data class EnergyChanged(val delta: Int) : GameEvent()
     data class Message(val text: String) : GameEvent()
 }
 
@@ -58,7 +59,7 @@ class LevelSession(val level: LevelDef) {
 
     init {
         require(level.startEra in level.eras)
-        level.enemies.forEach { spawn(it.pos, it.kind) }
+        level.enemies.forEach { spawn(it.pos, it.kind ?: defaultEnemy) }
         log(JournalKind.INFO, "${level.name}: ${heroEra.locative} göreve başladın.")
     }
 
@@ -68,6 +69,7 @@ class LevelSession(val level: LevelDef) {
     fun inBounds(p: Pos) = p.x in 0 until level.width && p.y in 0 until level.height
     fun enemyAt(p: Pos): Enemy? = _enemies.firstOrNull { it.pos == p }
     val enemiesVisible: Boolean get() = heroEra == level.enemyEra
+    private val defaultEnemy: EnemyKind get() = if (level.enemyEra == Era.FUTURE) EnemyKind.ROBOT else EnemyKind.RAIDER
 
     fun canWalk(era: Era, p: Pos): Boolean {
         if (!inBounds(p) || !cell(era, p).walkable) return false
@@ -164,7 +166,7 @@ class LevelSession(val level: LevelDef) {
 
     private fun validateBuild(a: Action.Build): String? {
         val kind = a.kind
-        if (kind !in level.allowed[heroEra].orEmpty()) return "${heroEra.locative} ${kind.title.lowercase()} yapılamaz"
+        if (kind !in level.allowed[heroEra].orEmpty()) return "${heroEra.locative} \"${kind.title}\" kullanılamaz"
         if (!inBounds(a.at)) return "Harita dışı"
         if (a.at.manhattan(heroPos) > 1) return "Hedef hücre yanında olmalı"
         val s = cell(heroEra, a.at)
@@ -176,6 +178,7 @@ class LevelSession(val level: LevelDef) {
             BuildKind.WALL -> "Çit boş araziye kurulur"
             BuildKind.DISMANTLE -> "Burada düşman kampı yok"
             BuildKind.ACTIVATE -> "Burada uyuyan mühür yok"
+            BuildKind.COLLECT -> "Burada kristal yok"
         }
         if (kind.woodCost > 0 && wood < kind.woodCost) return "Yeterli odun yok (${kind.woodCost} gerekli)"
         if (a.at == heroPos && !result.walkable) return "Durduğun yere bunu kuramazsın"
@@ -196,12 +199,14 @@ class LevelSession(val level: LevelDef) {
             is Action.Move -> {
                 events += GameEvent.HeroMoved(heroPos, a.to)
                 heroPos = a.to
+                collectHere(events)
             }
             is Action.SwitchEra -> {
                 events += GameEvent.EraSwitched(heroEra, a.era)
                 log(JournalKind.ACTION, "${heroEra.title} → ${a.era.title} zaman geçişi.")
                 heroEra = a.era
                 energy = energy?.minus(1)
+                collectHere(events)
             }
             is Action.Build -> doBuild(a, events)
             is Action.Attack -> {
@@ -221,8 +226,14 @@ class LevelSession(val level: LevelDef) {
     }
 
     private fun doBuild(a: Action.Build, events: MutableList<GameEvent>) {
+        applyChange(a.kind, a.at, events)
+    }
+
+    private fun applyChange(kind: BuildKind, at: Pos, events: MutableList<GameEvent>) {
+        val a = Action.Build(kind, at)
         val before = timeline.eras.associateWith { cell(it, a.at) }
         if (a.kind.woodCost != 0) { wood -= a.kind.woodCost; events += GameEvent.WoodChanged(-a.kind.woodCost) }
+        if (a.kind.energyGain != 0) energy?.let { energy = it + a.kind.energyGain; events += GameEvent.EnergyChanged(a.kind.energyGain) }
         val (rec, result) = timeline.addChange(heroEra, a.at, a.kind, turn)
         events += GameEvent.CellsChanged(result.changed)
         log(JournalKind.ACTION, "${heroEra.locative} ${a.at} ${a.kind.verb}.")
@@ -240,13 +251,20 @@ class LevelSession(val level: LevelDef) {
         trapEnemies(events)
     }
 
+    /** Kahramanın bulunduğu hücrede kristal varsa kendiliğinden toplanır (kalıcı bir değişikliktir). */
+    private fun collectHere(events: MutableList<GameEvent>) {
+        if (cell(heroEra, heroPos).feature == Feature.CRYSTAL) applyChange(BuildKind.COLLECT, heroPos, events)
+    }
+
     private fun handleVoided(voided: List<ChangeRecord>, events: MutableList<GameEvent>) {
         for (c in voided) {
             paradoxCount++
             if (c.kind.woodCost > 0) { wood += c.kind.woodCost; events += GameEvent.WoodChanged(c.kind.woodCost) }
             if (c.kind.woodCost < 0) { val lost = minOf(wood, -c.kind.woodCost); wood -= lost; if (lost > 0) events += GameEvent.WoodChanged(-lost) }
+            if (c.kind.energyGain > 0) energy?.let { val lost = minOf(it, c.kind.energyGain); energy = it - lost; if (lost > 0) events += GameEvent.EnergyChanged(-lost) }
             val text = "Paradoks! ${c.era.locative} ${c.turn}. turda ${c.pos} hücresinde yaptığın \"${c.kind.title}\" artık hiç gerçekleşmemiş oldu." +
-                (if (c.kind.woodCost > 0) " Harcadığın odun geri döndü." else if (c.kind.woodCost < 0) " Kazandığın odun buharlaştı." else "")
+                (if (c.kind.woodCost > 0) " Harcadığın odun geri döndü." else if (c.kind.woodCost < 0) " Kazandığın odun buharlaştı." else "") +
+                (if (c.kind.energyGain > 0) " Kazandığın enerji buharlaştı." else "")
             events += GameEvent.Paradox(text)
             log(JournalKind.PARADOX, text, c.era)
         }
@@ -292,6 +310,8 @@ class LevelSession(val level: LevelDef) {
             if (goalSet.isEmpty()) continue
             val step = enemyStep(e, goalSet, throughWalls = false)
             if (step != null) {
+                // Zaman Muhafızı korunan hücrenin üstünde duruyorsa düşman içeri giremez.
+                if (heroEra == era && step == heroPos) continue
                 if (step in targets) {
                     events += GameEvent.EnemyMoved(e.id, e.pos, step)
                     e.pos = step
@@ -329,9 +349,9 @@ class LevelSession(val level: LevelDef) {
             for (fort in timeline.grid(era).find(Feature.ENEMY_FORT)) {
                 if (_enemies.size >= level.maxEnemies) break
                 val at = fort.neighbors4().firstOrNull { canWalk(era, it) && !(heroEra == era && it == heroPos) } ?: continue
-                val e = spawn(at, EnemyKind.RAIDER)
+                val e = spawn(at, defaultEnemy)
                 events += GameEvent.EnemySpawned(e.id, at)
-                log(JournalKind.BATTLE, "Düşman kalesinden yeni bir akıncı çıktı ${at}.", era)
+                log(JournalKind.BATTLE, "Düşman kalesinden yeni bir ${e.kind.title.lowercase()} çıktı ${at}.", era)
             }
         }
     }

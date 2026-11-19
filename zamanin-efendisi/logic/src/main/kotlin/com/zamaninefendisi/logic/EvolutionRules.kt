@@ -17,7 +17,8 @@ class EvolutionRules(private val desertSpeed: Int) {
         val sandNear = sandWithin1(prev, p, memo)
         val (feature, grew) = when (old.feature) {
             Feature.SAPLING -> Feature.TREE to true
-            Feature.TREE -> Feature.TREE to false
+            // Doğa evrimi: en az bir çağ yaşamış ağaç, yanında 2+ bitki varsa geçilmez kadim ormana dönüşür.
+            Feature.TREE -> (if (old.level >= 1 && vegetationNeighbors(prev, p) >= 2) Feature.FOREST else Feature.TREE) to true
             Feature.FOREST -> Feature.FOREST to false
             Feature.STUMP -> Feature.NONE to false
             Feature.FIELD -> (if (terrain == Terrain.SAND) Feature.NONE else Feature.FIELD) to false
@@ -51,6 +52,8 @@ class EvolutionRules(private val desertSpeed: Int) {
         val c = prev[it]
         c.terrain == Terrain.WATER || c.feature.bridge
     }
+
+    private fun vegetationNeighbors(prev: EraGrid, p: Pos): Int = around(prev, p).count { it != p && prev[it].feature.vegetation }
 
     private fun vegetationNear(prev: EraGrid, p: Pos): Boolean = around(prev, p).any { prev[it].feature.vegetation }
 
@@ -108,6 +111,8 @@ class EvolutionRules(private val desertSpeed: Int) {
                 if (s.feature == Feature.ENEMY_CAMP) s.copy(feature = Feature.ENEMY_RUINS, level = 0) else null
             BuildKind.ACTIVATE ->
                 if (s.feature == Feature.SHRINE) s.copy(feature = Feature.SHRINE_ACTIVE) else null
+            BuildKind.COLLECT ->
+                if (s.feature == Feature.CRYSTAL) s.copy(feature = Feature.NONE, level = 0) else null
         }?.let { it.copy(durability = it.feature.baseDurability) }
     }
 }

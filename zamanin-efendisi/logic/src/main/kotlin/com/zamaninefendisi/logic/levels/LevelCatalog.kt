@@ -6,7 +6,7 @@ class AreaDef(val id: Int, val name: String, val unlocks: String, val descriptio
 
 /** Oynanabilir alanlar ve bölümler. Yeni alanlar buraya eklenir; her alan 5 bölümdür. */
 object LevelCatalog {
-    val areas: List<AreaDef> by lazy { listOf(Area01.area) }
+    val areas: List<AreaDef> by lazy { listOf(Area01.area, Area02.area, Area03.area) }
 
     val levels: List<LevelDef> by lazy { areas.flatMap { it.levels } }
 

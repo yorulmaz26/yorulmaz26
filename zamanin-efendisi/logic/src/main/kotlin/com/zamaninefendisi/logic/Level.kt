@@ -58,9 +58,10 @@ data class CausalLink(
 
 enum class EnemyKind(val title: String, val hp: Int, val attack: Int) {
     RAIDER("Akıncı", 1, 1),
+    ROBOT("Robot Muhafız", 1, 1),
 }
 
-data class EnemySpawn(val pos: Pos, val kind: EnemyKind = EnemyKind.RAIDER)
+data class EnemySpawn(val pos: Pos, val kind: EnemyKind? = null)
 
 /** Oyun içi öğretici ipucu: koşul sağlanmadığı sürece gösterilir; sıradaki ilk sağlanmamış ipucu görünür. */
 class TutorialHint(val text: String, val done: (LevelSession) -> Boolean)
@@ -102,13 +103,17 @@ class LevelDef(
     val width get() = parsed.width
     val height get() = parsed.height
     val heroStart get() = parsed.heroStart
-    val hasEnemies get() = enemies.isNotEmpty() || parsed.cells.any { it.feature == Feature.ENEMY_CAMP || it.feature == Feature.ENEMY_FORT }
+    val hasEnemies: Boolean by lazy {
+        val hostile = { c: CellState -> c.feature == Feature.ENEMY_CAMP || c.feature == Feature.ENEMY_FORT }
+        enemies.isNotEmpty() || parsed.cells.any(hostile) || parsed.overrides.values.any { m -> m.values.any(hostile) }
+    }
 }
 
 /**
  * ASCII harita çözümleyici.
  * G çayır · S kum · W nehir · M dağ · R yol · T ağaç · F tarla · H köy · C Zaman Kalesi
- * E düşman kampı · K düşman kalesi · X zaman mührü · P ahşap çit · B ahşap köprü · @ kahraman (çayır)
+ * E düşman kampı · K düşman kalesi · X zaman mührü · P ahşap çit · B ahşap köprü · O kadim orman · A yaşlı ağaç
+ * * zaman kristali · @ kahraman (çayır)
  */
 class LevelMap(
     val width: Int,
@@ -128,6 +133,7 @@ class LevelMap(
             'R' -> CellState(Terrain.ROAD)
             'T' -> CellState(Terrain.GRASS, Feature.TREE)
             'O' -> CellState(Terrain.GRASS, Feature.FOREST)
+            'A' -> CellState(Terrain.GRASS, Feature.TREE, level = 1)
             'F' -> CellState(Terrain.GRASS, Feature.FIELD)
             'H' -> CellState(Terrain.GRASS, Feature.HUT)
             'V' -> CellState(Terrain.GRASS, Feature.TOWN)
@@ -139,6 +145,7 @@ class LevelMap(
             'B' -> CellState(Terrain.WATER, Feature.BRIDGE_WOOD)
             'Q' -> CellState(Terrain.WATER, Feature.BRIDGE_STONE)
             'r' -> CellState(Terrain.GRASS, Feature.RUINS)
+            '*' -> CellState(Terrain.GRASS, Feature.CRYSTAL)
             else -> null
         }
 

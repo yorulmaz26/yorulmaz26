@@ -18,9 +18,9 @@ class DebugSim {
                         era == s.level.enemyEra && s.enemyAt(p) != null -> 'e'
                         else -> when (c.feature) {
                             Feature.NONE -> when (c.terrain) { Terrain.GRASS -> '.'; Terrain.SAND -> ':'; Terrain.WATER -> '~'; Terrain.MOUNTAIN -> '^'; Terrain.ROAD -> '=' }
-                            Feature.TREE, Feature.FOREST -> 'T'; Feature.SAPLING -> 't'; Feature.FIELD -> 'F'; Feature.STUMP -> ','
+                            Feature.TREE -> 'T'; Feature.FOREST -> 'O'; Feature.SAPLING -> 't'; Feature.FIELD -> 'F'; Feature.STUMP -> ','
                             Feature.BRIDGE_WOOD -> 'b'; Feature.BRIDGE_STONE -> 'B'; Feature.HUT -> 'h'; Feature.TOWN -> 'V'; Feature.RUINS -> 'r'
-                            Feature.PALISADE -> 'p'; Feature.STONE_WALL -> '#'; Feature.CASTLE -> 'C'; Feature.ENEMY_CAMP -> 'E'; Feature.ENEMY_FORT -> 'K'
+                            Feature.PALISADE -> 'p'; Feature.STONE_WALL -> '#'; Feature.CASTLE -> 'C'; Feature.ENEMY_CAMP -> 'E'; Feature.ENEMY_FORT -> 'K'; Feature.BRIDGE_TECH -> 'L'; Feature.ENERGY_WALL -> '%'; Feature.CITY -> 'Y'; Feature.CRYSTAL -> '*'
                             else -> '?'
                         }
                     }

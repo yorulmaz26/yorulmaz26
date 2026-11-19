@@ -128,7 +128,8 @@ class GameScreen(
         }
         if (level.hasEnemies && level.protect.isNotEmpty()) {
             goalsTable.add(ui.label("!", assets.fontS, Theme.purple)).width(26f)
-            goalsTable.add(ui.label("Akıncılar mor çerçeveli hücreye ulaşırsa kaybedersin", assets.fontS, Theme.purple, wrap = true)).width(620f).left().row()
+            val who = if (level.enemyEra == Era.FUTURE) "Robotlar (Gelecek'te)" else "Akıncılar (${level.enemyEra.locative})"
+            goalsTable.add(ui.label("$who mor çerçeveli hücreye ulaşırsa kaybedersin", assets.fontS, Theme.purple, wrap = true)).width(620f).left().row()
         }
         val hint = if (game.progression.data.settings.hints) s.currentHint() else null
         hintBox.isVisible = hint != null && s.status == SessionStatus.PLAYING
@@ -216,6 +217,7 @@ class GameScreen(
                 game.audio.play("build")
                 if (grew) game.audio.play("grow", 0.4f)
             }
+            is GameEvent.EnergyChanged -> floatAtHero(if (e.delta > 0) "+${e.delta} enerji" else "${e.delta} enerji", if (e.delta > 0) Theme.blue else Theme.purple)
             is GameEvent.WoodChanged -> floatAtHero(if (e.delta > 0) "+${e.delta} odun" else "${e.delta} odun", if (e.delta > 0) Theme.green else Theme.orange)
             is GameEvent.EnemyDefeated -> {
                 anim.fading += floatArrayOf(e.at.x.toFloat(), e.at.y.toFloat(), 0.6f)
@@ -229,7 +231,7 @@ class GameScreen(
             }
             is GameEvent.WallDamaged -> { anim.pops[e.at] = 0.35f; game.audio.play("hit", 0.3f) }
             is GameEvent.Paradox -> { ui.toast(root, e.text, Theme.purple); game.audio.play("paradox"); game.vibrate(40) }
-            is GameEvent.EnemySpawned -> if (session.heroEra == level.enemyEra) floatAt(e.at, "Yeni akıncı", Theme.red)
+            is GameEvent.EnemySpawned -> if (session.heroEra == level.enemyEra) floatAt(e.at, if (level.enemyEra == Era.FUTURE) "Yeni robot" else "Yeni akıncı", Theme.red)
             is GameEvent.EnemyMoved, is GameEvent.Message -> {}
         }
     }
@@ -494,6 +496,7 @@ class GameScreen(
         Feature.CASTLE -> Theme.purple
         Feature.ENEMY_CAMP, Feature.ENEMY_FORT -> Theme.red
         Feature.SHRINE, Feature.SHRINE_ACTIVE -> Theme.gold
+        Feature.CRYSTAL -> Theme.blue
     }
 
     private fun floatAtHero(text: String, color: Color) = floatAt(session.heroPos, text, color)
