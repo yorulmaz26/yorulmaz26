@@ -1,5 +1,11 @@
 # libGDX: yerel (JNI) yöntemler ve yansıma ile oluşturulan arka uç sınıfları
 -keepclasseswithmembernames class * { native <methods>; }
+# libGDX Pools/ReflectionPool, Scene2D olay ve eylemlerini yansıma ile parametresiz kurucudan oluşturur;
+# R8 bu kurucuları silerse sürüm paketi açılışta çöker (CI emülatör testinde yakalandı). libGDX tümüyle korunur.
+-keep class com.badlogic.gdx.** { *; }
+-keepclassmembers class * extends com.badlogic.gdx.utils.Pool$Poolable { <init>(); }
+-keepclassmembers class * extends com.badlogic.gdx.scenes.scene2d.Event { <init>(); }
+-keepclassmembers class * extends com.badlogic.gdx.scenes.scene2d.Action { <init>(); }
 -keep class com.badlogic.gdx.backends.android.** { *; }
 -keep class com.badlogic.gdx.graphics.g2d.freetype.** { *; }
 -keep class com.badlogic.gdx.utils.GdxNativesLoader { *; }

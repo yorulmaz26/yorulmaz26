@@ -41,7 +41,7 @@ Geliştirme aşamalarından **1, 2, 3 tamamlandı; 4 temel düzeyde** çalışı
 | Market ve özelleştirme | 17 kozmetik ve 2 indirimli paket: taşıyıcı derileri, çatı temaları, bayraklar, yolculuk izleri, özel ev tasarımları, şehir dekorasyonları, koleksiyon ürünleri; şehir ve taşıyıcı adı. Yalnızca oyun içi kaynaklarla, oynanışı değiştirmez. Satın alma `PurchaseProvider` arayüzünün arkasındadır: Google Play Billing ileride oyun mantığına dokunmadan eklenebilir |
 | Ses | 10 efekt ve döngü müziği kodla sentezlenir (harici dosya yok), oyun olaylarına bağlanır; ses/müzik açma-kapama ve düzey ayarı |
 | Performans | Düşük grafik modu, FPS göstergesi, sıralama ve renk önbellekleri; simülasyon adımı masaüstünde ~0,12 ms (68 bina, 89 medeniyet; testte sınırlanır) |
-| Yayın | R8 küçültmeli sürüm (APK ~4,8 MB, AAB ~3,2 MB), depo dışı anahtarla imzalama, mağaza metinleri ve görselleri, gizlilik politikası: [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md), [`docs/PRIVACY_POLICY.md`](docs/PRIVACY_POLICY.md) |
+| Yayın | R8 küçültmeli sürüm (APK ~5,4 MB, AAB ~4 MB), depo dışı anahtarla imzalama, mağaza metinleri ve görselleri, gizlilik politikası: [`docs/PLAY_STORE.md`](docs/PLAY_STORE.md), [`docs/PRIVACY_POLICY.md`](docs/PRIVACY_POLICY.md) |
 | Medeniyet itibarı | Ticaret, yardım ve anlaşmalarla artar; fiyatları ve yeni medeniyetlerin ilk tavrını etkiler |
 | Medeniyet aşamaları | 7 unvan; aşamalar yeni binalar açar |
 | Kayıt | Otomatik (30 sn + arka plana alınınca), CRC32 sağlama, yedek dosya, bozuk kayıtta yedekten yükleme; kayıt sürümü 5 (eski kayıtlar otomatik taşınır, testli) |
