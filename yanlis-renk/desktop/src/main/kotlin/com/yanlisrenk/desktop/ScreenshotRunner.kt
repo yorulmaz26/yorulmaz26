@@ -115,10 +115,10 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         elapsed += Gdx.graphics.deltaTime
         val name0 = shots[step].first
         val wait = when {
-            name0.startsWith("00a") -> 1.0f
-            name0.startsWith("00b") -> 1.9f
-            name0.startsWith("00c") -> 2.6f
-            name0.startsWith("00d") -> 3.35f
+            name0.startsWith("00a") -> 1.8f
+            name0.startsWith("00b") -> 3.4f
+            name0.startsWith("00c") -> 4.7f
+            name0.startsWith("00d") -> 6.0f
             name0.startsWith("07") || name0.startsWith("08") -> 2.6f
             else -> 0.8f
         }

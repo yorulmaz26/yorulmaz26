@@ -43,6 +43,8 @@ class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
     private val light = Pal.hex(0xF8FBFF)
 
     companion object {
+        /** Animasyon zaman ölçeği: 1.8 → tüm akış ~8,6 sn sürer. */
+        const val SLOW = 1.8f
         const val TOTAL = 4.8f
         const val BURST = 2.9f
     }
@@ -69,7 +71,7 @@ class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
 
     override fun extraInput(): InputProcessor = object : InputAdapter() {
         override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
-            if (t > 0.3f) finish()
+            if (t > 0.6f) finish()
             return true
         }
     }
@@ -84,7 +86,7 @@ class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
 
     override fun render(delta: Float) {
         val dt = minOf(delta, 0.05f)
-        t += dt
+        t += dt / SLOW
         particles.update(dt)
         stage.viewport.apply()
         val cam = stage.camera
