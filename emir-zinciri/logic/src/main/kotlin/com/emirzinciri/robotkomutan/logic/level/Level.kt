@@ -23,13 +23,21 @@ enum class Tile(val char: Char, val title: String) {
     DOOR('D', "Kapı"),
     DOOR_INV('d', "Ters kapı"),
     CHARGER('Q', "Şarj istasyonu"),
-    SOCKET('K', "Enerji soketi");
+    SOCKET('K', "Enerji soketi"),
+    CONV_N('^', "Bant"),
+    CONV_E('>', "Bant"),
+    CONV_S('v', "Bant"),
+    CONV_W('<', "Bant"),
+    LASER('L', "Lazer yayıcı");
+
+    /** Bantların taşıma yönü. */
+    val conveyorDir: Dir? get() = when (this) { CONV_N -> Dir.N; CONV_E -> Dir.E; CONV_S -> Dir.S; CONV_W -> Dir.W; else -> null }
 
     /** Robotun üzerinde durabileceği zemin (kapılar ayrıca duruma göre değerlendirilir). */
-    val isFloorLike: Boolean get() = this == FLOOR || this == EXIT || this == TARGET || this == PLATE || this == CHARGER
+    val isFloorLike: Boolean get() = this == FLOOR || this == EXIT || this == TARGET || this == PLATE || this == CHARGER || conveyorDir != null
 
     /** Robotun önünde durup kullandığı, üzerine çıkılamayan paneller. */
-    val isConsole: Boolean get() = this == SWITCH || this == TIMER || this == SOCKET
+    val isConsole: Boolean get() = this == SWITCH || this == TIMER || this == SOCKET || this == LASER
 
     val isDoor: Boolean get() = this == DOOR || this == DOOR_INV
 
@@ -74,6 +82,7 @@ enum class ObjectiveType(val title: String) {
     BOXES_ON_TARGETS("Kutuları hedeflere taşı"),
     COLLECT_ALL_ENERGY("Bütün enerjiyi topla"),
     POWER_SOCKETS("Enerji soketlerini doldur"),
+    SYNC_EXIT("Robotlar çıkışlara aynı anda ulaşsın"),
 }
 
 @Serializable
@@ -115,6 +124,8 @@ data class LevelDef(
     /** "x,y" -> değer: enerji hücresinin miktarı, zamanlı düğmenin süresi, soketin ihtiyacı. */
     val values: Map<String, Int> = emptyMap(),
     val boxes: List<String> = emptyList(),
+    /** Bu kanallardaki plakaların HEPSİ aynı anda basılı olmalı (koordinasyon kilitleri). */
+    val andChannels: List<Int> = emptyList(),
     val cells: List<String> = emptyList(),
     val maxTicks: Int = 200,
     val tutorial: String? = null,
@@ -174,8 +185,20 @@ class LevelData(val def: LevelDef) {
 
     /** Zamanlı düğmenin açık kalma süresi (adım). */
     fun timerDuration(p: Pos): Int = valueOf[idx(p)].takeIf { it > 0 } ?: DEFAULT_TIMER
+    /** Lazer yayıcının yönü (values: 0=K,1=D,2=G,3=B; varsayılan doğu). */
+    fun laserDir(p: Pos): Dir = Dir.entries[(valueOf[idx(p)].takeIf { it in 0..3 } ?: 1)]
+
     /** Soketin dolması için gereken enerji. */
     fun socketNeed(p: Pos): Int = valueOf[idx(p)].takeIf { it > 0 } ?: DEFAULT_SOCKET_NEED
+
+    val plates: List<Pos> by lazy { positionsOf(Tile.PLATE) }
+    val sockets: List<Pos> by lazy { positionsOf(Tile.SOCKET) }
+    val lasers: List<Pos> by lazy { positionsOf(Tile.LASER) }
+    val doors: List<Pos> by lazy { allPositions.filter { tile(it).isDoor } }
+    val exits: List<Pos> by lazy { positionsOf(Tile.EXIT) }
+    val targets: List<Pos> by lazy { positionsOf(Tile.TARGET) }
+    val hasConveyors: Boolean by lazy { allPositions.any { tile(it).conveyorDir != null } }
+    val andChannels: Set<Int> = def.andChannels.toSet()
 
     val allPositions: List<Pos> by lazy { (0 until height).flatMap { y -> (0 until width).map { x -> Pos(x, y) } } }
     fun positionsOf(t: Tile): List<Pos> = allPositions.filter { tile(it) == t }

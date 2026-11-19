@@ -72,10 +72,11 @@ class PlaySessionTest {
     @Test fun animationSpeedDoesNotChangeResult() {
         for (id in catalog.ids) {
             val def = catalog[id]!!
-            val slow = session(id, def.solution.getValue("A")).apply { play() }
-            val fast = session(id, def.solution.getValue("A")).apply { play() }
+            val slow = PlaySession(LevelData(def), def.solution).apply { play() }
+            val fast = PlaySession(LevelData(def), def.solution).apply { play() }
             val a = runUntilOutcome(slow, 1 / 60f, 0.42f)
             val b = runUntilOutcome(fast, 1 / 30f, 0.105f)
+            assertIs<Outcome.Win>(a, "Bölüm $id")
             assertEquals(a, b, "Bölüm $id")
             assertEquals(slow.current.signature(), fast.current.signature())
         }

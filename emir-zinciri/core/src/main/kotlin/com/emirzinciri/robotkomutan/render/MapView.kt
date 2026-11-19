@@ -17,6 +17,25 @@ class MapView(private val assets: Assets, private val session: PlaySession, priv
     private var time = 0f
     private var lw = -1f; private var lh = -1f; private var lx = 0f; private var ly = 0f
     var focusRobot: String? = null
+    /** Çok robotlu bölümlerde haritada robota dokunmak onun zincirini seçer. */
+    var onRobotTapped: ((String) -> Unit)? = null
+
+    init {
+        addListener(object : com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {
+            override fun clicked(event: com.badlogic.gdx.scenes.scene2d.InputEvent, x: Float, y: Float) {
+                if (session.robotIds.size < 2) return
+                val sx = x + this@MapView.x; val sy = y + this@MapView.y
+                val hit = session.current.robots.filter { it.alive }.minByOrNull { r ->
+                    val dx = renderer.sx(r.pos.x.toFloat(), r.pos.y.toFloat()) - sx
+                    val dy = renderer.sy(r.pos.x.toFloat(), r.pos.y.toFloat()) + renderer.tw * 0.3f - sy
+                    dx * dx + dy * dy
+                } ?: return
+                val dx = renderer.sx(hit.pos.x.toFloat(), hit.pos.y.toFloat()) - sx
+                val dy = renderer.sy(hit.pos.x.toFloat(), hit.pos.y.toFloat()) + renderer.tw * 0.3f - sy
+                if (dx * dx + dy * dy < renderer.tw * renderer.tw * 0.6f) onRobotTapped?.invoke(hit.id)
+            }
+        })
+    }
 
     private class Popup(val text: String, val color: Color, val gx: Float, val gy: Float, var life: Float = 1.1f)
     private val popups = ArrayList<Popup>()
@@ -43,7 +62,7 @@ class MapView(private val assets: Assets, private val session: PlaySession, priv
                 is SimEvent.MessageSent -> Triple("Sinyal!", Theme.blue, at(e.robot))
                 is SimEvent.PitFilled -> Triple("Doldu", Theme.green, e.at)
                 is SimEvent.OutOfEnergy -> Triple("Enerji yok!", Theme.red, at(e.robot))
-                is SimEvent.RobotLost -> Triple("Düştü!", Theme.red, e.at)
+                is SimEvent.RobotLost -> Triple(if (e.laser) "Lazer!" else "Düştü!", Theme.red, e.at)
                 else -> continue
             }
             if (p != null) popups += Popup(text, color, p.x.toFloat(), p.y.toFloat())

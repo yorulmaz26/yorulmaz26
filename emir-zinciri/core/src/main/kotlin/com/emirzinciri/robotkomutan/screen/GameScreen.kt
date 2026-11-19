@@ -91,6 +91,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         root.add(buildTopBar()).growX().pad(16f, 16f, 6f, 16f).row()
         map = MapView(assets, session) { services.save.settings.showGrid }
         map.focusRobot = if (session.robotIds.size > 1) selectedRobot else null
+        map.onRobotTapped = { id -> if (id != selectedRobot) { selectedRobot = id; selectedCard = -1; map.focusRobot = id; assets.play("click", 0.5f); refreshAll() } }
         root.add(map).grow().row()
         root.add(status).growX().padLeft(24f).padRight(24f).height(30f).row()
         root.add(buildBottom()).growX()
@@ -100,9 +101,11 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
         val t = Table()
         t.add(ui.iconButton("back", size = 72f) { onBack() }).size(72f)
         val titles = Table()
-        titles.add(ui.label("Bölüm ${def.id} · ${def.name}", assets.fontTitle, Theme.ink)).left().row()
-        titles.add(ui.label("Alan ${area.id}: ${area.name}", assets.fontSmall, Theme.inkSoft)).left()
-        t.add(titles).growX().left().padLeft(14f)
+        val title = ui.label("Bölüm ${def.id} · ${def.name}", if (def.name.length > 16) assets.fontBold else assets.fontTitle, Theme.ink)
+        title.setEllipsis(true)
+        titles.add(title).left().growX().minWidth(0f).row()
+        titles.add(ui.label("Alan ${area.id}: ${area.name}", assets.fontSmall, Theme.inkSoft).also { it.setEllipsis(true) }).left().growX().minWidth(0f)
+        t.add(titles).growX().minWidth(0f).left().padLeft(14f)
         val lives = Table()
         lives.background = assets.panel(Theme.white, 18, 3f)
         lives.add(ui.image("heart", Theme.red)).size(28f).padRight(6f)
@@ -125,7 +128,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
     }
 
     private fun goalIcon() = when (def.objectives.first().type) {
-        ObjectiveType.REACH_EXIT -> "map"
+        ObjectiveType.REACH_EXIT, ObjectiveType.SYNC_EXIT -> "map"
         ObjectiveType.BOXES_ON_TARGETS -> "check"
         ObjectiveType.COLLECT_ALL_ENERGY, ObjectiveType.POWER_SOCKETS -> "bolt"
     }
@@ -508,7 +511,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
                 is SimEvent.SocketPowered -> { sound = "energy"; msg = "Soket doldu!" }
                 is SimEvent.MessageSent -> { sound = "signal"; msg = msg ?: "${robot}sinyal gönderdi." }
                 is SimEvent.OutOfEnergy -> { sound = "bump"; msg = "$robot${e.pc + 1}. kart için enerji yetmedi." }
-                is SimEvent.RobotLost -> { sound = "fall"; msg = "${robot}boşluğa düştü!" }
+                is SimEvent.RobotLost -> { sound = "fall"; msg = if (e.laser) "${robot}lazere yakalandı!" else "${robot}boşluğa düştü!" }
                 else -> Unit
             }
         }
@@ -630,6 +633,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
 
     private fun failTitle(r: FailReason) = when (r) {
         FailReason.ROBOT_LOST -> "Robot düştü!"
+        FailReason.LASER -> "Lazere yakalandı!"
         FailReason.NO_ENERGY -> "Enerji bitti!"
         FailReason.PROGRAM_ENDED -> "Hedefe ulaşılamadı"
         FailReason.DEADLOCK -> "Robotlar takıldı"
@@ -639,6 +643,7 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
 
     private fun failTip(r: FailReason) = when (r) {
         FailReason.ROBOT_LOST -> "İpucu: boşluk ve çukurlara dikkat. Tek adım düğmesiyle hareketi adım adım izleyebilirsin."
+        FailReason.LASER -> "İpucu: kırmızı ışın açıkken geçme. Anahtarla kapat, kutuyla kes ya da doğru anı bekle."
         FailReason.NO_ENERGY -> "İpucu: enerji hücresi ya da şarj istasyonu kullan, gereksiz hamlelerden kaçın."
         FailReason.PROGRAM_ENDED -> "İpucu: kırmızı kartlar çarpmaları gösterir. Robotun yönünü takip et."
         FailReason.DEADLOCK -> "İpucu: 'Mesaj bekle' kartı bir sinyal gelene kadar bekler."
@@ -730,6 +735,19 @@ class GameScreen(game: EmirZinciriGame, private val def: LevelDef, private val s
                 TutorialHint.Step(card(CommandType.COLLECT), "Enerji topla: üzerinde durduğun hücreden enerji alırsın.") { count(CommandType.COLLECT) >= 1 },
             )
             "transfer" -> listOf(TutorialHint.Step(card(CommandType.TRANSFER), "Enerji aktar: önündeki sokete 3 enerji verir. Dolan soket kapıyı açar.") { count(CommandType.TRANSFER) >= 1 })
+            "second_robot" -> listOf(
+                TutorialHint.Step(robotTabs, "İki robotun var! Sekmeye dokunarak hangi robotun zincirini düzenlediğini seç.") { selectedRobot != session.robotIds.first() },
+                TutorialHint.Step(playButton, "İki zincir de doldurulunca Başlat: robotlar aynı anda, adım adım çalışır.") { session.mode != Mode.EDIT },
+            )
+            "signal" -> listOf(
+                TutorialHint.Step(card(CommandType.SEND), "Mesaj gönder: diğer robota sinyal yollar.") { session.programs.values.any { p -> p.any { it.type == CommandType.SEND } } },
+                TutorialHint.Step(card(CommandType.WAIT_MSG), "Mesaj bekle: sinyal gelene kadar tek kartla bekler. Çok sayıda 'Bekle' kartından tasarruf ettirir.") {
+                    session.programs.values.any { p -> p.any { it.type == CommandType.WAIT_MSG } } },
+            )
+            "conveyor" -> listOf(TutorialHint.Step(map, "Sarı oklu bantlar, üstündeki kutu ve robotları her adım bir hücre taşır. Programlar bitse de bant çalışmaya devam eder.") { session.totalCards >= 1 })
+            "laser" -> listOf(TutorialHint.Step(map, "Kırmızı ışına giren robot kaybolur. Anahtar lazeri kapatır, kutu ışını keser.") { session.totalCards >= 1 })
+            "and_lock" -> listOf(TutorialHint.Step(map, "Mor çerçeveli plakalar birlikte çalışır: kilit ancak hepsine aynı anda basılınca açılır.") { session.totalCards >= 1 })
+            "sync" -> listOf(TutorialHint.Step(map, "Bu bölümde robotlar çıkışlara aynı adımda varmalı. Erken varan robot kazanmaz.") { session.totalCards >= 1 })
             else -> emptyList()
         }
     }

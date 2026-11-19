@@ -29,17 +29,19 @@ class RobotState(
     var waitingForMessage = false
     var energyUsed = 0
     var bumps = 0
+    /** Çıkışa vardığı adım (senkron varış hedefi için); çıkışta değilse -1. */
+    var arrivedTick = -1
 
     val alive get() = status != RobotStatus.LOST
 
     fun copy(): RobotState = RobotState(id, type, pos, dir, energy, maxEnergy, 0).also {
         it.carrying = carrying; it.pc = pc; it.status = status; it.loopLeft = loopLeft.copyOf()
         it.inbox = inbox; it.activePc = activePc; it.waitingForMessage = waitingForMessage
-        it.energyUsed = energyUsed; it.bumps = bumps
+        it.energyUsed = energyUsed; it.bumps = bumps; it.arrivedTick = arrivedTick
     }
 
     fun signature(): String =
-        "$id@${pos.x},${pos.y},$dir,e$energy,c$carrying,pc$pc,$status,i$inbox,u$energyUsed,b$bumps,${loopLeft.joinToString(".")}"
+        "$id@${pos.x},${pos.y},$dir,e$energy,c$carrying,pc$pc,$status,i$inbox,u$energyUsed,b$bumps,a$arrivedTick,${loopLeft.joinToString(".")}"
 }
 
 /** Bütün dünyanın bir adımlık anlık görüntüsü. Kopyalanabilir; geri sarma ve test için kullanılır. */

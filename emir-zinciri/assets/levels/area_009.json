@@ -1,0 +1,319 @@
+{
+    "area": 9,
+    "levels": [
+        {
+            "id": 41,
+            "area": 9,
+            "name": "Çift Kilit",
+            "goalText": "A çıkışa ulaşsın.",
+            "hint": "Mor çerçeveli kilit: iki plakanın ikisine birden basılmalı. Kutu da plakaya basar.",
+            "story": "Koordinasyon Merkezi'nde kilitler tek başına açılmıyor. Robotların aynı anda doğru yerde olmalı.",
+            "map": [
+                ".B.p    ",
+                "......DE",
+                "...p    "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 16,
+            "par": 13,
+            "third": {
+                "type": "TICKS",
+                "value": 10
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT",
+                    "robots": [
+                        "A"
+                    ]
+                }
+            ],
+            "andChannels": [
+                1
+            ],
+            "tutorial": "and_lock",
+            "solution": {
+                "A": [
+                    "PUSH",
+                    "PUSH",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 42,
+            "area": 9,
+            "name": "Aynı Anda",
+            "goalText": "İki robot çıkışlara aynı adımda varsın.",
+            "hint": "Yeni hedef: senkron varış. Kısa yoldaki robot beklemeli.",
+            "map": [
+                "......E",
+                "       ",
+                "...E   "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "WAIT",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 16,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 6
+            },
+            "objectives": [
+                {
+                    "type": "SYNC_EXIT"
+                }
+            ],
+            "tutorial": "sync",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "WAIT",
+                    "WAIT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 43,
+            "area": 9,
+            "name": "Uzaktan Kumanda",
+            "goalText": "B çıkışa ulaşsın.",
+            "hint": "A anahtara basınca B'ye sinyal göndersin; B sinyali beklesin.",
+            "map": [
+                "........s",
+                "         ",
+                "E.D......"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 8,
+                    "y": 2,
+                    "dir": "W"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "SEND",
+                "WAIT_MSG"
+            ],
+            "maxCommands": 18,
+            "par": 18,
+            "third": {
+                "type": "TICKS",
+                "value": 13
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT",
+                    "robots": [
+                        "B"
+                    ]
+                }
+            ],
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "SEND"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT_MSG",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 44,
+            "area": 9,
+            "name": "Senkron Bant",
+            "goalText": "Çıkışlara aynı anda varın.",
+            "hint": "Bant bir robotu hızlandırır. Varışları eşitle.",
+            "map": [
+                ">>>>>E",
+                "      ",
+                "....E "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "WAIT",
+                "TURN_LEFT",
+                "TURN_RIGHT"
+            ],
+            "maxCommands": 14,
+            "par": 5,
+            "third": {
+                "type": "TICKS",
+                "value": 5
+            },
+            "objectives": [
+                {
+                    "type": "SYNC_EXIT"
+                }
+            ],
+            "solution": {
+                "A": [],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 45,
+            "area": 9,
+            "name": "Koordinasyon Finali",
+            "goalText": "Çıkışlara aynı anda varın.",
+            "hint": "Zamanlı düğme lazeri yalnızca 3 adım kapatır. İkisi de bu pencerede geçmeli ve aynı anda varmalı.",
+            "map": [
+                "..E.E..",
+                "L......",
+                ".t....."
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "W"
+                },
+                {
+                    "id": "B",
+                    "x": 4,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 12,
+            "par": 8,
+            "third": {
+                "type": "TICKS",
+                "value": 4
+            },
+            "objectives": [
+                {
+                    "type": "SYNC_EXIT"
+                }
+            ],
+            "values": {
+                "1,2": 3
+            },
+            "solution": {
+                "A": [
+                    "PRESS",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "BACK",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

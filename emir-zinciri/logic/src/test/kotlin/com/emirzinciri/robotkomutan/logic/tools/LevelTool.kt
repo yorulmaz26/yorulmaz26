@@ -22,21 +22,32 @@ fun main(args: Array<String>) {
         val file = File(dir, "area_%03d.json".format(area))
         val af = LevelParser.json.decodeFromString(AreaFile.serializer(), file.readText())
         val updated = af.levels.map { def ->
-            if (def.robots.size != 1) return@map def
             val t0 = System.currentTimeMillis()
-            val sol = Solver(LevelData(def), maxNodes = 3_000_000).solve(def.maxCommands)
-            if (sol == null) {
-                println("Bölüm ${def.id} '${def.name}': ÇÖZÜM YOK (≤${def.maxCommands} kart)")
+            val level = LevelData(def)
+            val sol = Solver(level, maxNodes = 4_000_000).solve(def.maxCommands)
+            val hand = def.solution.takeIf { it.isNotEmpty() }?.let { h ->
+                val o = Simulation.create(level, h).getOrNull()?.runToEnd()
+                if (o is Outcome.Win) h to o else { println("  Bölüm ${def.id}: elle yazılan çözüm kazanmıyor: $o"); null }
+            }
+            val fromSolver = sol?.let { s -> (if (s.programs.isEmpty()) mapOf(def.robots.single().id to s.cards) else s.programs) }
+                ?.let { p -> p to (Simulation.create(level, p).getOrThrow().runToEnd() as Outcome.Win) }
+            val best = listOfNotNull(hand, fromSolver).minByOrNull { it.second.stats.cards }
+            if (best == null) {
+                println("Bölüm ${def.id} '${def.name}': ÇÖZÜM YOK (≤${def.maxCommands} kart, ${System.currentTimeMillis() - t0}ms)")
                 return@map def
             }
-            val tokens = mapOf(def.robots.single().id to sol.cards)
-            val out = Simulation.create(LevelData(def), tokens).getOrThrow().runToEnd()
-            check(out is Outcome.Win) { "Çözüm doğrulanamadı: ${def.id}" }
-            val third = def.third ?: if (def.energy) StarRule(StarRuleType.ENERGY_USED, out.stats.energyUsed) else null
-            println("Bölüm %3d %-26s par=%2d adım=%2d enerji=%2d sınır=%2d düğüm=%7d %4dms  %s".format(
-                def.id, def.name, sol.cards.size, out.stats.ticks, out.stats.energyUsed, def.maxCommands,
-                sol.explored, System.currentTimeMillis() - t0, sol.cards.joinToString(" ") { it.take(4) }))
-            def.copy(par = sol.cards.size, solution = tokens, third = third)
+            val (tokens, out) = best
+            val third = def.third ?: when {
+                def.energy -> StarRule(StarRuleType.ENERGY_USED, out.stats.energyUsed)
+                def.robots.size > 1 -> StarRule(StarRuleType.TICKS, out.stats.ticks)
+                else -> null
+            }
+            val src = if (best === hand) "el" else "çözücü"
+            println("Bölüm %3d %-24s par=%2d (çözücü=%s, el=%s) adım=%2d sınır=%2d düğüm=%7d %5dms".format(
+                def.id, def.name, out.stats.cards, sol?.cards?.size ?: "-", hand?.second?.stats?.cards ?: "-",
+                out.stats.ticks, def.maxCommands, sol?.explored ?: -1, System.currentTimeMillis() - t0))
+            tokens.forEach { (id, c) -> println("      $id [$src]: ${c.joinToString(" ")}") }
+            def.copy(par = out.stats.cards, solution = tokens, third = third)
         }
         file.writeText(LevelParser.json.encodeToString(AreaFile.serializer(), af.copy(levels = updated)) + "\n")
     }

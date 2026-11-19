@@ -80,6 +80,7 @@ class IsoRenderer(private val assets: Assets) {
         collectObjects(f)
         list.sortWith(compareBy<Drawable>({ it.depth }, { it.order }))
         for (d in list) d.draw()
+        drawBeams(f)
         shapes.end()
         batch.begin()
         drawLabels(batch, f)
@@ -150,8 +151,10 @@ class IsoRenderer(private val assets: Assets) {
                 Tile.PLATE -> {
                     val pressed = f.to.boxes.contains(p) || f.to.robots.any { it.alive && it.pos == p }
                     val z = if (pressed) 1f else tw * 0.05f
+                    if (lv.channel(p) in lv.andChannels) diamond(cx, cy, tw * 0.9f, th * 0.9f, Theme.purple)
                     block(cx, cy, 0.66f, 0f, z, Theme.plateColor, shadeOf(Theme.plateColor, 0.8f), shadeOf(Theme.plateColor, 0.7f))
                 }
+                Tile.CONV_N, Tile.CONV_E, Tile.CONV_S, Tile.CONV_W -> drawConveyor(tile.conveyorDir!!, x, y, cx, cy, f.time)
                 Tile.CHARGER -> {
                     diamond(cx, cy, tw * 0.8f, th * 0.8f, Theme.mix(Theme.energyColor, Theme.white, 0.5f))
                     diamond(cx, cy, tw * 0.5f, th * 0.5f, Theme.energyColor)
@@ -159,6 +162,44 @@ class IsoRenderer(private val assets: Assets) {
                 }
                 else -> Unit
             }
+        }
+    }
+
+    private val convBase = Theme.rgb(0x7E8CA8)
+    private val convStripe = Theme.rgb(0xFFD66B)
+
+    /** Bant: koyu şerit ve akış yönünde kayan oklar. */
+    private fun drawConveyor(d: Dir, x: Int, y: Int, cx: Float, cy: Float, time: Float) {
+        diamond(cx, cy, tw * 0.92f, th * 0.92f, convBase)
+        val gx = x.toFloat(); val gy = y.toFloat()
+        val phase = (time * 1.2f) % 1f
+        for (k in 0..1) {
+            val o = ((k * 0.5f + phase) % 1f) - 0.5f
+            val px = gx + d.dx * o * 0.8f; val py = gy + d.dy * o * 0.8f
+            val ax = sx(px, py); val ay = sy(px, py)
+            val (fx, fy) = dirScreen(dirAngle(d)); val (sx2, sy2) = dirScreen(dirAngle(d) + 90f)
+            shapes.color = convStripe
+            shapes.triangle(ax + fx * 0.18f, ay + fy * 0.18f, ax - fx * 0.08f + sx2 * 0.18f, ay - fy * 0.08f + sy2 * 0.18f,
+                ax - fx * 0.08f - sx2 * 0.18f, ay - fy * 0.08f - sy2 * 0.18f)
+        }
+    }
+
+    private fun drawBeams(f: Frame) {
+        val beams = com.emirzinciri.robotkomutan.logic.sim.Environment.beams(f.level, f.to)
+        val flicker = 0.75f + 0.25f * sin(f.time * 18f)
+        for ((src, cells) in beams) {
+            if (cells.isEmpty()) continue
+            val last = cells.last()
+            val d = f.level.laserDir(src)
+            val z = tw * 0.2f
+            val x1 = sx(src.x.toFloat(), src.y.toFloat()); val y1 = sy(src.x.toFloat(), src.y.toFloat()) + z
+            val ex = last.x + d.dx * 0.45f; val ey = last.y + d.dy * 0.45f
+            val x2 = sx(ex, ey); val y2 = sy(ex, ey) + z
+            shapes.color = c(Theme.red, 0.25f * flicker)
+            shapes.rectLine(x1, y1, x2, y2, tw * 0.12f)
+            shapes.color = c(Theme.red, 0.9f * flicker)
+            shapes.rectLine(x1, y1, x2, y2, tw * 0.035f)
+            for (p in cells) diamond(sx(p.x.toFloat(), p.y.toFloat()), sy(p.x.toFloat(), p.y.toFloat()), tw * 0.5f, th * 0.5f, c(Theme.red, 0.12f))
         }
     }
 
@@ -271,6 +312,14 @@ class IsoRenderer(private val assets: Assets) {
                 val left = f.to.timers[ch] ?: 0
                 val col = if (left > 0) Theme.yellow else Theme.orange
                 block(cx, top, 0.34f, 0f, tw * 0.07f, Theme.mix(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
+            }
+            Tile.LASER -> {
+                val on = !com.emirzinciri.robotkomutan.logic.sim.Environment.channelActive(f.level, f.to, ch)
+                val col = if (on) Theme.red else Theme.inkFaint
+                block(cx, top, 0.36f, 0f, tw * 0.12f, Theme.mix(col, Theme.white, 0.3f), col, shadeOf(col, 0.85f))
+                val (dx, dy) = dirScreen(dirAngle(f.level.laserDir(p)))
+                shapes.color = col
+                shapes.circle(cx + dx * 0.36f, top + tw * 0.06f + dy * 0.36f, tw * 0.05f, 10)
             }
             Tile.SOCKET -> {
                 val need = f.level.socketNeed(p)

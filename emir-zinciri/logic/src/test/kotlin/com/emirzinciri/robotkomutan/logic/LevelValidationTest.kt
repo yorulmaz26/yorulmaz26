@@ -67,10 +67,14 @@ class LevelValidationTest {
         assertEquals(out, Simulation.create(level, d.solution).getOrThrow().runToEnd())
         // Hiç kart koymadan kazanılmamalı.
         assertIs<Outcome.Fail>(Simulation.create(level, emptyMap()).getOrThrow().runToEnd())
-        // Döngüsüz tek robot bölümlerinde par, çözücünün bulduğu kesin optimum olmalı (yıldız 2 adil ve ulaşılabilir).
-        if (d.robots.size == 1 && d.commands.none { it.isFlow }) {
-            val best = assertNotNull(Solver(level, maxNodes = 3_000_000).solve(d.par), "Çözücü çözüm bulamadı")
+        // par, çözücünün bulduğu kesin optimum olmalı (yıldız 2 adil ve ulaşılabilir).
+        val usesSignals = d.commands.any { it.isFlow || it == CommandType.SEND || it == CommandType.WAIT_MSG }
+        if (!usesSignals) {
+            val best = assertNotNull(Solver(level, maxNodes = 4_000_000).solve(d.par), "Çözücü çözüm bulamadı")
             assertEquals(d.par, best.cards.size, "par optimum değil")
+        } else {
+            // Sinyal kartlı bölümler: sinyal kullanmadan par'dan kısa çözüm olmamalı.
+            assertEquals(null, Solver(level, maxNodes = 4_000_000).solve(d.par - 1), "Sinyalsiz daha kısa çözüm var")
         }
     }
 
@@ -82,5 +86,10 @@ class LevelValidationTest {
             seen = seen + d.commands
         }
         assertEquals(listOf(CommandType.FORWARD), catalog[1]!!.commands)
+    }
+
+    @Test fun secondRobotArrivesAtLevel26() {
+        assertTrue(catalog.all().filter { it.id <= 25 }.all { it.robots.size == 1 })
+        assertEquals(2, catalog[26]!!.robots.size)
     }
 }

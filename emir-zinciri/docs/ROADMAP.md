@@ -11,8 +11,12 @@ Temel robot, komut kartları, dokun/sürükle-bırak düzenleme (ekle, sil, taş
 ## Aşama 3 — İlk 25 bölüm ✅
 5 alan × 5 bölüm, tek robot kuralı. Kutu alma/bırakma/itme, çukur doldurma, anahtar, basınç plakası, ters kapı, zamanlı düğme, bekleme, enerji hücresi, şarj istasyonu, enerji soketi. Etkileşimli öğretici balonları, alan hikâyeleri, YENİ kart rozetleri. Bütün bölümler otomatik doğrulanır.
 
-## Aşama 4 — Çoklu robot ⬜ (sıradaki)
-Bölüm 26–50, ikinci robot, eş zamanlı zincirler (motor ve arayüz zaten çoklu robotu destekliyor; mesaj gönder/bekle, robotlar arası enerji aktarımı ve çakışma kuralları testli), çok robotlu çözücü, hareketli bantlar, lazerler, senkron varış.
+## Aşama 4 — Çoklu robot 🟡 (bölüm 26–45 ✅, 46–50 patron alanı Aşama 6'ya bağlı)
+- ✅ Bölüm 26'da ikinci robot; eş zamanlı zincirler, robot sekmeleri, haritada robota dokunarak seçim, zinciri diğer robota kopyalama.
+- ✅ Mesaj gönder / Mesaj bekle (29 ve 43. bölümlerde kart sınırı sinyal kullanmayı zorunlu kılar).
+- ✅ Hareketli bantlar (bant üstünde dönmek/beklemek taşınır; programlar bitse de bant çalışır), lazerler (kanalla kapanır, kutu ışını keser), VE-kilitleri (bütün plakalar aynı anda), senkron varış hedefi.
+- ✅ Çok robotlu çözücü (Dijkstra, toplam kart maliyeti); 45 bölümün tamamında par = optimum doğrulanır.
+- ⬜ Alan 10 (46–50, Robot İsyanı patronu) düşman yapay zekâsı gerektirir.
 
 ## Aşama 5 — Kalıcı fabrika ⬜
 Kaynaklar (altın, metal, mikroçip) bölümlerden zaten birikiyor ve kaydediliyor; fabrika ekranı, binalar, araştırma ve robot geliştirme henüz yok.

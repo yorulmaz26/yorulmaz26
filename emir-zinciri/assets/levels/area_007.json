@@ -1,0 +1,239 @@
+{
+    "area": 7,
+    "levels": [
+        {
+            "id": 31,
+            "area": 7,
+            "name": "İlk Bant",
+            "goalText": "Kutuyu hedefe, robotu çıkışa götür.",
+            "hint": "Bantlar üzerlerindeki kutu ve robotları her adım bir hücre taşır. Kutuyu banda it, gerisini bant yapsın.",
+            "story": "Bant Fabrikası'nda üretim hatları kendi kendine çalışıyor. Bantlar seni de taşır: üstünde durma, yoksa sürüklenirsin!",
+            "map": [
+                ".B>>>x",
+                ".....E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 10,
+            "par": 7,
+            "objectives": [
+                {
+                    "type": "BOXES_ON_TARGETS"
+                },
+                {
+                    "type": "REACH_EXIT"
+                }
+            ],
+            "tutorial": "conveyor",
+            "solution": {
+                "A": [
+                    "PUSH",
+                    "PUSH",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 32,
+            "area": 7,
+            "name": "Kaygan Yol",
+            "goalText": "Bant seni boşluğa taşımadan in.",
+            "hint": "Bant üstünde dönmek veya beklemek seni de taşır. Doğru anda in.",
+            "map": [
+                "  E  ",
+                ">>>> "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 1,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 6,
+            "par": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "TURN_RIGHT",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 33,
+            "area": 7,
+            "name": "Dönerken Taşın",
+            "goalText": "Çıkışa ulaş.",
+            "hint": "Bant üstünde dönmek bedava yolculuktur: hem dönersin hem ilerlersin.",
+            "map": [
+                ">>>>v",
+                "#...v",
+                ".E..v",
+                "<<<<<"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 10,
+            "par": 3,
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        },
+        {
+            "id": 34,
+            "area": 7,
+            "name": "Teslimat Hattı",
+            "goalText": "Kutuyu hedefe taşı.",
+            "hint": "A kutuyu banda yükler; B hattın sonunda kutuyu karşılayıp hedefe iter.",
+            "map": [
+                ".B>>>v .",
+                "     v .",
+                "  x.....",
+                "        "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 7,
+                    "y": 0,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 9
+            },
+            "objectives": [
+                {
+                    "type": "BOXES_ON_TARGETS"
+                }
+            ],
+            "solution": {
+                "A": [
+                    "PUSH"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH"
+                ]
+            }
+        },
+        {
+            "id": 35,
+            "area": 7,
+            "name": "Bant Finali",
+            "goalText": "İki robot da çıkışa ulaşsın.",
+            "hint": "Bant B'yi plakaya taşır; plaka A'nın kapısını açar. Kimse boşluğa düşmesin.",
+            "map": [
+                "....DE",
+                ".     ",
+                ">>>p  ",
+                ".  ..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "BACK"
+            ],
+            "maxCommands": 18,
+            "par": 12,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK"
+                ]
+            }
+        }
+    ]
+}

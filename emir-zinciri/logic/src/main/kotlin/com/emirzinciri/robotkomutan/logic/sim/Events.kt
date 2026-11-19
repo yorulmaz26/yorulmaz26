@@ -5,7 +5,7 @@ import com.emirzinciri.robotkomutan.logic.grid.Pos
 /** Simülasyonun her adımda ürettiği olaylar. Animasyon, ses ve hata ayıklama paneli bunları kullanır. */
 sealed class SimEvent {
     data class Executed(val robot: String, val pc: Int) : SimEvent()
-    data class Moved(val robot: String, val from: Pos, val to: Pos, val jump: Boolean = false) : SimEvent()
+    data class Moved(val robot: String, val from: Pos, val to: Pos, val jump: Boolean = false, val conveyor: Boolean = false) : SimEvent()
     data class Turned(val robot: String) : SimEvent()
     data class Bumped(val robot: String, val at: Pos, val pc: Int, val reason: String) : SimEvent()
     data class CommandFailed(val robot: String, val pc: Int, val reason: String) : SimEvent()
@@ -21,13 +21,14 @@ sealed class SimEvent {
     data class MessageSent(val robot: String) : SimEvent()
     data class MessageReceived(val robot: String) : SimEvent()
     data class DoorChanged(val at: Pos, val open: Boolean) : SimEvent()
-    data class RobotLost(val robot: String, val at: Pos) : SimEvent()
+    data class RobotLost(val robot: String, val at: Pos, val laser: Boolean = false) : SimEvent()
     data class OutOfEnergy(val robot: String, val pc: Int) : SimEvent()
     data class ProgramFinished(val robot: String) : SimEvent()
 }
 
 enum class FailReason(val title: String) {
     ROBOT_LOST("Robot kayboldu"),
+    LASER("Robot lazere yakalandı"),
     NO_ENERGY("Enerji bitti"),
     PROGRAM_ENDED("Komutlar bitti ama hedef tamamlanmadı"),
     DEADLOCK("Robotlar birbirini bekliyor"),

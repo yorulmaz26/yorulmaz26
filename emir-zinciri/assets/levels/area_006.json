@@ -1,0 +1,313 @@
+{
+    "area": 6,
+    "levels": [
+        {
+            "id": 26,
+            "area": 6,
+            "name": "İkinci Robot",
+            "goalText": "İki robotu da çıkışa götür.",
+            "hint": "Her robotun kendi zinciri var. Üstteki sekmeden robot seç; ikisi aynı anda çalışır.",
+            "story": "Tebrikler komutan! İkinci robotun uyandı. Artık iki komut zinciri aynı anda çalışacak.",
+            "map": [
+                "....E",
+                "     ",
+                "...  ",
+                "  ..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 11,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "tutorial": "second_robot",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 27,
+            "area": 6,
+            "name": "Kapıyı Tut",
+            "goalText": "B robotunu çıkışa ulaştır.",
+            "hint": "A plakada durdukça kapı açık kalır. B'nin zamanlamasını ayarla.",
+            "map": [
+                "...p   ",
+                "       ",
+                "...D..E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 14,
+            "par": 10,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT",
+                    "robots": [
+                        "B"
+                    ]
+                }
+            ],
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 28,
+            "area": 6,
+            "name": "Karşılıklı Yardım",
+            "goalText": "İki robot da çıkışa ulaşsın.",
+            "hint": "Önce biri diğerine kapı açar, sonra diğeri ona. Kimin ne zaman ayrılacağını düşün.",
+            "map": [
+                "..p...DE",
+                "        ",
+                "..D..p.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "WAIT",
+                "BACK"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 8
+            },
+            "channels": {
+                "6,0": 2,
+                "5,2": 2
+            },
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 29,
+            "area": 6,
+            "name": "Sinyal",
+            "goalText": "B çıkışa ulaşsın. Yalnızca 16 kart var!",
+            "hint": "Yeni kartlar: Mesaj gönder ve Mesaj bekle. Uzun beklemeler için çok sayıda 'Bekle' yerine sinyal kullan.",
+            "map": [
+                "......s",
+                "       ",
+                "..D...E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "WAIT",
+                "PRESS",
+                "SEND",
+                "WAIT_MSG"
+            ],
+            "maxCommands": 16,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 13
+            },
+            "objectives": [
+                {
+                    "type": "REACH_EXIT",
+                    "robots": [
+                        "B"
+                    ]
+                }
+            ],
+            "tutorial": "signal",
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "SEND"
+                ],
+                "B": [
+                    "FORWARD",
+                    "WAIT_MSG",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 30,
+            "area": 6,
+            "name": "İkili Komuta Finali",
+            "goalText": "İki robot da çıkışa ulaşsın.",
+            "hint": "A plakayla B'ye yol açar, B zamanlı düğmeyle A'ya. Zamanlama her şey.",
+            "map": [
+                "..p..DE",
+                "       ",
+                "..D.t  ",
+                "   ..E "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0
+                },
+                {
+                    "id": "B",
+                    "x": 0,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 22,
+            "par": 17,
+            "third": {
+                "type": "TICKS",
+                "value": 10
+            },
+            "channels": {
+                "5,0": 2,
+                "4,2": 2
+            },
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}

@@ -38,6 +38,9 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         private set
 
     private val history = ArrayList<WorldState>()
+    private val lostByLaser = HashSet<String>()
+    /** Bu adımda bant bir şey taşıdı mı (programlar bitse de dünya hareket ediyor demektir). */
+    private var envMoved = false
     private val totalCards = this.programs.values.sumOf { it.cardCount }
     private val energyOn = level.def.energy
 
@@ -67,6 +70,9 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             e.setValue(e.value - 1)
             if (e.value <= 0) timerIt.remove()
         }
+
+        val startPos = s.robots.associateWith { it.pos }
+        val startBoxes = if (level.hasConveyors) s.boxes.toSet() else emptySet()
 
         // 2-4. Kart seçimi, enerji, dönüşler ve hareket talepleri
         val moves = ArrayList<MoveIntent>()
@@ -135,11 +141,21 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             act(r, pc, programs.getValue(r.id).instrs[pc], events, sentBy)
         }
 
+        // 7b. Bantlar: adım başında bantta olup kendi hareket etmeyen robot ve kutular bir hücre taşınır.
+        envMoved = false
+        if (level.hasConveyors) conveyors(startPos, startBoxes, events)
+
         // 8. Mesaj teslimi ve ortam
         for (sender in sentBy) for (o in s.robots) if (o !== sender && o.alive) o.inbox++
         updateDoors(events)
+        lasers(events)
+        for (r in s.robots) {
+            if (!r.alive) continue
+            if (level.tile(r.pos) == Tile.EXIT) { if (r.arrivedTick < 0) r.arrivedTick = s.tick } else r.arrivedTick = -1
+        }
 
         // 9. Sonuç
+        for (e in events) if (e is SimEvent.RobotLost && e.laser) lostByLaser += e.robot
         outcome = evaluate()
         return StepResult(s.tick, events, outcome)
     }
@@ -155,6 +171,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         if (history.isEmpty()) return false
         state = history.removeAt(history.lastIndex)
         outcome = null
+        lostByLaser.clear()
         return true
     }
 
@@ -422,19 +439,74 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
 
     // ---------------------------------------------------------------- ortam
 
-    private fun channelActive(ch: Int): Boolean {
+    private fun channelActive(ch: Int): Boolean = Environment.channelActive(level, state, ch)
+
+    private val sockets = level.sockets
+    private val doors = level.doors
+    private val exits = level.exits
+    private val targets = level.targets
+
+    /**
+     * Bant hareketi: aynı çakışma kuralları (duvar, kapalı kapı, kutu, aynı hücre, duran robot) uygulanır.
+     * Bant boşluğa taşırsa robot düşer, kutu kaybolur.
+     */
+    private fun conveyors(startPos: Map<RobotState, Pos>, startBoxes: Set<Pos>, events: MutableList<SimEvent>) {
         val s = state
-        if (ch in s.toggled || (s.timers[ch] ?: 0) > 0) return true
-        for (p in plates) if (level.channel(p) == ch && (p in s.boxes || s.robotAt(p) != null)) return true
-        for (p in sockets) if (level.channel(p) == ch && (s.socketCharge[p] ?: 0) >= level.socketNeed(p)) return true
-        return false
+        class Carry(val robot: RobotState?, val from: Pos, val to: Pos) { var blocked = false }
+        val list = ArrayList<Carry>()
+        for (r in s.robots) {
+            if (!r.alive || r.pos != startPos[r]) continue
+            val d = level.tile(r.pos).conveyorDir ?: continue
+            list += Carry(r, r.pos, r.pos + d)
+        }
+        for (b in s.boxes) {
+            if (b !in startBoxes) continue
+            val d = level.tile(b).conveyorDir ?: continue
+            list += Carry(null, b, b + d)
+        }
+        if (list.isEmpty()) return
+        val moversFrom = list.associateBy { it.from }
+        for (c in list) if (solidReason(c.to) != null) c.blocked = true
+        val claims = list.filter { !it.blocked }.groupingBy { it.to }.eachCount()
+        for (c in list) if (!c.blocked && claims.getValue(c.to) > 1) c.blocked = true
+        var changed = true
+        while (changed) {
+            changed = false
+            for (c in list) {
+                if (c.blocked) continue
+                val occupied = s.robotAt(c.to) != null || c.to in s.boxes
+                if (!occupied) continue
+                val other = moversFrom[c.to]
+                if (other == null || other.blocked || other.to == c.from) { c.blocked = true; changed = true }
+            }
+        }
+        val moving = list.filter { !it.blocked }
+        if (moving.isNotEmpty()) envMoved = true
+        for (c in moving) if (c.robot == null) s.boxes.remove(c.from)
+        for (c in moving) {
+            val r = c.robot
+            if (r == null) {
+                if (level.tile(c.to) == Tile.VOID) events += SimEvent.BoxLost(c.to)
+                else if (level.tile(c.to) == Tile.PIT && c.to !in s.filledPits) { s.filledPits += c.to; events += SimEvent.PitFilled(c.to) }
+                else s.boxes += c.to
+                events += SimEvent.BoxMoved(c.from, c.to)
+            } else {
+                r.pos = c.to
+                events += SimEvent.Moved(r.id, c.from, c.to, conveyor = true)
+                if (isHole(c.to)) { r.status = RobotStatus.LOST; events += SimEvent.RobotLost(r.id, c.to) }
+            }
+        }
     }
 
-    private val plates = level.positionsOf(Tile.PLATE)
-    private val sockets = level.positionsOf(Tile.SOCKET)
-    private val doors = level.allPositions.filter { level.tile(it).isDoor }
-    private val exits = level.positionsOf(Tile.EXIT)
-    private val targets = level.positionsOf(Tile.TARGET)
+    /** Işın içinde kalan robotlar kaybolur. */
+    private fun lasers(events: MutableList<SimEvent>) {
+        if (level.lasers.isEmpty()) return
+        val hit = Environment.beams(level, state).values.flatten().toSet()
+        for (r in state.robots) if (r.alive && r.pos in hit) {
+            r.status = RobotStatus.LOST
+            events += SimEvent.RobotLost(r.id, r.pos, laser = true)
+        }
+    }
 
     private fun updateDoors(events: MutableList<SimEvent>) {
         val s = state
@@ -471,6 +543,7 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
             ObjectiveType.BOXES_ON_TARGETS -> targets.all { it in s.boxes }
             ObjectiveType.COLLECT_ALL_ENERGY -> s.cells.isEmpty()
             ObjectiveType.POWER_SOCKETS -> sockets.all { (s.socketCharge[it] ?: 0) >= level.socketNeed(it) }
+            ObjectiveType.SYNC_EXIT -> s.robots.all { it.alive && it.pos in exits } && s.robots.map { it.arrivedTick }.distinct().size == 1
         }
     }
 
@@ -478,9 +551,12 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
         val s = state
         if (objectivesMet()) return Outcome.Win(stats())
         s.robots.firstOrNull { it.status == RobotStatus.LOST }?.let {
-            return Outcome.Fail(FailReason.ROBOT_LOST, "${it.id} robotu düştü.", stats(), it.id, it.activePc)
+            val byLaser = lostByLaser.contains(it.id)
+            return if (byLaser) Outcome.Fail(FailReason.LASER, "${it.id} robotu lazer ışınına girdi.", stats(), it.id, it.activePc)
+            else Outcome.Fail(FailReason.ROBOT_LOST, "${it.id} robotu düştü.", stats(), it.id, it.activePc)
         }
         val running = s.robots.filter { it.status == RobotStatus.RUNNING }
+        if (running.isEmpty() && envMoved && s.tick < level.def.maxTicks) return null
         if (running.isEmpty()) {
             s.robots.firstOrNull { it.status == RobotStatus.NO_ENERGY }?.let {
                 return Outcome.Fail(FailReason.NO_ENERGY, "${it.id} robotunun enerjisi bu komut için yetmedi.", stats(), it.id, it.activePc)
@@ -512,6 +588,10 @@ class Simulation(val level: LevelData, programs: Map<String, Program>) {
                 ObjectiveType.POWER_SOCKETS -> {
                     val left = sockets.count { (s.socketCharge[it] ?: 0) < level.socketNeed(it) }
                     if (left > 0) return "$left soket dolmadı."
+                }
+                ObjectiveType.SYNC_EXIT -> {
+                    if (s.robots.all { it.pos in exits }) return "Robotlar çıkışlara farklı adımlarda vardı; aynı anda varmalılar."
+                    return "Bütün robotlar çıkışlara ulaşmalı."
                 }
             }
         }

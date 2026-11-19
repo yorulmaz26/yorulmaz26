@@ -21,8 +21,10 @@ Bir adımın sırası:
 5. Hareket çakışmaları: statik engeller (duvar, panel, kapalı kapı, kutu) → aynı hücreye yönelenlerin hepsi durur → yer değiştirmeye izin yok → duran robotun hücresine giriş engellenir (sabit noktaya kadar; ardışık robotlar birlikte ilerleyebilir).
 6. Hareket/itme/çekme uygulanır; boşluğa giren robot kaybolur, çukura itilen kutu çukuru doldurur.
 7. Eylemler (al, bırak, bas, topla, aktar, mesaj gönder) hareket sonrası duruma göre robot sırasıyla.
+7b. Bantlar: adım başında bantta olup kendisi hareket etmeyen robot/kutular bir hücre taşınır (aynı çakışma kuralları). Programlar bitse de bant bir şey taşıdıkça simülasyon sürer.
 8. Mesajlar teslim edilir (bir sonraki adımda alınır); plaka, anahtar, zamanlayıcı ve soketlerden kanal durumu, oradan kapılar hesaplanır. Üzerinde robot/kutu olan kapı kapanmaz.
-9. Kazanma (bütün hedefler) / kaybetme (robot kaybı, enerji, program bitti, kilitlenme, süre) kontrolü.
+8b. Lazer ışınları (kanalı etkin lazer kapalı; duvar, panel, kapalı kapı ve kutu ışını keser) içinde kalan robotlar kaybolur.
+9. Kazanma (bütün hedefler; senkron varışta hepsi aynı adımda) / kaybetme (robot kaybı, enerji, program bitti, kilitlenme, süre) kontrolü.
 
 Her adım `SimEvent` listesi üretir; çizici, sesler, açılır yazılar ve hata ayıklama satırı bunları kullanır. Her adımdan önce dünyanın kopyası saklanır: **geri adım** bu kopyalardan döner.
 
@@ -43,6 +45,7 @@ Her alan dosyası 5 bölüm içerir. Harita karakterleri:
 | `p` | basınç plakası | `s` | anahtar paneli |
 | `t` | zamanlı düğme | `D` / `d` | kapı / ters kapı |
 | `Q` | şarj istasyonu | `K` | enerji soketi |
+| `^ > v <` | bant (taşıma yönü) | `L` | lazer yayıcı (`values` yön: 0 K, 1 D, 2 G, 3 B) |
 
 Diğer alanlar: `robots`, `commands` (açık kartlar), `maxCommands` (kart sınırı), `par` (2. yıldız), `third` (3. yıldız kuralı), `objectives`, `energy`, `channels` (`"x,y": kanal`), `values` (hücre miktarı / zamanlayıcı süresi / soket ihtiyacı), `tutorial`, `story`, `solution` (referans çözüm).
 
@@ -51,6 +54,8 @@ Diğer alanlar: `robots`, `commands` (açık kartlar), `maxCommands` (kart sın�
 ## Bölüm doğrulama
 
 `LevelValidationTest` her bölüm için: kimlik/alan tutarlılığı, robot sayısı kuralı (1–25 tek robot), robotların zeminde başlaması, referans çözümün yalnızca açık kartlarla **kazanıp 3 yıldız alması**, determinizm, boş zincirle kazanılamaması ve döngüsüz tek robot bölümlerinde `par` değerinin **BFS çözücünün bulduğu kesin optimum** olması.
+
+Çok robotlu bölümlerde çözücü her adımda her robot için bir kart seçer (ya da programı bitirir) ve toplam kart sayısını en aza indirir. Sinyal kartlı bölümlerde elle yazılan çözüm kullanılır ve sinyalsiz daha kısa çözüm olmadığı doğrulanır.
 
 Tasarım akışı: harita taslağı → `levelTool` çözer → `par` ve referans çözüm yazılır → testler doğrular. Çözücü tasarım sırasında iki çözümsüz bölümü ve iki istenmeyen kestirmeyi yakaladı.
 

@@ -1,0 +1,253 @@
+{
+    "area": 8,
+    "levels": [
+        {
+            "id": 36,
+            "area": 8,
+            "name": "Lazer Işını",
+            "goalText": "Lazeri kapat ve çıkışa geç.",
+            "hint": "Kırmızı ışına giren robot kaybolur. Anahtar lazeri kapatır.",
+            "story": "Güvenlik Koridoru lazerlerle korunuyor. Işınları kapat, kes ya da tam zamanında geç.",
+            "map": [
+                " E    ",
+                "L.....",
+                "s.... "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 2,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "tutorial": "laser",
+            "solution": {
+                "A": [
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "PRESS",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 37,
+            "area": 8,
+            "name": "Kutu Kalkanı",
+            "goalText": "Çıkışa ulaş.",
+            "hint": "Kutu ışını keser: kutunun arkası güvenlidir.",
+            "map": [
+                "  E   ",
+                "L.....",
+                ".B....",
+                "..    "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 1,
+                    "y": 3,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PUSH"
+            ],
+            "maxCommands": 10,
+            "par": 6,
+            "solution": {
+                "A": [
+                    "PUSH",
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 38,
+            "area": 8,
+            "name": "Zamanlı Geçit",
+            "goalText": "Lazer kapalıyken koridoru geç.",
+            "hint": "Zamanlı düğme lazeri 7 adım kapatır. En kısa yolu bul.",
+            "map": [
+                ".....EL",
+                "t     "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 0,
+                    "dir": "S"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS"
+            ],
+            "maxCommands": 10,
+            "par": 7,
+            "values": {
+                "6,0": 3,
+                "0,1": 7
+            },
+            "solution": {
+                "A": [
+                    "PRESS",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 39,
+            "area": 8,
+            "name": "İkili Kalkan",
+            "goalText": "İki robot da çıkışa geçsin.",
+            "hint": "Plakalardan biri basılıyken lazer kapalı. Biri geçerken diğeri nöbet tutsun.",
+            "map": [
+                "   E.Ep",
+                "L......",
+                ".p.....",
+                "...    "
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2
+                },
+                {
+                    "id": "B",
+                    "x": 3,
+                    "y": 2,
+                    "dir": "N"
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "BACK",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT"
+            ],
+            "maxCommands": 20,
+            "par": 14,
+            "third": {
+                "type": "TICKS",
+                "value": 7
+            },
+            "solution": {
+                "A": [
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "WAIT",
+                    "FORWARD",
+                    "FORWARD"
+                ],
+                "B": [
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT",
+                    "BACK",
+                    "BACK",
+                    "BACK",
+                    "FORWARD"
+                ]
+            }
+        },
+        {
+            "id": 40,
+            "area": 8,
+            "name": "Güvenlik Finali",
+            "goalText": "İki robot da çıkışa ulaşsın.",
+            "hint": "A lazeri anahtarla kapatır, B kutuyu plakaya iter. Sıra ve zamanlama önemli.",
+            "map": [
+                "L....DE",
+                "s......",
+                "..B.p.E"
+            ],
+            "robots": [
+                {
+                    "id": "A",
+                    "x": 0,
+                    "y": 2,
+                    "dir": "N"
+                },
+                {
+                    "id": "B",
+                    "x": 1,
+                    "y": 2
+                }
+            ],
+            "commands": [
+                "FORWARD",
+                "TURN_LEFT",
+                "TURN_RIGHT",
+                "WAIT",
+                "PRESS",
+                "PUSH"
+            ],
+            "maxCommands": 20,
+            "par": 16,
+            "third": {
+                "type": "TICKS",
+                "value": 8
+            },
+            "channels": {
+                "5,0": 2,
+                "4,2": 2
+            },
+            "solution": {
+                "A": [
+                    "TURN_RIGHT",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "FORWARD",
+                    "TURN_LEFT"
+                ],
+                "B": [
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "PUSH",
+                    "TURN_LEFT",
+                    "FORWARD",
+                    "FORWARD"
+                ]
+            }
+        }
+    ]
+}
