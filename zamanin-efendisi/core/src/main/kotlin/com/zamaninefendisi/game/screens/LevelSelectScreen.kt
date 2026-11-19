@@ -10,37 +10,74 @@ import com.zamaninefendisi.logic.Era
 import com.zamaninefendisi.logic.LevelDef
 import com.zamaninefendisi.logic.levels.LevelCatalog
 
-/** Alan ve bölüm seçimi. Kilitli bölümler önceki bölüm tamamlanınca açılır. */
-class LevelSelectScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
+/** Dünya haritası: 5 dünya × 20 alan. */
+class WorldMapScreen(game: ZamaninEfendisiGame, private val world: Int = (LevelCatalog.areaOfLevel(game.progression.nextPlayable()).id - 1) / 20 + 1) : BaseScreen(game) {
+    init {
+        root.top().pad(24f)
+        root.add(header("Dünya Haritası") { onBack() }).growX().padBottom(10f).row()
+        root.add(resourceBar()).padBottom(10f).row()
+        val names = listOf("Kırık Vadi", "Deniz, Buz ve Gök", "Çöl ve Ateş", "Paralel Zamanlar", "Zamanın Sonu")
+        val tabs = Table()
+        for (w in 1..5) tabs.add(ui.button("$w", if (w == world) worldColor(w) else Theme.grey, assets.fontM, if (w == world) Color.WHITE else Theme.ink) { game.go(WorldMapScreen(game, w)) }).size(110f, 70f).pad(4f)
+        root.add(tabs).row()
+        root.add(ui.label("Dünya $world · ${names[world - 1]}", assets.fontL, Theme.ink)).padTop(6f).padBottom(10f).row()
+        val grid = Table()
+        val p = game.progression
+        for (i in 0 until 20) {
+            val a = LevelCatalog.area((world - 1) * 20 + i + 1) ?: continue
+            val unlocked = p.isUnlocked(a.firstId)
+            val stars = a.ids.sumOf { p.progress(it).stars }
+            val done = a.ids.all { p.isCompleted(it) }
+            val col = when { !unlocked -> Theme.grey; done -> Theme.green; else -> worldColor(world) }
+            val b = ui.button("${a.id}\n${a.name}\n${if (unlocked) "★ $stars/15" else "Kilitli"}", col, assets.fontS) { game.go(LevelSelectScreen(game, a.id)) }
+            b.isDisabled = !unlocked
+            grid.add(b).size(160f, 150f).pad(4f)
+            if (i % 4 == 3) grid.row()
+        }
+        root.add(ui.scroll(grid)).grow()
+    }
+
+    private fun worldColor(w: Int) = listOf(Theme.green, Theme.blue, Theme.purple, Theme.orange, Theme.pink)[w - 1]
+
+    override fun onBack() = game.go(MainMenuScreen(game))
+}
+
+/** Alan seçimi: bir alanın 5 bölümü. Kilitli bölümler önceki bölüm tamamlanınca açılır. */
+class LevelSelectScreen(game: ZamaninEfendisiGame, areaId: Int = LevelCatalog.areaOfLevel(game.progression.nextPlayable()).id) : BaseScreen(game) {
+    private val area = LevelCatalog.area(areaId) ?: LevelCatalog.areas.first()
 
     init {
         root.top().pad(24f)
-        root.add(header("Bölümler") { onBack() }).growX().padBottom(14f).row()
+        root.add(header("Alan ${area.id}") { onBack() }).growX().padBottom(14f).row()
         root.add(resourceBar()).padBottom(18f).row()
-        val list = Table().top()
-        for (area in LevelCatalog.areas) {
-            val card = ui.panel(Theme.panel)
-            card.pad(26f)
-            card.add(ui.label("Alan ${area.id}", assets.fontS, Theme.orange)).left().row()
-            card.add(ui.label(area.name, assets.fontL, Theme.ink)).left().row()
-            card.add(ui.label("Açılan özellik: ${area.unlocks}", assets.fontS, Theme.purple)).left().padTop(4f).row()
-            card.add(ui.label(area.description, assets.fontS, Theme.inkSoft, wrap = true)).width(600f).left().padTop(8f).padBottom(18f).row()
-            val row = Table()
-            for (lv in area.levels) row.add(levelButton(lv)).size(110f, 130f).pad(4f)
-            card.add(row).row()
-            val stars = area.levels.sumOf { game.progression.progress(it.id).stars }
-            card.add(ui.label("Alan yıldızları: $stars / ${area.levels.size * 3}", assets.fontS, Theme.inkSoft)).padTop(12f)
-            list.add(card).width(660f).padBottom(20f).row()
+        val card = ui.panel(Theme.panel)
+        card.pad(26f)
+        card.add(ui.label("Dünya ${area.world} · Alan ${area.id}", assets.fontS, Theme.orange)).left().row()
+        card.add(ui.label(area.name, assets.fontL, Theme.ink)).left().row()
+        card.add(ui.label("Açılan özellik: ${area.unlocks}", assets.fontS, Theme.purple, wrap = true)).width(600f).left().padTop(4f).row()
+        card.add(ui.label(area.description, assets.fontS, Theme.inkSoft, wrap = true)).width(600f).left().padTop(8f).padBottom(18f).row()
+        val row = Table()
+        for (id in area.ids) row.add(levelButton(id)).size(110f, 130f).pad(4f)
+        card.add(row).row()
+        val stars = area.ids.sumOf { game.progression.progress(it).stars }
+        card.add(ui.label("Alan yıldızları: $stars / 15", assets.fontS, Theme.inkSoft)).padTop(12f)
+        root.add(card).width(660f).padBottom(16f).row()
+        val nav = Table()
+        LevelCatalog.area(area.id - 1)?.let { prev -> nav.add(ui.button("‹ Alan ${prev.id}", Theme.blue, assets.fontS) { game.go(LevelSelectScreen(game, prev.id)) }).size(240f, 76f).padRight(16f) }
+        LevelCatalog.area(area.id + 1)?.let { next ->
+            val b = ui.button("Alan ${next.id} ›", Theme.blue, assets.fontS) { game.go(LevelSelectScreen(game, next.id)) }
+            b.isDisabled = !game.progression.isUnlocked(next.firstId)
+            nav.add(b).size(240f, 76f)
         }
-        list.add(ui.label("Alan 6 ve sonrası (zaman dondurma, savunma, teknoloji aktarımı…) sonraki geliştirme aşamalarında eklenecek.", assets.fontS, Theme.muted, wrap = true, align = Align.center)).width(600f).padTop(10f).padBottom(30f)
-        root.add(ui.scroll(list).also { it.setScrollingDisabled(true, false) }).grow().top()
+        root.add(nav).row()
+        root.add(ui.button("Dünya Haritası", Theme.purple, assets.fontS) { game.go(WorldMapScreen(game, area.world)) }).size(300f, 76f).padTop(12f)
     }
 
-    private fun levelButton(lv: LevelDef): Table {
+    private fun levelButton(id: Int): Table {
         val p = game.progression
-        val unlocked = p.isUnlocked(lv.id)
-        val prog = p.progress(lv.id)
-        val boss = lv.id % 5 == 0
+        val unlocked = p.isUnlocked(id)
+        val prog = p.progress(id)
+        val boss = id % 5 == 0
         val color: Color = when {
             !unlocked -> Theme.grey
             prog.completed -> Theme.green
@@ -48,8 +85,8 @@ class LevelSelectScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             else -> Theme.orange
         }
         val t = Table()
-        val b = ui.button(if (unlocked) "${lv.id}" else "Kilit", color, if (unlocked) assets.fontL else assets.fontS) {
-            tryStart(game, root, lv.id, resume = false)
+        val b = ui.button(if (unlocked) "$id" else "Kilit", color, if (unlocked) assets.fontM else assets.fontS) {
+            tryStart(game, root, id, resume = false)
         }
         b.isDisabled = !unlocked
         t.add(b).size(100f, 90f).row()
@@ -58,7 +95,7 @@ class LevelSelectScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         return t
     }
 
-    override fun onBack() = game.go(MainMenuScreen(game))
+    override fun onBack() = game.go(WorldMapScreen(game, area.world))
 
     companion object {
         /** Bölüm tanıtımını gösterir; can ve kilit kurallarını uygular. */
@@ -82,7 +119,7 @@ class LevelSelectScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             if (resume && actions.isNotEmpty()) { game.go(GameScreen(game, lv, actions)); return }
             val box = ui.panel(Theme.panel)
             box.pad(30f)
-            box.add(ui.label(if (lv.id % 5 == 0) "Alan Patronu · Bölüm ${lv.id}" else "Bölüm ${lv.id}", a.fontS, Theme.orange)).left().row()
+            box.add(ui.label((if (lv.id % 5 == 0) "Patron · " else "") + "Bölüm ${lv.id} · Alan ${lv.area}", a.fontS, Theme.orange)).left().row()
             box.add(ui.label(lv.name, a.fontL, Theme.ink)).left().padBottom(10f).row()
             box.add(ui.label(lv.intro, a.fontS, Theme.inkSoft, wrap = true)).width(570f).left().padBottom(16f).row()
             box.add(ui.label("Hedefler", a.fontM, Theme.ink)).left().row()

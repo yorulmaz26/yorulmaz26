@@ -110,7 +110,7 @@ class ContinuityTest {
         val (p, _) = prog()
         val cm = p.continuity
         assertFalse(cm.prestigeAvailable())
-        for (lv in LevelCatalog.levels) {
+        for (lv in LevelCatalog.handcraftedLevels + listOf(40, 125, 250, 500).map { LevelCatalog.level(it)!! }) {
             val pl = cm.prestigeLevel(lv)
             assertEquals("döngü ${lv.id}", SessionStatus.WON, LevelSession.replay(pl, pl.solution).status)
             assertTrue(pl.maxTurns <= lv.maxTurns)

@@ -252,5 +252,5 @@ class Progression(private val saves: SaveSystem, private val clock: GameClock, t
         persist()
     }
 
-    fun nextPlayable(): Int = LevelCatalog.levels.firstOrNull { !isCompleted(it.id) }?.id ?: LevelCatalog.lastId
+    fun nextPlayable(): Int = LevelCatalog.ids.firstOrNull { !isCompleted(it) } ?: LevelCatalog.lastId
 }

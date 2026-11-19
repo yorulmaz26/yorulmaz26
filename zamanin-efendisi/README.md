@@ -18,7 +18,7 @@ logic/    Saf Kotlin oyun mantığı — grafikten bağımsız, JVM'de test edil
   CausalityEngine.kt  Artımlı yeniden hesaplama, paradoks tespiti, nedensellik bağlantıları, döngü/geriye dönük bağlantı denetimi
   LevelSession.kt     Bölüm simülasyonu: kahraman, eylemler, düşman yapay zekâsı, zaman tuzağı, hedefler, günlük
   Level.kt            Bölüm tanımı (ASCII harita), hedef türleri, öğretici ipuçları
-  levels/             Alan ve bölüm kataloğu (Area01–Area07: 1–35. bölümler)
+  levels/             100 alan / 500 bölüm: Area01–Area07 elle (1–35), ProceduralLevels ile Alan 8–100 (36–500)
   save/               Sürümlü kayıt + göç (v0→v1→v2), 4 can sistemi (saat hilesi korumalı), ilerleme/ödül/Zaman Ustası seviyesi
   meta/               Ekonomi (10 kaynak), Zaman Kalesi binaları ve üretimi, araştırma ağacı, market ve ödeme sağlayıcısı soyutlaması
 core/     libGDX katmanı
@@ -103,7 +103,7 @@ o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
 | 3 | 9 birlik türü (can/saldırı/savunma/menzil/hareket/yetenek/çağ uyumu), nöbet, kuleler, 6 düşman stratejisi, zaman dondurma, zincir kombosu, önceden görme, Alan 6–7 (toplam 35 bölüm) | **Tamamlandı** |
 | 4 | Zaman Kalesi (15 bina, çevrimdışı üretim, görsel büyüme), 5 kategorili 20 düğümlü araştırma ağacı, 10 kaynaklı ekonomi, 10 kategorili market (kozmetikler oyunda görünür), envanter, Zaman Rehberi | **Tamamlandı** |
 | 5 | Prosedürel üretici (5 şablon, çözüm simülasyonla doğrulanır), Sonsuz Mod, Günlük Bulmaca, Haftalık Kriz, günlük/haftalık görevler, zaman seferleri, 150 eserlik koleksiyon + 6 salonlu müze, 30 başarım, alternatif tarih görevleri, Krallık Savunması, Yeni Zaman Döngüsü (prestij), rastgele zaman olayları, kişisel rekorlar | **Tamamlandı** |
-| 6 | 100 alan / 500 bölüm, patronlar, dünya finalleri | Tasarım: docs/ALANLAR.md |
+| 6 | 100 alan / 500 bölüm: Alan 1–7 elle, Alan 8–100 temaya göre üretilmiş ve doğrulanmış; her 5. bölüm patron, her 25. özel patron, her 50. dünya finali; dünya haritası (5 dünya) ve alan seçimi | **Tamamlandı** (ayrıntı ve sınırlar: docs/ALANLAR.md) |
 | 7 | Performans, ses/animasyon cilası, ekran uyumluluğu, Google Play hazırlığı | Planlandı |
 
 Şu an olmayan özellikler arayüzde düğme olarak gösterilmez (sahte düğme yoktur).

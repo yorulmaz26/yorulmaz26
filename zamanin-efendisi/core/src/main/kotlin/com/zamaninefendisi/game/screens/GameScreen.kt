@@ -99,7 +99,10 @@ class GameScreen(
         bar.pad(10f, 14f, 10f, 14f)
         bar.add(ui.button("Menü", Theme.inkSoft, assets.fontS) { showPause() }).size(110f, 64f)
         val title = Table()
-        title.add(ui.label(if (mode == PlayMode.Main || mode == PlayMode.Alt) "Bölüm ${level.id} · ${level.name}" else level.name, assets.fontM, Theme.ink, align = Align.center)).row()
+        val titleText = if (mode == PlayMode.Main || mode == PlayMode.Alt) "Bölüm ${level.id} · ${level.name}" else level.name
+        val titleLabel = ui.label(titleText, if (titleText.length > 30) assets.fontS else assets.fontM, Theme.ink, align = Align.center)
+        titleLabel.setEllipsis(true)
+        title.add(titleLabel).width(430f).row()
         title.add(statsLabel).padTop(2f)
         bar.add(title).expandX()
         undoButton = ui.button("Geri Al", Theme.blue, assets.fontS) { undo() }
@@ -450,7 +453,7 @@ class GameScreen(
         box.add(ui.button("Nasıl Oynanır", Theme.blue) { saveProgress(); game.go(HowToPlayScreen(game, returnTo = { GameScreen(game, level, session.actions) })) }).width(420f).height(84f).padBottom(12f).row()
         box.add(ui.button(if (mode == PlayMode.Main) "Bölümlere Dön" else "Mücadelelere Dön", Theme.inkSoft) {
             saveProgress()
-            game.go(if (mode == PlayMode.Main) LevelSelectScreen(game) else ChallengesScreen(game))
+            game.go(if (mode == PlayMode.Main) LevelSelectScreen(game, level.area.coerceAtLeast(1)) else ChallengesScreen(game))
         }).width(420f).height(84f).row()
         box.add(ui.label(if (mode == PlayMode.Main) "İlerlemen kaydedilir; çıkmak can harcamaz." else "Mücadeleler can harcamaz.", assets.fontS, Theme.inkSoft)).padTop(14f)
         m = ui.modal(root, box, dismissOnOutside = true)
@@ -508,7 +511,7 @@ class GameScreen(
             row.defaults().pad(6f)
             val next = LevelCatalog.next(level.id)
             row.add(ui.button("Tekrar", Theme.orange, assets.fontS) { m.remove(); restart() }).size(170f, 80f)
-            row.add(ui.button("Bölümler", Theme.blue, assets.fontS) { game.go(LevelSelectScreen(game)) }).size(170f, 80f)
+            row.add(ui.button("Bölümler", Theme.blue, assets.fontS) { game.go(LevelSelectScreen(game, level.area.coerceAtLeast(1))) }).size(170f, 80f)
             if (next != null) row.add(ui.button("Sonraki ›", Theme.green, assets.fontS) { LevelSelectScreen.tryStart(game, root, next.id, resume = false) }).size(190f, 80f)
             box.add(row).padTop(20f)
         } else {
@@ -524,7 +527,7 @@ class GameScreen(
             val row = Table()
             row.defaults().pad(6f)
             row.add(ui.button("Günlük", Theme.teal, assets.fontS) { showJournal() }).size(170f, 80f)
-            row.add(ui.button("Bölümler", Theme.blue, assets.fontS) { game.go(LevelSelectScreen(game)) }).size(170f, 80f)
+            row.add(ui.button("Bölümler", Theme.blue, assets.fontS) { game.go(LevelSelectScreen(game, level.area.coerceAtLeast(1))) }).size(170f, 80f)
             val retry = ui.button("Tekrar Dene", Theme.green, assets.fontS) { m.remove(); restart() }
             retry.isDisabled = !p.canStart(level.id)
             row.add(retry).size(190f, 80f)
@@ -591,7 +594,7 @@ class GameScreen(
             PlayMode.Prestige -> {
                 val cycle = cm.recordPrestige(level.id, session)
                 if (cycle) info("Zaman Döngüsü tamamlandı! +3 Zaman Mührü, +10 kristal. Yeni döngü başladı.", Theme.green)
-                else if (won) info("Döngü ilerlemesi: ${game.progression.data.continuity.cycleDone.size}/${com.zamaninefendisi.logic.levels.LevelCatalog.levels.size}")
+                else if (won) info("Döngü ilerlemesi: ${game.progression.data.continuity.cycleDone.size}/${com.zamaninefendisi.logic.levels.LevelCatalog.LEVEL_COUNT}")
                 row.add(ui.button("Tekrar", Theme.orange, assets.fontS) { m.remove(); restart() }).size(180f, 80f)
                 row.add(ui.button("Döngü", Theme.blue, assets.fontS) { game.go(PrestigeScreen(game)) }).size(220f, 80f)
             }
@@ -606,7 +609,7 @@ class GameScreen(
 
     override fun onBack() {
         if (popup != null) { closePopup(); return }
-        if (session.status == SessionStatus.PLAYING) showPause() else game.go(if (mode == PlayMode.Main) LevelSelectScreen(game) else ChallengesScreen(game))
+        if (session.status == SessionStatus.PLAYING) showPause() else game.go(if (mode == PlayMode.Main) LevelSelectScreen(game, level.area.coerceAtLeast(1)) else ChallengesScreen(game))
     }
 
     // ------------------------------------------------------------------ Çizim

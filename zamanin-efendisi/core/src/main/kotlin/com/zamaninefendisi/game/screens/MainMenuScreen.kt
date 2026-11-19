@@ -39,15 +39,15 @@ class MainMenuScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             }).width(560f).height(96f).padBottom(16f).row()
         }
         val next = p.nextPlayable()
-        val allDone = LevelCatalog.levels.all { p.isCompleted(it.id) }
+        val allDone = LevelCatalog.ids.all { p.isCompleted(it) }
         buttons.add(ui.button(if (allDone) "Bölümler" else "Oyna · Bölüm $next", Theme.orange, assets.fontL) {
-            if (allDone) game.go(LevelSelectScreen(game)) else LevelSelectScreen.tryStart(game, root, next, resume = false)
+            if (allDone) game.go(WorldMapScreen(game)) else LevelSelectScreen.tryStart(game, root, next, resume = false)
         }).width(560f).height(96f).padBottom(10f).row()
         val grid = Table()
         fun cell(text: String, color: com.badlogic.gdx.graphics.Color, f: () -> Unit) =
             grid.add(ui.button(text, color, assets.fontS) { f() }).width(290f).height(66f).pad(5f)
         cell("Zaman Kalesi", Theme.purple) { game.go(CastleScreen(game)) }
-        cell("Bölüm Seçimi", Theme.blue) { game.go(LevelSelectScreen(game)) }
+        cell("Dünya Haritası", Theme.blue) { game.go(WorldMapScreen(game)) }
         grid.row()
         cell("Market", Theme.orange) { game.go(MarketScreen(game)) }
         cell("Envanter", Theme.teal) { game.go(InventoryScreen(game)) }
@@ -69,7 +69,7 @@ class MainMenuScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         buttons.add(grid).row()
         root.add(buttons).row()
         root.add().expandY().row()
-        root.add(ui.label("Sürüm 0.5 · Aşama 5: Süreklilik", assets.fontS, Theme.muted, align = Align.center)).padBottom(10f)
+        root.add(ui.label("Sürüm 0.6 · 100 alan · 500 bölüm", assets.fontS, Theme.muted, align = Align.center)).padBottom(10f)
     }
 
     override fun drawOverlay() {

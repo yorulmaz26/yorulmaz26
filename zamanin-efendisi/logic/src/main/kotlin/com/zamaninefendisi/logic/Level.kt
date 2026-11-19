@@ -171,6 +171,14 @@ class LevelDef(
     val solution: List<Action>,
 ) {
     val parsed: LevelMap by lazy { LevelMap.parse(map, overrides) }
+
+    /** Aynı bölümü farklı kimlik/alan/ad/tanıtımla kopyalar (üretilen bölümler ve döngü varyantları için). */
+    fun rebrand(id: Int = this.id, area: Int = this.area, name: String = this.name, intro: String = this.intro, maxTurns: Int = this.maxTurns, hints: List<TutorialHint> = this.hints) = LevelDef(
+        id = id, area = area, name = name, intro = intro, map = map, eras = eras, startEra = startEra, startWood = startWood, allowed = allowed,
+        goals = goals, maxTurns = maxTurns, par = par, desertSpeed = desertSpeed, overrides = overrides, links = links, enemies = enemies,
+        enemyEra = enemyEra, spawnEvery = spawnEvery, enemyKindOverride = enemyKindOverride, maxEnemies = maxEnemies, protect = protect,
+        heroHp = heroHp, energy = energy, units = units, freezes = freezes, hints = hints, solution = solution,
+    )
     val width get() = parsed.width
     val height get() = parsed.height
     val heroStart get() = parsed.heroStart

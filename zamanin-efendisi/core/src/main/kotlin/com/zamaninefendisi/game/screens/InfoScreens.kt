@@ -27,7 +27,7 @@ class JournalScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             for (e in entries) {
                 if (e.levelId != lastLevel) {
                     lastLevel = e.levelId
-                    list.add(ui.label("${LevelCatalog.level(e.levelId)?.name ?: "Bölüm ${e.levelId}"} · ${fmt.format(Date(e.timestamp))}", assets.fontS, Theme.orange)).left().padTop(14f).row()
+                    list.add(ui.label("${if (e.levelId in LevelCatalog.ids) LevelCatalog.levelName(e.levelId) else "Bölüm ${e.levelId}"} · ${fmt.format(Date(e.timestamp))}", assets.fontS, Theme.orange)).left().padTop(14f).row()
                 }
                 val card = ui.panel(Theme.panel, small = true)
                 card.add(ui.label(e.text.substringAfter(": "), assets.fontS, Theme.ink, wrap = true)).width(580f).pad(12f, 16f, 12f, 16f)
@@ -64,11 +64,11 @@ class ProfileScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         framed.add(card).width(644f)
         root.add(framed).width(660f).padBottom(18f).row()
 
-        val done = LevelCatalog.levels.count { p.isCompleted(it.id) }
+        val done = LevelCatalog.ids.count { p.isCompleted(it) }
         val st = d.stats
         val rows = listOf(
-            "Tamamlanan bölüm" to "$done / ${LevelCatalog.levels.size}",
-            "Toplam yıldız" to "${p.totalStars()} / ${LevelCatalog.levels.size * 3}",
+            "Tamamlanan bölüm" to "$done / ${LevelCatalog.LEVEL_COUNT}",
+            "Toplam yıldız" to "${p.totalStars()} / ${LevelCatalog.LEVEL_COUNT * 3}",
             "Altın" to "${p.amount(com.zamaninefendisi.logic.meta.Resource.GOLD)}",
             "Zaman kristali" to "${p.amount(com.zamaninefendisi.logic.meta.Resource.CRYSTAL)}",
             "Rekor: en güçlü zaman kalesi" to "${p.kingdomPower()}",
@@ -96,10 +96,10 @@ class ProfileScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         root.add(t).width(660f).row()
         val best = Table()
         best.add(ui.label("Bölüm rekorları", assets.fontM, Theme.ink)).left().padTop(20f).padBottom(8f).row()
-        for (lv in LevelCatalog.levels) {
-            val pr = p.progress(lv.id)
+        for (id in LevelCatalog.ids) {
+            val pr = p.progress(id)
             if (!pr.completed) continue
-            best.add(ui.label("${lv.id}. ${lv.name}: ${pr.bestActions} eylem · ${pr.stars} yıldız · ${pr.attempts} deneme", assets.fontS, Theme.inkSoft)).left().row()
+            best.add(ui.label("$id. ${LevelCatalog.levelName(id)}: ${pr.bestActions} eylem · ${pr.stars} yıldız · ${pr.attempts} deneme", assets.fontS, Theme.inkSoft)).left().row()
         }
         root.add(best).width(660f)
     }

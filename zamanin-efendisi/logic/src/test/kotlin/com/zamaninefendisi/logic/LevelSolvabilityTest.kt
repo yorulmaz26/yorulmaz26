@@ -26,6 +26,15 @@ class LevelSolvabilityTest {
     }
 
     @Test
+    fun catalogHas100AreasAnd500Levels() {
+        assertEquals(100, LevelCatalog.areas.size)
+        assertEquals(500, LevelCatalog.levels.size)
+        assertEquals((1..500).toList(), LevelCatalog.levels.map { it.id })
+        for (a in LevelCatalog.areas) assertTrue(a.levels.all { it.area == a.id })
+        assertEquals(LevelCatalog.levelName(250), LevelCatalog.level(250)!!.name)
+    }
+
+    @Test
     fun replayIsDeterministic() {
         for (level in LevelCatalog.levels) {
             val a = LevelSession.replay(level, level.solution)

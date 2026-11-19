@@ -67,7 +67,7 @@ class ChallengesScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             "Tamamlanan: ${st.altDone.size}", Theme.blue, "Görevleri Gör") { game.go(AltHistoryScreen(game)) }
         val all = cm.prestigeAvailable()
         entry("Yeni Zaman Döngüsü", "Bütün ana bölümler tamamlanınca açılır. Kayıtların korunur; aynı tarihi daha az zamanla ve kale bonusları olmadan yeniden yazarsın.",
-            if (all) "Döngü ${st.prestige + 1} · ilerleme ${st.cycleDone.size}/${LevelCatalog.levels.size}" else "Kilitli: bütün ${LevelCatalog.levels.size} ana bölümü tamamla (${LevelCatalog.levels.count { game.progression.isCompleted(it.id) }} tamamlandı)",
+            if (all) "Döngü ${st.prestige + 1} · ilerleme ${st.cycleDone.size}/${LevelCatalog.LEVEL_COUNT}" else "Kilitli: bütün ${LevelCatalog.LEVEL_COUNT} ana bölümü tamamla (${LevelCatalog.ids.count { game.progression.isCompleted(it) }} tamamlandı)",
             Theme.gold, "Döngüye Gir", enabled = all) { game.go(PrestigeScreen(game)) }
         root.add(ui.scroll(list)).grow()
     }
@@ -82,7 +82,7 @@ class AltHistoryScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         root.top().pad(24f)
         root.add(header("Alternatif Tarih") { onBack() }).growX().padBottom(14f).row()
         val list = Table().top()
-        val done = LevelCatalog.levels.filter { game.progression.isCompleted(it.id) }
+        val done = LevelCatalog.ids.filter { game.progression.isCompleted(it) }.map { LevelCatalog.level(it)!! }
         if (done.isEmpty()) list.add(ui.label("Önce ana bölümleri tamamla; tamamlanan her bölüm burada farklı bir koşulla yeniden açılır.", assets.fontM, Theme.inkSoft, wrap = true, align = Align.center)).width(600f).padTop(60f)
         for (lv in done) {
             val task = cm.altTask(lv)
@@ -109,11 +109,11 @@ class PrestigeScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         root.add(header("Zaman Döngüsü ${st.prestige + 1}") { onBack() }).growX().padBottom(14f).row()
         root.add(ui.label("Bu döngüde tur sınırları daralır ve kale bonusları kapanır. Bütün bölümleri yeniden yaz: +3 Zaman Mührü, +10 kristal.", assets.fontS, Theme.purple, wrap = true, align = Align.center)).width(640f).padBottom(10f).row()
         val list = Table().top()
-        for (lv in LevelCatalog.levels) {
-            val ok = lv.id in st.cycleDone
+        for (id in LevelCatalog.ids) {
+            val ok = id in st.cycleDone
             val row = Table()
-            row.add(ui.label("${lv.id}. ${lv.name}", assets.fontS, if (ok) Theme.green else Theme.ink)).left().expandX()
-            row.add(ui.button(if (ok) "✓" else "Oyna", if (ok) Theme.green else Theme.gold, assets.fontS) { game.go(GameScreen(game, cm.prestigeLevel(lv), emptyList(), mode = PlayMode.Prestige)) }).size(130f, 60f)
+            row.add(ui.label("$id. ${LevelCatalog.levelName(id)}", assets.fontS, if (ok) Theme.green else Theme.ink)).left().expandX()
+            row.add(ui.button(if (ok) "✓" else "Oyna", if (ok) Theme.green else Theme.gold, assets.fontS) { game.go(GameScreen(game, cm.prestigeLevel(LevelCatalog.level(id)!!), emptyList(), mode = PlayMode.Prestige)) }).size(130f, 60f)
             list.add(row).width(640f).padBottom(6f).row()
         }
         root.add(ui.scroll(list)).grow()

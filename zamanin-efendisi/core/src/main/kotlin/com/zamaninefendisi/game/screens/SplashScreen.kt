@@ -75,7 +75,8 @@ object DevStart {
                 val lv = com.zamaninefendisi.logic.levels.LevelCatalog.level(parts.getOrNull(1)?.toIntOrNull() ?: 1) ?: return null
                 GameScreen(game, lv, emptyList(), autoplay = lv.solution)
             }
-            "levels" -> LevelSelectScreen(game)
+            "levels" -> LevelSelectScreen(game, parts.getOrNull(1)?.toIntOrNull() ?: 1)
+            "world" -> WorldMapScreen(game, parts.getOrNull(1)?.toIntOrNull() ?: 1)
             "castle" -> CastleScreen(game)
             "research" -> ResearchScreen(game)
             "market" -> MarketScreen(game, com.zamaninefendisi.logic.meta.ShopCategory.entries[parts.getOrNull(1)?.toIntOrNull() ?: 0])

@@ -243,27 +243,20 @@ class ContinuityManager(private val p: Progression, private val clock: GameClock
 
     // ------------------------------------------------------------------ Prestij: Yeni Zaman Döngüsü
 
-    fun prestigeAvailable(): Boolean = LevelCatalog.levels.all { p.isCompleted(it.id) }
+    fun prestigeAvailable(): Boolean = LevelCatalog.ids.all { p.isCompleted(it) }
 
     /** Döngü kuralı: tur sınırı çözüme yaklaşır, kale bonusları devre dışıdır. */
     fun prestigeLevel(level: LevelDef): LevelDef {
         val n = c.prestige + 1
         val survive = level.goals.any { it is com.zamaninefendisi.logic.Goal.Survive }
         val tight = if (survive) level.maxTurns else minOf(level.maxTurns, level.solution.size + maxOf(2, 7 - n))
-        return LevelDef(
-            id = level.id, area = level.area, name = "${level.name} · Döngü $n", intro = "Yeni Zaman Döngüsü $n: aynı tarih, daha az zaman. " + level.intro,
-            map = level.map, eras = level.eras, startEra = level.startEra, startWood = level.startWood, allowed = level.allowed, goals = level.goals,
-            maxTurns = tight, par = level.par, desertSpeed = level.desertSpeed, overrides = level.overrides, links = level.links, enemies = level.enemies,
-            enemyEra = level.enemyEra, spawnEvery = level.spawnEvery, enemyKindOverride = level.enemyKindOverride, maxEnemies = level.maxEnemies,
-            protect = level.protect, heroHp = level.heroHp, energy = level.energy, units = level.units, freezes = level.freezes, hints = emptyList(),
-            solution = level.solution,
-        )
+        return level.rebrand(name = "${level.name} · Döngü $n", intro = "Yeni Zaman Döngüsü $n: aynı tarih, daha az zaman. " + level.intro, maxTurns = tight, hints = emptyList())
     }
 
     fun recordPrestige(levelId: Int, s: LevelSession): Boolean {
         if (s.status != SessionStatus.WON) return false
         val done = c.cycleDone + levelId
-        if (LevelCatalog.levels.all { it.id in done }) {
+        if (LevelCatalog.ids.all { it in done }) {
             set { it.copy(prestige = it.prestige + 1, cycleDone = emptySet()) }
             p.update { it.copy(wallet = it.wallet.plus(mapOf(Resource.SEAL to 3, Resource.CRYSTAL to 10))) }
             return true
@@ -298,7 +291,7 @@ class ContinuityManager(private val p: Progression, private val clock: GameClock
     fun checkAchievements(): List<Achievement> {
         val d = p.data
         val st = d.stats
-        fun areaDone(a: Int) = LevelCatalog.area(a)?.levels?.all { p.isCompleted(it.id) } == true
+        fun areaDone(a: Int) = LevelCatalog.area(a)?.ids?.all { p.isCompleted(it) } == true
         val ok = mapOf(
             "first_win" to (st.levelsWon >= 1), "area1" to areaDone(1), "area5" to areaDone(5), "area7" to areaDone(7),
             "stars30" to (p.totalStars() >= 30), "stars90" to (p.totalStars() >= 90), "switch100" to (st.eraSwitches >= 100),
