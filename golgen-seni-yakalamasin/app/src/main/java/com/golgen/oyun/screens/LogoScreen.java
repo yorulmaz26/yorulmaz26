@@ -39,6 +39,8 @@ public final class LogoScreen extends Screen {
     private float pathLen;
     private final float[] tmp = new float[2];
     private boolean burst, left;
+    private android.graphics.Shader fadeTop, fadeBottom, fadeLeft, fadeRight;
+    private final Paint fadePaint = new Paint();
 
     public LogoScreen(GameView g) {
         super(g);
@@ -60,6 +62,13 @@ public final class LogoScreen extends Screen {
         float lw = logo != null ? logo.getWidth() * k : w, lh = logo != null ? logo.getHeight() * k : w * 0.56f;
         float cy = h * 0.44f;
         dst.set(w / 2f - lw / 2f, cy - lh / 2f, w / 2f + lw / 2f, cy + lh / 2f);
+        // Görsel kenarlarını arka plana yumuşakça karıştıran geçişler (bir kez oluşturulur)
+        float f = 90f * u;
+        int clear = BG & 0x00FFFFFF;
+        fadeTop = new android.graphics.LinearGradient(0, dst.top, 0, dst.top + f, BG, clear, android.graphics.Shader.TileMode.CLAMP);
+        fadeBottom = new android.graphics.LinearGradient(0, dst.bottom - f, 0, dst.bottom, clear, BG, android.graphics.Shader.TileMode.CLAMP);
+        fadeLeft = new android.graphics.LinearGradient(dst.left, 0, dst.left + f, 0, BG, clear, android.graphics.Shader.TileMode.CLAMP);
+        fadeRight = new android.graphics.LinearGradient(dst.right - f, 0, dst.right, 0, clear, BG, android.graphics.Shader.TileMode.CLAMP);
         // Devre yolu (90° dönüşlü): ekranın altından SOFTWARE yazısının hemen altına (yazının üstünden geçmez)
         float cx = w / 2f, endY = dst.top + lh * 0.70f;
         px[0] = cx - 300f * u; py[0] = h + 60f * u;
@@ -158,6 +167,15 @@ public final class LogoScreen extends Screen {
             Ui.path.addCircle(px[4], py[4], Math.max(1f, revealR), android.graphics.Path.Direction.CW);
             c.clipPath(Ui.path);
             c.drawBitmap(logo, src, dst, bmp);
+            float f = 90f * u;
+            fadePaint.setShader(fadeTop);
+            c.drawRect(dst.left, dst.top, dst.right, dst.top + f, fadePaint);
+            fadePaint.setShader(fadeBottom);
+            c.drawRect(dst.left, dst.bottom - f, dst.right, dst.bottom, fadePaint);
+            fadePaint.setShader(fadeLeft);
+            c.drawRect(dst.left, dst.top, dst.left + f, dst.bottom, fadePaint);
+            fadePaint.setShader(fadeRight);
+            c.drawRect(dst.right - f, dst.top, dst.right, dst.bottom, fadePaint);
             c.restore();
             if (rt < 1f) {
                 // Işık cephesi
