@@ -18,7 +18,11 @@ Ekran görüntüleri: [`docs/screenshots/`](docs/screenshots).
 
 Android Studio ile `yanlis-renk/` klasörünü açın (kökteki diğer proje değil) ve `android` yapılandırmasını çalıştırın. Komut satırı için BUILD_REPORT.md'ye bakın.
 
+## Açılış
+Oyun, Magic Lumos Software logosunun oyuna özel animasyonuyla açılır (dokunarak geçilebilir).
+
 ## Lisanslar
 * Kod ve üretilmiş varlıklar: bu projeye aittir (`tools/art/gen_icons.py`, `tools/audio/gen_audio.py` ile yeniden üretilebilir).
+* Magic Lumos Software logosu: şirketin kendi görseli (`android/assets/brand/`).
 * Yazı tipi: Nunito — SIL Open Font License 1.1 (`android/assets/fonts/OFL.txt`).
 * libGDX: Apache 2.0.

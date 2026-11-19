@@ -38,7 +38,7 @@ class YanlisRenkGame(val platform: PlatformServices) : Game() {
         levels = LevelRepository { name -> runCatching { Gdx.files.internal("levels/$name").readString("UTF-8") }.getOrNull() }
         world = WorldRenderer(assets)
         syncTime()
-        setScreen(SplashScreen(this))
+        setScreen(com.yanlisrenk.game.screens.IntroScreen(this))
     }
 
     /** Güvenilir sunucu zamanıyla eşitle (internet yoksa sessizce geçer). */

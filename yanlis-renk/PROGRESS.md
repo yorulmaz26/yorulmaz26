@@ -26,3 +26,6 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 
 ## 1.0.1 (açılış çökmesi düzeltmesi)
 * Kullanıcı 1.0.0'ın açılmadığını bildirdi. Android 11 emülatöründe yeniden üretildi: R8 libGDX'in yansıma ile kullandığı kurucuları silmişti. R8 kapatıldı, yazı tipi paketleme ve müzik yükleme iyileştirildi, çökme raporu penceresi eklendi. 1.0.1 emülatörde açıldı ve oynandı.
+
+## 1.0.2 (Magic Lumos Software açılışı)
+* Oyun açılırken Magic Lumos Software logosu oyuna özel bir animasyonla gösteriliyor (`core/.../screens/IntroScreen.kt`, görsel `android/assets/brand/magic_lumos.jpg`): 4 oyun renginde devre hatları, logoyu soldan sağa açan renk değiştiren "lumos" ışık huzmesi, logodan geçerken K→M→Y→S olan küp karakter, 4 renkli ışık patlaması ve "sunar". ~4,8 sn, dokunarak atlanabilir. Masaüstü QA'da ara kareleri doğrulandı (`docs/screenshots/00a–00d`).

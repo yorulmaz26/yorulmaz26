@@ -52,6 +52,10 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
             game.go({ GameScreen(game, mode, level) }, remember = false)
             Gdx.app.postRunnable { (game.screen as? GameScreen)?.debugStart(secs) }
         })
+        go("00a_intro") { IntroScreen(game) }
+        go("00b_intro") { IntroScreen(game) }
+        go("00c_intro") { IntroScreen(game) }
+        go("00d_intro") { IntroScreen(game) }
         go("01_splash") { SplashScreen(game) }
         shots.add("02_ana_menu" to { s.data.daily.lastClaimDay = s.dayKey(); s.data.unlockedLevel = 38; game.go({ MainMenuScreen(game) }, remember = false) })
         go("03_harita") { WorldMapScreen(game) }
@@ -109,7 +113,15 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         frameTimes.add((System.nanoTime() - t0) / 1e6f)
         frames++
         elapsed += Gdx.graphics.deltaTime
-        val wait = if (shots[step].first.startsWith("07") || shots[step].first.startsWith("08")) 2.6f else 0.8f
+        val name0 = shots[step].first
+        val wait = when {
+            name0.startsWith("00a") -> 1.0f
+            name0.startsWith("00b") -> 1.9f
+            name0.startsWith("00c") -> 2.6f
+            name0.startsWith("00d") -> 3.35f
+            name0.startsWith("07") || name0.startsWith("08") -> 2.6f
+            else -> 0.8f
+        }
         if (frames >= 20 && elapsed >= wait) {
             elapsed = 0f
             val name = shots[step].first
