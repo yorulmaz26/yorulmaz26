@@ -28,7 +28,7 @@ namespace WorldWonders.Core
         public const int SigIntroLevel = 21;
 
         public static readonly string[] StoneNames =
-            { "Altın Sikke", "Antik Parşömen", "Antik Amfora", "Defne Çelengi", "Safir Pusula", "Yakut Taç" };
+            { "Altın Sikke", "Antik Parşömen", "Antik Amfora", "Defne Çelengi", "Horus’un Gözü", "Yakut Taç" };
 
         public static readonly Dictionary<string, int> BlockHp = new Dictionary<string, int>
         {

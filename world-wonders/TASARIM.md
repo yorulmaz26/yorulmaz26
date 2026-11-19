@@ -8,7 +8,7 @@ Bu doküman iki şeyi içeriyor: mevcut konseptin analizi ve henüz verilmemiş 
 
 | Karar | Prototipte |
 |---|---|
-| 6 sabit taş: Altın sikke, Parşömen, Amfora, Defne çelengi (başta Mısır skarabesiydi; kullanıcı isteğiyle değişti), Safir pusula, Yakut taç | Her destinasyonda aynı. Her birinin farklı bir silueti var: daire, geniş rulo, uzun vazo, oval böcek, eşkenar dörtgen, taç |
+| 6 sabit taş: Altın sikke, Parşömen, Amfora, Defne çelengi (başta Mısır skarabesiydi; kullanıcı isteğiyle değişti), Horus’un Gözü (başta Safir pusulaydı; kullanıcı isteğiyle değişti), Yakut taç | Her destinasyonda aynı. Her birinin farklı bir silueti var: daire, geniş rulo, uzun vazo, oval böcek, eşkenar dörtgen, taç |
 | Sade, nötr Match-3 tahtası | Açık taş rengi dama zemin. Tahtanın arkasında yapı ya da manzara yok |
 | Bölge atmosferi tahtanın dışında | Bölüm girişi illüstrasyonu, harita, engeller ve görev objeleri |
 | Her 5 bölümde 1 puzzle parçası | `LEVELS_PER_PIECE = 5` |
@@ -136,7 +136,7 @@ Periyodik mekaniklerde oyun ekranında geri sayım görünür ("Kum Fırtınası
 Liderlik tablosu, takımlar ve etkinlikler ("Haftanın Harikası" gibi). Bunlar şimdilik kapsam dışı ama kayıt yapısını etkiler (sunucu tarafı ilerleme).
 
 ### ✅ Karar 9: Erişilebilirlik (KARARLAŞTIRILDI ve UYGULANDI)
-- **Renk körü modu** (Ayarlar): her taşın köşesine ayrı bir sembol eklenir: ● sikke, ■ parşömen, ▲ amfora, ✚ defne çelengi, ◆ pusula, ★ taç. Taşların siluetleri zaten farklı; sembol ikinci bir güvence. Hedef simgelerine de yansır.
+- **Renk körü modu** (Ayarlar): her taşın köşesine ayrı bir sembol eklenir: ● sikke, ■ parşömen, ▲ amfora, ✚ defne çelengi, ◆ Horus’un Gözü, ★ taç. Taşların siluetleri zaten farklı; sembol ikinci bir güvence. Hedef simgelerine de yansır.
 - **Titreşim** (Ayarlar, varsayılan açık): özel güç, patlama ve puzzle parçasında kısa titreşim (destekleyen cihazlarda).
 - **Azaltılmış hareket:** cihazın "hareketi azalt" ayarı dikkate alınır.
 
