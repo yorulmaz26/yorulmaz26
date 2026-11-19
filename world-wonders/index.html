@@ -165,6 +165,14 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 .stoneList div{display:flex;flex-direction:column;align-items:center;font-size:11px;font-weight:800;color:var(--muted);text-align:center}
 .stoneList img{width:44px;height:44px}
 #fxLayer{position:absolute;inset:0;z-index:60;pointer-events:none}
+.tapLayer{position:absolute;inset:0;z-index:61;background:rgba(6,16,26,.35);display:flex;align-items:flex-end;justify-content:center;padding:0 16px max(9vh,calc(env(safe-area-inset-bottom,0px) + 24px))}
+.tapLayer span{padding:12px 20px;border-radius:999px;background:var(--parch);color:var(--ink);font-weight:900;font-size:16px;box-shadow:0 6px 20px rgba(0,0,0,.4);animation:bob 1.4s ease-in-out infinite}
+.deco{position:absolute;width:34px;height:40px;margin-left:-17px;transform-origin:50% 100%;transform-style:preserve-3d;pointer-events:none}
+.deco canvas{width:34px;height:40px;filter:drop-shadow(0 3px 2px rgba(0,0,0,.35))}
+.deco.pop{animation:decoPop 1s cubic-bezier(.2,1.8,.4,1) both}
+@keyframes decoPop{from{scale:0;opacity:0}to{scale:1;opacity:1}}
+.slot{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;border:2px dashed rgba(255,255,255,.55);pointer-events:none}
+.hardTag{display:inline-block;padding:2px 9px;border-radius:999px;background:#c23b3b;color:#fff;font-family:var(--f-body);font-weight:900;font-size:11px;letter-spacing:.08em;vertical-align:middle}
 @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 </style>
 </head>
@@ -741,8 +749,8 @@ function monumentIcon(id, w=208, h=192){ const cv = document.createElement('canv
 function makeLevel(g){
   const w = Math.min(WONDERS.length-1, Math.floor((g-1)/LEVELS_PER_WONDER)), li = (g-1)%LEVELS_PER_WONDER + 1, W = WONDERS[w];
   const rnd = mulberry32(g*7919 + 13);
-  const diff = clamp((li-1)/(LEVELS_PER_WONDER-1),0,1)*.75 + w*.035;
-  const L = { g, w, li, colors: g <= 8 ? 5 : 6, moves: Math.round(24 - diff*6 + rnd()*4), goals:[],
+  const diff = clamp((li-1)/(LEVELS_PER_WONDER-1),0,1)*.6 + w*.02;   // bot testleriyle ayarlandı
+  const L = { g, w, li, colors: g <= 8 ? 5 : 6, moves: Math.round(25 - diff*5 + rnd()*4), goals:[],
     blocks: Array.from({length:ROWS},()=>Array(COLS).fill(null)), layers: Array.from({length:ROWS},()=>Array(COLS).fill(0)),
     relics: [], relicTotal:0, seed: g*31 + 7 };
   const mirrorPick = (n, rows, avoid) => { const out = []; let guard = 0;
@@ -758,22 +766,30 @@ function makeLevel(g){
   else primary = mechs[Math.floor(rnd()*mechs.length)];
   const colorGoal = (k, base) => { const cs = shuffleArr([...Array(L.colors).keys()], rnd).slice(0,k); cs.forEach(ci => L.goals.push({ t:'color', c:ci, n: Math.round(base + diff*14 + rnd()*4) })); };
   const placeBlocks = (n) => { const ks = mirrorPick(n, [2,6]); const hard = W.blocks[1];
-    ks.forEach(k=>{ const r = Math.floor(k/COLS), c = k%COLS; let kind = W.blocks[0]; if (hard && rnd() < .2 + diff*.6) kind = hard; let hp = BLOCKS[kind].hp; if (hp >= 3 && rnd() > diff*1.3) hp = 2; L.blocks[r][c] = { kind, hp, max:hp }; });
+    ks.forEach(k=>{ const r = Math.floor(k/COLS), c = k%COLS; let kind = W.blocks[0]; if (hard && rnd() < .15 + diff*.45) kind = hard; let hp = BLOCKS[kind].hp; if (hp >= 3 && rnd() > diff*.8) hp = 2; L.blocks[r][c] = { kind, hp, max:hp }; });
     // simetri: ayna hücre aynı tür olsun
     for (let r=0;r<ROWS;r++) for (let c=0;c<COLS/2;c++){ const b = L.blocks[r][c]; if (b) L.blocks[r][COLS-1-c] = { ...b }; else L.blocks[r][COLS-1-c] = null; }
     return L.blocks.flat().filter(Boolean).length; };
   const placeLayers = (n) => { const ks = mirrorPick(n, [1,7], (r,c)=>L.blocks[r][c]); let cnt = 0;
-    ks.forEach(k=>{ const r = Math.floor(k/COLS), c = k%COLS; if (L.blocks[r][c]) return; L.layers[r][c] = rnd() < diff*.7 ? 2 : 1; cnt++; }); return cnt; };
+    ks.forEach(k=>{ const r = Math.floor(k/COLS), c = k%COLS; if (L.blocks[r][c]) return; L.layers[r][c] = rnd() < diff*.45 ? 2 : 1; cnt++; }); return cnt; };
   switch (primary){
     case 'tut1': L.moves = 20; L.goals.push({t:'color',c:0,n:12},{t:'color',c:3,n:12}); break;
     case 'tut2': L.moves = 20; L.goals.push({t:'score',n:3000}); break;
-    case 'color': colorGoal(rnd()<.5?1:2, 16); if (li > 6 && rnd() < .6) placeBlocks(4 + Math.floor(diff*6)); break;
-    case 'block': { const n = placeBlocks(6 + Math.floor(diff*10)); L.goals.push({ t:'block', n }); L.moves += 3; if (rnd()<.35) colorGoal(1, 12); break; }
-    case 'layer': { if (rnd() < .4) placeBlocks(4); const n = placeLayers(10 + Math.floor(diff*16)); L.goals.push({ t:'layer', n }); L.moves += 3; break; }
-    case 'relic': { if (rnd() < .5) placeBlocks(4 + Math.floor(diff*4)); L.relicTotal = 2 + Math.floor(diff*3); L.goals.push({ t:'relic', n:L.relicTotal }); L.moves += 4;
-      const cols = shuffleArr([1,2,3,4,5,6], rnd).slice(0, Math.min(2, L.relicTotal)); cols.forEach(c=>{ if (!L.blocks[0][c]) L.relics.push([0,c]); }); break; }
+    case 'color': colorGoal(rnd()<.5?1:2, 14); if (li > 6 && rnd() < .6) placeBlocks(4 + Math.floor(diff*6)); break;
+    case 'block': { const n = placeBlocks(6 + Math.floor(diff*8)); L.goals.push({ t:'block', n }); L.moves += 4; if (rnd()<.35) colorGoal(1, 12); break; }
+    case 'layer': { if (rnd() < .3) placeBlocks(4); const n = placeLayers(8 + Math.floor(diff*12)); L.goals.push({ t:'layer', n }); L.moves += 6; break; }
+    case 'relic': { if (rnd() < .35) placeBlocks(4 + Math.floor(diff*4)); L.relicTotal = 2 + Math.floor(diff*2); L.goals.push({ t:'relic', n:L.relicTotal }); L.moves += 9;
+      const cols = shuffleArr([1,2,3,4,5,6], rnd).slice(0, Math.min(3, L.relicTotal)); cols.forEach(c=>{ if (!L.blocks[0][c]) L.relics.push([0,c]); }); break; }
   }
   L.primary = primary;
+  // testere dişi: 5'li döngünün 1. bölümü "nefes", 5. bölümü parça taşıyan "zor bölüm"
+  const pos = (g-1) % LEVELS_PER_PIECE;
+  L.hard = g > LEVELS_PER_PIECE && pos === LEVELS_PER_PIECE-1;
+  if (g > LEVELS_PER_PIECE && pos === 0) L.moves += 3;
+  if (L.hard){ L.moves -= 2; L.goals.forEach(gl=>{ if (gl.t==='color' || gl.t==='score') gl.n = Math.round(gl.n*1.15); }); }
+  if (g <= 10) L.moves += 6 - Math.floor(g/3);           // ilk 10 bölüm: öğrenme dönemi, cömert hamle
+  else if (L.li <= 3) L.moves += 2;                       // yeni destinasyona yumuşak giriş
+  L.moves = Math.max(14, L.moves);
   return L;
 }
 function goalIcon(goal, W){
@@ -1040,7 +1056,7 @@ async function settle(){
 function bottomOf(r,c){ for (let y=r+1;y<ROWS;y++) if (!G.blocks[y][c]) return false; return true; }
 function fillableFromAbove(r,c){ for (let y=r; y>=0; y--) if (G.blocks[y][c]) return false; return true; }
 function spawnGem(c){
-  const rel = G.W.relic && G.relicSpawned < G.L.relicTotal && relicsOnBoard() < 2 && G.rnd() < .12;
+  const rel = G.W.relic && G.relicSpawned < G.L.relicTotal && relicsOnBoard() < 3 && G.rnd() < .25;
   if (rel){ G.relicSpawned++; return newGem(-1,-1,c,{ kind:'relic', shape:G.W.relic.shape }); }
   return newGem(randColor(), -1, c);
 }
@@ -1151,7 +1167,7 @@ function stepFx(dt){
 /* ---- HUD ---- */
 function renderHUD(){
   if (!G) return; const W = G.W;
-  $('#lvlTitle').innerHTML = `${W.name} · Bölüm ${G.L.li}<small>${W.country.toUpperCase()} · GENEL ${G.g}</small>`;
+  $('#lvlTitle').innerHTML = `${W.name} · Bölüm ${G.L.li}<small>${G.L.hard ? '<span class="hardTag">ZOR · PARÇA</span> ' : ''}${W.country.toUpperCase()} · GENEL ${G.g}</small>`;
   $('#moves').textContent = G.moves; $('#movesBox').classList.toggle('low', G.moves <= 5);
   $('#score').textContent = G.score.toLocaleString('tr-TR');
   $('#goals').innerHTML = G.goals.map(gl=>{ const left = gl.t==='score' ? Math.max(0, gl.n - G.score) : gl.left; const done = left<=0;
@@ -1167,14 +1183,14 @@ function toast(text){ const b = document.createElement('div'); b.className='bann
 /* ---- kazan / kaybet ---- */
 function starsFor(){ const ratio = G.moves / G.L.moves; return ratio >= .3 ? 3 : ratio >= .12 ? 2 : 1; }
 async function winLevel(){
-  G.over = true; G.busy = true; await wait(250);
+  G.over = true; G.busy = true; const me = G; await wait(250); if (G !== me) return;
   toast('Bölüm Tamamlandı!'); Sound.win();
   const stars = starsFor();
   // kalan hamle bonusu: her hamle rastgele bir taşı parlatır
   const bonusMoves = G.moves;
-  for (let i=0; i<Math.min(bonusMoves, 12); i++){ const cand = G.grid.flat().filter(g=>g && g.kind==='gem'); const g = cand[Math.floor(Math.random()*cand.length)]; if (g){ burst(g.x+.5,g.y+.5,'#fff1b0',10); addScore(250, g.y, g.x); } G.moves--; renderHUD(); await wait(90); }
+  for (let i=0; i<Math.min(bonusMoves, 12); i++){ const cand = G.grid.flat().filter(g=>g && g.kind==='gem'); const g = cand[Math.floor(Math.random()*cand.length)]; if (g){ burst(g.x+.5,g.y+.5,'#fff1b0',10); addScore(250, g.y, g.x); } G.moves--; renderHUD(); await wait(90); if (G !== me) return; }
   if (bonusMoves > 12){ addScore((bonusMoves-12)*250, 3.5, 3.5); G.moves = 0; }
-  await wait(600);
+  await wait(600); if (G !== me) return;
   const g = G.g; save.stars[g] = Math.max(save.stars[g] || 0, stars);
   const prevPieces = piecesOf(G.L.w);
   if (save.lvl === g) save.lvl = g + 1;
@@ -1189,7 +1205,7 @@ async function winLevel(){
     <h2>Harika iş!</h2>
     <div class="stars">${[1,2,3].map(i=>`<span class="${i<=stars?'on':''}" style="animation-delay:${i*.18}s">★</span>`).join('')}</div>
     <p style="text-align:center;font-weight:900;font-size:20px;margin:4px 0">${G.score.toLocaleString('tr-TR')} puan</p>
-    ${earnedPiece ? `<p style="text-align:center"><b>Yeni bir ${W.name} puzzle parçası kazandın!</b>${refilled ? `<br><span style="color:#c23b3b;font-weight:800">♥ Canların doldu!</span>` : ''}</p>` : `<p style="text-align:center;color:var(--muted);font-weight:700">Sonraki puzzle parçasına ${LEVELS_PER_PIECE - ((save.lvl-1)%LEVELS_PER_PIECE)} bölüm kaldı.</p>`}
+    ${earnedPiece ? `<p style="text-align:center"><b>Yeni bir ${W.name} puzzle parçası kazandın!</b><br><span style="color:var(--muted);font-weight:700;font-size:14px">Haritada ${W.name} çevresinde yeni bir süs açıldı.</span>${refilled ? `<br><span style="color:#c23b3b;font-weight:800">♥ Canların doldu!</span>` : ''}</p>` : `<p style="text-align:center;color:var(--muted);font-weight:700">Sonraki puzzle parçasına ${LEVELS_PER_PIECE - ((save.lvl-1)%LEVELS_PER_PIECE)} bölüm kaldı.</p>`}
     <div class="row">${earnedPiece ? `<button class="btn wide" id="mPiece">Parçayı Al</button>` : `<button class="btn ghost" id="mMap">Harita</button>${finished?'':'<button class="btn" id="mNext">Sonraki Bölüm</button>'}`}</div>`);
   if (earnedPiece) $('#mPiece').onclick = () => { closeModal(); openPuzzle(G.L.w, { reward:true }); };
   else { $('#mMap').onclick = () => { closeModal(); openMap(); }; const n = $('#mNext'); if (n) n.onclick = () => { closeModal(); openLevelIntro(save.lvl); }; }
@@ -1274,17 +1290,24 @@ async function openPuzzle(w, { reward=false } = {}){
   const fx = $('#fxLayer'); const fc = fx.getContext('2d'); const d = Math.min(2, window.devicePixelRatio||1);
   const ex = rect.left + (P.x - P.m)*scale, ey = rect.top + (P.y - P.m)*scale, ew = P.cv.width*scale, eh = P.cv.height*scale;
   const sx = window.innerWidth/2 - ew*.8, sy = window.innerHeight*.62 - eh*.8;
-  const o = { t:0 };
+  const o = { t:0 }; let hover = false;
   Sound.piece();
-  const anim = tween(o,{ t:1 },1300,linear);
   uiFx.piece = { draw: () => { const t = o.t; let x, y, s, r;
       if (t < .45){ const p = easeOutBack(t/.45); x = sx; y = sy + (1-p)*120; s = 1.6*p; r = (1-p)*-.6 + Math.sin(t*20)*.03; }
       else { const p = easeInOut((t-.45)/.55); x = sx + (ex - sx)*p; y = sy + (ey - sy)*p - Math.sin(p*Math.PI)*80; s = 1.6 + (1-1.6)*p; r = 0; }
+      if (hover){ const n = performance.now(); y += Math.sin(n*.004)*7; r = Math.sin(n*.003)*.05; }
       fc.save(); fc.translate((x+ew*s/2)*d,(y+eh*s/2)*d); fc.rotate(r); fc.globalAlpha = 1;
       fc.fillStyle = rgrad(fc,0,0,0,0,0,ew*s*d,[[0,'rgba(255,220,120,.45)'],[1,'rgba(255,220,120,0)']]); fc.fillRect(-ew*s*d,-eh*s*d,ew*s*2*d,eh*s*2*d);
       fc.drawImage(P.cv, -ew*s/2*d, -eh*s/2*d, ew*s*d, eh*s*d); fc.restore(); } };
-  await anim; uiFx.piece = null;
-  drawPuzzle(cv, w, owned); Sound.swap();
+  await tween(o,{ t:.45 },585,linear);
+  // hibrit etkileşim: parça ortada süzülür, oyuncu dokununca yerine uçar
+  hover = true;
+  const tap = document.createElement('button'); tap.className = 'tapLayer'; tap.id = 'tapPiece'; tap.setAttribute('aria-label','Parçayı yerleştir');
+  tap.innerHTML = '<span>Parçaya dokun, yerine oturt</span>'; $('#app').appendChild(tap); tap.focus();
+  await new Promise(res => { tap.onclick = res; });
+  tap.remove(); hover = false; Sound.swap();
+  await tween(o,{ t:1 },715,linear); uiFx.piece = null;
+  drawPuzzle(cv, w, owned); Sound.piece();
   confetti(rect.left + (P.x + P.cv.width/2 - P.m)*scale, rect.top + (P.y + P.cv.height/2 - P.m)*scale, 40, ['#ffd45a','#fff1b0','#e8b23a']);
   cv.parentElement.animate([{ transform:'scale(1)' },{ transform:'scale(1.03)' },{ transform:'scale(1)' }], { duration:300 });
   if (n >= PIECES_PER_WONDER){ await wait(700); await completeWonder(w); }
@@ -1329,6 +1352,53 @@ const LAND = [
 ];
 const DESERT = [[[ -15,28],[0,33],[20,30],[32,28],[34,18],[20,15],[0,16],[-14,18]],[[38,28],[50,30],[56,22],[48,16],[40,20]],[[122,-20],[136,-20],[140,-28],[126,-30]],[[90,45],[110,45],[115,40],[95,38]]];
 const ICE = [[[-55,62],[-42,62],[-24,70],[-28,79],[-58,79],[-66,75]]];
+/* ---- ara ödül: her puzzle parçası haritada harikanın çevresine bir süs açar ---- */
+const PROPS = { cypress:'Selvi', pine:'Çam', palm:'Palmiye', bush:'Çalı', flowers:'Çiçek Bahçesi', lantern:'Fener', flag:'Sancak', tent:'Bedevi Çadırı', camel:'Deve', llama:'Lama', house:'Ev', column:'Antik Sütun', torch:'Meşale', cactus:'Kaktüs', boat:'Kayık' };
+const DECOR = {
+  colosseum:['cypress','column','flag:#b3262b','pine','column','flowers','lantern','cypress','house','bush','flag:#e8b23a','cypress'],
+  petra:['palm','tent','camel','palm','torch','tent','camel','palm','bush','torch','flowers','palm'],
+  taj:['cypress','flowers','lantern','palm','flowers','cypress','flag:#2f9d62','bush','lantern','flowers','palm','cypress'],
+  wall:['pine','lantern','pine','flag:#e8b23a','pine','house','lantern','pine','bush','flag:#c23b3b','pine','lantern'],
+  machu:['llama','pine','bush','llama','house','flowers','pine','llama','bush','torch','flowers','house'],
+  chichen:['palm','cactus','torch','palm','bush','flowers','cactus','palm','torch','bush','flowers','palm'],
+  christ:['palm','boat','palm','house','flowers','boat','palm','house','lantern','bush','palm','flag:#2f9d62'],
+};
+function drawProp(c, spec){
+  const [type, col] = spec.split(':'); c.save(); c.translate(30,70); c.lineJoin='round'; c.lineCap='round';
+  const tri = (x,y,w,h,f)=>{ c.fillStyle=f; c.beginPath(); c.moveTo(x-w/2,y); c.lineTo(x,y-h); c.lineTo(x+w/2,y); c.closePath(); c.fill(); };
+  switch(type){
+    case 'cypress': c.fillStyle='#5b3a1e'; c.fillRect(-2,-8,4,8); c.fillStyle = grad(c,-8,0,8,0,[[0,'#2f6a33'],[1,'#1d4523']]); c.beginPath(); c.moveTo(0,-64); c.quadraticCurveTo(12,-30,7,-6); c.lineTo(-7,-6); c.quadraticCurveTo(-12,-30,0,-64); c.fill(); break;
+    case 'pine': c.fillStyle='#5b3a1e'; c.fillRect(-3,-10,6,10); tri(0,-8,40,26,'#1f5a35'); tri(0,-24,32,24,'#2a6e42'); tri(0,-40,22,22,'#368a52'); break;
+    case 'palm': c.strokeStyle='#8a5a2b'; c.lineWidth=5; c.beginPath(); c.moveTo(0,0); c.quadraticCurveTo(6,-26,2,-50); c.stroke(); c.fillStyle='#2f8a3e'; for(let i=0;i<6;i++){ c.save(); c.translate(2,-50); c.rotate(-2.6+i*1.04); c.beginPath(); c.ellipse(13,0,14,4.5,0,0,TAU); c.fill(); c.restore(); } break;
+    case 'bush': [[-10,-10,11],[10,-10,11],[0,-18,13]].forEach(([x,y,r],i)=>{ c.fillStyle = i===2?'#4f9a45':'#3b7d37'; c.beginPath(); c.arc(x,y,r,0,TAU); c.fill(); }); break;
+    case 'flowers': c.fillStyle='#4f9a45'; c.beginPath(); c.ellipse(0,-6,24,8,0,0,TAU); c.fill(); [['#e0384f',-12,-10],['#ffd45a',0,-14],['#c86bd8',12,-10],['#ffffff',-5,-6],['#ff8a3d',7,-5]].forEach(([f,x,y])=>{ c.fillStyle=f; c.beginPath(); c.arc(x,y,4,0,TAU); c.fill(); }); break;
+    case 'lantern': c.fillStyle='#3b3b40'; c.fillRect(-2,-46,4,46); c.fillStyle = rgrad(c,0,-50,1,0,-50,18,[[0,'rgba(255,220,120,.9)'],[1,'rgba(255,220,120,0)']]); c.beginPath(); c.arc(0,-50,18,0,TAU); c.fill(); c.fillStyle='#c23b3b'; rrect(c,-7,-58,14,16,5); c.fill(); c.fillStyle='#ffe08a'; c.fillRect(-3,-54,6,8); break;
+    case 'flag': c.fillStyle='#6b5a44'; c.fillRect(-2,-62,4,62); c.fillStyle = col || '#c23b3b'; c.beginPath(); c.moveTo(2,-62); c.quadraticCurveTo(14,-66,26,-58); c.quadraticCurveTo(14,-52,2,-48); c.fill(); break;
+    case 'tent': c.fillStyle='#7a4b2a'; c.beginPath(); c.moveTo(-26,0); c.lineTo(-16,-26); c.lineTo(16,-26); c.lineTo(26,0); c.fill(); c.fillStyle='#e6c79a'; for(let i=0;i<4;i++) c.fillRect(-22+i*12,-24,5,24); c.fillStyle='#3a2415'; c.beginPath(); c.moveTo(-6,0); c.lineTo(0,-14); c.lineTo(6,0); c.fill(); break;
+    case 'camel': c.fillStyle='#c48c52'; c.beginPath(); c.ellipse(0,-22,16,9,0,0,TAU); c.fill(); c.beginPath(); c.arc(-4,-30,7,Math.PI,0); c.fill(); c.fillRect(11,-40,5,18); c.beginPath(); c.ellipse(17,-40,6,4,0,0,TAU); c.fill(); [-11,-5,6,11].forEach(x=>c.fillRect(x-1.5,-16,3,16)); break;
+    case 'llama': c.fillStyle='#f2ede0'; c.beginPath(); c.ellipse(-2,-20,13,8,0,0,TAU); c.fill(); c.fillRect(6,-44,6,24); c.beginPath(); c.ellipse(11,-45,6,4,0,0,TAU); c.fill(); c.fillRect(8,-52,2,6); c.fillRect(12,-52,2,6); [-12,-6,4,9].forEach(x=>c.fillRect(x-1.5,-14,3,14)); c.fillStyle='#c23b3b'; c.fillRect(-8,-28,10,3); break;
+    case 'house': c.fillStyle='#f3ecdc'; c.fillRect(-14,-24,28,24); tri(0,-22,36,18,'#b8502c'); c.fillStyle='#4a3524'; c.fillRect(-4,-12,8,12); c.fillStyle='#7fb6e6'; c.fillRect(6,-18,5,5); break;
+    case 'column': c.fillStyle = grad(c,-8,0,8,0,[[0,'#f5ead2'],[1,'#c9b78f']]); c.fillRect(-7,-44,14,40); c.fillRect(-11,-6,22,6); c.fillRect(-10,-48,20,5); c.strokeStyle='rgba(120,100,70,.5)'; c.lineWidth=1; [-3,1,5].forEach(x=>{ c.beginPath(); c.moveTo(x,-43); c.lineTo(x,-6); c.stroke(); }); c.fillStyle='#d9c9a5'; c.beginPath(); c.moveTo(-10,-48); c.lineTo(-2,-54); c.lineTo(10,-48); c.fill(); break;
+    case 'torch': c.fillStyle='#5b3a1e'; c.fillRect(-2.5,-40,5,40); c.fillStyle = rgrad(c,0,-46,1,0,-46,16,[[0,'rgba(255,180,60,.9)'],[1,'rgba(255,180,60,0)']]); c.beginPath(); c.arc(0,-46,16,0,TAU); c.fill(); c.fillStyle='#ff9a2e'; c.beginPath(); c.moveTo(-6,-40); c.quadraticCurveTo(-6,-52,0,-58); c.quadraticCurveTo(6,-52,6,-40); c.fill(); c.fillStyle='#ffe08a'; c.beginPath(); c.ellipse(0,-44,3,5,0,0,TAU); c.fill(); break;
+    case 'cactus': c.fillStyle='#3f8a4a'; rrect(c,-6,-50,12,50,6); c.fill(); rrect(c,-20,-34,8,20,4); c.fill(); c.fillRect(-14,-20,10,6); rrect(c,12,-40,8,18,4); c.fill(); c.fillRect(4,-28,10,6); break;
+    case 'boat': c.fillStyle='#8a5a2b'; c.beginPath(); c.moveTo(-24,-12); c.lineTo(24,-12); c.lineTo(16,0); c.lineTo(-16,0); c.closePath(); c.fill(); c.fillStyle='#6b5a44'; c.fillRect(-1.5,-50,3,38); c.fillStyle='#fff'; c.beginPath(); c.moveTo(2,-48); c.lineTo(20,-16); c.lineTo(2,-16); c.fill(); break;
+  }
+  c.restore();
+}
+function propCanvas(spec){ const cv = document.createElement('canvas'); cv.width = 68; cv.height = 80; const c = cv.getContext('2d'); c.scale(68/60, 80/72); drawProp(c, spec); return cv; }
+function decoSlot(w, i){ const [x,y] = proj(WONDERS[w].lon, WONDERS[w].lat); const a = i/PIECES_PER_WONDER*TAU + w*.7 + .3, rad = 64 + (i%3)*24; return [x + Math.cos(a)*rad*1.25, y + Math.sin(a)*rad*.75 + 10]; }
+const totalPieces = () => WONDERS.reduce((a,_,w)=>a+piecesOf(w),0);
+function renderDecor(animateFrom){
+  const plane = $('#plane'); plane.querySelectorAll('.deco,.slot').forEach(e=>e.remove());
+  const cur = currentWonder(); let gIdx = 0; const fresh = [];
+  WONDERS.forEach((W,w)=>{ const k = piecesOf(w);
+    for (let i=0;i<PIECES_PER_WONDER;i++, gIdx++){ const [x,y] = decoSlot(w,i);
+      if (i < k){ const d = document.createElement('div'); d.className = 'deco'; d.style.left = x+'px'; d.style.top = (y-40)+'px'; d.style.transform = 'rotateX(-46deg)'; d.appendChild(propCanvas(DECOR[W.id][i]));
+        if (animateFrom !== null && gIdx >= animateFrom){ d.classList.add('pop'); d.style.animationDelay = (fresh.length*.25 + .3)+'s'; fresh.push({ w, spec:DECOR[W.id][i], el:d }); }
+        plane.insertBefore(d, plane.querySelector('.pin')); }
+      else if (w === cur){ const s = document.createElement('div'); s.className = 'slot'; s.style.left = x+'px'; s.style.top = y+'px'; plane.insertBefore(s, plane.querySelector('.pin')); } } });
+  return fresh;
+}
 let cam = { x:0, y:0 }, mapBuilt = false;
 function buildMap(){
   const plane = $('#plane'); plane.style.width = MW+'px'; plane.style.height = MH+'px';
@@ -1379,6 +1449,10 @@ async function openMap({ celebrate=null } = {}){
     pin.className = 'pin ' + (done ? 'done' : current ? 'current' : 'locked'); ring.className = 'ring ' + (done ? 'done' : ''); ring.style.display = done || current ? '' : 'none';
     const k = piecesOf(i); pin.querySelector('.sub').textContent = done ? '✦ Koleksiyonda' : current ? `🧩 ${k}/${PIECES_PER_WONDER} parça` : '🔒 Kilitli'; });
   renderRoute();
+  if (typeof save.decoSeen !== 'number'){ save.decoSeen = totalPieces(); persist(); }
+  const fresh = renderDecor(save.decoSeen < totalPieces() ? save.decoSeen : null);
+  if (fresh.length){ save.decoSeen = totalPieces(); persist();
+    setTimeout(()=>{ fresh.forEach((f,i)=>setTimeout(()=>{ const r = f.el.getBoundingClientRect(); confetti(r.left + r.width/2, r.top + r.height/2, 24, ['#ffd45a','#fff1b0','#2fa36b']); Sound.swap(); }, i*250)); mapNote(`Yeni süs: ${PROPS[fresh[fresh.length-1].spec.split(':')[0]]} · ${WONDERS[fresh[fresh.length-1].w].name}`); }, 700); }
   updateLifeChip();
   $('#starCount').textContent = totalStars(); $('#wonderCount').textContent = WONDERS.filter((_,i)=>wonderDone(i)).length;
   renderPanel();
@@ -1389,6 +1463,7 @@ async function openMap({ celebrate=null } = {}){
   else focusWonder(Math.min(cur, WONDERS.length-1), false);
   if (!save.seenIntro) showWelcome();
 }
+function mapNote(text){ const n = document.createElement('div'); n.className = 'chip'; n.textContent = text; n.style.cssText = 'position:absolute;z-index:6;left:50%;top:120px;translate:-50% 0;font-size:15px;padding:10px 16px;background:rgba(16,38,59,.9);animation:pop .4s cubic-bezier(.2,1.5,.4,1)'; $('#mapScreen').appendChild(n); setTimeout(()=>n.remove(), 3200); }
 function updateLifeChip(){ const l = syncLives(); $('#lifeCount').textContent = l; $('#lifeTimer').textContent = l < MAX_LIVES ? ' · ' + nextLifeText() : ''; }
 setInterval(()=>{ if ($('#mapScreen').classList.contains('active')) updateLifeChip(); const t = $('#mLifeTimer'); if (t){ t.textContent = nextLifeText(); if (save.lives > 0 && t.dataset.wait){ closeModal(); openLevelIntro(save.lvl); } } }, 1000);
 function noLivesModal(){
@@ -1446,6 +1521,7 @@ function openLevelIntro(g){
   const newTxt = L.introduces ? ({ block:()=>`Yeni engel: <b>${W.blocks.map(k=>BLOCKS[k].name).join(', ')}</b>. Yanında eşleşme yaparak kır.`, layer:()=>`Yeni engel: <b>${LAYERS[W.layer].name}</b>. Üzerindeki taşları eşleştirerek temizle.`, relic:()=>`Yeni görev: <b>${W.relic.name}</b>. Eseri tahtanın en altına indir.` })[L.primary]() : '';
   openModal(`<div class="kicker">${W.name} · ${W.country}</div><h2>Bölüm ${L.li}</h2>
     <canvas class="thumb" id="mThumb" width="480" height="360"></canvas>
+    ${L.hard ? `<p style="text-align:center;margin:0 0 6px"><span class="hardTag">ZOR BÖLÜM</span> <b>Kazanırsan puzzle parçası senin!</b></p>` : ''}
     <p style="text-align:center;font-weight:800;margin:0 0 4px">Hedefler · ${L.moves} hamle</p>
     <div class="goalsRow">${L.goals.map(gl=>`<div class="goal" title="${goalLabel(gl,W)}"><img alt="" src="${goalIcon(gl,W)}">${gl.t==='score'?gl.n.toLocaleString('tr-TR'):gl.n}</div>`).join('')}</div>
     ${newTxt ? `<p style="text-align:center">${newTxt}</p>` : ''}
@@ -1483,7 +1559,7 @@ function openSettings(){
   const tfl = $('#tFill'); if (tfl) tfl.onclick = () => { save.lives = MAX_LIVES; save.lifeTs = null; persist(); openSettings(); };
   const tj = $('#tJump'); if (tj) tj.onclick = () => { if (save.lvl <= TOTAL_LEVELS){ save.lvl = Math.max(save.lvl, Math.ceil(save.lvl/LEVELS_PER_PIECE)*LEVELS_PER_PIECE); persist(); } closeModal(); openMap(); };
   $('#tReset').onclick = () => { openModal(`<h2>Emin misin?</h2><p style="text-align:center">Tüm ilerlemen silinecek.</p><div class="row"><button class="btn ghost" id="mNo">Vazgeç</button><button class="btn" id="mYes">Sıfırla</button></div>`);
-    $('#mNo').onclick = openSettings; $('#mYes').onclick = () => { save = { lvl:1, stars:{}, sound:save.sound, test:save.test, seenIntro:true, lives:MAX_LIVES, lifeTs:null }; persist(); closeModal(); openMap(); }; };
+    $('#mNo').onclick = openSettings; $('#mYes').onclick = () => { save = { lvl:1, stars:{}, sound:save.sound, test:save.test, seenIntro:true, lives:MAX_LIVES, lifeTs:null, decoSeen:0 }; persist(); closeModal(); openMap(); }; };
   $('#mClose').onclick = () => { closeModal(); renderPanel(); };
 }
 
@@ -1492,7 +1568,7 @@ function showScreen(id){ document.querySelectorAll('.screen').forEach(s=>s.class
 function openModal(html){ $('#modalCard').innerHTML = html; $('#modal').hidden = false; $('#modalCard').style.animation = 'none'; void $('#modalCard').offsetWidth; $('#modalCard').style.animation = ''; }
 function closeModal(){ $('#modal').hidden = true; }
 $('#btnSettings').onclick = openSettings;
-$('#btnQuit').onclick = () => { if (!G) return; const costs = !G.over && G.moves < G.L.moves;
+$('#btnQuit').onclick = () => { if (!G || G.over) return; const costs = !G.over && G.moves < G.L.moves;
   openModal(`<h2>Bölümden çık?</h2><p style="text-align:center">${costs ? '<b>1 can kaybedeceksin.</b> ' : ''}Bu bölümdeki ilerlemen kaydedilmez.</p><div class="row"><button class="btn ghost" id="mStay">Oyuna Dön</button><button class="btn" id="mLeave">Haritaya Dön</button></div>`);
   $('#mStay').onclick = closeModal; $('#mLeave').onclick = () => { if (costs) loseLife(); closeModal(); openMap(); }; };
 $('#btnPuzzleBack').onclick = () => openMap();

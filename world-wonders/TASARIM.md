@@ -65,15 +65,15 @@ Not: "60 bölüm boyunca aynı harika" riski hâlâ geçerli. Karar 4'teki ara �
 #### ✅ Gelir modeli (KARARLAŞTIRILDI: şimdilik yok)
 Bu aşamada gelir modeli tasarlanmayacak. Can sistemi ileride ödüllü reklam veya tek seferlik satın alma eklenecek olursa onları taşıyabilecek şekilde bağımsız tutuldu.
 
-### Karar 3: Puzzle etkileşimi
-- (a) Otomatik yerleşme (prototip). Sıfır sürtünme, sinematik.
-- (b) Oyuncu parçayı sürükleyip yerine bırakır. Daha tatmin edici ama her ödülde 3–5 saniye ek etkileşim gerektirir.
-- (c) Hibrit: parça ekranın ortasında belirir, oyuncu dokununca uçup yerine oturur.
-**Öneri: (c).** Tek dokunuşla sahiplenme hissi verir, akışı bozmaz.
+### ✅ Karar 3: Puzzle etkileşimi (KARARLAŞTIRILDI: hibrit)
+Yeni parça ekranın ortasında büyük ve süzülerek belirir ve "Parçaya dokun, yerine oturt" yazısı çıkar. Oyuncu dokununca parça yay çizerek uçar ve yerine oturur; ardından ses, konfeti ve puzzle tablasının hafif zıplaması gelir. Tek dokunuşla sahiplenme hissi veriyor, sürükle-bırak kadar sürtünme yaratmıyor ve 1–2 saniyede bitiyor.
 
-### Karar 4: Ara ödüller (5 bölümlük döngünün içi)
-60 bölümlük bir harika döngüsünde oyuncuya sık sık küçük ödüller vermek gerekiyor. Seçenekler: her bölüm sonunda yıldız → yıldız sandığı (her 20 yıldızda bir), harika ilerlemesine bağlı "tarih kartları" (bilgi koleksiyonu), haritada her parçada anıtın etrafında küçük bir çevre detayının açılması (ağaç, kuş, ışık).
-**Öneri:** Harita çevre detayları. 3D harita sistemini her parçada tekrar ziyaret ettirir ve koleksiyon hissini güçlendirir.
+### ✅ Karar 4: Ara ödüller (KARARLAŞTIRILDI: harita süsleri)
+- Her puzzle parçası, haritada o harikanın çevresinde **bir süs** açar. 12 parça = 12 süs.
+- Süsler harikanın kültürüne göre seçildi: Kolezyum'da selvi ve antik sütun, Petra'da deve ve Bedevi çadırı, Çin Seddi'nde fener, Machu Picchu'da lama, Chichen Itza'da kaktüs ve meşale, Rio'da kayık ve palmiye gibi. Toplam 15 süs tipi var.
+- Mevcut harikanın açılmamış süs yerleri haritada **kesik çizgili halkalarla** görünür, böylece kalan ilerleme göz önünde olur.
+- Haritaya dönüldüğünde yeni süs zıplayarak belirir, konfeti çıkar ve "Yeni süs: Fener · Kolezyum" bildirimi görünür.
+- Puzzle parçası kazanınca canlar da dolduğu için 5 bölümde bir üç ödül birlikte gelir: **parça + süs + dolu can.**
 
 ### Karar 5: Teknoloji ve platform
 - Unity (C#): sektör standardı, 3D harita için güçlü, build boyutu büyük.
@@ -81,8 +81,30 @@ Bu aşamada gelir modeli tasarlanmayacak. Can sistemi ileride ödüllü reklam v
 - Web tabanlı (bu prototip) + Capacitor ile paketleme: en hızlı yineleme, düşük maliyet, performans sınırlı.
 **Öneri:** Mekanik ve ekonomi testleri bu web prototipiyle yapılsın. Üretim için Unity kullanılsın, 3D harita ayrı bir sahne olsun ve yalnızca harita ekranında yüklensin.
 
-### Karar 6: Bölüm tasarımı yaklaşımı
-Prototip bölümleri tohumlu prosedürel üretimle oluşturuyor (her oyuncuda aynı). Üretimde 420 bölümün elle tasarlanması mı, prosedürel üretim + elle ayar mı, yoksa her destinasyonun ilk 10 bölümünün elle tasarlanıp gerisinin prosedürel olması mı tercih edilecek? Zorluk eğrisi (testere dişi: her 5 bölümün 5.si "zor bölüm" olabilir ve parça ödülünü taşıyabilir) burada belirlenmeli.
+### ✅ Karar 6: Bölüm tasarımı ve zorluk eğrisi (KARARLAŞTIRILDI)
+**Yaklaşım:** Bölümler tohumlu prosedürel üretimle oluşuyor (her oyuncuda aynı bölüm). Üretim aşamasında her destinasyonun ilk birkaç bölümü elle cilalanabilir.
+
+**Testere dişi eğri:** Her 5 bölümlük parça döngüsünde:
+| Sıra | Rol | Ayar |
+|---|---|---|
+| 1. | Nefes bölümü | +3 hamle |
+| 2.–4. | Normal | Destinasyon içinde zorluk yavaşça artar |
+| 5. | **Zor bölüm** (parçayı verir) | −2 hamle, toplama hedefi %15 fazla; girişte ve oyun ekranında "ZOR · PARÇA" etiketi |
+
+Ek kurallar: ilk 10 bölüm öğrenme dönemi (cömert hamle), her destinasyonun ilk 3 bölümü yumuşak giriş (+2 hamle), yeni engeller her destinasyonun başında tek tek tanıtılır.
+
+**Bot ile doğrulama.** Açgözlü bir bot (her hamlede en iyi görünen eşleşmeyi seçer, ileriyi düşünmez) her bölümü 3 kez oynadı (ilk harikada her bölüm, diğerlerinde her 3. bölüm; toplam 180 bölüm, 540 oyun). Kazanma oranları:
+
+| Ölçüm | Bot kazanma oranı |
+|---|---|
+| İlk 10 bölüm | %100 |
+| Harika 1 → 7 | %89 · %80 · %78 · %73 · %68 · %72 · %67 |
+| Döngü 1. (nefes) | %92 |
+| Döngü 2.–4. | %73–81 |
+| Döngü 5. (zor) | %66 |
+| Hedef tipi | Taş %86 · Blok %81 · Katman %68 · Eser %58 (ayardan sonra, 5'er oyunla) |
+
+Gerçek oyuncu, ileriyi düşündüğü ve eserleri bilerek aşağı indirdiği için bottan biraz daha başarılı olur. Bu oranlar, casual Match-3 için hedeflenen "ilk denemede çoğunlukla kazanılır, parça bölümleri biraz terletir" hissine uygun. Sayılar ilk gerçek oyuncu testinde yeniden ayarlanmalı.
 
 ### Karar 7: Destinasyona özgü "imza" mekaniği
 Prototip 3 genel engel tipini farklı görünümlerle kullanıyor. Her harikaya bir tane benzersiz mekanik eklemek tazeliği artırır ama karmaşıklık da getirir. Örnek: Çin Seddi için "savunma" (her 3 hamlede bir ilerleyen ve durdurulması gereken bir engel), Chichen Itza için "gölge yılanı" (merdiven deseninde katman).
@@ -98,7 +120,8 @@ Siluetler zaten ayrışıyor. Ek olarak renk körü modu (taş üzerinde küçü
 
 ## 5. Önerilen sonraki adım
 
-Ekonomi kararları tamamlandı. Açık kalan sıradaki kararlar:
-1. **Karar 4: Ara ödüller.** 60 bölümlük harika döngüsünü desteklemek için en kritik konu. Öneri: her parçada haritada anıtın çevresinde küçük bir detay açılması.
-2. **Karar 3: Puzzle etkileşimi.** Öneri: hibrit, yani dokununca uçup yerine oturan parça.
-3. **Karar 6: Bölüm tasarımı ve zorluk eğrisi.**
+Oynanış, ekonomi, ödül ve zorluk kararları tamamlandı. Açık kalan konular:
+1. **Karar 5: Teknoloji ve platform.** Prototipten üretime geçiş (öneri: Unity).
+2. **Karar 7: Destinasyona özgü imza mekanikleri.** Lansman sonrası güncellemeler için.
+3. **Karar 9: Erişilebilirlik.** Renk körü modu, titreşim.
+4. **İlk gerçek oyuncu testi.** 5–10 kişiye prototip oynatılıp bot oranlarıyla karşılaştırılması.
