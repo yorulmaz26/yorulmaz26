@@ -18,7 +18,7 @@ logic/    Saf Kotlin oyun mantığı — grafikten bağımsız, JVM'de test edil
   CausalityEngine.kt  Artımlı yeniden hesaplama, paradoks tespiti, nedensellik bağlantıları, döngü/geriye dönük bağlantı denetimi
   LevelSession.kt     Bölüm simülasyonu: kahraman, eylemler, düşman yapay zekâsı, zaman tuzağı, hedefler, günlük
   Level.kt            Bölüm tanımı (ASCII harita), hedef türleri, öğretici ipuçları
-  levels/             Alan ve bölüm kataloğu (Area01: 1–5. bölümler)
+  levels/             Alan ve bölüm kataloğu (Area01–Area05: 1–25. bölümler)
   save/               Sürümlü kayıt + göç, 4 can sistemi (saat hilesi korumalı), ilerleme/ödül/Zaman Ustası seviyesi
 core/     libGDX katmanı
   ZamaninEfendisiGame Ekran yönetimi ve ortak hizmetler
@@ -48,7 +48,7 @@ cd zamanin-efendisi
 Masaüstü geliştirici kısayolları: `-Dzaman.start=game:3:2` (3. bölüm, çözümün ilk 2 adımı uygulanmış),
 `-Dzaman.start=play:5` (5. bölümü arayüz üzerinden otomatik oynat), `levels`, `journal`, `profile`, `howto`, `settings`.
 
-## Oynanış (Aşama 1)
+## Oynanış
 
 - Haritada komşu hücreye dokun: yürü. Uzak hücre: otomatik yol bulma. Yanındaki hücre: eylem menüsü
   (hücrenin bütün çağlardaki hâli ve hangi eylemden doğduğu da gösterilir).
@@ -68,12 +68,24 @@ Masaüstü geliştirici kısayolları: `-Dzaman.start=game:3:2` (3. bölüm, ç�
 | 4 | Ahşap ve Taş | Şimdi'nin çiti kırılır, Geçmiş'in çiti yıkılmaz taş surdur; zaman tuzağı |
 | 5 | Kırılma Komutanı (patron) | Kampı Geçmiş'te dağıt; ama köprün düşmana da yol açar — zaten çıkmış akıncılar kalır |
 
+### Alan 2–5 (Aşama 2)
+
+| Alan | Bölümler | Yeni kural |
+|---|---|---|
+| 2 · Geleceğin Kapısı | 6–10 | Gelecek çağı; köprü 3 aşamada evrilir (ahşap → taş → ışık geçidi); çit → taş sur → enerji kalkanı; Gelecek'te robotlar |
+| 3 · Kayıp Orman | 11–15 | Yaşlı ağaç + 2 komşu bitki → geçilmez Kadim Orman; kesmek ormanı önler; orman hem kalkan hem engel |
+| 4 · Taş Köprüler | 16–20 | Yapı evrimi hedefleri (Şimdi'de taş köprü, Gelecek'te şehir/enerji kalkanı); zaman mühürleri ile çağlar arası bağlantılar |
+| 5 · Enerji Vadisi | 21–25 | Zaman enerjisi: her geçiş 1 enerji; kristaller enerji verir; aynı kristali iki çağda toplamak paradoksla silinir |
+
+Kahraman korunan hücrenin üstünde durursa düşmanlar içeri giremez. Akıncı/robot yolu kapalıysa kırılabilir çite yüklenir,
+o da yoksa aynı çağdaki Zaman Muhafızı'nın peşine düşer.
+
 ## Geliştirme aşamaları ve durum
 
 | Aşama | İçerik | Durum |
 |---|---|---|
 | 1 | Proje, izometrik harita, Geçmiş↔Şimdi, nedensellik motoru, 5 bölüm, başarı/başarısızlık, kayıt, canlar | **Tamamlandı** |
-| 2 | Gelecek çağı, yapı/doğa evrimi derinleştirme, zaman enerjisi, yeni bölümler | Sırada |
+| 2 | Gelecek çağı, yapı/doğa evrimi (kadim orman), zaman enerjisi ve kristaller, robotlar, mühür bağlantıları, 20 yeni bölüm (toplam 25) | **Tamamlandı** |
 | 3 | Birlikler, tur tabanlı savaş, 6 düşman stratejisi, kaynaklar, özel mekanikler | Planlandı |
 | 4 | Zaman Kalesi (15 bina), araştırma ağacı, ekonomi, market | Planlandı |
 | 5 | Günlük/haftalık görevler, sonsuz mod, seferler, koleksiyon/müze, başarımlar, prestij | Planlandı |

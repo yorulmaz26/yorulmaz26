@@ -10,10 +10,10 @@ gerçekten oynanabilir olduğunu gösterir.
 | Alan | Bölümler | Ad | Açılan özellik / kural | Durum |
 |---|---|---|---|---|
 | 1 | 1–5 | İlk Kırılma | Geçmiş ve Şimdi, köprü evrimi, çöl yayılımı, köy→kasaba, çit→taş sur, zaman tuzağı, ilk patron | **Oynanabilir** |
-| 2 | 6–10 | Geleceğin Kapısı | Üçüncü çağ: Gelecek | Aşama 2 |
-| 3 | 11–15 | Kayıp Orman | Doğa evrimi: fidan→ağaç→kadim orman, orman geçilmezliği | Aşama 2 |
-| 4 | 16–20 | Taş Köprüler | Yapı evrimi: 3 çağlık köprü/yol zincirleri | Aşama 2 |
-| 5 | 21–25 | Enerji Vadisi | Zaman enerjisi (sınırlı geçiş) · 25: özel patron | Aşama 2 |
+| 2 | 6–10 | Geleceğin Kapısı | Üçüncü çağ: Gelecek, kadim orman, Gelecek robotları, ilk robot fabrikası patronu | **Oynanabilir** |
+| 3 | 11–15 | Kayıp Orman | Doğa evrimi: ormanı önlemek için kesmek, üç çağlık çöl, şehir için ağaç seçimi, orman kalkanı, yaşlı ağaç patronu | **Oynanabilir** |
+| 4 | 16–20 | Taş Köprüler | Yapı evrimi: taş köprü, iki şehir, enerji kalkanı, zaman mühürleri (çağlar arası bağlantı), Taş Kral patronu | **Oynanabilir** |
+| 5 | 21–25 | Enerji Vadisi | Zaman enerjisi, kristaller ve kristal paradoksu · 25: Enerji Lordu (özel patron) | **Oynanabilir** |
 | 6 | 26–30 | Donmuş Yıllar | Zaman dondurma: bir nesne çağlar boyunca evrilmez | Aşama 3 |
 | 7 | 31–35 | Yıkılmış Krallık | Savunma inşası, kule menzili | Aşama 3 |
 | 8 | 36–40 | Kayıp Teknoloji | Teknoloji aktarımı: Gelecek planını Geçmiş'te kurma | Aşama 3 |

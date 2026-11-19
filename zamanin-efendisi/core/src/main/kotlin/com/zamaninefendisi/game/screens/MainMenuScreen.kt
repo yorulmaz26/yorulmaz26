@@ -53,7 +53,7 @@ class MainMenuScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
         buttons.add(grid).row()
         root.add(buttons).row()
         root.add().expandY().row()
-        root.add(ui.label("Sürüm 0.1 · Aşama 1: Oynanabilir çekirdek", assets.fontS, Theme.muted, align = Align.center)).padBottom(10f)
+        root.add(ui.label("Sürüm 0.2 · Aşama 2: Üç çağ · 5 alan, 25 bölüm", assets.fontS, Theme.muted, align = Align.center)).padBottom(10f)
     }
 
     override fun drawOverlay() {

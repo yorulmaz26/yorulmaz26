@@ -32,7 +32,7 @@ class LevelSelectScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             card.add(ui.label("Alan yıldızları: $stars / ${area.levels.size * 3}", assets.fontS, Theme.inkSoft)).padTop(12f)
             list.add(card).width(660f).padBottom(20f).row()
         }
-        list.add(ui.label("Yeni alanlar geliştirme aşamalarında eklenecek: Gelecek çağı, zaman enerjisi ve daha fazlası.", assets.fontS, Theme.muted, wrap = true, align = Align.center)).width(600f).padTop(10f)
+        list.add(ui.label("Alan 6 ve sonrası (zaman dondurma, savunma, teknoloji aktarımı…) sonraki geliştirme aşamalarında eklenecek.", assets.fontS, Theme.muted, wrap = true, align = Align.center)).width(600f).padTop(10f).padBottom(30f)
         root.add(ui.scroll(list).also { it.setScrollingDisabled(true, false) }).grow().top()
     }
 
@@ -88,7 +88,8 @@ class LevelSelectScreen(game: ZamaninEfendisiGame) : BaseScreen(game) {
             box.add(ui.label("Hedefler", a.fontM, Theme.ink)).left().row()
             for (g in lv.goals) box.add(ui.label("• ${g.text}", a.fontS, Theme.ink, wrap = true)).width(570f).left().row()
             val eras = lv.eras.joinToString(" · ") { it.title }
-            box.add(ui.label("Çağlar: $eras   ·   3 yıldız: en fazla ${lv.par} eylem   ·   Tur sınırı: ${lv.maxTurns}", a.fontS, Theme.purple, wrap = true)).width(570f).left().padTop(12f).row()
+            val energy = lv.energy?.let { "   ·   Zaman enerjisi: $it" } ?: ""
+            box.add(ui.label("Çağlar: $eras   ·   3 yıldız: en fazla ${lv.par} eylem   ·   Tur sınırı: ${lv.maxTurns}$energy", a.fontS, Theme.purple, wrap = true)).width(570f).left().padTop(12f).row()
             if (p.needsLife(levelId)) box.add(ui.label("Başarısız denemede 1 can harcanır.", a.fontS, Theme.red)).left().padTop(8f).row()
             else box.add(ui.label("Tamamlanmış bölüm: tekrar oynamak can harcamaz.", a.fontS, Theme.green)).left().padTop(8f).row()
             val row = Table()
