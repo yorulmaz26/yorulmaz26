@@ -50,7 +50,7 @@ enum class RoomType(
         adjacency = mapOf(FOOD_STORAGE to 0.2f),
     ),
     FUNGUS_FARM(
-        "Mantar Çiftliği", "Taşınan yaprakları mantara çevirir (1 yaprak → 2 mantar). Besin Deposuna komşuysa +%20 üretim.",
+        "Mantar Çiftliği", "İşçilerin taşıdığı yaprakları mantara çevirir (1 yaprak → 2 mantar, 20 sn). Besin Deposuna komşuysa +%20 üretim.",
         5, 3, mapOf(SOIL to 14, LEAF to 10, WOOD to 4), 30f, 2, 3,
         adjacency = mapOf(FOOD_STORAGE to 0.2f, MATERIAL_STORAGE to 0.1f),
     ),

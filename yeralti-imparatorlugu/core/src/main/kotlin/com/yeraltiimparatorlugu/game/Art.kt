@@ -87,12 +87,12 @@ class Art(uiScale: Float) : Disposable {
             for (a in 0 until 5) dot(x + 8 + (cos(a * 1.256) * 4).toInt(), y + 7 + (sin(a * 1.256) * 4).toInt(), 3, Palette.hex("FF8FB1"))
             dot(x + 8, y + 7, 2, Palette.yellow)
         }
-        circle = alloc(64, 64) { x, y, _, _ -> dot(x + 32, y + 32, 31, Color.WHITE) }
-        ring = alloc(64, 64) { x, y, _, _ ->
-            pm.setColor(Color.WHITE); for (r in 27..31) pm.drawCircle(x + 32, y + 32, r)
-        }
+        circle = alloc(128, 128) { x, y, w, _ -> softDisc(x, y, w, 0f) }
+        ring = alloc(128, 128) { x, y, w, _ -> softDisc(x, y, w, 0.86f) }
         stripes = alloc(32, 32) { x, y, _, _ ->
-            for (i in -32 until 32 step 8) for (k in 0..2) line(x + i + k, y + 31, x + i + 31 + k, y, Color.WHITE)
+            // Desen yalnızca kendi 32x32 bölgesine çizilir (atlas komşularına taşmaz).
+            pm.setColor(Color.WHITE)
+            for (py in 0 until 32) for (px in 0 until 32) if ((px + py) % 8 < 3) pm.drawPixel(x + px, y + py)
         }
         crown = alloc(24, 16) { x, y, _, _ ->
             val gold = Palette.hex("FFC93C"); fillRect(x + 3, y + 9, 18, 6, gold)
@@ -100,7 +100,7 @@ class Art(uiScale: Float) : Disposable {
         }
         val patch = alloc(48, 48) { x, y, w, h -> roundRect(x, y, w, h, 14, Color.WHITE) }
         texture = Texture(pm).apply { setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear) }
-        for ((region, r) in pending) region.setRegion(texture, r[0], r[1], r[2], r[3])
+        for ((region, r) in pending) { region.texture = texture; region.setRegion(r[0], r[1], r[2], r[3]) }
         // Kenar taşmasını önlemek için atlas bölgeleri yarım piksel içeriden örneklenir.
         for ((region, _) in pending) inset(region)
         panelPatch = NinePatch(patch, 16, 16, 16, 16)
@@ -111,7 +111,7 @@ class Art(uiScale: Float) : Disposable {
         fun make(g: FreeTypeFontGenerator, px: Int): BitmapFont {
             val p = FreeTypeFontGenerator.FreeTypeFontParameter().apply {
                 size = (px * uiScale).toInt().coerceAtLeast(8)
-                characters = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ•→←×…–—’“”°½"
+                characters = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ•→←↑↓×…–—−’“”°½✓⚠"
                 minFilter = Texture.TextureFilter.Linear
                 magFilter = Texture.TextureFilter.Linear
                 color = Color.WHITE
@@ -151,6 +151,20 @@ class Art(uiScale: Float) : Disposable {
     private fun dot(x: Int, y: Int, r: Int, c: Color) { pm.setColor(c); pm.fillCircle(x, y, r) }
     private fun line(x1: Int, y1: Int, x2: Int, y2: Int, c: Color) { pm.setColor(c); pm.drawLine(x1, y1, x2, y2) }
     private fun thick(x1: Int, y1: Int, x2: Int, y2: Int, c: Color) { line(x1, y1, x2, y2, c); line(x1 + 1, y1, x2 + 1, y2, c); line(x1, y1 + 1, x2, y2 + 1, c) }
+
+    /** Kenarı yumuşatılmış daire veya halka ([inner] > 0 ise iç yarıçap oranı). */
+    private fun softDisc(x: Int, y: Int, size: Int, inner: Float) {
+        val r = size / 2f - 1f
+        val c = Color()
+        for (py in 0 until size) for (px in 0 until size) {
+            val d = kotlin.math.sqrt((px + 0.5f - size / 2f) * (px + 0.5f - size / 2f) + (py + 0.5f - size / 2f) * (py + 0.5f - size / 2f))
+            var a = (r - d + 0.5f).coerceIn(0f, 1f)
+            if (inner > 0f) a = minOf(a, (d - r * inner + 0.5f).coerceIn(0f, 1f))
+            if (a <= 0f) continue
+            c.set(1f, 1f, 1f, a)
+            pm.drawPixel(x + px, y + py, Color.rgba8888(c))
+        }
+    }
 
     private fun ellipse(cx: Int, cy: Int, rx: Int, ry: Int, c: Color) {
         pm.setColor(c)

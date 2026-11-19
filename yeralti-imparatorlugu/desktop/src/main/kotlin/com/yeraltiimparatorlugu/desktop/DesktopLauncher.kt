@@ -8,9 +8,12 @@ fun main() {
     val config = Lwjgl3ApplicationConfiguration().apply {
         setTitle("Yeraltı İmparatorluğu: Koloni Savaşları")
         // Telefon oranında (9:16) pencere.
-        setWindowedMode(450, 800)
+        val scale = System.getProperty("yi.scale")?.toFloatOrNull() ?: 1f
+        setWindowedMode((450 * scale).toInt(), (800 * scale).toInt())
         setForegroundFPS(60)
         useVsync(true)
     }
-    Lwjgl3Application(YeraltiGame(), config)
+    val shots = System.getProperty("yi.shots")
+    val game = YeraltiGame()
+    Lwjgl3Application(if (shots != null) ScreenshotDriver(game, shots) else game, config)
 }

@@ -46,6 +46,8 @@ class Simulation(val seed: Long) {
         const val FAR_SOURCE_LIFETIME = 420f
         const val LAY_INTERVAL = 45f
         const val MAX_BUILDERS = 3
+        /** Bir yaprağın iki mantara dönüşme süresi (sn, seviye 1, %100 verim). */
+        const val FARM_CYCLE = 20f
         const val PATH_BUDGET_PER_STEP = 8
         const val BASE_FOOD_CAPACITY = 20
         const val BASE_MATERIAL_CAPACITY = 50
@@ -93,6 +95,9 @@ class Simulation(val seed: Long) {
     private var lastDay = 1
     private val occupancy = HashMap<Long, Int>()
     private val riskyCells = HashSet<Long>()
+
+    /** Çizimde iki adım arası yumuşatma için (0..1). */
+    val alpha: Float get() = (accumulator / STEP).coerceIn(0f, 1f)
 
     val day: Int get() = (time / DAY_LENGTH).toInt() + 1
     val dayFraction: Float get() = ((time % DAY_LENGTH) / DAY_LENGTH).toFloat()
@@ -775,14 +780,14 @@ class Simulation(val seed: Long) {
     fun farmLeafCapacity(room: Room) = 10 * room.level
 
     /** Mantar çiftliğinin saniyelik mantar üretimi (yaprak varken). */
-    fun farmRate(room: Room): Float = roomEfficiency(room) * room.level / 12f * 2f
+    fun farmRate(room: Room): Float = roomEfficiency(room) * room.level / FARM_CYCLE * 2f
 
     private fun updateRooms(dt: Float) {
         for (r in rooms) {
             if (r.type == RoomType.FUNGUS_FARM && r.functional && r.leafBuffer > 0) {
                 val out = piles[cellKey(r.anchorX, r.anchorY)]
                 if (out != null && out.amount >= 12) continue
-                r.growProgress += dt * roomEfficiency(r) * r.level / 12f
+                r.growProgress += dt * roomEfficiency(r) * r.level / FARM_CYCLE
                 while (r.growProgress >= 1f && r.leafBuffer > 0) {
                     r.growProgress -= 1f
                     r.leafBuffer--

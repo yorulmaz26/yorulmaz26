@@ -64,7 +64,7 @@ object OfflineProgress {
         // 2) Mantar çiftlikleri: tampondaki ve depodaki yapraklarla üretim.
         var mushrooms = 0
         for (farm in sim.rooms.filter { it.type == RoomType.FUNGUS_FARM && it.functional }) {
-            val cycles = (eff * sim.roomEfficiency(farm) * farm.level / 12f).toInt()
+            val cycles = (eff * sim.roomEfficiency(farm) * farm.level / Simulation.FARM_CYCLE).toInt()
             var leaves = farm.leafBuffer + r[ResourceType.LEAF]
             var done = 0
             while (done < cycles && leaves > 0 && sim.freeSpace(StorageKind.FOOD) >= 2) {
