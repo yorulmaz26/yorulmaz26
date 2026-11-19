@@ -93,7 +93,7 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 .panelBtns{grid-column:1/-1;display:grid;grid-template-columns:1fr auto auto;gap:8px}
 
 /* ---------- oyun ekranı ---------- */
-#gameScreen{background:linear-gradient(#f3eee5,#e6dfd2);align-items:center}
+#gameScreen{background:linear-gradient(#f5ecd9,#eadcc0);align-items:center}
 .hud{width:100%;max-width:540px;padding:10px max(12px,env(safe-area-inset-right,0px)) 6px max(12px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
 .hud .iconbtn{background:var(--ink);}
 .lvlTitle{font-family:var(--f-display);font-weight:800;color:var(--ink);font-size:16px;line-height:1.1}
@@ -629,7 +629,7 @@ function drawBlock(c, kind, hp, max){
 function drawLayer(c, kind, hp){
   const S = 49; c.save(); rrect(c,-S,-S,S*2,S*2,12); c.clip();
   const deep = hp > 1;
-  if (kind==='sand'){ c.fillStyle = deep?'#d4a058':'#ebcb8f'; c.fillRect(-S,-S,S*2,S*2); const r = mulberry32(3); for(let i=0;i<50;i++){ c.fillStyle = r()<.5?'rgba(140,90,30,.35)':'rgba(255,240,200,.6)'; c.beginPath(); c.arc(-S+r()*S*2,-S+r()*S*2,1.3+r()*1.2,0,TAU); c.fill(); } c.strokeStyle='rgba(150,100,40,.35)'; c.lineWidth=2; c.beginPath(); c.moveTo(-S,-20); c.quadraticCurveTo(0,-34,S,-16); c.moveTo(-S,22); c.quadraticCurveTo(0,8,S,26); c.stroke(); }
+  if (kind==='sand'){ c.fillStyle = deep?'#c98f45':'#e2b773'; c.fillRect(-S,-S,S*2,S*2); const r = mulberry32(3); for(let i=0;i<50;i++){ c.fillStyle = r()<.5?'rgba(140,90,30,.35)':'rgba(255,240,200,.6)'; c.beginPath(); c.arc(-S+r()*S*2,-S+r()*S*2,1.3+r()*1.2,0,TAU); c.fill(); } c.strokeStyle='rgba(150,100,40,.35)'; c.lineWidth=2; c.beginPath(); c.moveTo(-S,-20); c.quadraticCurveTo(0,-34,S,-16); c.moveTo(-S,22); c.quadraticCurveTo(0,8,S,26); c.stroke(); }
   else if (kind==='garden'){ c.fillStyle = deep?'#4e9a5b':'#86c98f'; c.fillRect(-S,-S,S*2,S*2); c.fillStyle = deep?'#2f7040':'#5aa868'; for(let i=0;i<8;i++){ const x = -40 + (i%4)*26, y = -36 + Math.floor(i/4)*60; c.beginPath(); c.ellipse(x,y,5,10,.6,0,TAU); c.fill(); c.beginPath(); c.ellipse(x+8,y+3,5,10,-.6,0,TAU); c.fill(); } }
   else if (kind==='vine'){ c.fillStyle = deep?'#3c7a33':'#78b65d'; c.fillRect(-S,-S,S*2,S*2); c.strokeStyle = deep?'#1f4d1a':'#3f7c2e'; c.lineWidth = deep?5:3.5; c.beginPath(); c.moveTo(-S,-30); c.bezierCurveTo(-10,-50,10,0,S,-20); c.moveTo(-S,25); c.bezierCurveTo(-20,0,20,50,S,20); c.stroke(); c.fillStyle='#2f6a25'; [[-20,-34],[18,-14],[-26,22],[24,30]].forEach(([x,y])=>{ c.beginPath(); c.ellipse(x,y,6,3.5,.7,0,TAU); c.fill(); }); }
   else if (kind==='glyph'){ c.fillStyle = deep?'#a99a6c':'#d4c69c'; c.fillRect(-S,-S,S*2,S*2); c.strokeStyle='rgba(90,75,40,.55)'; c.lineWidth=3; rrect(c,-38,-38,76,76,8); c.stroke(); c.beginPath(); c.moveTo(-24,-24); c.lineTo(24,-24); c.lineTo(24,12); c.lineTo(-10,12); c.lineTo(-10,-8); c.lineTo(8,-8); c.stroke(); c.beginPath(); c.arc(-20,26,5,0,TAU); c.arc(20,26,5,0,TAU); c.stroke(); }
@@ -1267,10 +1267,10 @@ function boardTexture(){
   if (boardTex && boardTex.w === boardCv.width) return boardTex.cv;
   const cv = document.createElement('canvas'); cv.width = cv.height = boardCv.width; const c = cv.getContext('2d'); c.scale(DPR,DPR);
   const S = cell*COLS + pad*2;
-  rrect(c,0,0,S,S,pad*2); c.fillStyle = grad(c,0,0,0,S,[[0,'#d8d0c0'],[1,'#c9c0ae']]); c.fill();
+  rrect(c,0,0,S,S,pad*2); c.fillStyle = grad(c,0,0,0,S,[[0,'#dccaa5'],[1,'#cbb68d']]); c.fill();
   rrect(c,pad*.5,pad*.5,S-pad,S-pad,pad*1.6); c.fillStyle='rgba(255,255,255,.35)'; c.fill();
   const r = mulberry32(99);
-  for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){ c.fillStyle = (x+y)%2 ? '#f2ede3' : '#e9e2d4'; rrect(c,pad+x*cell+1,pad+y*cell+1,cell-2,cell-2,cell*.16); c.fill();
+  for (let y=0;y<ROWS;y++) for (let x=0;x<COLS;x++){ c.fillStyle = (x+y)%2 ? '#f6ebd3' : '#efe1c3'; rrect(c,pad+x*cell+1,pad+y*cell+1,cell-2,cell-2,cell*.16); c.fill();
     for (let i=0;i<6;i++){ c.fillStyle = 'rgba(140,120,90,.06)'; c.fillRect(pad+x*cell+r()*cell, pad+y*cell+r()*cell, 2, 2); } }
   boardTex = { w: boardCv.width, cv }; return cv;
 }
