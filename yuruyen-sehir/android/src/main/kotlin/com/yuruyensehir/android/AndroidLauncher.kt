@@ -16,4 +16,17 @@ class AndroidLauncher : AndroidApplication() {
         }
         initialize(YuruyenSehirGame(), config)
     }
+
+    /**
+     * libGDX 1.13.1: klavye yüksekliği sağlayıcısı başlamadan aktivite kapanırsa
+     * AndroidXKeyboardHeightProvider.close() boş görünüm yüzünden NPE fırlatır.
+     * Activity.onDestroy zaten çağrılmış olduğundan bu hatayı yutmak güvenlidir.
+     */
+    override fun onDestroy() {
+        try {
+            super.onDestroy()
+        } catch (e: NullPointerException) {
+            android.util.Log.w("YuruyenSehir", "Kapanışta libGDX klavye sağlayıcısı hatası yok sayıldı", e)
+        }
+    }
 }

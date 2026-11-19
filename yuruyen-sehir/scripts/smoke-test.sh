@@ -20,4 +20,14 @@ fi
 if grep -q "FATAL EXCEPTION" smoke/logcat.txt; then
   echo "HATA: FATAL EXCEPTION"; grep -A 30 "FATAL EXCEPTION" smoke/logcat.txt | head -80; exit 1
 fi
+# Ekran döndürme / yapılandırma değişikliği: oyun çökmemeli
+adb shell settings put system accelerometer_rotation 0 || true
+adb shell settings put system user_rotation 1 || true
+sleep 4
+adb shell settings put system user_rotation 0 || true
+sleep 4
+adb logcat -d > smoke/logcat.txt || true
+if grep -q "FATAL EXCEPTION" smoke/logcat.txt; then
+  echo "HATA: döndürmeden sonra FATAL EXCEPTION"; grep -A 30 "FATAL EXCEPTION" smoke/logcat.txt | head -80; exit 1
+fi
 echo "Açılış testi başarılı: oyun çalışıyor."

@@ -13,7 +13,7 @@
         android:theme="@style/GdxTheme">
         <activity
             android:name="com.yuruyensehir.android.AndroidLauncher"
-            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|smallestScreenSize|screenLayout|uiMode|density|fontScale|layoutDirection|locale"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
