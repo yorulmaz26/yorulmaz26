@@ -16,6 +16,8 @@ data class PlacedBuilding(
     var constructionLeft: Double = 0.0,
     var constructionTotal: Double = 0.0,
     var enabled: Boolean = true,
+    /** Kuleler için hedef önceliği; null ise genel öncelik kullanılır. */
+    var targetPriority: TargetPriority? = null,
 ) {
     val def: BuildingDef get() = type.def
     val underConstruction: Boolean get() = constructionLeft > 0.0
@@ -78,6 +80,8 @@ data class PopulationState(
     var health: Double = 75.0,
     var growthTimer: Double = 0.0,
     var declineTimer: Double = 0.0,
+    /** Keşif görevindeki yerleşimciler (çalışamaz). */
+    var away: Int = 0,
 )
 
 @Serializable
@@ -138,7 +142,7 @@ data class TravelState(
 }
 
 @Serializable
-enum class LogKind { INFO, BUILD, CARRIER, TRAVEL, EVENT, RESEARCH, STAGE, WARNING, DIPLOMACY }
+enum class LogKind { INFO, BUILD, CARRIER, TRAVEL, EVENT, RESEARCH, STAGE, WARNING, DIPLOMACY, BATTLE, EXPLORATION }
 
 @Serializable
 data class LogEntry(val day: Int, val text: String, val kind: LogKind = LogKind.INFO)
@@ -167,6 +171,9 @@ data class Stats(
     var waterProduced: Double = 0.0,
     var gathered: Double = 0.0,
     var trades: Int = 0,
+    var battlesWon: Int = 0,
+    var battlesLost: Int = 0,
+    var expeditionsDone: Int = 0,
 )
 
 @Serializable
@@ -195,6 +202,12 @@ data class GameState(
     /** Medeniyet itibarı (0-100): ticaret, yardım ve anlaşmalarla artar, savaşla düşer. */
     var reputation: Double = 20.0,
     val caravans: MutableList<Caravan> = mutableListOf(),
+    var battle: Battle? = null,
+    var defensePriority: TargetPriority = TargetPriority.NEAREST,
+    val expeditions: MutableList<Expedition> = mutableListOf(),
+    var nextExpeditionId: Int = 1,
+    /** Tehlike tespiti görevinden kalan süre: yol olayları seyrekleşir. */
+    var scoutedSeconds: Double = 0.0,
 ) {
     /** Şehir yapısı değiştiğinde artar; önbellekli hesaplamalar bunu izler. */
     @Transient var cityVersion: Int = 0
@@ -203,6 +216,10 @@ data class GameState(
 
     /** Bina başına son üretim adımının durumu (kalıcı değil). */
     @Transient val buildingStatus: HashMap<Int, BuildingStatus> = HashMap()
+
+    /** Savaş görselleri ve kule bekleme süreleri (kalıcı değil). */
+    @Transient val shots: ArrayList<Shot> = ArrayList()
+    @Transient val towerCooldown: HashMap<Int, Double> = HashMap()
 
     val day: Int get() = (gameSeconds / SECONDS_PER_DAY).toInt() + 1
 

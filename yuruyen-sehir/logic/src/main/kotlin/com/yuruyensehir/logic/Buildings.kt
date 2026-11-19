@@ -4,7 +4,7 @@ import com.yuruyensehir.logic.Resource.*
 import kotlinx.serialization.Serializable
 
 enum class BuildingCategory(val title: String) {
-    ADMIN("Yönetim"), POPULATION("Nüfus"), PRODUCTION("Üretim"), STORAGE("Depolama"), SPECIAL("Özel")
+    ADMIN("Yönetim"), POPULATION("Nüfus"), PRODUCTION("Üretim"), STORAGE("Depolama"), DEFENSE("Savunma"), SPECIAL("Özel")
 }
 
 enum class Profession(val title: String) {
@@ -43,6 +43,12 @@ data class BuildingDef(
     val healthRadius: Int = 0,
     val revealBonus: Int = 0,
     val travelSpeedBonus: Double = 0.0,
+    val towerRange: Double = 0.0,
+    val towerDps: Double = 0.0,
+    val towerEnergyPerShot: Double = 0.0,
+    val shieldRadius: Int = 0,
+    val shieldCapacity: Double = 0.0,
+    val guardCount: Int = 0,
     val adjacency: List<Adjacency> = emptyList(),
     val unique: Boolean = false,
     val requiresTech: TechId? = null,
@@ -57,7 +63,8 @@ enum class BuildingType {
     FARM, GREENHOUSE, WATER_COLLECTOR, MILL, WORKSHOP, METALWORKS, TEXTILE, FOOD_FACTORY, POWER_PLANT, RECYCLER,
     FOOD_STORAGE, WATER_STORAGE, MATERIAL_STORAGE,
     CARRIER_CARE, TECH_LAB, NAVIGATION_TOWER, GATHERER, SUPPORT_FRAME, CULTURE_CENTER,
-    TRADE_MARKET, TRADE_DEPOT;
+    TRADE_MARKET, TRADE_DEPOT,
+    WATCHTOWER, DEFENSE_TOWER, ENERGY_TOWER, SHIELD_CENTER, BARRACKS, EXPLORATION_CENTER;
 
     val def: BuildingDef get() = BuildingCatalog.get(this)
 }
@@ -270,6 +277,45 @@ object BuildingCatalog {
             storage = amounts(FOOD to 80, WATER to 80, WOOD to 80, STONE to 80, METAL to 60, CLOTH to 60, TOOLS to 40,
                 CRYSTAL to 20, RARE_ORE to 20, ANCIENT_PART to 20, TECH_PART to 20, LIGHT_MATERIAL to 30, CARE_ESSENCE to 20),
             minStage = 1, maxLevel = 3,
+        ),
+        // ---------------- Savunma ----------------
+        BuildingDef(
+            BuildingType.WATCHTOWER, "Gözetleme Kulesi", BuildingCategory.DEFENSE,
+            "Düşmanı erken görür (+8 sn hazırlık) ve 2 kare içindeki kulelerin menzilini +1.5 artırır. Kendisi de zayıf ok atar.",
+            1, 1, 14.0, amounts(WOOD to 40, CLOTH to 6), 20.0,
+            workers = 1, profession = Profession.GUARD, towerRange = 3.0, towerDps = 2.0, maxLevel = 3,
+        ),
+        BuildingDef(
+            BuildingType.DEFENSE_TOWER, "Savunma Kulesi", BuildingCategory.DEFENSE,
+            "Okçular menzildeki düşmanlara saniyede bir ok atar.",
+            1, 1, 24.0, amounts(WOOD to 50, STONE to 30, METAL to 5), 25.0,
+            workers = 1, profession = Profession.GUARD, towerRange = 4.0, towerDps = 7.0, upkeepGold = 0.1,
+        ),
+        BuildingDef(
+            BuildingType.ENERGY_TOWER, "Enerji Kulesi", BuildingCategory.DEFENSE,
+            "Güçlü enerji atışları yapar; her atış 1 enerji harcar. Enerji yoksa susar.",
+            1, 1, 30.0, amounts(METAL to 30, STONE to 30, TOOLS to 10, CRYSTAL to 4), 35.0,
+            workers = 1, profession = Profession.GUARD, towerRange = 3.5, towerDps = 16.0, towerEnergyPerShot = 1.0, upkeepGold = 0.3,
+            requiresTech = TechId.EFFICIENT_BOILERS, minStage = 1,
+        ),
+        BuildingDef(
+            BuildingType.SHIELD_CENTER, "Kalkan Merkezi", BuildingCategory.DEFENSE,
+            "3 kare içindeki binaları enerji kalkanıyla korur; kalkan savaşta enerjiyle dolar.",
+            2, 1, 34.0, amounts(METAL to 40, STONE to 30, CRYSTAL to 8, TOOLS to 10), 40.0,
+            workers = 1, profession = Profession.ENGINEER, shieldRadius = 3, shieldCapacity = 60.0, upkeepGold = 0.3, maxLevel = 3,
+            requiresTech = TechId.ENERGY_SHIELDS, minStage = 2,
+        ),
+        BuildingDef(
+            BuildingType.BARRACKS, "Muhafız Kışlası", BuildingCategory.DEFENSE,
+            "Savaşta 5 kare içindeki düşmanları karşılayan 2 muhafız (seviye başına) çıkarır. Muhafızlar düşmanları durdurur.",
+            2, 1, 32.0, amounts(WOOD to 70, STONE to 40, METAL to 15, CLOTH to 10), 35.0,
+            workers = 2, profession = Profession.GUARD, guardCount = 2, upkeepGold = 0.3, minStage = 1, maxLevel = 3,
+        ),
+        BuildingDef(
+            BuildingType.EXPLORATION_CENTER, "Keşif Merkezi", BuildingCategory.SPECIAL,
+            "3 kişilik keşif ekipleri gönderir (seviye başına 1 ekip). Yüksek seviye görev riskini azaltır.",
+            2, 1, 26.0, amounts(WOOD to 60, CLOTH to 20, TOOLS to 5), 35.0,
+            workers = 1, profession = Profession.EXPLORER, unique = true, minStage = 1, maxLevel = 3,
         ),
         BuildingDef(
             BuildingType.SUPPORT_FRAME, "Destek İskelesi", BuildingCategory.SPECIAL,

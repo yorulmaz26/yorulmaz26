@@ -16,7 +16,7 @@ object PopulationSystem {
         .sumOf { it.def.housing * (1.0 + 0.5 * (it.level - 1)) }.toInt()
 
     fun employed(state: GameState): Int = state.buildings.sumOf { it.workers }
-    fun freeWorkers(state: GameState): Int = (state.population.count - employed(state)).coerceAtLeast(0)
+    fun freeWorkers(state: GameState): Int = (state.population.count - state.population.away - employed(state)).coerceAtLeast(0)
 
     fun byProfession(state: GameState): Map<Profession, Int> {
         val m = LinkedHashMap<Profession, Int>()
@@ -45,7 +45,7 @@ object PopulationSystem {
 
     /** Nüfus azaldığında en yeni binalardan çalışan çekilir. */
     fun releaseExcess(state: GameState) {
-        var excess = employed(state) - state.population.count
+        var excess = employed(state) - (state.population.count - state.population.away)
         if (excess <= 0) return
         for (b in state.buildings.sortedByDescending { it.id }) {
             if (excess <= 0) break

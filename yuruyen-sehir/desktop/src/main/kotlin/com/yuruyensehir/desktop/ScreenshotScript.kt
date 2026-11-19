@@ -16,6 +16,9 @@ import com.yuruyensehir.logic.CivSystem
 import com.yuruyensehir.logic.Culture
 import com.yuruyensehir.logic.Resource
 import com.yuruyensehir.logic.TravelSystem
+import com.yuruyensehir.logic.CombatSystem
+import com.yuruyensehir.logic.EnemyType
+import com.yuruyensehir.logic.PopulationSystem
 
 /** Oyunu otomatik sürüp belirli anlarda ekran görüntüsü alır (görsel doğrulama için). */
 class ScreenshotScript(private val dir: String) : GameHook {
@@ -43,7 +46,7 @@ class ScreenshotScript(private val dir: String) : GameHook {
         240L to { shot(it, "06_harita") },
         245L to { g -> g.gameScreen.setMode(ViewMode.CITY); g.gameScreen.togglePanel(PanelId.RESEARCH) },
         270L to { shot(it, "07_arastirma") },
-        275L to { g -> g.gameScreen.closePanel(); g.core.state.buildings.firstOrNull { it.type == BuildingType.FARM }?.let { g.gameScreen.selectForTest(it.id) } },
+        275L to { g -> g.gameScreen.closePanel(); g.core.state.buildings.firstOrNull { it.type == BuildingType.FARM }?.let { g.gameScreen.selectBuilding(it.id) } },
         300L to { shot(it, "08_bina") },
         305L to { g -> g.gameScreen.closePanel(); g.gameScreen.setMode(ViewMode.MAP); g.gameScreen.tapMapCellForTest(Cell(2, 1)) },
         330L to { shot(it, "09_rota") },
@@ -67,7 +70,31 @@ class ScreenshotScript(private val dir: String) : GameHook {
         540L to { shot(it, "14_diplomasi") },
         545L to { g -> g.gameScreen.closePanel(); g.gameScreen.setMode(ViewMode.MAP); g.gameScreen.tapMapCellForTest(g.core.state.civs.first { it.met }.position) },
         570L to { shot(it, "15_harita_medeniyet") },
-        575L to { Gdx.app.exit() },
+        575L to { g ->
+            val s = g.core.state
+            g.gameScreen.setMode(ViewMode.CITY); g.gameScreen.closePanel()
+            s.stage = 2
+            s.population.count = 16
+            listOf(Resource.WOOD, Resource.STONE, Resource.METAL, Resource.CLOTH, Resource.FOOD, Resource.WATER).forEach { s.store.amounts[it] = 200.0 }
+            s.store.amounts[Resource.WOOD] = 400.0
+            s.store.amounts[Resource.TOOLS] = 40.0
+            BuildingSystem.place(s, BuildingType.DEFENSE_TOWER, 13, 7, instant = true)
+            BuildingSystem.place(s, BuildingType.DEFENSE_TOWER, 5, 6, instant = true)
+            BuildingSystem.place(s, BuildingType.WATCHTOWER, 9, 9, instant = true)
+            BuildingSystem.place(s, BuildingType.BARRACKS, 9, 2, instant = true)
+            BuildingSystem.place(s, BuildingType.EXPLORATION_CENTER, 11, 8, instant = true)
+            PopulationSystem.autoAssign(s)
+            s.settings.gameSpeed = 1
+            CombatSystem.start(s, "Haydut Çetesi", listOf(EnemyType.BANDIT to 4, EnemyType.BEAST to 2))
+            s.battle!!.prep = 0.0
+        },
+        700L to { shot(it, "16_savas") },
+        705L to { g -> g.core.state.battle = null },
+        710L to { g -> g.gameScreen.togglePanel(PanelId.DEFENSE) },
+        735L to { shot(it, "17_savunma") },
+        740L to { g -> g.gameScreen.togglePanel(PanelId.EXPLORATION) },
+        765L to { shot(it, "18_kesif") },
+        770L to { Gdx.app.exit() },
     )
 
     override fun onFrame(game: YuruyenSehirGame, frame: Long) {

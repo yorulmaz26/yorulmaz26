@@ -45,6 +45,12 @@ object BuildingArt {
         SUPPORT_FRAME -> BuildingStyle(10f, c("B98B5E"), c("D2AC7E"), Roof.FLAT)
         TRADE_MARKET -> BuildingStyle(14f, c("FFF3D6"), c("F6C445"), Roof.GABLE, 16f)
         TRADE_DEPOT -> BuildingStyle(18f, c("E3C59A"), c("D9A21B"), Roof.GABLE, 10f)
+        WATCHTOWER -> BuildingStyle(40f, c("E7C9A3"), c("8D6E63"), Roof.TOWER, 14f)
+        DEFENSE_TOWER -> BuildingStyle(36f, c("D9D2C5"), c("A0A4AA"), Roof.TOWER, 10f)
+        ENERGY_TOWER -> BuildingStyle(40f, c("E3F2FD"), c("26C6DA"), Roof.TOWER, 12f)
+        SHIELD_CENTER -> BuildingStyle(20f, c("E0F7FA"), c("4FC3F7"), Roof.DOME, 18f)
+        BARRACKS -> BuildingStyle(20f, c("D7CCC8"), c("5C6BC0"), Roof.GABLE, 12f)
+        EXPLORATION_CENTER -> BuildingStyle(20f, c("FFF3D6"), c("6DBE6A"), Roof.GABLE, 14f)
     }
 
     private val windowed = setOf(SMALL_HOUSE, LARGE_HOUSE, APARTMENTS, CITY_CENTER, TOWN_HALL, HEALTH_CENTER, CULTURE_CENTER)
@@ -142,7 +148,13 @@ object BuildingArt {
                     // bayrak / ışık
                     sr.setColor(0.45f, 0.35f, 0.25f, alpha); sr.rectLine(apx, apy, apx, apy + 12, 1.6f)
                     val wave = sin(time * 4f) * 2f
-                    if (t == NAVIGATION_TOWER) {
+                    if (t == ENERGY_TOWER) {
+                        val glow = 0.5f + 0.5f * sin(time * 5f)
+                        sr.setColor(0.4f, 0.9f, 1f, alpha * (0.5f + 0.5f * glow)); sr.circle(apx, apy + 8, 5f, 12)
+                    } else if (t == DEFENSE_TOWER) {
+                        // mazgallar
+                        sr.setColor(0.55f, 0.55f, 0.58f, alpha); sr.rect(apx - 6, apy - 6, 3f, 5f); sr.rect(apx + 3, apy - 6, 3f, 5f)
+                    } else if (t == NAVIGATION_TOWER) {
                         val glow = 0.6f + 0.4f * sin(time * 3f)
                         sr.setColor(1f, 0.9f, 0.4f, alpha * glow); sr.circle(apx, apy + 14, 4f, 10)
                     } else {

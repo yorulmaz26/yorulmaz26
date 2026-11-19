@@ -125,10 +125,12 @@ object CivSystem {
     }
 
     /** Oyuncunun çevresindeki bölgelerde (12x12) medeniyetleri tembel ve deterministik biçimde üretir. */
-    fun ensureNearby(state: GameState) {
-        val p = state.travel.position
+    fun ensureNearby(state: GameState) = ensureAround(state, state.travel.position)
+
+    /** Bir hücre çevresindeki bölgeleri üretir (keşif ekipleri de kullanır). */
+    fun ensureAround(state: GameState, p: Cell, radius: Int = 1) {
         val rx = Math.floorDiv(p.x, REGION); val ry = Math.floorDiv(p.y, REGION)
-        for (dx in -1..1) for (dy in -1..1) {
+        for (dx in -radius..radius) for (dy in -radius..radius) {
             val reg = Cell(rx + dx, ry + dy)
             if (!state.generatedRegions.add(reg.key())) continue
             val w = state.world
@@ -151,6 +153,18 @@ object CivSystem {
             Resource.entries.filter { TradeSystem.tradable(it) }.forEach { civ.stock[it] = targetStock(civ, it) }
             state.civs += civ
         }
+    }
+
+    /** [c] çevresindeki [r] bölge içinde tanınmayan medeniyetlerle tanışır; tanışılan sayıyı döndürür. */
+    fun meetNear(state: GameState, c: Cell, r: Int, offline: Boolean): Int {
+        var n = 0
+        for (civ in state.civs) if (!civ.met && civ.position.dist(c) <= r) {
+            civ.met = true; n++
+            state.travel.explored += civ.position.key()
+            if (!offline) state.log("Keşif ekibi ${civ.name} (${civ.culture.title}) ile tanıştı.", LogKind.DIPLOMACY)
+        }
+        if (n > 0) state.cityVersion++
+        return n
     }
 
     fun meetCheck(state: GameState, offline: Boolean) {
@@ -228,10 +242,11 @@ object CivSystem {
 
     fun raidEvent(state: GameState, c: Civilization): PendingEvent {
         val tribute = (30 + c.power * 3).toInt()
-        val dmg = (8 + c.power * 0.6).toInt()
-        return PendingEvent("raid", "${c.name} Baskını!", "Düşman akıncılar şehre yaklaşıyor. Güçleri: ${c.power.toInt()}.", listOf(
+        val n = (2 + c.power / 5).toInt().coerceIn(2, 12)
+        val type = if (c.culture == Culture.RIVAL_CITY || c.culture == Culture.IRON_UNION) "MECH:${n / 3},RAIDER:${n - n / 3}" else "RAIDER:$n"
+        return PendingEvent("raid", "${c.name} Baskını!", "$n düşman akıncı şehre yaklaşıyor (güç ${c.power.toInt()}). Savunma gücünüz ${CombatSystem.defenseRating(state).toInt()}.", listOf(
+            EventOption("Savun", effect = "battle=$type@${c.id}"),
             EventOption("Haraç öde", cost = amounts(GOLD to tribute), effect = "rel=${c.id}:3"),
-            EventOption("Savun", effect = "damage=2x$dmg;rel=${c.id}:-2"),
         ))
     }
 

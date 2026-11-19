@@ -60,6 +60,13 @@ object Palette {
         Resource.CARE_ESSENCE -> Color.valueOf("81C784")
     }
 
+    fun enemy(t: com.yuruyensehir.logic.EnemyType): Color = when (t) {
+        com.yuruyensehir.logic.EnemyType.BANDIT -> Color.valueOf("B23A48")
+        com.yuruyensehir.logic.EnemyType.BEAST -> Color.valueOf("8D5B3A")
+        com.yuruyensehir.logic.EnemyType.MECH -> Color.valueOf("6B7685")
+        com.yuruyensehir.logic.EnemyType.RAIDER -> Color.valueOf("7E57C2")
+    }
+
     fun relation(r: com.yuruyensehir.logic.Relation): Color = when (r) {
         com.yuruyensehir.logic.Relation.ENEMY -> Color.valueOf("D84A2B")
         com.yuruyensehir.logic.Relation.RIVAL -> Color.valueOf("FF9F43")

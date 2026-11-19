@@ -32,7 +32,7 @@ import com.yuruyensehir.logic.*
 enum class PanelId(val title: String) {
     BUILD("İnşa Et"), BUILDING("Bina"), CARRIER("Taşıyıcı"), ECONOMY("Kaynak Ekonomisi"), POPULATION("Nüfus"),
     RESEARCH("Araştırma"), MAP("Dünya Haritası ve Rota"), LOG("Dünya Günlüğü"), SETTINGS("Ayarlar ve İstatistikler"),
-    TRADE("Ticaret"), DIPLOMACY("Diplomasi"),
+    TRADE("Ticaret"), DIPLOMACY("Diplomasi"), DEFENSE("Savunma"), EXPLORATION("Keşif Ekipleri"),
 }
 
 enum class ViewMode { CITY, MAP }
@@ -98,6 +98,13 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     private val overlay = Table()
     private val toast = ui.label("", "light", wrap = true, align = Align.center)
     private val toastBox = Table()
+    private val battleBar = Table()
+    private val battleLabel = ui.label("", "small", wrap = true)
+    private val prioButtons = ArrayList<TextButton>()
+    private lateinit var repairButton: TextButton
+    private lateinit var tributeButton: TextButton
+    var expDirection = 1
+    var expDistance = 5
 
     init {
         buildUi()
@@ -154,6 +161,12 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         refreshTimer += dt
         if (refreshTimer > 0.6f && !Gdx.input.isTouched) { refreshTimer = 0f; if (openPanel != null) refreshPanel() }
         if (state.pendingEvent != null && overlay.children.size == 0) showEvent()
+        val inBattle = state.battle != null
+        if (inBattle != battleBar.isVisible) {
+            battleBar.isVisible = inBattle
+            if (!inBattle) layoutUi()
+            if (inBattle) { closePanel(); cancelPlacement(); if (mode == ViewMode.MAP) setMode(ViewMode.CITY); updateBattleBar() }
+        }
 
         autosaveTimer += dt
         if (autosaveTimer > 30f) { autosaveTimer = 0f; game.save() }
@@ -432,13 +445,35 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             "İnşa Et" to { togglePanel(PanelId.BUILD) }, "Taşıyıcı" to { togglePanel(PanelId.CARRIER) },
             "Harita" to { if (mode == ViewMode.MAP) { setMode(ViewMode.CITY); closePanel() } else { setMode(ViewMode.MAP); showPanel(PanelId.MAP) } },
             "Ekonomi" to { togglePanel(PanelId.ECONOMY) }, "Ticaret" to { togglePanel(PanelId.TRADE) },
+            "Savunma" to { togglePanel(PanelId.DEFENSE) },
             "Nüfus" to { togglePanel(PanelId.POPULATION) }, "Araştırma" to { togglePanel(PanelId.RESEARCH) },
-            "Diplomasi" to { togglePanel(PanelId.DIPLOMACY) }, "Günlük" to { togglePanel(PanelId.LOG) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
+            "Diplomasi" to { togglePanel(PanelId.DIPLOMACY) }, "Keşif" to { togglePanel(PanelId.EXPLORATION) },
+            "Günlük" to { togglePanel(PanelId.LOG) }, "Ayarlar" to { togglePanel(PanelId.SETTINGS) },
         )
         items.forEachIndexed { i, (t, f) ->
-            nav.add(ui.button(t, "nav", f).apply { pad(12f, 2f, 12f, 2f) }).expandX().fillX().uniformX().pad(3f)
-            if (i == 4) nav.row()
+            nav.add(ui.button(t, "nav", f).apply { pad(12f, 1f, 12f, 1f) }).expandX().fillX().uniformX().pad(2f)
+            if (i == 5) nav.row()
         }
+
+        // Savaş çubuğu
+        battleBar.background = theme.tinted("round", Color(1f, 0.93f, 0.9f, 0.97f))
+        battleBar.pad(12f)
+        ui.blockTouches(battleBar)
+        battleBar.add(battleLabel).expandX().fillX().colspan(2).row()
+        val prio = Table()
+        for (p in TargetPriority.entries) {
+            val b = ui.button(p.title, "chip") { CombatSystem.setPriority(state, p); updateBattleBar() }
+            b.pad(6f, 8f, 6f, 8f)
+            prioButtons += b
+            prio.add(b).padRight(4f)
+        }
+        battleBar.add(ui.label("Hedef önceliği:", "small")).left().colspan(2).padTop(4f).row()
+        battleBar.add(prio).left().colspan(2).padTop(2f).row()
+        repairButton = ui.button("Acil Onarım", "gold") { toast(CombatSystem.emergencyRepair(state).message) }
+        tributeButton = ui.button("Haraç öde", "danger") { val r = CombatSystem.payTribute(state); toast(r.message, !r.success) }
+        battleBar.add(repairButton).expandX().fillX().pad(6f, 0f, 0f, 4f)
+        battleBar.add(tributeButton).expandX().fillX().pad(6f, 4f, 0f, 0f)
+        battleBar.isVisible = false
 
         // Yerleştirme çubuğu
         placeBar.background = theme.tinted("round", Color(1f, 0.98f, 0.93f, 0.97f))
@@ -479,6 +514,7 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         stage.addActor(sheet)
         stage.addActor(nav)
         stage.addActor(placeBar)
+        stage.addActor(battleBar)
         stage.addActor(hud)
         stage.addActor(toastBox)
         stage.addActor(overlay)
@@ -495,6 +531,8 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         nav.setPosition(m, m)
         placeBar.width = w - 2 * m; placeBar.pack(); placeBar.width = w - 2 * m
         placeBar.setPosition(m, m)
+        battleBar.width = w - 2 * m; battleBar.pack(); battleBar.width = w - 2 * m
+        battleBar.setPosition(m, nav.height + 2 * m)
         val sheetH = if (mode == ViewMode.MAP) (h * 0.36f).coerceAtLeast(400f) else (h * 0.5f).coerceAtLeast(520f)
         sheet.setSize(w - 2 * m, sheetH)
         sheet.setPosition(m, nav.height + 2 * m)
@@ -529,6 +567,33 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
         carrierLabel.setText("${c.name}: Can %${c.health.toInt()} • Açlık ${pct(c.hunger, 70.0)} • Susuzluk ${pct(c.thirst, 70.0)} • Yorgunluk ${pct(c.fatigue, 80.0)}" +
             (if (c.forcedRest) " • [#D84A2B]Bitkin![]" else if (c.resting) " • Dinleniyor" else ""))
         if (placingType != null) updatePlaceBar()
+        if (state.battle != null) updateBattleBar()
+    }
+
+    private fun updateBattleBar() {
+        val b = state.battle ?: return
+        val left = (CombatSystem.TIME_LIMIT - (b.elapsed - b.prep.coerceAtLeast(0.0))).coerceAtLeast(0.0)
+        val cap = CombatSystem.shieldCapacity(state)
+        battleLabel.setText(
+            "[#D84A2B]SAVAŞ:[] ${b.title}\n" +
+                (if (b.prep > 0) "Hazırlık: ${b.prep.toInt()} sn • " else "Kalan süre: ${left.toInt()} sn • ") +
+                "Düşman ${b.enemies.size}/${b.total} • Yenilen ${b.kills}" +
+                (if (cap > 0) " • Kalkan ${b.shield.toInt()}/${cap.toInt()}" else "") +
+                " • Muhafız ${b.guards.count { it.alive }}/${b.guards.size} • Enerji ${fmt(state.store[Resource.ENERGY])}" +
+                "\n[#7D6750]Oyunu 'Dur' ile duraklatıp öncelikleri değiştirebilirsiniz. Süre dolarsa düşman yağmalayıp çekilir.[]",
+        )
+        prioButtons.forEachIndexed { i, btn -> btn.isChecked = state.defensePriority.ordinal == i }
+        repairButton.setText("Acil Onarım (${CombatSystem.repairCost.describe()})" + if (b.repairCooldown > 0) " ${b.repairCooldown.toInt()} sn" else "")
+        repairButton.isDisabled = b.repairCooldown > 0 || !state.store.canAfford(CombatSystem.repairCost)
+        tributeButton.setText("Haraç öde (${fmt(CombatSystem.tributeCost(state)[Resource.GOLD] ?: 0.0)} altın)")
+        tributeButton.isDisabled = !state.store.canAfford(CombatSystem.tributeCost(state))
+        battleBar.invalidateHierarchy(); battleBar.height = battleBar.prefHeight
+        battleBar.setPosition(10f, nav.y + nav.height + 8f)
+        if (sheet.isVisible) {
+            val bottom = battleBar.y + battleBar.height + 8f
+            sheet.setPosition(10f, bottom)
+            sheet.height = (hud.y - 8f - bottom).coerceAtLeast(200f)
+        }
     }
 
     // ------------------------------------------------------------------ Bildirimler ve diyaloglar
@@ -624,13 +689,14 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
 
     fun togglePanel(id: PanelId) {
         if (openPanel == id) closePanel() else {
-            if (id != PanelId.MAP && mode == ViewMode.MAP && id != PanelId.CARRIER && id != PanelId.DIPLOMACY && id != PanelId.TRADE) setMode(ViewMode.CITY)
+            if (id != PanelId.MAP && mode == ViewMode.MAP && id != PanelId.CARRIER && id != PanelId.DIPLOMACY && id != PanelId.TRADE && id != PanelId.EXPLORATION) setMode(ViewMode.CITY)
             showPanel(id)
         }
     }
 
     fun showPanel(id: PanelId) {
         if (placingType != null) cancelPlacement()
+        if (state.battle != null && id != PanelId.BUILDING && id != PanelId.DEFENSE) { toast("Savaş sürüyor: önce savunmaya odaklanın.", true); return }
         openPanel = id
         sheet.isVisible = true
         scroll.scrollY = 0f
@@ -666,6 +732,8 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
             PanelId.SETTINGS -> Panels.settings(this, content, width)
             PanelId.TRADE -> Panels.trade(this, content, width)
             PanelId.DIPLOMACY -> Panels.diplomacy(this, content, width)
+            PanelId.DEFENSE -> Panels.defense(this, content, width)
+            PanelId.EXPLORATION -> Panels.exploration(this, content, width)
         }
         scroll.layout()
         scroll.scrollY = keepY
@@ -700,8 +768,8 @@ class GameScreen(val game: YuruyenSehirGame) : ScreenAdapter() {
     fun startRouteForTest() = startRoute()
     fun dismissModalForTest() = closeModal()
 
-    /** Testler/betikler için: bir binayı seçip bilgi panelini açar. */
-    fun selectForTest(id: Int) { selectedId = id; showPanel(PanelId.BUILDING) }
+    /** Bir binayı seçip bilgi panelini açar. */
+    fun selectBuilding(id: Int) { selectedId = id; showPanel(PanelId.BUILDING) }
 
     fun demolishPending(b: PlacedBuilding) = confirmDemolishId == b.id
     fun startMove(b: PlacedBuilding) = beginMove(b)

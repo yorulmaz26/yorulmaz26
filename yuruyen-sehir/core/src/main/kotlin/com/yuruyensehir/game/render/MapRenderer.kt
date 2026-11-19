@@ -81,6 +81,16 @@ class MapRenderer {
             if (civ.atWar) { sr.color = Palette.red; sr.rectLine(px - 14, py + 16, px - 4, py + 26, 2.5f); sr.rectLine(px - 14, py + 26, px - 4, py + 16, 2.5f) }
         }
 
+        // Keşif ekipleri
+        for (e in state.expeditions) {
+            val px = e.target.x * SIZE + SIZE / 2; val py = e.target.y * SIZE + SIZE / 2
+            sr.setColor(0.4f, 0.3f, 0.2f, 1f); sr.rectLine(px, py - 14, px, py + 14, 2f)
+            sr.color = Palette.turquoise; sr.triangle(px, py + 14, px - 14, py + 9 + sin(time * 4) * 2, px, py + 4)
+            val f = (1 - e.secondsLeft / e.totalSeconds).toFloat()
+            val sx = t.position.x * SIZE + SIZE / 2; val sy = t.position.y * SIZE + SIZE / 2
+            sr.setColor(1f, 1f, 1f, 0.9f); sr.circle(sx + (px - sx) * (if (f < 0.5f) f * 2 else (1 - f) * 2), sy + (py - sy) * (if (f < 0.5f) f * 2 else (1 - f) * 2), 4f, 8)
+        }
+
         // Şehir konumu
         val pp = t.position
         val cx = pp.x * SIZE + SIZE / 2; val cy = pp.y * SIZE + SIZE / 2

@@ -27,7 +27,7 @@ class MemoryStorage : SaveStorage {
 class SaveCorruptException(msg: String) : Exception(msg)
 
 object SaveCodec {
-    const val CURRENT_VERSION = 2
+    const val CURRENT_VERSION = 3
 
     val json = Json {
         ignoreUnknownKeys = true
@@ -65,6 +65,8 @@ object SaveCodec {
                 // 1 -> 2: medeniyetler, itibar ve kervanlar eklendi. Eksik alanlar varsayılanlarını alır;
                 // dünya yeniden tarandığında medeniyetler deterministik olarak üretilir.
                 1 -> obj
+                // 2 -> 3: savaş, savunma önceliği, keşif görevleri; varsayılanlarla başlar.
+                2 -> obj
                 else -> obj
             }
             v++

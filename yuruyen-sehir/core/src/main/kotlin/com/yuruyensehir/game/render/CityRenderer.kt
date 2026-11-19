@@ -12,6 +12,8 @@ import com.yuruyensehir.logic.CityGrid
 import com.yuruyensehir.logic.GameState
 import com.yuruyensehir.logic.PlacedBuilding
 import com.yuruyensehir.logic.BalanceReport
+import com.yuruyensehir.logic.CombatSystem
+import com.yuruyensehir.logic.EnemyType
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.floor
@@ -171,6 +173,7 @@ class CityRenderer {
         }
 
         drawPeople(sr)
+        drawBattle(sr, state, time, selectedId)
         for (pf in puffs) if (pf.life > 0) {
             sr.setColor(0.95f, 0.95f, 0.95f, (pf.life / 2.2f) * 0.7f)
             sr.circle(pf.x, pf.y, pf.size, 10)
@@ -414,6 +417,91 @@ class CityRenderer {
             sr.setColor(0.2f, 0.2f, 0.1f, 0.25f); Draw.ellipseFan(sr, x, y, 4f, 2f, 8)
             sr.color = p.color; sr.rect(x - 2.5f, y + step, 5f, 8f)
             sr.setColor(1f, 0.85f, 0.7f, 1f); sr.circle(x, y + 10.5f + step, 3f, 8)
+        }
+    }
+
+    /** Izgara çemberini (yarıçap kare) güverte düzleminde elips olarak çizer. */
+    fun ring(sr: ShapeRenderer, gx: Float, gy: Float, r: Float, c: Color, width: Float) {
+        sr.color = c
+        val seg = 40
+        var px = 0f; var py = 0f
+        for (i in 0..seg) {
+            val a = i.toFloat() / seg * MathUtils.PI2
+            val x = worldX(gx + r * cos(a), gy + r * sin(a)); val y = worldY(gx + r * cos(a), gy + r * sin(a)) + deckOffset
+            if (i > 0) sr.rectLine(px, py, x, y, width)
+            px = x; py = y
+        }
+    }
+
+    private val ringColor = Color(1f, 1f, 1f, 0.6f)
+    private val shieldColor = Color(0.4f, 0.85f, 1f, 0.16f)
+
+    private fun drawBattle(sr: ShapeRenderer, state: GameState, time: Float, selectedId: Int) {
+        // Seçili kulenin menzili (savaş olmasa da)
+        state.building(selectedId)?.let { b ->
+            if (b.def.towerDps > 0) ring(sr, b.centerX.toFloat(), b.centerY.toFloat(), CombatSystem.towerRange(state, b).toFloat(), ringColor, 2f)
+            if (b.def.shieldRadius > 0) ring(sr, b.centerX.toFloat(), b.centerY.toFloat(), b.def.shieldRadius + 0.5f, Palette.turquoise, 2f)
+            if (b.def.guardCount > 0) ring(sr, b.centerX.toFloat(), b.centerY.toFloat(), 5f, Color(0.36f, 0.42f, 0.75f, 0.7f), 2f)
+        }
+        val battle = state.battle ?: return
+        if (battle.shield > 0) {
+            for (s in state.buildings) if (s.def.shieldRadius > 0 && CombatSystem.staffed(s)) {
+                val x = worldX(s.centerX.toFloat(), s.centerY.toFloat()); val y = worldY(s.centerX.toFloat(), s.centerY.toFloat()) + deckOffset
+                val r = s.def.shieldRadius + 0.5f
+                shieldColor.a = 0.10f + 0.06f * sin(time * 3f)
+                sr.color = shieldColor
+                Draw.ellipseFan(sr, x, y + 10f, r * Iso.HW * 1.41f, r * Iso.HH * 1.41f, 28)
+            }
+        }
+        val cx = CityGrid.CENTER_X; val cy = CityGrid.CENTER_Y
+        val rx = CityGrid.radiusX(state); val ry = CityGrid.radiusY(state)
+        fun lift(x: Double, y: Double): Float {
+            val nx = (x - cx) / rx; val ny = (y - cy) / ry
+            val r = kotlin.math.sqrt(nx * nx + ny * ny)
+            return (((1.3 - r) / 0.3).coerceIn(0.0, 1.0)).toFloat() * deckOffset
+        }
+        for (e in battle.enemies.sortedByDescending { it.y + (GW - it.x) }) {
+            val shake = if (e.attacking) sin(time * 30f + e.id) * 1.5f else 0f
+            val x = worldX(e.x.toFloat(), e.y.toFloat()) + shake
+            val y = worldY(e.x.toFloat(), e.y.toFloat()) + lift(e.x, e.y)
+            val col = Palette.enemy(e.type)
+            sr.setColor(0f, 0f, 0f, 0.25f); Draw.ellipseFan(sr, x, y, 9f, 4f, 10)
+            when (e.type) {
+                EnemyType.BEAST -> {
+                    sr.color = col; Draw.ellipseFan(sr, x, y + 8, 13f, 7f, 14); sr.circle(x + 11, y + 13, 6f, 10)
+                    sr.triangle(x + 8, y + 17, x + 11, y + 24, x + 13, y + 17)
+                    sr.setColor(1f, 0.9f, 0.3f, 1f); sr.circle(x + 13, y + 14, 1.6f, 6)
+                }
+                EnemyType.MECH -> {
+                    sr.color = col; sr.rect(x - 8, y + 2, 16f, 16f)
+                    sr.setColor(0.4f, 0.45f, 0.5f, 1f); sr.rectLine(x - 6, y + 2, x - 9, y - 3, 2f); sr.rectLine(x + 6, y + 2, x + 9, y - 3, 2f)
+                    sr.setColor(1f, 0.3f, 0.2f, 0.7f + 0.3f * sin(time * 6)); sr.circle(x, y + 12, 3f, 8)
+                }
+                else -> {
+                    sr.color = col; sr.triangle(x - 7, y, x + 7, y, x, y + 16)
+                    sr.setColor(1f, 0.85f, 0.7f, 1f); sr.circle(x, y + 18, 4f, 10)
+                    sr.color = col; sr.rect(x - 4.5f, y + 20, 9f, 3f)
+                }
+            }
+            if (e.hp < e.maxHp) {
+                sr.setColor(0f, 0f, 0f, 0.4f); sr.rect(x - 11, y + 30, 22f, 4f)
+                sr.color = Palette.red; sr.rect(x - 11, y + 30, 22f * (e.hp / e.maxHp).toFloat().coerceIn(0f, 1f), 4f)
+            }
+        }
+        for (g in battle.guards) {
+            if (!g.alive) continue
+            val x = worldX(g.x.toFloat(), g.y.toFloat()); val y = worldY(g.x.toFloat(), g.y.toFloat()) + deckOffset
+            sr.setColor(0f, 0f, 0f, 0.25f); Draw.ellipseFan(sr, x, y, 5f, 2.5f, 8)
+            sr.setColor(0.36f, 0.42f, 0.75f, 1f); sr.rect(x - 3.5f, y, 7f, 11f)
+            sr.setColor(1f, 0.85f, 0.7f, 1f); sr.circle(x, y + 14, 3.5f, 8)
+            sr.setColor(0.85f, 0.85f, 0.9f, 1f); sr.circle(x + 5, y + 6, 3.5f, 8)
+        }
+        for (s in state.shots) {
+            val x1 = worldX(s.x1.toFloat(), s.y1.toFloat()); val y1 = worldY(s.x1.toFloat(), s.y1.toFloat()) + deckOffset + 40f
+            val x2 = worldX(s.x2.toFloat(), s.y2.toFloat()); val y2 = worldY(s.x2.toFloat(), s.y2.toFloat()) + lift(s.x2, s.y2) + 10f
+            val a = (s.ttl / 0.25).toFloat().coerceIn(0f, 1f)
+            if (s.energy) { sr.setColor(0.4f, 0.9f, 1f, a); sr.rectLine(x1, y1, x2, y2, 3.5f) }
+            else { sr.setColor(0.45f, 0.32f, 0.2f, a); sr.rectLine(x1 + (x2 - x1) * 0.6f, y1 + (y2 - y1) * 0.6f, x2, y2, 2f) }
         }
     }
 

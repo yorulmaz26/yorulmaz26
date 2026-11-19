@@ -17,6 +17,7 @@ enum class TechId {
     NUTRITIOUS_FODDER, MUSCLE_TRAINING, DEEP_SLEEP,
     SHOCK_ABSORBERS, WATCHMEN,
     STAR_CHARTS, ROUTE_SCIENCE, BETTER_GATHERERS,
+    REINFORCED_ARROWS, ENERGY_SHIELDS, EXPEDITION_GEAR,
 }
 
 data class TechDef(
@@ -46,6 +47,9 @@ object TechCatalog {
         TechDef(TechId.DEEP_SLEEP, "Derin Uyku", ResearchBranch.CARRIER, "Dinlenirken toparlanma +%40.", 60.0, amounts(CLOTH to 20, FOOD to 40), listOf(TechId.NUTRITIOUS_FODDER)),
         TechDef(TechId.SHOCK_ABSORBERS, "Darbe Emiciler", ResearchBranch.DEFENSE, "Yolculukta yük kayması hasarı %40 azalır.", 50.0, amounts(CLOTH to 20, WOOD to 30)),
         TechDef(TechId.WATCHMEN, "Gözcü Eğitimi", ResearchBranch.DEFENSE, "Fırtına ve saldırı olaylarındaki hasar %25 azalır.", 80.0, amounts(METAL to 20, FOOD to 30), listOf(TechId.SHOCK_ABSORBERS)),
+        TechDef(TechId.REINFORCED_ARROWS, "Takviyeli Oklar", ResearchBranch.DEFENSE, "Bütün kulelerin hasarı +%25.", 60.0, amounts(METAL to 20, WOOD to 30)),
+        TechDef(TechId.ENERGY_SHIELDS, "Enerji Kalkanları", ResearchBranch.DEFENSE, "Kalkan Merkezi açılır; kalkan kapasitesi +%50.", 110.0, amounts(METAL to 30, CRYSTAL to 5), listOf(TechId.EFFICIENT_BOILERS)),
+        TechDef(TechId.EXPEDITION_GEAR, "Keşif Donanımı", ResearchBranch.EXPLORATION, "Keşif görevleri %20 daha hızlı ve daha az riskli.", 60.0, amounts(CLOTH to 20, TOOLS to 8), listOf(TechId.STAR_CHARTS)),
         TechDef(TechId.STAR_CHARTS, "Yıldız Haritaları", ResearchBranch.EXPLORATION, "Keşif menzili +1.", 40.0, amounts(CLOTH to 15)),
         TechDef(TechId.ROUTE_SCIENCE, "Rota Bilimi", ResearchBranch.EXPLORATION, "Yolculuk hızı +%10.", 70.0, amounts(CLOTH to 20, METAL to 10), listOf(TechId.STAR_CHARTS)),
         TechDef(TechId.BETTER_GATHERERS, "Gelişmiş Toplayıcılar", ResearchBranch.EXPLORATION, "Toplayıcı rampası verimi +%30.", 60.0, amounts(TOOLS to 10, WOOD to 30)),

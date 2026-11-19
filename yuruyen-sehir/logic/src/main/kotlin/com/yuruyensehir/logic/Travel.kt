@@ -180,7 +180,7 @@ object TravelSystem {
 
     fun step(state: GameState, dt: Double, report: BalanceReport) {
         val t = state.travel
-        if (!t.traveling || !CarrierSystem.canMove(state) || state.pendingEvent != null) return
+        if (!t.traveling || !CarrierSystem.canMove(state) || state.pendingEvent != null || state.battle != null) return
         val next = t.route[t.routeIndex]
         val biome = state.world.biomeAt(next)
         t.progress += CarrierSystem.speed(state, report) * CarrierSystem.terrainFactor(state, biome) * dt / 60.0
@@ -251,8 +251,9 @@ object EventSystem {
     }
 
     fun maybeTrigger(state: GameState, biome: Biome) {
-        if (state.pendingEvent != null || state.eventCooldown > 0) return
-        val chance = 0.10 + biome.danger * 0.30
+        if (state.pendingEvent != null || state.eventCooldown > 0 || state.battle != null) return
+        var chance = 0.10 + biome.danger * 0.30
+        if (state.scoutedSeconds > 0) chance *= 0.5
         if (state.nextRandom() >= chance) return
         state.pendingEvent = create(state, biome)
         state.eventCooldown = COOLDOWN
@@ -269,6 +270,8 @@ object EventSystem {
         pool += "predators" to if (biome == Biome.FOREST || biome == Biome.MYSTIC_FOREST || biome == Biome.SWAMP) 2.5 else 0.4
         pool += "ruins" to if (biome == Biome.RUINS || biome == Biome.MYSTIC_FOREST) 3.0 else 0.3
         pool += "tech" to if (biome == Biome.RUINS || biome == Biome.CRYSTAL_VALLEY) 2.0 else 0.1
+        pool += "bandits" to (0.3 + 2.5 * biome.danger)
+        pool += "mech" to if (biome == Biome.RUINS || biome == Biome.STORMLANDS || biome == Biome.CRYSTAL_VALLEY) 1.5 else 0.0
         val total = pool.sumOf { it.second }
         var r = state.nextRandom() * total
         var kind = pool.first().first
@@ -311,10 +314,28 @@ object EventSystem {
                 EventOption("İzini sür", reward = amounts(CRYSTAL to rnd(4, 9), TECH_PART to 2), effect = "fatigue=15"),
                 EventOption("Görmezden gel"),
             ))
-            "predators" -> PendingEvent(kind, "Yırtıcı Sürü", "Aç yırtıcılar taşıyıcının bacaklarına doğru sokuluyor.", listOf(
-                EventOption("Yiyecekle oyala", cost = amounts(FOOD to 35)),
-                EventOption("Kovala", effect = "damage=1x10;trust=-4"),
-            ))
+            "predators" -> {
+                val n = CombatSystem.scaledCount(state, 2, biome.danger)
+                PendingEvent(kind, "Yırtıcı Sürü", "$n aç yırtıcı taşıyıcının sırtına tırmanmaya çalışıyor.", listOf(
+                    EventOption("Savun", effect = "battle=BEAST:$n"),
+                    EventOption("Yiyecekle oyala", cost = amounts(FOOD to 35)),
+                ))
+            }
+            "bandits" -> {
+                val n = CombatSystem.scaledCount(state, 2, biome.danger)
+                PendingEvent(kind, "Haydut Çetesi", "$n haydut depolarınıza göz dikti. Savunma gücünüz ${CombatSystem.defenseRating(state).toInt()}.", listOf(
+                    EventOption("Savun", effect = "battle=BANDIT:$n"),
+                    EventOption("Haraç öde", cost = amounts(GOLD to n * 10)),
+                    EventOption("Hızla uzaklaş", effect = "fatigue=25"),
+                ))
+            }
+            "mech" -> {
+                val n = CombatSystem.scaledCount(state, 1, biome.danger)
+                PendingEvent(kind, "Mekanik Gözcüler", "Eski çağdan kalma $n mekanik gözcü uyandı ve kulelerinize yöneliyor.", listOf(
+                    EventOption("Savun", effect = "battle=MECH:$n"),
+                    EventOption("Hızla uzaklaş", effect = "fatigue=30"),
+                ))
+            }
             "ruins" -> PendingEvent(kind, "Antik Kalıntı", "Toprağın altından eski bir yapının kubbesi görünüyor.", listOf(
                 EventOption("Kazı yap", reward = amounts(ANCIENT_PART to rnd(3, 6), STONE to 30), effect = "research=25;fatigue=10"),
                 EventOption("Geç"),
@@ -348,6 +369,11 @@ object EventSystem {
                 "trust" -> state.carrier.trust = (state.carrier.trust + value.toDouble()).coerceIn(0.0, 100.0)
                 "health" -> state.carrier.health = (state.carrier.health + value.toDouble()).coerceIn(CarrierSystem.HEALTH_FLOOR, CarrierSystem.maxHealth(state))
                 "fatigue" -> state.carrier.fatigue = (state.carrier.fatigue + value.toDouble()).coerceIn(0.0, 100.0)
+                "battle" -> {
+                    val spec = CombatSystem.parseSpec(value.substringBefore('@'))
+                    val civId = if ('@' in value) value.substringAfter('@').toIntOrNull() ?: -1 else -1
+                    CombatSystem.start(state, ev.title, spec, civId)
+                }
                 "rel" -> CivSystem.civ(state, value.substringBefore(':').toInt())?.let { c ->
                     c.relation = (c.relation + value.substringAfter(':').toDouble()).coerceIn(-100.0, 100.0)
                 }

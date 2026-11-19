@@ -40,6 +40,9 @@ object Panels {
         if (def.healthRadius > 0) parts += "Sağlık kapsamı ${def.healthRadius} kare"
         if (def.revealBonus > 0) parts += "Keşif menzili +${def.revealBonus}"
         if (def.travelSpeedBonus > 0) parts += "Yolculuk hızı +%${(def.travelSpeedBonus * 100).toInt()}"
+        if (def.towerDps > 0) parts += "Savunma: ${fmt(def.towerDps)} hasar/sn, menzil ${fmt(def.towerRange)}" + if (def.towerEnergyPerShot > 0) " (atış başı ${fmt(def.towerEnergyPerShot)} enerji)" else ""
+        if (def.shieldCapacity > 0) parts += "Kalkan ${fmt(def.shieldCapacity)}, yarıçap ${def.shieldRadius}"
+        if (def.guardCount > 0) parts += "${def.guardCount} muhafız"
         if (def.upkeepGold > 0) parts += "Bakım: ${fmt(def.upkeepGold)} altın/dk"
         return parts.joinToString(" • ")
     }
@@ -123,6 +126,21 @@ object Panels {
         def.adjacency.forEach { a ->
             val on = BuildingSystem.activeAdjacencies(st, b).contains(a)
             t.text(s, (if (on) "$GREEN• " else "$SOFT• ") + a.note + if (on) " (etkin)[]" else " (komşu yok)[]", width)
+        }
+        if (def.towerDps > 0) {
+            t.text(s, "Kule: ${fmt(CombatSystem.towerDps(st, b))} hasar/sn • menzil ${fmt(CombatSystem.towerRange(st, b))} kare (menzil halkası şehirde gösterilir)", width)
+            val pr = Table()
+            val gen = s.ui.button("Genel", "chip") { s.act(CombatSystem.setTowerPriority(st, b.id, null)) }
+            gen.pad(6f, 8f, 6f, 8f); gen.isChecked = b.targetPriority == null
+            pr.add(gen).padRight(4f)
+            for (p in TargetPriority.entries) {
+                val bt = s.ui.button(p.title, "chip") { s.act(CombatSystem.setTowerPriority(st, b.id, p)) }
+                bt.pad(6f, 8f, 6f, 8f); bt.isChecked = b.targetPriority == p
+                pr.add(bt).padRight(4f).padTop(4f)
+                if (p.ordinal == 1) pr.row()
+            }
+            t.add(s.ui.label("Bu kulenin hedef önceliği:", "small")).left().padTop(4f).row()
+            t.add(pr).left().row()
         }
         val supported = st.buildings.any { it.def.supportRadius > 0 && it.id != b.id && it.gapTo(b) <= 1 } && def.supportRadius == 0
         t.text(s, "${SOFT}Ağırlık: ${fmt(WeightBalanceSystem.weightOf(st, b, supported))}${if (supported) " (destekli)" else ""} • Konum ${b.x},${b.y}[]", width)
@@ -432,6 +450,8 @@ object Panels {
         val err = TravelSystem.canTarget(st, target)
         t.section(s, "Hedef: ${if (TravelSystem.isExplored(st, target)) tb.title else "Keşfedilmemiş bölge"} (${target.dist(tr.position)} bölge uzakta)", width)
         if (TravelSystem.isExplored(st, target)) t.text(s, tb.hint + " Toplanabilir: " + tb.yields.keys.joinToString { it.title }, width)
+        if (target.dist(tr.position) >= ExplorationSystem.MIN_RANGE)
+            t.add(s.ui.button("Buraya keşif ekibi gönder", "default") { s.expDirection = 4; s.showPanel(PanelId.EXPLORATION) }).width(width).padTop(4f).row()
         if (err != null) { t.text(s, "$RED$err[]", width); return }
         if (tr.traveling) t.text(s, "${SOFT}Yeni rota seçerseniz mevcut yolculuk değişir.[]", width)
         val routes = s.mapRoutes()
@@ -463,7 +483,7 @@ object Panels {
             val col = when (e.kind) {
                 LogKind.WARNING -> RED; LogKind.STAGE -> "[#C07A10]"; LogKind.RESEARCH -> "[#1A9C90]"
                 LogKind.EVENT -> "[#8E5BB5]"; LogKind.TRAVEL -> "[#2E7DB5]"; LogKind.CARRIER -> "[#4E9F45]"
-                LogKind.DIPLOMACY -> "[#B5651D]"; else -> ""
+                LogKind.DIPLOMACY -> "[#B5651D]"; LogKind.BATTLE -> "[#C0392B]"; LogKind.EXPLORATION -> "[#1A9C90]"; else -> ""
             }
             t.add(s.ui.label("${SOFT}Gün ${e.day}[]  $col${e.text}${if (col.isNotEmpty()) "[]" else ""}", "small", wrap = true)).width(width).padTop(5f).row()
         }
@@ -499,6 +519,7 @@ object Panels {
             "Üretilen yiyecek: ${fmt(stats.foodProduced)} • Su: ${fmt(stats.waterProduced)} • Toplanan: ${fmt(stats.gathered)}",
             "Katedilen yol: ${st.travel.distanceTraveled} bölge • Keşfedilen bölge: ${st.travel.explored.size}",
             "Tamamlanan araştırma: ${st.research.completed.size}/${TechCatalog.all.size}",
+            "Savaş: ${stats.battlesWon} zafer, ${stats.battlesLost} geri çekilme • Keşif görevi: ${stats.expeditionsDone}",
             "Ticaret işlemi: ${stats.trades} • Tanınan medeniyet: ${st.civs.count { it.met }} • İtibar %${st.reputation.toInt()}",
         )
         lines.forEach { t.text(s, it, width) }
@@ -506,7 +527,7 @@ object Panels {
         t.section(s, "Yeni Oyun", width)
         t.text(s, "${RED}Mevcut şehir ve bütün ilerleme silinir.[]", width)
         t.add(s.ui.button(if (s.newGameConfirm()) "Emin misiniz? Silmek için tekrar dokunun" else "Yeni Oyun Başlat", "danger") { s.requestNewGame() }).width(width).padTop(6f).row()
-        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.2.0 (Aşama 1-4 + ticaret ve diplomasi)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
+        t.add(s.ui.label("${SOFT}Yürüyen Şehir: Göçebe Medeniyet • sürüm 0.3.0 (Aşama 1-5)[]", "small", wrap = true, align = Align.center)).width(width).padTop(16f).row()
     }
 
     // ------------------------------------------------------------------ Ticaret
@@ -646,5 +667,111 @@ object Panels {
         if (c.atWar) DiplomacySystem.peaceReason(st, c)?.let { t.text(s, "${SOFT}Barış: $it[]", width) }
         t.text(s, "${SOFT}Etkiler: Ticaret anlaşması fiyatları %10 düşürür, menzili +2 artırır ve ilişkiyi zamanla güçlendirir. Geçiş izni sınır ücretlerini kaldırır. Müttefikler yardım gönderir ve kervanlarınızı korur; fakat geleneksel rakipleri (${c.culture.rival.title}) size soğur. Savaşta yakındaki düşman baskın yapar.[]", width)
         t.add(s.ui.button("Bu medeniyetle ticaret yap", "default") { s.openCiv(c.id, PanelId.TRADE) }).width(width).padTop(8f).row()
+    }
+
+    // ------------------------------------------------------------------ Savunma
+    fun defense(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val towers = CombatSystem.towers(st)
+        t.text(s, "Savunma gücü: ${CombatSystem.defenseRating(st).toInt()} • Kule ${towers.size} • Muhafız ${CombatSystem.guardCount(st)} • Kalkan ${CombatSystem.shieldCapacity(st).toInt()}", width, "default")
+        t.text(s, "${SOFT}Savaşlar gerçek zamanlıdır ve 'Dur' ile duraklatılır. Kuleler menzile giren düşmana saniyede bir atış yapar; muhafızlar düşmanı durdurur; kalkan yakındaki binaların hasarını emer. Binalar en fazla %20 sağlamlığa düşer, yok olmaz. Kulelerin yeri, düşmanın geldiği yön ve enerji stoku sonucu belirler.[]", width)
+        t.section(s, "Genel hedef önceliği", width)
+        val pr = Table()
+        for (p in TargetPriority.entries) {
+            val b = s.ui.button(p.title, "chip") { s.act(CombatSystem.setPriority(st, p)) }
+            b.pad(8f, 10f, 8f, 10f); b.isChecked = st.defensePriority == p
+            pr.add(b).padRight(4f).padTop(4f)
+            if (p.ordinal == 2) pr.row()
+        }
+        t.add(pr).left().row()
+
+        t.section(s, "Savunma yapıları", width)
+        val defs = st.buildings.filter { it.def.towerDps > 0 || it.def.shieldCapacity > 0 || it.def.guardCount > 0 }
+        if (defs.isEmpty()) t.text(s, "${RED}Hiç savunma yapınız yok. İnşa › Savunma menüsünden Savunma Kulesi ve Gözetleme Kulesi kurun.[]", width)
+        for (b in defs) {
+            val card = s.ui.card(Color.WHITE)
+            val l = Table()
+            val info = when {
+                b.def.towerDps > 0 -> "${fmt(CombatSystem.towerDps(st, b))} hasar/sn • menzil ${fmt(CombatSystem.towerRange(st, b))} • hedef: ${(b.targetPriority ?: st.defensePriority).title}" + if (b.targetPriority == null) " (genel)" else ""
+                b.def.shieldCapacity > 0 -> "Kalkan ${fmt(b.def.shieldCapacity * b.level)} • yarıçap ${b.def.shieldRadius}"
+                else -> "${b.def.guardCount * b.level} muhafız"
+            }
+            val staffed = CombatSystem.staffed(b)
+            l.add(s.ui.label("${b.def.title} Sv${b.level}" + if (!staffed) "  ${RED}(çalışmıyor)[]" else "", "default")).left().row()
+            l.add(s.ui.label(info + " • Sağlamlık %${b.hp.toInt()}", "small", wrap = true)).width(width - 190f).left()
+            card.add(l).expandX().left()
+            card.add(s.ui.button("Seç", "default") { s.selectBuilding(b.id) }).width(140f)
+            t.cardRow(card, width)
+        }
+
+        t.section(s, "Tehditler", width)
+        val biome = st.world.biomeAt(st.travel.position)
+        t.text(s, "Bulunduğunuz bölge: ${biome.title} • tehlike %${(biome.danger * 100).toInt()}" + if (st.scoutedSeconds > 0) " • ${GREEN}tehlike tespiti etkin (${st.scoutedSeconds.toInt()} sn)[]" else "", width)
+        val hostile = CivSystem.met(st).filter { it.hostile || it.status == Relation.RIVAL }.sortedBy { it.position.dist(st.travel.position) }
+        if (hostile.isEmpty()) t.text(s, "${SOFT}Bilinen düşman veya rakip medeniyet yok.[]", width)
+        hostile.forEach { c -> t.text(s, "• ${c.name} [#${Palette.relationHex(c.status)}]${c.status.title}[] • güç ${c.power.toInt()} • ${c.position.dist(st.travel.position)} bölge" + if (c.hostile && c.position.dist(st.travel.position) <= 3) " ${RED}(baskın riski!)[]" else "", width) }
+        t.text(s, "${SOFT}Kazanılan savaş ${st.stats.battlesWon} • Kaybedilen ${st.stats.battlesLost}[]", width)
+    }
+
+    // ------------------------------------------------------------------ Keşif
+    fun exploration(s: GameScreen, t: Table, width: Float) {
+        val st = s.state
+        val center = ExplorationSystem.center(st)
+        if (center == null) t.text(s, "${RED}Keşif ekibi göndermek için Özel menüsünden Keşif Merkezi kurun (ve bir keşifçi atayın).[]", width)
+        t.text(s, "Ekipler: ${st.expeditions.size}/${ExplorationSystem.slots(st)} görevde • Ekip başına ${ExplorationSystem.TEAM} yerleşimci • Boşta ${PopulationSystem.freeWorkers(st)}", width, "default")
+        for (e in st.expeditions) {
+            val row = Table()
+            row.add(s.ui.label("${e.type.title} › ${e.target.dist(st.travel.position)} bölge • risk %${(e.risk * 100).toInt()}", "small", wrap = true)).width(width * 0.55f).left()
+            row.add(s.bar((1 - e.secondsLeft / e.totalSeconds).toFloat(), Palette.turquoise, width * 0.4f))
+            t.add(row).width(width).padTop(4f).row()
+        }
+
+        t.section(s, "Hedef", width)
+        val dirs = listOf("Kuzey" to Cell(0, 1), "Doğu" to Cell(1, 0), "Güney" to Cell(0, -1), "Batı" to Cell(-1, 0))
+        val mapTarget = s.mapTarget()
+        val dirRow = Table()
+        dirs.forEachIndexed { i, (n, _) ->
+            val b = s.ui.button(n, "chip") { s.expDirection = i; s.act(ActionResult.ok("Yön: $n")) }
+            b.pad(8f, 12f, 8f, 12f); b.isChecked = s.expDirection == i
+            dirRow.add(b).padRight(4f)
+        }
+        if (mapTarget != null) {
+            val b = s.ui.button("Harita hedefi", "chip") { s.expDirection = 4; s.act(ActionResult.ok("Hedef: haritada seçilen bölge")) }
+            b.pad(8f, 12f, 8f, 12f); b.isChecked = s.expDirection == 4
+            dirRow.add(b)
+        } else if (s.expDirection == 4) s.expDirection = 1
+        t.add(dirRow).left().row()
+        if (s.expDirection != 4) {
+            val distRow = Table()
+            for (d in listOf(3, 5, 8, 12)) {
+                val b = s.ui.button("$d bölge", "chip") { s.expDistance = d; s.act(ActionResult.ok("Uzaklık: $d")) }
+                b.pad(8f, 12f, 8f, 12f); b.isChecked = s.expDistance == d
+                distRow.add(b).padRight(4f).padTop(4f)
+            }
+            t.add(distRow).left().row()
+        }
+        val p = st.travel.position
+        val target = if (s.expDirection == 4 && mapTarget != null) mapTarget else dirs[s.expDirection].second.let { Cell(p.x + it.x * s.expDistance, p.y + it.y * s.expDistance) }
+        val known = TravelSystem.isExplored(st, target)
+        t.text(s, "Hedef: ${if (known) st.world.biomeAt(target).title else "keşfedilmemiş bölge"} • ${target.dist(p)} bölge • dönüş ~${fmt(ExplorationSystem.duration(st, target) / 60)} dk", width)
+
+        t.section(s, "Görevler", width)
+        for (m in MissionType.entries) {
+            val card = s.ui.card(Color.WHITE)
+            val l = Table()
+            val risk = ExplorationSystem.risk(st, m, target)
+            val riskCol = if (risk < 0.2) GREEN else if (risk < 0.4) "[#C07A10]" else RED
+            l.add(s.ui.label(m.title, "default")).left().row()
+            l.add(s.ui.label(m.description, "small", wrap = true)).width(width - 190f).left().row()
+            l.add(s.ui.label("Risk $riskCol%${(risk * 100).toInt()}[] • Erzak: " + s.ui.costText(ExplorationSystem.cost(m), st.store), "small", wrap = true)).width(width - 190f).left()
+            card.add(l).expandX().left()
+            val reason = ExplorationSystem.reason(st, m, target)
+            val b = s.ui.button("Gönder", "primary") { s.act(ExplorationSystem.send(st, m, target)) }
+            b.isDisabled = reason != null
+            card.add(b).width(140f)
+            t.cardRow(card, width)
+        }
+        ExplorationSystem.reason(st, MissionType.RESOURCES, target)?.let { t.text(s, "$RED$it[]", width) }
+        t.text(s, "${SOFT}Başarısız görevde ekip eli boş döner ve bazen bir keşifçi kaybolur. Keşif Merkezi seviyesi, Keşif Donanımı araştırması ve yakındaki müttefikler riski azaltır. Görevler siz yokken de sürer.[]", width)
     }
 }
