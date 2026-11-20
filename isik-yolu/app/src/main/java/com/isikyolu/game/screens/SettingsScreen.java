@@ -63,7 +63,7 @@ public final class SettingsScreen extends Screen {
         about.setGravity(Gravity.CENTER_HORIZONTAL);
         about.setPadding(Ui.dp(c, 18), Ui.dp(c, 18), Ui.dp(c, 18), Ui.dp(c, 18));
         about.addView(Ui.text(c, "Işık Yolu", 20, Palette.WHITE, Ui.BOLD));
-        about.addView(Ui.text(c, "Sürüm 1.5.1", 13, Palette.TURQUOISE, Ui.MEDIUM));
+        about.addView(Ui.text(c, "Sürüm 1.5.2", 13, Palette.TURQUOISE, Ui.MEDIUM));
         TextView info = Ui.text(c, Progress.LEVEL_COUNT + " bölüm · 5 dünya · " + Achievements.ALL.size() + " başarı · günlük bulmaca\n"
                 + "Tamamen çevrimdışı çalışır. Reklam yok, veri toplanmaz.\nİlerlemen cihazına otomatik kaydedilir.", 13, Palette.TEXT_DIM, Ui.REGULAR);
         info.setGravity(Gravity.CENTER);

@@ -366,8 +366,9 @@ public class UiFlowTest {
         shot("00b_studyo_acilis");    // ≈1,5 sn: logo ışıkla açılıyor, kıvılcımlar
         idle(400);
         shot("00c_studyo_logo");      // ≈2,6 sn: logo tamamen açıldı, ışık süzülüyor
-        idle(1300);
-        shot("00d_studyo_parilti");   // ≈4,6 sn: logo parlıyor, kararmaya hazır
+        shot("00d_studyo_isik_gecisi"); // ≈3,3 sn: ışık bandı ekranı geçiyor
+        idle(600);
+        shot("00e_studyo_parilti");   // ≈4,6 sn: logo parlıyor, kararmaya hazır
         waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
     }
 

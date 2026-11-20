@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.5.1
+# Build Raporu — Işık Yolu 1.5.2
 
 Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -16,6 +16,16 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.5.2 değişiklikleri
+
+- **Logonun kenarı artık belli olmuyor.** Logo resminin arka plan ışıltısı, yazı ve çizgiler silinerek
+  çıkarıldı. Bu ışıltı logonun çevresinde elips biçiminde ekranın kenar rengine (#081A2E, resmin kendi kenar
+  rengi) eritildi ve bütün ekranın arka planı yapıldı. Böylece kutu ya da bant şeklinde bir kenar kalmadı.
+  Dosya: `res/drawable-nodpi/studio_bg.webp`, 4 KB.
+- **Işık süzülmesi bütün ekrandan geçiyor:** çapraz ışık bandı yalnızca logonun üstünden değil, ekranın
+  tamamından geçiyor; baştan sona ekranın her yerini kat ediyor.
+- Pencere ve sistem çubuğu rengi #081A2E yapıldı.
 
 ## 1.5.1 değişiklikleri
 
@@ -102,10 +112,10 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.5.1.apk` (release, R8 küçültme + kaynak küçültme) | 1 984 317 bayt | `6a33dfcde603bd95c2d85d52bac2af3d80e7ca6de7a7ad534165ceb0d8057408` |
-| `teslimat/IsikYolu-1.5.1-debug.apk` | 2 098 086 bayt | `0bd8046675a9e8b99428a6eb1db266e92d13286ae0aa523cb3ea260740c12a91` |
+| `teslimat/IsikYolu-1.5.2.apk` (release, R8 küçültme + kaynak küçültme) | 1 987 794 bayt | `975665a869adf0adfb43b6ddee007fddf92e247563460ebee665d46ded21dbe9` |
+| `teslimat/IsikYolu-1.5.2-debug.apk` | 2 101 684 bayt | `ca456f45b699f2c25330061403bf652e47d7fd3b8c3d38f1d3b3679e47637dd9` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 7, sürüm adı 1.5.1 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 8, sürüm adı 1.5.2 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.

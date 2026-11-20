@@ -21,15 +21,16 @@ import java.util.Random;
 
 /**
  * Magic Lumos Software stüdyo açılışı (≈5,8 sn): karanlıkta bir ışık noktası yanar, büyüyerek logoyu
- * daire biçiminde aydınlatır, kıvılcımlar saçılır, yazının üzerinden ışık süzülür, sonra sahne kararır.
+ * daire biçiminde aydınlatır, kıvılcımlar saçılır, bütün ekranı çapraz bir ışık bandı geçer, sonra sahne kararır.
  */
 public final class StudioIntroView extends View {
-    public static final int BG = 0xFF06182D;
+    public static final int BG = 0xFF081A2E; // logo resminin kenar rengi
     /** Animasyon yavaşlatma katsayısı: tüm aşamalar bu oranda uzar. */
     public static final float SLOW = 1.8f;
     public static final long DURATION_MS = (long) (3200 * SLOW);
 
-    private final Bitmap logo;
+    private final Bitmap logo, bg;
+    private final RectF bgDst = new RectF();
     private final Paint bmp = new Paint(Paint.ANTI_ALIAS_FLAG | Paint.FILTER_BITMAP_FLAG);
     private final Paint mask = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint glow = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -51,8 +52,9 @@ public final class StudioIntroView extends View {
         BitmapFactory.Options o = new BitmapFactory.Options();
         o.inScaled = false;
         logo = BitmapFactory.decodeResource(c.getResources(), R.drawable.studio_logo, o);
+        // logo resminin arka plan ışıltısı (yazısız, bulanık): logonun kenarı ekranda belli olmaz
+        bg = BitmapFactory.decodeResource(c.getResources(), R.drawable.studio_bg, o);
         mask.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        shine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.ADD));
         Random r = new Random(5);
         int[] cols = {0xFFBFE6FF, 0xFFF5D58A, 0xFFFFFFFF, 0xFF7FC4FF};
         for (int i = 0; i < SPARKS; i++) {
@@ -70,6 +72,8 @@ public final class StudioIntroView extends View {
 
     private static float clamp(float v) { return Math.max(0f, Math.min(1f, v)); }
 
+    private static float easeInOut(float t) { t = clamp(t); return t * t * (3f - 2f * t); }
+
     private static float easeOut(float t) { t = clamp(t); return 1f - (1f - t) * (1f - t) * (1f - t); }
 
     @Override protected void onSizeChanged(int w, int h, int ow, int oh) {
@@ -77,8 +81,15 @@ public final class StudioIntroView extends View {
         float lh = logo == null ? 0 : lw * logo.getHeight() / logo.getWidth();
         float cy = h * 0.46f;
         dst.set((w - lw) / 2f, cy - lh / 2f, (w + lw) / 2f, cy + lh / 2f);
-        float bw = lw * 0.18f;
-        shineShader = new LinearGradient(-bw, 0, bw, 0, new int[]{0x00FFFFFF, 0x55FFF4D6, 0x00FFFFFF}, null, Shader.TileMode.CLAMP);
+        // arka plan resmi: genişliği ekran kadar, merkezi logonun merkezinde
+        if (bg != null) {
+            float bh = w * (float) bg.getHeight() / bg.getWidth();
+            bgDst.set(0, cy - bh / 2f, w, cy + bh / 2f);
+        }
+        // bütün ekranı çapraz geçen ışık bandı
+        float bw = w * 0.22f;
+        shineShader = new LinearGradient(-bw, 0, bw, 0, new int[]{0x00FFFFFF, 0x1CBFE6FF, 0x4AFFF4D6, 0x1CBFE6FF, 0x00FFFFFF},
+                new float[]{0f, 0.3f, 0.5f, 0.7f, 1f}, Shader.TileMode.CLAMP);
         shine.setShader(shineShader);
     }
 
@@ -89,6 +100,13 @@ public final class StudioIntroView extends View {
         int w = getWidth(), h = getHeight();
         c.drawColor(BG);
         float cx = dst.centerX(), cy = dst.centerY();
+        // logonun arka plan ışıltısı, ışık yandıkça belirir
+        float bgIn = easeOut((t - 0.2f) / 1.3f);
+        if (bg != null && bgIn > 0) {
+            bmp.setAlpha((int) (255 * bgIn));
+            c.drawBitmap(bg, null, bgDst, bmp);
+            bmp.setAlpha(255);
+        }
         float d = getResources().getDisplayMetrics().density;
 
         // 1) ışık noktası yanar (0–0.5 sn)
@@ -111,14 +129,6 @@ public final class StudioIntroView extends View {
             c.save();
             c.scale(sc, sc, cx, cy);
             c.drawBitmap(logo, null, dst, bmp);
-            // ışıltı geçişi (1.3–2.2 sn)
-            float sw = clamp((t - 1.3f) / 0.9f);
-            if (sw > 0 && sw < 1) {
-                m.setTranslate(dst.left - dst.width() * 0.2f + dst.width() * 1.4f * sw, 0);
-                m.preSkew(-0.35f, 0);
-                shineShader.setLocalMatrix(m);
-                c.drawRect(dst, shine);
-            }
             c.restore();
             mask.setShader(new RadialGradient(cx, cy, radius, new int[]{0xFFFFFFFF, 0xFFFFFFFF, 0x00FFFFFF}, new float[]{0f, 0.8f, 1f}, Shader.TileMode.CLAMP));
             c.drawRect(0, 0, w, h, mask);
@@ -139,7 +149,18 @@ public final class StudioIntroView extends View {
             }
         }
 
-        // 4) kenar karartması ve kapanış (2.6–3.2 sn)
+        // 4) bütün ekranı çapraz geçen ışık (1.3–2.4 sn)
+        float sw = clamp((t - 1.3f) / 1.1f);
+        if (sw > 0 && sw < 1) {
+            // band eğik: üstte x, altta x − 0,6·h; baştan sona ekranın tamamını geçer
+            float travel = w * 1.5f + h * 0.6f;
+            m.setTranslate(-w * 0.25f + travel * easeInOut(sw), 0);
+            m.preSkew(-0.6f, 0);
+            shineShader.setLocalMatrix(m);
+            c.drawRect(0, 0, w, h, shine);
+        }
+
+        // 5) kenar karartması ve kapanış (2.6–3.2 sn)
         float out = clamp((t - 2.6f) / 0.6f);
         if (out > 0) {
             fill.setColor(BG);
