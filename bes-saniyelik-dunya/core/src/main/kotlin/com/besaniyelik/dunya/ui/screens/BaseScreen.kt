@@ -31,7 +31,7 @@ import com.besaniyelik.dunya.ui.popIn
 /** Menülerde arkada kayan, açık renkli tema manzarası. */
 class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int = 1) {
     private val cam = OrthographicCamera()
-    private val vp = ExtendViewport(12.5f, 22.2f, cam)
+    private val vp = ExtendViewport(24f, 13.5f, cam)
     private var t = 0f
     private var theme: Theme = game.assets.theme(map)
     private val clouds = List(6) { floatArrayOf(MathUtils.random(0f, 14f), MathUtils.random(6f, 16f), MathUtils.random(0.6f, 1.3f)) }
@@ -44,11 +44,12 @@ class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int =
         t += dt
         val b = game.batch
         vp.apply()
-        cam.position.set(6.25f, 4.5f, 0f); cam.update()
+        val cxw = vp.worldWidth / 2f
+        cam.position.set(cxw, 5f, 0f); cam.update()
         b.projectionMatrix = cam.combined
         b.begin()
         val vw = vp.worldWidth; val vh = vp.worldHeight
-        val left = 6.25f - vw / 2; val bottom = 4.5f - vh / 2
+        val left = cxw - vw / 2; val bottom = 5f - vh / 2
         theme.drawSky(b, left, bottom, vw, vh)
         val scroll = t * 1.2f
         fun par(tex: com.badlogic.gdx.graphics.Texture, y: Float, h: Float, f: Float) {
@@ -77,7 +78,7 @@ class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int =
             val skin = Catalog.skin(game.profile.data.selectedSkin)
             val jump = ((t % 2.2f) / 2.2f)
             val jy = if (jump > 0.7f) kotlin.math.sin((jump - 0.7f) / 0.3f * Math.PI.toFloat()) * 1.6f else 0f
-            renderer.draw(b, skin, left + vw * 0.3f, 0.47f + jy, 0.98f, if (jy > 0.05f) CharState.JUMP else CharState.RUN, t)
+            renderer.draw(b, skin, left + vw * 0.28f, 0.7f + jy * 1.3f, 1.4f, if (jy > 0.05f) CharState.JUMP else CharState.RUN, t)
         }
         b.end()
     }
@@ -87,7 +88,8 @@ class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int =
 
 /** Bütün ekranların temeli: Scene2D sahnesi, geri tuşu, geçiş, bildirim ve diyalog yardımcıları. */
 abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
-    val stage = Stage(ExtendViewport(720f, 1280f), game.batch)
+    /** Arayüz sanal çözünürlüğü: yatay 1280 x 720 (geniş ekranlarda genişlik artar). */
+    val stage = Stage(ExtendViewport(1280f, 720f), game.batch)
     val kit get() = game.kit
     val a get() = game.assets
     val root = Table().apply { setFillParent(true); top() }
@@ -181,7 +183,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
             add(kit.label(text, a.f28, Palette.INK, wrap = true)).width(460f)
         }
         t.pack()
-        t.setPosition((stage.width - t.width) / 2, stage.height - 220f - toastY)
+        t.setPosition((stage.width - t.width) / 2, stage.height - 150f - toastY)
         toastY += t.height + 10f
         t.color.a = 0f
         t.addAction(Actions.sequence(Actions.fadeIn(0.2f), Actions.delay(toastTime), Actions.fadeOut(0.3f), Actions.run { toastY = (toastY - t.height - 10f).coerceAtLeast(0f) }, Actions.removeActor()))
@@ -195,7 +197,12 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         lateinit var close: () -> Unit
         close = { overlay.addAction(Actions.sequence(Actions.fadeOut(0.15f), Actions.removeActor())) }
         build(panel, close)
-        overlay.add(panel).width(640f).center()
+        // yatay ekranda yüksek içerik kaydırılabilir olur
+        panel.pack()
+        val w = kotlin.math.max(640f, panel.prefWidth)
+        val maxH = stage.viewport.worldHeight - 24f
+        if (panel.prefHeight > maxH) overlay.add(scroll(panel)).width(w).height(maxH).center()
+        else overlay.add(panel).width(w).center()
         overlay.addListener(object : ClickListener() { override fun clicked(event: InputEvent?, x: Float, y: Float) {} })
         stage.addActor(overlay)
         panel.popIn()

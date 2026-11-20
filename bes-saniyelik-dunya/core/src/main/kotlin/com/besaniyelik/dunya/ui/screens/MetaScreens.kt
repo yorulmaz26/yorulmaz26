@@ -41,8 +41,8 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     private fun skins(d: SaveData) {
         val skin = Catalog.skin(selected)
         val preview = kit.panel()
-        val av = AvatarActor(game, 240f, selected, CharState.HAPPY)
-        preview.add(av).size(240f).row()
+        val av = AvatarActor(game, 220f, selected, CharState.HAPPY)
+        preview.add(av).size(220f).row()
         preview.add(kit.label(skin.name, a.f48, Palette.INK)).row()
         val owned = skin.id in d.ownedSkins
         val unlock = skin.unlock
@@ -60,7 +60,6 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             }
             else -> preview.add(kit.label("Kilit: ${unlock.describe()}", a.f28, Palette.INK_SOFT)).padTop(6f)
         }
-        root.add(preview).width(640f).padTop(10f).row()
         val grid = Table()
         Catalog.skins.forEachIndexed { i, s ->
             val cell = Table().apply { background = kit.patch(if (s.id == selected) "card_sel" else "card"); pad(6f) }
@@ -70,10 +69,13 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             cell.add(kit.label(s.name, a.f22, Palette.INK)).row()
             if (s.id !in d.ownedSkins) cell.add(Image(a.ui("g_lock_gray"))).size(26f)
             cell.onTap(kit) { selected = s.id; rebuild() }
-            grid.add(cell).size(150f, 176f).pad(5f)
-            if (i % 4 == 3) grid.row()
+            grid.add(cell).size(140f, 168f).pad(5f)
+            if (i % 5 == 4) grid.row()
         }
-        root.add(scroll(grid)).grow().padTop(10f)
+        val body = Table()
+        body.add(preview).width(420f).top().padRight(16f)
+        body.add(scroll(grid)).grow()
+        root.add(body).grow().pad(8f, 20f, 10f, 20f)
     }
 
     private fun trails(d: SaveData) {
@@ -96,7 +98,7 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
                 }).width(160f).height(96f)
                 else -> row.add(Image(a.ui("g_lock_gray"))).size(60f)
             }
-            list.add(row).width(640f).padBottom(12f).row()
+            list.add(row).width(900f).padBottom(12f).row()
         }
         root.add(scroll(list)).grow().padTop(12f)
     }
@@ -119,8 +121,8 @@ class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             c.add(kit.button("$price", "yellow", "b_coin", a.f36o) {
                 val r = game.profile.buyPowerup(t); if (r == PurchaseResult.OK) game.audio.play(Sfx.REWARD); toast(r.message, "b_" + t.icon); rebuild()
             }).width(220f).height(96f).padTop(6f)
-            grid.add(c).width(310f).pad(6f)
-            if (i % 2 == 1) grid.row()
+            grid.add(c).width(290f).pad(6f)
+            if (i % 4 == 3) grid.row()
         }
         list.add(grid).padTop(8f).row()
         list.add(kit.label("Altın Paketleri (elmasla)", a.f36, Palette.INK)).padTop(20f).row()
@@ -172,7 +174,7 @@ class MissionsScreen(game: BesSaniyelikDunya, private var weekly: Boolean) : Bas
                 }).width(160f).height(100f)
                 else -> row.add(Image(a.ui("g_lock_gray"))).size(56f)
             }
-            list.add(row).width(650f).padBottom(14f).row()
+            list.add(row).width(900f).padBottom(14f).row()
         }
         root.add(scroll(list)).grow().padTop(10f)
     }
@@ -201,7 +203,7 @@ class AchievementsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             }
             row.add(info).expandX().left()
             row.add(Table().apply { add(Image(a.ui("b_gem"))).size(40f); add(kit.label("${ach.gems}", a.f22, Palette.INK)) })
-            list.add(row).width(650f).padBottom(10f).row()
+            list.add(row).width(900f).padBottom(10f).row()
         }
         root.add(scroll(list)).grow().padTop(10f)
     }
@@ -227,7 +229,7 @@ class CollectionScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             info.add(kit.label("Parçalar: ${ids.joinToString(", ") { "Bölüm $it" }}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(560f).left()
             row.add(info).expandX().left()
             row.add(kit.label("$have/5", a.f36, Palette.INK))
-            list.add(row).width(650f).padBottom(12f).row()
+            list.add(row).width(900f).padBottom(12f).row()
         }
         root.add(scroll(list)).grow().padTop(10f)
     }
@@ -238,17 +240,16 @@ class ProfileScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         val d = game.profile.data
         root.add(header("Profil")).growX().padTop(20f).row()
         val p = kit.panel()
-        p.add(AvatarActor(game, 200f, null, CharState.HAPPY)).size(200f).row()
+        p.add(AvatarActor(game, 170f, null, CharState.HAPPY)).size(170f).row()
         p.add(kit.label(d.playerName, a.f48, Palette.INK)).row()
         p.add(kit.label("Seviye ${d.playerLevel}", a.f28, Palette.INK_SOFT)).row()
         val need = ProgressionManager.xpToNext(d.playerLevel)
-        p.add(kit.bar(d.xp / need.toFloat(), "bar_fill_b", 24f)).width(440f).height(24f).padTop(8f).row()
-        p.add(kit.label("${d.xp} / $need XP  •  Sonraki ödül: ${ProgressionManager.levelUpText(d.playerLevel + 1)}", a.f22, Palette.INK_SOFT, wrap = true)).width(560f).padTop(4f).row()
+        p.add(kit.bar(d.xp / need.toFloat(), "bar_fill_b", 24f)).width(420f).height(24f).padTop(8f).row()
+        p.add(kit.label("${d.xp} / $need XP  •  Sonraki ödül: ${ProgressionManager.levelUpText(d.playerLevel + 1)}", a.f22, Palette.INK_SOFT, wrap = true)).width(480f).padTop(4f).row()
         val names = listOf("Koşucu", "Zıpzıp", "Hızlı", "Yıldız", "Bulut", "Kaşif", "Şimşek", "Minik")
         p.add(kit.button("İsmi Değiştir", "white", font = a.f28, textColor = Palette.INK) {
             d.playerName = names[(names.indexOf(d.playerName) + 1) % names.size]; game.profile.save(); rebuild()
         }).width(300f).height(90f).padTop(10f).row()
-        root.add(p).width(650f).padTop(10f).row()
         val st = d.stats
         val grid = Table()
         val stats = listOf(
@@ -261,7 +262,10 @@ class ProfileScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             grid.add(Table().apply { background = kit.patch("card"); pad(12f); add(kit.label(v, a.f28, Palette.INK)).row(); add(kit.label(k, a.f22, Palette.INK_SOFT)) }).width(200f).height(100f).pad(5f)
             if (i % 3 == 2) grid.row()
         }
-        root.add(scroll(grid)).grow().padTop(10f)
+        val body = Table()
+        body.add(p).width(560f).top().padRight(16f)
+        body.add(scroll(grid)).grow().top()
+        root.add(body).grow().pad(8f, 20f, 10f, 20f)
     }
 }
 
@@ -279,7 +283,7 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             t.add(Image(a.ui("soft")).apply { color = Color.WHITE }).size(52f).expandX().apply { if (value) right() else left() }
             t.onTap(kit) { set(!value); game.audio.applyVolume(); game.profile.save(); rebuild() }
             row.add(t).size(130f, 68f)
-            p.add(row).width(560f).padBottom(18f).row()
+            p.add(row).width(560f).padBottom(12f).row()
         }
         toggle("Müzik", "g_music", st.music) { st.music = it }
         toggle("Ses Efektleri", "g_sound", st.sound) { st.sound = it }
@@ -295,13 +299,17 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         }
         slider("Müzik sesi", st.musicVolume) { st.musicVolume = it }
         slider("Efekt sesi", st.soundVolume) { st.soundVolume = it }
-        root.add(p).width(650f).padTop(16f).row()
-        root.add(kit.button("Nasıl Oynanır?", "turq", "g_info") { game.go(HowToPlayScreen(game)) }).width(460f).height(110f).padTop(16f).row()
-        root.add(kit.button(if (confirmReset) "Emin misin? Tekrar dokun" else "İlerlemeyi Sıfırla", "red", "g_retry", a.f28) {
+        val side = Table()
+        side.add(kit.button("Nasıl Oynanır?", "turq", "g_info") { game.go(HowToPlayScreen(game)) }).width(420f).height(104f).row()
+        side.add(kit.button(if (confirmReset) "Emin misin? Tekrar dokun" else "İlerlemeyi Sıfırla", "red", "g_retry", a.f28) {
             if (confirmReset) { game.profile.resetAll(); toast("İlerleme sıfırlandı."); confirmReset = false } else confirmReset = true
             rebuild()
-        }).width(460f).height(100f).padTop(14f).row()
-        root.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternet gerekmez, ilerlemen cihazında güvenle saklanır.\nYazı tipi: Nunito (SIL OFL). Grafik ve sesler oyun için üretilmiştir.", a.f22, Palette.INK_SOFT, wrap = true)).width(600f).padTop(20f)
+        }).width(420f).height(96f).padTop(14f).row()
+        side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternet gerekmez, ilerlemen cihazında güvenle saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(18f)
+        val body = Table()
+        body.add(p).width(640f).padRight(24f)
+        body.add(side).top()
+        root.add(body).expand().center()
     }
 }
 
@@ -320,12 +328,11 @@ class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean
             cell.add(kit.label("${i + 1}. Gün", a.f22, Palette.INK)).row()
             val icon = when { r.gems > 0 && r.coins > 0 -> "b_gift"; r.gems > 0 -> "b_gem"; r.coins > 0 -> "b_coin"; else -> "b_" + r.powerups.keys.first().icon }
             cell.add(Image(a.ui(if (claimed) "g_check" else icon)).apply { if (claimed) color = Palette.GRASS }).size(if (i == 6) 90f else 70f).padTop(4f).row()
-            cell.add(kit.label(r.describe(), a.f22, Palette.INK_SOFT, wrap = true)).width(if (i == 6) 300f else 140f)
-            if (i == 6) grid.add(cell).colspan(3).width(460f).height(200f).pad(6f) else grid.add(cell).width(190f).height(200f).pad(6f)
-            if (i % 3 == 2) grid.row()
+            cell.add(kit.label(r.describe(), a.f22, Palette.INK_SOFT, wrap = true)).width(134f)
+            grid.add(cell).width(160f).height(if (i == 6) 236f else 216f).pad(5f)
             if (isToday) cell.popIn(0.1f)
         }
-        root.add(grid).padTop(16f).row()
+        root.add(grid).padTop(24f).row()
         if (available) {
             root.add(kit.button("Ödülü Al!", "green", "b_gift", a.f48o) {
                 val r = game.profile.claimLogin()
@@ -356,15 +363,15 @@ class HowToPlayScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         page = page.coerceIn(0, pages.size - 1)
         val (icon, title, text) = pages[page]
         val p = kit.panel()
-        p.add(Image(a.ui(icon)).apply { if (icon.startsWith("g_")) color = Palette.ORANGE }).size(150f).row()
+        p.add(Image(a.ui(icon)).apply { if (icon.startsWith("g_")) color = Palette.ORANGE }).size(120f).row()
         p.add(kit.label(title, a.f48, Palette.INK)).padTop(10f).row()
-        p.add(kit.label(text, a.f28, Palette.INK_SOFT, wrap = true)).width(560f).padTop(12f).row()
-        p.add(kit.label("${page + 1} / ${pages.size}", a.f22, Palette.INK_SOFT)).padTop(16f)
-        root.add(p).width(650f).padTop(40f).row()
+        p.add(kit.label(text, a.f28, Palette.INK_SOFT, wrap = true)).width(640f).padTop(10f).row()
+        p.add(kit.label("${page + 1} / ${pages.size}", a.f22, Palette.INK_SOFT)).padTop(12f)
         p.popIn()
-        val nav = Table()
-        nav.add(kit.iconButton("g_back", "white", 110f, 56f) { page--; rebuild() }).size(110f).padRight(30f).also { if (page == 0) it.actor.enabled = false }
-        nav.add(kit.iconButton("g_next", "green", 110f, 56f) { if (page < pages.size - 1) { page++; rebuild() } else onBack() }).size(110f)
-        root.add(nav).padTop(30f)
+        val body = Table()
+        body.add(kit.iconButton("g_back", "white", 110f, 56f) { page--; rebuild() }).size(110f).padRight(30f).also { if (page == 0) it.actor.enabled = false }
+        body.add(p).width(740f)
+        body.add(kit.iconButton("g_next", "green", 110f, 56f) { if (page < pages.size - 1) { page++; rebuild() } else onBack() }).size(110f).padLeft(30f)
+        root.add(body).expand().center()
     }
 }

@@ -1,6 +1,6 @@
 # 5 Saniyelik Dünya
 
-Her 5 saniyede kuralların değiştiği, renkli ve sevimli bir dikey Android platform oyunu. Kotlin + libGDX + Box2D.
+Her 5 saniyede kuralların değiştiği, renkli bir **yatay** (landscape) Android platform oyunu. Kotlin + libGDX + Box2D.
 
 * 10 harita × 10 alan × 5 bölüm = **100 alan, 500 doğrulanmış bölüm**, **Sonsuz Dünya** modu
 * 10 dünya mekaniği ve dengeli kombinasyonları

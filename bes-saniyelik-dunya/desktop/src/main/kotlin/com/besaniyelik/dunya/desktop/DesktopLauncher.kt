@@ -14,10 +14,10 @@ fun main(args: Array<String>) {
     val shots = System.getProperty("shots")
     val config = Lwjgl3ApplicationConfiguration().apply {
         setTitle("5 Saniyelik Dünya")
-        setWindowedMode(450, 800)
+        setWindowedMode(960, 540)
         useVsync(true)
         setForegroundFPS(60)
-        if (shots != null) setWindowedMode(540, 960)
+        if (shots != null) setWindowedMode(960, 540)
     }
     val game = BesSaniyelikDunya()
     if (shots != null) game.debugHook = ScreenshotTour(shots)::step
@@ -81,7 +81,7 @@ class ScreenshotTour(private val dir: String) {
 
     private fun tap(down: Boolean) {
         val p = Gdx.input.inputProcessor ?: return
-        if (down) p.touchDown(10, 700, 0, 0) else p.touchUp(10, 700, 0, 0)
+        if (down) p.touchDown(480, 400, 0, 0) else p.touchUp(480, 400, 0, 0)
     }
 
     fun step(game: BesSaniyelikDunya, frame: Int) {

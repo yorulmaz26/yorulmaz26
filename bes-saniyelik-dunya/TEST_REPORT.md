@@ -63,6 +63,10 @@ Bölüm 500: TAMAMLANDI (yıldız 3/3, altın 275, ölüm 0)
 
 Her haritadan bir bölüm; tamamlanma ekranı, XP, başarı ve seviye bildirimleri görsel olarak kontrol edildi (`docs/screenshots/`).
 
+## Yatay ekrana geçiş
+
+Oyun yalnızca yatay olarak çalışır (manifestte `sensorLandscape`, APK'da doğrulandı). Arayüz 1280×720 sanal çözünürlüğe, oyun kamerası 21×11,8 karoya göre yeniden düzenlendi; 15 menü ekranı, oyun içi göstergeler, diyaloglar ve açılış animasyonu masaüstünde 960×540 pencerede kontrol edildi. Bölüm 1, 23, 61, 160, 215, 330, 420 ve 470 yatay ekranda arayüz üzerinden baştan sona oynatıldı (hepsi 3/3 yıldız, 0 ölüm). Testler 39/39.
+
 ## Kullanıcı görsellerinin entegrasyonu
 
 220 kullanıcı görseli otomatik kontrol edildi (boyut, şeffaflık, kenar dikişi). Bozuk gelen 34 dosya yeniden üretildi ve kullanıldı; 10 tavan karosu yerine zeminin çevrilmiş hali kullanıldı. Altın animasyonu ve güçlendirme baloncuğu yarı saydam geldiği için programatik çizimler korundu. Masaüstü turunda her haritadan bir bölüm yeni görsellerle baştan sona oynatıldı (hepsi 3/3 yıldız, 0 ölüm); testler 39/39 geçti. APK 32 MB.

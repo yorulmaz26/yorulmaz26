@@ -1,6 +1,6 @@
 # 5 Saniyelik Dünya — Mimari
 
-Kotlin + libGDX 1.13.1 + Box2D, dikey (9:16) Android oyunu. Oyun mantığı arayüzden tamamen ayrıdır: simülasyon, ilerleme ve bölüm üretimi saf Kotlin/Box2D kodudur ve grafik bağlamı olmadan test edilir.
+Kotlin + libGDX 1.13.1 + Box2D, **yalnızca yatay** (sensorLandscape, 16:9 ve daha geniş) Android oyunu. Oyun mantığı arayüzden tamamen ayrıdır: simülasyon, ilerleme ve bölüm üretimi saf Kotlin/Box2D kodudur ve grafik bağlamı olmadan test edilir.
 
 ## Modüller
 
@@ -71,7 +71,7 @@ ui/         UiKit (UIManager: buton, panel, çubuk), screens/ (20 ekran), Assets
 ## Görüntüleme ve performans
 
 * Tek `SpriteBatch`, üç atlas sayfası (ui, game, tema) + iki paralaks dokusu; yalnızca o anki haritanın teması bellekte. Görünmeyen karolar çizilmez (görünür aralık kırpma), parçacıklar nesne havuzludur, çöp üretimi en aza indirilmiştir.
-* Dünya `ExtendViewport(12.5 × 22.2)`, arayüz `ExtendViewport(720 × 1280)` → bütün en-boy oranları desteklenir. Yazı tipleri ekran yoğunluğuna göre FreeType ile keskin üretilir (Türkçe karakterler dahil).
+* Dünya `ExtendViewport(21 × 11.8)` (zemin ve tavan aynı anda görünür, oyuncu soldan %28'de), arayüz `ExtendViewport(1280 × 720)` → bütün yatay en-boy oranları desteklenir; menüler iki sütunlu, oyun göstergeleri tek üst satırdadır. Yazı tipleri ekran yoğunluğuna göre FreeType ile keskin üretilir (Türkçe karakterler dahil).
 * "Az efekt" ayarı parçacık sayısını düşürür (düşük segment cihazlar için).
 
 ## Açılış animasyonu (Magic Lumos Software)

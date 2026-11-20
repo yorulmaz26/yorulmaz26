@@ -106,31 +106,36 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         game.audio.music(if (endless) "endless" else "map_%02d".format(map))
         stage.addActor(tint)
         root.touchable = Touchable.childrenOnly
-        // üst çubuk
+        // yatay ekran: tek üst satır — solda duraklat ve canlar, ortada kural sayacı, sağda ilerleme ve toplananlar
         val top = Table()
-        top.add(kit.iconButton("g_pause", "white", 88f, 44f) { openPauseMenu() }).size(88f).padLeft(18f)
-        val mid = Table()
-        if (endless) mid.add(scoreLabel).row() else {
-            mid.add(kit.label(level!!.name, a.f22, Palette.INK)).row()
-            mid.add(progress).width(300f).height(22f).padTop(4f)
-        }
-        top.add(mid).expandX()
-        val right = Table()
-        right.add(Image(a.ui("b_coin"))).size(48f); right.add(coinLabel).padLeft(4f).minWidth(60f).row()
-        right.add(starSlots).colspan(2).right()
-        top.add(right).right().padRight(18f)
-        root.add(top).growX().padTop(22f).row()
-        root.add(hearts).left().padLeft(24f).padTop(6f).row()
-        // kural paneli
-        val rp = Table().apply { background = kit.patch("chip_dark"); pad(8f, 16f, 10f, 16f) }
+        val leftBox = Table()
+        leftBox.add(kit.iconButton("g_pause", "white", 80f, 40f) { openPauseMenu() }).size(80f).padRight(10f)
+        leftBox.add(hearts)
+        top.add(leftBox).left().padLeft(16f).width(340f)
+        val rp = Table().apply { background = kit.patch("chip_dark"); pad(6f, 14f, 8f, 14f) }
         rp.add(ruleIcons).padRight(10f)
-        val rt = Table(); rt.add(ruleTime).row(); rt.add(ruleBar).width(140f).height(16f)
+        val rt = Table(); rt.add(ruleTime).row(); rt.add(ruleBar).width(130f).height(14f)
         rp.add(rt)
-        rp.add(nextIcons).padLeft(12f)
-        root.add(rp).padTop(4f).row()
-        root.add(powerRow).padTop(6f).row()
+        rp.add(nextIcons).padLeft(10f)
+        val center = Table()
+        center.add(rp).row()
+        center.add(powerRow).padTop(4f)
+        top.add(center).expandX().top()
+        val rightBox = Table()
+        val prog = Table()
+        if (endless) prog.add(scoreLabel) else {
+            prog.add(kit.label(level!!.name, a.f22, Palette.INK)).row()
+            prog.add(progress).width(220f).height(18f).padTop(4f)
+        }
+        rightBox.add(prog).padRight(14f)
+        val coll = Table()
+        coll.add(Image(a.ui("b_coin"))).size(42f); coll.add(coinLabel).padLeft(4f).minWidth(56f).row()
+        coll.add(starSlots).colspan(2).right()
+        rightBox.add(coll)
+        top.add(rightBox).right().padRight(16f).width(340f)
+        root.add(top).growX().padTop(12f).row()
         hintBox.color.a = 0f
-        root.add(hintBox).padTop(16f).row()
+        root.add(hintBox).padTop(10f).row()
         root.add().expandY()
         refreshHearts(); refreshStars(); refreshRules()
         showStartOverlay()
@@ -142,7 +147,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         val tut = level?.tutorial
         if (tut != null && level.kind == LevelKind.TUTORIAL) {
             p.add(kit.label("Yeni Kural!", a.f28, Palette.INK_SOFT)).row()
-            p.add(Image(a.ui("b_" + tut.icon))).size(130f).padTop(8f).row()
+            p.add(Image(a.ui("b_" + tut.icon))).size(100f).padTop(6f).row()
             p.add(kit.label(tut.title, a.f48, Palette.INK, wrap = true)).width(540f).padTop(6f).row()
             p.add(kit.label(tut.hint, a.f28, Palette.INK_SOFT, wrap = true)).width(520f).padTop(6f).row()
             p.add(kit.label(tutorialDetail(tut), a.f22, Palette.INK_SOFT, wrap = true)).width(520f).padTop(10f).row()
@@ -154,7 +159,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             p.add(kit.label(if (endless) "Sonsuz Dünya" else level!!.name, a.f48, Palette.INK, wrap = true)).width(540f).row()
             if (!endless) p.add(kit.stars(d.stars(level!!.id), 54f)).padTop(8f).row()
         }
-        p.add(Image(a.ui("g_tap")).apply { color = Palette.ORANGE }).size(90f).padTop(16f).row()
+        p.add(Image(a.ui("g_tap")).apply { color = Palette.ORANGE }).size(70f).padTop(10f).row()
         p.add(kit.label("Başlamak için dokun", a.f36, Palette.ORANGE)).padTop(4f)
         o.add(p).width(620f)
         stage.addActor(o)
@@ -278,20 +283,20 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         lastHearts = sim.hearts
         hearts.clear()
         val total = kotlin.math.max(sim.hearts, if (endless) 1 else 3)
-        for (i in 0 until total) hearts.add(Image(a.ui(if (i < sim.hearts) "b_heart" else "b_heart_empty"))).size(48f).padRight(2f)
+        for (i in 0 until total) hearts.add(Image(a.ui(if (i < sim.hearts) "b_heart" else "b_heart_empty"))).size(42f).padRight(2f)
     }
 
     private fun refreshStars() {
         lastStars = sim.starsCollected
         starSlots.clear()
         if (endless) { starSlots.add(Image(a.ui("b_star"))).size(38f); starSlots.add(kit.label(" ${sim.starsCollected}", a.f28, Color.WHITE)); return }
-        for (i in 0 until 3) starSlots.add(Image(a.ui(if (i < sim.starsCollected) "b_star" else "b_star_empty"))).size(40f)
+        for (i in 0 until 3) starSlots.add(Image(a.ui(if (i < sim.starsCollected) "b_star" else "b_star_empty"))).size(34f)
     }
 
     private fun refreshRules() {
         lastRules = sim.activeRules
         ruleIcons.clear()
-        sim.activeRules.forEach { ruleIcons.add(Image(a.ui("b_" + it.icon))).size(64f).pad(2f) }
+        sim.activeRules.forEach { ruleIcons.add(Image(a.ui("b_" + it.icon))).size(54f).pad(2f) }
         nextIcons.clear()
     }
 
@@ -315,7 +320,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         rules.forEach { b.add(Image(a.ui("b_" + it.icon))).size(46f).padRight(4f) }
         b.add(kit.label(rules.joinToString(" + ") { it.title }, a.f22, Palette.INK)).padLeft(6f)
         b.pack()
-        b.setPosition((stage.width - b.width) / 2, stage.height - 330f)
+        b.setPosition((stage.width - b.width) / 2, stage.height - 200f)
         b.color.a = 0f
         val hold = if (first) 0.9f else 0.55f
         b.addAction(Actions.sequence(Actions.fadeIn(0.1f), Actions.delay(hold), Actions.fadeOut(0.25f), Actions.removeActor()))
@@ -328,7 +333,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
 
     private fun deathText(cause: DeathCause) {
         val l = kit.label(cause.title, a.f36o, Color.WHITE)
-        l.pack(); l.setPosition((stage.width - l.width) / 2, stage.height - 400f)
+        l.pack(); l.setPosition((stage.width - l.width) / 2, stage.height * 0.6f)
         l.addAction(Actions.sequence(Actions.delay(0.5f), Actions.fadeOut(0.2f), Actions.removeActor()))
         stage.addActor(l)
     }
@@ -364,9 +369,9 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             toggles.add(kit.iconButton(if (st.music) "g_music" else "g_music_off", "pink", 100f, 54f) { st.music = !st.music; game.audio.applyVolume(); game.profile.save(); close(); paused = false; openPauseMenu() }).size(100f).pad(8f)
             toggles.add(kit.iconButton(if (st.sound) "g_sound" else "g_sound_off", "turq", 100f, 54f) { st.sound = !st.sound; game.profile.save(); close(); paused = false; openPauseMenu() }).size(100f).pad(8f)
             p.add(toggles).padTop(10f).row()
-            p.add(kit.button("Devam Et", "green", "g_play") { close(); paused = false; game.audio.resume() }).width(460f).height(116f).padTop(12f).row()
-            p.add(kit.button("Yeniden Başla", "yellow", "g_retry") { close(); restart() }).width(460f).height(116f).padTop(10f).row()
-            p.add(kit.button(if (endless) "Ana Menü" else "Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); quit() }).width(460f).height(116f).padTop(10f)
+            p.add(kit.button("Devam Et", "green", "g_play") { close(); paused = false; game.audio.resume() }).width(460f).height(96f).padTop(10f).row()
+            p.add(kit.button("Yeniden Başla", "yellow", "g_retry") { close(); restart() }).width(460f).height(96f).padTop(8f).row()
+            p.add(kit.button(if (endless) "Ana Menü" else "Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); quit() }).width(460f).height(96f).padTop(8f)
         }
     }
 
@@ -394,7 +399,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             val st = Table()
             for (i in 0 until 3) {
                 val img = Image(a.ui(if (i < res.stars) "b_star" else "b_star_empty"))
-                st.add(img).size(if (i == 1) 130f else 110f).pad(4f).bottom()
+                st.add(img).size(if (i == 1) 100f else 84f).pad(4f).bottom()
                 if (i < res.stars) { img.popIn(0.2f + i * 0.25f); stage.addAction(Actions.delay(0.25f + i * 0.25f, Actions.run { game.audio.play(Sfx.STAR, 1f + i * 0.12f) })) }
             }
             p.add(st).padTop(10f).row()
@@ -447,7 +452,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         game.profile.onLevelResult(LevelResult(lv, false, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, false))
         dialog { p, close ->
             p.add(kit.label("Canların Bitti", a.f48, Palette.INK)).row()
-            p.add(Image(a.ui("b_heart_empty"))).size(120f).padTop(8f).row()
+            p.add(Image(a.ui("b_heart_empty"))).size(80f).padTop(6f).row()
             p.add(kit.label("Pes etme! Her denemede daha iyi olursun.", a.f28, Palette.INK_SOFT, wrap = true)).width(540f).padTop(6f).row()
             val cost = 10
             val cont = kit.button("Devam Et (+2 can)  $cost", "purple", "b_gem") {
@@ -457,9 +462,9 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
                 } else toast("Yeterli elmasın yok.", "b_gem")
             }
             cont.enabled = d.gems >= cost
-            p.add(cont).width(520f).height(116f).padTop(16f).row()
-            p.add(kit.button("Tekrar Dene", "yellow", "g_retry") { close(); restart() }).width(520f).height(116f).padTop(10f).row()
-            p.add(kit.button("Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); quit() }).width(520f).height(116f).padTop(10f)
+            p.add(cont).width(520f).height(96f).padTop(12f).row()
+            p.add(kit.button("Tekrar Dene", "yellow", "g_retry") { close(); restart() }).width(520f).height(96f).padTop(8f).row()
+            p.add(kit.button("Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); quit() }).width(520f).height(96f).padTop(8f)
         }
     }
 

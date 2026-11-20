@@ -43,7 +43,8 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     // logo yerleşimi (kaynak logo koordinatlarından sahne koordinatlarına)
     private val srcCx = 679f
     private val srcCy = 400f
-    private val s = 660f / 846f
+    /** Logo ölçeği: yatay ekranda genişliğin yaklaşık %62'si. */
+    private val s get() = kotlin.math.min(stage.viewport.worldWidth * 0.62f, 820f) / 846f
     private val cx get() = stage.viewport.worldWidth / 2f
     private val cy get() = stage.viewport.worldHeight * 0.52f
 
@@ -232,7 +233,7 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         b.end()
     }
 
-    private fun burstY() = py(332f) + 230f
+    private fun burstY() = py(332f) + 160f
 
     /** Pati: soldan koşarak gelir, seçilen harflerin tepelerinde zıplar, son harften büyük zıplamayla ışığa dönüşür. */
     private fun drawPati(b: Batch) {

@@ -66,10 +66,11 @@ class WorldRenderer(
     private val confettiColors = listOf(Color.valueOf("FF6F91"), Color.valueOf("FFD54F"), Color.valueOf("58D6D0"), Color.valueOf("73D65C"), Color.valueOf("B388FF"), Color.valueOf("FF9F43"))
 
     companion object {
-        const val VIEW_W = 12.5f
-        const val VIEW_H = 22.2f
-        const val LOOK_AHEAD = 3.4f
-        const val CAM_Y = Physics.CEIL / 2f + 0.8f
+        // Yatay ekran: en az 21 x 11.8 karo görünür; zemin (0) ve tavan (9) aynı anda ekranda (geniş ekranlarda genişlik artar)
+        const val VIEW_W = 21f
+        const val VIEW_H = 11.8f
+        const val LOOK_AHEAD = 4.6f
+        const val CAM_Y = Physics.CEIL / 2f + 0.2f
     }
 
     fun resize(w: Int, h: Int) = viewport.update(w, h, false)
@@ -77,7 +78,8 @@ class WorldRenderer(
     fun update(dt: Float) {
         time += dt
         val p = sim.player
-        val target = p.x + LOOK_AHEAD
+        // oyuncu ekranın soldan yaklaşık %28'inde durur
+        val target = p.x + max(LOOK_AHEAD, viewport.worldWidth * 0.22f)
         camX += (target - camX) * min(1f, dt * 8f)
         if (abs(target - camX) > 8f) camX = target
         camera.position.set(camX, CAM_Y, 0f)

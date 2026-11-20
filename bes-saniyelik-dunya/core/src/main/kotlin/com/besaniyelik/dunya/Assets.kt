@@ -92,7 +92,7 @@ class Assets : Disposable {
     private var theme: Theme? = null
 
     /** UI sanal çözünürlüğü (720x1280) ile gerçek piksel arasındaki oran. */
-    val density: Float = (Gdx.graphics.height / 1280f).coerceIn(0.5f, 3f).let { if (it.isNaN() || it <= 0f) 1f else it }
+    val density: Float = (Gdx.graphics.height / 720f).coerceIn(0.5f, 3f).let { if (it.isNaN() || it <= 0f) 1f else it }
 
     private val chars = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ•…×→←↑↓★✓–—’“”"
     val f22: BitmapFont

@@ -15,7 +15,7 @@
         <activity
             android:name="com.besaniyelik.dunya.android.AndroidLauncher"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="sensorLandscape"
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenSize|screenLayout|uiMode"
             android:launchMode="singleTask">
             <intent-filter>

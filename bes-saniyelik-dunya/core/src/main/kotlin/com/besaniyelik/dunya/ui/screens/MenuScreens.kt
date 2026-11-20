@@ -19,16 +19,16 @@ class SplashScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     override fun build() {
         game.audio.music("menu")
         val logo = Image(a.ui("logo"))
-        root.add().height(330f).row()
-        root.add(logo).size(640f, 640f * logo.prefHeight / logo.prefWidth).row()
+        root.add().height(70f).row()
+        root.add(logo).size(620f, 620f * logo.prefHeight / logo.prefWidth).row()
         logo.popIn(0.1f)
-        root.add(kit.label("Her 5 saniyede kurallar değişir!", a.f36o, Color.WHITE)).padTop(40f).row()
+        root.add(kit.label("Her 5 saniyede kurallar değişir!", a.f36o, Color.WHITE)).padTop(24f).row()
         val bar = kit.bar(0f, "bar_fill_y")
-        root.add(bar).width(420f).height(28f).padTop(60f).row()
+        root.add(bar).width(420f).height(28f).padTop(36f).row()
         bar.addAction(object : com.badlogic.gdx.scenes.scene2d.Action() {
             override fun act(delta: Float): Boolean { bar.value = (t / 1.4f).coerceAtMost(1f); return false }
         })
-        root.add(kit.label("Yükleniyor…", a.f28, Palette.INK)).padTop(14f)
+        root.add(kit.label("Yükleniyor…", a.f28, Palette.INK)).padTop(12f)
     }
     override fun render(delta: Float) {
         t += delta
@@ -63,26 +63,26 @@ class MainMenuScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         cur.add(kit.currency("b_coin", d.coins.toString())).right().row()
         cur.add(kit.currency("b_gem", d.gems.toString())).right().padTop(6f)
         top.add(cur).right().padRight(20f)
-        root.add(top).growX().padTop(24f).row()
+        root.add(top).growX().padTop(18f).row()
 
+        // sol sütun: logo ve oyna düğmeleri, sağ sütun: menü ızgarası
+        val left = Table()
         val logo = Image(a.ui("logo"))
-        root.add(logo).size(600f, 600f * logo.prefHeight / logo.prefWidth).padTop(20f).row()
+        left.add(logo).size(520f, 520f * logo.prefHeight / logo.prefWidth).row()
         logo.popIn()
-
         val next = d.highestUnlocked.coerceAtMost(500)
         val play = kit.button(if (d.levels.isEmpty()) "OYNA" else "DEVAM: BÖLÜM $next", "green", "g_play", a.f48o) {
             val lv = LevelRepository.level(next)
             LevelInfo.show(this, game, lv)
         }
-        root.add(play).width(560f).height(140f).padTop(30f).row()
+        left.add(play).width(520f).height(124f).padTop(16f).row()
         play.popIn(0.1f)
         val row2 = Table()
-        row2.add(kit.button("Haritalar", "yellow", "b_map", a.f36o) { game.go(MapSelectScreen(game)) }).width(272f).height(118f).padRight(16f)
-        row2.add(kit.button("Sonsuz", "turq", "b_infinity", a.f36o) { game.go(EndlessIntroScreen(game)) }).width(272f).height(118f)
-        root.add(row2).padTop(16f).row()
+        row2.add(kit.button("Haritalar", "yellow", "b_map", a.f36o) { game.go(MapSelectScreen(game)) }).width(252f).height(104f).padRight(16f)
+        row2.add(kit.button("Sonsuz", "turq", "b_infinity", a.f36o) { game.go(EndlessIntroScreen(game)) }).width(252f).height(104f)
+        left.add(row2).padTop(14f).row()
         row2.popIn(0.18f)
 
-        // ikon ızgarası
         val grid = Table()
         val missionsReady = (d.missions.daily + d.missions.weekly).any { it.done && !it.claimed }
         val items = listOf(
@@ -97,25 +97,27 @@ class MainMenuScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         )
         items.forEachIndexed { i, (icon, text, act) ->
             val cell = Table()
-            val b = kit.iconButton(icon, "white", 120f, 76f) { act() }
+            val b = kit.iconButton(icon, "white", 104f, 66f) { act() }
             val stack = Stack(b)
             val dot = (icon == "b_gift" && game.profile.loginAvailable()) || ((icon == "b_scroll" || icon == "b_calendar") && missionsReady)
-            if (dot) stack.add(Table().apply { top().right(); add(Image(a.ui("b_heart"))).size(0f); add(Image(a.ui("soft")).apply { color = Palette.RED }).size(34f) })
-            cell.add(stack).size(120f).row()
+            if (dot) stack.add(Table().apply { top().right(); add(Image(a.ui("soft")).apply { color = Palette.RED }).size(30f) })
+            cell.add(stack).size(104f).row()
             cell.add(kit.label(text, a.f22, Palette.INK)).padTop(2f)
-            grid.add(cell).pad(8f, 14f, 8f, 14f)
+            grid.add(cell).pad(6f, 10f, 6f, 10f)
             if (i % 4 == 3) grid.row()
             cell.popIn(0.2f + i * 0.03f)
         }
-        val gp = Table().apply { background = kit.patch("panel"); pad(20f, 10f, 24f, 10f); add(grid) }
-        root.add(gp).padTop(22f).row()
-        root.add().expandY().row()
+        val gp = Table().apply { background = kit.patch("panel"); pad(18f, 10f, 22f, 10f); add(grid) }
+        val body = Table()
+        body.add(left).expandX().center()
+        body.add(gp).expandX().center()
+        root.add(body).grow().row()
         val bottom = Table()
-        bottom.add(kit.iconButton("g_settings", "blue", 96f, 54f) { game.go(SettingsScreen(game)) }).size(96f).padRight(14f)
-        bottom.add(kit.iconButton(if (d.settings.music) "g_music" else "g_music_off", "pink", 96f, 50f) {
+        bottom.add(kit.iconButton("g_settings", "blue", 84f, 48f) { game.go(SettingsScreen(game)) }).size(84f).padRight(12f)
+        bottom.add(kit.iconButton(if (d.settings.music) "g_music" else "g_music_off", "pink", 84f, 44f) {
             d.settings.music = !d.settings.music; game.audio.applyVolume(); game.profile.save(); rebuild()
-        }).size(96f)
-        root.add(bottom).padBottom(30f).right().padRight(30f)
+        }).size(84f)
+        root.add(bottom).padBottom(16f).right().padRight(24f)
     }
     override fun onBack() { com.badlogic.gdx.Gdx.app.exit() }
 }
@@ -145,28 +147,29 @@ object LevelInfo {
                 LevelKind.TUTORIAL -> "Eğitim Bölümü"; LevelKind.CHALLENGE -> "Meydan Okuma"; LevelKind.FINAL -> "Harita Finali"
                 LevelKind.GRAND_FINAL -> "BÜYÜK FİNAL"; LevelKind.NORMAL -> "Bölüm"
             }
-            p.add(kit.label("$kindText ${lv.id}", a.f28, Palette.INK_SOFT)).row()
-            p.add(kit.label(lv.name, a.f48, Palette.INK, wrap = true)).width(560f).padTop(4f).row()
-            p.add(kit.label("Alan ${GameContent.areaNumber(lv.id)}: ${lv.idea}  •  Zorluk ${lv.difficulty}/10", a.f22, Palette.INK_SOFT, wrap = true)).width(560f).padTop(6f).row()
-            p.add(kit.stars(d.stars(lv.id), 64f)).padTop(16f).row()
+            val left = Table()
+            left.add(kit.label("$kindText ${lv.id}", a.f28, Palette.INK_SOFT)).row()
+            left.add(kit.label(lv.name, a.f48, Palette.INK, wrap = true)).width(460f).padTop(4f).row()
+            left.add(kit.label("Alan ${GameContent.areaNumber(lv.id)}: ${lv.idea}  •  Zorluk ${lv.difficulty}/10", a.f22, Palette.INK_SOFT, wrap = true)).width(460f).padTop(6f).row()
+            left.add(kit.stars(d.stars(lv.id), 60f)).padTop(12f).row()
             val mech = Table()
             val ms = if (lv.mechanics.isEmpty()) listOf(Mechanic.NORMAL) else lv.mechanics
-            ms.forEach { m -> mech.add(Table().apply { add(Image(a.ui("b_" + m.icon))).size(64f).row(); add(kit.label(m.title.split(" ").first(), a.f22, Palette.INK_SOFT)) }).pad(4f) }
-            p.add(kit.label("Bu bölümdeki kurallar", a.f22, Palette.INK)).padTop(16f).row()
-            p.add(mech).padTop(6f).row()
+            ms.forEach { m -> mech.add(Table().apply { add(Image(a.ui("b_" + m.icon))).size(56f).row(); add(kit.label(m.title.split(" ").first(), a.f22, Palette.INK_SOFT)) }).pad(3f) }
+            left.add(kit.label("Bu bölümdeki kurallar", a.f22, Palette.INK)).padTop(12f).row()
+            left.add(mech).padTop(4f).row()
             if (GameContent.hasPiece(lv.id)) {
                 val got = lv.id in d.pieces
-                p.add(Table().apply { add(Image(a.ui("b_puzzle"))).size(44f).padRight(8f); add(kit.label(if (got) "Gizli parça bulundu" else "Bu bölümde gizli bir parça var!", a.f22, Palette.INK)) }).padTop(10f).row()
+                left.add(Table().apply { add(Image(a.ui("b_puzzle"))).size(40f).padRight(8f); add(kit.label(if (got) "Gizli parça bulundu" else "Bu bölümde gizli bir parça var!", a.f22, Palette.INK)) }).padTop(8f).row()
             }
-            // güçlendirme seçimi
+            val right = Table()
             val chosen = LinkedHashSet<PowerupType>()
             val owned = d.inventory.filter { it.value > 0 }
             if (owned.isNotEmpty()) {
-                p.add(kit.label("Başlangıç güçlendirmesi (en fazla 2)", a.f22, Palette.INK)).padTop(16f).row()
-                val row = Table()
-                owned.forEach { (t, n) ->
-                    val cell = Table().apply { background = kit.patch("card"); pad(8f) }
-                    cell.add(Image(a.ui("b_" + t.icon))).size(60f).row()
+                right.add(kit.label("Başlangıç güçlendirmesi\n(en fazla 2)", a.f22, Palette.INK)).row()
+                val grid = Table()
+                owned.entries.forEachIndexed { i, (t, n) ->
+                    val cell = Table().apply { background = kit.patch("card"); pad(6f) }
+                    cell.add(Image(a.ui("b_" + t.icon))).size(54f).row()
                     cell.add(kit.label("x$n", a.f22, Palette.INK))
                     cell.touchable = com.badlogic.gdx.scenes.scene2d.Touchable.enabled
                     cell.addListener(object : com.badlogic.gdx.scenes.scene2d.utils.ClickListener() {
@@ -176,18 +179,19 @@ object LevelInfo {
                             cell.background = kit.patch(if (t in chosen) "card_sel" else "card")
                         }
                     })
-                    row.add(cell).size(96f, 110f).pad(4f)
+                    grid.add(cell).size(84f, 96f).pad(3f)
+                    if (i % 3 == 2) grid.row()
                 }
-                p.add(scrollRow(row)).width(560f).height(120f).row()
+                right.add(grid).padTop(6f).row()
             }
-            val btns = Table()
-            btns.add(kit.button("Kapat", "white", font = a.f36, textColor = Palette.INK) { close() }).width(220f).height(110f).padRight(14f)
-            btns.add(kit.button("BAŞLA", "green", "g_play", a.f48o) {
+            right.add(kit.button("BAŞLA", "green", "g_play", a.f48o) {
                 close()
                 val boosts = chosen.filter { game.profile.usePowerup(it) }
                 game.go(GameScreen(game, lv, null, boosts))
-            }).width(320f).height(120f)
-            p.add(btns).padTop(24f)
+            }).width(300f).height(112f).padTop(16f).row()
+            right.add(kit.button("Kapat", "white", font = a.f36, textColor = Palette.INK) { close() }).width(300f).height(96f).padTop(10f)
+            p.add(left).top().padRight(24f)
+            p.add(right).top()
         }
     }
 
@@ -207,13 +211,13 @@ class MapSelectScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             val left = Table()
             left.add(kit.label("Harita ${m.id}", a.f22, Palette.INK_SOFT, Align.left)).left().row()
             left.add(kit.label(m.name, a.f48, Palette.INK, Align.left)).left().row()
-            left.add(kit.label(m.subtitle, a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(380f).left().row()
+            left.add(kit.label(m.subtitle, a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(400f).left().row()
             val stats = Table()
             stats.add(Image(a.ui("b_star"))).size(36f); stats.add(kit.label(" $stars/150", a.f22, Palette.INK)).padRight(16f)
             stats.add(Image(a.ui("b_puzzle"))).size(36f); stats.add(kit.label(" ${CollectionManager.piecesOf(d, m.id)}/5", a.f22, Palette.INK)).padRight(16f)
             stats.add(kit.label("$done/50  •  10 alan", a.f22, Palette.INK))
             left.add(stats).left().padTop(8f).row()
-            left.add(kit.bar(done / 50f, "bar_fill", 18f)).width(380f).height(18f).left().padTop(8f)
+            left.add(kit.bar(done / 50f, "bar_fill", 18f)).width(400f).height(18f).left().padTop(8f)
             card.add(left).expandX().left()
             if (unlocked) card.add(kit.iconButton("g_play", "green", 110f, 60f) { game.go(LevelSelectScreen(game, m.id)) }).size(110f)
             else card.add(Image(a.ui("g_lock_gray"))).size(80f)
@@ -223,7 +227,8 @@ class MapSelectScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
                     if (unlocked) { kit.click(); game.go(LevelSelectScreen(game, m.id)) } else toast("Önce ${GameContent.maps[m.id - 2].name} finalini geç!", "g_lock_gray")
                 }
             })
-            list.add(card).width(660f).padBottom(18f).row()
+            list.add(card).width(590f).pad(0f, 8f, 16f, 8f)
+            if (m.id % 2 == 0) list.row()
         }
         root.add(scroll(list)).grow().padTop(12f)
     }
@@ -246,18 +251,21 @@ class LevelSelectScreen(game: BesSaniyelikDunya, private val map: Int) : BaseScr
             val ht = Table()
             ht.add(kit.label("Alan $no: ${idea.title}", a.f28, Palette.INK, Align.left)).expandX().left()
             ht.add(Image(a.ui("b_star"))).size(30f); ht.add(kit.label(" $stars/15", a.f22, Palette.INK_SOFT))
-            head.add(ht).width(580f).row()
-            head.add(kit.label(idea.desc, a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(580f).left()
-            list.add(head).width(640f).padTop(16f).padBottom(6f).row()
+            head.add(ht).width(540f).row()
+            head.add(kit.label(idea.desc, a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(540f).left()
+            val col = Table()
+            col.add(head).width(590f).padBottom(6f).row()
             val grid = Table()
-            for (i in 0 until GameContent.LEVELS_PER_AREA) grid.add(levelButton(first + i, d)).size(116f, 136f).pad(6f)
-            list.add(grid).row()
+            for (i in 0 until GameContent.LEVELS_PER_AREA) grid.add(levelButton(first + i, d)).size(108f, 126f).pad(4f)
+            col.add(grid)
+            list.add(col).pad(10f, 10f, 6f, 10f).top()
+            if (area % 2 == 1) list.row()
         }
         val sp = scroll(list)
         root.add(sp).grow().padTop(8f)
         // açık olan son bölüme kaydır
         val target = ((d.highestUnlocked - m.firstLevel) / GameContent.LEVELS_PER_AREA).coerceIn(0, 9)
-        stage.addAction(Actions.delay(0.05f, Actions.run { sp.layout(); sp.scrollY = (target * 262f).coerceAtMost(sp.maxY) }))
+        stage.addAction(Actions.delay(0.05f, Actions.run { sp.layout(); sp.scrollY = ((target / 2) * 250f).coerceAtMost(sp.maxY) }))
     }
 
     private fun levelButton(id: Int, d: SaveData): Actor {
@@ -287,36 +295,38 @@ class EndlessIntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         val d = game.profile.data
         root.add(header("Sonsuz Dünya")).growX().padTop(20f).row()
         val p = kit.panel()
-        p.add(Image(a.ui("b_infinity"))).size(120f).row()
-        p.add(kit.label("Ne kadar uzağa gidebilirsin?", a.f36, Palette.INK)).padTop(8f).row()
+        p.add(Image(a.ui("b_infinity"))).size(96f).row()
+        p.add(kit.label("Ne kadar uzağa gidebilirsin?", a.f36, Palette.INK)).padTop(6f).row()
         p.add(kit.label("Platformlar sonsuza kadar sürer, hız giderek artar ve her 5 saniyede kurallar değişir. Henüz öğrenmediğin kurallar gelince kısa bir öğretici gösterilir.",
-            a.f22, Palette.INK_SOFT, wrap = true)).width(560f).padTop(8f).row()
+            a.f22, Palette.INK_SOFT, wrap = true)).width(520f).padTop(6f).row()
         val st = Table()
-        fun stat(icon: String, title: String, v: String) { st.add(Table().apply { background = kit.patch("card"); pad(14f); add(Image(a.ui(icon))).size(54f).row(); add(kit.label(v, a.f36, Palette.INK)).row(); add(kit.label(title, a.f22, Palette.INK_SOFT)) }).width(180f).pad(6f) }
+        fun stat(icon: String, title: String, v: String) { st.add(Table().apply { background = kit.patch("card"); pad(12f); add(Image(a.ui(icon))).size(48f).row(); add(kit.label(v, a.f36, Palette.INK)).row(); add(kit.label(title, a.f22, Palette.INK_SOFT)) }).width(168f).pad(5f) }
         stat("b_trophy", "En iyi puan", d.stats.endlessBestScore.toString())
         stat("b_bolt", "En uzun süre", "%.0f sn".format(d.stats.endlessBestSeconds))
         stat("b_map", "En uzak", "%.0f m".format(d.stats.endlessBestDistance))
-        p.add(st).padTop(16f).row()
-        if (d.endlessRecords.isNotEmpty()) {
-            p.add(kit.label("Rekorlar", a.f28, Palette.INK)).padTop(14f).row()
-            val rec = Table()
-            d.endlessRecords.take(5).forEachIndexed { i, r ->
-                rec.add(kit.label("${i + 1}.", a.f22, Palette.INK_SOFT)).width(50f)
-                rec.add(kit.label("${r.score} puan", a.f22, Palette.INK, Align.left)).width(220f).left()
-                rec.add(kit.label("%.0f sn  •  %.0f m".format(r.seconds, r.distance), a.f22, Palette.INK_SOFT)).row()
-            }
-            p.add(rec).row()
+        p.add(st).padTop(12f).row()
+        val side = kit.panel()
+        side.add(kit.label("Rekorlar", a.f28, Palette.INK)).row()
+        if (d.endlessRecords.isEmpty()) side.add(kit.label("Henüz rekor yok.\nİlk koşunu yap!", a.f22, Palette.INK_SOFT)).padTop(6f).row()
+        val rec = Table()
+        d.endlessRecords.take(5).forEachIndexed { i, r ->
+            rec.add(kit.label("${i + 1}.", a.f22, Palette.INK_SOFT)).width(40f)
+            rec.add(kit.label("${r.score} puan", a.f22, Palette.INK, Align.left)).width(150f).left()
+            rec.add(kit.label("%.0f sn".format(r.seconds), a.f22, Palette.INK_SOFT)).row()
         }
+        side.add(rec).padTop(4f).row()
         val ms = d.missions.daily.filter { it.type in setOf(MissionType.ENDLESS_SCORE, MissionType.ENDLESS_SURVIVE, MissionType.PLAY_ENDLESS) }
         if (ms.isNotEmpty()) {
-            p.add(kit.label("Bugünün sonsuz görevleri", a.f28, Palette.INK)).padTop(14f).row()
-            ms.forEach { m -> p.add(kit.label("• ${m.type.text(m.target)} (${m.progress.coerceAtMost(m.target)}/${m.target})", a.f22, Palette.INK_SOFT)).row() }
+            side.add(kit.label("Bugünün sonsuz görevleri", a.f22, Palette.INK)).padTop(12f).row()
+            ms.forEach { m -> side.add(kit.label("• ${m.type.text(m.target)} (${m.progress.coerceAtMost(m.target)}/${m.target})", a.f22, Palette.INK_SOFT, wrap = true)).width(320f).row() }
         }
-        root.add(p).width(660f).padTop(20f).row()
-        root.add().expandY().row()
-        root.add(kit.button("BAŞLA", "turq", "g_play", a.f48o) {
+        side.add(kit.button("BAŞLA", "turq", "g_play", a.f48o) {
             val seed = System.nanoTime()
             game.go(GameScreen(game, null, seed, emptyList()))
-        }).width(480f).height(140f).padBottom(60f)
+        }).width(320f).height(116f).padTop(16f)
+        val body = Table()
+        body.add(p).width(600f).padRight(20f)
+        body.add(side).width(380f)
+        root.add(body).expand().center()
     }
 }
