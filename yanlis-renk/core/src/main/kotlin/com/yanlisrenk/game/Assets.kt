@@ -57,8 +57,8 @@ class Assets : Disposable {
             "obj_coin" to "objects/coin.png", "obj_diamond" to "objects/diamond.png", "obj_shield" to "objects/shield.png",
             "obj_pad" to "objects/pad_shift.png", "obj_gate_hidden" to "objects/gate_hidden.png",
         )
-        val SPRITE_CHARS = listOf("char_klasik", "char_top", "char_robot", "char_panda", "char_kedi", "char_uzayli",
-            "char_kristal", "char_bulut", "char_yildiz", "char_kral")
+        /** Görseli olabilecek tüm karakterler (dosyası olmayanlar vektör çizimle kalır). */
+        val SPRITE_CHARS: List<String> get() = com.yanlisrenk.logic.shop.ShopCatalog.characters.map { it.id }
         const val CHARS = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ★•→←–—’“”…₺"
     }
 

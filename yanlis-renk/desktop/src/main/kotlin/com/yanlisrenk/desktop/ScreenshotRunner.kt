@@ -79,6 +79,17 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         go("10_market") { ShopScreen(game) }
         go("10b_market_can") { ShopScreen(game, com.yanlisrenk.logic.shop.ShopCategory.LIFE) }
         go("11_karakterler") { CharactersScreen(game) }
+        shots.add("11b_karakterler_alt" to {
+            s.data.unlockedLevel = 38; game.go({ CharactersScreen(game) }, remember = false)
+            Gdx.app.postRunnable { (game.screen as? BaseScreen)?.root?.let { r -> com.badlogic.gdx.utils.Array<com.badlogic.gdx.scenes.scene2d.Actor>().also { r.stage?.root?.findActor<com.badlogic.gdx.scenes.scene2d.Actor>("x") } }
+                fun findScroll(a: com.badlogic.gdx.scenes.scene2d.Actor): com.badlogic.gdx.scenes.scene2d.ui.ScrollPane? {
+                    if (a is com.badlogic.gdx.scenes.scene2d.ui.ScrollPane) return a
+                    if (a is com.badlogic.gdx.scenes.scene2d.Group) for (c in a.children) findScroll(c)?.let { return it }
+                    return null
+                }
+                (game.screen as? BaseScreen)?.stage?.root?.let { findScroll(it) }?.let { it.layout(); it.scrollPercentY = 0.55f; it.updateVisualScroll() }
+            }
+        })
         go("12_kostumler") { CostumesScreen(game) }
         go("13_gorevler") { MissionsScreen(game) }
         go("13b_gorevler_haftalik") { MissionsScreen(game, true) }
