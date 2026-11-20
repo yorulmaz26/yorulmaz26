@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.scenes.scene2d.utils.Cullable
+import com.badlogic.gdx.scenes.scene2d.ui.Widget
 import com.yanlisrenk.game.YanlisRenkGame
 import com.yanlisrenk.game.ui.Pal
 import com.yanlisrenk.game.ui.Ui
@@ -44,20 +45,33 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
         scroll.setFlickScroll(true)
         scroll.fadeScrollBars = true
         root.add(scroll).grow()
-        val target = if (focusLevel > 0) focusLevel else session.currentLevel
-        // açılışta hedef bölüme kaydır
-        stage.addAction(Actions.run { scrollTo(target, false) })
         val back = Table()
         back.setFillParent(true)
         back.bottom().right().pad(0f, 0f, 30f, 24f)
-        back.add(ui.button("Bölümüme dön", Pal.ORANGE, "flag", Ui.Size.S) { scrollTo(session.currentLevel, true) })
+        backButton = ui.button("Bölümüme dön", Pal.ORANGE, "flag", Ui.Size.S) { scrollTo(session.currentLevel, true) }
+        back.add(backButton)
         back.touchable = com.badlogic.gdx.scenes.scene2d.Touchable.childrenOnly
         stage.addActor(back)
     }
 
+    private var backButton: com.badlogic.gdx.scenes.scene2d.ui.Button? = null
+    private var initialScrollDone = false
+
+    override fun afterDraw(delta: Float) {
+        // ilk kaydırma: yerleşim gerçekten bittikten (boyutlar kesinleştikten) sonra
+        if (!initialScrollDone && scroll.height > 0f && map.width > 0f) {
+            initialScrollDone = true
+            scrollTo(if (focusLevel > 0) focusLevel else session.currentLevel, false)
+        }
+        // geçerli bölüm ekrandaysa "Bölümüme dön" gizlenir
+        val cy = map.nodeY(session.currentLevel)
+        val top = map.height - scroll.visualScrollY
+        val visible = cy in (top - scroll.height + 60f)..(top - 60f)
+        backButton?.isVisible = initialScrollDone && !visible
+    }
+
     private fun scrollTo(level: Int, smooth: Boolean) {
         scroll.layout()
-        if (map.width != scroll.width && scroll.width > 0f) { map.width = scroll.width; scroll.layout() }
         val y = map.nodeY(level)
         val vh = scroll.height
         scroll.scrollY = (map.height - y - vh / 2f).coerceIn(0f, scroll.maxY)
@@ -75,18 +89,21 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
     }
 
     /** Haritanın tamamını çizen, görünmeyen kısımları atlayan aktör. */
-    inner class MapActor : Actor(), Cullable {
+    inner class MapActor : Widget(), Cullable {
         private val spacing = 172f
         private val margin = 260f
         private val worldGap = 190f        // dünya başlığı için ek boşluk
         private val segH = spacing * 25 + worldGap // bir dünya = 5 alan × 5 bölüm
         private var cull: Rectangle? = null
+        private val fullHeight get() = margin * 2 + spacing * 499 + worldGap * 19
+        override fun getPrefWidth() = 360f          // kaydırma alanı bundan genişse alan genişliğine yayılır
+        override fun getPrefHeight() = fullHeight
         private val layout = GlyphLayout()
         private var t = 0f
         private val tmp = Color()
 
         init {
-            setSize(720f, margin * 2 + spacing * 499 + worldGap * 19)
+            setSize(720f, fullHeight)
             addListener(object : ClickListener() {
                 override fun clicked(event: InputEvent?, x: Float, y: Float) { hit(x, y)?.let { openLevel(it) } }
             })
@@ -182,7 +199,7 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
                 if (by < visBottom - 100f || by > visTop + 100f) continue
                 val wi = AreaCatalog.world(w)
                 batch.setColor(1f, 1f, 1f, 0.92f * parentAlpha)
-                ui.panel(Pal.WHITE).draw(batch, ox + 110f, oy + by - 40f, 500f, 80f)
+                ui.panel(Pal.WHITE).draw(batch, ox + width / 2 - 250f, oy + by - 40f, 500f, 80f)
                 fM.color = Pal.TEXT
                 layout.setText(fM, "Dünya $w · ${wi.name}")
                 fM.draw(batch, layout, ox + width / 2 - layout.width / 2, oy + by + layout.height / 2)

@@ -43,7 +43,7 @@ class AndroidLauncher : AndroidApplication() {
             runCatching {
                 val sw = java.io.StringWriter()
                 e.printStackTrace(java.io.PrintWriter(sw))
-                crashFile.writeText("Yanlış Renk 1.2.0 · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
+                crashFile.writeText("Yanlış Renk 1.2.1 · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
             }
             prev?.uncaughtException(t, e)
         }

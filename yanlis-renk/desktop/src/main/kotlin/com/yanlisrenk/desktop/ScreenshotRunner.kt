@@ -182,7 +182,7 @@ fun main(args: Array<String>) {
     val platform = DesktopPlatform(tmp).also { it.allowNetwork = false }
     val cfg = Lwjgl3ApplicationConfiguration()
     cfg.setTitle("Yanlış Renk QA")
-    cfg.setWindowedMode(540, 1080)
+    cfg.setWindowedMode(480, 1040) // telefon oranı (~0,46)
     cfg.setBackBufferConfig(8, 8, 8, 8, 16, 0, 4)
     cfg.setForegroundFPS(60)
     cfg.useVsync(false)

@@ -23,7 +23,7 @@ import kotlin.math.sin
  * 0.0–1.2 sn  Devre hatları oyunun 4 renginde logoya doğru çizilir, uçlarında ışık noktaları akar.
  * 0.6–2.0 sn  Renk değiştiren "lumos" ışık huzmesi logoyu soldan sağa aydınlatır.
  * 1.6–2.9 sn  Oyunun küp karakteri aşağıdan gelir, dokunuşlarla K→M→Y→S olur, logodan kapı gibi geçer.
- * 2.9 sn      Dört renkli ışık patlaması, logo parlar, "sunar".
+ * 2.9 sn      Dört renkli ışık patlaması, logo parlar.
  * 4.2–4.8 sn  Oyunun aydınlık zeminine geçiş → SplashScreen.
  * Dokunarak atlanabilir.
  */
@@ -218,20 +218,16 @@ class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
         if (t < 0.4f) { sr.setColor(0f, 0f, 0f, 1f - t / 0.4f); sr.rect(x0, y0, w, h) }
         sr.end()
 
-        // "sunar"
+        // "Dokunarak geç" ipucu (logo altı yazısı yok)
         if (t > BURST + 0.2f && t < 4.4f) {
             val a = ((t - BURST - 0.2f) / 0.5f).coerceIn(0f, 1f) * (1f - ((t - 4.0f) / 0.4f).coerceIn(0f, 1f))
-            val f = ui.font(com.yanlisrenk.game.ui.Ui.Size.M)
-            stage.batch.begin()
-            f.setColor(0.85f, 0.9f, 1f, a)
-            layout.setText(f, "sunar")
-            f.draw(batch, layout, cx - layout.width / 2, ly + lh * 0.2f)
             val s = ui.font(com.yanlisrenk.game.ui.Ui.Size.S)
+            stage.batch.begin()
             s.setColor(0.6f, 0.7f, 0.85f, a * 0.8f)
             layout.setText(s, "Dokunarak geç")
-            s.draw(batch, layout, cx - layout.width / 2, y0 + 70f)
-            f.setColor(Color.WHITE); s.setColor(Color.WHITE)
-            batch.end()
+            s.draw(stage.batch, layout, cx - layout.width / 2, y0 + 70f)
+            s.setColor(Color.WHITE)
+            stage.batch.end()
         }
 
         if (t >= TOTAL) finish()

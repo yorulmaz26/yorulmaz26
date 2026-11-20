@@ -68,3 +68,7 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 ## 1.2.0 (yol haritası)
 * `SagaMapScreen`: 500 bölüm kıvrımlı bir yol üzerinde yuvarlak düğümler olarak (1. bölüm altta, yukarı kaydırılır). Her dünyanın bölümleri kendi arka planı üzerinde (aynalanarak tekrarlanır), dünya geçişlerinde başlık, her alanın başında alan etiketi, düğüm altında yıldızlar, kilitli düğümler gri, finaller büyük ve taçlı, geçerli bölümde parlayan halka ve zıplayan karakter. Açılışta geçerli bölüme kayar; "Bölümüme dön" butonu. Yalnızca görünen kısım çizilir (Cullable).
 * Harita, alan girişi, ödül ekranı, can ekranı ve bölüm sonu "Harita" butonları yeni haritaya gider. Ustalık modu alan listesini kullanmaya devam eder.
+
+## 1.2.1
+* Kullanıcı telefonunda harita ekranın sol şeridine sıkışıyordu: harita genişliği yerleşim bitmeden kaydırma alanından okunuyordu. Harita artık `Widget` (kaydırma alanı genişliğine her zaman yayılır); ilk kaydırma yerleşim tamamlandıktan sonra yapılıyor. "Bölümüme dön" geçerli bölüm ekrandayken gizleniyor. Masaüstü QA artık telefon oranında (480×1040).
+* Açılış animasyonundaki "sunar" yazısı kaldırıldı.
