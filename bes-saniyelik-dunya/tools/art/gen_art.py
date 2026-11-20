@@ -157,12 +157,13 @@ import progress_skins
 for f in os.listdir(out):
     if f.startswith('heroes') or f.startswith('hero_') or f.startswith('hero_thumbs'): os.remove(os.path.join(out, f))
 nh = 0
-thumbs = Packer('hero_thumbs', 1024, filt='MipMapLinearLinear,Linear')
+thumbs = Packer('hero_thumbs', 1024, filt='Linear,Linear')
 for sid in progress_skins.SKINS:
     fr = user_art.hero_frames(sid)
     if not fr: continue
     nh += 1
-    hp = Packer('hero_' + sid, 2048, filt='MipMapLinearLinear,Linear')
+    # karakterde mipmap yok: üç-doğrusal filtre küçültmede yarı çözünürlüklü kopyayı karıştırıp bulanıklaştırıyordu
+    hp = Packer('hero_' + sid, 2048, filt='Linear,Linear')
     for i, f in enumerate(fr): hp.add('f%d' % i, f)
     hp.write(out)
     idle = fr[15]

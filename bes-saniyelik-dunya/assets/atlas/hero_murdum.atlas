@@ -1,118 +1,118 @@
 
 hero_murdum.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
-f0
-  rotate: false
-  xy: 3, 3
-  size: 214, 232
-  orig: 214, 232
-  offset: 0, 0
-  index: -1
-f8
-  rotate: false
-  xy: 220, 3
-  size: 206, 223
-  orig: 206, 223
-  offset: 0, 0
-  index: -1
 f14
   rotate: false
-  xy: 429, 3
-  size: 252, 221
-  orig: 252, 221
+  xy: 3, 3
+  size: 275, 227
+  orig: 275, 227
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 684, 3
-  size: 213, 212
-  orig: 213, 212
-  offset: 0, 0
-  index: -1
-f2
-  rotate: false
-  xy: 900, 3
-  size: 252, 206
-  orig: 252, 206
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 1155, 3
-  size: 252, 204
-  orig: 252, 204
+  xy: 281, 3
+  size: 300, 224
+  orig: 300, 224
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 1410, 3
-  size: 252, 204
-  orig: 252, 204
+  xy: 584, 3
+  size: 281, 215
+  orig: 281, 215
   offset: 0, 0
   index: -1
-f4
+f2
   rotate: false
-  xy: 1665, 3
-  size: 222, 201
-  orig: 222, 201
+  xy: 868, 3
+  size: 345, 202
+  orig: 345, 202
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 238
-  size: 241, 195
-  orig: 241, 195
+  xy: 1216, 3
+  size: 306, 202
+  orig: 306, 202
   offset: 0, 0
   index: -1
-f3
+f1
   rotate: false
-  xy: 247, 238
-  size: 226, 194
-  orig: 226, 194
+  xy: 1525, 3
+  size: 300, 202
+  orig: 300, 202
   offset: 0, 0
   index: -1
-f9
+f4
   rotate: false
-  xy: 476, 238
-  size: 249, 192
-  orig: 249, 192
-  offset: 0, 0
-  index: -1
-f11
-  rotate: false
-  xy: 728, 238
-  size: 252, 191
-  orig: 252, 191
+  xy: 3, 233
+  size: 263, 202
+  orig: 263, 202
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 983, 238
-  size: 221, 191
-  orig: 221, 191
+  xy: 269, 233
+  size: 260, 202
+  orig: 260, 202
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 532, 233
+  size: 256, 202
+  orig: 256, 202
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 791, 233
+  size: 242, 202
+  orig: 242, 202
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 1036, 233
+  size: 275, 195
+  orig: 275, 195
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 1314, 233
+  size: 319, 189
+  orig: 319, 189
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 1207, 238
-  size: 235, 184
-  orig: 235, 184
+  xy: 1636, 233
+  size: 300, 188
+  orig: 300, 188
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1445, 238
-  size: 252, 179
-  orig: 252, 179
+  xy: 3, 438
+  size: 303, 187
+  orig: 303, 187
+  offset: 0, 0
+  index: -1
+f8
+  rotate: false
+  xy: 309, 438
+  size: 236, 160
+  orig: 236, 160
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 1700, 238
-  size: 252, 145
-  orig: 252, 145
+  xy: 548, 438
+  size: 277, 143
+  orig: 277, 143
   offset: 0, 0
   index: -1

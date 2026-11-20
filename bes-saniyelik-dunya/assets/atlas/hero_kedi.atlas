@@ -1,118 +1,118 @@
 
 hero_kedi.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
 f13
   rotate: false
   xy: 3, 3
-  size: 248, 220
-  orig: 248, 220
-  offset: 0, 0
-  index: -1
-f8
-  rotate: false
-  xy: 254, 3
-  size: 235, 220
-  orig: 235, 220
+  size: 278, 222
+  orig: 278, 222
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 492, 3
-  size: 248, 218
-  orig: 248, 218
+  xy: 284, 3
+  size: 253, 220
+  orig: 253, 220
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 743, 3
-  size: 216, 213
-  orig: 216, 213
+  xy: 540, 3
+  size: 255, 215
+  orig: 255, 215
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 962, 3
-  size: 248, 205
-  orig: 248, 205
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 1213, 3
-  size: 213, 205
-  orig: 213, 205
-  offset: 0, 0
-  index: -1
-f15
-  rotate: false
-  xy: 1429, 3
-  size: 215, 203
-  orig: 215, 203
+  xy: 798, 3
+  size: 309, 207
+  orig: 309, 207
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 1647, 3
-  size: 214, 202
-  orig: 214, 202
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 3, 226
-  size: 213, 201
-  orig: 213, 201
-  offset: 0, 0
-  index: -1
-f3
-  rotate: false
-  xy: 219, 226
-  size: 215, 200
-  orig: 215, 200
+  xy: 1110, 3
+  size: 249, 202
+  orig: 249, 202
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 437, 226
-  size: 214, 200
-  orig: 214, 200
-  offset: 0, 0
-  index: -1
-f12
-  rotate: false
-  xy: 654, 226
-  size: 248, 199
-  orig: 248, 199
+  xy: 1362, 3
+  size: 239, 202
+  orig: 239, 202
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 905, 226
-  size: 239, 194
-  orig: 239, 194
+  xy: 1604, 3
+  size: 302, 201
+  orig: 302, 201
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 3, 228
+  size: 241, 201
+  orig: 241, 201
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 247, 228
+  size: 229, 201
+  orig: 229, 201
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 479, 228
+  size: 225, 201
+  orig: 225, 201
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 707, 228
+  size: 219, 201
+  orig: 219, 201
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 929, 228
+  size: 264, 200
+  orig: 264, 200
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 1147, 226
-  size: 248, 193
-  orig: 248, 193
+  xy: 1196, 228
+  size: 293, 195
+  orig: 293, 195
+  offset: 0, 0
+  index: -1
+f8
+  rotate: false
+  xy: 1492, 228
+  size: 284, 189
+  orig: 284, 189
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 1398, 226
-  size: 241, 187
-  orig: 241, 187
+  xy: 1779, 228
+  size: 266, 189
+  orig: 266, 189
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1642, 226
-  size: 248, 186
-  orig: 248, 186
+  xy: 3, 432
+  size: 311, 188
+  orig: 311, 188
   offset: 0, 0
   index: -1

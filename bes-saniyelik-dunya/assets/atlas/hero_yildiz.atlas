@@ -2,117 +2,117 @@
 hero_yildiz.png
 size: 2048, 512
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 237, 224
-  orig: 237, 224
+  size: 238, 225
+  orig: 238, 225
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 243, 3
-  size: 218, 214
-  orig: 218, 214
-  offset: 0, 0
-  index: -1
-f8
-  rotate: false
-  xy: 464, 3
-  size: 225, 211
-  orig: 225, 211
+  xy: 244, 3
+  size: 240, 215
+  orig: 240, 215
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 692, 3
-  size: 237, 210
-  orig: 237, 210
-  offset: 0, 0
-  index: -1
-f11
-  rotate: false
-  xy: 932, 3
-  size: 237, 205
-  orig: 237, 205
+  xy: 487, 3
+  size: 266, 211
+  orig: 266, 211
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 1172, 3
-  size: 200, 205
-  orig: 200, 205
+  xy: 756, 3
+  size: 212, 206
+  orig: 212, 206
   offset: 0, 0
   index: -1
-f1
+f11
   rotate: false
-  xy: 1375, 3
-  size: 202, 203
-  orig: 202, 203
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 1580, 3
-  size: 193, 203
-  orig: 193, 203
-  offset: 0, 0
-  index: -1
-f3
-  rotate: false
-  xy: 1776, 3
-  size: 205, 202
-  orig: 205, 202
+  xy: 971, 3
+  size: 286, 205
+  orig: 286, 205
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 230
-  size: 230, 201
-  orig: 230, 201
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 236, 230
-  size: 237, 195
-  orig: 237, 195
+  xy: 1260, 3
+  size: 264, 201
+  orig: 264, 201
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 476, 230
-  size: 217, 194
-  orig: 217, 194
+  xy: 1527, 3
+  size: 238, 201
+  orig: 238, 201
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 1768, 3
+  size: 230, 201
+  orig: 230, 201
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 696, 230
-  size: 209, 192
-  orig: 209, 192
+  xy: 3, 231
+  size: 221, 201
+  orig: 221, 201
   offset: 0, 0
   index: -1
-f12
+f1
   rotate: false
-  xy: 908, 230
-  size: 237, 191
-  orig: 237, 191
+  xy: 227, 231
+  size: 213, 201
+  orig: 213, 201
   offset: 0, 0
   index: -1
-f10
+f0
   rotate: false
-  xy: 1148, 230
-  size: 237, 189
-  orig: 237, 189
+  xy: 443, 231
+  size: 197, 201
+  orig: 197, 201
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 1388, 230
-  size: 209, 189
-  orig: 209, 189
+  xy: 643, 231
+  size: 225, 200
+  orig: 225, 200
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 871, 231
+  size: 267, 196
+  orig: 267, 196
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 1141, 231
+  size: 240, 192
+  orig: 240, 192
+  offset: 0, 0
+  index: -1
+f10
+  rotate: false
+  xy: 1384, 231
+  size: 288, 189
+  orig: 288, 189
+  offset: 0, 0
+  index: -1
+f8
+  rotate: false
+  xy: 1675, 231
+  size: 262, 167
+  orig: 262, 167
   offset: 0, 0
   index: -1

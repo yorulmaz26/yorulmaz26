@@ -1,118 +1,118 @@
 
 hero_saatci.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 253, 236
-  orig: 253, 236
+  size: 256, 237
+  orig: 256, 237
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 259, 3
-  size: 253, 221
-  orig: 253, 221
+  xy: 262, 3
+  size: 282, 222
+  orig: 282, 222
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 515, 3
-  size: 233, 216
-  orig: 233, 216
+  xy: 547, 3
+  size: 280, 217
+  orig: 280, 217
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 751, 3
-  size: 253, 209
-  orig: 253, 209
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 1007, 3
-  size: 219, 205
-  orig: 219, 205
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 1229, 3
-  size: 217, 204
-  orig: 217, 204
-  offset: 0, 0
-  index: -1
-f5
-  rotate: false
-  xy: 1449, 3
-  size: 247, 202
-  orig: 247, 202
-  offset: 0, 0
-  index: -1
-f3
-  rotate: false
-  xy: 1699, 3
-  size: 221, 201
-  orig: 221, 201
-  offset: 0, 0
-  index: -1
-f4
-  rotate: false
-  xy: 3, 242
-  size: 235, 200
-  orig: 235, 200
-  offset: 0, 0
-  index: -1
-f12
-  rotate: false
-  xy: 241, 242
-  size: 253, 199
-  orig: 253, 199
-  offset: 0, 0
-  index: -1
-f15
-  rotate: false
-  xy: 497, 242
-  size: 240, 199
-  orig: 240, 199
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 740, 242
-  size: 253, 197
-  orig: 253, 197
+  xy: 830, 3
+  size: 298, 210
+  orig: 298, 210
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 996, 242
-  size: 227, 197
-  orig: 227, 197
+  xy: 1131, 3
+  size: 256, 202
+  orig: 256, 202
+  offset: 0, 0
+  index: -1
+f5
+  rotate: false
+  xy: 1390, 3
+  size: 277, 201
+  orig: 277, 201
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 1670, 3
+  size: 267, 201
+  orig: 267, 201
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 3, 243
+  size: 262, 201
+  orig: 262, 201
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 268, 243
+  size: 249, 201
+  orig: 249, 201
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 520, 243
+  size: 242, 201
+  orig: 242, 201
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 765, 243
+  size: 227, 201
+  orig: 227, 201
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 995, 243
+  size: 260, 200
+  orig: 260, 200
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 1258, 243
+  size: 286, 198
+  orig: 286, 198
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1226, 242
-  size: 253, 194
-  orig: 253, 194
+  xy: 1547, 243
+  size: 311, 195
+  orig: 311, 195
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 1482, 242
-  size: 240, 192
-  orig: 240, 192
+  xy: 3, 447
+  size: 282, 193
+  orig: 282, 193
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 1725, 242
-  size: 244, 175
-  orig: 244, 175
+  xy: 288, 447
+  size: 300, 176
+  orig: 300, 176
   offset: 0, 0
   index: -1

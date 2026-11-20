@@ -353,8 +353,59 @@ def parallax(m, layer, w=2048, h=1024):
 HERO_FRAME_H = 200  # kaynak kare çözünürlüğüne yakın: telefonda küçültülerek (keskin) çizilir  # bekleme karesi hedef yüksekliği (piksel)
 
 
+def _remove_ground_shadow(c):
+    """Ayakların altındaki gri zemin gölgesini kaldırır. Ayak tabanı = gri olmayan opak piksellerin bulunduğu
+    en alt satır; onun altındaki her şey (gri gölge şeridi, beyaz sis) temizlenir."""
+    a = arr(c)
+    rgb = a[..., :3]
+    sat = rgb.max(axis=2) - rgb.min(axis=2)
+    lum = rgb.mean(axis=2)
+    gray = (sat < 22) & (lum > 110)
+    solid = (a[..., 3] > 150) & ~gray
+    rows = np.where(solid.sum(axis=1) >= 5)[0]
+    if len(rows):
+        cut = rows.max() + 2
+        a[cut:, :, 3] = 0
+        # ayak tabanı hizasındaki gölge: alt bantta kalan grimsi pikseller (botlar kremsi, tabanlar koyu: korunur)
+        top_rows = np.where((a[..., 3] > 40).sum(axis=1) > 0)[0]
+        if len(top_rows):
+            h = cut - top_rows.min()
+            y0 = max(0, cut - int(h * 0.12))
+            band = a[y0:cut]
+            brgb = band[..., :3]
+            bsat = brgb.max(axis=2) - brgb.min(axis=2)
+            blum = brgb.mean(axis=2)
+            sh = (bsat < 30) & (blum > 100) & (blum < 238) & (band[..., 3] < 240)
+            band[..., 3] = np.where(sh, 0, band[..., 3])
+            a[y0:cut] = band
+    return img(a)
+
+
+def _bbox(c, thr=40):
+    al = np.asarray(c)[..., 3]
+    ys, xs = np.where(al > thr)
+    return (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1) if len(xs) else (0, 0, c.width, c.height)
+
+
+def _body_anchor_x(c, box):
+    """Gövde/bacak bandındaki (kutu yüksekliğinin %55-%95'i) opak piksellerin medyan x'i: pelerin salınımından etkilenmez."""
+    x0, y0, x1, y1 = box
+    al = np.asarray(c)[..., 3]
+    hh = y1 - y0
+    band = al[y0 + int(hh * 0.55): y0 + int(hh * 0.95), x0:x1]
+    ys, xs = np.where(band > 120)
+    if len(xs) < 20:
+        return (x0 + x1) / 2
+    return x0 + float(np.median(xs))
+
+
 def hero_frames(skin_id):
-    """16 kareyi kırpar, ayak çizgisine (alt orta) hizalar ve görünümler arası aynı boya ölçekler."""
+    """16 kareyi temizler, gövdeye göre ortalar, ayak çizgisine (alt) hizalar ve tutarlı boya ölçekler.
+
+    - Yatay hiza: gövde/bacak bandının medyanı (pelerin salınımı karakteri kaydırmaz)
+    - Koşu kareleri (0-5) ve bekleme (15) aynı yüksekliğe eşitlenir (koşarken boy titremesi olmaz)
+    - Bütün görünümler aynı referans boyuna getirilir
+    """
     n = 'hero_%s_sheet.png' % skin_id
     if not has(n): return None
     im = load(n)
@@ -366,20 +417,24 @@ def hero_frames(skin_id):
         a = arr(c)
         haze = (a[..., 3] < 130) & (a[..., :3].min(axis=2) > 195)
         a[..., 3] = np.where(haze | (a[..., 3] < 40), 0, a[..., 3]); c = img(a)
+        c = _remove_ground_shadow(c)
         frames.append(c)
-    # ölçek: koşu ve bekleme karelerinin medyan yüksekliği
-    def bbox(c):
-        al = np.asarray(c)[..., 3]; ys, xs = np.where(al > 40)
-        return (xs.min(), ys.min(), xs.max() + 1, ys.max() + 1) if len(xs) else (0, 0, c.width, c.height)
-    ref = np.median([bbox(frames[i])[3] - bbox(frames[i])[1] for i in (0, 1, 2, 3, 4, 5, 15)])
-    s = HERO_FRAME_H / max(1, ref)
+    boxes = [_bbox(c) for c in frames]
+    heights = [b[3] - b[1] for b in boxes]
+    steady = [0, 1, 2, 3, 4, 5, 15]
+    ref = float(np.median([heights[i] for i in steady]))
+    base_scale = HERO_FRAME_H / max(1.0, ref)
     out = []
-    for c in frames:
-        x0, y0, x1, y1 = bbox(c)
-        cx = (x0 + x1) / 2
-        half = max(cx - x0, x1 - cx) + 2
-        box = (int(cx - half), max(0, y0 - 2), int(cx + half), y1)
-        piece = c.crop(box)
+    for i, c in enumerate(frames):
+        box = boxes[i]
+        x0, y0, x1, y1 = box
+        s = base_scale
+        if i in steady:
+            # koşu/bekleme karelerinde boyu referansa eşitle (en fazla ±%10 düzeltme)
+            s = base_scale * float(np.clip(ref / max(1, heights[i]), 0.9, 1.1))
+        ax = _body_anchor_x(c, box)
+        half = max(ax - x0, x1 - ax) + 2
+        piece = c.crop((int(ax - half), max(0, y0 - 2), int(ax + half), y1))
         out.append(piece.resize((max(4, int(piece.width * s)), max(4, int(piece.height * s))), Image.LANCZOS))
     return out
 

@@ -1,118 +1,118 @@
 
 hero_damla.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
-f0
+f8
   rotate: false
   xy: 3, 3
-  size: 211, 244
-  orig: 211, 244
+  size: 230, 223
+  orig: 230, 223
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 217, 3
-  size: 258, 219
-  orig: 258, 219
-  offset: 0, 0
-  index: -1
-f8
-  rotate: false
-  xy: 478, 3
-  size: 204, 218
-  orig: 204, 218
+  xy: 236, 3
+  size: 276, 221
+  orig: 276, 221
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 685, 3
-  size: 207, 212
-  orig: 207, 212
+  xy: 515, 3
+  size: 274, 216
+  orig: 274, 216
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 895, 3
-  size: 253, 208
-  orig: 253, 208
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 1151, 3
-  size: 215, 208
-  orig: 215, 208
-  offset: 0, 0
-  index: -1
-f2
-  rotate: false
-  xy: 1369, 3
-  size: 230, 207
-  orig: 230, 207
+  xy: 792, 3
+  size: 297, 210
+  orig: 297, 210
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 1602, 3
-  size: 258, 201
-  orig: 258, 201
+  xy: 1092, 3
+  size: 316, 202
+  orig: 316, 202
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 250
-  size: 255, 200
-  orig: 255, 200
+  xy: 1411, 3
+  size: 304, 202
+  orig: 304, 202
   offset: 0, 0
   index: -1
-f4
+f2
   rotate: false
-  xy: 261, 250
-  size: 232, 200
-  orig: 232, 200
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 496, 250
-  size: 243, 197
-  orig: 243, 197
+  xy: 1718, 3
+  size: 276, 202
+  orig: 276, 202
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 742, 250
-  size: 218, 191
-  orig: 218, 191
+  xy: 3, 229
+  size: 269, 202
+  orig: 269, 202
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 275, 229
+  size: 252, 202
+  orig: 252, 202
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 530, 229
+  size: 234, 202
+  orig: 234, 202
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 767, 229
+  size: 229, 202
+  orig: 229, 202
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 999, 229
+  size: 278, 197
+  orig: 278, 197
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 963, 250
-  size: 258, 182
-  orig: 258, 182
+  xy: 1280, 229
+  size: 316, 184
+  orig: 316, 184
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 1224, 250
-  size: 231, 176
-  orig: 231, 176
+  xy: 1599, 229
+  size: 282, 174
+  orig: 282, 174
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1458, 250
-  size: 258, 160
-  orig: 258, 160
+  xy: 3, 434
+  size: 316, 158
+  orig: 316, 158
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 1719, 250
-  size: 250, 138
-  orig: 250, 138
+  xy: 322, 434
+  size: 271, 136
+  orig: 271, 136
   offset: 0, 0
   index: -1

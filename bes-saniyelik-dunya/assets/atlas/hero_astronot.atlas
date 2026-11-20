@@ -1,118 +1,118 @@
 
 hero_astronot.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
 f8
   rotate: false
   xy: 3, 3
-  size: 230, 234
-  orig: 230, 234
+  size: 270, 234
+  orig: 270, 234
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 236, 3
-  size: 240, 225
-  orig: 240, 225
+  xy: 276, 3
+  size: 249, 226
+  orig: 249, 226
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 479, 3
-  size: 261, 222
-  orig: 261, 222
+  xy: 528, 3
+  size: 322, 223
+  orig: 322, 223
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 743, 3
-  size: 222, 220
-  orig: 222, 220
+  xy: 853, 3
+  size: 270, 220
+  orig: 270, 220
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 968, 3
-  size: 264, 204
-  orig: 264, 204
-  offset: 0, 0
-  index: -1
-f2
-  rotate: false
-  xy: 1235, 3
-  size: 227, 204
-  orig: 227, 204
-  offset: 0, 0
-  index: -1
-f4
-  rotate: false
-  xy: 1465, 3
-  size: 232, 203
-  orig: 232, 203
+  xy: 1126, 3
+  size: 286, 205
+  orig: 286, 205
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 1700, 3
-  size: 240, 202
-  orig: 240, 202
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 3, 240
-  size: 230, 202
-  orig: 230, 202
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 236, 240
-  size: 230, 202
-  orig: 230, 202
+  xy: 1415, 3
+  size: 268, 202
+  orig: 268, 202
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 469, 240
-  size: 230, 201
-  orig: 230, 201
+  xy: 1686, 3
+  size: 254, 202
+  orig: 254, 202
   offset: 0, 0
   index: -1
-f9
+f2
   rotate: false
-  xy: 702, 240
-  size: 257, 198
-  orig: 257, 198
+  xy: 3, 240
+  size: 240, 202
+  orig: 240, 202
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 246, 240
+  size: 237, 202
+  orig: 237, 202
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 486, 240
+  size: 236, 202
+  orig: 236, 202
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 725, 240
+  size: 232, 202
+  orig: 232, 202
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 962, 240
-  size: 209, 193
-  orig: 209, 193
+  xy: 960, 240
+  size: 225, 202
+  orig: 225, 202
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 1188, 240
+  size: 278, 198
+  orig: 278, 198
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 1174, 240
-  size: 256, 180
-  orig: 256, 180
+  xy: 1469, 240
+  size: 257, 180
+  orig: 257, 180
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1433, 240
-  size: 264, 164
-  orig: 264, 164
+  xy: 3, 445
+  size: 328, 164
+  orig: 328, 164
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 1700, 240
-  size: 264, 144
-  orig: 264, 144
+  xy: 334, 445
+  size: 270, 145
+  orig: 270, 145
   offset: 0, 0
   index: -1

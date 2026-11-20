@@ -28,7 +28,7 @@ class WorldRenderer(
     val viewport = ExtendViewport(VIEW_W, VIEW_H, camera)
     val theme: Theme = a.theme(map)
     val particles = Particles().apply { reduced = reducedEffects }
-    private val character = CharacterRenderer(a)
+    private val character = CharacterRenderer(a).apply { spriteScale = 1.18f } // oyun ekranında %18 daha büyük
     private val bodyColor = rgb(skin.body)
     private val trailColors = trail.colors.map { rgb(it) }
     private val trailRegion: TextureRegion = a.g(when (trail.shape) {

@@ -1,118 +1,118 @@
 
 hero_ari.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 244, 229
-  orig: 244, 229
+  size: 250, 229
+  orig: 250, 229
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 250, 3
-  size: 226, 212
-  orig: 226, 212
+  xy: 256, 3
+  size: 252, 213
+  orig: 252, 213
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 479, 3
-  size: 244, 211
-  orig: 244, 211
+  xy: 511, 3
+  size: 281, 212
+  orig: 281, 212
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 726, 3
-  size: 196, 206
-  orig: 196, 206
+  xy: 795, 3
+  size: 218, 207
+  orig: 218, 207
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 925, 3
-  size: 244, 205
-  orig: 244, 205
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 1172, 3
-  size: 200, 205
-  orig: 200, 205
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 1375, 3
-  size: 199, 204
-  orig: 199, 204
+  xy: 1016, 3
+  size: 298, 205
+  orig: 298, 205
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 1577, 3
-  size: 215, 201
-  orig: 215, 201
-  offset: 0, 0
-  index: -1
-f3
-  rotate: false
-  xy: 1795, 3
-  size: 207, 201
-  orig: 207, 201
+  xy: 1317, 3
+  size: 260, 201
+  orig: 260, 201
   offset: 0, 0
   index: -1
 f15
   rotate: false
+  xy: 1580, 3
+  size: 244, 201
+  orig: 244, 201
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
   xy: 3, 235
-  size: 220, 198
-  orig: 220, 198
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 226, 235
-  size: 231, 197
-  orig: 231, 197
-  offset: 0, 0
-  index: -1
-f4
-  rotate: false
-  xy: 460, 235
-  size: 196, 196
-  orig: 196, 196
-  offset: 0, 0
-  index: -1
-f12
-  rotate: false
-  xy: 659, 235
-  size: 244, 195
-  orig: 244, 195
+  size: 235, 201
+  orig: 235, 201
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 906, 235
-  size: 205, 190
-  orig: 205, 190
+  xy: 241, 235
+  size: 228, 201
+  orig: 228, 201
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 472, 235
+  size: 212, 201
+  orig: 212, 201
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 687, 235
+  size: 208, 201
+  orig: 208, 201
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 898, 235
+  size: 205, 201
+  orig: 205, 201
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 1106, 235
+  size: 277, 197
+  orig: 277, 197
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 1386, 235
+  size: 256, 195
+  orig: 256, 195
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1114, 235
-  size: 244, 173
-  orig: 244, 173
+  xy: 1645, 235
+  size: 315, 174
+  orig: 315, 174
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 1361, 235
-  size: 186, 158
-  orig: 186, 158
+  xy: 3, 439
+  size: 207, 158
+  orig: 207, 158
   offset: 0, 0
   index: -1

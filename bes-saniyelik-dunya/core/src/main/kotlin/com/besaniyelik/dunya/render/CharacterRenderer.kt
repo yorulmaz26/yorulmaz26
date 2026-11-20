@@ -16,6 +16,8 @@ fun rgb(c: Int, a: Float = 1f) = Color(((c shr 16) and 255) / 255f, ((c shr 8) a
 
 /** Karakteri parçalardan (gövde, desen, gözler, ağız, ayaklar, aksesuar) çizer; 20 görünümün hepsi aynı iskeleti kullanır. */
 class CharacterRenderer(private val a: Assets) {
+    /** Kare animasyonlu karakterin görsel büyütmesi (yalnızca çizim; çarpışma kutusu etkilenmez, ayak çizgisi sabit). */
+    var spriteScale = 1f
     private val body = a.g("ch_body"); private val shine = a.g("ch_shine"); private val belly = a.g("ch_belly")
     private val eye = a.g("ch_eye"); private val pupil = a.g("ch_pupil"); private val eyeHappy = a.g("ch_eye_happy"); private val eyeX = a.g("ch_eye_x")
     private val cheek = a.g("ch_cheek"); private val foot = a.g("ch_foot")
@@ -116,7 +118,7 @@ class CharacterRenderer(private val a: Assets) {
             CharState.IDLE -> 15
         }.let { if (state == CharState.RUN && squash > 0.45f) 10 else it }
         val r = frames[idx] ?: frames[0]
-        val k = size * 1.45f / HERO_REF_PX
+        val k = size * 1.45f * spriteScale / HERO_REF_PX
         val sq = 1f - squash * 0.12f
         val w = r.regionWidth * k * (2f - sq)
         val h = r.regionHeight * k * sq

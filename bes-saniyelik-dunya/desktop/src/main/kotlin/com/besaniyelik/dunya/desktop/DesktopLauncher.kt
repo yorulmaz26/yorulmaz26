@@ -18,6 +18,7 @@ fun main(args: Array<String>) {
         useVsync(true)
         setForegroundFPS(60)
         if (shots != null) setWindowedMode(960, 540)
+        System.getProperty("win")?.split("x")?.let { setWindowedMode(it[0].toInt(), it[1].toInt()) }
     }
     val game = BesSaniyelikDunya()
     if (shots != null) game.debugHook = ScreenshotTour(shots)::step

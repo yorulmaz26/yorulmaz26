@@ -1,118 +1,118 @@
 
 hero_kaos.png
-size: 2048, 512
+size: 2048, 1024
 format: RGBA8888
-filter: MipMapLinearLinear,Linear
+filter: Linear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 250, 234
-  orig: 250, 234
+  size: 255, 234
+  orig: 255, 234
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 256, 3
-  size: 250, 221
-  orig: 250, 221
+  xy: 261, 3
+  size: 278, 221
+  orig: 278, 221
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 509, 3
-  size: 229, 211
-  orig: 229, 211
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 741, 3
-  size: 219, 208
-  orig: 219, 208
+  xy: 542, 3
+  size: 262, 211
+  orig: 262, 211
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 963, 3
-  size: 250, 206
-  orig: 250, 206
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 1216, 3
-  size: 226, 206
-  orig: 226, 206
-  offset: 0, 0
-  index: -1
-f6
-  rotate: false
-  xy: 1445, 3
-  size: 244, 203
-  orig: 244, 203
-  offset: 0, 0
-  index: -1
-f5
-  rotate: false
-  xy: 1692, 3
-  size: 241, 202
-  orig: 241, 202
-  offset: 0, 0
-  index: -1
-f3
-  rotate: false
-  xy: 3, 240
-  size: 231, 201
-  orig: 231, 201
-  offset: 0, 0
-  index: -1
-f11
-  rotate: false
-  xy: 237, 240
-  size: 250, 200
-  orig: 250, 200
-  offset: 0, 0
-  index: -1
-f4
-  rotate: false
-  xy: 490, 240
-  size: 239, 197
-  orig: 239, 197
+  xy: 807, 3
+  size: 264, 206
+  orig: 264, 206
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 732, 240
-  size: 237, 194
-  orig: 237, 194
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 972, 240
-  size: 250, 191
-  orig: 250, 191
+  xy: 1074, 3
+  size: 273, 202
+  orig: 273, 202
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 1225, 240
-  size: 230, 190
-  orig: 230, 190
+  xy: 1350, 3
+  size: 244, 202
+  orig: 244, 202
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 1597, 3
+  size: 276, 201
+  orig: 276, 201
+  offset: 0, 0
+  index: -1
+f5
+  rotate: false
+  xy: 3, 240
+  size: 263, 201
+  orig: 263, 201
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 269, 240
+  size: 253, 201
+  orig: 253, 201
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 525, 240
+  size: 246, 201
+  orig: 246, 201
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 774, 240
+  size: 232, 201
+  orig: 232, 201
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 1009, 240
+  size: 216, 201
+  orig: 216, 201
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 1228, 240
+  size: 266, 191
+  orig: 266, 191
+  offset: 0, 0
+  index: -1
+f6
+  rotate: false
+  xy: 1497, 240
+  size: 285, 180
+  orig: 285, 180
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 1458, 240
-  size: 250, 173
-  orig: 250, 173
+  xy: 3, 444
+  size: 311, 172
+  orig: 311, 172
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 1711, 240
-  size: 238, 168
-  orig: 238, 168
+  xy: 317, 444
+  size: 268, 168
+  orig: 268, 168
   offset: 0, 0
   index: -1

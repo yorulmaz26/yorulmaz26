@@ -63,6 +63,13 @@ Bölüm 500: TAMAMLANDI (yıldız 3/3, altın 275, ölüm 0)
 
 Her haritadan bir bölüm; tamamlanma ekranı, XP, başarı ve seviye bildirimleri görsel olarak kontrol edildi (`docs/screenshots/`).
 
+## Karakter netliği
+
+* Karakter atlaslarında mipmap kapatıldı (`Linear,Linear`): üç-doğrusal filtre 200 → ~130 piksel küçültmede yarı çözünürlüklü kopyayı karıştırıp karakteri bulanıklaştırıyordu.
+* Oyun ekranında karakter %18 büyütüldü (yalnızca çizim; çarpışma kutusu ve ayak çizgisi aynı).
+* Kare hizalama: gövde/bacak bandına göre yatay ortalama (pelerin salınımı karakteri kaydırmaz), koşu ve bekleme karelerinde boy eşitleme (±%10), ayak altındaki gri gölge şeridinin temizlenmesi.
+* Önce/sonra karşılaştırması 1920×1080 pencerede alındı: `docs/karakter_once_sonra.jpg`. Testler 39/39.
+
 ## Görüntü kalitesi, bölüm haritası, ses
 
 * Kalite: karakter kareleri 200 piksel (telefonda küçültülerek keskin çizilir), arka planlar kaynak çözünürlüğünde 2048×1024 (önce 512 yükseklikti), gökyüzü kaynak genişliğinde 16:9 bant (önce 540 genişlikte, 3,5 kat büyütülüyordu). Bazı paralaks katmanlarında kalan gökyüzü artıklarının oluşturduğu düz kenarlı bantlar temizlendi. Bellek için büyük karakter atlaslarından en fazla 3'ü tutulur; listelerde hafif önizleme atlası kullanılır.
