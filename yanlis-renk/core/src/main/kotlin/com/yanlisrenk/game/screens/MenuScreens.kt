@@ -83,7 +83,7 @@ class MainMenuScreen(game: YanlisRenkGame) : BaseScreen(game) {
         root.add(ui.label("Bölüm $cur · ${area.name}", Ui.Size.S, Pal.TEXT_SOFT)).padTop(6f).padBottom(12f).row()
         val row2 = Table()
         row2.add(ui.button("Sonsuz", Pal.TURQ, "infinity", Ui.Size.M) { game.go({ GameScreen(game, Mode.ENDLESS) }) }).width(250f).padRight(16f)
-        row2.add(ui.button("Harita", Pal.BLUE, "map", Ui.Size.M) { game.go({ WorldMapScreen(game) }) }).width(250f).padRight(16f)
+        row2.add(ui.button("Harita", Pal.BLUE, "map", Ui.Size.M) { game.go({ SagaMapScreen(game) }) }).width(250f).padRight(16f)
         row2.add(ui.iconButton("medal", 100f, Pal.PURPLE) {
             if (session.isAreaComplete(1)) game.go({ masteryScreen(game) }) else ui.toast(stage, "Ustalık için önce bir alanı tamamla", "medal")
         }).size(100f)

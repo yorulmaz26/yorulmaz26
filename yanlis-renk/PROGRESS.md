@@ -64,3 +64,7 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 * Hız seçimi: Rahat (%68, varsayılan), Normal (%82), Hızlı (%100 — tek kişilik sonsuz mod hızı). Tepki payı +0,22 sn, kapı aralıkları %22 daha geniş.
 * Bölünmüş ekranda adil olmayan mekanikler çıkarıldı: sis, gizli kapı, hızlı karar, yanıp sönen, hafıza ve hafıza zinciri.
 * Yeni test: `ikiKisilikPistAdilVeYavas`.
+
+## 1.2.0 (yol haritası)
+* `SagaMapScreen`: 500 bölüm kıvrımlı bir yol üzerinde yuvarlak düğümler olarak (1. bölüm altta, yukarı kaydırılır). Her dünyanın bölümleri kendi arka planı üzerinde (aynalanarak tekrarlanır), dünya geçişlerinde başlık, her alanın başında alan etiketi, düğüm altında yıldızlar, kilitli düğümler gri, finaller büyük ve taçlı, geçerli bölümde parlayan halka ve zıplayan karakter. Açılışta geçerli bölüme kayar; "Bölümüme dön" butonu. Yalnızca görünen kısım çizilir (Cullable).
+* Harita, alan girişi, ödül ekranı, can ekranı ve bölüm sonu "Harita" butonları yeni haritaya gider. Ustalık modu alan listesini kullanmaya devam eder.

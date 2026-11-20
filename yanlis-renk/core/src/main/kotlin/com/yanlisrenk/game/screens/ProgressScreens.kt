@@ -243,7 +243,7 @@ class LivesScreen(game: YanlisRenkGame) : BaseScreen(game) {
         card.add(ui.label("Beklerken:", Ui.Size.M)).padTop(6f).padBottom(8f).row()
         card.add(ui.button("Sonsuz Mod (ücretsiz)", Pal.GREEN, "infinity", Ui.Size.M) { game.go({ GameScreen(game, Mode.ENDLESS) }) }).width(520f).padBottom(10f).row()
         card.add(ui.button("Günlük Görevler", Pal.BLUE, "missions", Ui.Size.M) { game.go({ MissionsScreen(game) }) }).width(520f).padBottom(10f).row()
-        if (l.canPlay) card.add(ui.button("Oyna", Pal.GREEN, "play", Ui.Size.M) { game.go({ AreaScreen(game, AreaCatalog.areaOfLevel(session.currentLevel)) }) }).width(520f)
+        if (l.canPlay) card.add(ui.button("Oyna", Pal.GREEN, "play", Ui.Size.M) { game.go({ SagaMapScreen(game) }) }).width(520f)
         root.add(ui.scroll(card)).width(680f).grow().padBottom(20f)
     }
 

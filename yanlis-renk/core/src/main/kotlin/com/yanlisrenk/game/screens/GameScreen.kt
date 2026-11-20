@@ -259,7 +259,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
             if (level != null) {
                 ui.confirm(stage, "Bölümden çık?", "Çıkarsan bu deneme başarısız sayılır ve 1 can kaybedersin.", "Çık") {
                     session.failLevel(levelId, world.gatesPassed, world.taps, world.coins)
-                    game.go({ AreaScreen(game, level.area, mode == Mode.MASTERY) }, remember = false)
+                    game.go({ mapScreen(game, level.id, mode == Mode.MASTERY) }, remember = false)
                 }
             } else endRun()
         }).width(440f)
@@ -372,7 +372,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         buttons.add(ui.iconButton("refresh", 110f, Pal.WHITE) {
             ov.remove(); game.go({ if (session.lives.canPlay) GameScreen(game, mode, lvl.id) else LivesScreen(game) }, remember = false)
         }).size(110f).padRight(16f)
-        buttons.add(ui.iconButton("map", 110f, Pal.WHITE) { game.go({ AreaScreen(game, lvl.area, mode == Mode.MASTERY) }, remember = false) }).size(110f).padRight(16f)
+        buttons.add(ui.iconButton("map", 110f, Pal.WHITE) { game.go({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }, remember = false) }).size(110f).padRight(16f)
         val nextId = lvl.id + 1
         when {
             special -> buttons.add(ui.button("Ödüller", Pal.ORANGE, "gift") { game.go({ RewardScreen(game, reward, lvl.id, mode == Mode.MASTERY) }, remember = false) })
@@ -386,7 +386,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
                     }
                 }, remember = false)
             })
-            else -> buttons.add(ui.button("Devam", Pal.GREEN, "play") { game.go({ AreaScreen(game, lvl.area, mode == Mode.MASTERY) }, remember = false) })
+            else -> buttons.add(ui.button("Devam", Pal.GREEN, "play") { game.go({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }, remember = false) })
         }
         card.add(buttons)
         ov = ui.overlay(stage, card, 0.3f)
@@ -410,7 +410,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
             card.add(ui.button("Canlar", Pal.PINK, "heart_full", textColor = Pal.TEXT) { game.go({ LivesScreen(game) }, remember = false) }).width(460f).padBottom(12f).row()
             card.add(ui.button("Sonsuz Mod", Pal.TURQ, "infinity") { game.go({ GameScreen(game, Mode.ENDLESS) }, remember = false) }).width(460f).padBottom(12f).row()
         }
-        card.add(ui.button("Harita", Pal.BLUE, "map") { game.go({ AreaScreen(game, level.area, mode == Mode.MASTERY) }, remember = false) }).width(460f)
+        card.add(ui.button("Harita", Pal.BLUE, "map") { game.go({ mapScreen(game, level.id, mode == Mode.MASTERY) }, remember = false) }).width(460f)
         ui.overlay(stage, card, 0.3f)
     }
 

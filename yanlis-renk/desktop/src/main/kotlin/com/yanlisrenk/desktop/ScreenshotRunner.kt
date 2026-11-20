@@ -58,7 +58,9 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         go("00d_intro") { IntroScreen(game) }
         go("01_splash") { SplashScreen(game) }
         shots.add("02_ana_menu" to { s.data.daily.lastClaimDay = s.dayKey(); s.data.unlockedLevel = 38; game.go({ MainMenuScreen(game) }, remember = false) })
-        go("03_harita") { WorldMapScreen(game) }
+        go("03_harita") { SagaMapScreen(game) }
+        go("03b_harita_dunya_gecisi") { SagaMapScreen(game, 25) }
+        go("03c_harita_baslangic") { SagaMapScreen(game, 3) }
         go("04_bolum_secim") { AreaScreen(game, 8) }
         go("05a_bolum_baslangic") { GameScreen(game, Mode.LEVEL, 36) }
         play("05b_oyun_alan1", Mode.LEVEL, 3, 6.5f)

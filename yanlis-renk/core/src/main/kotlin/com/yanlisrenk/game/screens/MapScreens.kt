@@ -139,7 +139,7 @@ class AreaIntroScreen(game: YanlisRenkGame, private val areaId: Int) : BaseScree
             card.add(t).width(580f).padBottom(10f).row()
         }
         card.add(ui.label("Toplanacak parça: ${a.collectible}", Ui.Size.S, Pal.TEXT_SOFT)).padTop(6f).padBottom(18f).row()
-        card.add(ui.button("Alana Gir", Pal.GREEN, "play") { game.go({ AreaScreen(game, areaId) }, remember = false) }).width(420f)
+        card.add(ui.button("Alana Gir", Pal.GREEN, "play") { game.go({ SagaMapScreen(game, a.firstLevel) }, remember = false) }).width(420f)
         root.add(card).width(660f)
     }
 }
@@ -205,15 +205,15 @@ class RewardScreen(game: YanlisRenkGame, private val reward: Reward, private val
             game.go({
                 if (!mastery && next <= 500 && reward.areaCompleted > 0) {
                     val na = AreaCatalog.areaOfLevel(next)
-                    if (na !in session.data.areaIntroSeen) AreaIntroScreen(game, na) else AreaScreen(game, na)
-                } else AreaScreen(game, AreaCatalog.areaOfLevel(levelId), mastery)
+                    if (na !in session.data.areaIntroSeen) AreaIntroScreen(game, na) else SagaMapScreen(game, next)
+                } else mapScreen(game, levelId, mastery)
             }, remember = false)
         }).width(420f)
         root.add(card).width(660f)
         repeat(3) { i -> stage.addAction(Actions.delay(i * 0.25f, Actions.run { game.audio.play("star", 1f + i * 0.1f) })) }
         flushAchievementToasts()
     }
-    override fun onBack() { game.go({ AreaScreen(game, AreaCatalog.areaOfLevel(levelId), mastery) }, remember = false) }
+    override fun onBack() { game.go({ mapScreen(game, levelId, mastery) }, remember = false) }
 }
 
 /** 23. Ustalık modu ekranı = ustalık filtreli harita */
