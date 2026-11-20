@@ -87,7 +87,7 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
                     if (a is com.badlogic.gdx.scenes.scene2d.Group) for (c in a.children) findScroll(c)?.let { return it }
                     return null
                 }
-                (game.screen as? BaseScreen)?.stage?.root?.let { findScroll(it) }?.let { it.layout(); it.scrollPercentY = 0.55f; it.updateVisualScroll() }
+                (game.screen as? BaseScreen)?.stage?.root?.let { findScroll(it) }?.let { it.layout(); it.scrollPercentY = 0.42f; it.updateVisualScroll() }
             }
         })
         go("12_kostumler") { CostumesScreen(game) }

@@ -49,3 +49,6 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 * Tek renkli sabit kapılar ve zaman kapısı tamamen görselle; çok renkli/hareketli kapılar (gökkuşağı, yasak, dönen, kayan) vektör gövde + görsel direklerle çiziliyor.
 * Kapı görselleri karakterin altında kalacak şekilde çizim sırası düzenlendi; kural simgeleri yumuşak kenarlı dokulara geçti.
 * Uygulama simgesi (`tools/art/import_app_icon.py`): uyarlanabilir simge (#31C8FB zemin + kenarı zemine kaynaşan ön katman), eski tip kare/yuvarlak mipmap'ler ve 512 px Play simgesi.
+
+## 1.0.8
+* Kalan 6 karakterin (Kalpçik, Petek Arı, Tavşan, Penguen, Damla, Ahtapotçuk) yeniden üretilmiş görselleri eklendi. 30 karakterin tamamı kullanıcı görselli.
