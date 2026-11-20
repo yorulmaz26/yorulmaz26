@@ -1,118 +1,118 @@
 
 hero_pati.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f8
   rotate: false
   xy: 3, 3
-  size: 125, 139
-  orig: 125, 139
+  size: 208, 232
+  orig: 208, 232
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 131, 3
-  size: 170, 137
-  orig: 170, 137
+  xy: 214, 3
+  size: 283, 229
+  orig: 283, 229
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 304, 3
-  size: 128, 131
-  orig: 128, 131
+  xy: 500, 3
+  size: 214, 219
+  orig: 214, 219
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 435, 3
-  size: 161, 128
-  orig: 161, 128
+  xy: 717, 3
+  size: 269, 214
+  orig: 269, 214
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 599, 3
-  size: 143, 125
-  orig: 143, 125
+  xy: 989, 3
+  size: 238, 209
+  orig: 238, 209
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 745, 3
-  size: 132, 123
-  orig: 132, 123
+  xy: 1230, 3
+  size: 220, 205
+  orig: 220, 205
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 880, 3
-  size: 131, 123
-  orig: 131, 123
+  xy: 1453, 3
+  size: 219, 205
+  orig: 219, 205
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 3, 145
-  size: 130, 122
-  orig: 130, 122
+  xy: 1675, 3
+  size: 217, 204
+  orig: 217, 204
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 136, 145
-  size: 138, 121
-  orig: 138, 121
+  xy: 3, 238
+  size: 230, 202
+  orig: 230, 202
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 277, 145
-  size: 139, 120
-  orig: 139, 120
+  xy: 236, 238
+  size: 232, 201
+  orig: 232, 201
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 419, 145
-  size: 135, 120
-  orig: 135, 120
+  xy: 471, 238
+  size: 226, 201
+  orig: 226, 201
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 557, 145
-  size: 121, 116
-  orig: 121, 116
+  xy: 700, 238
+  size: 203, 194
+  orig: 203, 194
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 681, 145
-  size: 171, 109
-  orig: 171, 109
+  xy: 906, 238
+  size: 285, 182
+  orig: 285, 182
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 855, 145
-  size: 147, 108
-  orig: 147, 108
+  xy: 1194, 238
+  size: 245, 180
+  orig: 245, 180
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 3, 270
-  size: 171, 88
-  orig: 171, 88
+  xy: 1442, 238
+  size: 285, 147
+  orig: 285, 147
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 177, 270
-  size: 157, 81
-  orig: 157, 81
+  xy: 1730, 238
+  size: 262, 136
+  orig: 262, 136
   offset: 0, 0
   index: -1

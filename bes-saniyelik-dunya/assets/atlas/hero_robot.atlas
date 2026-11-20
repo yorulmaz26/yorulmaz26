@@ -1,118 +1,118 @@
 
 hero_robot.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 152, 134
-  orig: 152, 134
+  size: 253, 224
+  orig: 253, 224
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 158, 3
-  size: 128, 128
-  orig: 128, 128
+  xy: 259, 3
+  size: 213, 214
+  orig: 213, 214
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 289, 3
-  size: 152, 124
-  orig: 152, 124
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 444, 3
-  size: 152, 122
-  orig: 152, 122
+  xy: 475, 3
+  size: 253, 206
+  orig: 253, 206
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 599, 3
-  size: 152, 122
-  orig: 152, 122
+  xy: 731, 3
+  size: 253, 204
+  orig: 253, 204
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 987, 3
+  size: 253, 203
+  orig: 253, 203
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 754, 3
-  size: 144, 122
-  orig: 144, 122
+  xy: 1243, 3
+  size: 240, 203
+  orig: 240, 203
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 3, 140
-  size: 152, 121
-  orig: 152, 121
+  xy: 1486, 3
+  size: 253, 201
+  orig: 253, 201
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 158, 140
-  size: 131, 121
-  orig: 131, 121
+  xy: 1742, 3
+  size: 219, 201
+  orig: 219, 201
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 292, 140
-  size: 152, 120
-  orig: 152, 120
+  xy: 3, 230
+  size: 253, 200
+  orig: 253, 200
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 447, 140
-  size: 152, 120
-  orig: 152, 120
+  xy: 259, 230
+  size: 253, 200
+  orig: 253, 200
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 602, 140
-  size: 152, 119
-  orig: 152, 119
+  xy: 515, 230
+  size: 253, 199
+  orig: 253, 199
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 757, 140
-  size: 152, 119
-  orig: 152, 119
+  xy: 771, 230
+  size: 253, 199
+  orig: 253, 199
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 3, 264
-  size: 136, 114
-  orig: 136, 114
+  xy: 1027, 230
+  size: 228, 190
+  orig: 228, 190
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 142, 264
-  size: 152, 111
-  orig: 152, 111
+  xy: 1258, 230
+  size: 253, 186
+  orig: 253, 186
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 297, 264
-  size: 152, 110
-  orig: 152, 110
+  xy: 1514, 230
+  size: 253, 183
+  orig: 253, 183
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 452, 264
-  size: 144, 106
-  orig: 144, 106
+  xy: 1770, 230
+  size: 240, 177
+  orig: 240, 177
   offset: 0, 0
   index: -1

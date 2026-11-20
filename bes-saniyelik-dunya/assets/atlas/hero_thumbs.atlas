@@ -1,0 +1,286 @@
+
+hero_thumbs.png
+size: 1024, 1024
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+h_cilek
+  rotate: false
+  xy: 3, 3
+  size: 151, 120
+  orig: 151, 120
+  offset: 0, 0
+  index: -1
+t_gokkusagi
+  rotate: false
+  xy: 157, 3
+  size: 151, 120
+  orig: 151, 120
+  offset: 0, 0
+  index: -1
+h_pati
+  rotate: false
+  xy: 311, 3
+  size: 150, 120
+  orig: 150, 120
+  offset: 0, 0
+  index: -1
+h_murdum
+  rotate: false
+  xy: 464, 3
+  size: 148, 120
+  orig: 148, 120
+  offset: 0, 0
+  index: -1
+t_kum
+  rotate: false
+  xy: 615, 3
+  size: 148, 120
+  orig: 148, 120
+  offset: 0, 0
+  index: -1
+h_robot
+  rotate: false
+  xy: 766, 3
+  size: 147, 120
+  orig: 147, 120
+  offset: 0, 0
+  index: -1
+t_kaos
+  rotate: false
+  xy: 3, 126
+  size: 146, 120
+  orig: 146, 120
+  offset: 0, 0
+  index: -1
+h_damla
+  rotate: false
+  xy: 152, 126
+  size: 145, 120
+  orig: 145, 120
+  offset: 0, 0
+  index: -1
+t_saatci
+  rotate: false
+  xy: 300, 126
+  size: 144, 120
+  orig: 144, 120
+  offset: 0, 0
+  index: -1
+h_bulut
+  rotate: false
+  xy: 447, 126
+  size: 143, 120
+  orig: 143, 120
+  offset: 0, 0
+  index: -1
+t_papatya
+  rotate: false
+  xy: 593, 126
+  size: 142, 120
+  orig: 142, 120
+  offset: 0, 0
+  index: -1
+t_mantar
+  rotate: false
+  xy: 738, 126
+  size: 142, 120
+  orig: 142, 120
+  offset: 0, 0
+  index: -1
+h_astronot
+  rotate: false
+  xy: 883, 126
+  size: 141, 120
+  orig: 141, 120
+  offset: 0, 0
+  index: -1
+t_penguen
+  rotate: false
+  xy: 3, 249
+  size: 139, 120
+  orig: 139, 120
+  offset: 0, 0
+  index: -1
+h_penguen
+  rotate: false
+  xy: 145, 249
+  size: 139, 120
+  orig: 139, 120
+  offset: 0, 0
+  index: -1
+t_murdum
+  rotate: false
+  xy: 287, 249
+  size: 138, 120
+  orig: 138, 120
+  offset: 0, 0
+  index: -1
+h_ari
+  rotate: false
+  xy: 428, 249
+  size: 138, 120
+  orig: 138, 120
+  offset: 0, 0
+  index: -1
+h_gunes
+  rotate: false
+  xy: 569, 249
+  size: 137, 120
+  orig: 137, 120
+  offset: 0, 0
+  index: -1
+h_saatci
+  rotate: false
+  xy: 709, 249
+  size: 137, 120
+  orig: 137, 120
+  offset: 0, 0
+  index: -1
+t_damla
+  rotate: false
+  xy: 849, 249
+  size: 136, 120
+  orig: 136, 120
+  offset: 0, 0
+  index: -1
+t_tavsan
+  rotate: false
+  xy: 3, 372
+  size: 136, 120
+  orig: 136, 120
+  offset: 0, 0
+  index: -1
+h_mantar
+  rotate: false
+  xy: 142, 372
+  size: 136, 120
+  orig: 136, 120
+  offset: 0, 0
+  index: -1
+h_kedi
+  rotate: false
+  xy: 281, 372
+  size: 135, 120
+  orig: 135, 120
+  offset: 0, 0
+  index: -1
+h_tavsan
+  rotate: false
+  xy: 419, 372
+  size: 135, 120
+  orig: 135, 120
+  offset: 0, 0
+  index: -1
+h_kum
+  rotate: false
+  xy: 557, 372
+  size: 135, 120
+  orig: 135, 120
+  offset: 0, 0
+  index: -1
+h_kaos
+  rotate: false
+  xy: 695, 372
+  size: 135, 120
+  orig: 135, 120
+  offset: 0, 0
+  index: -1
+h_yildiz
+  rotate: false
+  xy: 833, 372
+  size: 135, 120
+  orig: 135, 120
+  offset: 0, 0
+  index: -1
+h_papatya
+  rotate: false
+  xy: 3, 495
+  size: 134, 120
+  orig: 134, 120
+  offset: 0, 0
+  index: -1
+t_yildiz
+  rotate: false
+  xy: 140, 495
+  size: 134, 120
+  orig: 134, 120
+  offset: 0, 0
+  index: -1
+h_gokkusagi
+  rotate: false
+  xy: 277, 495
+  size: 134, 120
+  orig: 134, 120
+  offset: 0, 0
+  index: -1
+t_ari
+  rotate: false
+  xy: 414, 495
+  size: 133, 120
+  orig: 133, 120
+  offset: 0, 0
+  index: -1
+t_gunes
+  rotate: false
+  xy: 550, 495
+  size: 130, 120
+  orig: 130, 120
+  offset: 0, 0
+  index: -1
+t_robot
+  rotate: false
+  xy: 683, 495
+  size: 130, 120
+  orig: 130, 120
+  offset: 0, 0
+  index: -1
+t_astronot
+  rotate: false
+  xy: 816, 495
+  size: 129, 120
+  orig: 129, 120
+  offset: 0, 0
+  index: -1
+t_kedi
+  rotate: false
+  xy: 3, 618
+  size: 127, 120
+  orig: 127, 120
+  offset: 0, 0
+  index: -1
+t_pati
+  rotate: false
+  xy: 133, 618
+  size: 125, 120
+  orig: 125, 120
+  offset: 0, 0
+  index: -1
+t_cilek
+  rotate: false
+  xy: 261, 618
+  size: 121, 120
+  orig: 121, 120
+  offset: 0, 0
+  index: -1
+t_bulut
+  rotate: false
+  xy: 385, 618
+  size: 117, 120
+  orig: 117, 120
+  offset: 0, 0
+  index: -1
+t_nane
+  rotate: false
+  xy: 505, 618
+  size: 93, 120
+  orig: 93, 120
+  offset: 0, 0
+  index: -1
+h_nane
+  rotate: false
+  xy: 601, 618
+  size: 86, 120
+  orig: 86, 120
+  offset: 0, 0
+  index: -1

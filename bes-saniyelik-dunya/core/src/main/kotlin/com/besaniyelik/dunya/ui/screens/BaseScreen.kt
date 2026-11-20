@@ -36,6 +36,8 @@ class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int =
     private var theme: Theme = game.assets.theme(map)
     private val clouds = List(6) { floatArrayOf(MathUtils.random(0f, 14f), MathUtils.random(6f, 16f), MathUtils.random(0.6f, 1.3f)) }
     var showRunner = true
+    /** Verilirse arka plan zamanla değil bu değere (ör. kaydırma konumu) göre kayar. */
+    var scrollOverride: (() -> Float)? = null
 
     fun setMap(m: Int) { if (m != map) { map = m; theme = game.assets.theme(m) } }
     fun resize(w: Int, h: Int) = vp.update(w, h, true)
@@ -51,7 +53,7 @@ class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int =
         val vw = vp.worldWidth; val vh = vp.worldHeight
         val left = cxw - vw / 2; val bottom = 5f - vh / 2
         theme.drawSky(b, left, bottom, vw, vh)
-        val scroll = t * 1.2f
+        val scroll = scrollOverride?.invoke() ?: (t * 1.2f)
         fun par(tex: com.badlogic.gdx.graphics.Texture, y: Float, h: Float, f: Float) {
             val tw = h * com.besaniyelik.dunya.Theme.PARALLAX_ASPECT
             val u0 = (scroll * f) / tw

@@ -395,3 +395,18 @@ def logo(font_path, w=900, h=420):
     txt(330, 130, "Saniyelik", '#FFFFFF', '#FF6F91', mid)
     txt(330, 260, "Dünya", '#FFFFFF', '#3BB4E0', ImageFont.truetype(font_path, 150 * S))
     return c.done()
+
+
+def level_node(color, sz=136):
+    """Bölüm haritası için yuvarlak düğme: gölge, kalın beyaz kenar, degrade dolgu, parlama."""
+    c = Canvas(sz, sz)
+    cx = cy = sz / 2
+    r = sz * 0.42
+    c.shadow(lambda l: c.circle(cx, cy + 5, r + 6, fill=(0, 0, 0, 255), img=l), offset=(0, 4), blur=5, color=(37, 56, 88, 80))
+    c.circle(cx, cy + 4, r + 6, fill=shade(color, 0.7))
+    c.circle(cx, cy, r + 6, fill='#FFFFFF')
+    lay = c.layer(); c.circle(cx, cy, r - 2, fill='#FFFFFF', img=lay)
+    c.gradient_fill(lay, shade(color, 1.22), shade(color, 0.86))
+    c.circle(cx, cy, r - 2, outline=shade(color, 0.72), width=3)
+    c.ellipse((cx - r * 0.62, cy - r * 0.82, cx + r * 0.5, cy - r * 0.28), fill=(255, 255, 255, 95))
+    return c.done()

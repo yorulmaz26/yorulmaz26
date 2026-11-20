@@ -307,16 +307,38 @@ def sky(m):
     n = 'map%02d_sky.png' % m
     if not has(n): return None
     im = load(n).convert('RGB')
-    return im.resize((540, 960), Image.LANCZOS)
+    # Yatay ekran: dikey gökyüzünden 16:9 bant (üst-orta bölge), kaynak genişliğinde (kayıpsız)
+    w = im.width
+    h = int(w * 9 / 16)
+    y0 = max(0, min(im.height - h, int(im.height * 0.38) - h // 2))
+    return im.crop((0, y0, w, y0 + h))
 
 
-def parallax(m, layer, w=2048, h=512):
+def parallax(m, layer, w=2048, h=1024):
     """(rgb, alfa) çifti döndürür. Şeffaf olmayan katmanlarda üst kısım gökyüzüne eritilir."""
     n = 'map%02d_%s.png' % (m, layer)
     if not has(n): return None
     im = clean_white(load(n))
     a = arr(im)
-    if (a[..., 3] < 10).mean() < 0.05:  # opak: üstü erit
+    # Üst kenara bağlı açık gökyüzü piksellerini (soluk mavi/pembe/beyaz) şeffaf yap: oyunun kendi gökyüzü görünsün
+    rgb = a[..., :3]
+    bright = rgb.mean(axis=2)
+    sat = rgb.max(axis=2) - rgb.min(axis=2)
+    skyish = (bright > 205) & (sat < 70) & (a[..., 3] > 0)
+    H0 = a.shape[0]
+    # içeriğin başladığı satır (bazı katmanlar ortadan başlayan düz kenarlı şeritler)
+    cov = (a[..., 3] > 128).mean(axis=1)
+    rows = np.where(cov > 0.3)[0]
+    ctop = int(rows[0]) if len(rows) else 0
+    upper = np.zeros_like(skyish); upper[: ctop + int((H0 - ctop) * 0.45), :] = True  # yalnızca içeriğin üst bölgesi
+    seed = np.zeros_like(skyish); seed[0, :] = True
+    sky_mask = _flood((skyish | (a[..., 3] < 20)) & upper, seed)
+    soft = np.asarray(Image.fromarray((sky_mask * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(6))).astype(np.float32) / 255
+    a[..., 3] *= (1 - soft)
+    # her katmanın en üstü yumuşak geçişle erir (dikdörtgen kenar görünmesin)
+    top_ramp = np.clip((np.arange(H0) - ctop) / max(1.0, (H0 - ctop) * 0.2), 0, 1)
+    a[..., 3] *= top_ramp[:, None]
+    if (a[..., 3] < 10).mean() < 0.05:  # hâlâ opak: üstü daha geniş erit
         H = a.shape[0]
         ramp = np.clip((np.arange(H) / H - (0.05 if layer == 'far' else 0.15)) / 0.38, 0, 1)
         ramp = ramp * ramp * (3 - 2 * ramp)
@@ -328,7 +350,7 @@ def parallax(m, layer, w=2048, h=512):
 
 
 # ------------------------------------------------------------------ karakterler
-HERO_FRAME_H = 120  # bekleme karesi hedef yüksekliği (piksel)
+HERO_FRAME_H = 200  # kaynak kare çözünürlüğüne yakın: telefonda küçültülerek (keskin) çizilir  # bekleme karesi hedef yüksekliği (piksel)
 
 
 def hero_frames(skin_id):

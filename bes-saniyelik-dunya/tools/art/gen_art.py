@@ -82,6 +82,8 @@ for b in ['coin', 'gem', 'star', 'star_empty', 'star_gray', 'heart', 'heart_empt
           'p_shield', 'p_magnet', 'p_double', 'p_invincible', 'p_life', 'p_coinx2', 'p_finder', 'p_guard']:
     p.add('b_' + b, ui_art.badge(b))
 p.add('soft', ui_art.soft_circle(64))
+for nm, col in [('yellow', '#FFC93C'), ('orange', '#FF9F43'), ('pink', '#FF7EB6'), ('turq', '#38C9C2'), ('gray', '#AFBBCC'), ('green', '#5CC96B')]:
+    p.add('node_' + nm, ui_art.level_node(col))
 img, split = game_art.sign_board()
 p.add('sign', img, split)
 p.add('logo', ui_art.logo(font))
@@ -136,15 +138,15 @@ for mid, th in theme_art.THEMES.items():
     tp.write(out)
     sk = user_art.sky(mid)
     skp = os.path.join(bgdir, '%02d_sky.jpg' % mid)
-    if sk: sk.save(skp, quality=86, optimize=True)
+    if sk: sk.save(skp, quality=92, optimize=True)
     elif os.path.exists(skp): os.remove(skp)
     for layer in ('far', 'mid'):
         r = user_art.parallax(mid, layer)
         if r:
-            r[0].save(os.path.join(bgdir, '%02d_%s.jpg' % (mid, layer)), quality=84, optimize=True)
+            r[0].save(os.path.join(bgdir, '%02d_%s.jpg' % (mid, layer)), quality=90, optimize=True)
             r[1].save(os.path.join(bgdir, '%02d_%s_a.png' % (mid, layer)), optimize=True)
         else:
-            img = theme_art.background(th, layer, mid).resize((2048, 512), Image.LANCZOS)
+            img = theme_art.background(th, layer, mid).resize((2048, 1024), Image.LANCZOS)
             img.convert('RGB').save(os.path.join(bgdir, '%02d_%s.jpg' % (mid, layer)), quality=90)
             img.split()[3].save(os.path.join(bgdir, '%02d_%s_a.png' % (mid, layer)), optimize=True)
     print('tema', mid, th['name'], 'kullanıcı' if top else 'programatik')
@@ -153,15 +155,20 @@ for mid, th in theme_art.THEMES.items():
 import progress_skins
 # her görünüm ayrı küçük atlasta: oyunda yalnızca seçili karakter yüklenir
 for f in os.listdir(out):
-    if f.startswith('heroes') or f.startswith('hero_'): os.remove(os.path.join(out, f))
+    if f.startswith('heroes') or f.startswith('hero_') or f.startswith('hero_thumbs'): os.remove(os.path.join(out, f))
 nh = 0
+thumbs = Packer('hero_thumbs', 1024, filt='MipMapLinearLinear,Linear')
 for sid in progress_skins.SKINS:
     fr = user_art.hero_frames(sid)
     if not fr: continue
     nh += 1
-    hp = Packer('hero_' + sid, 1024, filt='MipMapLinearLinear,Linear')
+    hp = Packer('hero_' + sid, 2048, filt='MipMapLinearLinear,Linear')
     for i, f in enumerate(fr): hp.add('f%d' % i, f)
     hp.write(out)
+    idle = fr[15]
+    thumbs.add('t_' + sid, idle.resize((max(1, int(idle.width * 120 / idle.height)), 120), Image.LANCZOS))
+    thumbs.add('h_' + sid, fr[13].resize((max(1, int(fr[13].width * 120 / fr[13].height)), 120), Image.LANCZOS))
+if nh: thumbs.write(out)
 print('karakter görünümü:', nh)
 
 # ---------------- uygulama simgesi

@@ -1,118 +1,118 @@
 
 hero_murdum.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f0
   rotate: false
   xy: 3, 3
-  size: 128, 139
-  orig: 128, 139
+  size: 214, 232
+  orig: 214, 232
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 134, 3
-  size: 124, 133
-  orig: 124, 133
+  xy: 220, 3
+  size: 206, 223
+  orig: 206, 223
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 261, 3
-  size: 151, 132
-  orig: 151, 132
+  xy: 429, 3
+  size: 252, 221
+  orig: 252, 221
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 415, 3
-  size: 128, 127
-  orig: 128, 127
+  xy: 684, 3
+  size: 213, 212
+  orig: 213, 212
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 546, 3
-  size: 151, 124
-  orig: 151, 124
+  xy: 900, 3
+  size: 252, 206
+  orig: 252, 206
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 700, 3
-  size: 151, 122
-  orig: 151, 122
+  xy: 1155, 3
+  size: 252, 204
+  orig: 252, 204
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 854, 3
-  size: 151, 122
-  orig: 151, 122
+  xy: 1410, 3
+  size: 252, 204
+  orig: 252, 204
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 3, 145
-  size: 133, 121
-  orig: 133, 121
+  xy: 1665, 3
+  size: 222, 201
+  orig: 222, 201
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 139, 145
-  size: 145, 117
-  orig: 145, 117
+  xy: 3, 238
+  size: 241, 195
+  orig: 241, 195
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 287, 145
-  size: 135, 116
-  orig: 135, 116
+  xy: 247, 238
+  size: 226, 194
+  orig: 226, 194
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 425, 145
-  size: 149, 115
-  orig: 149, 115
+  xy: 476, 238
+  size: 249, 192
+  orig: 249, 192
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 577, 145
-  size: 151, 114
-  orig: 151, 114
+  xy: 728, 238
+  size: 252, 191
+  orig: 252, 191
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 731, 145
-  size: 132, 114
-  orig: 132, 114
+  xy: 983, 238
+  size: 221, 191
+  orig: 221, 191
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 866, 145
-  size: 141, 110
-  orig: 141, 110
+  xy: 1207, 238
+  size: 235, 184
+  orig: 235, 184
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 3, 269
-  size: 151, 107
-  orig: 151, 107
+  xy: 1445, 238
+  size: 252, 179
+  orig: 252, 179
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 157, 269
-  size: 151, 87
-  orig: 151, 87
+  xy: 1700, 238
+  size: 252, 145
+  orig: 252, 145
   offset: 0, 0
   index: -1

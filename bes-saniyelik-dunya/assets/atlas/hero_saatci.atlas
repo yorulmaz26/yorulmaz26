@@ -1,118 +1,118 @@
 
 hero_saatci.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 152, 141
-  orig: 152, 141
+  size: 253, 236
+  orig: 253, 236
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 158, 3
-  size: 152, 132
-  orig: 152, 132
+  xy: 259, 3
+  size: 253, 221
+  orig: 253, 221
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 313, 3
-  size: 139, 129
-  orig: 139, 129
+  xy: 515, 3
+  size: 233, 216
+  orig: 233, 216
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 455, 3
-  size: 152, 125
-  orig: 152, 125
+  xy: 751, 3
+  size: 253, 209
+  orig: 253, 209
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 610, 3
-  size: 131, 123
-  orig: 131, 123
+  xy: 1007, 3
+  size: 219, 205
+  orig: 219, 205
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 744, 3
-  size: 130, 122
-  orig: 130, 122
+  xy: 1229, 3
+  size: 217, 204
+  orig: 217, 204
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 147
-  size: 148, 121
-  orig: 148, 121
+  xy: 1449, 3
+  size: 247, 202
+  orig: 247, 202
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 154, 147
-  size: 132, 121
-  orig: 132, 121
+  xy: 1699, 3
+  size: 221, 201
+  orig: 221, 201
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 289, 147
-  size: 141, 120
-  orig: 141, 120
+  xy: 3, 242
+  size: 235, 200
+  orig: 235, 200
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 433, 147
-  size: 152, 119
-  orig: 152, 119
+  xy: 241, 242
+  size: 253, 199
+  orig: 253, 199
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 588, 147
-  size: 144, 119
-  orig: 144, 119
+  xy: 497, 242
+  size: 240, 199
+  orig: 240, 199
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 735, 147
-  size: 152, 118
-  orig: 152, 118
+  xy: 740, 242
+  size: 253, 197
+  orig: 253, 197
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 3, 271
-  size: 136, 118
-  orig: 136, 118
+  xy: 996, 242
+  size: 227, 197
+  orig: 227, 197
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 142, 271
-  size: 152, 116
-  orig: 152, 116
+  xy: 1226, 242
+  size: 253, 194
+  orig: 253, 194
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 297, 271
-  size: 144, 115
-  orig: 144, 115
+  xy: 1482, 242
+  size: 240, 192
+  orig: 240, 192
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 444, 271
-  size: 146, 105
-  orig: 146, 105
+  xy: 1725, 242
+  size: 244, 175
+  orig: 244, 175
   offset: 0, 0
   index: -1

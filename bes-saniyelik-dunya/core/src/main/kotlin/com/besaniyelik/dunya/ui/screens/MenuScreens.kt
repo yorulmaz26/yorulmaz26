@@ -130,6 +130,18 @@ class AvatarActor(private val game: BesSaniyelikDunya, private val sz: Float, va
     override fun act(delta: Float) { super.act(delta); t += delta }
     override fun draw(batch: com.badlogic.gdx.graphics.g2d.Batch, parentAlpha: Float) {
         val skin = Catalog.skin(skinId ?: game.profile.data.selectedSkin)
+        // küçük boyutlarda hafif önizleme karesi: 20 karakter aynı anda büyük atlaslarını yüklemez
+        if (width <= 140f) {
+            val th = a.heroThumb(skin.id, state == CharState.HAPPY)
+            if (th != null) {
+                val h = height * 0.92f; val w = h * th.regionWidth / th.regionHeight
+                val bob = kotlin.math.abs(kotlin.math.sin(t * 2.2f)) * height * 0.03f
+                batch.setColor(1f, 1f, 1f, parentAlpha * color.a)
+                batch.draw(th, x + (width - w) / 2f, y + bob, w, h)
+                batch.setColor(1f, 1f, 1f, 1f)
+                return
+            }
+        }
         val sz = if (a.heroFrames(skin.id) != null) width * 0.62f else width * 0.78f
         val cy = if (a.heroFrames(skin.id) != null) y + sz / 2f + height * 0.04f else y + height * 0.42f
         r.draw(batch, skin, x + width / 2, cy, sz, state, t, alpha = parentAlpha * color.a)
@@ -234,58 +246,146 @@ class MapSelectScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     }
 }
 
+/**
+ * Bölüm haritası: harita manzarası üzerinde kıvrılarak ilerleyen noktalı bir yol ve yol boyunca 50 yuvarlak bölüm düğmesi.
+ * Yatayda kaydırılır; arka plan kaydırmayla birlikte paralaks hareket eder. Her 5 bölümde bir alan tabelası vardır.
+ */
 class LevelSelectScreen(game: BesSaniyelikDunya, private val map: Int) : BaseScreen(game) {
-    init { background?.setMap(map) }
+    private lateinit var sp: ScrollPane
+    init {
+        background?.setMap(map)
+        background?.showRunner = false
+        background?.scrollOverride = { if (this::sp.isInitialized) sp.visualScrollX / 70f else 0f }
+    }
+
+    companion object {
+        const val SPACING = 168f
+        const val MARGIN = 220f
+    }
+
     override fun build() {
         game.audio.music("map_%02d".format(map))
         val d = game.profile.data
         val m = GameContent.maps[map - 1]
-        root.add(header(m.name)).growX().padTop(20f).row()
-        val list = Table()
-        for (area in 0 until 10) {
-            val first = m.firstLevel + area * GameContent.LEVELS_PER_AREA
-            val idea = GameContent.stageOf(first)
-            val no = GameContent.areaNumber(first)
-            val stars = (first until first + 5).sumOf { d.stars(it) }
-            val head = Table().apply { background = kit.patch("banner"); pad(10f, 24f, 14f, 24f) }
-            val ht = Table()
-            ht.add(kit.label("Alan $no: ${idea.title}", a.f28, Palette.INK, Align.left)).expandX().left()
-            ht.add(Image(a.ui("b_star"))).size(30f); ht.add(kit.label(" $stars/15", a.f22, Palette.INK_SOFT))
-            head.add(ht).width(540f).row()
-            head.add(kit.label(idea.desc, a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(540f).left()
-            val col = Table()
-            col.add(head).width(590f).padBottom(6f).row()
-            val grid = Table()
-            for (i in 0 until GameContent.LEVELS_PER_AREA) grid.add(levelButton(first + i, d)).size(108f, 126f).pad(4f)
-            col.add(grid)
-            list.add(col).pad(10f, 10f, 6f, 10f).top()
-            if (area % 2 == 1) list.row()
-        }
-        val sp = scroll(list)
-        root.add(sp).grow().padTop(8f)
-        // açık olan son bölüme kaydır
-        val target = ((d.highestUnlocked - m.firstLevel) / GameContent.LEVELS_PER_AREA).coerceIn(0, 9)
-        stage.addAction(Actions.delay(0.05f, Actions.run { sp.layout(); sp.scrollY = ((target / 2) * 250f).coerceAtMost(sp.maxY) }))
+        root.add(header(m.name)).growX().padTop(14f).row()
+        val path = LevelPath(this, d, m)
+        sp = ScrollPane(path).apply { setScrollingDisabled(false, true); fadeScrollBars = true; setOverscroll(true, false); setFlickScroll(true) }
+        root.add(sp).grow()
+        // şu anki bölüme kaydır
+        val cur = (d.highestUnlocked - m.firstLevel).coerceIn(0, 49)
+        stage.addAction(Actions.delay(0.05f, Actions.run {
+            sp.layout()
+            sp.scrollX = (MARGIN + cur * SPACING - sp.width / 2f).coerceIn(0f, sp.maxX)
+            sp.updateVisualScroll()
+        }))
     }
 
-    private fun levelButton(id: Int, d: SaveData): Actor {
-        val kind = GameContent.kindOf(id)
-        val unlocked = d.isUnlocked(id)
-        val color = when { !unlocked -> "gray"; kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL -> "pink"; kind == LevelKind.CHALLENGE -> "orange"; kind == LevelKind.TUTORIAL -> "turq"; else -> "yellow" }
-        val b = UiButton(kit.patch("btn_$color"), kit)
-        b.pad(6f, 4f, 16f, 4f)
-        if (unlocked) {
-            b.add(kit.label(((id - 1) % 50 + 1).toString(), a.f36o, Color.WHITE)).row()
-            b.add(kit.stars(d.stars(id), 28f)).padTop(2f)
-            if (kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL) b.add(Image(a.ui("b_crown"))).size(0f)
-        } else b.add(Image(a.ui("g_lock"))).size(50f)
-        b.onClick {
-            if (unlocked) LevelInfo.show(this, game, LevelRepository.level(id)) else toast("Bu bölüm henüz kilitli.", "g_lock_gray")
-        }
-        return b
+    fun openLevel(id: Int) {
+        if (game.profile.data.isUnlocked(id)) LevelInfo.show(this, game, LevelRepository.level(id)) else toast("Bu bölüm henüz kilitli.", "g_lock_gray")
     }
 
     override fun onBack() { game.go(MapSelectScreen(game)) }
+}
+
+/** Yol ve düğmeleri çizen, mutlak konumlu çocuklar barındıran grup. */
+class LevelPath(private val screen: LevelSelectScreen, private val d: SaveData, private val m: MapDef) : com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup() {
+    private val a = screen.game.assets
+    private val kit = screen.game.kit
+    private val pts = ArrayList<com.badlogic.gdx.math.Vector2>()
+    private val dot = a.ui("soft")
+    private var t = 0f
+    private val current = (d.highestUnlocked - m.firstLevel).coerceIn(0, 49)
+    private val currentNode = m.firstLevel + current
+
+    override fun getPrefWidth() = LevelSelectScreen.MARGIN * 2 + 49 * LevelSelectScreen.SPACING
+    override fun getPrefHeight() = 560f
+
+    init {
+        for (i in 0 until 50) {
+            val x = LevelSelectScreen.MARGIN + i * LevelSelectScreen.SPACING
+            // kıvrımlı yol: iki farklı dalganın toplamı, her haritada farklı bir şekil
+            val y = 270f + 120f * kotlin.math.sin(i * 0.55f + m.id) + 40f * kotlin.math.sin(i * 1.3f + m.id * 2f)
+            pts.add(com.badlogic.gdx.math.Vector2(x, y))
+        }
+        for (i in 0 until 50) addNode(i)
+        // alan tabelaları
+        for (area in 0 until 10) {
+            val i = area * GameContent.LEVELS_PER_AREA
+            val first = m.firstLevel + i
+            val idea = GameContent.stageOf(first)
+            val stars = (first until first + 5).sumOf { d.stars(it) }
+            val sign = Table().apply { background = kit.patch("banner"); pad(6f, 16f, 10f, 16f) }
+            sign.add(kit.label("Alan ${GameContent.areaNumber(first)}", a.f22, Palette.INK_SOFT)).row()
+            sign.add(kit.label(idea.title, a.f28, Palette.INK)).row()
+            sign.add(Table().apply { add(Image(a.ui("b_star"))).size(22f); add(kit.label(" $stars/15", a.f22, Palette.INK_SOFT)) })
+            sign.pack()
+            val p = pts[i]
+            val above = p.y < 300f
+            sign.setPosition(p.x - sign.width / 2f, if (above) p.y + 74f else p.y - 74f - sign.height)
+            addActor(sign)
+        }
+    }
+
+    private fun addNode(i: Int) {
+        val id = m.firstLevel + i
+        val kind = GameContent.kindOf(id)
+        val unlocked = d.isUnlocked(id)
+        val col = when { !unlocked -> "gray"; kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL -> "pink"; kind == LevelKind.CHALLENGE -> "orange"; kind == LevelKind.TUTORIAL -> "turq"; d.isCompleted(id) -> "yellow"; else -> "green" }
+        val big = kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL || kind == LevelKind.CHALLENGE
+        val size = if (big) 112f else 96f
+        val node = UiButton(com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable(a.ui("node_$col")), kit)
+        if (unlocked) node.add(kit.label(((id - 1) % 50 + 1).toString(), if (big) a.f48o else a.f36o, com.badlogic.gdx.graphics.Color.WHITE)).padBottom(4f)
+        else node.add(Image(a.ui("g_lock"))).size(size * 0.42f)
+        node.onClick { screen.openLevel(id) }
+        node.setSize(size, size)
+        node.setPosition(pts[i].x - size / 2f, pts[i].y - size / 2f)
+        addActor(node)
+        if (d.isCompleted(id)) {
+            val st = kit.stars(d.stars(id), 26f)
+            st.pack(); st.setPosition(pts[i].x - st.width / 2f, pts[i].y - size / 2f - 22f)
+            addActor(st)
+        }
+        if (kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL) {
+            val crown = Image(a.ui("b_crown")); crown.setSize(56f, 56f); crown.setPosition(pts[i].x - 28f, pts[i].y + size / 2f - 14f)
+            addActor(crown)
+        }
+        if (id == currentNode) {
+            val av = AvatarActor(screen.game, 96f, null, CharState.IDLE)
+            av.setSize(96f, 96f)
+            av.setPosition(pts[i].x - 48f, pts[i].y + size / 2f - 8f)
+            av.addAction(Actions.forever(Actions.sequence(Actions.moveBy(0f, 10f, 0.5f, com.badlogic.gdx.math.Interpolation.sine), Actions.moveBy(0f, -10f, 0.5f, com.badlogic.gdx.math.Interpolation.sine))))
+            addActor(av)
+        }
+    }
+
+    override fun act(delta: Float) { super.act(delta); t += delta }
+
+    override fun draw(batch: com.badlogic.gdx.graphics.g2d.Batch, parentAlpha: Float) {
+        // noktalı yol: düğümler arasında yumuşak eğri (Catmull-Rom); geçilen kısım altın, kalan beyaz
+        val tmp = com.badlogic.gdx.math.Vector2()
+        val spline = com.badlogic.gdx.math.CatmullRomSpline(pts.toTypedArray(), false)
+        val n = pts.size - 1
+        val steps = n * 9
+        for (k in 0..steps) {
+            val u = k / steps.toFloat()
+            spline.valueAt(tmp, u)
+            val seg = u * n
+            val done = seg < current
+            val px = x + tmp.x; val py = y + tmp.y
+            batch.setColor(0.15f, 0.22f, 0.35f, 0.35f * parentAlpha)
+            batch.draw(dot, px - 16f, py - 19f, 32f, 32f)
+            if (done) batch.setColor(1f, 0.82f, 0.25f, parentAlpha) else batch.setColor(1f, 1f, 1f, parentAlpha)
+            batch.draw(dot, px - 14f, py - 14f, 28f, 28f)
+        }
+        // şu anki bölümün etrafında nabız
+        val cp = pts[current]
+        val pulse = 1f + 0.12f * kotlin.math.sin(t * 5f)
+        batch.setColor(1f, 0.95f, 0.6f, 0.55f * parentAlpha)
+        val r = 82f * pulse
+        batch.draw(dot, x + cp.x - r, y + cp.y - r, r * 2, r * 2)
+        batch.setColor(1f, 1f, 1f, 1f)
+        super.draw(batch, parentAlpha)
+    }
 }
 
 class EndlessIntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {

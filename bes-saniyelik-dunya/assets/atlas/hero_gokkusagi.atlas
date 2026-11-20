@@ -1,118 +1,118 @@
 
 hero_gokkusagi.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 160, 152
-  orig: 160, 152
+  size: 268, 254
+  orig: 268, 254
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 166, 3
-  size: 160, 144
-  orig: 160, 144
+  xy: 274, 3
+  size: 268, 240
+  orig: 268, 240
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 329, 3
-  size: 150, 132
-  orig: 150, 132
+  xy: 545, 3
+  size: 250, 221
+  orig: 250, 221
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 482, 3
-  size: 160, 131
-  orig: 160, 131
+  xy: 798, 3
+  size: 268, 218
+  orig: 268, 218
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 645, 3
-  size: 139, 131
-  orig: 139, 131
+  xy: 1069, 3
+  size: 231, 218
+  orig: 231, 218
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 787, 3
-  size: 134, 123
-  orig: 134, 123
+  xy: 1303, 3
+  size: 224, 206
+  orig: 224, 206
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 3, 158
-  size: 140, 122
-  orig: 140, 122
+  xy: 1530, 3
+  size: 234, 204
+  orig: 234, 204
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 146, 158
-  size: 160, 121
-  orig: 160, 121
+  xy: 1767, 3
+  size: 268, 203
+  orig: 268, 203
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 309, 158
-  size: 156, 121
-  orig: 156, 121
+  xy: 3, 260
+  size: 260, 202
+  orig: 260, 202
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 468, 158
-  size: 142, 121
-  orig: 142, 121
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 613, 158
-  size: 160, 118
-  orig: 160, 118
+  xy: 266, 260
+  size: 238, 202
+  orig: 238, 202
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 776, 158
-  size: 149, 118
-  orig: 149, 118
+  xy: 507, 260
+  size: 249, 197
+  orig: 249, 197
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 759, 260
+  size: 268, 196
+  orig: 268, 196
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 3, 283
-  size: 144, 116
-  orig: 144, 116
+  xy: 1030, 260
+  size: 241, 193
+  orig: 241, 193
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 150, 283
-  size: 160, 115
-  orig: 160, 115
+  xy: 1274, 260
+  size: 268, 192
+  orig: 268, 192
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 313, 283
-  size: 144, 112
-  orig: 144, 112
+  xy: 1545, 260
+  size: 241, 187
+  orig: 241, 187
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 460, 283
-  size: 151, 97
-  orig: 151, 97
+  xy: 1789, 260
+  size: 252, 161
+  orig: 252, 161
   offset: 0, 0
   index: -1

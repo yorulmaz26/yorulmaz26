@@ -63,6 +63,13 @@ Bölüm 500: TAMAMLANDI (yıldız 3/3, altın 275, ölüm 0)
 
 Her haritadan bir bölüm; tamamlanma ekranı, XP, başarı ve seviye bildirimleri görsel olarak kontrol edildi (`docs/screenshots/`).
 
+## Görüntü kalitesi, bölüm haritası, ses
+
+* Kalite: karakter kareleri 200 piksel (telefonda küçültülerek keskin çizilir), arka planlar kaynak çözünürlüğünde 2048×1024 (önce 512 yükseklikti), gökyüzü kaynak genişliğinde 16:9 bant (önce 540 genişlikte, 3,5 kat büyütülüyordu). Bazı paralaks katmanlarında kalan gökyüzü artıklarının oluşturduğu düz kenarlı bantlar temizlendi. Bellek için büyük karakter atlaslarından en fazla 3'ü tutulur; listelerde hafif önizleme atlası kullanılır.
+* Bölüm haritası: masaüstünde kontrol edildi; bölüm düğmeleri açılıyor, şu anki bölüme otomatik kaydırılıyor.
+* Altın sesi: hacim 0,45 → 0,16 ve kare dalga yerine yumuşak çan tınısı. Açılıştaki "sunar" yazısı kaldırıldı.
+* APK 52 MB (yüksek çözünürlüklü görseller nedeniyle). Testler 39/39.
+
 ## Yatay ekrana geçiş
 
 Oyun yalnızca yatay olarak çalışır (manifestte `sensorLandscape`, APK'da doğrulandı). Arayüz 1280×720 sanal çözünürlüğe, oyun kamerası 21×11,8 karoya göre yeniden düzenlendi; 15 menü ekranı, oyun içi göstergeler, diyaloglar ve açılış animasyonu masaüstünde 960×540 pencerede kontrol edildi. Bölüm 1, 23, 61, 160, 215, 330, 420 ve 470 yatay ekranda arayüz üzerinden baştan sona oynatıldı (hepsi 3/3 yıldız, 0 ölüm). Testler 39/39.

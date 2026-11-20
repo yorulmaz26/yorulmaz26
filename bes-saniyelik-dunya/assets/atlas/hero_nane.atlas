@@ -1,118 +1,118 @@
 
 hero_nane.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f9
   rotate: false
   xy: 3, 3
-  size: 117, 144
-  orig: 117, 144
+  size: 196, 240
+  orig: 196, 240
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 123, 3
-  size: 100, 139
-  orig: 100, 139
+  xy: 202, 3
+  size: 168, 233
+  orig: 168, 233
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 226, 3
-  size: 108, 138
-  orig: 108, 138
+  xy: 373, 3
+  size: 181, 230
+  orig: 181, 230
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 337, 3
-  size: 97, 131
-  orig: 97, 131
+  xy: 557, 3
+  size: 163, 218
+  orig: 163, 218
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 437, 3
-  size: 107, 130
-  orig: 107, 130
+  xy: 723, 3
+  size: 179, 217
+  orig: 179, 217
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 547, 3
-  size: 104, 125
-  orig: 104, 125
+  xy: 905, 3
+  size: 174, 209
+  orig: 174, 209
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 654, 3
-  size: 97, 123
-  orig: 97, 123
+  xy: 1082, 3
+  size: 161, 206
+  orig: 161, 206
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 754, 3
-  size: 102, 121
-  orig: 102, 121
-  offset: 0, 0
-  index: -1
-f2
-  rotate: false
-  xy: 859, 3
-  size: 100, 117
-  orig: 100, 117
+  xy: 1246, 3
+  size: 170, 202
+  orig: 170, 202
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 150
-  size: 96, 117
-  orig: 96, 117
+  xy: 1419, 3
+  size: 160, 196
+  orig: 160, 196
+  offset: 0, 0
+  index: -1
+f2
+  rotate: false
+  xy: 1582, 3
+  size: 168, 195
+  orig: 168, 195
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 102, 150
-  size: 108, 116
-  orig: 108, 116
+  xy: 1753, 3
+  size: 180, 193
+  orig: 180, 193
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 213, 150
-  size: 100, 115
-  orig: 100, 115
+  xy: 3, 246
+  size: 168, 192
+  orig: 168, 192
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 316, 150
-  size: 101, 114
-  orig: 101, 114
+  xy: 174, 246
+  size: 169, 190
+  orig: 169, 190
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 420, 150
-  size: 105, 112
-  orig: 105, 112
+  xy: 346, 246
+  size: 175, 187
+  orig: 175, 187
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 528, 150
-  size: 111, 111
-  orig: 111, 111
+  xy: 524, 246
+  size: 185, 185
+  orig: 185, 185
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 642, 150
-  size: 94, 105
-  orig: 94, 105
+  xy: 712, 246
+  size: 157, 175
+  orig: 157, 175
   offset: 0, 0
   index: -1

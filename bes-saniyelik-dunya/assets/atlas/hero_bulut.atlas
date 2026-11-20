@@ -1,118 +1,118 @@
 
 hero_bulut.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f0
   rotate: false
   xy: 3, 3
-  size: 128, 144
-  orig: 128, 144
+  size: 214, 240
+  orig: 214, 240
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 134, 3
-  size: 157, 139
-  orig: 157, 139
+  xy: 220, 3
+  size: 262, 232
+  orig: 262, 232
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 294, 3
-  size: 124, 132
-  orig: 124, 132
+  xy: 485, 3
+  size: 208, 220
+  orig: 208, 220
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 421, 3
-  size: 157, 131
-  orig: 157, 131
+  xy: 696, 3
+  size: 262, 219
+  orig: 262, 219
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 581, 3
-  size: 126, 130
-  orig: 126, 130
+  xy: 961, 3
+  size: 210, 217
+  orig: 210, 217
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 710, 3
-  size: 135, 124
-  orig: 135, 124
+  xy: 1174, 3
+  size: 225, 207
+  orig: 225, 207
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 848, 3
-  size: 153, 123
-  orig: 153, 123
+  xy: 1402, 3
+  size: 255, 206
+  orig: 255, 206
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 150
-  size: 149, 123
-  orig: 149, 123
+  xy: 1660, 3
+  size: 249, 205
+  orig: 249, 205
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 155, 150
-  size: 128, 121
-  orig: 128, 121
+  xy: 3, 246
+  size: 214, 202
+  orig: 214, 202
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 286, 150
-  size: 132, 120
-  orig: 132, 120
+  xy: 220, 246
+  size: 221, 200
+  orig: 221, 200
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 421, 150
-  size: 157, 119
-  orig: 157, 119
+  xy: 444, 246
+  size: 262, 198
+  orig: 262, 198
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 581, 150
-  size: 137, 118
-  orig: 137, 118
+  xy: 709, 246
+  size: 229, 197
+  orig: 229, 197
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 721, 150
-  size: 116, 118
-  orig: 116, 118
-  offset: 0, 0
-  index: -1
-f11
-  rotate: false
-  xy: 840, 150
-  size: 157, 116
-  orig: 157, 116
+  xy: 941, 246
+  size: 193, 197
+  orig: 193, 197
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 3, 276
-  size: 143, 116
-  orig: 143, 116
+  xy: 1137, 246
+  size: 239, 194
+  orig: 239, 194
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 1379, 246
+  size: 262, 193
+  orig: 262, 193
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 149, 276
-  size: 157, 108
-  orig: 157, 108
+  xy: 1644, 246
+  size: 262, 180
+  orig: 262, 180
   offset: 0, 0
   index: -1

@@ -213,7 +213,7 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             }
         }
 
-        // 6) ışık süzmesi ve "sunar"
+        // 6) ışık süzmesi
         val sw = (t - (tFlip + 0.25f)) / 0.6f
         if (sw in 0f..1f) {
             b.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE)
@@ -221,12 +221,6 @@ class IntroScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             b.setColor(1f, 1f, 1f, 0.35f * sin(sw * Math.PI.toFloat()))
             b.draw(soft, x - 60f, py(300f) - 260f, 120f, 300f)
             b.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
-        }
-        val su = ((t - tFlip) / 0.4f).coerceIn(0f, 1f)
-        if (su > 0f) {
-            a.f28.setColor(0.75f, 0.85f, 1f, su)
-            a.f28.draw(b, "sunar", 0f, py(520f) - 10f, vw, com.badlogic.gdx.utils.Align.center, false)
-            a.f28.setColor(Color.WHITE)
         }
         particles.draw(b)
         b.setColor(1f, 1f, 1f, 1f)

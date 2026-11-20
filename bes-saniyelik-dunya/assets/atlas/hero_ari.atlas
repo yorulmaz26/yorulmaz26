@@ -1,118 +1,118 @@
 
 hero_ari.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 146, 137
-  orig: 146, 137
+  size: 244, 229
+  orig: 244, 229
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 152, 3
-  size: 135, 127
-  orig: 135, 127
+  xy: 250, 3
+  size: 226, 212
+  orig: 226, 212
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 290, 3
-  size: 146, 126
-  orig: 146, 126
-  offset: 0, 0
-  index: -1
-f11
-  rotate: false
-  xy: 439, 3
-  size: 146, 123
-  orig: 146, 123
-  offset: 0, 0
-  index: -1
-f0
-  rotate: false
-  xy: 588, 3
-  size: 120, 123
-  orig: 120, 123
+  xy: 479, 3
+  size: 244, 211
+  orig: 244, 211
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 711, 3
-  size: 117, 123
-  orig: 117, 123
+  xy: 726, 3
+  size: 196, 206
+  orig: 196, 206
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 925, 3
+  size: 244, 205
+  orig: 244, 205
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 1172, 3
+  size: 200, 205
+  orig: 200, 205
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 831, 3
-  size: 119, 122
-  orig: 119, 122
+  xy: 1375, 3
+  size: 199, 204
+  orig: 199, 204
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 143
-  size: 129, 121
-  orig: 129, 121
+  xy: 1577, 3
+  size: 215, 201
+  orig: 215, 201
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 135, 143
-  size: 124, 121
-  orig: 124, 121
-  offset: 0, 0
-  index: -1
-f9
-  rotate: false
-  xy: 262, 143
-  size: 139, 118
-  orig: 139, 118
+  xy: 1795, 3
+  size: 207, 201
+  orig: 207, 201
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 404, 143
-  size: 132, 118
-  orig: 132, 118
+  xy: 3, 235
+  size: 220, 198
+  orig: 220, 198
   offset: 0, 0
   index: -1
-f12
+f9
   rotate: false
-  xy: 539, 143
-  size: 146, 117
-  orig: 146, 117
+  xy: 226, 235
+  size: 231, 197
+  orig: 231, 197
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 688, 143
-  size: 117, 117
-  orig: 117, 117
+  xy: 460, 235
+  size: 196, 196
+  orig: 196, 196
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 659, 235
+  size: 244, 195
+  orig: 244, 195
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 808, 143
-  size: 123, 114
-  orig: 123, 114
+  xy: 906, 235
+  size: 205, 190
+  orig: 205, 190
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 3, 267
-  size: 146, 104
-  orig: 146, 104
+  xy: 1114, 235
+  size: 244, 173
+  orig: 244, 173
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 152, 267
-  size: 112, 95
-  orig: 112, 95
+  xy: 1361, 235
+  size: 186, 158
+  orig: 186, 158
   offset: 0, 0
   index: -1

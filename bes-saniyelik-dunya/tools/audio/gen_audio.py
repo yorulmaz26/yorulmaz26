@@ -42,7 +42,8 @@ def note(f, d, kind='square', a=0.005, r=0.08, vol=1.0):
 
 # ---------------- efektler
 save('jump', osc('square', sweep(330, 720, 0.16), 0.16) * env(int(SR * .16), .003, .1) * 0.6)
-save('coin', cat(note(988, .06, 'square', r=.04), note(1319, .18, 'square', r=.16)) * 0.6)
+# yumuşak çan tınısı (kare dalga kulağı yoruyordu)
+save('coin', cat(note(1319, .05, 'bell', r=.04), note(1760, .16, 'bell', r=.15)) * 0.5)
 save('star', cat(*[note(f, .07, 'bell', r=.06) for f in (784, 988, 1175, 1568)], note(2093, .3, 'bell', r=.28)))
 x = osc('sine', sweep(300, 1200, .35), .35) * env(int(SR * .35), .02, .2)
 save('rule', x + cat(np.zeros(int(SR * .2)), note(1568, .15, 'bell', r=.14)) * 0.7)

@@ -150,7 +150,7 @@ class CharacterRenderer(private val a: Assets) {
 
     companion object {
         /** tools/art/user_art.py HERO_FRAME_H ile aynı: bekleme/koşu karesinin piksel yüksekliği. */
-        const val HERO_REF_PX = 120f
+        const val HERO_REF_PX = 200f
 
         fun stateFor(grounded: Boolean, vyUp: Float): CharState = when {
             grounded -> CharState.RUN

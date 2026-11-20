@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Disposable
 import com.besaniyelik.dunya.progress.Settings
 
 enum class Sfx(val file: String, val vol: Float = 1f) {
-    JUMP("jump", 0.5f), COIN("coin", 0.45f), STAR("star", 0.8f), RULE("rule", 0.8f), WARN("warn", 0.5f),
+    JUMP("jump", 0.5f), COIN("coin", 0.16f), STAR("star", 0.8f), RULE("rule", 0.8f), WARN("warn", 0.5f),
     COMPLETE("complete", 0.9f), FAIL("fail", 0.8f), CLICK("click", 0.6f), REWARD("reward", 0.8f), SPRING("spring", 0.7f),
     POWERUP("powerup", 0.7f), CHECKPOINT("checkpoint", 0.7f), LAND("land", 0.35f), DEATH("death", 0.7f), BOOST("boost", 0.6f), SHIELD("shield", 0.7f),
 }

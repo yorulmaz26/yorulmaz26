@@ -78,6 +78,10 @@ ui/         UiKit (UIManager: buton, panel, çubuk), screens/ (20 ekran), Assets
 
 `IntroScreen` uygulama açılışında ~7,4 sn oynar (dokununca geçilir). `tools/intro/extract_logo.py` şirket logosunu (`tools/intro/magic_lumos_logo.jpg`) parlaklık anahtarlamasıyla katmanlara ayırır: 10 harf, SOFTWARE'in 10 karakteri, köşeli parantezler, kod işaretleri ve kenarları yumuşatılmış devre çizgileri (`assets/intro/`, konumlar `layout.txt`). Animasyon oyunun diliyle kurgulanmıştır: devre çizgileri merkezden açılır → harfler zıplayarak düşer → oyunun karakteri harflerin üstünde zıplar → "Lumos" ışık patlaması → SOFTWARE ters yer çekimiyle baş aşağı gelip düzelir → ışık süzmesi ve "sunar".
 
+## Bölüm haritası
+
+`LevelSelectScreen` her haritanın 50 bölümünü manzara üzerinde kıvrılan noktalı bir yol (Catmull-Rom eğrisi) boyunca yuvarlak düğmeler olarak gösterir; yatayda kaydırılır ve arka plan kaydırmayla paralaks hareket eder. Geçilen yol altın rengindedir, şu anki bölümde karakter durur ve nabız efekti vardır; her 5 bölümde bir alan tabelası, finallerde taç bulunur.
+
 ## Kullanıcı görselleri (art_input/)
 
 Oyunun görselleri yapay zekâ ile üretilmiş kullanıcı görselleridir (`art_input/parca1..4`, `art_input/duzeltilmis`; sonra gelen öncekinin yerine geçer). `tools/art/user_art.py` bunları otomatik işler, `tools/art/gen_art.py` atlaslara paketler:

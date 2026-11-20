@@ -1,118 +1,118 @@
 
 hero_kaos.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 150, 140
-  orig: 150, 140
+  size: 250, 234
+  orig: 250, 234
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 156, 3
-  size: 150, 132
-  orig: 150, 132
+  xy: 256, 3
+  size: 250, 221
+  orig: 250, 221
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 309, 3
-  size: 137, 126
-  orig: 137, 126
+  xy: 509, 3
+  size: 229, 211
+  orig: 229, 211
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 449, 3
-  size: 131, 125
-  orig: 131, 125
+  xy: 741, 3
+  size: 219, 208
+  orig: 219, 208
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 583, 3
-  size: 150, 124
-  orig: 150, 124
+  xy: 963, 3
+  size: 250, 206
+  orig: 250, 206
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 736, 3
-  size: 136, 124
-  orig: 136, 124
+  xy: 1216, 3
+  size: 226, 206
+  orig: 226, 206
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 875, 3
-  size: 146, 122
-  orig: 146, 122
+  xy: 1445, 3
+  size: 244, 203
+  orig: 244, 203
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 3, 146
-  size: 144, 121
-  orig: 144, 121
+  xy: 1692, 3
+  size: 241, 202
+  orig: 241, 202
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 150, 146
-  size: 139, 121
-  orig: 139, 121
+  xy: 3, 240
+  size: 231, 201
+  orig: 231, 201
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 292, 146
-  size: 150, 120
-  orig: 150, 120
+  xy: 237, 240
+  size: 250, 200
+  orig: 250, 200
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 445, 146
-  size: 143, 118
-  orig: 143, 118
+  xy: 490, 240
+  size: 239, 197
+  orig: 239, 197
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 591, 146
-  size: 142, 116
-  orig: 142, 116
+  xy: 732, 240
+  size: 237, 194
+  orig: 237, 194
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 736, 146
-  size: 150, 114
-  orig: 150, 114
+  xy: 972, 240
+  size: 250, 191
+  orig: 250, 191
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 3, 270
-  size: 138, 114
-  orig: 138, 114
+  xy: 1225, 240
+  size: 230, 190
+  orig: 230, 190
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 144, 270
-  size: 150, 103
-  orig: 150, 103
+  xy: 1458, 240
+  size: 250, 173
+  orig: 250, 173
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 297, 270
-  size: 143, 100
-  orig: 143, 100
+  xy: 1711, 240
+  size: 238, 168
+  orig: 238, 168
   offset: 0, 0
   index: -1

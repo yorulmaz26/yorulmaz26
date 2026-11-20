@@ -1,118 +1,118 @@
 
 hero_tavsan.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f0
   rotate: false
   xy: 3, 3
-  size: 118, 139
-  orig: 118, 139
+  size: 198, 232
+  orig: 198, 232
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 124, 3
-  size: 120, 134
-  orig: 120, 134
+  xy: 204, 3
+  size: 200, 223
+  orig: 200, 223
   offset: 0, 0
   index: -1
 f13
   rotate: false
-  xy: 247, 3
-  size: 147, 130
-  orig: 147, 130
+  xy: 407, 3
+  size: 245, 217
+  orig: 245, 217
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 397, 3
-  size: 147, 126
-  orig: 147, 126
+  xy: 655, 3
+  size: 245, 211
+  orig: 245, 211
   offset: 0, 0
   index: -1
 f14
   rotate: false
-  xy: 547, 3
-  size: 147, 126
-  orig: 147, 126
+  xy: 903, 3
+  size: 245, 211
+  orig: 245, 211
   offset: 0, 0
   index: -1
 f7
   rotate: false
-  xy: 697, 3
-  size: 132, 123
-  orig: 132, 123
+  xy: 1151, 3
+  size: 220, 206
+  orig: 220, 206
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 832, 3
-  size: 140, 121
-  orig: 140, 121
-  offset: 0, 0
-  index: -1
-f15
-  rotate: false
-  xy: 3, 145
-  size: 136, 121
-  orig: 136, 121
-  offset: 0, 0
-  index: -1
-f4
-  rotate: false
-  xy: 142, 145
-  size: 127, 121
-  orig: 127, 121
+  xy: 1374, 3
+  size: 233, 202
+  orig: 233, 202
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 272, 145
-  size: 122, 121
-  orig: 122, 121
+  xy: 1610, 3
+  size: 204, 202
+  orig: 204, 202
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 1817, 3
+  size: 228, 201
+  orig: 228, 201
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 3, 238
+  size: 213, 201
+  orig: 213, 201
   offset: 0, 0
   index: -1
 f1
   rotate: false
-  xy: 397, 145
-  size: 121, 121
-  orig: 121, 121
+  xy: 219, 238
+  size: 201, 201
+  orig: 201, 201
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 521, 145
-  size: 144, 120
-  orig: 144, 120
+  xy: 423, 238
+  size: 241, 200
+  orig: 241, 200
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 668, 145
-  size: 121, 120
-  orig: 121, 120
-  offset: 0, 0
-  index: -1
-f10
-  rotate: false
-  xy: 792, 145
-  size: 147, 117
-  orig: 147, 117
+  xy: 667, 238
+  size: 202, 200
+  orig: 202, 200
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 3, 269
-  size: 147, 117
-  orig: 147, 117
+  xy: 872, 238
+  size: 245, 196
+  orig: 245, 196
+  offset: 0, 0
+  index: -1
+f10
+  rotate: false
+  xy: 1120, 238
+  size: 245, 195
+  orig: 245, 195
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 153, 269
-  size: 139, 112
-  orig: 139, 112
+  xy: 1368, 238
+  size: 232, 187
+  orig: 232, 187
   offset: 0, 0
   index: -1

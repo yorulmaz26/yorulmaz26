@@ -1,118 +1,118 @@
 
 hero_penguen.png
-size: 1024, 512
+size: 2048, 512
 format: RGBA8888
 filter: MipMapLinearLinear,Linear
 repeat: none
 f14
   rotate: false
   xy: 3, 3
-  size: 152, 145
-  orig: 152, 145
+  size: 254, 243
+  orig: 254, 243
   offset: 0, 0
   index: -1
 f8
   rotate: false
-  xy: 158, 3
-  size: 145, 138
-  orig: 145, 138
-  offset: 0, 0
-  index: -1
-f13
-  rotate: false
-  xy: 306, 3
-  size: 152, 131
-  orig: 152, 131
-  offset: 0, 0
-  index: -1
-f7
-  rotate: false
-  xy: 461, 3
-  size: 134, 131
-  orig: 134, 131
+  xy: 260, 3
+  size: 242, 230
+  orig: 242, 230
   offset: 0, 0
   index: -1
 f6
   rotate: false
-  xy: 598, 3
-  size: 130, 131
-  orig: 130, 131
+  xy: 505, 3
+  size: 216, 219
+  orig: 216, 219
+  offset: 0, 0
+  index: -1
+f13
+  rotate: false
+  xy: 724, 3
+  size: 254, 218
+  orig: 254, 218
+  offset: 0, 0
+  index: -1
+f7
+  rotate: false
+  xy: 981, 3
+  size: 223, 218
+  orig: 223, 218
   offset: 0, 0
   index: -1
 f11
   rotate: false
-  xy: 731, 3
-  size: 152, 125
-  orig: 152, 125
+  xy: 1207, 3
+  size: 254, 208
+  orig: 254, 208
   offset: 0, 0
   index: -1
 f10
   rotate: false
-  xy: 3, 151
-  size: 152, 123
-  orig: 152, 123
+  xy: 1464, 3
+  size: 254, 205
+  orig: 254, 205
   offset: 0, 0
   index: -1
 f4
   rotate: false
-  xy: 158, 151
-  size: 128, 122
-  orig: 128, 122
+  xy: 1721, 3
+  size: 213, 203
+  orig: 213, 203
   offset: 0, 0
   index: -1
 f5
   rotate: false
-  xy: 289, 151
-  size: 148, 121
-  orig: 148, 121
-  offset: 0, 0
-  index: -1
-f1
-  rotate: false
-  xy: 440, 151
-  size: 127, 121
-  orig: 127, 121
+  xy: 3, 249
+  size: 248, 202
+  orig: 248, 202
   offset: 0, 0
   index: -1
 f3
   rotate: false
-  xy: 570, 151
-  size: 127, 121
-  orig: 127, 121
+  xy: 254, 249
+  size: 211, 202
+  orig: 211, 202
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 468, 249
+  size: 212, 201
+  orig: 212, 201
   offset: 0, 0
   index: -1
 f9
   rotate: false
-  xy: 700, 151
-  size: 152, 120
-  orig: 152, 120
+  xy: 683, 249
+  size: 254, 200
+  orig: 254, 200
   offset: 0, 0
   index: -1
 f12
   rotate: false
-  xy: 855, 151
-  size: 152, 120
-  orig: 152, 120
+  xy: 940, 249
+  size: 254, 200
+  orig: 254, 200
   offset: 0, 0
   index: -1
 f15
   rotate: false
-  xy: 3, 277
-  size: 140, 120
-  orig: 140, 120
+  xy: 1197, 249
+  size: 233, 200
+  orig: 233, 200
   offset: 0, 0
   index: -1
 f2
   rotate: false
-  xy: 146, 277
-  size: 128, 120
-  orig: 128, 120
+  xy: 1433, 249
+  size: 213, 200
+  orig: 213, 200
   offset: 0, 0
   index: -1
 f0
   rotate: false
-  xy: 277, 277
-  size: 124, 120
-  orig: 124, 120
+  xy: 1649, 249
+  size: 206, 200
+  orig: 206, 200
   offset: 0, 0
   index: -1

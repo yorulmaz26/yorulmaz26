@@ -44,7 +44,7 @@ class Theme(val map: Int) : Disposable {
     override fun dispose() { atlas.dispose(); far.dispose(); mid.dispose(); skyTexture?.dispose() }
 
     companion object {
-        /** Paralaks katmanlarının özgün en-boy oranı (dokular 2'nin kuvveti boyutunda, 2048x512, saklanır). */
+        /** Paralaks katmanlarının özgün en-boy oranı (dokular 2'nin kuvveti boyutunda, 2048x1024, saklanır). */
         const val PARALLAX_ASPECT = 3.2f
 
         /** JPG renk + PNG alfa maskesinden saydam doku kurar (APK boyutunu küçük tutmak için). */
@@ -127,18 +127,32 @@ class Assets : Disposable {
     fun has(name: String) = ui.findRegion(name) != null || game.findRegion(name) != null
     fun patch(name: String): NinePatch = patchCache.getOrPut(name) { ui.createPatch(name).apply { scale(1f, 1f) } }
 
-    private val heroAtlases = HashMap<String, TextureAtlas?>()
-    private val heroFrames = HashMap<String, List<TextureRegion>?>()
+    // Büyük karakter atlasları: en son kullanılan 3 tanesi bellekte tutulur (LRU), diğerleri serbest bırakılır.
+    private val heroAtlases = object : LinkedHashMap<String, TextureAtlas>(8, 0.75f, true) {}
+    private val heroFrames = HashMap<String, List<TextureRegion>>()
+    private val heroMissing = HashSet<String>()
+    private val heroThumbs: TextureAtlas? = Gdx.files.internal("atlas/hero_thumbs.atlas").takeIf { it.exists() }?.let { TextureAtlas(it) }
 
     /** Karakter görünümünün 16 animasyon karesi (yoksa null → parçalı çizim kullanılır). */
-    fun heroFrames(skinId: String): List<TextureRegion>? = heroFrames.getOrPut(skinId) {
+    fun heroFrames(skinId: String): List<TextureRegion>? {
+        if (skinId in heroMissing) return null
+        heroAtlases[skinId]?.let { return heroFrames[skinId] }
         val f = Gdx.files.internal("atlas/hero_$skinId.atlas")
-        if (!f.exists()) null else {
-            val at = TextureAtlas(f)
-            heroAtlases[skinId] = at
-            (0 until 16).map { at.findRegion("f$it") }
+        if (!f.exists()) { heroMissing.add(skinId); return null }
+        val at = TextureAtlas(f)
+        heroAtlases[skinId] = at
+        val frames = (0 until 16).map { at.findRegion("f$it") }
+        heroFrames[skinId] = frames
+        while (heroAtlases.size > 3) {
+            val eldest = heroAtlases.keys.first()
+            heroAtlases.remove(eldest)?.dispose()
+            heroFrames.remove(eldest)
         }
+        return frames
     }
+
+    /** Liste ve küçük simgeler için hafif önizleme karesi (bekleme ya da sevinme). */
+    fun heroThumb(skinId: String, happy: Boolean = false): TextureRegion? = heroThumbs?.findRegion((if (happy) "h_" else "t_") + skinId)
 
     fun theme(map: Int): Theme {
         val t = theme
@@ -148,7 +162,7 @@ class Assets : Disposable {
     }
 
     override fun dispose() {
-        ui.dispose(); game.dispose(); theme?.dispose(); heroAtlases.values.forEach { it?.dispose() }
+        ui.dispose(); game.dispose(); theme?.dispose(); heroAtlases.values.forEach { it.dispose() }; heroThumbs?.dispose()
         listOf(f22, f28, f36, f48, f36o, f48o, f72o).forEach { it.dispose() }
     }
 }

@@ -288,9 +288,51 @@ b_p_guard
   orig: 160, 160
   offset: 0, 0
   index: -1
-sign
+node_yellow
   rotate: false
   xy: 1470, 738
+  size: 136, 136
+  orig: 136, 136
+  offset: 0, 0
+  index: -1
+node_orange
+  rotate: false
+  xy: 1609, 738
+  size: 136, 136
+  orig: 136, 136
+  offset: 0, 0
+  index: -1
+node_pink
+  rotate: false
+  xy: 1748, 738
+  size: 136, 136
+  orig: 136, 136
+  offset: 0, 0
+  index: -1
+node_turq
+  rotate: false
+  xy: 1887, 738
+  size: 136, 136
+  orig: 136, 136
+  offset: 0, 0
+  index: -1
+node_gray
+  rotate: false
+  xy: 3, 901
+  size: 136, 136
+  orig: 136, 136
+  offset: 0, 0
+  index: -1
+node_green
+  rotate: false
+  xy: 142, 901
+  size: 136, 136
+  orig: 136, 136
+  offset: 0, 0
+  index: -1
+sign
+  rotate: false
+  xy: 281, 901
   size: 160, 120
   split: 34, 34, 34, 36
   orig: 160, 120
@@ -298,7 +340,7 @@ sign
   index: -1
 btn_yellow
   rotate: false
-  xy: 1633, 738
+  xy: 444, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -306,7 +348,7 @@ btn_yellow
   index: -1
 btn_orange
   rotate: false
-  xy: 1756, 738
+  xy: 567, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -314,7 +356,7 @@ btn_orange
   index: -1
 btn_pink
   rotate: false
-  xy: 1879, 738
+  xy: 690, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -322,7 +364,7 @@ btn_pink
   index: -1
 btn_turq
   rotate: false
-  xy: 3, 901
+  xy: 813, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -330,7 +372,7 @@ btn_turq
   index: -1
 btn_green
   rotate: false
-  xy: 126, 901
+  xy: 936, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -338,7 +380,7 @@ btn_green
   index: -1
 btn_blue
   rotate: false
-  xy: 249, 901
+  xy: 1059, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -346,7 +388,7 @@ btn_blue
   index: -1
 btn_purple
   rotate: false
-  xy: 372, 901
+  xy: 1182, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -354,7 +396,7 @@ btn_purple
   index: -1
 btn_white
   rotate: false
-  xy: 495, 901
+  xy: 1305, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -362,7 +404,7 @@ btn_white
   index: -1
 btn_gray
   rotate: false
-  xy: 618, 901
+  xy: 1428, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -370,7 +412,7 @@ btn_gray
   index: -1
 btn_red
   rotate: false
-  xy: 741, 901
+  xy: 1551, 901
   size: 120, 120
   split: 43, 43, 43, 48
   orig: 120, 120
@@ -378,14 +420,14 @@ btn_red
   index: -1
 b_star_gray
   rotate: false
-  xy: 864, 901
+  xy: 1674, 901
   size: 104, 104
   orig: 104, 104
   offset: 0, 0
   index: -1
 banner
   rotate: false
-  xy: 971, 901
+  xy: 1781, 901
   size: 128, 96
   split: 42, 42, 42, 42
   orig: 128, 96
@@ -393,7 +435,7 @@ banner
   index: -1
 card
   rotate: false
-  xy: 1102, 901
+  xy: 1912, 901
   size: 96, 96
   split: 30, 30, 30, 30
   orig: 96, 96
@@ -401,7 +443,7 @@ card
   index: -1
 card_sel
   rotate: false
-  xy: 1201, 901
+  xy: 3, 1040
   size: 96, 96
   split: 30, 30, 30, 30
   orig: 96, 96
@@ -409,154 +451,154 @@ card_sel
   index: -1
 g_play
   rotate: false
-  xy: 1300, 901
+  xy: 102, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_pause
   rotate: false
-  xy: 1399, 901
+  xy: 201, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_home
   rotate: false
-  xy: 1498, 901
+  xy: 300, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_retry
   rotate: false
-  xy: 1597, 901
+  xy: 399, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_next
   rotate: false
-  xy: 1696, 901
+  xy: 498, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_back
   rotate: false
-  xy: 1795, 901
+  xy: 597, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_close
   rotate: false
-  xy: 1894, 901
+  xy: 696, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_check
   rotate: false
-  xy: 3, 1024
+  xy: 795, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_plus
   rotate: false
-  xy: 102, 1024
+  xy: 894, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_settings
   rotate: false
-  xy: 201, 1024
+  xy: 993, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_music
   rotate: false
-  xy: 300, 1024
+  xy: 1092, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_music_off
   rotate: false
-  xy: 399, 1024
+  xy: 1191, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_sound
   rotate: false
-  xy: 498, 1024
+  xy: 1290, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_sound_off
   rotate: false
-  xy: 597, 1024
+  xy: 1389, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_vibrate
   rotate: false
-  xy: 696, 1024
+  xy: 1488, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_lock
   rotate: false
-  xy: 795, 1024
+  xy: 1587, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_info
   rotate: false
-  xy: 894, 1024
+  xy: 1686, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_tap
   rotate: false
-  xy: 993, 1024
+  xy: 1785, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_hold
   rotate: false
-  xy: 1092, 1024
+  xy: 1884, 1040
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_run
   rotate: false
-  xy: 1191, 1024
+  xy: 3, 1139
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 g_lock_gray
   rotate: false
-  xy: 1290, 1024
+  xy: 102, 1139
   size: 96, 96
   orig: 96, 96
   offset: 0, 0
   index: -1
 tab
   rotate: false
-  xy: 1389, 1024
+  xy: 201, 1139
   size: 96, 80
   split: 30, 30, 30, 30
   orig: 96, 80
@@ -564,7 +606,7 @@ tab
   index: -1
 tab_sel
   rotate: false
-  xy: 1488, 1024
+  xy: 300, 1139
   size: 96, 80
   split: 30, 30, 30, 30
   orig: 96, 80
@@ -572,7 +614,7 @@ tab_sel
   index: -1
 toggle_on
   rotate: false
-  xy: 1587, 1024
+  xy: 399, 1139
   size: 120, 64
   split: 32, 32, 32, 32
   orig: 120, 64
@@ -580,7 +622,7 @@ toggle_on
   index: -1
 toggle_off
   rotate: false
-  xy: 1710, 1024
+  xy: 522, 1139
   size: 120, 64
   split: 32, 32, 32, 32
   orig: 120, 64
@@ -588,7 +630,7 @@ toggle_off
   index: -1
 chip
   rotate: false
-  xy: 1833, 1024
+  xy: 645, 1139
   size: 80, 64
   split: 32, 32, 32, 32
   orig: 80, 64
@@ -596,7 +638,7 @@ chip
   index: -1
 chip_dark
   rotate: false
-  xy: 1916, 1024
+  xy: 728, 1139
   size: 80, 64
   split: 32, 32, 32, 32
   orig: 80, 64
@@ -604,14 +646,14 @@ chip_dark
   index: -1
 soft
   rotate: false
-  xy: 3, 1123
+  xy: 811, 1139
   size: 64, 64
   orig: 64, 64
   offset: 0, 0
   index: -1
 bar_bg
   rotate: false
-  xy: 70, 1123
+  xy: 878, 1139
   size: 64, 40
   split: 20, 20, 20, 20
   orig: 64, 40
@@ -619,7 +661,7 @@ bar_bg
   index: -1
 bar_fill
   rotate: false
-  xy: 137, 1123
+  xy: 945, 1139
   size: 64, 40
   split: 20, 20, 20, 20
   orig: 64, 40
@@ -627,7 +669,7 @@ bar_fill
   index: -1
 bar_fill_y
   rotate: false
-  xy: 204, 1123
+  xy: 1012, 1139
   size: 64, 40
   split: 20, 20, 20, 20
   orig: 64, 40
@@ -635,7 +677,7 @@ bar_fill_y
   index: -1
 bar_fill_b
   rotate: false
-  xy: 271, 1123
+  xy: 1079, 1139
   size: 64, 40
   split: 20, 20, 20, 20
   orig: 64, 40
@@ -643,7 +685,7 @@ bar_fill_b
   index: -1
 white
   rotate: false
-  xy: 338, 1123
+  xy: 1146, 1139
   size: 16, 16
   split: 4, 4, 4, 4
   orig: 16, 16
