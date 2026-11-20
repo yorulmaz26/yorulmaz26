@@ -78,6 +78,17 @@ ui/         UiKit (UIManager: buton, panel, çubuk), screens/ (20 ekran), Assets
 
 `IntroScreen` uygulama açılışında ~7,4 sn oynar (dokununca geçilir). `tools/intro/extract_logo.py` şirket logosunu (`tools/intro/magic_lumos_logo.jpg`) parlaklık anahtarlamasıyla katmanlara ayırır: 10 harf, SOFTWARE'in 10 karakteri, köşeli parantezler, kod işaretleri ve kenarları yumuşatılmış devre çizgileri (`assets/intro/`, konumlar `layout.txt`). Animasyon oyunun diliyle kurgulanmıştır: devre çizgileri merkezden açılır → harfler zıplayarak düşer → oyunun karakteri harflerin üstünde zıplar → "Lumos" ışık patlaması → SOFTWARE ters yer çekimiyle baş aşağı gelip düzelir → ışık süzmesi ve "sunar".
 
+## Kullanıcı görselleri (art_input/)
+
+Oyunun görselleri yapay zekâ ile üretilmiş kullanıcı görselleridir (`art_input/parca1..4`, `art_input/duzeltilmis`; sonra gelen öncekinin yerine geçer). `tools/art/user_art.py` bunları otomatik işler, `tools/art/gen_art.py` atlaslara paketler:
+
+* Kalan beyaz arka plan ve yapay "dama deseni" artıkları temizlenir; zemin üst karolarının üstü şeffaf yapılır; kesim artığı koyu bantlar ve beyaz kenarlar kırpılır.
+* Karolar çapraz geçişle dikişsiz hale getirilir; tavan karosu zemin üst karosunun dikey çevrilmiş halidir.
+* Şeffaf olmayan paralaks katmanlarının üstü gökyüzüne eritilir; arka planlar 2048×512 JPG + PNG alfa maskesi olarak saklanır (2'nin kuvveti boyut, küçük APK) ve çizimde 3,2:1 oranı geri kurulur.
+* Karakter sayfaları (8×2 kare) kırpılır, ayak çizgisine hizalanır, bütün görünümler aynı boya ölçeklenir; her görünüm ayrı küçük atlastadır (`hero_<id>.atlas`), oyunda yalnızca gerekenler yüklenir.
+* Süs nesneleri ayrıştırılıp tutarlı dünya ölçeğine (110 piksel = 1 karo) getirilir.
+* Kullanıcı görseli olmayan ya da kullanılamayan öğeler (altın animasyonu, güçlendirme baloncuğu, bazı arayüz parçaları) programatik çizimlerle tamamlanır.
+
 ## Grafik ve ses kaynakları
 
 Bütün grafikler `tools/art` betikleriyle programatik çizilir (4× süper örnekleme ile kenar yumuşatma); bütün sesler/müzikler `tools/audio` ile sentezlenir. Tek dış varlık Nunito yazı tipidir (SIL Open Font License, `assets/fonts/OFL-Nunito.txt`). Lisans sorunu yoktur.

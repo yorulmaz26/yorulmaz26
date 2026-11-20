@@ -20,7 +20,7 @@ class SplashScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         game.audio.music("menu")
         val logo = Image(a.ui("logo"))
         root.add().height(330f).row()
-        root.add(logo).size(640f, 300f).row()
+        root.add(logo).size(640f, 640f * logo.prefHeight / logo.prefWidth).row()
         logo.popIn(0.1f)
         root.add(kit.label("Her 5 saniyede kurallar değişir!", a.f36o, Color.WHITE)).padTop(40f).row()
         val bar = kit.bar(0f, "bar_fill_y")
@@ -66,7 +66,7 @@ class MainMenuScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         root.add(top).growX().padTop(24f).row()
 
         val logo = Image(a.ui("logo"))
-        root.add(logo).size(600f, 280f).padTop(20f).row()
+        root.add(logo).size(600f, 600f * logo.prefHeight / logo.prefWidth).padTop(20f).row()
         logo.popIn()
 
         val next = d.highestUnlocked.coerceAtMost(500)
@@ -122,12 +122,15 @@ class MainMenuScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
 
 /** Seçili karakteri UI içinde çizen aktör. */
 class AvatarActor(private val game: BesSaniyelikDunya, private val sz: Float, var skinId: String? = null, var state: CharState = CharState.IDLE) : Actor() {
+    private val a = game.assets
     private val r = CharacterRenderer(game.assets)
     private var t = 0f
     override fun act(delta: Float) { super.act(delta); t += delta }
     override fun draw(batch: com.badlogic.gdx.graphics.g2d.Batch, parentAlpha: Float) {
         val skin = Catalog.skin(skinId ?: game.profile.data.selectedSkin)
-        r.draw(batch, skin, x + width / 2, y + height * 0.42f, width * 0.78f, state, t, alpha = parentAlpha * color.a)
+        val sz = if (a.heroFrames(skin.id) != null) width * 0.62f else width * 0.78f
+        val cy = if (a.heroFrames(skin.id) != null) y + sz / 2f + height * 0.04f else y + height * 0.42f
+        r.draw(batch, skin, x + width / 2, cy, sz, state, t, alpha = parentAlpha * color.a)
         batch.setColor(1f, 1f, 1f, 1f)
     }
 }

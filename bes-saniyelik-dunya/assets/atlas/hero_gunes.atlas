@@ -1,0 +1,118 @@
+
+hero_gunes.png
+size: 1024, 512
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+f14
+  rotate: false
+  xy: 3, 3
+  size: 147, 135
+  orig: 147, 135
+  offset: 0, 0
+  index: -1
+f13
+  rotate: false
+  xy: 153, 3
+  size: 147, 128
+  orig: 147, 128
+  offset: 0, 0
+  index: -1
+f7
+  rotate: false
+  xy: 303, 3
+  size: 121, 124
+  orig: 121, 124
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 427, 3
+  size: 133, 122
+  orig: 133, 122
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 563, 3
+  size: 147, 121
+  orig: 147, 121
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 713, 3
+  size: 147, 121
+  orig: 147, 121
+  offset: 0, 0
+  index: -1
+f5
+  rotate: false
+  xy: 863, 3
+  size: 143, 121
+  orig: 143, 121
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 3, 141
+  size: 122, 121
+  orig: 122, 121
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 128, 141
+  size: 117, 121
+  orig: 117, 121
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 248, 141
+  size: 130, 118
+  orig: 130, 118
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 381, 141
+  size: 129, 118
+  orig: 129, 118
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 513, 141
+  size: 141, 117
+  orig: 141, 117
+  offset: 0, 0
+  index: -1
+f2
+  rotate: false
+  xy: 657, 141
+  size: 127, 113
+  orig: 127, 113
+  offset: 0, 0
+  index: -1
+f6
+  rotate: false
+  xy: 787, 141
+  size: 141, 110
+  orig: 141, 110
+  offset: 0, 0
+  index: -1
+f10
+  rotate: false
+  xy: 3, 265
+  size: 147, 107
+  orig: 147, 107
+  offset: 0, 0
+  index: -1
+f8
+  rotate: false
+  xy: 153, 265
+  size: 116, 94
+  orig: 116, 94
+  offset: 0, 0
+  index: -1

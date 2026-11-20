@@ -29,6 +29,8 @@ class CharacterRenderer(private val a: Assets) {
      */
     fun draw(batch: Batch, skin: Skin, cx: Float, cy: Float, size: Float, state: CharState, t: Float,
              flip: Boolean = false, squash: Float = 0f, rot: Float = 0f, alpha: Float = 1f, look: Float = 1f) {
+        val frames = a.heroFrames(skin.id)
+        if (frames != null) { drawSprite(batch, frames, cx, cy, size, state, t, flip, squash, rot, alpha); return }
         val k = size / 160f
         var sx = 1f; var sy = 1f
         var bob = 0f
@@ -97,6 +99,38 @@ class CharacterRenderer(private val a: Assets) {
         batch.setColor(1f, 1f, 1f, 1f)
     }
 
+    /**
+     * Kare animasyonlu karakter. Sayfa düzeni: 0-5 koşu, 6 kalkış, 7 yükseliş, 8 tepe, 9 düşüş, 10 iniş,
+     * 11 hasar, 12 yenilgi, 13 sevinç, 14 güç, 15 bekleme. Kareler ayak çizgisine (alt orta) hizalıdır.
+     * (cx, cy) ve size eski parçalı çizimle aynı anlamdadır: size kenarlı kutunun merkezi ve boyutu; ayaklar kutunun altında.
+     */
+    private fun drawSprite(batch: Batch, frames: List<TextureRegion>, cx: Float, cy: Float, size: Float, state: CharState, t: Float,
+                           flip: Boolean, squash: Float, rot: Float, alpha: Float) {
+        val idx = when (state) {
+            CharState.RUN -> ((t * 13f).toInt() % 6)
+            CharState.JUMP -> 7
+            CharState.FALL -> if (squash > 0.35f) 10 else 9
+            CharState.HURT -> 11
+            CharState.DEAD -> 12
+            CharState.HAPPY -> 13
+            CharState.IDLE -> 15
+        }.let { if (state == CharState.RUN && squash > 0.45f) 10 else it }
+        val r = frames[idx] ?: frames[0]
+        val k = size * 1.45f / HERO_REF_PX
+        val sq = 1f - squash * 0.12f
+        val w = r.regionWidth * k * (2f - sq)
+        val h = r.regionHeight * k * sq
+        val sign = if (flip) -1f else 1f
+        val feetY = cy - sign * size / 2f
+        batch.setColor(1f, 1f, 1f, alpha)
+        if (rot != 0f) {
+            batch.draw(r, cx - w / 2f, feetY, w / 2f, (cy - feetY), w, h * sign, 1f, 1f, rot)
+        } else {
+            batch.draw(r, cx - w / 2f, feetY, w, h * sign)
+        }
+        batch.setColor(1f, 1f, 1f, 1f)
+    }
+
     private fun accessory(batch: Batch, name: String, alpha: Float) {
         if (name == "none" || name == "scarf" || name == "star_glasses") return
         val r = a.g("acc_$name")
@@ -115,6 +149,9 @@ class CharacterRenderer(private val a: Assets) {
         draw(batch, skin, cx, cy, size, state, t)
 
     companion object {
+        /** tools/art/user_art.py HERO_FRAME_H ile aynı: bekleme/koşu karesinin piksel yüksekliği. */
+        const val HERO_REF_PX = 120f
+
         fun stateFor(grounded: Boolean, vyUp: Float): CharState = when {
             grounded -> CharState.RUN
             vyUp > 1f -> CharState.JUMP

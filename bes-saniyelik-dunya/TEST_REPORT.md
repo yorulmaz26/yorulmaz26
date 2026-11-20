@@ -63,6 +63,10 @@ Bölüm 500: TAMAMLANDI (yıldız 3/3, altın 275, ölüm 0)
 
 Her haritadan bir bölüm; tamamlanma ekranı, XP, başarı ve seviye bildirimleri görsel olarak kontrol edildi (`docs/screenshots/`).
 
+## Kullanıcı görsellerinin entegrasyonu
+
+220 kullanıcı görseli otomatik kontrol edildi (boyut, şeffaflık, kenar dikişi). Bozuk gelen 34 dosya yeniden üretildi ve kullanıldı; 10 tavan karosu yerine zeminin çevrilmiş hali kullanıldı. Altın animasyonu ve güçlendirme baloncuğu yarı saydam geldiği için programatik çizimler korundu. Masaüstü turunda her haritadan bir bölüm yeni görsellerle baştan sona oynatıldı (hepsi 3/3 yıldız, 0 ölüm); testler 39/39 geçti. APK 32 MB.
+
 ## Açılış animasyonu
 
 Masaüstünde (Xvfb + OpenGL) açılıştan oyunun splash ekranına kesintisiz geçiş doğrulandı; kare kare kayıt `docs/intro_animasyon.gif`. Gerilen beyaz bölgenin kenar yumuşaması nedeniyle oluşan açık renkli çerçeve ve portre ekranda devre katmanının boş kalması düzeltildi.

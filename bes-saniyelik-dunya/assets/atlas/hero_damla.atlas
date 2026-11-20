@@ -1,0 +1,118 @@
+
+hero_damla.png
+size: 1024, 512
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+f0
+  rotate: false
+  xy: 3, 3
+  size: 127, 146
+  orig: 127, 146
+  offset: 0, 0
+  index: -1
+f14
+  rotate: false
+  xy: 133, 3
+  size: 155, 131
+  orig: 155, 131
+  offset: 0, 0
+  index: -1
+f8
+  rotate: false
+  xy: 291, 3
+  size: 122, 131
+  orig: 122, 131
+  offset: 0, 0
+  index: -1
+f7
+  rotate: false
+  xy: 416, 3
+  size: 124, 127
+  orig: 124, 127
+  offset: 0, 0
+  index: -1
+f13
+  rotate: false
+  xy: 543, 3
+  size: 152, 125
+  orig: 152, 125
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 698, 3
+  size: 129, 125
+  orig: 129, 125
+  offset: 0, 0
+  index: -1
+f2
+  rotate: false
+  xy: 830, 3
+  size: 138, 124
+  orig: 138, 124
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 3, 152
+  size: 155, 121
+  orig: 155, 121
+  offset: 0, 0
+  index: -1
+f5
+  rotate: false
+  xy: 161, 152
+  size: 153, 119
+  orig: 153, 119
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 317, 152
+  size: 139, 119
+  orig: 139, 119
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 459, 152
+  size: 146, 118
+  orig: 146, 118
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 608, 152
+  size: 131, 114
+  orig: 131, 114
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 742, 152
+  size: 155, 109
+  orig: 155, 109
+  offset: 0, 0
+  index: -1
+f6
+  rotate: false
+  xy: 3, 276
+  size: 139, 105
+  orig: 139, 105
+  offset: 0, 0
+  index: -1
+f10
+  rotate: false
+  xy: 145, 276
+  size: 155, 96
+  orig: 155, 96
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 303, 276
+  size: 150, 82
+  orig: 150, 82
+  offset: 0, 0
+  index: -1

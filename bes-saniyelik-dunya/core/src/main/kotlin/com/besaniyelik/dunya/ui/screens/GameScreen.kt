@@ -148,7 +148,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             p.add(kit.label(tutorialDetail(tut), a.f22, Palette.INK_SOFT, wrap = true)).width(520f).padTop(10f).row()
             game.profile.markTutorialSeen("m_" + tut.name)
         } else if (level?.id == 1) {
-            p.add(Image(a.ui("logo"))).size(420f, 196f).row()
+            val lg = Image(a.ui("logo")); p.add(lg).size(420f, 420f * lg.prefHeight / lg.prefWidth).row()
             p.add(kit.label("Karakterin kendiliğinden koşar.\nEkrana dokun: zıpla.\nBasılı tut: daha yükseğe zıpla.\nHer 5 saniyede dünyanın kuralları değişir!", a.f28, Palette.INK, wrap = true)).width(520f).padTop(10f).row()
         } else {
             p.add(kit.label(if (endless) "Sonsuz Dünya" else level!!.name, a.f48, Palette.INK, wrap = true)).width(540f).row()

@@ -1,0 +1,118 @@
+
+hero_cilek.png
+size: 1024, 512
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+f8
+  rotate: false
+  xy: 3, 3
+  size: 117, 132
+  orig: 117, 132
+  offset: 0, 0
+  index: -1
+f14
+  rotate: false
+  xy: 123, 3
+  size: 157, 130
+  orig: 157, 130
+  offset: 0, 0
+  index: -1
+f7
+  rotate: false
+  xy: 283, 3
+  size: 122, 129
+  orig: 122, 129
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 408, 3
+  size: 126, 123
+  orig: 126, 123
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 537, 3
+  size: 124, 123
+  orig: 124, 123
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 664, 3
+  size: 124, 123
+  orig: 124, 123
+  offset: 0, 0
+  index: -1
+f2
+  rotate: false
+  xy: 791, 3
+  size: 131, 121
+  orig: 131, 121
+  offset: 0, 0
+  index: -1
+f13
+  rotate: false
+  xy: 3, 138
+  size: 152, 120
+  orig: 152, 120
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 158, 138
+  size: 129, 120
+  orig: 129, 120
+  offset: 0, 0
+  index: -1
+f5
+  rotate: false
+  xy: 290, 138
+  size: 128, 118
+  orig: 128, 118
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 421, 138
+  size: 143, 116
+  orig: 143, 116
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 567, 138
+  size: 114, 113
+  orig: 114, 113
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 684, 138
+  size: 160, 109
+  orig: 160, 109
+  offset: 0, 0
+  index: -1
+f6
+  rotate: false
+  xy: 847, 138
+  size: 141, 106
+  orig: 141, 106
+  offset: 0, 0
+  index: -1
+f10
+  rotate: false
+  xy: 3, 261
+  size: 160, 92
+  orig: 160, 92
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 166, 261
+  size: 147, 77
+  orig: 147, 77
+  offset: 0, 0
+  index: -1

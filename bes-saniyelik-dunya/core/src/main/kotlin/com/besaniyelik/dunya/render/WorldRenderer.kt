@@ -61,6 +61,7 @@ class WorldRenderer(
     private val coins = (0 until 6).map { a.g("coin_$it") }
     private val star = a.g("star_item"); private val piece = a.g("piece_item"); private val bubble = a.g("bubble"); private val glow = a.g("pt_glow")
     private val dust = a.g("pt_dust"); private val sparkle = a.g("pt_sparkle"); private val starP = a.g("pt_star"); private val confetti = a.g("pt_confetti")
+    private val haze = a.ui("white").let { TextureRegion(it, 6, 6, 4, 4) }
     private val ring = a.g("pt_ring"); private val line = a.g("pt_line"); private val arrow = a.g("arrow")
     private val confettiColors = listOf(Color.valueOf("FF6F91"), Color.valueOf("FFD54F"), Color.valueOf("58D6D0"), Color.valueOf("73D65C"), Color.valueOf("B388FF"), Color.valueOf("FF9F43"))
 
@@ -128,7 +129,7 @@ class WorldRenderer(
                     sim.pads.any { abs(it.def.x - x) < 2.5f } || sim.solids.any { it.def.type != SolidType.GROUND && it.def.type != SolidType.CEILING && x > it.def.x - 1.5f && x < it.def.x + it.def.w + 1.5f && abs((if (down) it.def.y + it.def.h else it.def.y) - surface) < 5f }
                 if (!near && rnd.nextFloat() < 0.75f) {
                     val r = theme.decor[rnd.nextInt(theme.decor.size)]
-                    val sc = (0.0075f + rnd.nextFloat() * 0.002f)
+                    val sc = (1f / 110f) * (0.9f + rnd.nextFloat() * 0.2f)
                     val w = r.regionWidth * sc; val h = r.regionHeight * sc
                     decors.add(Decor(r, x - w / 2, if (down) surface + 0.08f else surface - 0.08f, w, h, down))
                 }
@@ -163,9 +164,15 @@ class WorldRenderer(
         val vw = viewport.worldWidth; val vh = viewport.worldHeight
         val left = camX - vw / 2; val bottom = CAM_Y - vh / 2; val top = CAM_Y + vh / 2
         batch.setColor(1f, 1f, 1f, 1f)
-        batch.draw(theme.sky, left - 0.1f, bottom - 0.1f, vw + 0.2f, vh + 0.2f)
+        theme.drawSky(batch, left - 0.1f, bottom - 0.1f, vw + 0.2f, vh + 0.2f)
+        // uzak katman soluk (atmosfer derinliği), yakın katman tam renk; üstüne hafif pus: ön plan okunaklı kalır
+        batch.setColor(1f, 1f, 1f, 0.8f)
         parallax(batch, theme.far, left, vw, -1.2f, 9.5f, 0.12f)
+        batch.setColor(1f, 1f, 1f, 1f)
         parallax(batch, theme.mid, left, vw, -1.8f, 7.2f, 0.3f)
+        batch.setColor(1f, 1f, 1f, 0.24f)
+        batch.draw(haze, left - 0.1f, bottom - 0.1f, vw + 0.2f, vh + 0.2f)
+        batch.setColor(1f, 1f, 1f, 1f)
         val x0 = left - 1f; val x1 = left + vw + 1f
         for (d in decors) {
             if (d.x + d.w < x0 || d.x > x1) continue
@@ -187,7 +194,7 @@ class WorldRenderer(
     }
 
     private fun parallax(batch: Batch, tex: Texture, left: Float, vw: Float, y: Float, h: Float, factor: Float) {
-        val texW = h * tex.width / tex.height.toFloat()
+        val texW = h * Theme.PARALLAX_ASPECT
         val u0 = left * factor / texW
         val u1 = u0 + vw / texW
         batch.draw(tex, left, y, vw, h, u0, 1f, u1, 0f)
@@ -254,17 +261,31 @@ class WorldRenderer(
         }
     }
 
+    /** Havada duran platform: görselin kendi oranıyla, yürünen yüzey çarpışma kutusunun yüzeyine hizalı.
+     *  Tavan tarafındaki (ters yer çekimi) platformlar dikeyde çevrilir. */
     private fun drawBlock(batch: Batch, x: Float, y: Float, w: Float, h: Float) {
-        val capW = min(0.5f, w / 2f)
-        batch.draw(theme.blockL.texture, x, y, capW, h, theme.blockL.u, theme.blockL.v2, theme.blockL.u + (theme.blockL.u2 - theme.blockL.u) * capW, theme.blockL.v)
-        var cx = x + capW
-        while (cx < x + w - capW - 0.001f) {
-            val cw = min(1f, x + w - capW - cx)
-            batch.draw(theme.blockM.texture, cx, y, cw, h, theme.blockM.u, theme.blockM.v2, theme.blockM.u + (theme.blockM.u2 - theme.blockM.u) * cw, theme.blockM.v)
+        val L = theme.blockL; val M = theme.blockM; val R = theme.blockR
+        val unitPx = M.regionWidth.toFloat()
+        val vh = max(h, M.regionHeight / unitPx)
+        val down = y + h / 2f > Physics.CEIL / 2f
+        val yy = if (down) y else y + h - vh
+        var capL = min(w / 2f, L.regionWidth / unitPx)
+        var capR = min(w / 2f, R.regionWidth / unitPx)
+        fun part(r: TextureRegion, px: Float, pw: Float, uFrac0: Float, uFrac1: Float, rh: Float) {
+            val u0 = r.u + (r.u2 - r.u) * uFrac0; val u1 = r.u + (r.u2 - r.u) * uFrac1
+            val ph = vh * rh
+            val py = if (down) y else y + h - ph
+            if (down) batch.draw(r.texture, px, py, pw, ph, u0, r.v, u1, r.v2) else batch.draw(r.texture, px, py, pw, ph, u0, r.v2, u1, r.v)
+        }
+        val rl = L.regionHeight / M.regionHeight.toFloat(); val rr = R.regionHeight / M.regionHeight.toFloat()
+        part(L, x, capL, 0f, 1f, rl)
+        var cx = x + capL
+        while (cx < x + w - capR - 0.001f) {
+            val cw = min(1f, x + w - capR - cx)
+            part(M, cx, cw, 0f, cw, 1f)
             cx += 1f
         }
-        val r = theme.blockR
-        batch.draw(r.texture, x + w - capW, y, capW, h, r.u2 - (r.u2 - r.u) * capW, r.v2, r.u2, r.v)
+        part(R, x + w - capR, capR, 0f, 1f, rr)
     }
 
     private fun drawPads(batch: Batch, x0: Float, x1: Float) {
@@ -275,8 +296,9 @@ class WorldRenderer(
             when (d.type) {
                 PadType.SPRING -> {
                     val r = if (p.anim > 0f) spring1 else spring0
-                    val h = 0.88f
-                    if (d.dir > 0) batch.draw(r, d.x - 0.05f, d.y - 0.05f, d.w + 0.1f, h) else batch.draw(r, d.x - 0.05f, d.y + 0.05f, d.w + 0.1f, -h)
+                    val w = d.w + 0.2f
+                    val h = min(1.2f, w * r.regionHeight / r.regionWidth.toFloat())
+                    if (d.dir > 0) batch.draw(r, d.x - 0.1f, d.y - 0.05f, w, h) else batch.draw(r, d.x - 0.1f, d.y + 0.05f, w, -h)
                 }
                 PadType.BOOST -> {
                     val pulse = 0.85f + 0.15f * sin(time * 10f)
@@ -295,10 +317,12 @@ class WorldRenderer(
             val ph = sim.phases.lastOrNull { it.x <= cp }
             val down = ph != null && RuleEffects.of(ph.rules).gravitySign < 0
             val r = if (passed) flag1 else flag0
-            if (down) batch.draw(r, cp - 0.3f, Physics.CEIL, 0.75f, -1.6f) else batch.draw(r, cp - 0.3f, 0f, 0.75f, 1.6f)
+            val fw = 1.6f * r.regionWidth / r.regionHeight.toFloat()
+            if (down) batch.draw(r, cp - fw * 0.4f, Physics.CEIL, fw, -1.6f) else batch.draw(r, cp - fw * 0.4f, 0f, fw, 1.6f)
         }
         if (sim.goalX < x1 + 3f && sim.goalX > x0 - 4f) {
-            batch.draw(goal, sim.goalX - 1.4f, -0.05f, 3f, 3.95f)
+            val gh = 3.95f; val gw = gh * goal.regionWidth / goal.regionHeight.toFloat()
+            batch.draw(goal, sim.goalX - gw / 2f, -0.05f, gw, gh)
         }
     }
 

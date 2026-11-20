@@ -3,7 +3,7 @@ import os, sys, time
 from PIL import Image
 sys.path.insert(0, os.path.dirname(__file__))
 from common import Packer, Canvas, hexc, shade
-import ui_art, game_art, theme_art
+import ui_art, game_art, theme_art, user_art
 
 assets = sys.argv[1]
 res = sys.argv[2]
@@ -12,6 +12,52 @@ ui_art.FONT = font
 out = os.path.join(assets, 'atlas')
 os.makedirs(out, exist_ok=True)
 t0 = time.time()
+n_user = user_art.init(os.path.join(assets, '..', 'art_input'))
+print('kullanıcı görseli:', n_user)
+
+# ---------------- kullanıcı görselleri: atlas bölge adı -> işlenmiş görsel
+BTN = {'yellow': 'yellow', 'orange': 'orange', 'pink': 'pink', 'turq': 'turquoise', 'green': 'green', 'blue': 'blue',
+       'purple': 'purple', 'white': 'white', 'gray': 'grey', 'red': 'red'}
+ICON = {'coin': 'coin', 'gem': 'gem', 'star': 'star', 'star_empty': 'star_empty', 'heart': 'heart', 'heart_empty': 'heart_empty',
+        'trophy': 'trophy', 'gift': 'gift', 'calendar': 'calendar', 'scroll': 'missions', 'puzzle': 'collection', 'person': 'profile',
+        'bag': 'shop', 'map': 'map', 'infinity': 'endless', 'crown': 'crown', 'bolt': 'lightning'}
+MECH = {'m_normal': 'normal', 'm_gravity': 'gravity', 'm_fast': 'fast', 'm_ice': 'ice', 'm_ghost': 'ghost', 'm_bouncy': 'bouncy',
+        'm_small': 'small', 'm_control': 'control', 'm_slow': 'slow', 'm_shift': 'shift'}
+POWER = {'p_shield': 'shield', 'p_magnet': 'magnet', 'p_double': 'double_jump', 'p_invincible': 'invincible', 'p_life': 'extra_life',
+         'p_coinx2': 'coin_x2', 'p_finder': 'star_finder', 'p_guard': 'checkpoint_guard'}
+OBJ = {'spike': ('spike.png', 256), 'saw': ('saw.png', 384), 'spring_0': ('spring_idle.png', 256), 'spring_1': ('spring_pressed.png', 256),
+       'boost': ('boost.png', 512), 'flag_0': ('checkpoint_off.png', 384), 'flag_1': ('checkpoint_on.png', 384), 'goal': ('goal.png', 640),
+       'chaser': ('chaos_wall.png', 384), 'tile_ghost': ('platform_ghost.png', 256), 'tile_shift': ('platform_shift.png', 256),
+       'tile_move': ('platform_move.png', 256), 'star_item': ('star.png', 256), 'piece_item': ('piece.png', 256)}
+# Not: kullanıcının altın sayfası ve güçlendirme baloncuğu yarı saydam/soluk geldi; mevcut çizimler kullanılır.
+COINS = None
+
+
+def override(atlas, name, img, split):
+    if atlas == 'ui' and name.startswith('btn_') and name[4:] in BTN:
+        return user_art.button_patch('button_%s.png' % BTN[name[4:]])
+    if atlas == 'ui' and name == 'panel':
+        return user_art.panel_patch()
+    if name.startswith('g_') and user_art.has('glyph_%s.png' % name[2:]):
+        return user_art.ui_plain('glyph_%s.png' % name[2:], 96), split
+    if name.startswith('b_'):
+        k = name[2:]
+        f = ('icon_%s.png' % ICON[k]) if k in ICON else ('mech_%s.png' % MECH[k]) if k in MECH else ('power_%s.png' % POWER[k]) if k in POWER else None
+        if f and user_art.has(f):
+            return user_art.ui_plain(f, 160 if atlas == 'ui' else 128), split
+    if atlas == 'ui' and name == 'logo' and user_art.has('game_logo.png'):
+        im = user_art.obj('game_logo.png', 1000)
+        return im, None
+    if atlas == 'game' and name in OBJ:
+        f, sz = OBJ[name]
+        im = user_art.obj(f, sz)
+        if im is not None: return im, None
+    if atlas == 'game' and name.startswith('coin_') and COINS:
+        return COINS[int(name[5:])], None
+    return None
+
+
+Packer.OVERRIDE = override
 
 # ---------------- UI
 p = Packer('ui', 2048, filt='Linear,Linear')
@@ -65,19 +111,58 @@ for b in ['p_shield', 'p_magnet', 'p_double', 'p_invincible', 'p_life', 'p_coinx
 print('game sayfa:', g.write(out))
 
 # ---------------- temalar
+from PIL import ImageOps
+bgdir = os.path.join(assets, 'bg'); os.makedirs(bgdir, exist_ok=True)
 for mid, th in theme_art.THEMES.items():
     tp = Packer('theme_%02d' % mid, 2048, filt='MipMapLinearLinear,Linear')
-    tp.add('top', theme_art.tile_top(th, mid * 3), extrude=2)
-    tp.add('fill', theme_art.tile_fill(th, mid * 3 + 1), extrude=2)
-    tp.add('ceil', theme_art.tile_top(th, mid * 3 + 2, ceiling=True), extrude=2)
-    for k, v in theme_art.block_parts(th).items(): tp.add('block_' + k, v, extrude=1)
-    tp.add('low', theme_art.low_tile(th), extrude=2)
-    for i, d in enumerate(th['decor']): tp.add('decor_%d' % i, theme_art.decor(d, th, mid * 10 + i))
+    top = user_art.ground_top(mid)
+    fill = user_art.ground_fill(mid)
+    tp.add('top', top if top else theme_art.tile_top(th, mid * 3), extrude=2)
+    tp.add('fill', fill if fill else theme_art.tile_fill(th, mid * 3 + 1), extrude=2)
+    ceil = ImageOps.flip(top) if top else theme_art.tile_top(th, mid * 3 + 2, ceiling=True)
+    tp.add('ceil', ceil, extrude=2)
+    parts = user_art.platform_parts(mid)
+    if parts:
+        for k, v in zip(('l', 'm', 'r'), parts): tp.add('block_' + k, v, extrude=1)
+    else:
+        for k, v in theme_art.block_parts(th).items(): tp.add('block_' + k, v, extrude=1)
+    tp.add('low', ceil if top else theme_art.low_tile(th), extrude=2)
+    props = user_art.decor_props(mid)
+    if props:
+        for i in range(6): tp.add('decor_%d' % i, props[i % len(props)])
+    else:
+        for i, d in enumerate(th['decor']): tp.add('decor_%d' % i, theme_art.decor(d, th, mid * 10 + i))
     tp.add('sky', theme_art.sky_strip(th))
     tp.write(out)
+    sk = user_art.sky(mid)
+    skp = os.path.join(bgdir, '%02d_sky.jpg' % mid)
+    if sk: sk.save(skp, quality=86, optimize=True)
+    elif os.path.exists(skp): os.remove(skp)
     for layer in ('far', 'mid'):
-        theme_art.background(th, layer, mid).save(os.path.join(out, 'bg_%02d_%s.png' % (mid, layer)), optimize=True)
-    print('tema', mid, th['name'])
+        r = user_art.parallax(mid, layer)
+        if r:
+            r[0].save(os.path.join(bgdir, '%02d_%s.jpg' % (mid, layer)), quality=84, optimize=True)
+            r[1].save(os.path.join(bgdir, '%02d_%s_a.png' % (mid, layer)), optimize=True)
+        else:
+            img = theme_art.background(th, layer, mid).resize((2048, 512), Image.LANCZOS)
+            img.convert('RGB').save(os.path.join(bgdir, '%02d_%s.jpg' % (mid, layer)), quality=90)
+            img.split()[3].save(os.path.join(bgdir, '%02d_%s_a.png' % (mid, layer)), optimize=True)
+    print('tema', mid, th['name'], 'kullanıcı' if top else 'programatik')
+
+# ---------------- karakter kareleri
+import progress_skins
+# her görünüm ayrı küçük atlasta: oyunda yalnızca seçili karakter yüklenir
+for f in os.listdir(out):
+    if f.startswith('heroes') or f.startswith('hero_'): os.remove(os.path.join(out, f))
+nh = 0
+for sid in progress_skins.SKINS:
+    fr = user_art.hero_frames(sid)
+    if not fr: continue
+    nh += 1
+    hp = Packer('hero_' + sid, 1024, filt='MipMapLinearLinear,Linear')
+    for i, f in enumerate(fr): hp.add('f%d' % i, f)
+    hp.write(out)
+print('karakter görünümü:', nh)
 
 # ---------------- uygulama simgesi
 def launcher(sz, round_=False):
@@ -101,9 +186,34 @@ def launcher(sz, round_=False):
     d.text((150 * k * 4, 44 * k * 4), "5", font=f, fill=(255, 255, 255, 255), anchor='mm', stroke_width=int(7 * k * 4), stroke_fill=hexc('#FF6F91'))
     return c.done()
 
+USER_ICON = user_art.load('play_icon.png') if user_art.has('play_icon.png') else None
+
+
+def round_mask(im):
+    from PIL import ImageDraw
+    m = Image.new('L', (im.width * 4, im.height * 4), 0)
+    ImageDraw.Draw(m).ellipse((0, 0, m.width - 1, m.height - 1), fill=255)
+    im = im.copy(); im.putalpha(m.resize(im.size, Image.LANCZOS)); return im
+
+
+def rounded(im, r=0.22):
+    from PIL import ImageDraw
+    m = Image.new('L', (im.width * 4, im.height * 4), 0)
+    ImageDraw.Draw(m).rounded_rectangle((0, 0, m.width - 1, m.height - 1), radius=int(m.width * r), fill=255)
+    im = im.copy(); im.putalpha(m.resize(im.size, Image.LANCZOS)); return im
+
+
 for dens, sz in [('mdpi', 48), ('hdpi', 72), ('xhdpi', 96), ('xxhdpi', 144), ('xxxhdpi', 192)]:
     dd = os.path.join(res, 'mipmap-' + dens); os.makedirs(dd, exist_ok=True)
-    launcher(sz).save(os.path.join(dd, 'ic_launcher.png'))
-    launcher(sz, True).save(os.path.join(dd, 'ic_launcher_round.png'))
-launcher(512).save(os.path.join(assets, '..', 'docs', 'play_icon_512.png'))
+    if USER_ICON:
+        base = USER_ICON.resize((sz, sz), Image.LANCZOS)
+        rounded(base).save(os.path.join(dd, 'ic_launcher.png'))
+        round_mask(base).save(os.path.join(dd, 'ic_launcher_round.png'))
+    else:
+        launcher(sz).save(os.path.join(dd, 'ic_launcher.png'))
+        launcher(sz, True).save(os.path.join(dd, 'ic_launcher_round.png'))
+docs = os.path.join(assets, '..', 'docs')
+if USER_ICON: USER_ICON.resize((512, 512), Image.LANCZOS).convert('RGB').save(os.path.join(docs, 'play_icon_512.png'))
+else: launcher(512).save(os.path.join(docs, 'play_icon_512.png'))
+if user_art.has('feature_graphic.png'): user_art.load('feature_graphic.png').convert('RGB').resize((1024, 500)).save(os.path.join(docs, 'play_feature_graphic.png'))
 print('bitti %.1f sn' % (time.time() - t0))

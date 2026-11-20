@@ -1,0 +1,118 @@
+
+hero_gokkusagi.png
+size: 1024, 512
+format: RGBA8888
+filter: MipMapLinearLinear,Linear
+repeat: none
+f14
+  rotate: false
+  xy: 3, 3
+  size: 160, 152
+  orig: 160, 152
+  offset: 0, 0
+  index: -1
+f13
+  rotate: false
+  xy: 166, 3
+  size: 160, 144
+  orig: 160, 144
+  offset: 0, 0
+  index: -1
+f6
+  rotate: false
+  xy: 329, 3
+  size: 150, 132
+  orig: 150, 132
+  offset: 0, 0
+  index: -1
+f12
+  rotate: false
+  xy: 482, 3
+  size: 160, 131
+  orig: 160, 131
+  offset: 0, 0
+  index: -1
+f7
+  rotate: false
+  xy: 645, 3
+  size: 139, 131
+  orig: 139, 131
+  offset: 0, 0
+  index: -1
+f0
+  rotate: false
+  xy: 787, 3
+  size: 134, 123
+  orig: 134, 123
+  offset: 0, 0
+  index: -1
+f1
+  rotate: false
+  xy: 3, 158
+  size: 140, 122
+  orig: 140, 122
+  offset: 0, 0
+  index: -1
+f11
+  rotate: false
+  xy: 146, 158
+  size: 160, 121
+  orig: 160, 121
+  offset: 0, 0
+  index: -1
+f5
+  rotate: false
+  xy: 309, 158
+  size: 156, 121
+  orig: 156, 121
+  offset: 0, 0
+  index: -1
+f3
+  rotate: false
+  xy: 468, 158
+  size: 142, 121
+  orig: 142, 121
+  offset: 0, 0
+  index: -1
+f9
+  rotate: false
+  xy: 613, 158
+  size: 160, 118
+  orig: 160, 118
+  offset: 0, 0
+  index: -1
+f15
+  rotate: false
+  xy: 776, 158
+  size: 149, 118
+  orig: 149, 118
+  offset: 0, 0
+  index: -1
+f4
+  rotate: false
+  xy: 3, 283
+  size: 144, 116
+  orig: 144, 116
+  offset: 0, 0
+  index: -1
+f10
+  rotate: false
+  xy: 150, 283
+  size: 160, 115
+  orig: 160, 115
+  offset: 0, 0
+  index: -1
+f2
+  rotate: false
+  xy: 313, 283
+  size: 144, 112
+  orig: 144, 112
+  offset: 0, 0
+  index: -1
+f8
+  rotate: false
+  xy: 460, 283
+  size: 151, 97
+  orig: 151, 97
+  offset: 0, 0
+  index: -1

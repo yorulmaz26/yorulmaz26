@@ -49,10 +49,10 @@ class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int =
         b.begin()
         val vw = vp.worldWidth; val vh = vp.worldHeight
         val left = 6.25f - vw / 2; val bottom = 4.5f - vh / 2
-        b.draw(theme.sky, left, bottom, vw, vh)
+        theme.drawSky(b, left, bottom, vw, vh)
         val scroll = t * 1.2f
         fun par(tex: com.badlogic.gdx.graphics.Texture, y: Float, h: Float, f: Float) {
-            val tw = h * tex.width / tex.height.toFloat()
+            val tw = h * com.besaniyelik.dunya.Theme.PARALLAX_ASPECT
             val u0 = (scroll * f) / tw
             b.draw(tex, left, y, vw, h, u0, 1f, u0 + vw / tw, 0f)
         }

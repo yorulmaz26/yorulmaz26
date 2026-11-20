@@ -126,7 +126,13 @@ class Packer:
         self.name, self.size, self.pad, self.filt = name, size, pad, filt
         self.items = []
 
+    OVERRIDE = None  # (atlas, ad, görsel, split) -> (görsel, split): kullanıcı görselleri için kanca
+
     def add(self, name, img, split=None, extrude=0):
+        if Packer.OVERRIDE is not None:
+            r = Packer.OVERRIDE(self.name, name, img, split)
+            if r is not None:
+                img, split = r
         self.items.append((name, img, split, extrude))
 
     def write(self, out_dir):
