@@ -1,0 +1,1 @@
+10 engel/nesne PNG dosyasi ortak 2x5 atlasindan ayrildi. Beyaz arka plan yaklasik alfa maskesiyle kaldirildi. Tam dogru alfa, dikişsiz tekrar, animasyon ve Unity testleri yapilmadi. Kalan platform_shift ve platform_move sonraki gruptadir.

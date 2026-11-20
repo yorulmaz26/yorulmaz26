@@ -1,0 +1,1 @@
+Ortak atlas görselinden ayrıştırılmıştır. Gökyüzü yapay uzatılmıştır. Dekor/platform şeffaflığı yaklaşık maskelemedir. Dikişsiz tekrar ve Unity uyumu doğrulanmamıştır.

@@ -1,0 +1,1 @@
+Map06: ortak atlas gorselinden kesildi. Sky atmosferik uzatmadir; parallax katmanlari gercek alfa seffafligi ve dikissiz tekrari garanti etmez. Decor ve platform beyaz maskelemesi yaklasiktir. Unity oncesi QA gerekir.
