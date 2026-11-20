@@ -72,3 +72,4 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 ## 1.2.1
 * Kullanıcı telefonunda harita ekranın sol şeridine sıkışıyordu: harita genişliği yerleşim bitmeden kaydırma alanından okunuyordu. Harita artık `Widget` (kaydırma alanı genişliğine her zaman yayılır); ilk kaydırma yerleşim tamamlandıktan sonra yapılıyor. "Bölümüme dön" geçerli bölüm ekrandayken gizleniyor. Masaüstü QA artık telefon oranında (480×1040).
 * Açılış animasyonundaki "sunar" yazısı kaldırıldı.
+* Android 11 emülatöründe doğrulandı: öğretici → alan girişi → harita akışında harita tam genişlikte (`docs/screenshots/emulator_harita.jpg`).
