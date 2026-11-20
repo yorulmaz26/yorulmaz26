@@ -407,7 +407,6 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strBought = context.getString(R.string.market_bought)
     private val strLevelLocked = context.getString(R.string.level_locked)
     private val strNoLives = context.getString(R.string.lives_empty)
-    private val strPresents = context.getString(R.string.splash_presents)
     private val strTapToSkip = context.getString(R.string.splash_skip)
     private val strLifeRule = context.getString(R.string.lives_rule)
     private val modNames = Mod.entries.map { context.getString(it.nameRes) }
@@ -3667,7 +3666,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             splashPaint.shader = null
         }
 
-        // Altta: "sunar" ve oyunun adı
+        // Altta: oyunun adı
         canvas.save()
         canvas.scale(scale, scale)
         curW = uiW
@@ -3675,15 +3674,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val logoBottom = logoRect.bottom / scale
         val ta = ((splashT - SPL_TITLE_START) / 0.5f).coerceIn(0f, 1f)
         if (ta > 0f) {
-            labelPaint.textSize = 18f
-            labelPaint.color = withAlpha(hex(0xFF9AB8D8), (ta * 255).toInt())
-            drawFit(canvas, strPresents, cx, logoBottom + 30f, labelPaint)
             val rise = (1f - ta) * 20f
             titlePaint.textSize = 46f
             titlePaint.color = withAlpha(Color.BLACK, (ta * 100).toInt())
-            drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 96f + rise, titlePaint)
+            drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 76f + rise, titlePaint)
             titlePaint.color = withAlpha(colWarm, (ta * 255).toInt())
-            drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 92f + rise, titlePaint)
+            drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 72f + rise, titlePaint)
         }
         if (splashT > 0.8f && splashT < SPL_FADE_START) {
             textPaint.textSize = 16f

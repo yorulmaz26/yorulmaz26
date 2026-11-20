@@ -54,7 +54,7 @@ görmesini engeller; öyle bir ağda hotspot kullanın. Ağ kodu [`NetLink.kt`](
 
 Oyun açılırken **Magic Lumos Software** logosu oyuna özel bir animasyonla gösterilir: seçili araç karanlık uzaydan
 geçer, ışığı logoyu soldan sağa aydınlatarak ortaya çıkarır ("Lumos"), ardından ışık patlaması, harflerin üstünden
-geçen parıltı ve "sunar · GEZEGEN KAÇIŞI" yazısı gelir. Ekrana dokununca atlanır. Logo resmi
+geçen parıltı ve "GEZEGEN KAÇIŞI" yazısı gelir. Ekrana dokununca atlanır. Logo resmi
 `res/drawable-nodpi/splash_logo.jpg`, animasyon `GameView.kt` içindeki "Açılış" bölümündedir.
 
 ### 2.0: Bölümler, para, market ve canlar

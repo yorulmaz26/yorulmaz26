@@ -173,6 +173,5 @@
     <string name="lives_rule">Başlarken 1 can gider, geçersen geri gelir · 15 dk’da 1 can dolar</string>
 
     <!-- Açılış -->
-    <string name="splash_presents">sunar</string>
     <string name="splash_skip">Geçmek için dokun</string>
 </resources>
