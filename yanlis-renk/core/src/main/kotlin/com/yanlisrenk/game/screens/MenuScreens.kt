@@ -73,7 +73,7 @@ class MainMenuScreen(game: YanlisRenkGame) : BaseScreen(game) {
             root.add(ui.label("RENK", Ui.Size.XL, Pal.TEXT)).row()
         }
         val ch = CharacterActor(game, session.equipped(ShopCategory.CHARACTER), session.equipped(ShopCategory.COSTUME).style, 0)
-        root.add(ch).size(270f, 270f).row()
+        root.add(ch).size(220f, 220f).row()
         ui.onTap(ch) { }
 
         val cur = session.currentLevel
@@ -87,7 +87,8 @@ class MainMenuScreen(game: YanlisRenkGame) : BaseScreen(game) {
         row2.add(ui.iconButton("medal", 100f, Pal.PURPLE) {
             if (session.isAreaComplete(1)) game.go({ masteryScreen(game) }) else ui.toast(stage, "Ustalık için önce bir alanı tamamla", "medal")
         }).size(100f)
-        root.add(row2).padBottom(20f).row()
+        root.add(row2).padBottom(12f).row()
+        root.add(ui.button("2 Kişilik Kapışma", Pal.ORANGE, "profile", Ui.Size.M) { game.go({ TwoPlayerScreen(game) }) }).width(536f).padBottom(14f).row()
 
         val grid = Table()
         fun tile(icon: String, label: String, count: Int = 0, action: () -> Unit) {

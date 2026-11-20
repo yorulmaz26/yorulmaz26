@@ -52,3 +52,8 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 
 ## 1.0.8
 * Kalan 6 karakterin (Kalpçik, Petek Arı, Tavşan, Penguen, Damla, Ahtapotçuk) yeniden üretilmiş görselleri eklendi. 30 karakterin tamamı kullanıcı görselli.
+
+## 1.0.9 (iki kişilik kapışma)
+* `TwoPlayerScreen`: aynı cihazda yüz yüze iki kişilik mod. Ekran ikiye bölünür (üst yarı 180° döndürülmüş), her oyuncu kendi yarısına dokunur (çoklu dokunma). İki oyuncu birebir aynı doğrulanmış sonsuz pistte yarışır; yanlış kapıdan ilk geçen elenir, aynı anda elenirlerse berabere. Can harcanmaz. Her yarı 13,2 birim görüş yüksekliğiyle doğrulayıcının 11 birimlik görüş varsayımını karşılar.
+* Masaüstünde klavye: A/Boşluk = 1. oyuncu, L/Enter = 2. oyuncu.
+* Çevrimiçi iki kişilik oyun bu sürümde yok (sunucu gerekir).

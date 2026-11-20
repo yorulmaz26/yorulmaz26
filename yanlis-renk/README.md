@@ -2,7 +2,7 @@
 
 Türkçe, aydınlık temalı, dikey Android renk-refleks oyunu. Kotlin + libGDX + Scene2D.
 
-Ekrana dokun → karakterin rengi Kırmızı → Mavi → Yeşil → Sarı sırasıyla değişir. "=" kapısından aynı, "≠" kapısından farklı renkle geç. 100 alan, 500 bölüm, sonsuz mod, haftalık mücadele, ustalık modu, 4 can, market, 30 karakter, görevler, 115 başarı, 100 parçalık koleksiyon.
+Ekrana dokun → karakterin rengi Kırmızı → Mavi → Yeşil → Sarı sırasıyla değişir. "=" kapısından aynı, "≠" kapısından farklı renkle geç. 100 alan, 500 bölüm, sonsuz mod, iki kişilik kapışma (aynı cihazda), haftalık mücadele, ustalık modu, 4 can, market, 30 karakter, görevler, 115 başarı, 100 parçalık koleksiyon.
 
 | Belge | İçerik |
 |---|---|

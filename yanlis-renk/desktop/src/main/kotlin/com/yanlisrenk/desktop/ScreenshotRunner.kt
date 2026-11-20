@@ -75,6 +75,15 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         play("05m_oyun_dunya18", Mode.LEVEL, 428, 8f)
         play("05n_oyun_dunya19", Mode.LEVEL, 466, 11f)
         play("06_sonsuz", Mode.ENDLESS, 0, 25f)
+        shots.add("26a_iki_kisilik_hazir" to { s.data.unlockedLevel = 38; game.go({ TwoPlayerScreen(game, 7L) }, remember = false) })
+        shots.add("26b_iki_kisilik_oyun" to {
+            game.go({ TwoPlayerScreen(game, 7L) }, remember = false)
+            Gdx.app.postRunnable { (game.screen as? TwoPlayerScreen)?.debugPlay(14f) }
+        })
+        shots.add("26c_iki_kisilik_sonuc" to {
+            game.go({ TwoPlayerScreen(game, 7L) }, remember = false)
+            Gdx.app.postRunnable { (game.screen as? TwoPlayerScreen)?.debugPlay(40f, loser = 1) }
+        })
         go("09_canlar") { LivesScreen(game) }
         go("10_market") { ShopScreen(game) }
         go("10b_market_can") { ShopScreen(game, com.yanlisrenk.logic.shop.ShopCategory.LIFE) }
@@ -134,7 +143,7 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
             name0.startsWith("00b") -> 3.4f
             name0.startsWith("00c") -> 4.7f
             name0.startsWith("00d") -> 6.0f
-            name0.startsWith("07") || name0.startsWith("08") -> 2.6f
+            name0.startsWith("07") || name0.startsWith("08") || name0.startsWith("26c") -> 2.6f
             else -> 0.8f
         }
         if (frames >= 20 && elapsed >= wait) {
