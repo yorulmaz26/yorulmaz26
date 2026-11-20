@@ -19,7 +19,7 @@ import kotlin.math.*
 class WorldRenderer(
     private val a: Assets,
     private val sim: Simulation,
-    map: Int,
+    private val map: Int,
     private val skin: Skin,
     private val trail: Trail,
     reducedEffects: Boolean,
@@ -28,7 +28,7 @@ class WorldRenderer(
     val viewport = ExtendViewport(VIEW_W, VIEW_H, camera)
     val theme: Theme = a.theme(map)
     val particles = Particles().apply { reduced = reducedEffects }
-    private val character = CharacterRenderer(a).apply { spriteScale = 1.18f } // oyun ekranında %18 daha büyük
+    private val character = CharacterRenderer(a)
     private val bodyColor = rgb(skin.body)
     private val trailColors = trail.colors.map { rgb(it) }
     private val trailRegion: TextureRegion = a.g(when (trail.shape) {
@@ -66,6 +66,9 @@ class WorldRenderer(
     private val confettiColors = listOf(Color.valueOf("FF6F91"), Color.valueOf("FFD54F"), Color.valueOf("58D6D0"), Color.valueOf("73D65C"), Color.valueOf("B388FF"), Color.valueOf("FF9F43"))
 
     companion object {
+        /** Yalnızca masaüstü teşhis turu: virgülle ayrılmış atlanacak katmanlar. */
+        var debugSkip = ""
+        private val BUSY_MAPS = setOf(5, 7, 8, 9, 10)
         // Yatay ekran: en az 21 x 11.8 karo görünür; zemin (0) ve tavan (9) aynı anda ekranda (geniş ekranlarda genişlik artar)
         const val VIEW_W = 21f
         const val VIEW_H = 11.8f
@@ -169,14 +172,16 @@ class WorldRenderer(
         theme.drawSky(batch, left - 0.1f, bottom - 0.1f, vw + 0.2f, vh + 0.2f)
         // uzak katman soluk (atmosfer derinliği), yakın katman tam renk; üstüne hafif pus: ön plan okunaklı kalır
         batch.setColor(1f, 1f, 1f, 0.8f)
-        parallax(batch, theme.far, left, vw, -1.2f, 9.5f, 0.12f)
+        if ("far" !in debugSkip) parallax(batch, theme.far, left, vw, -1.2f, 9.5f, 0.12f)
         batch.setColor(1f, 1f, 1f, 1f)
-        parallax(batch, theme.mid, left, vw, -1.8f, 7.2f, 0.3f)
-        batch.setColor(1f, 1f, 1f, 0.24f)
+        if ("mid" !in debugSkip) parallax(batch, theme.mid, left, vw, -1.8f, 7.2f, 0.3f)
+        // ayrıntılı arka planlı haritalarda pus biraz daha güçlü: karakter ve engeller öne çıkar
+        batch.setColor(1f, 1f, 1f, if (map in BUSY_MAPS) 0.36f else 0.24f)
         batch.draw(haze, left - 0.1f, bottom - 0.1f, vw + 0.2f, vh + 0.2f)
         batch.setColor(1f, 1f, 1f, 1f)
         val x0 = left - 1f; val x1 = left + vw + 1f
         for (d in decors) {
+            if ("decor" in debugSkip) break
             if (d.x + d.w < x0 || d.x > x1) continue
             if (d.down) batch.draw(d.region, d.x, d.y + d.h, d.w, -d.h) else batch.draw(d.region, d.x, d.y, d.w, d.h)
         }
@@ -185,8 +190,8 @@ class WorldRenderer(
         drawMarkers(batch, x0, x1)
         drawHazards(batch, x0, x1)
         drawCollectibles(batch, x0, x1)
-        particles.draw(batch)
-        drawPlayer(batch)
+        if ("particles" !in debugSkip) particles.draw(batch)
+        if ("player" !in debugSkip) drawPlayer(batch)
         if (sim.chaserEnabled) {
             val cw = 2.2f
             var y = bottom - (bottom % 2.2f) - 2.2f
@@ -345,7 +350,7 @@ class WorldRenderer(
                 }
                 HazardType.SAW -> {
                     if (h.cx - d.w > x1 || h.cx + d.w < x0) continue
-                    val s = d.w * 2.1f
+                    val s = d.w * 1.95f
                     batch.draw(saw, h.cx - s / 2, h.cy - s / 2, s / 2, s / 2, s, s, 1f, 1f, -sim.time * 400f)
                 }
             }
@@ -401,8 +406,10 @@ class WorldRenderer(
 
     private fun drawPlayer(batch: Batch) {
         val p = sim.player
-        val size = Physics.PLAYER_SIZE * p.scale * 1.22f
         val ws = sim.effects.gravitySign
+        // Görsel boy PLAYER_VISUAL_H; ayaklar çarpışma kutusunun tabanına oturur (kare boyu = size * 1.45).
+        val size = Physics.PLAYER_VISUAL_H * p.scale / 1.45f
+        val feet = p.y - ws * p.hh
         var state = when {
             happy -> CharState.HAPPY
             sim.status == SimStatus.DYING -> CharState.DEAD
@@ -410,18 +417,19 @@ class WorldRenderer(
         }
         var alpha = 1f
         var rot = 0f
-        var cy = p.y + (size - Physics.PLAYER_SIZE * p.scale) * 0.3f * ws
+        var cy = feet + ws * size / 2f
         if (sim.status == SimStatus.DYING) { rot = deathT * 540f; alpha = max(0f, 1f - deathT * 1.2f); cy += deathT * 2f * ws }
         if (p.invuln > 0f && sim.status == SimStatus.RUNNING && (time * 14f).toInt() % 2 == 0) alpha = 0.45f
         if (sim.status == SimStatus.GAME_OVER) return
         if (p.invuln > 1.7f || sim.player.invuln > 0f && sim.powerupsUsed > 0 && p.invuln > 2f) {
-            batch.setColor(1f, 0.9f, 0.4f, 0.5f); batch.draw(glow, p.x - size, cy - size, size * 2, size * 2); batch.setColor(1f, 1f, 1f, 1f)
+            batch.setColor(1f, 0.9f, 0.4f, 0.5f); val mid = cy + ws * (Physics.PLAYER_VISUAL_H * p.scale / 2f - size / 2f); batch.draw(glow, p.x - size * 1.3f, mid - size * 1.3f, size * 2.6f, size * 2.6f); batch.setColor(1f, 1f, 1f, 1f)
         }
         val flipNow = flip < 0f
         character.draw(batch, skin, p.x, cy, size, state, time, flipNow, squash, rot, alpha)
         if (sim.shield > 0) {
             batch.setColor(0.6f, 1f, 0.97f, 0.55f + 0.15f * sin(time * 6f))
-            batch.draw(bubble, p.x - size * 0.78f, cy - size * 0.78f, size * 1.56f, size * 1.56f)
+            val mid = cy + ws * (Physics.PLAYER_VISUAL_H * p.scale / 2f - size / 2f); val bs = Physics.PLAYER_VISUAL_H * p.scale * 1.12f
+            batch.draw(bubble, p.x - bs / 2f, mid - bs / 2f, bs, bs)
             batch.setColor(1f, 1f, 1f, 1f)
         }
         if (p.boost > 0f) {

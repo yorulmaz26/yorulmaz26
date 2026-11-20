@@ -225,7 +225,7 @@ class CollectionScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             val ids = listOf(8, 18, 28, 38, 48).map { m.firstLevel - 1 + it }
             ids.forEach { id -> pcs.add(Image(a.ui("b_puzzle")).apply { if (id !in d.pieces) color = Color(0.6f, 0.65f, 0.75f, 0.35f) }).size(56f).pad(2f) }
             info.add(pcs).left().padTop(4f).row()
-            info.add(kit.label("Ödül: ${CollectionManager.rewardName(m.id)}" + if (done) "  ✓" else "", a.f22, if (done) Palette.GRASS else Palette.INK_SOFT, Align.left)).left().padTop(4f).row()
+            info.add(kit.label("Ödül: ${CollectionManager.rewardName(m.id)}" + if (done) "  (alındı)" else "", a.f22, if (done) Palette.GRASS else Palette.INK_SOFT, Align.left)).left().padTop(4f).row()
             info.add(kit.label("Parçalar: ${ids.joinToString(", ") { "Bölüm $it" }}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(560f).left()
             row.add(info).expandX().left()
             row.add(kit.label("$have/5", a.f36, Palette.INK))
@@ -245,7 +245,7 @@ class ProfileScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         p.add(kit.label("Seviye ${d.playerLevel}", a.f28, Palette.INK_SOFT)).row()
         val need = ProgressionManager.xpToNext(d.playerLevel)
         p.add(kit.bar(d.xp / need.toFloat(), "bar_fill_b", 24f)).width(420f).height(24f).padTop(8f).row()
-        p.add(kit.label("${d.xp} / $need XP  •  Sonraki ödül: ${ProgressionManager.levelUpText(d.playerLevel + 1)}", a.f22, Palette.INK_SOFT, wrap = true)).width(480f).padTop(4f).row()
+        p.add(kit.label("${d.xp} / $need XP  •  Seviye ${d.playerLevel + 1}: ${ProgressionManager.levelUpText(d.playerLevel + 1).let { if (it == "Seviye atladın!") "${ProgressionManager.rewardFor(d.playerLevel + 1).coins} altın" else it }}", a.f22, Palette.INK_SOFT, wrap = true)).width(480f).padTop(4f).row()
         val names = listOf("Koşucu", "Zıpzıp", "Hızlı", "Yıldız", "Bulut", "Kaşif", "Şimşek", "Minik")
         p.add(kit.button("İsmi Değiştir", "white", font = a.f28, textColor = Palette.INK) {
             d.playerName = names[(names.indexOf(d.playerName) + 1) % names.size]; game.profile.save(); rebuild()
@@ -355,7 +355,7 @@ class HowToPlayScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         val pages = buildList {
             add(Triple("g_tap", "Dokun ve Zıpla", "Karakterin kendiliğinden koşar. Ekrana dokunduğunda zıplar. Basılı tutarsan daha yükseğe zıplarsın. Kenardan düştükten hemen sonra bile kısa bir süre zıplayabilirsin."))
             add(Triple("b_m_normal", "5 Saniye Kuralı", "Her 5 saniyede dünyanın kuralları değişir. Değişimden önce ekranın üstünde sıradaki kural yanıp söner. Kural değişimi seni asla haksız yere öldürmez."))
-            add(Triple("b_star", "Yıldızlar ve Altınlar", "Her bölümde 3 yıldız var. 1★ bölümü bitir, 2★ en az 2 yıldız topla, 3★ üç yıldızı da topla ve en fazla 1 kez yanıl. Altınlarla mağazadan alışveriş yap."))
+            add(Triple("b_star", "Yıldızlar ve Altınlar", "Her bölümde 3 yıldız var. 1 yıldız için bölümü bitir, 2 yıldız için en az 2 yıldız topla, 3 yıldız için üç yıldızı da topla ve en fazla 1 kez yanıl. Altınlarla mağazadan alışveriş yap."))
             add(Triple("b_heart", "Canlar ve Kontrol Noktaları", "Her bölümde 3 canın var. Yeşil bayraklar kontrol noktasıdır: düşersen oradan devam edersin."))
             add(Triple("b_p_shield", "Güçlendirmeler", "Baloncuklu güçlendirmeleri topla: kalkan, mıknatıs, çift zıplama, dokunulmazlık, ekstra can, altın çarpanı, yıldız algılayıcı ve kontrol noktası koruması."))
             Mechanic.learnOrder.forEach { add(Triple("b_" + it.icon, it.title, it.hint + "\n(Bölüm ${it.unlockLevel}'de öğrenilir)")) }

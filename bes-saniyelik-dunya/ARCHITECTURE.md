@@ -30,6 +30,7 @@ ui/         UiKit (UIManager: buton, panel, çubuk), screens/ (20 ekran), Assets
 ## Simülasyon
 
 * Sabit 60 Hz tick. Her tick: içerik akışı (sonsuz mod) → kural aşaması → zaman ölçekli `dt` → hareketli/hayalet platformlar → oyuncu girişi → `World.step` → etkileşimler (engel, ped, toplanabilir, kontrol noktası, kovalayan duvar, bitiş).
+* **Oyuncu çarpışma kutusu** gövdeye uygun dikdörtgendir (`Physics.PLAYER_W` × `PLAYER_H` = 0,85 × 1,42 karo); karakter `PLAYER_VISUAL_H` = 1,55 karo boyunda, ayakları kutunun tabanına oturacak şekilde çizilir. Sürekli çarpışma kapalı olduğundan hızlı düşüşteki gömülme her adımda sabit katılardan dışarı itilerek giderilir. `AuditTest` 500 bölümde çizilen karakter ile çizilen engellerin ölmeden üst üste binmediğini denetler.
 * **Box2D** oyuncu (dinamik, döndürülmez, pahlı kutu) ile katı platformlar (statik/kinematik kutular) arasındaki çarpışmayı çözer. Zemin, engel ve toplanabilir kontrolleri durumsuz geometrik sorgulardır; bu sayede **anlık görüntü / geri yükleme** tamamen deterministiktir (geri yüklemede oyuncu gövdesi yeniden kurulur, temas geçmişi sızmaz; hareketli platformlar her tick tam hedef konumlarına oturtulur).
 * **Kural aşamaları konuma bağlıdır**: her aşama, o kuralın hızıyla 5 saniyede alınan mesafedir. Oyuncu engele takılsa bile geometri ile kurallar hiç kaymaz; HUD kalan süreyi saniye olarak gösterir; 1,2 sn önce uyarı verilir.
 * Kontrol iyileştirmeleri: coyote time (0,1 sn), zıplama tamponu (0,12 sn), basılı tutmaya göre değişken zıplama yüksekliği, ters yer çekiminde ayna kontrol.

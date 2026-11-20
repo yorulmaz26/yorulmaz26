@@ -11,3 +11,10 @@
 | 7 — Optimizasyon ve teslim | ✅ | Görünür alan kırpma, nesne havuzu, tek atlas sayfaları, az efekt modu; APK + AAB; dokümantasyon ve test raporu |
 
 Ayrıntılı sonuçlar: `TEST_REPORT.md`. Mimari: `ARCHITECTURE.md`. Kalan işler: `TASKS.md`.
+
+### 20 Kasım — mantık ve görüntü denetimi
+
+* Çarpışma kutusu karakter görseline uyduruldu (dikenlere görsel olarak sürtüp ölmeme hatası), kalıplar ve 500 bölüm yeniden üretildi; düşüşte zemine gömülme giderildi.
+* Sonuç pencereleri sabit boyutlu.
+* 102 bölüm (her alandan bir) oyun ekranında baştan sona oynatıldı: 102/102; bulunan görüntü hataları düzeltildi (süslerdeki çerçeve çizgileri, üst üste binen bildirimler, 2. harita zemini, eksik font simgeleri, profil metni).
+* Testler: 41/41.

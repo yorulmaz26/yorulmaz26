@@ -16,8 +16,8 @@ class PlayerController(private val sim: Simulation) {
     private var fixture: Fixture? = null
 
     var scale = 1f
-    val hw get() = Physics.PLAYER_SIZE * scale / 2f
-    val hh get() = Physics.PLAYER_SIZE * scale / 2f
+    val hw get() = Physics.PLAYER_W * scale / 2f
+    val hh get() = Physics.PLAYER_H * scale / 2f
     val x get() = body.position.x
     val y get() = body.position.y
     val vx get() = body.linearVelocity.x
@@ -106,10 +106,11 @@ class PlayerController(private val sim: Simulation) {
     /** Büyümek için yer var mı? (Dar geçitte büyüme ertelenir, böylece kural değişimi oyuncuyu öldürmez.) */
     private fun tryGrow(target: Float) {
         val sign = gravSign
-        val nh = Physics.PLAYER_SIZE * target / 2f
+        val nh = Physics.PLAYER_H * target / 2f
+        val nw = Physics.PLAYER_W * target / 2f
         val feet = y - sign * hh
         val ny = feet + sign * nh
-        val x0 = x - nh; val x1 = x + nh; val y0 = ny - nh; val y1 = ny + nh
+        val x0 = x - nw; val x1 = x + nw; val y0 = ny - nh; val y1 = ny + nh
         for (s in sim.solidsNear(x0 - 1, x1 + 1)) {
             if (!s.active || s.removed) continue
             if (s.overlaps(x0 + 0.02f, y0 + 0.02f, x1 - 0.02f, y1 - 0.02f)) return
@@ -237,6 +238,7 @@ class PlayerController(private val sim: Simulation) {
         } else blocked = max(0f, blocked - Physics.TICK * 2f)
         invuln = max(0f, invuln - Physics.TICK)
         if (blocked > Physics.STUCK_TIME) { sim.kill(DeathCause.STUCK); return }
+        depenetrate()
         // Ezilme: hareketli bir platform oyuncuyu bir katıya birkaç tick boyunca derinlemesine gömerse
         val m = 0.16f * scale + 0.05f
         var deep = false
@@ -246,6 +248,34 @@ class PlayerController(private val sim: Simulation) {
         }
         crushTicks = if (deep) crushTicks + 1 else 0
         if (crushTicks >= 5) { sim.kill(DeathCause.CRUSH); return }
+    }
+
+    /**
+     * Sürekli çarpışma (CCD) kapalı olduğundan hızlı düşüşte gövde bir adımda zeminin içine 0.2+ karo girebilir;
+     * Box2D bunu birkaç adımda düzeltir ama o arada karakter zemine gömülü görünür. Sabit katılarla dikey
+     * örtüşmeyi (yatay örtüşmeden küçükse) hemen giderir.
+     */
+    private fun depenetrate() {
+        var px = x; var py = y
+        var vy = body.linearVelocity.y
+        var moved = false
+        for (s in sim.solidsNear(px - hw, px + hw)) {
+            if (!s.active || s.removed || s.moving) continue
+            val ox = min(px + hw, s.x + s.w) - max(px - hw, s.x)
+            if (ox <= 0.02f) continue
+            val top = s.y + s.h
+            val oy = min(py + hh, top) - max(py - hh, s.y)
+            if (oy <= 0.015f) continue
+            if (oy < ox && oy <= 0.45f) {
+                if (py > s.y + s.h / 2f) { py = top + hh; if (vy < 0f) vy = 0f } else { py = s.y - hh; if (vy > 0f) vy = 0f }
+                moved = true
+            } else if (ox < oy && ox > 0.03f && ox <= 0.3f) {
+                // yandan duvara gömülme: geldiği tarafa it
+                px = if (px < s.x + s.w / 2f) s.x - hw else s.x + s.w + hw
+                moved = true
+            }
+        }
+        if (moved) { body.setTransform(px, py, 0f); body.setLinearVelocity(body.linearVelocity.x, vy) }
     }
 
     /** Kalkan veya dokunulmazlıkla kurtarma: son güvenli zemine taşı. */

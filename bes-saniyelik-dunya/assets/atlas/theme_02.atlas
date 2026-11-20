@@ -7,97 +7,97 @@ repeat: none
 decor_0
   rotate: false
   xy: 3, 3
-  size: 502, 330
-  orig: 502, 330
+  size: 288, 330
+  orig: 288, 330
   offset: 0, 0
   index: -1
 decor_4
   rotate: false
-  xy: 508, 3
-  size: 502, 330
-  orig: 502, 330
+  xy: 294, 3
+  size: 288, 330
+  orig: 288, 330
   offset: 0, 0
   index: -1
 decor_1
   rotate: false
-  xy: 1013, 3
-  size: 128, 324
-  orig: 128, 324
+  xy: 585, 3
+  size: 127, 328
+  orig: 127, 328
   offset: 0, 0
   index: -1
 decor_5
   rotate: false
-  xy: 1144, 3
-  size: 128, 324
-  orig: 128, 324
+  xy: 715, 3
+  size: 127, 328
+  orig: 127, 328
   offset: 0, 0
   index: -1
 decor_3
   rotate: false
-  xy: 1275, 3
-  size: 131, 312
-  orig: 131, 312
+  xy: 845, 3
+  size: 132, 312
+  orig: 132, 312
   offset: 0, 0
   index: -1
 decor_2
   rotate: false
-  xy: 1409, 3
-  size: 105, 303
-  orig: 105, 303
+  xy: 980, 3
+  size: 103, 304
+  orig: 103, 304
   offset: 0, 0
   index: -1
 top
   rotate: false
-  xy: 1519, 5
+  xy: 1088, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 fill
   rotate: false
-  xy: 1782, 5
+  xy: 1351, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 ceil
   rotate: false
-  xy: 5, 338
+  xy: 1614, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 low
   rotate: false
-  xy: 268, 338
+  xy: 5, 338
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 sky
   rotate: false
-  xy: 529, 336
+  xy: 266, 336
   size: 4, 256
   orig: 4, 256
   offset: 0, 0
   index: -1
 block_l
   rotate: false
-  xy: 537, 337
+  xy: 274, 337
   size: 256, 113
   orig: 256, 113
   offset: 0, 0
   index: -1
 block_m
   rotate: false
-  xy: 798, 337
+  xy: 535, 337
   size: 256, 113
   orig: 256, 113
   offset: 0, 0
   index: -1
 block_r
   rotate: false
-  xy: 1059, 337
+  xy: 796, 337
   size: 252, 113
   orig: 252, 113
   offset: 0, 0

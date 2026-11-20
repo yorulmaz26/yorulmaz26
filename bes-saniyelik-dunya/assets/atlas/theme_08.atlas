@@ -14,29 +14,29 @@ decor_0
 decor_2
   rotate: false
   xy: 121, 3
-  size: 152, 326
-  orig: 152, 326
+  size: 153, 326
+  orig: 153, 326
   offset: 0, 0
   index: -1
 decor_3
   rotate: false
-  xy: 276, 3
-  size: 235, 306
-  orig: 235, 306
+  xy: 277, 3
+  size: 235, 307
+  orig: 235, 307
   offset: 0, 0
   index: -1
 decor_1
   rotate: false
-  xy: 514, 3
-  size: 123, 306
-  orig: 123, 306
+  xy: 515, 3
+  size: 122, 306
+  orig: 122, 306
   offset: 0, 0
   index: -1
 decor_4
   rotate: false
   xy: 640, 3
-  size: 91, 296
-  orig: 91, 296
+  size: 91, 295
+  orig: 91, 295
   offset: 0, 0
   index: -1
 top
@@ -77,8 +77,8 @@ sky
 decor_5
   rotate: false
   xy: 1793, 3
-  size: 99, 210
-  orig: 99, 210
+  size: 98, 210
+  orig: 98, 210
   offset: 0, 0
   index: -1
 block_m

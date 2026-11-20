@@ -43,6 +43,7 @@ class ScreenshotTour(private val dir: String) {
     private val log = StringBuilder()
 
     init {
+        com.besaniyelik.dunya.render.WorldRenderer.debugSkip = System.getProperty("skipLayers") ?: ""
         fun screen(name: String, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(45)); steps.add(Step.Shot(name)) }
         if (System.getProperty("introGif") != null) {
             for (i in 0 until 115) { steps.add(Step.Wait(3)); steps.add(Step.Shot("gif_%03d".format(i))) }
@@ -99,7 +100,7 @@ class ScreenshotTour(private val dir: String) {
                 shot("2_lv%03d_complete".format(playId))
                 log.append("Bölüm $playId: TAMAMLANDI (tick ${sim.tick}, yıldız ${sim.starsCollected}/3, altın ${sim.coinCount}, ölüm ${sim.deaths})\n")
                 playing = null
-            } else if (playFrames > 60 * 200 || sim.status == com.besaniyelik.dunya.sim.SimStatus.GAME_OVER) {
+            } else if (playFrames > 60 * 400 || sim.status == com.besaniyelik.dunya.sim.SimStatus.GAME_OVER) {
                 shot("2_lv%03d_FAIL".format(playId))
                 log.append("Bölüm $playId: BAŞARISIZ (durum ${sim.status}, x=${sim.player.x})\n")
                 playing = null
@@ -116,6 +117,7 @@ class ScreenshotTour(private val dir: String) {
                 val level = LevelRepository.level(st.id)
                 val s = GameScreen(game, level, null, emptyList())
                 s.autoplay = com.besaniyelik.dunya.level.InputTrack(level.solution.toIntArray())
+                s.timeScale = (System.getProperty("speed") ?: "1").toFloat()
                 game.go(s)
                 playing = s; playId = st.id; playFrames = 0; playShots = 0; doneAt = -1
             }

@@ -26,7 +26,7 @@ fun flatLevel(
     solids.add(SolidDef(x, -3f, goal + 20f - x, 3f))
     solids.add(SolidDef(-10f, Physics.CEIL, goal + 30f, 3f, SolidType.CEILING))
     solids.addAll(extraSolids)
-    return LevelData(1, 1, 1, "Test", LevelKind.NORMAL, 1, "test", Vec(2f, 0.41f), goal, solids, hazards, pads, coins, stars, phases = phases)
+    return LevelData(1, 1, 1, "Test", LevelKind.NORMAL, 1, "test", Vec(2f, Physics.PLAYER_H / 2f + 0.01f), goal, solids, hazards, pads, coins, stars, phases = phases)
 }
 
 class SimulationTest {
@@ -45,7 +45,7 @@ class SimulationTest {
         run(sim, 120)
         assertTrue(sim.player.grounded)
         assertEquals(Physics.RUN_SPEED * 2f + 2f, sim.player.x, 0.4f)
-        assertEquals(0.4f, sim.player.y, 0.05f)
+        assertEquals(Physics.PLAYER_H / 2f, sim.player.y, 0.05f)
         sim.dispose()
     }
 
@@ -70,7 +70,7 @@ class SimulationTest {
         val full = apex(40)
         assertTrue(tap > 0.9f, "kısa zıplama en az ~0.5 karo yükselmeli: $tap")
         assertTrue(full > tap + 1.2f, "basılı tutma belirgin şekilde yükseğe çıkarmalı: tap=$tap full=$full")
-        assertEquals(0.4f + Physics.JUMP_V * Physics.JUMP_V / (2 * Physics.GRAVITY), full, 0.25f)
+        assertEquals(Physics.PLAYER_H / 2f + Physics.JUMP_V * Physics.JUMP_V / (2 * Physics.GRAVITY), full, 0.25f)
     }
 
     @DisplayName("coyote time kenardan sonra kısa süre zıplamaya izin verir")
@@ -95,7 +95,7 @@ class SimulationTest {
         run(sim, 10) { true } // zıpla
         run(sim, 25) { false }
         // inişten hemen önce dokun
-        while (sim.player.y > 0.75f && sim.player.vy < 0f || sim.player.vy > 0f) sim.step(false)
+        while (sim.player.y > Physics.PLAYER_H / 2f + 0.35f && sim.player.vy < 0f || sim.player.vy > 0f) sim.step(false)
         sim.step(true) // havadayken bas
         var jumped = false
         repeat(10) { sim.step(true); if (sim.player.vy > 5f) jumped = true }
@@ -110,10 +110,10 @@ class SimulationTest {
         run(sim, 200)
         assertEquals(-1, sim.effects.gravitySign)
         assertTrue(sim.player.grounded)
-        assertEquals(Physics.CEIL - 0.4f, sim.player.y, 0.08f)
+        assertEquals(Physics.CEIL - Physics.PLAYER_H / 2f, sim.player.y, 0.08f)
         // Tavanda zıplama aşağı doğrudur
         sim.step(true); run(sim, 6) { true }
-        assertTrue(sim.player.y < Physics.CEIL - 0.8f)
+        assertTrue(sim.player.y < Physics.CEIL - Physics.PLAYER_H / 2f - 0.4f)
         sim.dispose()
     }
 
@@ -175,8 +175,8 @@ class SimulationTest {
 
     @DisplayName("küçük dünya karakteri küçültür ve dar geçitte büyüme ertelenir")
     @Test fun kucuk_dunya_karakteri_kucultur_ve_dar_gecitte_buyume_ertelenir() {
-        // 0.62 yüksekliğinde tünel: x 20..40; küçük aşama 0..30, sonra normal
-        val tunnel = SolidDef(20f, 0.62f, 20f, 3f, SolidType.LOW)
+        // LOW_CLEARANCE yüksekliğinde tünel: x 20..40; küçük aşama 0..30, sonra normal
+        val tunnel = SolidDef(20f, Physics.LOW_CLEARANCE, 20f, 3f, SolidType.LOW)
         val lvl = flatLevel(listOf(PhaseDef(-100f, listOf(Mechanic.SMALL)), PhaseDef(30f, listOf(Mechanic.NORMAL))), extraSolids = listOf(tunnel))
         val sim = Simulation(lvl)
         run(sim, 30)
@@ -200,11 +200,11 @@ class SimulationTest {
         val sim = Simulation(flatLevel(listOf(PhaseDef(-100f, listOf(Mechanic.REVERSE_CONTROL)))))
         var maxY = 0f
         repeat(60) { sim.step(false); maxY = maxOf(maxY, sim.player.y) }
-        assertTrue(maxY > 1.5f, "bırakınca otomatik zıplamalı")
+        assertTrue(maxY > 2f, "bırakınca otomatik zıplamalı")
         while (!sim.player.grounded) sim.step(true)
         var maxY2 = 0f
         repeat(60) { sim.step(true); maxY2 = maxOf(maxY2, sim.player.y) }
-        assertTrue(maxY2 < 0.5f, "basılı tutunca yerde kalmalı: $maxY2")
+        assertTrue(maxY2 < Physics.PLAYER_H / 2f + 0.1f, "basılı tutunca yerde kalmalı: $maxY2")
         sim.dispose()
     }
 
@@ -233,9 +233,9 @@ class SimulationTest {
         assertTrue(sim.player.x < 11.7f, "duvar ilerlemeyi durdurmalı")
         repeat(20) { sim.step(true) }
         repeat(30) { sim.step(false) }
-        assertTrue(sim.player.grounded && sim.player.y > 1.5f, "bloğun üstüne inmeli (y=${sim.player.y})")
+        assertTrue(sim.player.grounded && sim.player.y > 1.8f, "bloğun üstüne inmeli (y=${sim.player.y})")
         sim.dispose()
-        for ((h, expect) in listOf(HazardDef(HazardType.SPIKE, 10f, 0f, 2f, 1) to DeathCause.SPIKE, HazardDef(HazardType.SAW, 10f, 0.4f, 0.6f, 1) to DeathCause.SAW)) {
+        for ((h, expect) in listOf(HazardDef(HazardType.SPIKE, 10f, 0f, 2f, 1) to DeathCause.SPIKE, HazardDef(HazardType.SAW, 10f, 0.6f, 0.6f, 1) to DeathCause.SAW)) {
             val s2 = Simulation(flatLevel(hazards = listOf(h)))
             var cause: DeathCause? = null
             s2.listener = object : SimListener { override fun onDeath(c: DeathCause) { if (cause == null) cause = c } }

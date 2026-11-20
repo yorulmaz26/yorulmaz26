@@ -171,7 +171,7 @@ object Patterns {
         flat(c, x, x + 1.5f)
         val g0 = x + 1.5f
         flat(c, g0 + w, g0 + w + 2f)
-        c.b.coinArc(c.sign, g0 - 0.6f, 0.4f, c.vx, c.jumpV * 0.85f, 5, c.airTime / 6f)
+        c.b.coinArc(c.sign, g0 - 0.6f, Physics.PLAYER_H / 2f, c.vx, c.jumpV * 0.85f, 5, c.airTime / 6f)
         return g0 + w + 2f
     }
 
@@ -237,7 +237,7 @@ object Patterns {
     fun movingSaw(c: PatternCtx, x: Float): Float {
         flat(c, x, x + 7f)
         val period = c.rnd(1.8f, 2.6f)
-        c.b.saw(c.sign, x + 3.5f, 1.8f, 0.6f, 0f, 1.25f, period, c.rnd(0f, 6.28f))
+        c.b.saw(c.sign, x + 3.5f, 2.1f, 0.6f, 0f, 1.25f, period, c.rnd(0f, 6.28f))
         return x + 7f
     }
 
@@ -275,7 +275,7 @@ object Patterns {
         c.b.pad(c.sign, PadType.BOOST, x + 0.8f, 0f, 2f)
         val w = min(gapWidth(c) * 1.45f, 0.62f * c.reach * Physics.BOOST_MUL)
         flat(c, x + 4f + w, x + 4f + w + 2.5f)
-        c.b.coinArc(c.sign, x + 3.4f, 0.4f, c.vx * Physics.BOOST_MUL, c.jumpV * 0.85f, 6, c.airTime / 7f)
+        c.b.coinArc(c.sign, x + 3.4f, Physics.PLAYER_H / 2f, c.vx * Physics.BOOST_MUL, c.jumpV * 0.85f, 6, c.airTime / 7f)
         return x + 4f + w + 2.5f
     }
 
@@ -313,8 +313,8 @@ object Patterns {
     fun lowTunnel(c: PatternCtx, x: Float, limit: Float): Float {
         val len = min(c.lerp(4f, 8f) * c.rnd(0.9f, 1.1f), limit - x - 5f).coerceAtLeast(3f)
         flat(c, x, x + 2f + len + 2f)
-        c.b.box(c.sign, x + 2f, 0.62f, len, 4.2f, SolidType.LOW)
-        c.b.coinLine(c.sign, x + 2.3f, x + 1.7f + len, 0.25f)
+        c.b.box(c.sign, x + 2f, Physics.LOW_CLEARANCE, len, 4.2f, SolidType.LOW)
+        c.b.coinLine(c.sign, x + 2.3f, x + 1.7f + len, Physics.PLAYER_H * Physics.SMALL_SCALE / 2f)
         var end = x + 2f + len + 2f
         if (c.t > 0.4f && end + 9f < limit) {
             val w = min(gapWidth(c), 0.55f * c.reach)
@@ -322,7 +322,7 @@ object Patterns {
             val l2 = c.rnd(3f, 5f)
             val x2 = end + w + 1.5f
             flat(c, x2, x2 + l2 + 2f)
-            c.b.box(c.sign, x2, 0.62f, l2, 4.2f, SolidType.LOW)
+            c.b.box(c.sign, x2, Physics.LOW_CLEARANCE, l2, 4.2f, SolidType.LOW)
             end = x2 + l2 + 2f
         }
         return end
@@ -340,7 +340,7 @@ object Patterns {
             val w = c.rnd(0.5f, 0.62f) * c.reach
             flat(c, x, x + 1.5f)
             flat(c, x + 1.5f + w, x + 1.5f + w + 2.5f)
-            c.b.coinArc(c.sign, x + 0.9f, 0.4f, c.vx, c.jumpV * 0.85f, 6, c.airTime / 7f)
+            c.b.coinArc(c.sign, x + 0.9f, Physics.PLAYER_H / 2f, c.vx, c.jumpV * 0.85f, 6, c.airTime / 7f)
             x + 1.5f + w + 2.5f
         }
     }
@@ -348,9 +348,9 @@ object Patterns {
     fun overhead(c: PatternCtx, x: Float): Float {
         val len = c.rnd(2.5f, 4.5f)
         flat(c, x, x + 2f + len + 2.5f)
-        c.b.box(c.sign, x + 2f, 1.6f, len, 2.2f, SolidType.BLOCK)
-        c.b.spikes(c.sign, x + 2f, 1.6f, len, up = false)
-        c.b.coinLine(c.sign, x + 2.2f, x + 1.8f + len, 0.4f)
+        c.b.box(c.sign, x + 2f, 2.25f, len, 2.85f, SolidType.BLOCK)
+        c.b.spikes(c.sign, x + 2f, 2.25f, len, up = false)
+        c.b.coinLine(c.sign, x + 2.2f, x + 1.8f + len, Physics.PLAYER_H / 2f)
         var end = x + 2f + len + 2.5f
         if (c.t > 0.3f && c.chance(0.6f)) {
             // ardından küçük bir boşluk
@@ -366,8 +366,8 @@ object Patterns {
         flat(c, x, x + 2f)
         val g0 = x + 2f
         flat(c, g0 + w, g0 + w + 2.5f)
-        c.b.box(c.sign, g0 - 0.8f, 2.9f, w + 1.6f, 3.4f, SolidType.BLOCK)
-        c.b.spikes(c.sign, g0 - 0.8f, 2.9f, w + 1.6f, up = false)
+        c.b.box(c.sign, g0 - 0.8f, 3.5f, w + 1.6f, 4.0f, SolidType.BLOCK)
+        c.b.spikes(c.sign, g0 - 0.8f, 3.5f, w + 1.6f, up = false)
         return g0 + w + 2.5f
     }
 

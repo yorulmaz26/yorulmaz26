@@ -237,7 +237,7 @@ object LevelGenerator {
         val data = LevelData(
             id = levelId, map = map.id, indexInMap = (levelId - 1) % 50 + 1,
             name = GameContent.levelName(levelId, 0), kind = kind, difficulty = diff,
-            idea = stage.title, start = Vec(2f, 0.4f + 0.01f), goalX = r2(goalX),
+            idea = stage.title, start = Vec(2f, Physics.PLAYER_H / 2f + 0.01f), goalX = r2(goalX),
             solids = b.solids, hazards = b.hazards, pads = b.pads,
             checkpoints = cps, phases = phases, mechanics = mechanics, tutorial = tutorialMech,
             hints = hints, chaser = kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL, seed = seed,

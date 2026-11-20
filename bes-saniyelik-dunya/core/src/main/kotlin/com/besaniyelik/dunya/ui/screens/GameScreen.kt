@@ -28,6 +28,7 @@ import com.besaniyelik.dunya.ui.*
 class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private val seed: Long?, private val boosts: List<PowerupType>) : BaseScreen(game) {
     override val background: MenuBackground? = null
     override val toastTime = 1.0f
+    override val toastCompact = true
     private val endless = level == null
     private val d = game.profile.data
     private val generator = if (endless) EndlessGenerator(seed ?: 1L, Mechanic.unlockedAt(d.highestUnlocked).toSet()) else null
@@ -37,6 +38,8 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
 
     /** Test/tanıtım için: kayıtlı çözümü gerçek giriş yerine oynatır. */
     var autoplay: InputTrack? = null
+    /** Yalnızca masaüstü test turu için: simülasyonu hızlandırır (oyunda her zaman 1). */
+    var timeScale = 1f
     val simulation get() = sim
     private var acc = 0f
     private var pressed = false
@@ -194,15 +197,16 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             // etkileşimli eğitim: ipucunda dokunuş beklenirken ağır çekim
             val slow = waitHint != null
             if (!slow || frame % 7 == 0) {
-                acc += if (slow) Physics.TICK else dt
+                acc += if (slow) Physics.TICK else dt * timeScale
                 var steps = 0
-                while (acc >= Physics.TICK && steps < 5) {
+                val maxSteps = (5 * timeScale).toInt()
+                while (acc >= Physics.TICK && steps < maxSteps) {
                     val ap = autoplay
                     if (ap != null) { pressed = ap.at(sim.tick); if (pressed && waitHint != null) clearWait() }
                     sim.step(pressed)
                     acc -= Physics.TICK; steps++
                 }
-                if (steps == 5) acc = 0f
+                if (steps == maxSteps) acc = 0f
             }
             checkHints()
             if (endless && frame % 120 == 0) sim.pruneBefore(sim.player.x - 30f)
@@ -231,7 +235,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         val icon = when { h.icon.startsWith("m_") -> "b_" + h.icon; h.icon == "i_tap" -> "g_tap"; h.icon == "i_hold" -> "g_hold"; h.icon == "i_run" -> "g_run"; h.icon == "i_star" -> "b_star"; h.icon == "i_spring" -> "b_m_bouncy"; h.icon == "i_boost" -> "b_m_fast"; h.icon == "i_saw" || h.icon == "i_spike" -> "b_heart"; else -> "b_star" }
         val img = Image(a.ui(icon)); if (icon.startsWith("g_")) img.color = Palette.ORANGE
         hintBox.add(img).size(64f).padRight(14f)
-        hintBox.add(kit.label(h.text, a.f28, Palette.INK, wrap = true)).width(440f)
+        hintBox.add(kit.label(h.text, a.f28, Palette.INK, wrap = true)).width(400f)
         hintBox.color.a = 0f
         hintBox.addAction(Actions.sequence(Actions.fadeIn(0.25f), Actions.delay(if (h.waitTap) 30f else 1.8f), Actions.fadeOut(0.3f)))
     }
@@ -320,7 +324,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         rules.forEach { b.add(Image(a.ui("b_" + it.icon))).size(46f).padRight(4f) }
         b.add(kit.label(rules.joinToString(" + ") { it.title }, a.f22, Palette.INK)).padLeft(6f)
         b.pack()
-        b.setPosition((stage.width - b.width) / 2, stage.height - 200f)
+        b.setPosition((stage.width - b.width) / 2, stage.height - 300f)
         b.color.a = 0f
         val hold = if (first) 0.9f else 0.55f
         b.addAction(Actions.sequence(Actions.fadeIn(0.1f), Actions.delay(hold), Actions.fadeOut(0.25f), Actions.removeActor()))
@@ -394,34 +398,46 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         finished = true
         val lv = level ?: return
         val res = game.profile.onLevelResult(LevelResult(lv, true, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, sim.pieceCollected))
-        dialog { p, close ->
-            p.add(kit.label("Bölüm Tamamlandı!", a.f48, Palette.INK)).row()
+        dialog(resultW, resultH) { p, close ->
+            p.top()
+            p.add(kit.label("Bölüm Tamamlandı!", a.f48, Palette.INK)).colspan(2).padTop(4f).row()
+            // Sol sütun: yıldızlar ve özet
+            val left = Table().top()
             val st = Table()
             for (i in 0 until 3) {
                 val img = Image(a.ui(if (i < res.stars) "b_star" else "b_star_empty"))
-                st.add(img).size(if (i == 1) 100f else 84f).pad(4f).bottom()
+                st.add(img).size(if (i == 1) 96f else 80f).pad(4f).bottom()
                 if (i < res.stars) { img.popIn(0.2f + i * 0.25f); stage.addAction(Actions.delay(0.25f + i * 0.25f, Actions.run { game.audio.play(Sfx.STAR, 1f + i * 0.12f) })) }
             }
-            p.add(st).padTop(10f).row()
+            left.add(st).row()
             val info = Table()
-            fun row(icon: String, text: String) { info.add(Image(a.ui(icon))).size(44f).padRight(10f); info.add(kit.label(text, a.f28, Palette.INK, Align.left)).left().row() }
+            fun row(icon: String, text: String) { info.add(Image(a.ui(icon))).size(40f).padRight(10f).padTop(4f); info.add(kit.label(text, a.f28, Palette.INK, Align.left)).left().padTop(4f).row() }
             row("b_star", "Toplanan yıldız: ${sim.starsCollected}/3")
             row("b_coin", "+${res.coins} altın  (${sim.coinCount}/${lv.coins.size})")
             row("b_bolt", "+${res.xp} XP" + if (res.firstClear) "  (ilk geçiş x2)" else "")
             row("b_heart", "Ölüm: ${sim.deaths}")
-            p.add(info).padTop(10f).row()
-            p.add(kit.label("2★: en az 2 yıldız veya altınların %70'i  •  3★: 3 yıldız, en fazla 1 ölüm", a.f22, Palette.INK_SOFT, wrap = true)).width(560f).padTop(6f).row()
-            res.levelUps.forEach { u -> p.add(kit.label("Seviye ${u.level}! ${u.text}", a.f28, Palette.GOLD, wrap = true)).width(560f).padTop(4f).row() }
-            res.achievements.forEach { ach -> p.add(kit.label("Başarı: ${ach.title} (+${ach.gems} elmas)", a.f28, Palette.ORANGE, wrap = true)).width(560f).padTop(4f).row() }
-            res.missions.forEach { m -> p.add(kit.label("Görev tamamlandı: ${m.type.text(m.target)}", a.f22, Palette.GRASS, wrap = true)).width(560f).row() }
-            res.collectionCompleted?.let { p.add(kit.label("${GameContent.maps[it - 1].name} koleksiyonu tamam! ${CollectionManager.rewardName(it)}", a.f28, Palette.GOLD, wrap = true)).width(560f).row() }
-            res.unlocked.forEach { p.add(kit.label("Açıldı: $it", a.f28, Palette.GOLD)).row() }
+            left.add(info).padTop(8f).left().row()
+            left.add(kit.label("2 yıldız: 2 yıldız topla veya altınların %70'i\n3 yıldız: 3 yıldız topla, en fazla 1 ölüm", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(420f).padTop(10f).left()
+            // Sağ sütun: ödüller ve bildirimler (sabit alan, gerekirse kaydırılır)
+            val notes = Table().top().left()
+            fun note(text: String, color: Color, font: com.badlogic.gdx.graphics.g2d.BitmapFont = a.f28) { notes.add(kit.label(text, font, color, Align.left, wrap = true)).width(440f).left().padBottom(8f).row() }
+            res.levelUps.forEach { u -> note("Seviye ${u.level}! ${u.text}", Palette.GOLD) }
+            res.achievements.forEach { ach -> note("Başarı: ${ach.title} (+${ach.gems} elmas)", Palette.ORANGE) }
+            res.missions.forEach { m -> note("Görev tamamlandı: ${m.type.text(m.target)}", Palette.GRASS, a.f22) }
+            res.collectionCompleted?.let { note("${GameContent.maps[it - 1].name} koleksiyonu tamam! ${CollectionManager.rewardName(it)}", Palette.GOLD) }
+            res.unlocked.forEach { note("Açıldı: $it", Palette.GOLD) }
+            if (notes.children.size == 0) note(if (res.stars < 3) "Daha fazla yıldız için bölümü tekrar oynayabilirsin." else "Harika! Bu bölümü kusursuz bitirdin.", Palette.INK_SOFT, a.f22)
             if (res.levelUps.isNotEmpty() || res.achievements.isNotEmpty()) game.audio.play(Sfx.REWARD)
+            val right = Table().top()
+            right.add(kit.label("Ödüller", a.f36, Palette.INK)).left().row()
+            right.add(scroll(notes)).width(460f).height(resultH - 330f).top().left().padTop(6f)
+            p.add(left).width(resultW * 0.46f).top().padTop(6f).expandY().fillY()
+            p.add(right).width(resultW * 0.46f).top().padTop(6f).expandY().fillY().row()
             val btns = Table()
-            btns.add(kit.iconButton("g_retry", "yellow", 120f, 60f) { close(); restart() }).size(120f).pad(8f)
-            btns.add(kit.iconButton("g_home", "white", 120f, 60f) { close(); quit() }).size(120f).pad(8f)
-            if (lv.id < 500) btns.add(kit.button("Sonraki", "green", "g_next") { close(); game.go(GameScreen(game, LevelRepository.level(lv.id + 1), null, emptyList())) }).width(260f).height(120f).pad(8f)
-            p.add(btns).padTop(18f)
+            btns.add(kit.iconButton("g_retry", "yellow", 120f, 60f) { close(); restart() }).size(112f).pad(8f)
+            btns.add(kit.iconButton("g_home", "white", 120f, 60f) { close(); quit() }).size(112f).pad(8f)
+            if (lv.id < 500) btns.add(kit.button("Sonraki", "green", "g_next") { close(); game.go(GameScreen(game, LevelRepository.level(lv.id + 1), null, emptyList())) }).width(260f).height(112f).pad(8f)
+            p.add(btns).colspan(2).padBottom(4f)
         }
     }
 
@@ -430,7 +446,8 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         if (endless) {
             val sc = score()
             val res = game.profile.onEndlessResult(EndlessResult(sc, sim.tick / 60f, sim.distance, sim.coinValue, sim.starsCollected, jumps, sim.rulesChanged, sim.powerupsUsed))
-            dialog { p, close ->
+            dialog(resultW, resultH) { p, close ->
+                p.top()
                 p.add(kit.label(if (res.newRecord) "YENİ REKOR!" else "Oyun Bitti", a.f48, if (res.newRecord) Palette.ORANGE else Palette.INK)).row()
                 p.add(kit.label("$sc", a.f72o, Palette.SUN)).padTop(6f).row()
                 p.add(kit.label("puan", a.f22, Palette.INK_SOFT)).row()
@@ -438,9 +455,11 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
                 fun row(t: String, v: String) { info.add(kit.label(t, a.f28, Palette.INK_SOFT, Align.left)).left().width(300f); info.add(kit.label(v, a.f28, Palette.INK, Align.right)).right().row() }
                 row("Süre", "%.1f sn".format(sim.tick / 60f)); row("Mesafe", "%.0f m".format(sim.distance)); row("Altın", "+${sim.coinValue}")
                 row("Atlatılan kural", "${sim.rulesChanged}"); row("En iyi puan", "${d.stats.endlessBestScore}"); row("Kazanılan XP", "+${res.xp}")
-                p.add(info).padTop(12f).row()
-                res.achievements.forEach { ach -> p.add(kit.label("Başarı: ${ach.title}", a.f28, Palette.ORANGE)).row() }
-                res.missions.forEach { m -> p.add(kit.label("Görev tamamlandı: ${m.type.text(m.target)}", a.f22, Palette.GRASS, wrap = true)).width(560f).row() }
+                p.add(info).padTop(8f).row()
+                val notes = Table().top()
+                res.achievements.forEach { ach -> notes.add(kit.label("Başarı: ${ach.title}", a.f28, Palette.ORANGE, wrap = true)).width(640f).row() }
+                res.missions.forEach { m -> notes.add(kit.label("Görev tamamlandı: ${m.type.text(m.target)}", a.f22, Palette.GRASS, wrap = true)).width(640f).row() }
+                p.add(scroll(notes)).width(660f).expandY().fillY().padTop(4f).row()
                 val btns = Table()
                 btns.add(kit.button("Tekrar", "turq", "g_retry") { close(); restart() }).width(280f).height(116f).pad(8f)
                 btns.add(kit.button("Menü", "white", "g_home", a.f36, Palette.INK) { close(); game.go(MainMenuScreen(game)) }).width(240f).height(116f).pad(8f)
@@ -450,7 +469,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         }
         val lv = level!!
         game.profile.onLevelResult(LevelResult(lv, false, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, false))
-        dialog { p, close ->
+        dialog(resultW, resultH) { p, close ->
             p.add(kit.label("Canların Bitti", a.f48, Palette.INK)).row()
             p.add(Image(a.ui("b_heart_empty"))).size(80f).padTop(6f).row()
             p.add(kit.label("Pes etme! Her denemede daha iyi olursun.", a.f28, Palette.INK_SOFT, wrap = true)).width(540f).padTop(6f).row()

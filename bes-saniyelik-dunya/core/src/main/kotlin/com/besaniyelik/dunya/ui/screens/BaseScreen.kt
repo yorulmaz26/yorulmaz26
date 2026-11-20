@@ -178,14 +178,18 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     private var toastY = 0f
     /** Bildirim süresi (oyun ekranı kısaltır). */
     open val toastTime = 2.4f
+    /** Oyun ekranında bildirimler sol üstte, küçük gösterilir (ipucu ve kural etiketiyle çakışmasın). */
+    open val toastCompact = false
     fun toast(text: String, icon: String? = null) {
         val t = Table().apply {
             background = kit.patch("banner"); pad(16f, 26f, 20f, 26f)
             if (icon != null) add(Image(a.ui(icon))).size(56f).padRight(12f)
-            add(kit.label(text, a.f28, Palette.INK, wrap = true)).width(460f)
+            if (toastCompact) { pad(10f, 16f, 14f, 18f); cells.firstOrNull()?.size(42f)?.padRight(8f) }
+            add(kit.label(text, if (toastCompact) a.f22 else a.f28, Palette.INK, wrap = true)).width(if (toastCompact) 240f else 460f)
         }
         t.pack()
-        t.setPosition((stage.width - t.width) / 2, stage.height - 150f - toastY)
+        if (toastCompact) t.setPosition(24f, stage.height - 118f - t.height - toastY)
+        else t.setPosition((stage.width - t.width) / 2, stage.height - 150f - toastY)
         toastY += t.height + 10f
         t.color.a = 0f
         t.addAction(Actions.sequence(Actions.fadeIn(0.2f), Actions.delay(toastTime), Actions.fadeOut(0.3f), Actions.run { toastY = (toastY - t.height - 10f).coerceAtLeast(0f) }, Actions.removeActor()))
@@ -193,13 +197,24 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     }
 
     /** Ortada açılan modal diyalog; arka plan yarı saydam açık renk. */
-    fun dialog(build: (Table, () -> Unit) -> Unit): Table {
+    /** Sabit boyutlu sonuç pencereleri için ölçü (içerik ne olursa olsun pencere aynı kalır). */
+    val resultW get() = kotlin.math.min(1060f, stage.viewport.worldWidth - 40f)
+    val resultH get() = kotlin.math.min(620f, stage.viewport.worldHeight - 40f)
+
+    fun dialog(fixedW: Float = 0f, fixedH: Float = 0f, build: (Table, () -> Unit) -> Unit): Table {
         val overlay = Table().apply { setFillParent(true); background = kit.patch("white").tint(Color(0.97f, 0.98f, 1f, 0.6f)); touchable = Touchable.enabled }
         val panel = kit.panel()
         lateinit var close: () -> Unit
         close = { overlay.addAction(Actions.sequence(Actions.fadeOut(0.15f), Actions.removeActor())) }
         build(panel, close)
         // yatay ekranda yüksek içerik kaydırılabilir olur
+        if (fixedW > 0f && fixedH > 0f) {
+            overlay.add(panel).size(fixedW, fixedH).center()
+            overlay.addListener(object : ClickListener() { override fun clicked(event: InputEvent?, x: Float, y: Float) {} })
+            stage.addActor(overlay)
+            panel.popIn()
+            return overlay
+        }
         panel.pack()
         val w = kotlin.math.max(640f, panel.prefWidth)
         val maxH = stage.viewport.worldHeight - 24f

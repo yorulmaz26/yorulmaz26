@@ -18,7 +18,13 @@ object Physics {
     const val NORMAL_ACCEL = 40f
     const val BOOST_MUL = 1.6f
     const val BOOST_TIME = 1.1f
-    const val PLAYER_SIZE = 0.8f
+    /** Çarpışma kutusu: karakter görselinin gövdesine uygun dikdörtgen (pelerin ve kapüşon ucu görsel olarak taşabilir). */
+    const val PLAYER_W = 0.85f
+    const val PLAYER_H = 1.42f
+    /** Oyuncunun ekranda çizilen boyu (karo); çarpışma kutusuyla orantılı tutulur. */
+    const val PLAYER_VISUAL_H = 1.55f
+    /** Dar geçit alt yüzeyinin yerden yüksekliği: küçük boy (PLAYER_H * SMALL_SCALE ≈ 0.78) geçer, normal boy geçemez. */
+    const val LOW_CLEARANCE = 0.9f
     const val SMALL_SCALE = 0.55f
     const val COYOTE = 0.1f
     const val JUMP_BUFFER = 0.12f

@@ -21,64 +21,64 @@ decor_0
 decor_3
   rotate: false
   xy: 395, 3
-  size: 192, 312
-  orig: 192, 312
+  size: 192, 308
+  orig: 192, 308
   offset: 0, 0
   index: -1
 decor_1
   rotate: false
   xy: 590, 3
-  size: 190, 268
-  orig: 190, 268
-  offset: 0, 0
-  index: -1
-decor_4
-  rotate: false
-  xy: 783, 3
-  size: 202, 266
-  orig: 202, 266
+  size: 190, 264
+  orig: 190, 264
   offset: 0, 0
   index: -1
 top
   rotate: false
-  xy: 990, 5
+  xy: 785, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 fill
   rotate: false
-  xy: 1253, 5
+  xy: 1048, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 ceil
   rotate: false
-  xy: 1516, 5
+  xy: 1311, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 low
   rotate: false
-  xy: 1779, 5
+  xy: 1574, 5
   size: 256, 256
   orig: 256, 256
   offset: 0, 0
   index: -1
 sky
   rotate: false
-  xy: 2040, 3
+  xy: 1835, 3
   size: 4, 256
   orig: 4, 256
+  offset: 0, 0
+  index: -1
+decor_4
+  rotate: false
+  xy: 1842, 3
+  size: 202, 244
+  orig: 202, 244
   offset: 0, 0
   index: -1
 decor_2
   rotate: false
   xy: 3, 336
-  size: 248, 246
-  orig: 248, 246
+  size: 248, 239
+  orig: 248, 239
   offset: 0, 0
   index: -1
 block_m

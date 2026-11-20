@@ -11,7 +11,7 @@ import kotlin.test.*
 
 class FixedClock(var day: Long) : GameClock { override fun epochDay() = day }
 
-fun testLevel(id: Int = 1, coins: Int = 40) = LevelData(id, (id - 1) / 50 + 1, (id - 1) % 50 + 1, "T", GameContent.kindOf(id), 3, "x", Vec(2f, 0.4f), 100f,
+fun testLevel(id: Int = 1, coins: Int = 40) = LevelData(id, (id - 1) / 50 + 1, (id - 1) % 50 + 1, "T", GameContent.kindOf(id), 3, "x", Vec(2f, 0.66f), 100f,
     emptyList(), coins = List(coins) { Vec(it.toFloat(), 1f) }, stars = List(3) { Vec(it.toFloat(), 2f) }, phases = listOf(PhaseDef(0f, listOf(Mechanic.NORMAL))), coinTarget = (coins * 0.7f).toInt())
 
 class ProgressTest {

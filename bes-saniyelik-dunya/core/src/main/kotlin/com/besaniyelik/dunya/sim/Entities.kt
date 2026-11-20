@@ -50,15 +50,15 @@ class HazardEntity(val def: HazardDef, val index: Int) {
     fun hits(px: Float, py: Float, hw: Float, hh: Float, m: Float = 0.08f): Boolean {
         return when (def.type) {
             HazardType.SPIKE -> {
-                val x0 = cx + 0.18f
-                val x1 = cx + def.w - 0.18f
+                val x0 = cx + 0.1f
+                val x1 = cx + def.w - 0.1f
                 val y0: Float
                 val y1: Float
-                if (def.dir > 0) { y0 = cy; y1 = cy + 0.5f } else { y0 = cy - 0.5f; y1 = cy }
+                if (def.dir > 0) { y0 = cy; y1 = cy + 0.52f } else { y0 = cy - 0.52f; y1 = cy }
                 px - hw + m < x1 && px + hw - m > x0 && py - hh + m < y1 && py + hh - m > y0
             }
             HazardType.SAW -> {
-                val r = def.w * 0.82f
+                val r = def.w * 0.86f
                 val nx = cx.coerceIn(px - hw + m, px + hw - m)
                 val ny = cy.coerceIn(py - hh + m, py + hh - m)
                 val dx = cx - nx

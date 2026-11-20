@@ -110,6 +110,18 @@ def trim(im, pad=2):
     return im.crop((x0, y0, x1, y1))
 
 
+def remove_thin(im, k=9):
+    """Kalınlığı k pikselden az olan çizgileri (kaynak görseldeki kırpma çerçevesi vb.) siler; ana nesnenin kenarları korunur."""
+    a = im.getchannel('A')
+    mask = a.point(lambda v: 255 if v > 30 else 0)
+    opened = mask.filter(ImageFilter.MinFilter(k)).filter(ImageFilter.MaxFilter(k))
+    keep = opened.filter(ImageFilter.MaxFilter(5))
+    na = np.minimum(np.asarray(a), np.asarray(keep))
+    out = im.copy()
+    out.putalpha(Image.fromarray(na.astype(np.uint8)))
+    return out
+
+
 def trim_main(im, gap=6, axis_cols=True):
     """Dikeyde en çok içeriğe sahip bitişik satır grubunu tutar; ince ayrık çizgileri atar."""
     a = np.asarray(im)[..., 3]
@@ -225,7 +237,67 @@ def ground_top(m, size=256):
     soft = np.asarray(Image.fromarray((mask * 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(1.5))).astype(np.float32) / 255
     a[..., 3] *= (1 - soft)
     im = seam_h(img(a))
+    if m in TILE_TONE:
+        al = np.asarray(im)[..., 3]
+        rows = np.where((al > 200).mean(axis=1) > 0.9)[0]
+        top_y = int(rows[0]) if len(rows) else 0
+        # açık bulut şeridinin kalınlığı: üstten itibaren parlak satırlar
+        lum = arr(im)[..., :3].mean(axis=2)
+        band = top_y
+        while band < im.height - 1 and lum[band].mean() > 225: band += 1
+        im = tone_tile(im, m, keep_top=max(band, top_y + 10))
+        im = cloud_rim(im, top_y)
     return im.resize((size, size), Image.LANCZOS)
+
+
+# Gökyüzüne çok yakın renkteki zemin karoları (ör. 2. harita) için ton: doku korunur, gövde koyulaştırılır.
+TILE_TONE = {2: (0.62, 0.66, 0.92)}
+
+
+def tone_tile(im, m, keep_top=0):
+    t = TILE_TONE.get(m)
+    if not t: return im
+    a = arr(im)
+    k = np.ones(a.shape[0], np.float32)
+    if keep_top:
+        # üstteki bulut şeridi açık kalır, altına yumuşak geçiş
+        y = np.arange(a.shape[0])
+        k = np.clip((y - keep_top) / 18.0, 0, 1)
+    for c in range(3):
+        mul = 1 - (1 - t[c]) * k
+        a[..., c] = a[..., c] * mul[:, None]
+    # bulut şeridinin altına ince gölge (zemin kenarı okunur)
+    if keep_top:
+        band = (np.abs(np.arange(a.shape[0]) - keep_top - 6) < 6).astype(np.float32) * 0.18
+        a[..., :3] *= (1 - band)[:, None, None]
+    return img(a)
+
+
+def cloud_rim(im, top_y):
+    """Zeminin üst kenarına yatayda dikişsiz, yumuşak bulut kıvrımları çizer (yürünen yüzey gökyüzünden ayrışsın)."""
+    from PIL import ImageDraw
+    w, h = im.size
+    n = 2
+    layer = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    shade = Image.new('RGBA', (w, h), (0, 0, 0, 0))
+    d = ImageDraw.Draw(layer); ds = ImageDraw.Draw(shade)
+    bumps = []
+    for i in range(n):
+        bumps.append(((i + 0.5) * w / n, w / n * 0.62, 0.0))      # büyük kıvrım
+        bumps.append(((i + 1.0) * w / n, w / n * 0.42, 0.10))     # aradaki küçük kıvrım
+    for cx, rx, off in bumps:
+        ry = rx * 0.5
+        cy = top_y + ry * 0.75 + off * h
+        for dx in (-w, 0, w):
+            ds.ellipse((cx + dx - rx, cy - ry + ry * 0.35, cx + dx + rx, cy + ry + ry * 0.35), fill=(70, 80, 150, 90))
+            d.ellipse((cx + dx - rx, cy - ry, cx + dx + rx, cy + ry), fill=(250, 251, 255, 255))
+    # gövde dışına taşan kısımları kes (yalnızca opak bölgenin üst kenarından itibaren)
+    lim = Image.new('L', (w, h), 0); ImageDraw.Draw(lim).rectangle((0, int(top_y), w, h), fill=255)
+    shade = shade.filter(ImageFilter.GaussianBlur(4)); layer = layer.filter(ImageFilter.GaussianBlur(0.8))
+    out = im.copy()
+    out.alpha_composite(Image.composite(shade, Image.new('RGBA', (w, h), (0, 0, 0, 0)), lim))
+    out.alpha_composite(layer)
+    return out
 
 
 def ground_fill(m, size=256):
@@ -235,6 +307,7 @@ def ground_fill(m, size=256):
     im = fix_dark_lines(im)
     a = arr(im); a[..., 3] = 255
     im = seam_v(seam_h(img(a)))
+    im = tone_tile(im, m)
     return im.resize((size, size), Image.LANCZOS)
 
 
@@ -293,7 +366,7 @@ def decor_props(m, px_per_unit=110, tallest_units=3.0):
         cw = im.width // 6
         runs = [(i * cw, (i + 1) * cw) for i in range(6)]
     runs = sorted(sorted(runs, key=lambda r: r[1] - r[0], reverse=True)[:6])
-    props = [trim_main(im.crop((r0, 0, r1, im.height))) for r0, r1 in runs]
+    props = [trim_main(remove_thin(im.crop((r0, 0, r1, im.height)))) for r0, r1 in runs]
     props = [p for p in props if p.height > 20]
     hmax = max(p.height for p in props)
     out = []

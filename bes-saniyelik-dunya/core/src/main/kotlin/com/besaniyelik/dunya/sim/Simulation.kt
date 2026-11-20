@@ -91,7 +91,7 @@ class Simulation(
     var goalX = Float.MAX_VALUE
     var levelEnd = 0f
     var startX = 2f
-    var startY = 0.4f
+    var startY = Physics.PLAYER_H / 2f + 0.01f
     val chaserEnabled = level?.chaser == true
 
     /** Sonsuz modda zamanla artan hız çarpanı. */
