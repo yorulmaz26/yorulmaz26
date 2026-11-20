@@ -112,8 +112,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         g.color.set(color.r, color.g, color.b, color.a * alpha)
     }
 
-    private fun glyphWH(name: String, cx: Float, cy: Float, w: Float, h: Float, alpha: Float = 1f) {
-        glyph(name, cx, cy, 1f, Pal.WHITE, alpha)
+    private fun glyphWH(name: String, cx: Float, cy: Float, w: Float, h: Float, alpha: Float = 1f, color: Color = Pal.WHITE) {
+        glyph(name, cx, cy, 1f, color, alpha)
         val g = glyphs[glyphCount - 1]
         g.x = cx - w / 2; g.y = cy - h / 2; g.w = w; g.h = h
     }
@@ -317,6 +317,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         }
         if (lastGateColor > 99) return
 
+        // kapı görselleri karakterin altında kalsın: şimdiye kadarki simgeleri çiz
+        flushGlyphs(cam)
         // iz
         drawTrail(look, py)
         if (bgTex == null) Backgrounds.drawNear(sr, th, left, bottom, vw, vh, cam.position.y, time, look.reducedMotion)
@@ -339,9 +341,13 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             sr.color = tmp.set(1f, 1f, 1f, 0.97f); sr.rect(left, fy + 1.6f, vw, top - fy)
         }
         particles.draw(sr)
-        sr.end()
 
-        // simge ve yazılar
+        flushGlyphs(cam, restartShapes = false)
+    }
+
+    /** Biriken simge ve yazıları çizer; [restartShapes] → ShapeRenderer'ı yeniden başlatır. */
+    private fun flushGlyphs(cam: OrthographicCamera, restartShapes: Boolean = true) {
+        if (sr.isDrawing) sr.end()
         batch.projectionMatrix = cam.combined
         batch.begin()
         for (k in 0 until glyphCount) {
@@ -362,6 +368,12 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         }
         f.color = Color.WHITE
         batch.end()
+        glyphCount = 0; textCount = 0
+        if (restartShapes) {
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+            sr.begin(ShapeRenderer.ShapeType.Filled)
+        }
     }
 
     private fun visibility(g: GateData, i: Int, world: RunWorld, py: Float, time: Float): Float {
@@ -388,6 +400,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         val hideColors = (g.chain || (g.memoryDist > 0f && dist < g.memoryDist)) && !passed
         val style = th.area.gateStyle
         val t = world.time
+
+        if (assets.has("gate_normal_body") && drawSpriteGate(g, look, alpha, hideColors, t)) return
 
         // gölge + çerçeve
         sr.color = tmp.set(0.15f, 0.22f, 0.35f, 0.16f * alpha); Shapes.roundRect(sr, ROAD_L - 0.05f, y0 - 0.14f, ROAD_W + 0.1f, h, h / 2)
@@ -488,7 +502,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
                 if (g.word >= 0) {
                     text(GameColor.of(g.word).upper, CX + 0.2f, g.y + 0.02f, 0.017f, Pal.WHITE, alpha)
                     // neye bakılacağını gösteren göz rozeti
-                    sr.color = tmp.set(1f, 1f, 1f, alpha); sr.circle(ROAD_R - 0.62f, g.y, 0.42f, 20)
+                    glyph("circle", ROAD_R - 0.62f, g.y, 0.84f, Pal.WHITE, alpha)
                     glyph(if (g.readBy == 1) "sym_word" else "sym_paint", ROAD_R - 0.62f, g.y, 0.6f, dark, alpha)
                     if (look.colorBlind && g.readBy == 0) glyph(shapeIcons[c], ROAD_R - 1.45f, g.y, 0.4f, alpha = alpha)
                 } else if (look.colorBlind && g.rule != RuleType.REPEAT) {
@@ -496,8 +510,71 @@ class WorldRenderer(private val assets: Assets) : Disposable {
                 }
             }
         }
-        posts(style, g.y, if (g.colors.isNotEmpty() && g.motion == Motion.STATIC) Pal.gameColor(g.colors[0]) else th.a1, alpha)
+        if (assets.has("gate_posts_deco")) gateSprite("gate_posts_deco", g.y, Pal.WHITE, alpha)
+        else posts(style, g.y, if (g.colors.isNotEmpty() && g.motion == Motion.STATIC) Pal.gameColor(g.colors[0]) else th.a1, alpha)
         ruleGlyph(g, alpha, if (g.word >= 0) ROAD_L + 0.62f else CX)
+    }
+
+    // ---- kullanıcı kapı görselleri: boyanan gövde + boyanmayan süs (direkler, amblem, saat) ----
+    private val gateCanvasW = (ROAD_W + 0.2f) / 0.702f     // direklerin iç kenarları yolun kenarına denk gelsin
+    private val gateCanvasH = gateCanvasW / 4f
+    private val gateCenterFromBottom = 0.453f                // kapsül/amblem merkezi tuvalin alttan %45'inde
+
+    private fun gateSprite(name: String, y: Float, color: Color, alpha: Float) {
+        glyphWH(name, CX, y - gateCenterFromBottom * gateCanvasH + gateCanvasH / 2, gateCanvasW, gateCanvasH, alpha, color)
+    }
+
+    /** Tek renkli kapıları görselle çizer. Çizildiyse true; çok renkli/hareketli kapılar vektörle sürer. */
+    private fun drawSpriteGate(g: GateData, look: Look, alpha: Float, hideColors: Boolean, t: Float): Boolean {
+        if (g.rule == RuleType.FREE) {
+            gateSprite("gate_sahte_body", g.y, Pal.hex(0xE3E8F2), alpha * 0.85f)
+            gateSprite("gate_sahte_deco", g.y, Pal.WHITE, alpha)
+            text("SAHTE", CX, g.y + 0.02f, 0.012f, dark, alpha)
+            return true
+        }
+        if (hideColors) return false
+        if (g.motion == Motion.TIMED) {
+            val f = t / g.segDur + g.phase
+            val idx = Math.floorMod(floor(f).toInt(), g.colors.size)
+            val c = g.colors[idx]
+            val rem = 1f - (f - floor(f))
+            sr.color = tmp.set(0.15f, 0.22f, 0.35f, 0.14f * alpha); Shapes.roundRect(sr, ROAD_L - 0.05f, g.y - 0.75f, ROAD_W + 0.1f, 0.4f, 0.2f)
+            gateSprite("gate_zaman_body", g.y, Pal.gameColor(c), alpha)
+            gateSprite("gate_zaman_deco", g.y, Pal.WHITE, alpha)
+            // sıradaki renk: kalan süre azaldıkça büyüyen baloncuk
+            val nx = CX - 1.6f
+            val nc = Pal.gameColor(g.colors[(idx + 1) % g.colors.size])
+            glyph("circle", nx, g.y, 0.86f, Pal.WHITE, alpha)
+            glyph("circle", nx, g.y, 0.2f + 0.5f * (1f - rem), nc, alpha)
+            if (look.colorBlind) glyph(shapeIcons[c], CX - 0.3f, g.y, 0.44f, alpha = alpha)
+            return true
+        }
+        if (g.motion != Motion.STATIC) return false
+        if (g.rule != RuleType.SAME && g.rule != RuleType.DIFF && g.rule != RuleType.NEXT && g.rule != RuleType.PREV && g.rule != RuleType.REPEAT) return false
+        val c = g.colors.firstOrNull() ?: 0
+        val fill = if (g.rule == RuleType.REPEAT) Pal.hex(0xEDEFF5) else Pal.gameColor(c)
+        val diff = g.rule == RuleType.DIFF
+        sr.color = tmp.set(0.15f, 0.22f, 0.35f, 0.14f * alpha); Shapes.roundRect(sr, ROAD_L - 0.05f, g.y - 0.75f, ROAD_W + 0.1f, 0.4f, 0.2f)
+        val emblem = g.word < 0 && (g.rule == RuleType.SAME || diff)
+        val bodyName = when { diff -> "gate_ters_body"; emblem -> "gate_normal_body"; assets.has("gate_normal_body_full") -> "gate_normal_body_full"; else -> "gate_normal_body" }
+        gateSprite(bodyName, g.y, fill, alpha)
+        when {
+            emblem -> gateSprite(if (diff) "gate_ters_deco" else "gate_normal_deco", g.y, Pal.WHITE, alpha)
+            else -> gateSprite("gate_posts_deco", g.y, Pal.WHITE, alpha)
+        }
+        if (g.word >= 0) {
+            text(GameColor.of(g.word).upper, CX + 0.2f, g.y + 0.02f, 0.017f, Pal.WHITE, alpha)
+            glyph("circle", ROAD_R - 0.62f, g.y, 0.84f, Pal.WHITE, alpha)
+            glyph(if (g.readBy == 1) "sym_word" else "sym_paint", ROAD_R - 0.62f, g.y, 0.6f, dark, alpha)
+            if (look.colorBlind && g.readBy == 0) glyph(shapeIcons[c], ROAD_R - 1.45f, g.y, 0.4f, alpha = alpha)
+            ruleGlyph(g, alpha, ROAD_L + 0.62f)
+        } else {
+            if (look.colorBlind && g.rule != RuleType.REPEAT) {
+                glyph(shapeIcons[c], CX + 2.0f, g.y, 0.44f, alpha = alpha); glyph(shapeIcons[c], CX - 2.0f, g.y, 0.44f, alpha = alpha)
+            }
+            if (!emblem) ruleGlyph(g, alpha, CX)
+        }
+        return true
     }
 
     /** Kapının kural simgesi (= ≠ → ← ↺) — renkten bağımsız okunabilir. */
@@ -510,8 +587,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             RuleType.REPEAT -> "sym_repeat"
             RuleType.FREE -> return
         }
-        sr.color = tmp.set(dark).also { it.a = alpha }; sr.circle(x, g.y, 0.46f, 22)
-        sr.color = tmp.set(1f, 1f, 1f, alpha); sr.circle(x, g.y, 0.4f, 22)
+        glyph("circle", x, g.y, 0.94f, dark, alpha)
+        glyph("circle", x, g.y, 0.8f, Pal.WHITE, alpha)
         glyph(name, x, g.y, 0.62f, dark, alpha)
     }
 

@@ -43,3 +43,9 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 ## 1.0.6
 * 14 karakter görseli daha eklendi (`tools/art/import_characters.py`: kopuk kırıntıları siler, küçük çizimleri 512 tuvale büyütür): Üçgen Tayfa, Ayıcık, Kurbağa, Hayaletçik, Civciv, Minik Ejder, Buz Küpü, Şeker Kalıbı, Ay Dede, Güneşçik, Kaktüs, Prizma, Altın Robot, Gökkuşağı Küpü. Toplam 24/30 karakter görselli.
 * Vektör çizimle kalan 6 karakter: Kalpçik, Petek Arı, Tavşan, Penguen, Damla, Ahtapotçuk — gönderilen görsellerde karakterle aynı tonda opak arka plan parçaları (kaide, gri blok) vardı; rembg/BiRefNet ile ayrılamadı. Yeniden üretilmeleri gerekiyor.
+
+## 1.0.7 (yeni kapılar ve uygulama simgesi)
+* Normal, ters, zaman ve sahte kapı görselleri `tools/art/import_gates.py` ile iki katmana ayrıldı: boyanan gövde (kapının rengi) + boyanmayan süs (altın direkler, =/≠ amblemi, saat). Amblemsiz kapılar (yanıltıcı, sıradaki, önceki, yankı) için ortası doldurulmuş gövde üretildi.
+* Tek renkli sabit kapılar ve zaman kapısı tamamen görselle; çok renkli/hareketli kapılar (gökkuşağı, yasak, dönen, kayan) vektör gövde + görsel direklerle çiziliyor.
+* Kapı görselleri karakterin altında kalacak şekilde çizim sırası düzenlendi; kural simgeleri yumuşak kenarlı dokulara geçti.
+* Uygulama simgesi (`tools/art/import_app_icon.py`): uyarlanabilir simge (#31C8FB zemin + kenarı zemine kaynaşan ön katman), eski tip kare/yuvarlak mipmap'ler ve 512 px Play simgesi.

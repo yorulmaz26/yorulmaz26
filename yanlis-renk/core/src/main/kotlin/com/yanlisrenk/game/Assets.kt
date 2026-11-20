@@ -56,6 +56,11 @@ class Assets : Disposable {
             "ui2_stars" to "ui2/stars_reward.png", "ui2_chest" to "ui2/chest.png",
             "obj_coin" to "objects/coin.png", "obj_diamond" to "objects/diamond.png", "obj_shield" to "objects/shield.png",
             "obj_pad" to "objects/pad_shift.png", "obj_gate_hidden" to "objects/gate_hidden.png",
+            "gate_normal_body" to "gates/normal_body.png", "gate_normal_deco" to "gates/normal_deco.png",
+            "gate_ters_body" to "gates/ters_body.png", "gate_ters_deco" to "gates/ters_deco.png",
+            "gate_zaman_body" to "gates/zaman_body.png", "gate_zaman_deco" to "gates/zaman_deco.png",
+            "gate_sahte_body" to "gates/sahte_body.png", "gate_sahte_deco" to "gates/sahte_deco.png",
+            "gate_posts_deco" to "gates/posts_deco.png", "gate_normal_body_full" to "gates/normal_body_full.png",
         )
         /** Görseli olabilecek tüm karakterler (dosyası olmayanlar vektör çizimle kalır). */
         val SPRITE_CHARS: List<String> get() = com.yanlisrenk.logic.shop.ShopCatalog.characters.map { it.id }
