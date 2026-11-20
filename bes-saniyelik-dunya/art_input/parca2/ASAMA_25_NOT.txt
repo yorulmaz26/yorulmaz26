@@ -1,0 +1,1 @@
+25. asama: map01_mid.png (2048x640 RGBA) eklendi. Seffaflik yaklasik maske ile uretildi; kusursuz yatay seamless gecis garanti edilmez.

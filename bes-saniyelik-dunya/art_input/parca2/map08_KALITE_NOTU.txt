@@ -1,0 +1,1 @@
+Map08 görselleri ortak atlas üzerinden ayrıştırıldı. Dikey gökyüzü uzatılmıştır; şeffaflık yaklaşık maskedir. Dikişsiz tekrar ve Unity testleri yapılmamıştır.

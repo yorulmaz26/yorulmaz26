@@ -1,0 +1,1 @@
+Yeşil Vadi: map01_sky.png ve map01_far.png mevcut. map01_far.png kaynak çizimden dönüştürüldü; alfa geçişi ve yatay dikiş için yaklaşık düzeltme yapıldı, oyun içi test gereklidir. Diğer 6 katman henüz yok.

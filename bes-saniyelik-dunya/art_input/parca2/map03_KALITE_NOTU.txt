@@ -1,0 +1,1 @@
+Hız Çölü: 8 dosya ortak atlaslardan kesilip hedef boyutlara ölçeklendi. Şeffaflık yaklaşık; tileable dikişler ve dekor hücreleri doğrulanmadı. Sky panoramik şeritten genişletildi; nihai dikey kompozisyon değildir. Unity kullanımı öncesi yeniden işleme gerekir.
