@@ -1,0 +1,1 @@
+6 yeni PNG eklendi. Kaynak ortak atlas olup arka plan yaklasik maskeleme ile silinmistir. Coin sheet 6 ayri render degil, tek on gorunusun daraltilmis varyasyonlaridir. Dikis, saydamlik ve oyun ici kalite kontrol gereklidir.

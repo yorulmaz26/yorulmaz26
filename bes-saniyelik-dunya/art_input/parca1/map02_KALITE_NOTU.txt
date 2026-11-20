@@ -1,0 +1,1 @@
+Map02 katmanları toplu konsept sayfasından kırpılmıştır. Şeffaflık yaklaşık; yatay dikişsizlik, dekor ayrımı ve gerçek Unity kullanımı doğrulanmamıştır. Sky kaynağı etiketli kompozit sayfadan alınmıştır.

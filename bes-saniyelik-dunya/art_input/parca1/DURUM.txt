@@ -1,0 +1,1 @@
+Asama 20: Kaos sprite sheet eklendi. 2048x512 RGBA; arka plan otomatik maskelendi, kenarlar ve animasyon hizasi manuel kontrol gerektirir.
