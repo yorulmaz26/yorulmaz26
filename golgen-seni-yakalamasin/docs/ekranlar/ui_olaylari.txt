@@ -1,862 +1,843 @@
-11-19 23:35:07.472  3004  3004 I GolgenUI: ekran=LogoScreen
-11-19 23:35:07.975  3004  3004 I GolgenUI: ekran=LogoScreen
-11-19 23:35:20.096  3004  3004 I GolgenUI: ekran=SplashScreen
-11-19 23:35:22.797  3004  3004 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
-11-19 23:35:22.797  3004  3004 I GolgenUI: hedef ekran=TutorialScreen ad=OYNA x=540 y=1409
-11-19 23:35:22.798  3004  3004 I GolgenUI: hedef ekran=TutorialScreen ad=ANA MENÜ x=540 y=1569
-11-19 23:35:22.798  3004  3004 I GolgenUI: ekran=TutorialScreen
-11-19 23:35:22.798  3004  3004 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
-11-19 23:35:24.041  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:24.312  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:24.459  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:24.767  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:25.300  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:25.533  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:25.746  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:26.047  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:26.157  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:26.496  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:26.776  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:27.044  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:27.211  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:27.561  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:27.844  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:28.067  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:30.652  3004  3004 I GolgenUI: dokunma a=0 x=955 y=208 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:30.686  3004  3004 I GolgenUI: dokunma a=1 x=955 y=208 fade=0 ekranAdi=TutorialScreen
-11-19 23:35:30.686  3004  3004 I GolgenUI: tik ad=Atla
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:35:30.904  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:35:30.910  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:35:30.910  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=gunluk-odul x=540 y=1553
-11-19 23:35:35.357  3004  3004 I GolgenUI: dokunma a=0 x=540 y=1553 fade=0 ekranAdi=MenuScreen
-11-19 23:35:35.466  3004  3004 I GolgenUI: dokunma a=1 x=540 y=1553 fade=0 ekranAdi=MenuScreen
-11-19 23:35:35.468  3004  3004 I GolgenUI: tik ad=gunluk-odul
-11-19 23:35:35.618  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:35:35.618  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:35:35.619  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:35:35.619  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:35:35.619  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:35:35.619  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:35:35.619  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:35:40.646  3004  3004 I GolgenUI: dokunma a=0 x=540 y=1763 fade=0 ekranAdi=MenuScreen
-11-19 23:35:40.733  3004  3004 I GolgenUI: dokunma a=1 x=540 y=1763 fade=0 ekranAdi=MenuScreen
-11-19 23:35:40.733  3004  3004 I GolgenUI: tik ad=OYNA
-11-19 23:35:41.075  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:35:41.076  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:35:41.076  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:35:41.076  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:35:41.076  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:35:41.076  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:35:41.076  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:35:41.076  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:35:41.080  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:35:44.292  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:44.570  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:44.966  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:45.207  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:45.368  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:45.576  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:45.770  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:46.066  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:46.220  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:46.441  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:46.771  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:47.061  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:47.307  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:47.579  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:48.007  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:48.249  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:48.449  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:48.703  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:48.853  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:49.131  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:49.317  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:49.564  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:49.713  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:35:49.988  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=PlayScreen
-11-19 23:35:52.371  3004  3004 I GolgenUI: dokunma a=0 x=988 y=214 fade=0 ekranAdi=PlayScreen
-11-19 23:35:52.417  3004  3004 I GolgenUI: dokunma a=1 x=988 y=214 fade=0 ekranAdi=PlayScreen
-11-19 23:35:53.409  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
-11-19 23:35:53.409  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
-11-19 23:35:53.409  3004  3004 I GolgenUI: ekran=GameOverScreen
-11-19 23:35:53.409  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
-11-19 23:35:53.409  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
-11-19 23:35:57.651  3004  3004 I GolgenUI: dokunma a=0 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
-11-19 23:35:57.879  3004  3004 I GolgenUI: dokunma a=1 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
-11-19 23:35:57.879  3004  3004 I GolgenUI: tik ad=TEKRAR OYNA
-11-19 23:35:58.158  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:35:58.159  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:36:00.461  3004  3004 I GolgenUI: dokunma a=0 x=988 y=214 fade=0 ekranAdi=PlayScreen
-11-19 23:36:00.500  3004  3004 I GolgenUI: dokunma a=1 x=988 y=214 fade=0 ekranAdi=PlayScreen
-11-19 23:36:00.501  3004  3004 I GolgenUI: tik ad=null
-11-19 23:36:00.579  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:36:00.579  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:36:00.579  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:36:00.579  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:36:00.579  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:36:00.579  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:36:11.103  3004  3004 I GolgenUI: dokunma a=0 x=540 y=1025 fade=0 ekranAdi=PlayScreen
-11-19 23:36:11.158  3004  3004 I GolgenUI: dokunma a=1 x=540 y=1025 fade=0 ekranAdi=PlayScreen
-11-19 23:36:11.159  3004  3004 I GolgenUI: tik ad=DEVAM ET
-11-19 23:36:11.183  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:36:17.486  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
-11-19 23:36:17.487  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
-11-19 23:36:17.488  3004  3004 I GolgenUI: ekran=GameOverScreen
-11-19 23:36:17.488  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
-11-19 23:36:17.488  3004  3004 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
-11-19 23:36:21.660  3004  3004 I GolgenUI: dokunma a=0 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
-11-19 23:36:21.731  3004  3004 I GolgenUI: dokunma a=1 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
-11-19 23:36:21.731  3004  3004 I GolgenUI: tik ad=TEKRAR OYNA
-11-19 23:36:21.942  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:36:21.945  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:36:23.661  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:36:23.661  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:36:23.661  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:36:23.661  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:36:23.661  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:36:23.661  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:36:24.835  3004  3004 I GolgenUI: dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
-11-19 23:36:24.907  3004  3004 I GolgenUI: dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
-11-19 23:36:24.907  3004  3004 I GolgenUI: tik ad=ANA MENÜ
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:25.093  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:25.093  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:36:25.094  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:25.094  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:25.094  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:25.094  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:25.094  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:25.095  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:25.095  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:27.558  3004  3004 I GolgenUI: dokunma a=0 x=244 y=2167 fade=0 ekranAdi=MenuScreen
-11-19 23:36:27.563  3004  3004 I GolgenUI: dokunma a=1 x=244 y=2167 fade=0 ekranAdi=MenuScreen
-11-19 23:36:27.563  3004  3004 I GolgenUI: tik ad=Karakter
-11-19 23:36:27.793  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:27.793  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=ikon--1 x=540 y=778
-11-19 23:36:27.793  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
-11-19 23:36:27.793  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
-11-19 23:36:27.793  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
-11-19 23:36:27.794  3004  3004 I GolgenUI: ekran=SkinsScreen
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
-11-19 23:36:27.794  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
-11-19 23:36:27.795  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
-11-19 23:36:27.795  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
-11-19 23:36:27.795  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
-11-19 23:36:27.795  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
-11-19 23:36:27.795  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
-11-19 23:36:29.351  3004  3004 I GolgenUI: dokunma a=0 x=655 y=1033 fade=0 ekranAdi=SkinsScreen
-11-19 23:36:29.414  3004  3004 I GolgenUI: dokunma a=1 x=655 y=1033 fade=0 ekranAdi=SkinsScreen
-11-19 23:36:29.451  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:29.459  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=SATIN AL  ·  120 x=540 y=778
-11-19 23:36:29.460  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
-11-19 23:36:29.460  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
-11-19 23:36:29.460  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
-11-19 23:36:29.460  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
-11-19 23:36:29.460  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
-11-19 23:36:29.460  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
-11-19 23:36:29.461  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
-11-19 23:36:29.461  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
-11-19 23:36:29.461  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
-11-19 23:36:29.461  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
-11-19 23:36:29.461  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
-11-19 23:36:29.461  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
-11-19 23:36:32.378  3004  3004 I GolgenUI: dokunma a=0 x=540 y=778 fade=0 ekranAdi=SkinsScreen
-11-19 23:36:32.437  3004  3004 I GolgenUI: dokunma a=1 x=540 y=778 fade=0 ekranAdi=SkinsScreen
-11-19 23:36:32.437  3004  3004 I GolgenUI: tik ad=SATIN AL  ·  120
-11-19 23:36:32.494  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:32.495  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
-11-19 23:36:32.496  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
-11-19 23:36:32.497  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
-11-19 23:36:32.498  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
-11-19 23:36:32.499  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
-11-19 23:36:32.501  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
-11-19 23:36:32.501  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
-11-19 23:36:32.501  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
-11-19 23:36:32.501  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
-11-19 23:36:32.501  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
-11-19 23:36:32.501  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
-11-19 23:36:32.502  3004  3004 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
-11-19 23:36:36.514  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:36.514  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:36.514  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:36.515  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:36.515  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:36.515  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:36.515  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:36.519  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:36.519  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:37.377  3004  3004 I GolgenUI: dokunma a=0 x=540 y=2167 fade=0 ekranAdi=MenuScreen
-11-19 23:36:37.380  3004  3004 I GolgenUI: dokunma a=1 x=540 y=2167 fade=0 ekranAdi=MenuScreen
-11-19 23:36:37.380  3004  3004 I GolgenUI: tik ad=Görevler
-11-19 23:36:37.646  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:37.646  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
-11-19 23:36:37.646  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
-11-19 23:36:37.646  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
-11-19 23:36:37.647  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=can-doldur x=845 y=464
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=can-doldur x=845 y=464
-11-19 23:36:37.648  3004  3004 I GolgenUI: ekran=MissionsScreen
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
-11-19 23:36:37.648  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=can-doldur x=845 y=464
-11-19 23:36:40.451  3004  3004 I GolgenUI: dokunma a=0 x=226 y=356 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:40.501  3004  3004 I GolgenUI: dokunma a=1 x=226 y=356 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:40.501  3004  3004 I GolgenUI: tik ad=Haritalar
-11-19 23:36:40.507  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:40.508  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
-11-19 23:36:40.508  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
-11-19 23:36:40.508  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
-11-19 23:36:40.508  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-19 23:36:40.508  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-19 23:36:40.512  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-19 23:36:40.513  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-19 23:36:40.513  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-19 23:36:40.513  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-19 23:36:40.513  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-19 23:36:43.527  3004  3004 I GolgenUI: dokunma a=0 x=853 y=356 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:43.588  3004  3004 I GolgenUI: dokunma a=1 x=853 y=356 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:43.588  3004  3004 I GolgenUI: tik ad=Başarılar
-11-19 23:36:43.602  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:43.602  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
-11-19 23:36:43.602  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
-11-19 23:36:43.602  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
-11-19 23:36:46.532  3004  3004 I GolgenUI: dokunma a=0 x=226 y=356 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:46.581  3004  3004 I GolgenUI: dokunma a=1 x=226 y=356 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:46.582  3004  3004 I GolgenUI: tik ad=Haritalar
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-19 23:36:46.611  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-19 23:36:46.612  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-19 23:36:46.612  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-19 23:36:46.612  3004  3004 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-19 23:36:47.908  3004  3004 I GolgenUI: dokunma a=0 x=170 y=784 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:48.011  3004  3004 I GolgenUI: dokunma a=1 x=170 y=784 fade=0 ekranAdi=MissionsScreen
-11-19 23:36:48.241  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:36:48.243  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:36:48.244  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:36:48.244  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:36:48.244  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:36:48.245  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:36:48.245  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:36:48.246  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:36:51.968  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:36:51.971  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:36:51.971  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:36:51.971  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:36:51.971  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:36:51.971  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:36:52.758  3004  3004 I GolgenUI: dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
-11-19 23:36:52.760  3004  3004 I GolgenUI: dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
-11-19 23:36:52.761  3004  3004 I GolgenUI: tik ad=ANA MENÜ
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:52.961  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:52.962  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:52.962  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:54.023  3004  3004 I GolgenUI: dokunma a=0 x=836 y=2167 fade=0 ekranAdi=MenuScreen
-11-19 23:36:54.119  3004  3004 I GolgenUI: dokunma a=1 x=836 y=2167 fade=0 ekranAdi=MenuScreen
-11-19 23:36:54.119  3004  3004 I GolgenUI: tik ad=Rekorlar
-11-19 23:36:54.340  3004  3004 I GolgenUI: hedef ekran=RecordsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:54.340  3004  3004 I GolgenUI: ekran=RecordsScreen
-11-19 23:36:54.340  3004  3004 I GolgenUI: hedef ekran=RecordsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:57.392  3004  3004 I GolgenUI: dokunma a=0 x=96 y=216 fade=0 ekranAdi=RecordsScreen
-11-19 23:36:57.479  3004  3004 I GolgenUI: dokunma a=1 x=96 y=216 fade=0 ekranAdi=RecordsScreen
-11-19 23:36:57.480  3004  3004 I GolgenUI: tik ad=null
-11-19 23:36:57.681  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:57.682  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:57.682  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:57.682  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:57.682  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:57.682  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:57.682  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:57.683  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:36:57.683  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:36:58.688  3004  3004 I GolgenUI: dokunma a=0 x=984 y=216 fade=0 ekranAdi=MenuScreen
-11-19 23:36:58.755  3004  3004 I GolgenUI: dokunma a=1 x=984 y=216 fade=0 ekranAdi=MenuScreen
-11-19 23:36:58.755  3004  3004 I GolgenUI: tik ad=null
-11-19 23:36:59.013  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:59.013  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=EVET, SIFIRLA x=350 y=1380
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=VAZGEÇ x=730 y=1380
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
-11-19 23:36:59.014  3004  3004 I GolgenUI: ekran=SettingsScreen
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
-11-19 23:36:59.014  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
-11-19 23:37:00.184  3004  3004 I GolgenUI: dokunma a=0 x=540 y=403 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:00.216  3004  3004 I GolgenUI: dokunma a=1 x=540 y=403 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:00.218  3004  3004 I GolgenUI: tik ad=ayar-ses
-11-19 23:37:01.542  3004  3004 I GolgenUI: dokunma a=0 x=540 y=751 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:01.602  3004  3004 I GolgenUI: dokunma a=1 x=540 y=751 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:01.602  3004  3004 I GolgenUI: tik ad=ayar-titresim
-11-19 23:37:04.831  3004  3004 I GolgenUI: dokunma a=0 x=540 y=403 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:04.880  3004  3004 I GolgenUI: dokunma a=1 x=540 y=403 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:04.880  3004  3004 I GolgenUI: tik ad=ayar-ses
-11-19 23:37:06.110  3004  3004 I GolgenUI: dokunma a=0 x=540 y=1131 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:06.162  3004  3004 I GolgenUI: dokunma a=1 x=540 y=1131 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:06.163  3004  3004 I GolgenUI: tik ad=İLERLEMEYİ SIFIRLA
-11-19 23:37:06.174  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=EVET, SIFIRLA x=350 y=1380
-11-19 23:37:06.175  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=VAZGEÇ x=730 y=1380
-11-19 23:37:09.366  3004  3004 I GolgenUI: dokunma a=0 x=730 y=1380 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:09.424  3004  3004 I GolgenUI: dokunma a=1 x=730 y=1380 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:09.424  3004  3004 I GolgenUI: tik ad=VAZGEÇ
-11-19 23:37:09.433  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
-11-19 23:37:09.433  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
-11-19 23:37:09.436  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
-11-19 23:37:09.436  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
-11-19 23:37:09.437  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
-11-19 23:37:09.437  3004  3004 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
-11-19 23:37:10.627  3004  3004 I GolgenUI: dokunma a=0 x=540 y=971 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:10.677  3004  3004 I GolgenUI: dokunma a=1 x=540 y=971 fade=0 ekranAdi=SettingsScreen
-11-19 23:37:10.677  3004  3004 I GolgenUI: tik ad=ÖĞRETİCİYİ OYNA
-11-19 23:37:10.864  3004  3004 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
-11-19 23:37:10.864  3004  3004 I GolgenUI: ekran=TutorialScreen
-11-19 23:37:10.864  3004  3004 I GolgenUI: hedef ekran=TutorialScreen ad=Kapat x=955 y=208
-11-19 23:37:14.011  3004  3004 I GolgenUI: dokunma a=0 x=955 y=208 fade=0 ekranAdi=TutorialScreen
-11-19 23:37:14.063  3004  3004 I GolgenUI: dokunma a=1 x=955 y=208 fade=0 ekranAdi=TutorialScreen
-11-19 23:37:14.067  3004  3004 I GolgenUI: tik ad=Kapat
-11-19 23:37:14.244  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:37:14.247  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:37:14.248  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:37:14.248  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:37:14.248  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:37:14.248  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:37:14.248  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:37:14.249  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:37:14.249  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:37:14.249  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:37:14.249  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:37:14.249  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:37:14.252  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:37:14.253  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:37:14.253  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:15.665  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:15.665  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:16.856  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:17.094  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:17.257  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:17.570  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:17.768  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:18.123  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:18.273  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:18.519  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:18.667  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:18.957  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:19.226  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:19.515  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:19.677  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:19.964  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:20.164  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:20.473  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:20.554  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:20.858  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:23.005  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:23.005  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:23.005  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:23.006  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:23.006  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:23.006  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:23.344  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:23.344  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:23.344  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:23.345  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:23.345  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:23.345  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:23.345  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:23.345  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:24.595  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:24.849  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:25.061  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:25.395  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:25.539  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:25.865  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:26.050  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:26.324  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:26.444  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:26.733  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:26.877  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:27.158  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:27.355  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:27.638  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:27.773  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:28.012  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:28.130  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:28.441  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:29.584  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:29.585  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:29.585  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:29.585  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:29.585  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:29.586  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:29.833  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:29.833  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:29.833  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:29.833  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:29.834  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:29.834  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:29.834  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:29.835  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:30.791  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:31.056  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:31.153  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:31.478  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:31.653  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:31.922  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:32.054  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:32.360  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:32.532  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:32.804  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:32.924  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:33.229  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:33.413  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:33.709  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:33.857  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:34.176  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:34.364  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:34.677  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:36.758  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:36.758  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:36.758  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:36.758  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:36.758  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:36.758  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:37.045  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:37.045  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:37.923  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:38.206  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:38.409  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:38.717  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:38.871  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:39.141  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:39.255  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:39.588  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:39.780  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:40.068  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:40.210  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:40.561  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:40.674  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:40.958  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:41.095  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:41.377  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:41.543  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:41.796  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:43.539  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:43.540  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:43.540  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:43.540  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:43.540  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:43.540  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:43.809  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:43.809  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:43.809  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:43.810  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:43.810  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:43.810  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:43.813  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:43.813  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:44.812  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:45.114  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:45.225  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:45.527  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:45.573  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:45.905  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:46.020  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:46.338  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:46.514  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:46.817  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:46.978  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:47.270  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:47.503  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:47.773  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:47.936  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:48.288  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:48.488  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:48.798  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:50.506  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:50.506  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:50.506  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:50.506  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:50.507  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:50.507  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:50.779  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:50.780  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:50.780  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:50.780  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:50.781  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:50.781  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:50.781  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:50.783  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:51.637  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:51.947  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.084  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.428  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.542  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.852  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.016  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.282  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.487  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.779  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.940  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.225  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.376  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.730  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.882  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:55.162  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:55.312  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:55.598  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:57.086  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:37:57.086  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:58.172  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:58.468  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:58.669  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:58.939  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.168  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.379  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.538  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.889  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.092  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.333  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.467  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.813  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.982  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.253  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.375  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.704  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.884  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:02.222  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:04.095  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:04.095  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:04.095  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:04.096  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:04.096  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:04.096  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:04.393  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:04.393  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:04.393  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:04.393  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:04.393  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:04.393  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:04.393  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:04.394  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:05.197  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:05.502  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:05.666  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:05.938  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.162  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.401  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.602  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.874  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.095  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.399  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.552  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.840  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.889  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.240  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.317  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.662  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.782  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:09.080  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:10.875  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:10.875  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:11.793  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.112  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.280  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.616  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.725  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.971  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.101  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.364  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.523  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.776  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.948  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.233  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.351  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.635  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.801  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:15.084  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:15.186  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:15.492  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:17.195  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:17.195  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:18.304  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:18.590  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:18.728  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:18.949  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.089  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.451  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.525  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.881  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.020  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.275  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.360  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.650  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.744  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.076  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.266  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.511  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.715  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.958  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:23.047  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:23.047  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:23.047  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:23.047  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:23.047  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:23.048  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:23.321  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:23.321  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:23.321  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:23.321  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:23.321  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:23.321  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:23.321  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:23.322  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:24.310  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:24.545  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:24.619  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:24.907  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.032  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.315  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.399  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.646  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.728  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.054  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.182  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.441  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.628  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.927  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.050  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.356  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.488  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.822  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:29.083  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:29.084  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:29.084  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:29.084  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:29.084  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:29.084  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:29.263  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:29.263  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:30.310  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:30.571  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:30.675  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.003  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.089  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.357  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.489  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.766  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.859  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.210  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.306  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.542  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.630  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.925  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.985  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:33.321  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:33.523  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:33.851  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:34.815  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:34.816  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:34.816  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:34.817  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:34.817  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:34.817  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:35.010  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:35.010  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:35.016  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:35.016  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:35.016  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:35.016  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:35.016  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:35.016  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:36.161  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.441  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.552  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.799  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.950  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.305  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.364  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.658  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.761  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.003  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.105  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.412  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.520  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.832  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.938  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:39.243  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:39.357  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:39.706  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:40.934  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:40.934  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:40.934  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:40.934  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:40.934  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:40.937  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:41.206  3004  3004 I GolgenUI: ekran=PlayScreen
-11-19 23:38:41.206  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:42.339  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:42.640  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:42.756  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.141  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.346  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.505  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.654  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.884  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.006  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.323  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.445  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.738  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.901  3004  3004 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.240  3004  3004 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.409  3004  3004 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.755  3004  3004 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.939  3004  3004 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:46.239  3004  3004 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:47.370  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:47.371  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:47.371  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:47.372  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:47.372  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:47.372  3004  3004 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:38:47.692  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:38:47.697  3004  3004 I GolgenUI: ekran=MenuScreen
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:38:47.698  3004  3004 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:38:49.254  7754  7754 I GolgenUI: ekran=LogoScreen
-11-19 23:38:58.607  7754  7754 I GolgenUI: ekran=SplashScreen
-11-19 23:39:01.258  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:39:01.258  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:39:01.258  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:39:01.258  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:39:01.259  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:39:01.259  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:39:01.259  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:39:01.260  7754  7754 I GolgenUI: ekran=MenuScreen
-11-19 23:39:01.260  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:39:01.261  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:39:01.261  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:39:01.261  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:39:01.261  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:39:01.261  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:39:01.261  7754  7754 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:01:04.949  3148  3148 I GolgenUI: ekran=LogoScreen
+11-20 16:01:20.086  3148  3148 I GolgenUI: ekran=SplashScreen
+11-20 16:01:22.845  3148  3148 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
+11-20 16:01:22.848  3148  3148 I GolgenUI: hedef ekran=TutorialScreen ad=OYNA x=540 y=1409
+11-20 16:01:22.848  3148  3148 I GolgenUI: hedef ekran=TutorialScreen ad=ANA MENÜ x=540 y=1569
+11-20 16:01:22.849  3148  3148 I GolgenUI: ekran=TutorialScreen
+11-20 16:01:22.849  3148  3148 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
+11-20 16:01:24.234  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:24.461  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:24.582  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:25.392  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:25.590  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:25.871  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:25.989  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:26.292  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:26.369  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:26.696  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:26.956  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:27.267  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:27.713  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1700 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:27.982  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:28.322  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:28.616  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1800 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:31.382  3148  3148 I GolgenUI: dokunma a=0 x=955 y=208 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:31.385  3148  3148 I GolgenUI: dokunma a=1 x=955 y=208 fade=0 ekranAdi=TutorialScreen
+11-20 16:01:31.385  3148  3148 I GolgenUI: tik ad=Atla
+11-20 16:01:31.672  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:01:31.672  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:01:31.672  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:01:31.672  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:01:31.672  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:01:31.672  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:01:31.673  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:01:31.732  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:01:31.732  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=gunluk-odul x=540 y=1553
+11-20 16:01:36.718  3148  3148 I GolgenUI: dokunma a=0 x=540 y=1553 fade=0 ekranAdi=MenuScreen
+11-20 16:01:36.871  3148  3148 I GolgenUI: dokunma a=1 x=540 y=1553 fade=0 ekranAdi=MenuScreen
+11-20 16:01:36.871  3148  3148 I GolgenUI: tik ad=gunluk-odul
+11-20 16:01:36.973  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:01:36.979  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:01:36.979  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:01:36.979  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:01:36.979  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:01:36.979  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:01:36.979  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:01:43.928  3148  3148 I GolgenUI: dokunma a=0 x=540 y=1763 fade=0 ekranAdi=MenuScreen
+11-20 16:01:44.000  3148  3148 I GolgenUI: dokunma a=1 x=540 y=1763 fade=0 ekranAdi=MenuScreen
+11-20 16:01:44.003  3148  3148 I GolgenUI: tik ad=OYNA
+11-20 16:01:44.354  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:01:44.354  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:01:44.354  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:01:44.354  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:01:44.356  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:01:44.356  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:01:44.356  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:01:44.356  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:01:44.357  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:01:49.013  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:49.564  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:49.803  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:50.024  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:50.331  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:50.429  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:50.709  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:50.983  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:51.172  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:51.626  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:51.834  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:52.091  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:52.349  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:52.596  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:52.827  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:53.060  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:53.202  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:53.444  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:53.658  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:53.973  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:54.205  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:54.436  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:54.882  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:01:55.177  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1500 fade=0 ekranAdi=PlayScreen
+11-20 16:01:59.920  3148  3148 I GolgenUI: dokunma a=0 x=988 y=214 fade=0 ekranAdi=PlayScreen
+11-20 16:02:00.010  3148  3148 I GolgenUI: dokunma a=1 x=988 y=214 fade=0 ekranAdi=PlayScreen
+11-20 16:02:01.300  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
+11-20 16:02:01.303  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
+11-20 16:02:01.303  3148  3148 I GolgenUI: ekran=GameOverScreen
+11-20 16:02:01.304  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
+11-20 16:02:01.304  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
+11-20 16:02:04.477  3148  3148 I GolgenUI: dokunma a=0 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
+11-20 16:02:04.543  3148  3148 I GolgenUI: dokunma a=1 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
+11-20 16:02:04.543  3148  3148 I GolgenUI: tik ad=TEKRAR OYNA
+11-20 16:02:04.914  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:02:04.914  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:02:07.352  3148  3148 I GolgenUI: dokunma a=0 x=988 y=214 fade=0 ekranAdi=PlayScreen
+11-20 16:02:07.399  3148  3148 I GolgenUI: dokunma a=1 x=988 y=214 fade=0 ekranAdi=PlayScreen
+11-20 16:02:07.401  3148  3148 I GolgenUI: tik ad=null
+11-20 16:02:07.419  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:02:07.420  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:02:07.421  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:02:07.425  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:02:07.426  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:02:07.427  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:02:18.500  3148  3148 I GolgenUI: dokunma a=0 x=540 y=1025 fade=0 ekranAdi=PlayScreen
+11-20 16:02:18.581  3148  3148 I GolgenUI: dokunma a=1 x=540 y=1025 fade=0 ekranAdi=PlayScreen
+11-20 16:02:18.584  3148  3148 I GolgenUI: tik ad=DEVAM ET
+11-20 16:02:18.604  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:02:25.839  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
+11-20 16:02:25.839  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
+11-20 16:02:25.839  3148  3148 I GolgenUI: ekran=GameOverScreen
+11-20 16:02:25.840  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=TEKRAR OYNA x=540 y=2027
+11-20 16:02:25.840  3148  3148 I GolgenUI: hedef ekran=GameOverScreen ad=ANA MENÜ x=540 y=2197
+11-20 16:02:30.676  3148  3148 I GolgenUI: dokunma a=0 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
+11-20 16:02:30.737  3148  3148 I GolgenUI: dokunma a=1 x=540 y=2027 fade=0 ekranAdi=GameOverScreen
+11-20 16:02:30.737  3148  3148 I GolgenUI: tik ad=TEKRAR OYNA
+11-20 16:02:30.983  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:02:30.986  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:02:33.233  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:02:33.233  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:02:33.233  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:02:33.233  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:02:33.234  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:02:33.234  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:02:34.635  3148  3148 I GolgenUI: dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-20 16:02:34.695  3148  3148 I GolgenUI: dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-20 16:02:34.695  3148  3148 I GolgenUI: tik ad=ANA MENÜ
+11-20 16:02:34.917  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:02:34.918  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:02:34.918  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:02:34.918  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:02:34.918  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:02:34.918  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:02:34.918  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:02:34.919  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:02:34.919  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:02:34.919  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:02:34.919  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:02:34.920  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:02:34.920  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:02:34.920  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:02:34.920  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:02:37.309  3148  3148 I GolgenUI: dokunma a=0 x=244 y=2167 fade=0 ekranAdi=MenuScreen
+11-20 16:02:37.392  3148  3148 I GolgenUI: dokunma a=1 x=244 y=2167 fade=0 ekranAdi=MenuScreen
+11-20 16:02:37.392  3148  3148 I GolgenUI: tik ad=Karakter
+11-20 16:02:37.695  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:37.696  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=ikon--1 x=540 y=778
+11-20 16:02:37.696  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
+11-20 16:02:37.696  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
+11-20 16:02:37.696  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
+11-20 16:02:37.696  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
+11-20 16:02:37.696  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
+11-20 16:02:37.698  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
+11-20 16:02:37.698  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
+11-20 16:02:37.698  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
+11-20 16:02:37.699  3148  3148 I GolgenUI: ekran=SkinsScreen
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
+11-20 16:02:37.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
+11-20 16:02:37.700  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
+11-20 16:02:37.702  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
+11-20 16:02:37.702  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
+11-20 16:02:37.702  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
+11-20 16:02:39.590  3148  3148 I GolgenUI: dokunma a=0 x=655 y=1033 fade=0 ekranAdi=SkinsScreen
+11-20 16:02:39.678  3148  3148 I GolgenUI: dokunma a=1 x=655 y=1033 fade=0 ekranAdi=SkinsScreen
+11-20 16:02:39.699  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:39.700  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=SATIN AL  ·  120 x=540 y=778
+11-20 16:02:39.701  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
+11-20 16:02:39.703  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
+11-20 16:02:39.704  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
+11-20 16:02:39.704  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
+11-20 16:02:39.708  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
+11-20 16:02:39.708  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
+11-20 16:02:39.708  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
+11-20 16:02:39.708  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
+11-20 16:02:39.708  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
+11-20 16:02:39.709  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
+11-20 16:02:39.709  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
+11-20 16:02:39.709  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
+11-20 16:02:43.597  3148  3148 I GolgenUI: dokunma a=0 x=540 y=778 fade=0 ekranAdi=SkinsScreen
+11-20 16:02:43.673  3148  3148 I GolgenUI: dokunma a=1 x=540 y=778 fade=0 ekranAdi=SkinsScreen
+11-20 16:02:43.675  3148  3148 I GolgenUI: tik ad=SATIN AL  ·  120
+11-20 16:02:43.716  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:43.716  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-0 x=195 y=1033
+11-20 16:02:43.719  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-1 x=425 y=1033
+11-20 16:02:43.719  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-2 x=655 y=1033
+11-20 16:02:43.721  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-3 x=885 y=1033
+11-20 16:02:43.721  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-4 x=195 y=1303
+11-20 16:02:43.721  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-5 x=425 y=1303
+11-20 16:02:43.721  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-6 x=655 y=1303
+11-20 16:02:43.722  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-7 x=885 y=1303
+11-20 16:02:43.722  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-8 x=195 y=1573
+11-20 16:02:43.722  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-9 x=425 y=1573
+11-20 16:02:43.722  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-10 x=655 y=1573
+11-20 16:02:43.723  3148  3148 I GolgenUI: hedef ekran=SkinsScreen ad=kart-11 x=885 y=1573
+11-20 16:02:48.287  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:02:48.288  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:02:48.289  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:02:48.290  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:02:48.290  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:02:48.290  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:02:48.290  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:02:48.291  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:02:48.292  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:02:48.292  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:02:48.293  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:02:48.293  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:02:48.293  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:02:48.293  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:02:48.293  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:02:48.603  3148  3148 I GolgenUI: dokunma a=0 x=540 y=2167 fade=-1 ekranAdi=MenuScreen
+11-20 16:02:48.682  3148  3148 I GolgenUI: dokunma a=1 x=540 y=2167 fade=0 ekranAdi=MenuScreen
+11-20 16:02:48.683  3148  3148 I GolgenUI: tik ad=Görevler
+11-20 16:02:48.940  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:48.941  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
+11-20 16:02:48.941  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
+11-20 16:02:48.942  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
+11-20 16:02:48.942  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=can-doldur x=845 y=464
+11-20 16:02:48.943  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:48.945  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
+11-20 16:02:48.945  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
+11-20 16:02:48.946  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
+11-20 16:02:48.946  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=can-doldur x=845 y=464
+11-20 16:02:48.946  3148  3148 I GolgenUI: ekran=MissionsScreen
+11-20 16:02:48.946  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:48.946  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
+11-20 16:02:48.946  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
+11-20 16:02:48.947  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
+11-20 16:02:48.947  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=can-doldur x=845 y=464
+11-20 16:02:52.747  3148  3148 I GolgenUI: dokunma a=0 x=226 y=356 fade=0 ekranAdi=MissionsScreen
+11-20 16:02:52.817  3148  3148 I GolgenUI: dokunma a=1 x=226 y=356 fade=0 ekranAdi=MissionsScreen
+11-20 16:02:52.819  3148  3148 I GolgenUI: tik ad=Haritalar
+11-20 16:02:52.853  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:52.854  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
+11-20 16:02:52.854  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
+11-20 16:02:52.856  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
+11-20 16:02:52.856  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-20 16:02:52.856  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-20 16:02:52.856  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-20 16:02:52.857  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-20 16:02:52.857  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-20 16:02:52.857  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-20 16:02:52.858  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-20 16:02:52.858  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-20 16:02:52.858  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-20 16:02:52.858  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-20 16:02:52.858  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-20 16:02:52.858  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-20 16:02:52.859  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-20 16:02:52.859  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-20 16:02:52.859  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-20 16:02:55.923  3148  3148 I GolgenUI: dokunma a=0 x=853 y=356 fade=0 ekranAdi=MissionsScreen
+11-20 16:02:55.996  3148  3148 I GolgenUI: dokunma a=1 x=853 y=356 fade=0 ekranAdi=MissionsScreen
+11-20 16:02:55.997  3148  3148 I GolgenUI: tik ad=Başarılar
+11-20 16:02:56.018  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:56.019  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
+11-20 16:02:56.019  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
+11-20 16:02:56.020  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
+11-20 16:02:59.151  3148  3148 I GolgenUI: dokunma a=0 x=226 y=356 fade=0 ekranAdi=MissionsScreen
+11-20 16:02:59.234  3148  3148 I GolgenUI: dokunma a=1 x=226 y=356 fade=0 ekranAdi=MissionsScreen
+11-20 16:02:59.236  3148  3148 I GolgenUI: tik ad=Haritalar
+11-20 16:02:59.260  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-20 16:02:59.263  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Haritalar x=226 y=356
+11-20 16:02:59.264  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Günlük x=540 y=356
+11-20 16:02:59.265  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=Başarılar x=853 y=356
+11-20 16:02:59.266  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-20 16:02:59.266  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-20 16:02:59.266  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-20 16:02:59.266  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-20 16:02:59.267  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-20 16:02:59.267  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-20 16:02:59.268  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-20 16:02:59.268  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-20 16:02:59.269  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-20 16:02:59.269  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-20 16:02:59.270  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-20 16:02:59.270  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-20 16:02:59.271  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-20 16:02:59.271  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-20 16:02:59.272  3148  3148 I GolgenUI: hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-20 16:03:00.467  3148  3148 I GolgenUI: dokunma a=0 x=170 y=784 fade=0 ekranAdi=MissionsScreen
+11-20 16:03:00.556  3148  3148 I GolgenUI: dokunma a=1 x=170 y=784 fade=0 ekranAdi=MissionsScreen
+11-20 16:03:00.847  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:00.848  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:00.848  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:00.848  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:00.848  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:00.848  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:00.848  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:03:00.848  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:03:04.541  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:04.541  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:04.541  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:04.541  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:04.541  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:04.541  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:05.470  3148  3148 I GolgenUI: dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-20 16:03:05.554  3148  3148 I GolgenUI: dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-20 16:03:05.559  3148  3148 I GolgenUI: tik ad=ANA MENÜ
+11-20 16:03:05.826  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:03:05.827  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:03:05.827  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:03:05.827  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:03:05.827  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:03:05.828  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:03:05.828  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:03:05.828  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:03:05.829  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:03:05.830  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:03:05.830  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:03:05.830  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:03:05.830  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:03:05.830  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:03:05.831  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:03:07.128  3148  3148 I GolgenUI: dokunma a=0 x=836 y=2167 fade=0 ekranAdi=MenuScreen
+11-20 16:03:07.214  3148  3148 I GolgenUI: dokunma a=1 x=836 y=2167 fade=0 ekranAdi=MenuScreen
+11-20 16:03:07.215  3148  3148 I GolgenUI: tik ad=Rekorlar
+11-20 16:03:07.479  3148  3148 I GolgenUI: hedef ekran=RecordsScreen ad=ikon-3 x=96 y=216
+11-20 16:03:07.480  3148  3148 I GolgenUI: ekran=RecordsScreen
+11-20 16:03:07.480  3148  3148 I GolgenUI: hedef ekran=RecordsScreen ad=ikon-3 x=96 y=216
+11-20 16:03:11.149  3148  3148 I GolgenUI: dokunma a=0 x=96 y=216 fade=0 ekranAdi=RecordsScreen
+11-20 16:03:11.234  3148  3148 I GolgenUI: dokunma a=1 x=96 y=216 fade=0 ekranAdi=RecordsScreen
+11-20 16:03:11.241  3148  3148 I GolgenUI: tik ad=null
+11-20 16:03:11.452  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:03:11.453  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:03:11.457  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:03:11.457  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:03:11.458  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:03:11.458  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:03:11.458  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:03:11.462  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:03:11.462  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:03:11.463  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:03:11.463  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:03:11.463  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:03:11.463  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:03:11.463  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:03:11.463  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:03:12.800  3148  3148 I GolgenUI: dokunma a=0 x=984 y=216 fade=0 ekranAdi=MenuScreen
+11-20 16:03:12.874  3148  3148 I GolgenUI: dokunma a=1 x=984 y=216 fade=0 ekranAdi=MenuScreen
+11-20 16:03:12.877  3148  3148 I GolgenUI: tik ad=null
+11-20 16:03:13.144  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
+11-20 16:03:13.148  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
+11-20 16:03:13.148  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
+11-20 16:03:13.148  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
+11-20 16:03:13.148  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
+11-20 16:03:13.149  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
+11-20 16:03:13.149  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=EVET, SIFIRLA x=350 y=1380
+11-20 16:03:13.149  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=VAZGEÇ x=730 y=1380
+11-20 16:03:13.149  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
+11-20 16:03:13.153  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
+11-20 16:03:13.153  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
+11-20 16:03:13.153  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
+11-20 16:03:13.153  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
+11-20 16:03:13.153  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
+11-20 16:03:13.153  3148  3148 I GolgenUI: ekran=SettingsScreen
+11-20 16:03:13.154  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
+11-20 16:03:13.154  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
+11-20 16:03:13.154  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
+11-20 16:03:13.154  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
+11-20 16:03:13.154  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
+11-20 16:03:13.154  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
+11-20 16:03:14.596  3148  3148 I GolgenUI: dokunma a=0 x=540 y=403 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:14.669  3148  3148 I GolgenUI: dokunma a=1 x=540 y=403 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:14.669  3148  3148 I GolgenUI: tik ad=ayar-ses
+11-20 16:03:15.982  3148  3148 I GolgenUI: dokunma a=0 x=540 y=751 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:16.041  3148  3148 I GolgenUI: dokunma a=1 x=540 y=751 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:16.041  3148  3148 I GolgenUI: tik ad=ayar-titresim
+11-20 16:03:20.143  3148  3148 I GolgenUI: dokunma a=0 x=540 y=403 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:20.191  3148  3148 I GolgenUI: dokunma a=1 x=540 y=403 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:20.191  3148  3148 I GolgenUI: tik ad=ayar-ses
+11-20 16:03:21.563  3148  3148 I GolgenUI: dokunma a=0 x=540 y=1131 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:21.603  3148  3148 I GolgenUI: dokunma a=1 x=540 y=1131 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:21.603  3148  3148 I GolgenUI: tik ad=İLERLEMEYİ SIFIRLA
+11-20 16:03:21.613  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=EVET, SIFIRLA x=350 y=1380
+11-20 16:03:21.613  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=VAZGEÇ x=730 y=1380
+11-20 16:03:25.106  3148  3148 I GolgenUI: dokunma a=0 x=730 y=1380 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:25.168  3148  3148 I GolgenUI: dokunma a=1 x=730 y=1380 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:25.168  3148  3148 I GolgenUI: tik ad=VAZGEÇ
+11-20 16:03:25.188  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ikon-3 x=96 y=216
+11-20 16:03:25.188  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-ses x=540 y=403
+11-20 16:03:25.188  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-muzik x=540 y=577
+11-20 16:03:25.188  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ayar-titresim x=540 y=751
+11-20 16:03:25.188  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=ÖĞRETİCİYİ OYNA x=540 y=971
+11-20 16:03:25.188  3148  3148 I GolgenUI: hedef ekran=SettingsScreen ad=İLERLEMEYİ SIFIRLA x=540 y=1131
+11-20 16:03:26.516  3148  3148 I GolgenUI: dokunma a=0 x=540 y=971 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:26.657  3148  3148 I GolgenUI: dokunma a=1 x=540 y=971 fade=0 ekranAdi=SettingsScreen
+11-20 16:03:26.657  3148  3148 I GolgenUI: tik ad=ÖĞRETİCİYİ OYNA
+11-20 16:03:26.859  3148  3148 I GolgenUI: hedef ekran=TutorialScreen ad=Atla x=955 y=208
+11-20 16:03:26.863  3148  3148 I GolgenUI: ekran=TutorialScreen
+11-20 16:03:26.865  3148  3148 I GolgenUI: hedef ekran=TutorialScreen ad=Kapat x=955 y=208
+11-20 16:03:30.517  3148  3148 I GolgenUI: dokunma a=0 x=955 y=208 fade=0 ekranAdi=TutorialScreen
+11-20 16:03:30.521  3148  3148 I GolgenUI: dokunma a=1 x=955 y=208 fade=0 ekranAdi=TutorialScreen
+11-20 16:03:30.521  3148  3148 I GolgenUI: tik ad=Kapat
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:03:30.699  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:03:30.700  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:03:30.700  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:03:30.701  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:03:30.701  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:03:30.701  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:03:30.701  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:03:30.701  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:03:30.701  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:32.142  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:03:32.142  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:03:33.551  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:33.795  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:33.952  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:34.266  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:34.359  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:34.676  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:34.825  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:35.083  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:35.259  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:35.547  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:35.664  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:35.964  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:36.166  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:36.428  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:36.531  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:36.867  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:37.041  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:37.318  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:39.157  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:39.157  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:39.157  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:39.157  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:39.157  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:39.161  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:39.534  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:39.534  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:39.535  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:39.536  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:39.536  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:39.536  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:39.536  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:03:39.536  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:03:40.346  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:40.624  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:40.845  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:41.136  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:41.288  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:41.600  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:41.819  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:42.143  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:42.261  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:42.571  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:42.724  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:43.047  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:43.207  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:43.523  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:43.810  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:44.092  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:44.265  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:44.626  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:46.654  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:46.654  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:46.654  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:46.654  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:46.654  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:46.654  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:46.982  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:03:46.993  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:03:46.999  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:03:47.000  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:03:47.000  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:03:47.000  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:03:47.001  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:03:47.001  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:03:48.288  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:48.519  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:48.833  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:49.091  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:49.337  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:49.651  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:49.962  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:50.282  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:50.468  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:50.782  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:51.140  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:51.427  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:51.698  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:52.025  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:52.208  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:52.546  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:52.743  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:53.074  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:55.816  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:03:55.818  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:03:57.055  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:57.297  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:57.439  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:57.772  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:58.096  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:58.366  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:58.636  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:03:58.905  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:59.064  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:03:59.379  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:59.549  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:03:59.863  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:00.036  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:00.315  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:00.566  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:00.785  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:01.000  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:01.344  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:03.370  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:03.370  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:03.370  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:03.370  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:03.370  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:03.370  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:03.653  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:03.653  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:04.894  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:05.199  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:05.465  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:05.814  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:05.942  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:06.196  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:06.421  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:06.759  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:06.954  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:07.286  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:07.430  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:07.760  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:08.139  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:08.507  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:08.789  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:09.143  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:09.361  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:09.598  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:12.262  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:12.262  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:12.262  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:12.262  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:12.263  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:12.263  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:12.673  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:12.674  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:12.674  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:12.674  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:12.674  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:12.674  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:12.688  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:12.689  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:13.795  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:14.109  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:14.288  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:14.561  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:14.916  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:15.203  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:15.455  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:15.752  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:16.090  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:16.433  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:16.679  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:16.968  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:17.102  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:17.436  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:17.628  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:17.947  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:18.195  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:18.530  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:20.468  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:20.468  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:20.468  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:20.468  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:20.468  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:20.468  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:20.800  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:20.802  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:20.802  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:20.803  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:20.803  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:20.804  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:20.804  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:20.805  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:21.730  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.036  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.166  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.518  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.642  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.934  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:23.247  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:23.532  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:24.275  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:24.553  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:24.772  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.030  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.364  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.735  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.877  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:26.226  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:26.424  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:26.760  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:28.745  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:28.745  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:28.753  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:28.753  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:28.754  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:28.754  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:29.119  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:29.120  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:29.120  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:29.120  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:29.120  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:29.120  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:29.120  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:29.120  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:30.162  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:30.470  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:30.584  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:30.978  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.169  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.466  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.655  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.970  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.107  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.472  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.569  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.923  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.090  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.480  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.691  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.983  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:34.119  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:34.446  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:36.382  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:36.382  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:36.382  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:36.382  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:36.382  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:36.382  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:36.747  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:36.749  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:36.749  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:36.749  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:36.749  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:36.749  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:36.749  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:36.752  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:37.772  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.105  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.311  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.661  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.960  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:39.249  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:39.438  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:39.767  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.026  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.360  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.619  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.916  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.182  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.494  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.761  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:42.042  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:42.175  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:42.535  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:44.197  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:44.199  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:44.202  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:44.202  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:44.202  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:44.202  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:44.609  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:44.614  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:44.615  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:44.615  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:44.615  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:44.615  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:44.615  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:44.615  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:45.657  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.016  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.146  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.478  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.631  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.846  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.964  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.310  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.429  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.746  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.939  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:48.294  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:48.487  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:48.800  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.149  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.464  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.646  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.946  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:52.194  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:04:52.194  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:53.538  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:53.863  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.106  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.415  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.589  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.882  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.151  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.403  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.625  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.914  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.170  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.437  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.614  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.944  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.053  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.406  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.577  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.920  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:00.708  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:05:00.708  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:05:01.903  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.202  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.429  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.730  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.932  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.265  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.455  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.787  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.957  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:04.292  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:04.489  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:04.838  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.136  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.419  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.610  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.863  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.979  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:06.302  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:08.352  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:05:08.352  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:05:09.303  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:09.591  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:09.761  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.034  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.259  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.544  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.826  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.118  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.240  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.506  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.668  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.936  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.064  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.370  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.508  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.855  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.989  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:13.354  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:14.846  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:05:14.846  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:05:14.846  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:05:14.847  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:05:14.847  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:05:14.847  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:05:15.247  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:05:15.247  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:05:15.247  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:05:15.247  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:05:15.247  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:05:15.247  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:05:15.247  3148  3148 I GolgenUI: ekran=PlayScreen
+11-20 16:05:15.248  3148  3148 I GolgenUI: hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:05:16.093  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:16.414  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:16.614  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:16.952  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.140  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.413  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.544  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.863  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.065  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.404  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.634  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.904  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.978  3148  3148 I GolgenUI: dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.345  3148  3148 I GolgenUI: dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.500  3148  3148 I GolgenUI: dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.788  3148  3148 I GolgenUI: dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.913  3148  3148 I GolgenUI: dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:20.195  3148  3148 I GolgenUI: dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:21.925  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:21.925  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:21.925  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:21.926  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:21.926  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:21.926  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:21.926  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:21.927  3148  3148 I GolgenUI: ekran=MenuScreen
+11-20 16:05:21.927  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:21.927  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:21.927  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:21.928  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:21.928  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:21.928  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:21.928  3148  3148 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:23.848  7861  7861 I GolgenUI: ekran=LogoScreen
+11-20 16:05:34.684  7861  7861 I GolgenUI: ekran=SplashScreen
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:37.391  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:37.392  7861  7861 I GolgenUI: ekran=MenuScreen
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:37.392  7861  7861 I GolgenUI: hedef ekran=MenuScreen ad=ikon-17 x=848 y=216

@@ -1,300 +1,300 @@
-11-19 23:37:50.506 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:50.507 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:50.507 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:50.779 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:37:50.780 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:37:50.780 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:37:50.780 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:37:50.781 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:37:50.781 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:37:50.781 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:37:50.783 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:51.637 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:51.947 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.084 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.428 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.542 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:52.852 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.016 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.282 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.487 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.779 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:53.833 I/GolgenFPS( 3004): fps=22.2 ekran=PlayScreen
-11-19 23:37:53.940 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.225 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.376 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.730 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:54.882 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:55.162 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:55.312 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:55.598 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:57.086 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:37:57.086 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:37:58.172 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:58.468 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:58.669 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:58.939 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.168 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.379 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.538 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.889 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:37:59.944 I/GolgenFPS( 3004): fps=21.5 ekran=PlayScreen
-11-19 23:38:00.092 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.333 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.467 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.813 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:00.982 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.253 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.375 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.704 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:01.884 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:02.222 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:04.095 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:04.095 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:04.095 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:04.096 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:04.096 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:04.096 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:04.393 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:04.393 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:04.393 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:04.393 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:04.393 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:04.393 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:04.393 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:04.394 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:05.197 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:05.502 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:05.666 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:05.938 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.113 I/GolgenFPS( 3004): fps=21.2 ekran=PlayScreen
-11-19 23:38:06.162 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.401 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.602 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:06.874 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.095 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.399 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.552 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.840 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:07.889 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.240 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.317 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.662 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:08.782 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:09.080 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:10.875 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:10.875 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:11.793 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.112 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.177 I/GolgenFPS( 3004): fps=20.7 ekran=PlayScreen
-11-19 23:38:12.280 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.616 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.725 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:12.971 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.101 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.364 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.523 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.776 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:13.948 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.233 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.351 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.635 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:14.801 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:15.084 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:15.186 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:15.492 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:17.195 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:17.195 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:18.071 I/GolgenFPS( 3004): fps=21.3 ekran=PlayScreen
-11-19 23:38:18.304 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:18.590 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:18.728 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:18.949 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.089 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.451 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.525 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:19.881 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.020 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.275 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.360 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.650 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:20.744 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.076 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.266 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.511 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.715 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:21.958 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:23.047 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:23.047 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:23.047 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:23.047 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:23.047 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:23.048 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:23.321 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:23.321 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:23.321 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:23.321 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:23.321 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:23.321 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:23.321 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:23.322 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:23.853 I/GolgenFPS( 3004): fps=23.2 ekran=PlayScreen
-11-19 23:38:24.310 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:24.545 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:24.619 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:24.907 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.032 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.315 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.399 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.646 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:25.728 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.054 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.182 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.441 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.628 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:26.927 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.050 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.356 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.488 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:27.822 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:29.083 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:29.084 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:29.084 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:29.084 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:29.084 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:29.084 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:29.263 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:29.263 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:29.327 I/GolgenFPS( 3004): fps=24.3 ekran=PlayScreen
-11-19 23:38:30.310 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:30.571 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:30.675 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.003 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.089 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.357 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.489 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.766 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:31.859 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.210 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.306 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.542 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.630 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.925 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:32.985 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:33.321 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:33.523 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:33.851 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:34.815 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:34.816 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:34.816 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:34.817 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:34.817 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:34.817 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:34.869 I/GolgenFPS( 3004): fps=23.0 ekran=PlayScreen
-11-19 23:38:35.010 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:35.010 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:35.016 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:35.016 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:35.016 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:35.016 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:35.016 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:35.016 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:36.161 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.441 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.552 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.799 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:36.950 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.305 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.364 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.658 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:37.761 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.003 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.105 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.412 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.520 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.832 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:38.938 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:39.243 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:39.357 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:39.706 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:40.673 I/GolgenFPS( 3004): fps=21.8 ekran=PlayScreen
-11-19 23:38:40.934 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:40.934 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:40.934 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:40.934 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:40.934 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:40.937 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:41.206 I/GolgenUI( 3004): ekran=PlayScreen
-11-19 23:38:41.206 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-19 23:38:42.339 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:42.640 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:42.756 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.141 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.346 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.505 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.654 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:43.884 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.006 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.323 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.445 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.738 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:44.901 I/GolgenUI( 3004): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.240 I/GolgenUI( 3004): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.409 I/GolgenUI( 3004): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.755 I/GolgenUI( 3004): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:45.939 I/GolgenUI( 3004): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
-11-19 23:38:46.239 I/GolgenUI( 3004): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
-11-19 23:38:46.957 I/GolgenFPS( 3004): fps=20.6 ekran=PlayScreen
-11-19 23:38:47.370 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
-11-19 23:38:47.371 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
-11-19 23:38:47.371 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
-11-19 23:38:47.372 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-19 23:38:47.372 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-19 23:38:47.372 I/GolgenUI( 3004): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:38:47.692 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:38:47.697 I/GolgenUI( 3004): ekran=MenuScreen
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:38:47.698 I/GolgenUI( 3004): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:38:48.967 W/ActivityManager(  520): setHasOverlayUi called on unknown pid: 3004
-11-19 23:38:49.254 I/GolgenUI( 7754): ekran=LogoScreen
-11-19 23:38:56.146 I/GolgenFPS( 7754): fps=30.7 ekran=LogoScreen
-11-19 23:38:58.607 I/GolgenUI( 7754): ekran=SplashScreen
-11-19 23:39:01.258 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:39:01.258 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:39:01.258 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:39:01.258 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:39:01.259 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:39:01.259 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:39:01.259 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:39:01.260 I/GolgenUI( 7754): ekran=MenuScreen
-11-19 23:39:01.260 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
-11-19 23:39:01.261 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
-11-19 23:39:01.261 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
-11-19 23:39:01.261 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
-11-19 23:39:01.261 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
-11-19 23:39:01.261 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-19 23:39:01.261 I/GolgenUI( 7754): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-19 23:39:01.309 I/GolgenFPS( 7754): fps=32.9 ekran=MenuScreen
+11-20 16:04:22.166 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.518 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.642 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:22.934 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:23.247 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:23.532 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:24.275 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:24.553 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:24.772 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.030 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.364 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.735 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:25.877 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:26.226 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:26.424 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:26.760 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:27.735 I/GolgenFPS( 3148): fps=20.5 ekran=PlayScreen
+11-20 16:04:28.745 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:28.745 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:28.753 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:28.753 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:28.754 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:28.754 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:29.119 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:29.120 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:29.120 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:29.120 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:29.120 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:29.120 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:29.120 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:04:29.120 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:30.162 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:30.470 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:30.584 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:30.978 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.169 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.466 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.655 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:31.970 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.107 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.472 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.569 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:32.923 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.090 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.480 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.691 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:33.983 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:34.119 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:34.446 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:34.790 I/GolgenFPS( 3148): fps=20.6 ekran=PlayScreen
+11-20 16:04:36.382 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:36.382 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:36.382 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:36.382 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:36.382 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:36.382 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:36.747 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:36.749 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:36.749 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:36.749 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:36.749 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:36.749 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:36.749 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:04:36.752 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:37.772 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.105 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.311 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.661 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:38.960 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:39.249 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:39.438 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:39.767 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.026 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.360 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.619 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:40.916 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.182 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.494 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.761 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:41.846 I/GolgenFPS( 3148): fps=20.5 ekran=PlayScreen
+11-20 16:04:42.042 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:42.175 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:42.535 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:44.197 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:44.199 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:44.202 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:44.202 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:44.202 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:44.202 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:44.609 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:04:44.614 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:04:44.615 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:04:44.615 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:04:44.615 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:04:44.615 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:04:44.615 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:04:44.615 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:45.657 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.016 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.146 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.478 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.631 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.846 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:46.964 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.310 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.429 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.746 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:47.939 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:48.294 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:48.487 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:48.556 I/GolgenFPS( 3148): fps=20.7 ekran=PlayScreen
+11-20 16:04:48.800 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.149 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.464 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.646 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:49.946 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:52.194 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:04:52.194 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:04:53.538 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:53.863 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.106 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.415 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.589 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:54.882 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.151 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.248 I/GolgenFPS( 3148): fps=21.1 ekran=PlayScreen
+11-20 16:04:55.403 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.625 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:55.914 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.170 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.376 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.GmsIntentOperationService in 1000ms for start-requested
+11-20 16:04:56.381 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.GmsBoundBrokerService in 10995ms for connection
+11-20 16:04:56.381 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.container.ExternalFileApkService in 20995ms for start-requested
+11-20 16:04:56.381 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.icing.service.IndexWorkerService in 30995ms for start-requested
+11-20 16:04:56.437 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.563 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/com.google.android.contextmanager.service.ContextManagerService in 40813ms for start-requested
+11-20 16:04:56.564 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.clearcut.debug.ClearcutDebugDumpService in 50812ms for start-requested
+11-20 16:04:56.565 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.thunderbird.EmergencyPersistentService in 60812ms for start-requested
+11-20 16:04:56.565 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentIntentOperationService in 70811ms for start-requested
+11-20 16:04:56.565 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.deviceconnection.service.DeviceConnectionWatcherService in 80811ms for start-requested
+11-20 16:04:56.566 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.geotimezone.GeoTimeZoneService in 90811ms for connection
+11-20 16:04:56.614 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:04:56.618 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.network.NetworkLocationService in 100758ms for connection
+11-20 16:04:56.619 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.internal.server.GoogleLocationService in 110757ms for start-requested
+11-20 16:04:56.679 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.nearby.messages.service.NearbyMessagesService in 120697ms for start-requested
+11-20 16:04:56.680 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.gcm.GcmService in 130696ms for start-requested
+11-20 16:04:56.680 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.location.geocode.GeocodeService in 140696ms for connection
+11-20 16:04:56.680 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentBoundBrokerService in 150696ms for connection
+11-20 16:04:56.680 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.nearby.exposurenotification.service.ExposureNotificationInternalService in 160696ms for start-requested
+11-20 16:04:56.681 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.fused.FusedLocationService in 170696ms for connection
+11-20 16:04:56.681 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.location.persistent.LocationPersistentService in 180695ms for start-requested
+11-20 16:04:56.681 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.nearby.exposurenotification.service.ExposureMatchingService in 190695ms for start-requested
+11-20 16:04:56.681 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.presencemanager.service.PresenceManagerPresenceReportService in 200695ms for start-requested
+11-20 16:04:56.685 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.gcm.nts.SchedulerService in 210691ms for start-requested
+11-20 16:04:56.685 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentApiService in 220691ms for connection
+11-20 16:04:56.685 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.nearby.sharing.ReceiveSurfaceService in 230691ms for start-requested
+11-20 16:04:56.685 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.common.stats.GmsCoreStatsService in 240691ms for start-requested
+11-20 16:04:56.685 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentDirectBootAwareApiService in 250691ms for connection
+11-20 16:04:56.686 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.internal.server.HardwareArProviderService in 260691ms for connection
+11-20 16:04:56.686 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.auth.setup.devicesignals.LockScreenService in 270690ms for start-requested
+11-20 16:04:56.686 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService in 280690ms for start-requested
+11-20 16:04:56.848 W/ActivityManager(  518): Rescheduling restart of crashed service com.google.android.gms/.chimera.GmsIntentOperationService in 528ms for other
+11-20 16:04:56.849 W/ActivityManager(  518): Rescheduling restart of crashed service com.google.android.gms/.chimera.GmsBoundBrokerService in 10528ms for other
+11-20 16:04:56.857 W/ActivityManager(  518): Rescheduling restart of crashed service com.google.android.gms/.chimera.container.ExternalFileApkService in 20528ms for other
+11-20 16:04:56.857 W/ActivityManager(  518): Rescheduling restart of crashed service com.google.android.gms/.icing.service.IndexWorkerService in 30528ms for other
+11-20 16:04:56.944 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.053 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.368 W/ActivityManager(  518): Slow operation: 58ms so far, now at startProcess: returned from zygote!
+11-20 16:04:57.369 W/ActivityManager(  518): Slow operation: 59ms so far, now at startProcess: done updating battery stats
+11-20 16:04:57.369 W/ActivityManager(  518): Slow operation: 59ms so far, now at startProcess: building log message
+11-20 16:04:57.369 W/ActivityManager(  518): Slow operation: 59ms so far, now at startProcess: starting to update pids map
+11-20 16:04:57.370 W/ActivityManager(  518): Slow operation: 59ms so far, now at startProcess: done updating pids map
+11-20 16:04:57.406 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.577 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:04:57.634 W/ActivityManager(  518): ProcessRecord{eda3648 0:com.google.process.gapps/u0a131} is attached to a previous process 1877
+11-20 16:04:57.751 W/ActivityManager(  518): Slow operation: 117ms so far, now at startProcess: returned from zygote!
+11-20 16:04:57.752 W/ActivityManager(  518): Slow operation: 118ms so far, now at startProcess: done updating battery stats
+11-20 16:04:57.752 W/ActivityManager(  518): Slow operation: 118ms so far, now at startProcess: building log message
+11-20 16:04:57.752 W/ActivityManager(  518): Slow operation: 118ms so far, now at startProcess: starting to update pids map
+11-20 16:04:57.752 W/ActivityManager(  518): Slow operation: 118ms so far, now at startProcess: done updating pids map
+11-20 16:04:57.920 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:00.450 W/ActivityManager(  518): Scheduling restart of crashed service com.google.android.gms/.chimera.UiIntentOperationService in 1000ms for start-requested
+11-20 16:05:00.708 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:05:00.708 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:05:01.546 W/ActivityManager(  518): Slow operation: 96ms so far, now at startProcess: returned from zygote!
+11-20 16:05:01.576 W/ActivityManager(  518): Slow operation: 126ms so far, now at startProcess: done updating battery stats
+11-20 16:05:01.576 W/ActivityManager(  518): Slow operation: 126ms so far, now at startProcess: building log message
+11-20 16:05:01.576 W/ActivityManager(  518): Slow operation: 126ms so far, now at startProcess: starting to update pids map
+11-20 16:05:01.578 W/ActivityManager(  518): Slow operation: 128ms so far, now at startProcess: done updating pids map
+11-20 16:05:01.622 I/GolgenFPS( 3148): fps=21.0 ekran=PlayScreen
+11-20 16:05:01.903 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.202 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.429 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.730 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:02.932 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.136 W/ActivityManager(  518): Unable to start service Intent { act=com.google.android.gms.home.service.START pkg=com.google.android.gms } U=0: not found
+11-20 16:05:03.137 W/ActivityManager(  518): Unbind failed: could not find connection for android.os.BinderProxy@ddb99af
+11-20 16:05:03.265 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.455 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.787 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:03.957 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:04.292 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:04.489 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:04.838 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.136 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.419 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.610 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.863 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:05.979 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:06.302 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:07.937 I/GolgenFPS( 3148): fps=20.6 ekran=PlayScreen
+11-20 16:05:08.352 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:05:08.352 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:05:09.303 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:09.591 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:09.761 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.034 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.259 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.544 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:10.826 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.118 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.240 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.506 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.668 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:11.936 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.064 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.370 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.508 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.855 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:12.989 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:13.354 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:14.614 I/GolgenFPS( 3148): fps=20.7 ekran=PlayScreen
+11-20 16:05:14.846 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:05:14.846 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:05:14.846 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:05:14.847 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:05:14.847 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:05:14.847 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:05:15.247 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-20 16:05:15.247 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-20 16:05:15.247 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-20 16:05:15.247 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-20 16:05:15.247 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-20 16:05:15.247 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-20 16:05:15.247 I/GolgenUI( 3148): ekran=PlayScreen
+11-20 16:05:15.248 I/GolgenUI( 3148): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-20 16:05:16.093 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:16.414 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:16.614 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:16.952 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.140 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.413 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.544 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:17.863 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.065 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.404 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.634 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.904 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:18.978 I/GolgenUI( 3148): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.345 I/GolgenUI( 3148): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.500 I/GolgenUI( 3148): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.788 I/GolgenUI( 3148): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:19.913 I/GolgenUI( 3148): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-20 16:05:20.195 I/GolgenUI( 3148): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-20 16:05:21.925 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:21.925 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:21.925 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:21.926 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:21.926 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:21.926 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:21.926 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:21.927 I/GolgenUI( 3148): ekran=MenuScreen
+11-20 16:05:21.927 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:21.927 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:21.927 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:21.928 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:21.928 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:21.928 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:21.928 I/GolgenUI( 3148): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:22.206 I/GolgenFPS( 3148): fps=20.7 ekran=MenuScreen
+11-20 16:05:23.552 W/ActivityManager(  518): setHasOverlayUi called on unknown pid: 3148
+11-20 16:05:23.848 I/GolgenUI( 7861): ekran=LogoScreen
+11-20 16:05:32.094 I/GolgenFPS( 7861): fps=24.8 ekran=LogoScreen
+11-20 16:05:34.684 I/GolgenUI( 7861): ekran=SplashScreen
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:37.391 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:37.392 I/GolgenUI( 7861): ekran=MenuScreen
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-20 16:05:37.392 I/GolgenUI( 7861): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-20 16:05:37.468 I/GolgenFPS( 7861): fps=26.3 ekran=MenuScreen
