@@ -270,6 +270,26 @@ class MetaTests {
         assertTrue(s.claimWeeklyTier(0)); assertFalse(s.claimWeeklyTier(0)); assertFalse(s.claimWeeklyTier(1))
     }
 
+    @Test fun ikiKisilikPistAdilVeYavas() {
+        // bölünmüş ekran: 8,2 birim görüşle doğrulanmış, normal sonsuzdan yavaş ve aralıklı
+        val two = EndlessGenerator.twoPlayer(99, 0.68f)
+        val solo = EndlessGenerator(99)
+        assertTrue(two.speedFor(0) < solo.speedFor(0) * 0.75f)
+        val banned = setOf(com.yanlisrenk.logic.model.Mechanic.FOG, com.yanlisrenk.logic.model.Mechanic.HIDDEN,
+            com.yanlisrenk.logic.model.Mechanic.CHAIN, com.yanlisrenk.logic.model.Mechanic.FLICKER, com.yanlisrenk.logic.model.Mechanic.MEMORY)
+        for (i in 0 until 25) {
+            val ch = two.chunk(i)
+            assertEquals(8.2f, ch.fogDist)
+            assertTrue("parça $i", LevelValidator.validate(ch, startColors = listOf(0, 1, 2, 3), startLastGate = listOf(0, 1, 2, 3)).ok)
+            assertTrue(ch.mechanics.none { it in banned })
+            assertTrue(ch.gates.none { it.revealDist > 0f || it.memoryDist > 0f || it.chain || it.flicker })
+        }
+        // ilk parçalarda kapılar arası süre daha uzun
+        fun avgGap(g: EndlessGenerator): Float { val c = g.chunk(5); val tl = com.yanlisrenk.logic.level.Timeline.build(c.speed, c.zones)
+            return (1 until c.gates.size).map { tl.timeAt(c.gates[it].y) - tl.timeAt(c.gates[it - 1].y) }.average().toFloat() }
+        assertTrue(avgGap(two) > avgGap(solo))
+    }
+
     @Test fun sonsuzModKombo() {
         // 30 aynı renk kapı: kombo 30, çarpan 4 olmalı
         val gates = (1..30).map { com.yanlisrenk.logic.model.GateData(10f + it * 6f, com.yanlisrenk.logic.model.RuleType.SAME, listOf(0)) }

@@ -2,15 +2,15 @@
 
 | Çıktı | Dosya | Boyut | İmza |
 |---|---|---|---|
-| Release APK | `dist/YanlisRenk-1.0.9.apk` | 11,9 MB | **Android debug anahtarı** (kurulabilir test sürümü) |
-| Debug APK | `dist/YanlisRenk-1.0.9-debug.apk` | ~12,7 MB | Android debug anahtarı |
-| Google Play AAB | `dist/YanlisRenk-1.0.9-release.aab` | ~9 MB | **Android debug anahtarı** |
+| Release APK | `dist/YanlisRenk-1.1.0.apk` | 11,9 MB | **Android debug anahtarı** (kurulabilir test sürümü) |
+| Debug APK | `dist/YanlisRenk-1.1.0-debug.apk` | ~12,7 MB | Android debug anahtarı |
+| Google Play AAB | `dist/YanlisRenk-1.1.0-release.aab` | ~9 MB | **Android debug anahtarı** |
 
 > 1.0.0 sürüm APK, R8 küçültmesi yüzünden açılışta çöküyordu; 1.0.1'de R8 kapalı (ayrıntı TEST_REPORT.md).
 
 SHA-256 özetleri: `dist/SHA256SUMS.txt` (`dist/` git'e eklenmez; komutlarla yeniden üretilir).
 
-* Paket adı: `com.yanlisrenk.oyun` · sürüm 1.0.9 (kod 10) · minSdk 26 (Android 8.0) · targetSdk/compileSdk 35
+* Paket adı: `com.yanlisrenk.oyun` · sürüm 1.1.0 (kod 11) · minSdk 26 (Android 8.0) · targetSdk/compileSdk 35
 * ABI: armeabi-v7a, arm64-v8a, x86, x86_64
 * İzinler: `INTERNET` (yalnızca güvenilir zaman için), `VIBRATE`
 * Yönlendirme: dikey · Kenar yumuşatma: 4× MSAA

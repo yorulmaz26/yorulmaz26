@@ -50,6 +50,8 @@ object LevelGenerator {
         val endless: Boolean = false,
         val shieldChance: Float = 0f,
         val wordBias: Float = 0.5f,
+        /** >0 ise oyuncunun görüş mesafesi bu kadardır (ör. bölünmüş ekran); doğrulama buna göre yapılır. */
+        val viewDist: Float = 0f,
     )
 
     var debug = false
@@ -551,6 +553,7 @@ object LevelGenerator {
             id = p.id, area = p.area, index = p.index, isFinal = p.isFinal, speed = v, length = length,
             difficulty = 1, startColor = startColor, reaction = react, gates = gates, pickups = pickups,
             zones = zoneData, pads = pads.sortedBy { it.y }, signs = signs.sortedBy { it.y }, mechanics = p.mechanics,
+            fogDist = p.viewDist,
         )
     }
 

@@ -32,7 +32,10 @@ import com.yanlisrenk.logic.shop.ShopCategory
  * İki oyuncu birebir aynı doğrulanmış sonsuz pistte yarışır; yanlış kapıdan ilk geçen elenir.
  * Can harcanmaz.
  */
-class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nanoTime()) : BaseScreen(game) {
+class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nanoTime(), private val pace: Pace = Pace.RAHAT) : BaseScreen(game) {
+    /** Oyun hızı seçeneği: hız çarpanı. */
+    enum class Pace(val title: String, val scale: Float) { RAHAT("Rahat", 0.68f), NORMAL("Normal", 0.82f), HIZLI("Hızlı", 1f) }
+
     private enum class State { READY, COUNTDOWN, PLAYING, PAUSED, ENDED }
 
     override val music: String = "endless"
@@ -49,7 +52,7 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
         val tint: Color get() = if (index == 0) Pal.BLUE else Pal.ORANGE
     }
 
-    private val gen = EndlessGenerator(seed)
+    private val gen = EndlessGenerator.twoPlayer(seed, pace.scale)
     /** Paylaşılan parçalar: iki oyuncu aynı pisti oynar. */
     private val chunks = ArrayList<com.yanlisrenk.logic.model.LevelData>()
     private val chunkStart = ArrayList<Float>()
@@ -69,8 +72,9 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
 
     companion object {
         /** Her yarıda görünen dünya yüksekliği (doğrulayıcının 11 birimlik görüşünü karşılar). */
-        const val HALF_VIEW_H = 13.2f
-        const val PLAYER_Y = 2.0f
+        /** Her yarıda görünen dünya yüksekliği: büyük görüntü; üretici 8,2 birimlik görüşe göre doğrular. */
+        const val HALF_VIEW_H = 10.5f
+        const val PLAYER_Y = 1.7f
     }
 
     init {
@@ -143,8 +147,17 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
         card.add(ui.label("İki Kişilik Kapışma", Ui.Size.XL)).padBottom(10f).row()
         card.add(ui.label("Telefonu masaya koyun ve karşılıklı oturun.\nAlt yarı 1. oyuncu, üst yarı 2. oyuncu.\nKendi yarınıza dokunarak renk değiştirin.\nYanlış kapıdan ilk geçen elenir!", Ui.Size.M, Pal.TEXT_SOFT, wrap = true))
             .width(560f).padBottom(14f).row()
-        card.add(ui.label("İkiniz de aynı pisti oynarsınız · Can harcanmaz", Ui.Size.S, Pal.BLUE, wrap = true)).width(560f).padBottom(16f).row()
+        card.add(ui.label("İkiniz de aynı pisti oynarsınız · Can harcanmaz", Ui.Size.S, Pal.BLUE, wrap = true)).width(560f).padBottom(14f).row()
+        card.add(ui.label("Hız", Ui.Size.M)).padBottom(6f).row()
+        val pr = Table()
         lateinit var ov: Table
+        for (pc in Pace.entries) {
+            val sel = pc == pace
+            pr.add(ui.button(pc.title, if (sel) Pal.ORANGE else Pal.WHITE, size = Ui.Size.S, textColor = if (sel) Pal.WHITE else Pal.TEXT) {
+                if (!sel) { ov.remove(); game.go({ TwoPlayerScreen(game, seed, pc) }, remember = false) }
+            }).width(180f).pad(4f)
+        }
+        card.add(pr).padBottom(16f).row()
         card.add(ui.button("BAŞLA", Pal.GREEN, "play") { ov.remove(); readyCard = null; startCountdown() }).width(400f)
         ov = ui.overlay(stage, card, 0.3f)
         readyCard = ov
@@ -327,7 +340,7 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
         val title = when (winner) { -1 -> "Berabere!"; 0 -> "1. Oyuncu kazandı!"; else -> "2. Oyuncu kazandı!" }
         card.add(ui.label(title, Ui.Size.XL, if (winner == -1) Pal.ORANGE else Pal.GREEN)).padBottom(8f).row()
         card.add(ui.label("1. Oyuncu: ${players[0].world.gatesPassed} kapı   ·   2. Oyuncu: ${players[1].world.gatesPassed} kapı", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(18f).row()
-        card.add(ui.button("Rövanş", Pal.GREEN, "refresh") { game.go({ TwoPlayerScreen(game) }, remember = false) }).width(420f).padBottom(12f).row()
+        card.add(ui.button("Rövanş", Pal.GREEN, "refresh") { game.go({ TwoPlayerScreen(game, pace = pace) }, remember = false) }).width(420f).padBottom(12f).row()
         card.add(ui.button("Menü", Pal.BLUE, "home") { game.clearHistory(); game.go({ MainMenuScreen(game) }, remember = false) }).width(420f)
         val ov = ui.overlay(stage, card, 0.2f)
         ov.addAction(Actions.fadeIn(0.2f))

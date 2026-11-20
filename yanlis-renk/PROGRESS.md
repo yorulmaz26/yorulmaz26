@@ -57,3 +57,10 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 * `TwoPlayerScreen`: aynı cihazda yüz yüze iki kişilik mod. Ekran ikiye bölünür (üst yarı 180° döndürülmüş), her oyuncu kendi yarısına dokunur (çoklu dokunma). İki oyuncu birebir aynı doğrulanmış sonsuz pistte yarışır; yanlış kapıdan ilk geçen elenir, aynı anda elenirlerse berabere. Can harcanmaz. Her yarı 13,2 birim görüş yüksekliğiyle doğrulayıcının 11 birimlik görüş varsayımını karşılar.
 * Masaüstünde klavye: A/Boşluk = 1. oyuncu, L/Enter = 2. oyuncu.
 * Çevrimiçi iki kişilik oyun bu sürümde yok (sunucu gerekir).
+
+## 1.1.0 (iki kişilik mod: daha büyük görüntü, daha fazla zaman)
+* Kullanıcı geri bildirimi: bölünmüş ekranda alan küçülüyor ve renk değiştirme süresi çok kısa.
+* Her yarıdaki görüş 13,2 → 10,5 birime indirildi (karakter ve kapılar ~%25 daha büyük). Üretici artık bu kısa görüşü biliyor: parçalar 8,2 birimlik görüşle doğrulanıyor (`EndlessGenerator.twoPlayer`, `LevelGenerator.Params.viewDist`).
+* Hız seçimi: Rahat (%68, varsayılan), Normal (%82), Hızlı (%100 — tek kişilik sonsuz mod hızı). Tepki payı +0,22 sn, kapı aralıkları %22 daha geniş.
+* Bölünmüş ekranda adil olmayan mekanikler çıkarıldı: sis, gizli kapı, hızlı karar, yanıp sönen, hafıza ve hafıza zinciri.
+* Yeni test: `ikiKisilikPistAdilVeYavas`.
