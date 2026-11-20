@@ -126,7 +126,7 @@ Engel türleri (9): boşluklu duvar, mayın, salınan blok, dönen lazer, **yan�
 Oyun, yapımcı **Magic Lumos Software** logosuyla açılır (`app/src/main/assets/magic_lumos_logo.jpg`). Animasyon oyunun mekaniğini
 kullanır: karanlıkta karakter devre yolunda neon iz bırakarak ilerler, mor gölgesi geçmiş hareketlerini gecikmeli tekrar ederek
 onu kovalar; karakter merkeze varınca "Lumos" ışığı patlar, gölge dağılır, genişleyen ışık halkası logoyu karanlıktan açığa
-çıkarır, yazının üzerinden ışık süzülür ve "sunar" belirir (≈7 sn, dokunarak geçilebilir).
+çıkarır ve yazının üzerinden ışık süzülür (≈7 sn, dokunarak geçilebilir).
 
 ## Ekranlar
 Logo animasyonu · Açılış · Ana menü · Oynanış (HUD) · Duraklatma · Oyun sonu · Karakter seçimi · Görevler (Görev Modu / Günlük / Başarılar) · Rekorlar · Ayarlar · Öğretici.

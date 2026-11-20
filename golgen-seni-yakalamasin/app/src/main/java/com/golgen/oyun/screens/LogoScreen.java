@@ -241,12 +241,6 @@ public final class LogoScreen extends Screen {
         }
         particles.draw(c, 1f);
 
-        // 7) "sunar"
-        float ta = (time - (T_ARRIVE + T_REVEAL + 0.3f)) / 0.9f;
-        if (ta > 0f) {
-            float a = Math.min(1f, ta);
-            Ui.text(c, "sunar", w / 2f, dst.bottom + 90f * u, 40f * u, Theme.alpha(0xFFB8C7E0, a), Paint.Align.CENTER, Ui.MEDIUM);
-        }
         if (time > 0.6f && time < T_ARRIVE) {
             Ui.text(c, "Dokunarak geç", w / 2f, h - safeB - 70f * u, 28f * u, Theme.alpha(Theme.MUTED, 0.6f), Paint.Align.CENTER, Ui.MEDIUM);
         }
