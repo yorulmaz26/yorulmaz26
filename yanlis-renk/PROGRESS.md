@@ -29,3 +29,10 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 
 ## 1.0.2 (Magic Lumos Software açılışı)
 * Oyun açılırken Magic Lumos Software logosu oyuna özel bir animasyonla gösteriliyor (`core/.../screens/IntroScreen.kt`, görsel `android/assets/brand/magic_lumos.jpg`): 4 oyun renginde devre hatları, logoyu soldan sağa açan renk değiştiren "lumos" ışık huzmesi, logodan geçerken K→M→Y→S olan küp karakter, 4 renkli ışık patlaması ve "sunar". ~8,6 sn (1.0.3 ile yavaşlatıldı), dokunarak atlanabilir. Masaüstü QA'da ara kareleri doğrulandı (`docs/screenshots/00a–00d`).
+
+## 1.0.4 (kullanıcı görselleri)
+* Kullanıcının ürettiği 39 görsel `tools/art/import_user_art.py` ile işlenip oyuna eklendi (sahte dama/beyaz zeminler temizlendi, mobil için boyutlandırıldı, sprite'lar 2'nin kuvveti tuvallere yerleştirildi).
+* 11–20. dünyalar görsel arka planla çiziliyor (`assets/bg/`); 1–10. dünyalar için görsel gelmediğinden vektör arka planlar sürüyor.
+* 10 karakter (Klasik Küp, Zıp Top, Sevimli Robot, Mini Panda, Renkli Kedi, Uzaylı, Kristal, Bulut, Yıldız Kahraman, Kral Küp) görselle çiziliyor ve oyun rengine boyanıyor; kalan 20 karakter vektör.
+* Altın, elmas, kalkan, renk pedi ve gizli/hafıza kapısı görselleri; yeni logo, menü ve harita arka planı, parlak butonlar, panel, kalp/elmas/kalkan/sandık simgeleri, ödül ekranı görselleri, Play Store tanıtım görseli.
+* Kullanılmayanlar: 31/32/35 (yalnızca ince çizgi, kapı gövdesi yok), 33/34 (sabit 4 renk; oyunda kapı renkleri bölüme göre değişiyor), 43'teki renkli butonlar ayrı ayrı değil tek beyaz şablon olarak (her renge boyanabilsin diye).

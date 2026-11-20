@@ -86,7 +86,29 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
         else -> Pal.hex(0x87CEFA) to Pal.hex(0xF8FBFF)
     }
 
+    /** Varsayılan temada menü arka plan görseli (kullanıcı görseli). */
+    open val backgroundImage: String?
+        get() = if (session.equipped(ShopCategory.THEME).style == 0) "ui2/menu_bg.jpg" else null
+
     open fun drawBackground(delta: Float) {
+        val img = backgroundImage?.let { game.assets.background(it) }
+        if (img != null) {
+            val cam = stage.camera
+            val w = stage.viewport.worldWidth
+            val h = stage.viewport.worldHeight
+            val b = stage.batch
+            b.projectionMatrix = cam.combined
+            b.begin()
+            b.setColor(1f, 1f, 1f, 1f)
+            val ratio = img.height.toFloat() / img.width
+            var bw = w * 1.04f
+            var bh = bw * ratio
+            if (bh < h * 1.04f) { bh = h * 1.04f; bw = bh / ratio }
+            val drift = if (session.data.settings.reducedMotion) 0f else sin(time * 0.25f) * 10f
+            b.draw(img, cam.position.x - bw / 2, cam.position.y - bh / 2 + drift, bw, bh)
+            b.end()
+            return
+        }
         val (top, bottom) = themeColors()
         val cam = stage.camera
         bgShapes.projectionMatrix = cam.combined
@@ -218,7 +240,7 @@ class CharacterActor(private val game: YanlisRenkGame, var item: ShopItem, var c
         sr.transformMatrix = batch.transformMatrix
         sr.begin(ShapeRenderer.ShapeType.Filled)
         val c = if (locked) Pal.hex(0xC5CCDA) else Pal.game[colorIndex]
-        CharacterPainter.draw(sr, item, if (locked) 0 else costume, Color(c.r, c.g, c.b, parentAlpha * color.a), x + width / 2, y + height * 0.42f, width * 0.55f, t, squash,
+        CharacterPainter.drawAny(sr, game.world.batch, item, if (locked) 0 else costume, Color(c.r, c.g, c.b, parentAlpha * color.a), x + width / 2, y + height * 0.42f, width * 0.55f, t, squash,
             idleAnim = !game.session.data.settings.reducedMotion)
         sr.end()
         sr.transformMatrix.idt()
@@ -258,7 +280,7 @@ class MechanicActor(private val game: YanlisRenkGame, val mechanic: com.yanlisre
         // karakter
         val stepColor = when (mechanic) { M.DIFF, M.NONE -> 3; M.NEXT -> 2; M.PREV -> 0; M.MIX -> 3; else -> 1 }
         val chY = y + height * 0.22f + ((t * 0.5f) % 1f) * height * 0.15f
-        CharacterPainter.draw(sr, com.yanlisrenk.logic.shop.ShopCatalog.characters[0], 0, Pal.game[stepColor], cx, chY, height * 0.26f, t)
+        CharacterPainter.drawAny(sr, game.world.batch, com.yanlisrenk.logic.shop.ShopCatalog.characters[0], 0, Pal.game[stepColor], cx, chY, height * 0.26f, t)
         sr.end()
         sr.transformMatrix.idt()
         batch.begin()

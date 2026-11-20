@@ -25,10 +25,15 @@ class SplashScreen(game: YanlisRenkGame) : BaseScreen(game) {
     override fun build() {
         val ch = CharacterActor(game, session.equipped(ShopCategory.CHARACTER), session.equipped(ShopCategory.COSTUME).style, 0, cycleColors = true)
         root.add(ch).size(300f, 300f).padBottom(20f).row()
-        val title = Table()
-        "YANLIŞ".forEachIndexed { i, c -> title.add(ui.label(c.toString(), Ui.Size.HUGE, Pal.game[i % 4])) }
-        root.add(title).row()
-        root.add(ui.label("RENK", Ui.Size.HUGE, Pal.TEXT)).padBottom(30f).row()
+        if (game.assets.has("ui2_logo")) {
+            val logo = com.badlogic.gdx.scenes.scene2d.ui.Image(game.assets.drawable("ui2_logo"), com.badlogic.gdx.utils.Scaling.fit)
+            root.add(logo).size(520f, 440f).padBottom(10f).row()
+        } else {
+            val title = Table()
+            "YANLIŞ".forEachIndexed { i, c -> title.add(ui.label(c.toString(), Ui.Size.HUGE, Pal.game[i % 4])) }
+            root.add(title).row()
+            root.add(ui.label("RENK", Ui.Size.HUGE, Pal.TEXT)).padBottom(30f).row()
+        }
         root.add(ui.label("Renkler seni kandırmasın!", Ui.Size.M, Pal.TEXT_SOFT)).padBottom(60f).row()
         root.add(ui.progress(0f, Pal.TURQ, 400f, 26f).also { bar = it as com.yanlisrenk.game.ui.ProgressBarActor }).size(400f, 26f)
     }
@@ -58,10 +63,15 @@ class MainMenuScreen(game: YanlisRenkGame) : BaseScreen(game) {
         lvl.add(ui.progress(session.data.xp.toFloat() / PlayerLevels.xpForNext(session.data.playerLevel), Pal.YELLOW, 200f, 20f)).size(200f, 20f)
         ui.onTap(lvl) { game.go({ ProfileScreen(game) }) }
         root.add(lvl).padTop(4f).row()
-        val title = Table()
-        "YANLIŞ".forEachIndexed { i, c -> title.add(ui.label(c.toString(), Ui.Size.HUGE, Pal.game[i % 4])) }
-        root.add(title).padTop(16f).row()
-        root.add(ui.label("RENK", Ui.Size.XL, Pal.TEXT)).row()
+        if (game.assets.has("ui2_logo")) {
+            val logo = com.badlogic.gdx.scenes.scene2d.ui.Image(game.assets.drawable("ui2_logo"), com.badlogic.gdx.utils.Scaling.fit)
+            root.add(logo).size(400f, 260f).padTop(6f).row()
+        } else {
+            val title = Table()
+            "YANLIŞ".forEachIndexed { i, c -> title.add(ui.label(c.toString(), Ui.Size.HUGE, Pal.game[i % 4])) }
+            root.add(title).padTop(16f).row()
+            root.add(ui.label("RENK", Ui.Size.XL, Pal.TEXT)).row()
+        }
         val ch = CharacterActor(game, session.equipped(ShopCategory.CHARACTER), session.equipped(ShopCategory.COSTUME).style, 0)
         root.add(ch).size(270f, 270f).row()
         ui.onTap(ch) { }

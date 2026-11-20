@@ -199,7 +199,7 @@ class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
                 particles.emit(cx, py, 10, Pal.game[ci], 260f, 5f, 0.45f, 0, 0f)
             }
             val squash = 1f - ((k * 4f) % 1f).coerceIn(0f, 1f)
-            CharacterPainter.draw(sr, ShopCatalog.characters[0], 0, Pal.game[ci], cx, py, 110f, t, squash * 0.8f, idleAnim = false)
+            CharacterPainter.drawAny(sr, game.world.batch, ShopCatalog.characters[0], 0, Pal.game[ci], cx, py, 110f, t, squash * 0.8f, idleAnim = false)
         }
         if (t >= BURST && !burst) {
             burst = true

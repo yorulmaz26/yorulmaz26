@@ -67,16 +67,23 @@ class Ui(val assets: Assets, val audio: Audio) {
         return l
     }
 
-    fun panel(color: Color = Pal.CARD): Drawable = assets.nine("panel", 36, 36, 36, 36, color)
+    fun panel(color: Color = Pal.CARD): Drawable =
+        if (assets.has("ui2_panel")) assets.nineScaled("ui2_panel", 80, 80, 80, 80, 0.5f, color)
+        else assets.nine("panel", 36, 36, 36, 36, color)
+
+    /** Parlak 3B buton zemini (kullanıcı görseli varsa onu kullanır, boyanabilir). */
+    fun buttonBg(color: Color, scale: Float = 0.36f): Drawable =
+        if (assets.has("ui2_button")) assets.nineScaled("ui2_button", 150, 150, 140, 150, scale, color)
+        else assets.nine("button", 36, 36, 36, 40, color)
     fun pill(color: Color): Drawable = assets.nine("pill", 30, 30, 30, 30, color)
     fun icon(name: String, size: Float): Image = Image(assets.drawable(name), Scaling.fit).also { it.setSize(size, size) }
 
     /** Basılınca küçülen, sesli, renkli 3B buton. */
     fun button(text: String, color: Color = Pal.TURQ, icon: String? = null, size: Size = Size.L, textColor: Color = Pal.WHITE, onClick: () -> Unit): Button {
         val st = Button.ButtonStyle()
-        st.up = assets.nine("button", 36, 36, 36, 40, color)
-        st.down = assets.nine("button", 36, 36, 36, 40, Pal.darker(color, 0.9f))
-        st.disabled = assets.nine("button", 36, 36, 36, 40, Pal.GREY)
+        st.up = buttonBg(color)
+        st.down = buttonBg(Pal.darker(color, 0.9f))
+        st.disabled = buttonBg(Pal.GREY)
         val b = Button(st)
         b.pad(14f, 26f, 22f, 26f)
         if (icon != null) b.add(icon(icon, if (size == Size.S) 44f else 54f)).size(if (size == Size.S) 44f else 54f).padRight(if (text.isEmpty()) 0f else 12f)
@@ -88,7 +95,7 @@ class Ui(val assets: Assets, val audio: Audio) {
     /** Yuvarlak simge butonu. */
     fun iconButton(icon: String, size: Float = 96f, bg: Color? = Pal.WHITE, onClick: () -> Unit): Button {
         val st = Button.ButtonStyle()
-        if (bg != null) { st.up = assets.nine("button", 36, 36, 36, 40, bg); st.down = assets.nine("button", 36, 36, 36, 40, Pal.darker(bg, 0.92f)) }
+        if (bg != null) { st.up = buttonBg(bg, 0.29f); st.down = buttonBg(Pal.darker(bg, 0.92f), 0.29f) }
         val b = Button(st)
         b.add(icon(icon, size * 0.66f)).size(size * 0.66f).padBottom(if (bg != null) 6f else 0f)
         onTap(b, onClick)

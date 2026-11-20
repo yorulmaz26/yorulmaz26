@@ -70,6 +70,10 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         play("05h_oyun_zincir", Mode.LEVEL, 82, 7f)
         play("05i_oyun_kayan", Mode.LEVEL, 78, 11f)
         play("05j_oyun_final500", Mode.LEVEL, 500, 22f)
+        play("05k_oyun_dunya12", Mode.LEVEL, 278, 9f)
+        play("05l_oyun_dunya14", Mode.LEVEL, 333, 10f)
+        play("05m_oyun_dunya18", Mode.LEVEL, 428, 8f)
+        play("05n_oyun_dunya19", Mode.LEVEL, 466, 11f)
         play("06_sonsuz", Mode.ENDLESS, 0, 25f)
         go("09_canlar") { LivesScreen(game) }
         go("10_market") { ShopScreen(game) }

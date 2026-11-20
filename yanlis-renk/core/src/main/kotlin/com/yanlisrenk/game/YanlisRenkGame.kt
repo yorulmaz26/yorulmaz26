@@ -32,6 +32,7 @@ class YanlisRenkGame(val platform: PlatformServices) : Game() {
         Gdx.input.setCatchKey(Input.Keys.BACK, true)
         assets = Assets()
         assets.load()
+        com.yanlisrenk.game.render.CharacterPainter.spriteFor = { id -> assets.characterSprite(id) }
         session = GameSession(SaveManager(platform.storage) { platform.newInstallId() }, platform.clock) { platform.tzOffsetMillis() }
         audio = Audio(assets) { session.data.settings }
         ui = Ui(assets, audio)

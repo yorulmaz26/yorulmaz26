@@ -17,6 +17,7 @@ private fun areaColor(id: Int): Color = Pal.hex(AreaCatalog.area(id).accent1)
 /** 3. Alan seçim ekranı (dünya haritası) */
 class WorldMapScreen(game: YanlisRenkGame, private val mastery: Boolean = false) : BaseScreen(game) {
     override val recreate: (() -> BaseScreen) = { WorldMapScreen(game, mastery) }
+    override val backgroundImage: String? get() = "ui2/map_bg.jpg"
     override fun build() {
         root.top()
         root.add(topBar(if (mastery) "Ustalık Modu" else "Harita")).growX().row()
@@ -176,7 +177,11 @@ class RewardScreen(game: YanlisRenkGame, private val reward: Reward, private val
     override fun build() {
         game.audio.play(if (reward.areaCompleted > 0) "area_complete" else "unlock")
         val card = ui.card(pad = 40f)
-        card.add(ui.icon(if (reward.areaCompleted > 0) "trophy" else "gift", 150f)).size(150f).row()
+        val hero = if (reward.areaCompleted > 0) "ui2_chest" else "ui2_stars"
+        if (game.assets.has(hero)) {
+            val img = com.badlogic.gdx.scenes.scene2d.ui.Image(game.assets.drawable(hero), com.badlogic.gdx.utils.Scaling.fit)
+            card.add(img).size(if (hero == "ui2_chest") 200f else 300f, 200f).row()
+        } else card.add(ui.icon(if (reward.areaCompleted > 0) "trophy" else "gift", 150f)).size(150f).row()
         if (reward.areaCompleted > 0) {
             val a = AreaCatalog.area(reward.areaCompleted)
             card.add(ui.label("ALAN TAMAMLANDI!", Ui.Size.L, Pal.GREEN)).row()

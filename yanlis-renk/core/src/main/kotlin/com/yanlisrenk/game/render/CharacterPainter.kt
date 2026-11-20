@@ -69,6 +69,40 @@ object CharacterPainter {
     private val cheek = Pal.hex(0xFF8FA8, 0.7f)
     private val tmp = Color()
 
+    /** Karakterin görsel hâlini sağlar (Assets tarafından ayarlanır). */
+    var spriteFor: (String) -> com.badlogic.gdx.graphics.g2d.TextureRegion? = { null }
+
+    /**
+     * Görseli varsa görseli (oyun rengine boyanmış), yoksa vektör çizimi kullanır.
+     * Çağrıldığında [sr] Filled modunda açık olmalıdır; dönüşte yine açıktır.
+     */
+    fun drawAny(sr: ShapeRenderer, batch: com.badlogic.gdx.graphics.g2d.SpriteBatch, item: ShopItem, costume: Int, bodyColor: Color,
+                cx: Float, cy: Float, size: Float, t: Float, squash: Float = 0f, blink: Float = 0f, idleAnim: Boolean = true) {
+        val reg = spriteFor(item.id)
+        if (reg == null) { draw(sr, item, costume, bodyColor, cx, cy, size, t, squash, blink, idleAnim); return }
+        val io = if (idleAnim) idleOffset(item, t) else floatArrayOf(0f, 0f, 1f, 1f)
+        val sx = io[2] * (1f + squash * 0.16f)
+        val sy = io[3] * (1f - squash * 0.16f)
+        // gölge
+        sr.color = tmp.set(0.15f, 0.22f, 0.35f, 0.18f * bodyColor.a)
+        sr.ellipse(cx - size * 0.42f * sx, cy - size * 0.66f, size * 0.84f * sx, size * 0.18f, 20)
+        sr.end()
+        val dw = size * 1.45f * sx
+        val dh = size * 1.45f * sy
+        batch.projectionMatrix = sr.projectionMatrix
+        batch.transformMatrix = sr.transformMatrix
+        batch.begin()
+        batch.color = bodyColor
+        batch.draw(reg, cx - dw / 2, cy - size * 0.62f + io[0] * size, dw / 2, 0f, dw, dh, 1f, 1f, io[1])
+        batch.color = Color.WHITE
+        batch.end()
+        batch.transformMatrix = com.badlogic.gdx.math.Matrix4()
+        com.badlogic.gdx.Gdx.gl.glEnable(com.badlogic.gdx.graphics.GL20.GL_BLEND)
+        com.badlogic.gdx.Gdx.gl.glBlendFunc(com.badlogic.gdx.graphics.GL20.GL_SRC_ALPHA, com.badlogic.gdx.graphics.GL20.GL_ONE_MINUS_SRC_ALPHA)
+        sr.begin(ShapeRenderer.ShapeType.Filled)
+        if (costume > 0) costume(sr, costume, cx, cy + io[0] * size + size * 0.08f, size * sx, size * sy, t)
+    }
+
     fun idleOffset(item: ShopItem, t: Float): FloatArray {
         // [dy, rot, scaleX, scaleY]
         return when (item.idle) {

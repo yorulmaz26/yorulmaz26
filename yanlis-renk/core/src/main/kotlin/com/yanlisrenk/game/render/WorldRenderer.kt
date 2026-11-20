@@ -112,6 +112,15 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         g.color.set(color.r, color.g, color.b, color.a * alpha)
     }
 
+    private fun glyphWH(name: String, cx: Float, cy: Float, w: Float, h: Float, alpha: Float = 1f) {
+        glyph(name, cx, cy, 1f, Pal.WHITE, alpha)
+        val g = glyphs[glyphCount - 1]
+        g.x = cx - w / 2; g.y = cy - h / 2; g.w = w; g.h = h
+    }
+
+    /** Görsel varsa onun adını, yoksa yedeğini döndürür. */
+    private fun art(name: String, fallback: String) = if (assets.has(name)) name else fallback
+
     private fun text(s: String, cx: Float, cy: Float, scale: Float, color: Color, alpha: Float = 1f) {
         if (textCount >= texts.size) texts.add(Txt("", 0f, 0f, 1f))
         val t = texts[textCount++]
@@ -167,13 +176,32 @@ class WorldRenderer(private val assets: Assets) : Disposable {
 
         Gdx.gl.glEnable(GL20.GL_BLEND)
         Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        // kullanıcı arka planı (11–20. dünyalar): ekranı kaplayacak şekilde, hafif paralaksla
+        val bgTex = assets.background("bg/world_${th.world.id}.jpg")
+        if (bgTex != null) {
+            batch.projectionMatrix = cam.combined
+            batch.disableBlending()
+            batch.begin()
+            val ratio = bgTex.height.toFloat() / bgTex.width
+            var bw = vw * 1.06f
+            var bh = bw * ratio
+            if (bh < vh * 1.06f) { bh = vh * 1.06f; bw = bh / ratio }
+            val drift = if (look.reducedMotion) 0f else sin(cam.position.y * 0.02f) * vh * 0.015f
+            batch.draw(bgTex, left + (vw - bw) / 2, bottom + (vh - bh) / 2 + drift, bw, bh)
+            batch.end()
+            batch.enableBlending()
+            Gdx.gl.glEnable(GL20.GL_BLEND)
+            Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA)
+        }
         sr.projectionMatrix = cam.combined
         sr.begin(ShapeRenderer.ShapeType.Filled)
-        Backgrounds.drawSky(sr, th, left, bottom, vw, vh)
-        Backgrounds.drawLayers(sr, th, left, bottom, vw, vh, cam.position.y, time, look.reducedMotion)
+        if (bgTex == null) {
+            Backgrounds.drawSky(sr, th, left, bottom, vw, vh)
+            Backgrounds.drawLayers(sr, th, left, bottom, vw, vh, cam.position.y, time, look.reducedMotion)
+        }
 
-        // yol
-        sr.color = tmp.set(th.path.r, th.path.g, th.path.b, 0.82f)
+        // yol (görsel arka planda daha saydam: resmin kendi yolu görünsün)
+        sr.color = tmp.set(th.path.r, th.path.g, th.path.b, if (bgTex != null) 0.42f else 0.82f)
         sr.rect(ROAD_L, bottom, ROAD_W, vh)
         sr.color = tmp.set(1f, 1f, 1f, 0.9f)
         sr.rect(ROAD_L - 0.08f, bottom, 0.12f, vh); sr.rect(ROAD_R - 0.04f, bottom, 0.12f, vh)
@@ -240,7 +268,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
                 if (look.colorBlind) glyph(shapeIcons[p.value], CX, p.y, 0.42f, alpha = a)
                 text("RENK", CX - 1.75f, p.y + 0.12f, 0.009f, dark, a)
             } else {
-                for (k in 0 until 4) { sr.color = tmp.set(Pal.game[k]).also { it.a = a }; sr.rect(CX - 1.1f + k * 0.55f, p.y - 0.3f, 0.55f, 0.6f) }
+                if (assets.has("obj_pad")) glyphWH("obj_pad", CX, p.y, 3.0f, 0.75f, a)
+                else for (k in 0 until 4) { sr.color = tmp.set(Pal.game[k]).also { it.a = a }; sr.rect(CX - 1.1f + k * 0.55f, p.y - 0.3f, 0.55f, 0.6f) }
                 text("+${p.value}", CX, p.y + 0.15f, 0.013f, Pal.WHITE, a)
             }
             if (i < 0) break
@@ -255,11 +284,11 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             when (p.type) {
                 PickupType.COIN -> {
                     if (p.color >= 0) { sr.color = Pal.gameColor(p.color); sr.circle(CX, p.y + bob, 0.42f, 20) }
-                    glyph("coin", CX, p.y + bob, if (p.color >= 0) 0.6f else 0.7f)
+                    glyph(art("obj_coin", "coin"), CX, p.y + bob, if (p.color >= 0) 0.66f else 0.78f)
                     if (p.color >= 0 && look.colorBlind) glyph(shapeIcons[p.color], CX + 0.42f, p.y + bob + 0.32f, 0.3f)
                 }
-                PickupType.DIAMOND -> { sr.color = tmp.set(1f, 1f, 1f, 0.5f); sr.circle(CX, p.y + bob, 0.55f + sin(time * 5f) * 0.05f, 20); glyph("diamond", CX, p.y + bob, 0.8f) }
-                PickupType.SHIELD -> { sr.color = tmp.set(0.5f, 0.8f, 1f, 0.45f); sr.circle(CX, p.y + bob, 0.55f, 20); glyph("shield", CX, p.y + bob, 0.75f) }
+                PickupType.DIAMOND -> { sr.color = tmp.set(1f, 1f, 1f, 0.5f); sr.circle(CX, p.y + bob, 0.55f + sin(time * 5f) * 0.05f, 20); glyph(art("obj_diamond", "diamond"), CX, p.y + bob, 0.9f) }
+                PickupType.SHIELD -> { sr.color = tmp.set(0.5f, 0.8f, 1f, 0.45f); sr.circle(CX, p.y + bob, 0.55f, 20); glyph(art("obj_shield", "shield"), CX, p.y + bob, 0.85f) }
             }
         }
 
@@ -290,11 +319,11 @@ class WorldRenderer(private val assets: Assets) : Disposable {
 
         // iz
         drawTrail(look, py)
-        Backgrounds.drawNear(sr, th, left, bottom, vw, vh, cam.position.y, time, look.reducedMotion)
+        if (bgTex == null) Backgrounds.drawNear(sr, th, left, bottom, vw, vh, cam.position.y, time, look.reducedMotion)
 
         // karakter
         val blink = if (blinkT < 0f) 1f else 0f
-        CharacterPainter.draw(sr, look.character, look.costume, displayColor, CX, py, PLAYER_SIZE, time, squash, blink, !look.reducedMotion)
+        CharacterPainter.drawAny(sr, batch, look.character, look.costume, displayColor, CX, py, PLAYER_SIZE, time, squash, blink, !look.reducedMotion)
         if (look.colorBlind) {
             sr.color = Pal.WHITE; sr.circle(CX + 0.62f, py + 0.55f, 0.24f, 16)
             sr.color = Pal.gameColor(world.color); sr.circle(CX + 0.62f, py + 0.55f, 0.19f, 16)
@@ -371,10 +400,16 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             posts(style, g.y, Pal.GREY, alpha)
             return
         }
-        Shapes.roundRect(sr, ROAD_L - 0.07f, y0 - 0.07f, ROAD_W + 0.14f, h + 0.14f, h / 2 + 0.07f)
+        if (!(hideColors && assets.has("obj_gate_hidden"))) Shapes.roundRect(sr, ROAD_L - 0.07f, y0 - 0.07f, ROAD_W + 0.14f, h + 0.14f, h / 2 + 0.07f)
 
         val inner = ROAD_W
         if (hideColors) {
+            if (assets.has("obj_gate_hidden")) {
+                // gizli/hafıza kapısı görseli (ortasında soru işareti var) → kural simgesi sola
+                glyphWH("obj_gate_hidden", CX, g.y, ROAD_W + 0.5f, (ROAD_W + 0.5f) / 4f, alpha)
+                ruleGlyph(g, alpha, ROAD_L + 0.15f)
+                return
+            }
             sr.color = tmp.set(0.78f, 0.82f, 0.88f, alpha); Shapes.roundRect(sr, ROAD_L, y0, inner, h, h / 2)
             glyph("sym_question", CX - 1.7f, g.y, 0.6f, alpha = alpha); glyph("sym_question", CX + 1.7f, g.y, 0.6f, alpha = alpha)
             posts(style, g.y, Pal.GREY, alpha)

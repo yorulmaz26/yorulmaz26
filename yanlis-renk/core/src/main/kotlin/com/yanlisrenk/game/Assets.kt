@@ -50,6 +50,15 @@ class Assets : Disposable {
         val SFX = listOf("tap", "gate_ok", "gate_fail", "coin", "diamond", "life_refill", "level_complete", "area_complete", "unlock",
             "purchase", "achievement", "button", "countdown", "go", "combo", "star", "whoosh", "shield")
         val MUSIC = listOf("menu", "garden", "candy", "sky", "crystal", "space", "carnival", "final", "endless")
+        /** Kullanıcı görselleri: (doku adı, yol) */
+        val ART = listOf(
+            "ui2_button" to "ui2/button.png", "ui2_panel" to "ui2/panel.png", "ui2_logo" to "ui2/logo.png",
+            "ui2_stars" to "ui2/stars_reward.png", "ui2_chest" to "ui2/chest.png",
+            "obj_coin" to "objects/coin.png", "obj_diamond" to "objects/diamond.png", "obj_shield" to "objects/shield.png",
+            "obj_pad" to "objects/pad_shift.png", "obj_gate_hidden" to "objects/gate_hidden.png",
+        )
+        val SPRITE_CHARS = listOf("char_klasik", "char_top", "char_robot", "char_panda", "char_kedi", "char_uzayli",
+            "char_kristal", "char_bulut", "char_yildiz", "char_kral")
         const val CHARS = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ★•→←–—’“”…₺"
     }
 
@@ -57,7 +66,42 @@ class Assets : Disposable {
         for (n in ICONS) loadTex(n, "icons/$n.png")
         for (n in UI) loadTex(n, "ui/$n.png")
         for (n in SFX) runCatching { sounds[n] = Gdx.audio.newSound(Gdx.files.internal("sfx/$n.ogg")) }
+        // kullanıcı tarafından üretilen görseller (varsa)
+        for (n in ART) if (Gdx.files.internal(n.second).exists()) loadTex(n.first, n.second)
+        for (c in SPRITE_CHARS) if (Gdx.files.internal("chars/$c.png").exists()) loadTex("sprite_$c", "chars/$c.png")
         buildFonts()
+    }
+
+    fun has(name: String) = textures.containsKey(name)
+
+    /** Karakterin görsel (sprite) hâli varsa döndürür. */
+    fun characterSprite(id: String): TextureRegion? = regions["sprite_$id"]
+
+    private val lazyTex = HashMap<String, Texture?>()
+
+    /** Büyük arka planlar gerektiğinde yüklenir; [keep] dışındakiler bellekten atılır. */
+    fun background(path: String): Texture? {
+        lazyTex[path]?.let { return it }
+        if (lazyTex.containsKey(path)) return null
+        val t = if (Gdx.files.internal(path).exists()) runCatching {
+            Texture(Gdx.files.internal(path)).also { it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear) }
+        }.getOrNull() else null
+        // en fazla 3 büyük doku tut
+        if (lazyTex.size >= 3) lazyTex.entries.firstOrNull { it.key != path }?.let { e -> e.value?.dispose(); lazyTex.remove(e.key) }
+        lazyTex[path] = t
+        return t
+    }
+
+    /** Ölçeklenmiş dokuz-parça (yüksek çözünürlüklü görseller için). */
+    fun nineScaled(name: String, l: Int, r: Int, t: Int, b: Int, scale: Float, tint: Color): NinePatchDrawable {
+        val np = NinePatch(region(name), l, r, t, b)
+        np.scale(scale, scale)
+        np.color = tint
+        val d = NinePatchDrawable(np)
+        // en küçük boyut yalnızca köşeler kadar olsun (yüksek çözünürlüklü görselin orta kısmı sayılmasın)
+        d.minWidth = (l + r) * scale
+        d.minHeight = (t + b) * scale
+        return d
     }
 
     private fun loadTex(name: String, path: String) {
@@ -115,6 +159,7 @@ class Assets : Disposable {
 
     override fun dispose() {
         textures.values.forEach { it.dispose() }
+        lazyTex.values.forEach { it?.dispose() }
         sounds.values.forEach { it.dispose() }
         music.values.forEach { it.dispose() }
         listOf(fontS, fontM, fontL, fontXL, fontHuge, fontWorld).forEach { it.dispose() }

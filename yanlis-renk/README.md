@@ -24,5 +24,6 @@ Oyun, Magic Lumos Software logosunun oyuna özel animasyonuyla açılır (dokuna
 ## Lisanslar
 * Kod ve üretilmiş varlıklar: bu projeye aittir (`tools/art/gen_icons.py`, `tools/audio/gen_audio.py` ile yeniden üretilebilir).
 * Magic Lumos Software logosu: şirketin kendi görseli (`android/assets/brand/`).
+* Kullanıcı tarafından sağlanan oyun görselleri: `android/assets/bg`, `chars`, `objects`, `ui2` (işleme betiği: `tools/art/import_user_art.py`).
 * Yazı tipi: Nunito — SIL Open Font License 1.1 (`android/assets/fonts/OFL.txt`).
 * libGDX: Apache 2.0.
