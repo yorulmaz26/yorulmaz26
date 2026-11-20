@@ -1,0 +1,1 @@
+Buz Krallığı: 8 PNG. Ortak atlas kesilerek hedef boyutlara uyarlanmıştır. Sky dikey alanı düz renk ile genişletilmiştir. Platform/dekor alfa temizliği yaklaşık, gerçek tileable ve Unity hizaları doğrulanmamıştır. Dekor altıncı nesne belgeye göre zarif kardan buz heykelidir; üretilen görsel kraliçe biçimli olduğu için tam eşleşme değildir.

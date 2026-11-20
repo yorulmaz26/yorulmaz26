@@ -1,0 +1,1 @@
+18 genel ikon 256x256 RGBA olarak tek atlastan ayrildi. Beyaz arka plan bagli alan maskesi ile temizlendi. Kenar ve Unity kalite kontrolu gereklidir.

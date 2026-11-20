@@ -1,0 +1,1 @@
+Hayalet Ormanı: 8 PNG. Ortak görselden kırpılıp yeniden boyutlandırıldı. Gökyüzü dikey uzatıldı. Alfa maskesi yaklaşık; dekorlar ayrı hücrelere ayrılmadı. Tile seam ve Unity testi yapılmadı.

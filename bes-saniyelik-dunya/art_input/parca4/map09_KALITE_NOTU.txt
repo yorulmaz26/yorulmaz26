@@ -1,0 +1,1 @@
+Zaman Şehri: atlas görüntüsünden ayrıştırılmış 8 PNG. Gökyüzü yeniden kompoze edildi; platform/dekor beyaz arka planı yaklaşık maske ile kaldırıldı. Dikişsiz karo, tam alfa ve Unity testi doğrulanmadı.
