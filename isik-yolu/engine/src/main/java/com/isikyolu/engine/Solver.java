@@ -26,6 +26,47 @@ public final class Solver {
         return search(start, stateCap, true);
     }
 
+    /**
+     * Ulaşılabilen bütün durumlarda ışık alan hücrelerin renk birleşimi (sınır aşılırsa null).
+     * Hiçbir durumda ışık almayan döner aynaları bulmak için kullanılır.
+     */
+    public static int[] litUnion(Board start, int cap) {
+        Board work = start.copy();
+        BeamTracer tracer = new BeamTracer();
+        int[] union = new int[work.width * work.height];
+        java.util.ArrayDeque<Long> q = new java.util.ArrayDeque<>();
+        LongIntMap seen = new LongIntMap(1024);
+        long k0 = work.stateKey();
+        seen.putIfAbsent(k0, 0);
+        q.add(k0);
+        while (!q.isEmpty()) {
+            long k = q.poll();
+            work.applyKey(k);
+            BeamTracer.Result r = tracer.run(work, false);
+            for (int c = 0; c < union.length; c++) union[c] |= r.lit[c];
+            for (Move m : work.legalMoves()) {
+                work.apply(m);
+                long nk = work.stateKey();
+                work.applyKey(k);
+                if (seen.putIfAbsent(nk, 0)) {
+                    if (seen.size() > cap) return null;
+                    q.add(nk);
+                }
+            }
+        }
+        return union;
+    }
+
+    /** Hiçbir durumda ışık almayan döner aynaları sabitler (yönleri sonucu etkilemez). @return sabitlenen sayısı */
+    public static int fixDeadMirrors(Level level, int cap) {
+        int[] u = litUnion(new Board(level), cap);
+        if (u == null) return 0;
+        int n = 0;
+        for (Piece p : level.pieces)
+            if (p.type == Cell.MIRROR && p.rotatable && u[p.y * level.width + p.x] == 0) { p.rotatable = false; n++; }
+        return n;
+    }
+
     /** Başlangıçtan ulaşılabilen toplam durum sayısı (sınırla). */
     public static int countReachable(Board start, int stateCap) {
         Solution s = search(start, stateCap, false);

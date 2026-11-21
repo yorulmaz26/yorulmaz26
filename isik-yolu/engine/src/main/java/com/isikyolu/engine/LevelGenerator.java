@@ -148,6 +148,8 @@ public final class LevelGenerator {
         if (sol.optimal < cfg.minOpt || sol.optimal > cfg.maxOpt) return null;
         if (Solver.countReachable(board, cfg.stateCap) < 0) return null;
         level.optimal = sol.optimal;
+        // hiç ışık alamayan döner aynalar oyuncuyu boşa dokundurur: sabitlenir (çözüm ve optimum değişmez)
+        Solver.fixDeadMirrors(level, cfg.stateCap);
         return level;
     }
 
