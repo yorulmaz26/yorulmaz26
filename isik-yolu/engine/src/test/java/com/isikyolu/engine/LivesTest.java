@@ -161,4 +161,22 @@ public class LivesTest {
         }
         assertFalse(new GameSession(l).isOutOfMoves()); // günlük/sınırsız oturum
     }
+
+    @Test public void trustedWallIgnoresClockChangesWithinBoot() {
+        Phone ph = new Phone();
+        Progress p = new Progress();
+        long t1 = Lives.trustedWall(p, ph.clock());
+        assertEquals(ph.wall, t1);
+        ph.pass(10 * MIN);
+        ph.wall += 3 * 24 * 60 * MIN; // saat 3 gün ileri
+        assertEquals(t1 + 10 * MIN, Lives.trustedWall(p, ph.clock()));
+        ph.wall -= 6 * 24 * 60 * MIN; // 6 gün geri
+        ph.pass(MIN);
+        assertEquals(t1 + 11 * MIN, Lives.trustedWall(p, ph.clock()));
+        // yeniden başlatma sonrası saat geri alınmışsa güvenilir zaman geri gitmez
+        ph.reboot(5 * MIN);
+        assertTrue(Lives.trustedWall(p, ph.clock()) >= t1 + 11 * MIN);
+        // gün hesabı
+        assertEquals(Economy.dayOf(t1, 0), (int) Math.floorDiv(t1, 86_400_000L));
+    }
 }

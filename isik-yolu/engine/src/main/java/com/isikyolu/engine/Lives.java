@@ -113,6 +113,26 @@ public final class Lives {
     /** Deneme kaybedildi veya bırakıldı: can geri gelmez. */
     public static void loseAttempt(Progress p) { p.attemptLevel = 0; }
 
+    /**
+     * Güvenilir şimdiki zaman (gün hesabı için): aynı açılışta son güvenilir zaman + monoton saatte geçen süre;
+     * telefon saatini ileri/geri almak etkilemez. Yeniden başlatmada ağ saati varsa o, yoksa duvar saati
+     * kullanılır ama daha önceki güvenilir zamandan geriye gidilmez.
+     */
+    public static long trustedWall(Progress p, Clock c) {
+        boolean same;
+        if (p.trustWall == 0) same = false;
+        else if (p.trustBoot >= 0 && c.boot >= 0) same = p.trustBoot == c.boot && c.elapsed >= p.trustElapsed;
+        else same = c.elapsed >= p.trustElapsed;
+        long t;
+        if (same) t = p.trustWall + (c.elapsed - p.trustElapsed);
+        else if (c.net >= 0) t = Math.max(c.net, p.trustWall);
+        else t = Math.max(c.wall, p.trustWall);
+        p.trustWall = t;
+        p.trustElapsed = c.elapsed;
+        p.trustBoot = c.boot;
+        return t;
+    }
+
     /** "12:34" biçiminde süre. */
     public static String format(long ms) {
         long s = (ms + 999) / 1000;

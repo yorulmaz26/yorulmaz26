@@ -32,6 +32,9 @@ public final class Progress {
     public int lives = Lives.MAX;
     public long lifeBaseWall, lifeBaseElapsed = Long.MIN_VALUE, lifeBaseNet = -1, lifeMaxWall;
     public int lifeBaseBoot = -1;
+    /** Gün hesabı için güvenilir zaman (bkz. Lives.trustedWall). */
+    public long trustWall, trustElapsed;
+    public int trustBoot = -1;
     /** Canı düşülmüş, henüz bitmemiş deneme (0 = yok). */
     public int attemptLevel;
 
@@ -148,6 +151,9 @@ public final class Progress {
         m.put("lbn", lifeBaseNet);
         m.put("lmw", lifeMaxWall);
         m.put("att", attemptLevel);
+        m.put("tw", trustWall);
+        m.put("te", trustElapsed);
+        m.put("tb", trustBoot);
         m.put("kr", crystals);
         m.put("gem", gems);
         m.put("tik", tickets);
@@ -196,6 +202,9 @@ public final class Progress {
             p.lifeBaseNet = Json.getLong(m, "lbn", -1);
             p.lifeMaxWall = Json.getLong(m, "lmw", 0);
             p.attemptLevel = Json.getInt(m, "att", 0);
+            p.trustWall = Json.getLong(m, "tw", 0);
+            p.trustElapsed = Json.getLong(m, "te", 0);
+            p.trustBoot = Json.getInt(m, "tb", -1);
             p.crystals = Math.max(0, Json.getInt(m, "kr", Economy.START_CRYSTALS));
             p.gems = Math.max(0, Json.getInt(m, "gem", 0));
             p.tickets = Math.max(0, Json.getInt(m, "tik", 0));

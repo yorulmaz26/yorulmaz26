@@ -18,7 +18,8 @@ public final class Demos {
         final int W = LightColor.WHITE;
         switch (ch) {
             case 1:
-                return new Level(5, 4).add(Piece.source(0, 3, Dir.RIGHT, W)).add(Piece.mirror(3, 3, 0, true)).add(Piece.target(3, 0, W));
+                return new Level(5, 4).add(Piece.source(0, 3, Dir.RIGHT, W)).add(Piece.mirror(3, 3, 0, true)).add(Piece.target(3, 0, W))
+                        .add(Piece.mirror(1, 0, 1, false)); // sabit ayna örneği
             case 2:
                 return new Level(5, 4).add(Piece.source(0, 3, Dir.RIGHT, W)).add(Piece.mirror(2, 3, 0, true))
                         .add(Piece.mirror(2, 1, 0, true)).add(Piece.target(4, 1, W)).add(Piece.mirror(4, 3, 1, true));

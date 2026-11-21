@@ -37,6 +37,7 @@ public final class BoardView extends View {
         boolean onRotate(int x, int y);
         boolean onPush(int x, int y, int dir);
         void onBlockTapped();
+        void onFixedMirrorTapped();
     }
 
     private static final int MAXP = 280;
@@ -581,6 +582,13 @@ public final class BoardView extends View {
             rect.set(-h, -h, h, h);
             shaderPaint.setShader(mountShader);
             c.drawRoundRect(rect, cell * 0.1f, cell * 0.1f, shaderPaint);
+            if (pulse[i] > 0.01f) { // dokunuldu ama dönmez: kırmızı halka ve hafif sallanma
+                stroke.setStrokeWidth(cell * 0.05f);
+                stroke.setColor(Palette.withAlpha(0xFFFF5C7A, (int) (230 * pulse[i])));
+                rect.set(-h - cell * 0.03f, -h - cell * 0.03f, h + cell * 0.03f, h + cell * 0.03f);
+                c.drawRoundRect(rect, cell * 0.12f, cell * 0.12f, stroke);
+                c.translate((float) Math.sin(pulse[i] * 28f) * cell * 0.03f * pulse[i], 0);
+            }
             float q = h * 0.74f;
             for (int k = 0; k < 4; k++) {
                 float bx = (k & 1) == 0 ? -q : q, by = k < 2 ? -q : q;
@@ -827,22 +835,38 @@ public final class BoardView extends View {
         return cy * gw + cx;
     }
 
+    /** Süren dokunmayı iptal eder (ör. can kalmadığında). */
+    public void cancelTouch() {
+        dragging = false; pushed = true; dragOffX = dragOffY = 0; touchCell = -1;
+        invalidate();
+    }
+
+    /** Takip edilen parmak ve bu dokunmada blok itildi mi (bir dokunmada en fazla bir itme). */
+    private int pointerId = -1;
+    private boolean pushed;
+
     @Override public boolean onTouchEvent(MotionEvent e) {
         if (session == null || !inputEnabled || cell == 0) return false;
         Board b = session.board();
         switch (e.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN: {
+                pointerId = e.getPointerId(0);
                 downX = e.getX(); downY = e.getY();
                 touchCell = cellAt(downX, downY);
                 dragging = touchCell >= 0 && b.isMovable(touchCell);
                 dragMoved = false;
+                pushed = false;
                 dragX0 = downX; dragY0 = downY; dragOffX = dragOffY = 0;
                 if (dragging) getParent().requestDisallowInterceptTouchEvent(true);
                 return true;
-            case MotionEvent.ACTION_MOVE:
-                if (dragging) {
-                    float dx = e.getX() - dragX0, dy = e.getY() - dragY0;
-                    if (Math.abs(e.getX() - downX) > slop || Math.abs(e.getY() - downY) > slop) dragMoved = true;
+            }
+            case MotionEvent.ACTION_MOVE: {
+                int pi = e.findPointerIndex(pointerId);
+                if (pi < 0) return true;
+                float ex = e.getX(pi), ey = e.getY(pi);
+                if (dragging && !pushed) {
+                    float dx = ex - dragX0, dy = ey - dragY0;
+                    if (Math.abs(ex - downX) > slop || Math.abs(ey - downY) > slop) dragMoved = true;
                     int d;
                     float mag;
                     if (Math.abs(dx) > Math.abs(dy)) { d = dx > 0 ? Dir.RIGHT : Dir.LEFT; mag = Math.abs(dx); }
@@ -851,40 +875,53 @@ public final class BoardView extends View {
                     float lim = can ? cell * 0.55f : cell * 0.12f;
                     float vis = Math.min(mag, lim);
                     dragOffX = Dir.DX[d] * vis; dragOffY = Dir.DY[d] * vis;
-                    if (can && mag > cell * 0.5f) {
+                    if (can && mag > cell * 0.5f && host != null) {
+                        // bir dokunmada tek itme: titreme ya da uzun/eğik sürükleme fazladan hak yemez
+                        pushed = true;
                         int x = touchCell % gw, y = touchCell / gw;
-                        if (host != null && host.onPush(x, y, d)) {
-                            touchCell = b.cell(x + Dir.DX[d], y + Dir.DY[d]);
-                            dragX0 += Dir.DX[d] * cell; dragY0 += Dir.DY[d] * cell;
-                            dragOffX -= Dir.DX[d] * cell; dragOffY -= Dir.DY[d] * cell;
-                            if (!inputEnabled) { dragging = false; dragOffX = dragOffY = 0; }
-                        }
+                        if (host.onPush(x, y, d)) touchCell = b.cell(x + Dir.DX[d], y + Dir.DY[d]);
+                        dragOffX = dragOffY = 0;
+                        dragging = false;
                     }
                     invalidate();
                 }
                 return true;
-            case MotionEvent.ACTION_UP:
+            }
+            case MotionEvent.ACTION_POINTER_UP:
+                // takip edilen parmak kalktı: dokunma biter, kalan parmak itme yapmaz
+                if (e.getPointerId(e.getActionIndex()) == pointerId) {
+                    if (dragging && touchCell >= 0) { blockOffX[touchCell] = dragOffX; blockOffY[touchCell] = dragOffY; }
+                    dragging = false; pushed = true; dragOffX = dragOffY = 0; touchCell = -1; pointerId = -1;
+                    invalidate();
+                }
+                return true;
+            case MotionEvent.ACTION_UP: {
+                if (pointerId < 0 || e.getPointerId(0) != pointerId) { touchCell = -1; return true; }
+                float ux = e.getX(), uy = e.getY();
                 if (dragging) {
                     if (!dragMoved && host != null) host.onBlockTapped();
                     if (touchCell >= 0) { blockOffX[touchCell] = dragOffX; blockOffY[touchCell] = dragOffY; }
                     dragging = false; dragOffX = dragOffY = 0;
-                } else if (Math.abs(e.getX() - downX) < slop * 2 && Math.abs(e.getY() - downY) < slop * 2) {
-                    int c2 = cellAt(e.getX(), e.getY());
+                } else if (!pushed && Math.abs(ux - downX) < slop * 2 && Math.abs(uy - downY) < slop * 2) {
+                    int c2 = cellAt(ux, uy);
                     if (c2 >= 0 && c2 == touchCell && host != null) {
                         if (b.isRotatable(c2)) host.onRotate(c2 % gw, c2 / gw);
                         else if (b.typeAt(c2) == Cell.MIRROR) {
-                            pulse[c2] = 0.6f;
+                            pulse[c2] = 1f; // sabit ayna: kırmızı titreşim halkası çizilir
                             Game.audio().play(Audio.LOCKED);
                             Game.haptics().error();
+                            host.onFixedMirrorTapped();
                         }
                     }
                 }
                 touchCell = -1;
+                pointerId = -1;
                 invalidate();
                 performClick();
                 return true;
+            }
             case MotionEvent.ACTION_CANCEL:
-                dragging = false; dragOffX = dragOffY = 0; touchCell = -1;
+                dragging = false; dragOffX = dragOffY = 0; touchCell = -1; pointerId = -1;
                 return true;
             default:
                 return true;

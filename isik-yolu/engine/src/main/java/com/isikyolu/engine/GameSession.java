@@ -91,6 +91,50 @@ public final class GameSession {
 
     public int stars() { return StarRating.stars(moves(), level.optimal); }
 
+    /** Akıllı ipucu planı: kaç kez Geri Al (bedava) gerektiği, sonraki hamle ve kalan en az hamle. */
+    public static final class Plan {
+        /** Önce kaç kez Geri Al yapılmalı (0 = doğrudan hamle). */
+        public int undos;
+        /** undos == 0 iken yapılacak hamle. */
+        public Move move;
+        /** Geri almalardan sonra çözüme kalan en az hamle (bulunamazsa -1). */
+        public int remaining = -1;
+        /** Kalan hak bu planla bölümü bitirmeye yetiyor mu. */
+        public boolean feasible;
+    }
+
+    /**
+     * Geri Al hak harcamadığı için en iyi yol bazen önce geri almaktan geçer. Geçmişteki her ara
+     * durumun çözüme uzaklığına bakılır; en kısa olan (eşitlikte en az geri alan) seçilir.
+     */
+    public Plan plan(int stateCap) {
+        Plan pl = new Plan();
+        java.util.Map<Long, Integer> dist = Solver.distancesToGoal(board, stateCap);
+        if (dist == null) return pl;
+        Board b = board.copy();
+        Integer d0 = dist.get(b.stateKey());
+        int best = d0 == null ? Integer.MAX_VALUE : d0, bestUndo = 0, i = 0;
+        for (Move m : history) { // en son hamleden geriye
+            b.revert(m);
+            i++;
+            Integer d = dist.get(b.stateKey());
+            if (d != null && d < best) { best = d; bestUndo = i; }
+        }
+        if (best == Integer.MAX_VALUE) return pl;
+        pl.undos = bestUndo;
+        pl.remaining = best;
+        pl.feasible = !limited || best <= budgetLeft();
+        if (bestUndo == 0 && best > 0) {
+            for (Move m : board.legalMoves()) {
+                board.apply(m);
+                Integer d = dist.get(board.stateKey());
+                board.revert(m);
+                if (d != null && d == best - 1) { pl.move = m; break; }
+            }
+        }
+        return pl;
+    }
+
     /** Mevcut durumdan en kısa çözümün ilk hamlesi (yoksa null). */
     public Move hint(int stateCap) {
         Solver.Solution s = Solver.solve(board, stateCap);

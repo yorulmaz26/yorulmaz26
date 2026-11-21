@@ -98,9 +98,11 @@ public final class TutorialOverlay extends Overlay {
 
     private static List<Page> basics() {
         List<Page> l = new ArrayList<>();
-        l.add(new Page("ÖĞRETİCİ · 1/3", "Hoş geldin!", "Işık kaynağından çıkan ışını hedef halkaya ulaştır. Bütün hedefler yandığında bölüm tamamlanır.", Demos.intro()));
-        l.add(new Page("ÖĞRETİCİ · 2/3", "Aynaları döndür", "Turkuaz halkalı aynalara dokun. Her dokunuş aynayı 90° çevirir ve ışın yeni yönüne yansır.", Demos.chapter(1)));
-        l.add(new Page("ÖĞRETİCİ · 3/3", "Yıldızları topla", "En az hamleyle bitirirsen 3 yıldız kazanırsın. Geri Al ve Sıfırla her zaman elinde; takılırsan İpucu bir sonraki doğru hamleyi gösterir.", Demos.chapter(2)));
+        l.add(new Page("ÖĞRETİCİ · 1/4", "Hoş geldin!", "Işık kaynağından çıkan ışını hedef halkaya ulaştır. Bütün hedefler yandığında bölüm tamamlanır. Duvarlar ışığı durdurur.", Demos.intro()));
+        l.add(new Page("ÖĞRETİCİ · 2/4", "Aynaları döndür", "Turkuaz halkalı aynalara dokun: her dokunuş aynayı 90° çevirir. Cıvatalı koyu yuvadaki aynalar sabittir, dönmez.", Demos.chapter(1)));
+        l.add(new Page("ÖĞRETİCİ · 3/4", "Yıldızları topla", "En az hamleyle bitirirsen 3 yıldız kazanırsın. Takılırsan İpucu bir sonraki doğru hamleyi (gerekirse önce Geri Al'ı) gösterir.", Demos.chapter(2)));
+        l.add(new Page("ÖĞRETİCİ · 4/4", "Hamle hakkı ve canlar", "Her bölümde sınırlı hamle hakkın var (sağ üstte HAK). Geri Al hakkı geri vermez. "
+                + "İlk hamlede 1 can düşer, bölümü bitirince geri gelir; hak bitince, yeniden başlayınca ya da çıkınca can gider. Canlar 15 dakikada bir yenilenir.", Demos.chapter(7)));
         return l;
     }
 

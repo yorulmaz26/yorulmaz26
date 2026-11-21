@@ -103,4 +103,39 @@ public class GameSessionTest {
         while (!g.isSolved()) assertTrue(g.play(g.hint(200_000)));
         assertTrue(g.isSolved());
     }
+
+    /** Denetim bulgusu: bölüm 45'te Geri Al'la keşif sonrası düz ipucu kaybettiriyordu; akıllı plan Geri Al'ı önerir. */
+    @Test public void smartPlanPrefersFreeUndo() throws Exception {
+        Level l = TestUtil.pack().get(45);
+        GameSession g = new GameSession(l, true);
+        // ilk döner aynayı 9 kez çevir + geri al (hak harcanır, durum değişmez), sonra bir kez daha çevir
+        Move probe = null;
+        for (Move m : g.board().legalMoves()) if (m.kind == Move.ROTATE) { probe = m; break; }
+        for (int i = 0; i < 9; i++) { assertTrue(g.play(probe)); assertTrue(g.undo()); }
+        assertTrue(g.play(probe));
+        int left = g.budgetLeft();
+        GameSession.Plan pl = g.plan(500_000);
+        assertTrue("plan kalan hakla yapılabilmeli", pl.feasible);
+        assertTrue(pl.remaining <= left);
+        // planı uygula: önce geri al, sonra hamleler
+        int guard = 0;
+        while (!g.isSolved() && guard++ < 60) {
+            GameSession.Plan p = g.plan(500_000);
+            assertTrue(p.feasible);
+            if (p.undos > 0) assertTrue(g.undo());
+            else assertTrue(g.play(p.move));
+        }
+        assertTrue("akıllı ipucu çözdürmeli (hak: " + g.budgetLeft() + ")", g.isSolved());
+    }
+
+    @Test public void planReportsInfeasibleWhenBudgetGone() throws Exception {
+        Level l = TestUtil.pack().get(350);
+        GameSession g = new GameSession(l, true);
+        Move probe = null;
+        for (Move m : g.board().legalMoves()) if (m.kind == Move.ROTATE) { probe = m; break; }
+        while (g.budgetLeft() > 1) { g.play(probe); g.undo(); }
+        GameSession.Plan pl = g.plan(500_000);
+        assertFalse("kalan 1 hak, en az " + pl.remaining + " gerekir", pl.feasible);
+        assertTrue(Economy.continueMoves(pl.remaining) >= pl.remaining);
+    }
 }

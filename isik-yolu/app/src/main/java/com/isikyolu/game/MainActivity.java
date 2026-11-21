@@ -64,11 +64,20 @@ public final class MainActivity extends Activity {
     public void goLevel(int id) {
         Game.refreshLives();
         com.isikyolu.engine.Progress p = Game.progress();
-        if (p.lives <= 0 && p.attemptLevel != id) { showNoLives(); return; }
+        if (p.lives <= 0 && p.attemptLevel != id) {
+            // bitmiş bir oyun ekranında takılı kalınmasın: önce bölümlere dön
+            if (current instanceof GameScreen) show(new LevelSelectScreen(this), false);
+            showNoLives(id);
+            return;
+        }
         show(new GameScreen(this, id), true);
     }
 
-    public void showNoLives() {
+    public void showNoLives() { showNoLives(0); }
+
+    /** Can kalmadı penceresi; retryLevel > 0 ise can alınınca o bölüm açılır. Aynı anda tek pencere. */
+    public void showNoLives(int retryLevel) {
+        if (hasOverlay()) return;
         com.isikyolu.game.ui.Overlay o = new com.isikyolu.game.ui.Overlay(this);
         FrameLayout ic = new FrameLayout(this);
         ic.setBackground(Ui.round(0x33FF5C7A, Ui.dp(this, 34)));
@@ -97,6 +106,7 @@ public final class MainActivity extends Activity {
             o.dismiss();
             toast("+1 can alındı");
             checkAchievements();
+            if (retryLevel > 0) goLevel(retryLevel);
         });
         o.button("Market", Ui.PURPLE, com.isikyolu.game.ui.Icon.BAG, v -> { o.dismiss(); goMarket(2); });
         o.button("Günlük Bulmaca", Ui.SECONDARY, com.isikyolu.game.ui.Icon.CALENDAR, v -> { o.dismiss(); goDaily(); });
@@ -174,7 +184,7 @@ public final class MainActivity extends Activity {
         // önce açık pencereyi kapat
         for (int i = root.getChildCount() - 1; i >= 0; i--) {
             View v = root.getChildAt(i);
-            if (v instanceof com.isikyolu.game.ui.Overlay) {
+            if (v instanceof com.isikyolu.game.ui.Overlay && !((com.isikyolu.game.ui.Overlay) v).isClosing()) {
                 com.isikyolu.game.ui.Overlay o = (com.isikyolu.game.ui.Overlay) v;
                 if (o.isCancelable()) o.dismiss();
                 return;
@@ -199,13 +209,17 @@ public final class MainActivity extends Activity {
     }
 
     @Override protected void onDestroy() {
+        // etkinlik kapanıyor ya da yeniden oluşturuluyor: yarım deneme bırakılmış sayılır
+        if (current != null) current.onHide();
+        Game.save();
         super.onDestroy();
         if (isFinishing()) Game.audio().release();
     }
 
     /** Overlay'ler için: ekranda açık pencere var mı? */
     public boolean hasOverlay() {
-        for (int i = 0; i < root.getChildCount(); i++) if (root.getChildAt(i) instanceof com.isikyolu.game.ui.Overlay) return true;
+        for (int i = 0; i < root.getChildCount(); i++)
+            if (root.getChildAt(i) instanceof com.isikyolu.game.ui.Overlay && !((com.isikyolu.game.ui.Overlay) root.getChildAt(i)).isClosing()) return true;
         return false;
     }
 

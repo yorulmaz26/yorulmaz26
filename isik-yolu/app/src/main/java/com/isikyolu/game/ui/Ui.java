@@ -159,6 +159,11 @@ public final class Ui {
             return false;
         });
         v.setOnClickListener(view -> {
+            // çift tıklama koruması: aynı düğmeye 400 ms içinde ikinci tıklama yok sayılır
+            long now = android.os.SystemClock.uptimeMillis();
+            Object last = view.getTag(com.isikyolu.game.R.id.last_click);
+            if (last instanceof Long && now - (Long) last < 400) return;
+            view.setTag(com.isikyolu.game.R.id.last_click, now);
             Game.audio().play(com.isikyolu.game.Audio.CLICK);
             Game.haptics().tick();
             if (l != null) l.onClick(view);

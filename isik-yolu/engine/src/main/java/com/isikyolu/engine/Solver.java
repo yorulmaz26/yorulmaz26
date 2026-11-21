@@ -67,6 +67,48 @@ public final class Solver {
         return n;
     }
 
+    /**
+     * Başlangıçtan ulaşılabilen her durumun çözüme en kısa uzaklığı (hamleler tersinir olduğu için
+     * hedef durumlarından geriye çok kaynaklı BFS). Sınır aşılırsa null.
+     */
+    public static java.util.Map<Long, Integer> distancesToGoal(Board start, int cap) {
+        Board work = start.copy();
+        BeamTracer tracer = new BeamTracer();
+        java.util.ArrayDeque<Long> q = new java.util.ArrayDeque<>();
+        java.util.HashSet<Long> all = new java.util.HashSet<>();
+        java.util.ArrayList<Long> goals = new java.util.ArrayList<>();
+        long k0 = work.stateKey();
+        all.add(k0); q.add(k0);
+        while (!q.isEmpty()) {
+            long k = q.poll();
+            work.applyKey(k);
+            if (tracer.isSolved(work)) goals.add(k);
+            for (Move m : work.legalMoves()) {
+                work.apply(m);
+                long nk = work.stateKey();
+                work.applyKey(k);
+                if (all.add(nk)) {
+                    if (all.size() > cap) return null;
+                    q.add(nk);
+                }
+            }
+        }
+        java.util.HashMap<Long, Integer> dist = new java.util.HashMap<>();
+        for (long g : goals) { dist.put(g, 0); q.add(g); }
+        while (!q.isEmpty()) {
+            long k = q.poll();
+            int d = dist.get(k);
+            work.applyKey(k);
+            for (Move m : work.legalMoves()) {
+                work.apply(m);
+                long nk = work.stateKey();
+                work.applyKey(k);
+                if (!dist.containsKey(nk)) { dist.put(nk, d + 1); q.add(nk); }
+            }
+        }
+        return dist;
+    }
+
     /** Başlangıçtan ulaşılabilen toplam durum sayısı (sınırla). */
     public static int countReachable(Board start, int stateCap) {
         Solution s = search(start, stateCap, false);

@@ -71,7 +71,8 @@ public class UiFlowTest {
 
     private Overlay topOverlay() {
         ViewGroup r = act.overlayLayer();
-        for (int i = r.getChildCount() - 1; i >= 0; i--) if (r.getChildAt(i) instanceof Overlay) return (Overlay) r.getChildAt(i);
+        for (int i = r.getChildCount() - 1; i >= 0; i--)
+            if (r.getChildAt(i) instanceof Overlay && !((Overlay) r.getChildAt(i)).isClosing()) return (Overlay) r.getChildAt(i);
         return null;
     }
 
@@ -182,7 +183,7 @@ public class UiFlowTest {
         idle(800);
         assertTrue(act.currentScreen() instanceof DailyScreen);
         shot("09_gunluk_bulmaca");
-        int today = DailyPuzzle.today();
+        int today = Game.today(); // uygulamanın güvenilir günü
         Level daily = DailyPuzzle.generate(today);
         act.goDailyGame(daily, today);
         idle(800);
@@ -250,9 +251,9 @@ public class UiFlowTest {
             GameScreen gs = (GameScreen) act.currentScreen();
             // çözüme ait olmayan bir aynayı çevirerek hakkı çözmeden bitir
             for (int i = 0; i < budget; i++) { assertTrue(gs.onRotate(mx, my)); idle(20); }
-            idle(900);
+            waitFor("hak bitti penceresi", () -> topOverlay() != null);
+            idle(300);
             assertEquals("tur " + round, 3 - round, p.lives);
-            assertNotNull("hak bitti penceresi", topOverlay());
             if (round == 0) shot("13_hak_bitti");
             View again = findByDescription(topOverlay(), "Bölümler");
             assertNotNull(again);
@@ -332,11 +333,8 @@ public class UiFlowTest {
         // hak bitince 80 kristalle +5 hak
         final int lvl = 12;
         Level l = Game.levels().get(lvl);
-        java.util.Set<Integer> sol = new java.util.HashSet<>();
-        for (Move mv : Solver.solve(new Board(l), 100000).moves) sol.add(mv.cell);
-        int mx = -1, my = -1;
-        for (com.isikyolu.engine.Piece pc : l.pieces)
-            if (pc.type == com.isikyolu.engine.Cell.MIRROR && pc.rotatable && !sol.contains(pc.y * l.width + pc.x)) { mx = pc.x; my = pc.y; }
+        int[] pm = probeMirror(lvl);
+        int mx = pm[0], my = pm[1];
         act.checkAchievements(); // testte verilen yıldızların başarı ödüllerini önceden işle
         act.goLevel(lvl);
         idle(500);
@@ -344,8 +342,8 @@ public class UiFlowTest {
         GameScreen gs = (GameScreen) act.currentScreen();
         int budget = com.isikyolu.engine.Lives.moveBudget(l.optimal);
         for (int i = 0; i < budget; i++) { assertTrue(gs.onRotate(mx, my)); idle(20); }
-        idle(900);
-        assertNotNull(topOverlay());
+        waitFor("hak bitti penceresi", () -> topOverlay() != null);
+        idle(300);
         shot("18_devam_teklifi");
         int kr = p.crystals, lives = p.lives;
         View cont = findByDescription(topOverlay(), "+5 hak");
@@ -356,6 +354,163 @@ public class UiFlowTest {
         assertEquals("devam etmek can harcamaz", lives, p.lives);
         assertTrue("devamdan sonra hamle yapılabilir", gs.onRotate(mx, my));
         assertTrue(p.achievements.contains("alisveris"));
+    }
+
+    // ---------- denetim bulgularının geri dönüş testleri ----------
+
+    private GameScreen openLevel(int id) throws Exception {
+        act.goLevel(id);
+        idle(500);
+        closeOverlays();
+        assertTrue(act.currentScreen() instanceof GameScreen);
+        return (GameScreen) act.currentScreen();
+    }
+
+    /** Çözüme ait olmayan bir döner ayna (tek başına çevrilince bölümü bitirmez). */
+    private int[] probeMirror(int id) {
+        Level l = Game.levels().get(id);
+        java.util.Set<Integer> sol = new java.util.HashSet<>();
+        for (Move mv : Solver.solve(new Board(l), 100000).moves) sol.add(mv.cell);
+        for (com.isikyolu.engine.Piece pc : l.pieces)
+            if (pc.type == com.isikyolu.engine.Cell.MIRROR && pc.rotatable && !sol.contains(pc.y * l.width + pc.x)) return new int[]{pc.x, pc.y};
+        for (com.isikyolu.engine.Piece pc : l.pieces) // optimumu 1'den büyük bölümde tek ayna tek başına çözmez
+            if (pc.type == com.isikyolu.engine.Cell.MIRROR && pc.rotatable && l.optimal > 1) return new int[]{pc.x, pc.y};
+        throw new AssertionError("yoklama aynası yok: " + id);
+    }
+
+    private void burnBudget(GameScreen gs, int id) {
+        int[] pm = probeMirror(id);
+        int budget = com.isikyolu.engine.Lives.moveBudget(Game.levels().get(id).optimal);
+        for (int i = 0; i < budget; i++) { assertTrue(gs.onRotate(pm[0], pm[1])); idle(10); }
+    }
+
+    /** Bulgu: hak bitince hemen geri basılırsa can gitmiyor, eski pencere başka ekranda açılıyordu. */
+    @Test public void backRightAfterOutOfMovesLosesLife() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        GameScreen gs = openLevel(12);
+        burnBudget(gs, 12);
+        assertEquals(3, p.lives);
+        assertTrue(act.currentScreen().onBack()); // pencere gelmeden geri
+        idle(200);
+        for (int i = 0; i < 40; i++) { Thread.sleep(10); idle(50); }
+        assertTrue(act.currentScreen() instanceof LevelSelectScreen);
+        assertNull("eski pencere yeni ekranda açılmamalı", topOverlay());
+        assertEquals("deneme kapanmalı", 0, p.attemptLevel);
+        assertEquals("can geri gelmemeli", 3, p.lives);
+    }
+
+    /** Bulgu: pencere kapanırken çift dokunuş ipucunu iki kez harcatıyordu. */
+    @Test public void doubleTapSpendsHintOnce() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        GameScreen gs = openLevel(38);
+        Method req = GameScreen.class.getDeclaredMethod("requestHint");
+        req.setAccessible(true);
+        req.invoke(gs);
+        idle(400);
+        int before = p.hints;
+        View b = findByDescription(topOverlay(), "İpucu Göster");
+        assertNotNull(b);
+        // gerçek parmak gibi: dokunuşlar pencerenin kökünden gelir; ikinci dokunuş 60 ms sonra
+        com.isikyolu.game.ui.Overlay ov = topOverlay();
+        int[] lo = new int[2], lb = new int[2];
+        ov.getLocationInWindow(lo); b.getLocationInWindow(lb);
+        float bx = lb[0] - lo[0] + b.getWidth() / 2f, by = lb[1] - lo[1] + b.getHeight() / 2f;
+        long t = android.os.SystemClock.uptimeMillis();
+        for (int k = 0; k < 2; k++) {
+            long t0 = t + k * 60;
+            ov.dispatchTouchEvent(android.view.MotionEvent.obtain(t0, t0, android.view.MotionEvent.ACTION_DOWN, bx, by, 0));
+            ov.dispatchTouchEvent(android.view.MotionEvent.obtain(t0, t0 + 20, android.view.MotionEvent.ACTION_UP, bx, by, 0));
+            idle(60);
+        }
+        b.performClick(); // doğrudan ikinci tıklama da (çift tıklama koruması) yok sayılmalı
+        for (int i = 0; i < 30; i++) { Thread.sleep(10); idle(30); }
+        assertEquals("tek ipucu harcanmalı", before - 1, p.hints);
+    }
+
+    /** Bulgu: can 0 iken "Tekrar Dene" oyuncuyu donmuş tahtada bırakıyordu. */
+    @Test public void retryWithNoLivesGoesToLevels() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        p.lives = 1;
+        GameScreen gs = openLevel(12);
+        burnBudget(gs, 12);
+        waitFor("hak bitti penceresi", () -> topOverlay() != null);
+        idle(300);
+        View retry = findByDescription(topOverlay(), "Tekrar Dene");
+        retry.performClick();
+        idle(600);
+        assertEquals(0, p.lives);
+        assertTrue("bölümler ekranına dönülmeli", act.currentScreen() instanceof LevelSelectScreen);
+        assertNotNull("can kalmadı penceresi", topOverlay());
+        // can satın alınınca bölüm açılır
+        p.crystals = 500;
+        View buy = findByDescription(topOverlay(), "+1 can al");
+        assertNotNull(buy);
+        buy.performClick();
+        idle(800);
+        closeOverlays();
+        assertTrue("can alınınca bölüm açılmalı", act.currentScreen() instanceof GameScreen);
+    }
+
+    /** Bulgu: blok sürüklemede titreme/uzun sürükleme birden çok itme ve hak harcatıyordu. */
+    @Test public void oneDragPushesBlockOnce() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        GameScreen gs = openLevel(71);
+        java.lang.reflect.Field fb = GameScreen.class.getDeclaredField("board"); fb.setAccessible(true);
+        com.isikyolu.game.ui.BoardView bv = (com.isikyolu.game.ui.BoardView) fb.get(gs);
+        java.lang.reflect.Field fs = GameScreen.class.getDeclaredField("session"); fs.setAccessible(true);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) fs.get(gs);
+        float ox = f(bv, "ox"), oy = f(bv, "oy"), cell = f(bv, "cell");
+        int blk = ses.board().blockCells()[0];
+        int bx = blk % ses.board().width, by = blk / ses.board().width;
+        int dir = -1;
+        for (int d = 0; d < 4; d++) if (ses.board().canPush(blk, d)) { dir = d; break; }
+        assertTrue(dir >= 0);
+        float sx = ox + (bx + 0.5f) * cell, sy = oy + (by + 0.5f) * cell;
+        int[] DX = {0, 1, 0, -1}, DY = {-1, 0, 1, 0};
+        long t = android.os.SystemClock.uptimeMillis();
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, sx, sy, 0));
+        // titreme: ±0.5 hücre civarında gidip gelme, sonra 1.8 hücre uzun sürükleme
+        float[] amounts = {0.3f, 0.51f, 0.49f, 0.51f, 0.49f, 0.9f, 1.4f, 1.8f};
+        for (int i = 0; i < amounts.length; i++)
+            bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 10 * (i + 1), android.view.MotionEvent.ACTION_MOVE,
+                    sx + DX[dir] * amounts[i] * cell, sy + DY[dir] * amounts[i] * cell, 0));
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 200, android.view.MotionEvent.ACTION_UP, sx + DX[dir] * 1.8f * cell, sy + DY[dir] * 1.8f * cell, 0));
+        idle(100);
+        assertEquals("bir sürüklemede tek itme", 1, ses.actions());
+    }
+
+    private static float f(Object o, String name) throws Exception {
+        java.lang.reflect.Field x = o.getClass().getDeclaredField(name); x.setAccessible(true); return x.getFloat(o);
+    }
+
+    /** Bulgu: günlük bulmaca cihaz tarihine göre ödül veriyordu; yalnızca güvenilir "bugün" ödüllendirilir. */
+    @Test public void dailyRewardOnlyForTrustedToday() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        int tomorrow = Game.today() + 1;
+        Level dl = DailyPuzzle.generate(tomorrow);
+        act.goDailyGame(dl, tomorrow);
+        idle(600);
+        int before = p.crystals;
+        solveThroughUi((GameScreen) act.currentScreen(), dl);
+        idle(1600);
+        assertEquals("yarının bulmacası ödül vermemeli", before, p.crystals);
+        closeOverlays();
+        int today = Game.today();
+        Level tl = DailyPuzzle.generate(today);
+        act.goDailyGame(tl, today);
+        idle(600);
+        solveThroughUi((GameScreen) act.currentScreen(), tl);
+        idle(1600);
+        assertTrue("bugünün bulmacası ödül vermeli", p.crystals > before);
     }
 
     @Test public void splashScreenRenders() throws Exception {

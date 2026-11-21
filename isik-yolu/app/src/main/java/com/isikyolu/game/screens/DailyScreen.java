@@ -34,7 +34,7 @@ public final class DailyScreen extends Screen {
         super(a);
         Context c = a;
         Progress p = Game.progress();
-        int today = DailyPuzzle.today();
+        int today = Game.today(); // saat hilesine karşı güvenilir gün
         boolean done = p.dailyDone.contains(DailyPuzzle.keyFor(today));
         LinearLayout root = Ui.vertical(c);
         root.addView(Ui.header(c, "Günlük Bulmaca", v -> a.goMenu(), null));

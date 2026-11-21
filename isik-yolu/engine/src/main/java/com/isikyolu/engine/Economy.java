@@ -81,6 +81,16 @@ public final class Economy {
         return (int) Math.floorDiv(t + zoneOffsetMs, DAY_MS);
     }
 
+    /** Güvenilir zamandan (Lives.trustedWall) yerel gün. */
+    public static int dayOf(long trustedWall, long zoneOffsetMs) {
+        return (int) Math.floorDiv(trustedWall + zoneOffsetMs, DAY_MS);
+    }
+
+    /** Güvenilir zamana göre bir sonraki gün başına kalan süre. */
+    public static long msUntilNextDayAt(long trustedWall, long zoneOffsetMs) {
+        return DAY_MS - Math.floorMod(trustedWall + zoneOffsetMs, DAY_MS);
+    }
+
     /** Gün değiştiyse günlük alım sayaçları sıfırlanır. */
     static void rollDay(Progress p, int day) {
         if (p.shopDay != day) {
@@ -228,6 +238,9 @@ public final class Economy {
     public static int continuePrice(int continuesThisAttempt) { return 80 << Math.min(continuesThisAttempt, 6); }
 
     public static final int CONTINUE_MOVES = 5;
+
+    /** Devamda verilecek hak: en az 5, ama bölümü bitirmeye yetmeyecekse kalan en az hamle kadar. */
+    public static int continueMoves(int remainingOptimal) { return Math.max(CONTINUE_MOVES, remainingOptimal); }
 
     /** Bilet varsa bilet, yoksa kristal harcar. */
     public static boolean payContinue(Progress p, int continuesThisAttempt) {

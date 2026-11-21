@@ -42,8 +42,16 @@ public class Overlay extends FrameLayout {
     }
 
     public Overlay setCancelable(boolean c) { cancelable = c; return this; }
+
+    /** Kapanma animasyonu sırasında düğmeler ikinci kez tetiklenmesin (çift dokunuş koruması). */
+    @Override public boolean onInterceptTouchEvent(android.view.MotionEvent e) { return closing || super.onInterceptTouchEvent(e); }
+
+    @Override public boolean onTouchEvent(android.view.MotionEvent e) { return closing || super.onTouchEvent(e); }
     public Overlay setOnDismiss(Runnable r) { onDismiss = r; return this; }
     public boolean isCancelable() { return cancelable; }
+
+    /** Kapanma animasyonu sürüyor mu (artık "açık pencere" sayılmaz). */
+    public boolean isClosing() { return closing; }
 
     public void show(ViewGroup parent) {
         parent.addView(this, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));

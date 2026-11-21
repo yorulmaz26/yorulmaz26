@@ -46,7 +46,7 @@ public final class Chapters {
             "Duvarlar ışığı durdurur. Koyu çerçeveli aynalar sabittir, dönmez.",
             "Renkli kaynaklar! Her hedef halkasının rengindeki ışığı ister. Kırmızı + yeşil = sarı.",
             "Renk filtreleri yalnızca kendi rengini geçirir. Beyaz ışık filtreden renkli çıkar.",
-            "Prizma ışığı ayrıştırır: kırmızı sola, yeşil düz, mavi sağa sapar.",
+            "Prizma ışığı ayrıştırır. Işığın GİDİŞ YÖNÜNE göre kırmızı sola, yeşil düz, mavi sağa sapar: aşağı giden ışıkta kırmızı ekranın sağına gider.",
             "Birden fazla hedef var. Bölümü bitirmek için hepsi aynı anda yanmalı.",
             "Altın bloklar ışığı keser. Sürükleyerek bir kare kaydırabilirsin.",
             "Işık bir anahtar taşına değince aynı renkteki kapı açılır.",

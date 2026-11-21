@@ -38,7 +38,10 @@ public final class Game {
             progress = Progress.deserialize(prefs.getString(KEY, null));
             clockSource = app;
             // uygulama bir bölümün ortasında kapatıldıysa o denemenin canı geri gelmez
-            if (progress.attemptLevel != 0) { com.isikyolu.engine.Economy.loseAttempt(progress, clock()); abandonedAttempt = true; }
+            if (progress.attemptLevel != 0) {
+                abandonedShield = com.isikyolu.engine.Economy.loseAttempt(progress, clock());
+                abandonedAttempt = true;
+            }
             Lives.update(progress, clock());
             save();
         }
@@ -61,10 +64,13 @@ public final class Game {
     }
 
     private static Context clockSource;
-    private static boolean abandonedAttempt;
+    private static boolean abandonedAttempt, abandonedShield;
 
     /** Yarım kalan denemede can harcandı mı (bir kez bildirilir). */
     public static boolean takeAbandonedNotice() { boolean b = abandonedAttempt; abandonedAttempt = false; return b; }
+
+    /** Yarım kalan denemede Can Kalkanı kullanıldı mı. */
+    public static boolean abandonedShieldUsed() { return abandonedShield; }
 
     /** Can sistemi için saatler: monoton saat, açılış sayacı ve (varsa) ağ saati. */
     public static Lives.Clock clock() {
@@ -88,11 +94,18 @@ public final class Game {
 
     public static long zoneOffset() { return java.util.TimeZone.getDefault().getOffset(System.currentTimeMillis()); }
 
-    /** Market günü (saati geri almak günü geri götürmez). */
-    public static int shopDay() {
-        Lives.update(progress, clock()); // en ileri görülen zamanı günceller
-        return com.isikyolu.engine.Economy.trustedDay(progress, System.currentTimeMillis(), zoneOffset());
+    /** Güvenilir şimdiki zaman: telefon saatini ileri/geri almak etkilemez (bkz. Lives.trustedWall). */
+    public static long trustedNow() {
+        Lives.Clock c = clock();
+        Lives.update(progress, c);
+        return Lives.trustedWall(progress, c);
     }
+
+    /** Market ve günlük bulmaca günü (saat hilesine karşı güvenilir gün). */
+    public static int shopDay() { return com.isikyolu.engine.Economy.dayOf(trustedNow(), zoneOffset()); }
+
+    /** Günlük bulmacanın "bugün"ü. */
+    public static int today() { return shopDay(); }
 
     public static LevelPack levels() { return levels; }
     public static Progress progress() { return progress; }

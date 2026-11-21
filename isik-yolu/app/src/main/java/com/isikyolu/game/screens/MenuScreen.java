@@ -61,7 +61,7 @@ public final class MenuScreen extends Screen {
         col.addView(Ui.button(a, playLabel, Ui.PRIMARY, Icon.PLAY, v -> a.goLevel(next)),
                 Ui.lpMargins(a, -1, Ui.dp(a, 62), 0, 0, 0, 14));
 
-        boolean dailyDone = p.dailyDone.contains(DailyPuzzle.keyFor(DailyPuzzle.today()));
+        boolean dailyDone = p.dailyDone.contains(DailyPuzzle.keyFor(Game.today()));
         LinearLayout row1 = Ui.horizontal(a);
         row1.addView(tile(Icon.GRID, "Bölümler", Palette.TURQUOISE, null, () -> a.goLevels()), weight(0, 6));
         row1.addView(tile(Icon.CALENDAR, "Günlük Bulmaca", Palette.GOLD, dailyDone ? null : "YENİ", () -> a.goDaily()), weight(6, 0));
@@ -83,7 +83,8 @@ public final class MenuScreen extends Screen {
     }
 
     @Override public void onShow() {
-        if (Game.takeAbandonedNotice()) act.toast("Yarım bırakılan bölüm için 1 can harcandı");
+        if (Game.takeAbandonedNotice())
+            act.toast(Game.abandonedShieldUsed() ? "Yarım bırakılan bölümde Can Kalkanı canını korudu" : "Yarım bırakılan bölüm için 1 can harcandı");
     }
 
     private LinearLayout.LayoutParams weight(float l, float r) {

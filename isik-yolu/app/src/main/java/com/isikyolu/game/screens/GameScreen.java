@@ -42,8 +42,13 @@ public final class GameScreen extends Screen implements BoardView.Host {
     private final GameSession session;
     private final BoardView board;
     private final TextView movesText, movesLabel, goalText, hintBadge;
+    private FrameLayout undoButton;
     private final MiniStars live;
-    private boolean finished, thinking;
+    private boolean finished, thinking, won;
+    /** Ertelenmiş pencere (tamamlandı / hak bitti): ekrandan çıkılınca iptal edilir. */
+    private Runnable pendingOverlay;
+    /** Akıllı ipucu "önce N kez Geri Al" dedi: kalan geri alma sayısı. */
+    private int pendingUndoHint;
     private int lastLiveStars = 3;
 
     public GameScreen(MainActivity a, int levelId) { this(a, Game.levels().get(levelId), -1); }
@@ -120,7 +125,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
         LinearLayout bottom = Ui.horizontal(c);
         bottom.setGravity(Gravity.CENTER);
         bottom.setPadding(Ui.dp(c, 16), Ui.dp(c, 4), Ui.dp(c, 16), Ui.dp(c, 18));
-        bottom.addView(action(c, Icon.UNDO, "Geri Al", Ui.SECONDARY, v -> undo()), weightLp(c));
+        undoButton = action(c, Icon.UNDO, "Geri Al", Ui.SECONDARY, v -> undo());
+        bottom.addView(undoButton, weightLp(c));
         bottom.addView(action(c, Icon.RESET, "Sıfırla", Ui.SECONDARY, v -> reset()), weightLp(c));
         FrameLayout hint = action(c, Icon.BULB, "İpucu", Ui.GOLD, v -> requestHint());
         hintBadge = Ui.text(c, "", 12, Palette.WHITE, Ui.BOLD);
@@ -203,8 +209,19 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     // ---------- hamleler ----------
 
+    /** Yeni deneme için can var mı? Yoksa hamle uygulanmaz ve tek bir "can kalmadı" penceresi açılır. */
+    private boolean canStart() {
+        if (daily || attemptActive()) return true;
+        Game.refreshLives();
+        if (Game.progress().lives > 0) return true;
+        board.cancelTouch();
+        act.showNoLives(level.id);
+        return false;
+    }
+
     @Override public boolean onRotate(int x, int y) {
         if (finished || thinking) return false;
+        if (!canStart()) return false;
         if (!session.tap(x, y)) { if (session.isOutOfMoves()) outOfMoves(); return false; }
         if (!beginAttempt()) return false;
         Game.audio().play(Audio.ROTATE, 0.9f + (float) Math.random() * 0.25f);
@@ -216,6 +233,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     @Override public boolean onPush(int x, int y, int dir) {
         if (finished || thinking) return false;
+        if (!canStart()) return false;
         if (!session.drag(x, y, dir)) return false;
         if (!beginAttempt()) return false;
         Game.audio().play(Audio.PUSH);
@@ -233,8 +251,9 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (!Lives.startAttempt(p, Game.clock(), level.id)) {
             session.reset();
             board.onMove(null, false);
+            board.cancelTouch();
             updateHud();
-            act.showNoLives();
+            act.showNoLives(level.id);
             return false;
         }
         Game.save();
@@ -244,11 +263,21 @@ public final class GameScreen extends Screen implements BoardView.Host {
     private boolean attemptActive() { return !daily && Game.progress().attemptLevel == level.id; }
 
     @Override public void onHide() {
-        // bölümden çıkıldı: denemenin canı geri gelmez
-        if (attemptActive() && !finished) giveUpAttempt();
+        if (pendingOverlay != null) { removeCallbacks(pendingOverlay); pendingOverlay = null; }
+        // bölümden kazanmadan çıkıldı (hak bitmiş olsa bile): denemenin canı geri gelmez
+        if (attemptActive() && !won) giveUpAttempt();
     }
 
-    @Override public void onBlockTapped() { act.toast("Altın bloğu sürükleyerek kaydır"); }
+    private boolean onScreen() { return act.currentScreen() == this; }
+
+    @Override public void onBlockTapped() { act.toast("Altın bloğu bir kare sürükleyerek kaydır"); }
+
+    private long lastFixedToast;
+
+    @Override public void onFixedMirrorTapped() {
+        long now = android.os.SystemClock.uptimeMillis();
+        if (now - lastFixedToast > 2500) { lastFixedToast = now; act.toast("Cıvatalı koyu aynalar sabittir, dönmez"); }
+    }
 
     private void undo() {
         if (finished || thinking) return;
@@ -259,6 +288,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         board.onMove(m, true);
         updateHud();
         checkAchievements();
+        if (pendingUndoHint > 0 && --pendingUndoHint == 0) showPlanMove(false); // geri almalar bitti: sıradaki hamle ücretsiz gösterilir
     }
 
     private void reset() {
@@ -267,8 +297,10 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (attemptActive()) {
             Overlay o = new Overlay(act);
             o.title("Yeniden başla?");
-            o.body("Bu denemenin canı geri gelmez.\nKalan can: " + Game.progress().lives
-                    + (Game.progress().lives == 0 ? "\nYeni deneme için can yenilenmesini beklemen gerekecek." : ""));
+            Progress pp = Game.progress();
+            o.body((pp.shields > 0 ? "Bu deneme bırakılır; Can Kalkanın (" + pp.shields + ") canını korur ve 1 kalkan harcanır."
+                    : "Bu denemenin canı geri gelmez.") + "\nKalan can: " + pp.lives
+                    + (pp.lives == 0 && pp.shields == 0 ? "\nYeni deneme için can yenilenmesini beklemen gerekecek." : ""));
             o.button("Yeniden Başla", Ui.GOLD, Icon.RESET, v -> { o.dismiss(); giveUpAttempt(); doReset(); });
             o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
             o.show(act.overlayLayer());
@@ -278,6 +310,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
     }
 
     private void doReset() {
+        pendingUndoHint = 0;
         session.reset();
         Game.audio().play(Audio.UNDO, 0.8f);
         board.onMove(null, false);
@@ -305,10 +338,15 @@ public final class GameScreen extends Screen implements BoardView.Host {
         Game.save();
         Game.audio().play(Audio.LOCKED, 0.8f);
         Game.haptics().error();
-        postDelayed(this::showOutOfMoves, 500);
+        final GameSession s = session;
+        GameLoader.background(() -> s.plan(HINT_CAP), plan -> {
+            pendingOverlay = () -> { pendingOverlay = null; if (onScreen()) showOutOfMoves(plan); };
+            postDelayed(pendingOverlay, 300);
+        });
     }
 
-    private void showOutOfMoves() {
+    private void showOutOfMoves(GameSession.Plan plan) {
+        final int extra = Economy.continueMoves(plan == null || plan.remaining < 0 ? Economy.CONTINUE_MOVES : plan.remaining);
         Overlay o = new Overlay(act).setCancelable(false);
         Context c = act;
         FrameLayout ic = new FrameLayout(c);
@@ -320,8 +358,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
         int price = Economy.continuePrice(session.continues());
         o.body("Devam etmezsen bu denemenin canı gider.\nKalan can: " + p.lives + "/" + Lives.MAX
                 + (p.shields > 0 ? "\nCan Kalkanı: " + p.shields + " (canını korur)" : ""));
-        String contLabel = p.tickets > 0 ? "Bilet kullan · +" + Economy.CONTINUE_MOVES + " hak (" + p.tickets + ")"
-                : "+" + Economy.CONTINUE_MOVES + " hak · " + price + " kristal";
+        String contLabel = p.tickets > 0 ? "Bilet kullan · +" + extra + " hak (" + p.tickets + ")"
+                : "+" + extra + " hak · " + price + " kristal";
         o.button(contLabel, Ui.GOLD, p.tickets > 0 ? Icon.TICKET : Icon.CRYSTAL, v -> {
             if (!Economy.payContinue(Game.progress(), session.continues())) {
                 Game.audio().play(Audio.LOCKED);
@@ -329,7 +367,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
                 return;
             }
             o.dismiss();
-            session.addBudget(Economy.CONTINUE_MOVES);
+            session.addBudget(extra);
             finished = false;
             board.setInputEnabled(true);
             Game.save();
@@ -337,7 +375,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
             updateHud();
             act.checkAchievements();
         });
-        o.button("Tekrar Dene", Ui.PRIMARY, Icon.RESET, v -> { o.dismiss(); giveUpAttempt(); act.goLevel(level.id); });
+        o.button("Tekrar Dene", Ui.PRIMARY, Icon.RESET, v -> { o.dismiss(); giveUpAttempt(); act.goLevel(level.id); }); // can yoksa goLevel bölümlere döner
         o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); giveUpAttempt(); act.goLevels(); });
         o.button("Ana Menü", Ui.SECONDARY, Icon.HOME, v -> { o.dismiss(); giveUpAttempt(); act.goMenu(); });
         o.show(act.overlayLayer());
@@ -402,6 +440,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
     }
 
     private void useHint() {
+        if (thinking || finished) return;
         Progress p = Game.progress();
         if (!p.useHint()) return;
         session.markHintUsed();
@@ -411,13 +450,44 @@ public final class GameScreen extends Screen implements BoardView.Host {
         board.setInputEnabled(false);
         act.toast("Işık yolu hesaplanıyor…");
         final GameSession s = session;
-        GameLoader.background(() -> s.hint(HINT_CAP), m -> {
+        GameLoader.background(() -> s.plan(HINT_CAP), pl -> {
             thinking = false;
             board.setInputEnabled(!finished);
-            if (m == null) { act.toast("İpucu bulunamadı. Sıfırlayıp tekrar dene."); p.hints++; updateHud(); return; }
+            if (pl == null || pl.remaining < 0) { refundHint("İpucu bulunamadı. Sıfırlayıp tekrar dene."); return; }
+            if (!pl.feasible) {
+                refundHint("Bu denemede kalan hak (" + session.budgetLeft() + ") yetmez: en az " + pl.remaining
+                        + " hamle gerekir. Sıfırla ya da hak bitince devam et. İpucun iade edildi.");
+                return;
+            }
             Game.audio().play(Audio.HINT);
-            board.showHint(m);
+            if (pl.undos > 0) {
+                pendingUndoHint = pl.undos;
+                act.toast("Önce " + pl.undos + " kez Geri Al'a dokun (hak harcamaz), sonra sıradaki hamle gösterilecek");
+                undoButton.animate().scaleX(1.15f).scaleY(1.15f).setDuration(180).withEndAction(() -> undoButton.animate().scaleX(1f).scaleY(1f).setDuration(220).start()).start();
+            } else if (pl.move != null) {
+                board.showHint(pl.move);
+            }
             checkAchievements();
+        });
+    }
+
+    private void refundHint(String msg) {
+        Game.progress().hints++;
+        Game.progress().hintsUsedTotal = Math.max(0, Game.progress().hintsUsedTotal - 1);
+        Game.save();
+        updateHud();
+        act.toast(msg);
+    }
+
+    /** Geri almalar bittiğinde sıradaki hamleyi ücretsiz gösterir. */
+    private void showPlanMove(boolean charge) {
+        thinking = true;
+        board.setInputEnabled(false);
+        final GameSession s = session;
+        GameLoader.background(() -> s.plan(HINT_CAP), pl -> {
+            thinking = false;
+            board.setInputEnabled(!finished);
+            if (pl != null && pl.feasible && pl.undos == 0 && pl.move != null) board.showHint(pl.move);
         });
     }
 
@@ -425,6 +495,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     private void win() {
         finished = true;
+        won = true;
+        pendingUndoHint = 0;
         board.setInputEnabled(false);
         board.celebrate();
         Game.audio().play(Audio.WIN);
@@ -435,9 +507,11 @@ public final class GameScreen extends Screen implements BoardView.Host {
         int hintsBefore = p.hints;
         Economy.Reward reward;
         if (daily) {
-            boolean firstToday = !p.dailyDone.contains(DailyPuzzle.keyFor(epochDay));
-            p.dailyDone.add(DailyPuzzle.keyFor(epochDay));
-            reward = firstToday ? Economy.onDailyComplete(p, p.dailyStreak(DailyPuzzle.today())) : new Economy.Reward();
+            // ödül yalnızca güvenilir "bugün"ün bulmacası için ve o gün ilk kez çözülünce
+            boolean isToday = epochDay == Game.today();
+            boolean firstToday = isToday && !p.dailyDone.contains(DailyPuzzle.keyFor(epochDay));
+            if (isToday) p.dailyDone.add(DailyPuzzle.keyFor(epochDay)); // başka günün bulmacası seriye/başarılara sayılmaz
+            reward = firstToday ? Economy.onDailyComplete(p, p.dailyStreak(epochDay)) : new Economy.Reward();
         } else {
             int oldStars = p.stars[level.id];
             first = p.recordLevel(level.id, stars, session.moves(), session.hintsUsed() > 0);
@@ -447,10 +521,13 @@ public final class GameScreen extends Screen implements BoardView.Host {
         boolean rewarded = p.hints > hintsBefore;
         Game.save();
         final boolean firstF = first;
-        postDelayed(() -> {
+        pendingOverlay = () -> {
+            pendingOverlay = null;
+            if (!onScreen()) return;
             showComplete(stars, firstF, rewarded, reward);
             checkAchievements();
-        }, 1100);
+        };
+        postDelayed(pendingOverlay, 1100);
     }
 
     private void checkAchievements() { act.checkAchievements(); }
@@ -471,7 +548,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (!daily && Game.progress().bestMoves[level.id] > 0)
             b.append("\nEn iyi sonucun: ").append(Game.progress().bestMoves[level.id]).append(" hamle");
         if (stars < 3) b.append("\n3 yıldız için ").append(level.optimal).append(" hamlede bitir.");
-        if (daily) b.append("\nSeri: ").append(Game.progress().dailyStreak(DailyPuzzle.today())).append(" gün");
+        if (daily) b.append("\nSeri: ").append(Game.progress().dailyStreak(epochDay)).append(" gün");
         o.body(b.toString());
         if (reward.any()) {
             LinearLayout gain = Ui.horizontal(c);
@@ -518,12 +595,13 @@ public final class GameScreen extends Screen implements BoardView.Host {
     // ---------- duraklatma ----------
 
     private void showPause() {
-        if (act.hasOverlay()) return;
+        if (act.hasOverlay() || finished) return; // bitmiş bölümde (pencere gelmek üzere) duraklatma açılmaz
         Overlay o = new Overlay(act);
         o.title("Duraklatıldı");
         o.body((daily ? "Günlük Bulmaca" : "Bölüm " + level.id + " · " + level.name) + "\nHamle: " + session.moves()
                 + (daily ? "" : " · Kalan hak: " + session.budgetLeft())
-                + (attemptActive() ? "\nÇıkarsan bu denemenin canı geri gelmez." : ""));
+                + (attemptActive() ? (Game.progress().shields > 0 ? "\nÇıkarsan deneme bırakılır; Can Kalkanın canını korur (1 kalkan harcanır)."
+                        : "\nÇıkarsan bu denemenin canı geri gelmez.") : ""));
         o.button("Devam Et", Ui.PRIMARY, Icon.PLAY, v -> o.dismiss());
         o.button("Yeniden Başla", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); reset(); });
         if (daily) o.button("Günlük Bulmaca", Ui.SECONDARY, Icon.CALENDAR, v -> { o.dismiss(); act.goDaily(); });
