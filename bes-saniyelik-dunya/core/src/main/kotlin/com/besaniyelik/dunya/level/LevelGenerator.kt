@@ -156,6 +156,37 @@ object LevelGenerator {
         return max(0.5f * speedPrev, 0.6f * reach)
     }
 
+    /** Bir aşamanın engel bölgesinin uzunluğu (kural süresi x hız - giriş ve çıkış tamponları). */
+    fun zoneLength(prev: RuleEffects?, e: RuleEffects, t: Float, intro: Boolean, first: Boolean, speedMul: Float = 1f): Float {
+        val sp = Physics.realSpeed(e, speedMul)
+        val len = Physics.RULE_PERIOD * sp * (if (first) 1.15f else 1f)
+        val bufIn = if (prev == null) (11f - 1.5f * t).coerceAtLeast(9f) else bufferIn(prev, e, sp, t, intro, speedMul)
+        return len - bufIn - bufferOut(e, sp, speedMul)
+    }
+
+    /**
+     * Hayalet / Kayan Platform kuralı, nesnesinin sığmayacağı kadar kısa aşamalardan (ör. yer çekimi dönüşünden hemen
+     * sonraki Yavaş Zaman aşaması) çıkarılır: kural duyurulup dünyada hiçbir karşılığı olmadan geçmez. Bu iki kural
+     * hızı, yer çekimini ve boyu değiştirmediği için aşama sınırları aynı kalır.
+     */
+    fun fitRules(plan: List<List<Mechanic>>, t: Float, intro: Boolean, speedMul: Float = 1f): List<List<Mechanic>> {
+        val out = ArrayList<List<Mechanic>>()
+        for ((i, rules) in plan.withIndex()) {
+            var r = rules
+            val prev = if (i == 0) null else RuleEffects.of(out[i - 1])
+            fun drop(m: Mechanic, p: Pattern) {
+                if (m !in r) return
+                val e = RuleEffects.of(r)
+                if (zoneLength(prev, e, t, intro, i == 0, speedMul) >= Patterns.minZone(p, e)) return
+                r = (r - m).ifEmpty { listOf(Mechanic.NORMAL) }
+            }
+            drop(Mechanic.GHOST, Pattern.GHOST_BRIDGE)
+            drop(Mechanic.SHIFTING, Pattern.SHIFT_BRIDGE)
+            out.add(r)
+        }
+        return out
+    }
+
     /**
      * Bir aşamanın engel bölgesini [zx0, zx1] desenlerle doldurur. Kurala özgü desenler önce denenir; sığmayan desen
      * aşamayı boş bırakmaz (sıradaki denenir), bölgeden taşan desen geri alınır.
@@ -166,21 +197,38 @@ object LevelGenerator {
         var cx = zx0
         val queue = ArrayList(dedicated)
         val tried = HashSet<Pattern>()
+        val retried = HashSet<Pattern>()
         var guard = 0
         var first = true
-        while (cx < zx1 - 4f && guard++ < 18) {
+        while (cx < zx1 - 4f && guard++ < 24) {
             // aşamanın ilk deseninden önce ayrıca dinlenme boşluğu gerekmez: giriş tamponu zaten düzdür
-            val r = if (first) 0.5f else rest()
+            var r = if (first) 0.5f else rest()
+            // Sırada kurala özgü desen varsa dinlenme düzlüğü, o desen sığacak kadar (en az 1 karo) kısalır
+            if (!first && queue.isNotEmpty()) r = min(r, max(1f, zx1 - cx - Patterns.minLength(queue[0]) - 0.05f))
             val avail = zx1 - (cx + r)
             var p: Pattern? = null
             while (queue.isNotEmpty() && p == null) { val q = queue.removeAt(0); if (Patterns.minLength(q) <= avail && q !in tried) p = q }
+            val isDedicated = p != null
             if (p == null) p = pick(avail, tried)
             if (p == null) break
+            // Sırada başka kurala özgü desen varsa bu desen ona yer bırakacak şekilde sınırlanır (ilk denemede)
+            var lim = zx1
+            if (isDedicated && p !in retried) {
+                val reserve = queue.sumOf { (Patterns.minLength(it) + 1.1f).toDouble() }.toFloat()
+                if (avail - reserve >= Patterns.minLength(p) + 0.3f) lim = zx1 - reserve
+            }
+            // Yüksek yoğunlukta kurala özgü desen bölgenin en fazla yarısını kaplar; kalanı genel engellere kalır
+            if (isDedicated && ctx.crowd > 0f && p !in Patterns.precision) lim = min(lim, cx + r + max(Patterns.minLength(p) + 1.5f, avail * (1f - 0.5f * ctx.crowd)))
             val mark = b.mark()
             b.ground(sign, cx, cx + r)
             if (r > 2.5f && ctx.chance(coinChance)) b.coinLine(sign, cx + 0.5f, cx + r - 0.5f, Physics.PLAYER_H * ctx.e.sizeScale / 2f)
-            val end = Patterns.place(p, ctx, cx + r, zx1)
-            if (end > zx1 + 0.01f) { b.rollback(mark); tried.add(p); continue }
+            val end = Patterns.place(p, ctx, cx + r, lim)
+            if (end > lim + 0.01f) {
+                b.rollback(mark)
+                // Kurala özgü desen sığmadıysa bir kez daha (tüm bölgeyle) denenir; kural "boşa" duyurulmasın
+                if (isDedicated && retried.add(p)) queue.add(0, p) else tried.add(p)
+                continue
+            }
             tried.clear()
             first = false
             cx = end
@@ -199,10 +247,10 @@ object LevelGenerator {
         val t = ((target - 1f) / 8.5f + tShift).coerceIn(0f, 1.6f)
         val diff = GameContent.difficulty(levelId)
         val count = phaseCount(levelId, rng)
-        val plan = PhasePlanner.plan(levelId, count, rng)
+        val intro = kind == LevelKind.TUTORIAL
+        val plan = fitRules(PhasePlanner.plan(levelId, count, rng), t, intro)
         val effects = plan.map { RuleEffects.of(it) }
         val b = LevelBuilder()
-        val intro = kind == LevelKind.TUTORIAL
 
         // Aşama sınırları
         val bounds = FloatArray(count + 1)
@@ -253,7 +301,7 @@ object LevelGenerator {
                 if (i >= 2) queue.add(tutorial[tutorialIdx++ % tutorial.size])
                 fillPhase(b, ctx, zx0, zx1, queue, { 3f }, 0.5f) { _, _ -> null }
             } else {
-                fillPhase(b, ctx, zx0, zx1, Patterns.dedicated(e), { ctx.lerp(3.2f, 1.3f, 1.0f) * ctx.rnd(0.8f, 1.3f) }, 0.5f) { avail, tried ->
+                fillPhase(b, ctx, zx0, zx1, Patterns.required(ctx), { ctx.lerp(3.2f, 1.3f, 1.0f) * ctx.rnd(0.8f, 1.3f) }, 0.5f) { avail, tried ->
                     pick(ctx, stage, levelId, avail, kind, tried)
                 }
             }
@@ -300,11 +348,14 @@ object LevelGenerator {
             if (c.t > 0.6f) {
                 val k = (c.t - 0.6f).coerceAtMost(0.8f)
                 when (p) {
-                    Pattern.SPIKES, Pattern.SAW, Pattern.SPIKE_GAP, Pattern.CEILING_GAP, Pattern.FLOATING -> w *= 1f + 2.2f * k
+                    Pattern.SPIKES, Pattern.SAW, Pattern.SPIKE_GAP, Pattern.CEILING_GAP -> w *= 1f + 2.2f * k
+                    Pattern.FLOATING -> w *= 1f + 1.0f * k
                     Pattern.GAP, Pattern.STEP, Pattern.BOOST_GAP, Pattern.MOVING_SAW -> w *= 1f - 0.8f * k
                     else -> {}
                 }
             }
+            // En üst zorlukta "üstünden atla / altından koş" türü kolay desenler daha da seyrelir
+            if (c.crowd > 0f && (p == Pattern.MOVING_SAW || p == Pattern.BOOST_GAP || p == Pattern.SPRING_WALL || p == Pattern.STEP)) w *= 1f - 0.6f * c.crowd
             if (c.e.reverseControl && (p == Pattern.FLOATING || p == Pattern.STAIRS || p == Pattern.STEP)) w *= 0.3f
             if (c.e.sizeScale < 1f && (p == Pattern.SPRING_WALL || p == Pattern.STAIRS)) w *= 0.3f
             candidates.add(p to w)

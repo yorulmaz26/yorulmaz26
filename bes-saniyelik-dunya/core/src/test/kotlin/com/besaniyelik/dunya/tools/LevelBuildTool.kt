@@ -22,6 +22,18 @@ object LevelBuildTool {
         val spec = System.getProperty("levels") ?: args.getOrNull(1) ?: "1-500"
         val ids = spec.split(",").flatMap { part -> part.trim().split("-").let { (it[0].toInt()..it.last().toInt()).toList() } }.distinct().sorted()
         val range = ids.first()..ids.last()
+        // -Prestamp=1: bölümleri yeniden üretmeden yalnızca zorluk etiketlerini güncel hedef eğrisine göre yeniden yazar
+        if ((System.getProperty("restamp") ?: args.getOrNull(4) ?: "0") == "1") {
+            var changed = 0
+            for (map in 1..10) {
+                val file = File(outDir, "map_%02d.json".format(map))
+                val pack = LevelRepository.json.decodeFromString(MapPack.serializer(), file.readText())
+                val levels = pack.levels.map { l -> val d = GameContent.difficulty(l.id); if (d != l.difficulty) { changed++; l.copy(difficulty = d) } else l }
+                file.writeText(LevelRepository.json.encodeToString(MapPack.serializer(), MapPack(map, levels)))
+            }
+            println("Zorluk etiketi güncellenen bölüm: $changed")
+            return
+        }
         val threads = Runtime.getRuntime().availableProcessors().coerceAtMost(4)
         val pool = Executors.newFixedThreadPool(threads)
         val t0 = System.currentTimeMillis()
@@ -51,6 +63,7 @@ object LevelBuildTool {
             val file = File(outDir, "map_%02d.json".format(map))
             val existing = if (file.exists()) LevelRepository.json.decodeFromString(MapPack.serializer(), file.readText()).levels else emptyList()
             val merged = (existing.filter { e -> list.none { it.level.id == e.id } } + list.map { it.level }).sortedBy { it.id }
+                .map { l -> if (l.difficulty == GameContent.difficulty(l.id)) l else l.copy(difficulty = GameContent.difficulty(l.id)) }
             file.writeText(LevelRepository.json.encodeToString(MapPack.serializer(), MapPack(map, merged)))
         }
         for ((id, f) in futures) {

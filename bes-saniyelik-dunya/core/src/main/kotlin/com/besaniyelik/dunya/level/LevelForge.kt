@@ -1,5 +1,6 @@
 package com.besaniyelik.dunya.level
 
+import kotlin.math.max
 import com.besaniyelik.dunya.sim.*
 import java.util.Random
 import kotlin.math.abs
@@ -34,9 +35,12 @@ class ForgeResult(val level: LevelData, val report: ForgeReport)
 object LevelForge {
     class TrajPoint(val x: Float, val y: Float, val grounded: Boolean, val sign: Int, val tick: Int)
 
-    private class Candidate(val result: ForgeResult, val err: Float, val windowsOk: Boolean) {
-        /** Küçük olan daha iyi: pencere ihlali her zaman zorluk sapmasından kötüdür. */
-        val penalty: Float get() = kotlin.math.abs(err) + (if (windowsOk) 0f else 5f)
+    private class Candidate(val result: ForgeResult, val err: Float, val windowsOk: Boolean, val deficit: Int, val toggles: IntArray) {
+        /**
+         * Küçük olan daha iyi: pencere ihlali her zaman zorluk sapmasından kötüdür. Penceresi dar adaylar ölçülmez
+         * (puanları yoktur); kendi aralarında pencere açığına göre sıralanır.
+         */
+        val penalty: Float get() = if (windowsOk) kotlin.math.abs(err) else 5f + deficit
     }
 
     // Üretim süresi dökümü (teşhis)
@@ -99,7 +103,8 @@ object LevelForge {
                 else -> "hedeften kolay"
             }
             val report = ForgeReport(levelId, attempt + 1, totalNodes, traj.last().tick, fair, target, m.score, m.minWindow, m.minHold, m.pComplete, withItems.coins.size, note)
-            val cand = Candidate(ForgeResult(withItems, report), err, windowsOk)
+            val deficit = max(0, needWin - m.minWindow) + max(0, needHold - m.minHold)
+            val cand = Candidate(ForgeResult(withItems, report), err, windowsOk, deficit, toggles)
             if (best == null || cand.penalty < best.penalty) best = cand
             if (fair) return cand.result
             log("  #$levelId deneme $attempt: ölçülen %.1f / hedef %.1f, pencere %d, tutma %d, t%+.2f -> %s".format(m.score, target, m.minWindow, m.minHold, tShift, note))
@@ -110,18 +115,34 @@ object LevelForge {
                 log("    DAR %s / %s w%d h%d dx%.1f".format(f?.p ?: "-", ph?.rules?.joinToString("+") { it.name.take(5) } ?: "-", m.windows[jj], m.holdWindows[jj], fx - (f?.x ?: fx)))
             }
             // Desen yoğunluğunu ölçüme göre ayarla: zor/dar çıktıysa azalt, kolay çıktıysa artır
-            val push = if (!windowsOk) -0.05f else (-0.08f * err.coerceIn(-3f, 3f))
+            val push = if (!windowsOk) -(0.04f + 0.015f * deficit).coerceAtMost(0.12f) else (-0.08f * err.coerceIn(-3f, 3f))
             tShift = (tShift + push).coerceIn(-0.6f, 0.9f)
         }
         val b = best ?: throw IllegalStateException("Bölüm $levelId üretilemedi")
         val r = b.result.report
-        return ForgeResult(b.result.level, ForgeReport(levelId, r.attempts, totalNodes, r.solveTicks, false, r.target, r.measured, r.minWindow, r.minHold, r.pComplete, r.coins, r.note))
+        var measured = r.measured; var pc = r.pComplete
+        if (!b.windowsOk) {
+            // Penceresi dar aday ölçülmemişti: rapora gerçek puan yazılsın diye kapısız ölçülür
+            LevelAnalyzer.measure(b.result.level, b.toggles)?.let { measured = it.score; pc = it.pComplete }
+        }
+        return ForgeResult(b.result.level, ForgeReport(levelId, r.attempts, totalNodes, r.solveTicks, false, r.target, measured, r.minWindow, r.minHold, pc, r.coins, r.note))
     }
 
+    /**
+     * Dürüst (katı) çözücü. Önce 4 tick'lik karar ızgarasıyla aranır; çözüm çıkmazsa 2 tick'lik ince ızgarayla bir kez
+     * daha denenir: dar ama insan için geçilebilir (6-8 tick paylı) engeller kaba ızgaraya denk gelmeyebilir.
+     */
     fun trySolve(level: LevelData, maxNodes: Int = 350_000): SolveResult {
+        val coarse = solveWith(level, maxNodes, 4)
+        if (coarse.success || !coarse.reason.startsWith("çözüm yok")) return coarse
+        val fine = solveWith(level, maxNodes, 2)
+        return if (fine.success) fine else coarse
+    }
+
+    private fun solveWith(level: LevelData, maxNodes: Int, decision: Int): SolveResult {
         val sim = Simulation(level, SimConfig(solver = true, powerups = false, strict = true))
         try {
-            return LevelSolver(maxNodes = maxNodes).solve(sim)
+            return LevelSolver(maxNodes = maxNodes, decision = decision).solve(sim)
         } finally { sim.dispose() }
     }
 

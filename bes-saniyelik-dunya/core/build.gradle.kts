@@ -42,7 +42,8 @@ tasks.register<JavaExec>("generateLevels") {
     jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
     workingDir = rootProject.file("assets")
     args = listOf(rootProject.file("assets/levels").absolutePath, (project.findProperty("levels") ?: "1-500").toString(),
-        (project.findProperty("offset") ?: "0").toString(), (project.findProperty("improve") ?: "0").toString())
+        (project.findProperty("offset") ?: "0").toString(), (project.findProperty("improve") ?: "0").toString(),
+        (project.findProperty("restamp") ?: "0").toString())
     maxHeapSize = "3g"
 }
 
@@ -69,6 +70,21 @@ tasks.register<JavaExec>("probeAttempt") {
     dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.ProbeAttempt")
     jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8"); maxHeapSize = "3g"
     args = (project.findProperty("a") ?: "1 GAP /tmp/probe").toString().split(" ")
+}
+tasks.register<JavaExec>("draftStats") {
+    dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.DraftStats")
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
+    args = listOf((project.findProperty("attempts") ?: "3").toString()); systemProperty("show", (project.findProperty("show") ?: "kayan").toString())
+}
+tasks.register<JavaExec>("probeUnsolved") {
+    dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.ProbeUnsolved")
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8"); maxHeapSize = "3g"
+    args = (project.findProperty("a") ?: "300 20 0.3").toString().split(" ")
+}
+tasks.register<JavaExec>("draftDump") {
+    dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.DraftDump")
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8"); maxHeapSize = "3g"
+    args = (project.findProperty("a") ?: "1 0 0").toString().split(" ")
 }
 tasks.register<JavaExec>("probe2") {
     dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.Probe2"); args = listOf((project.findProperty("lv") ?: "1").toString())

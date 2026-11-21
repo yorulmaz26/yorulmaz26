@@ -84,7 +84,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             override fun onCheckpoint(x: Float) { game.audio.play(Sfx.CHECKPOINT); renderer.onCheckpoint(x) }
             override fun onShieldSave() { game.audio.play(Sfx.SHIELD); toast("Kalkan korudu!", "b_p_shield") }
             override fun onDeath(cause: DeathCause) { game.audio.play(Sfx.DEATH); renderer.onDeath(); game.vibrate(60); deathText(cause) }
-            override fun onRespawn() { refreshHearts(); refreshRules(); ruleBanner(sim.activeRules); readyHold(0.8f) }
+            override fun onRespawn() { refreshHearts(); refreshRules(); ruleBanner(sim.activeRules); rewindHints(); readyHold(0.8f) }
             override fun onComplete() { game.audio.play(Sfx.COMPLETE); renderer.celebrate(); completeTimer = 1.4f }
             override fun onGameOver() { game.audio.play(Sfx.FAIL); refreshHearts() }
         }
@@ -119,6 +119,16 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         if (v && !started && !finished && startOverlay != null) { begin(); return }
         pressed = v
         if (v && waitHint != null) clearWait()
+    }
+
+    /**
+     * Yeniden doğuşta ipuçları geri sarılır: bekleyen "dokun" ipucu (ağır çekim) kapanır ve oyuncunun önünde kalan
+     * ipuçları yeniden gösterilir. Aksi halde eğitim bölümünde ölen oyuncu başlangıçta ağır çekimde kalıyordu.
+     */
+    private fun rewindHints() {
+        val hints = level?.hints ?: return
+        if (waitHint != null) { waitHint = null; hintBox.clearActions(); hintBox.addAction(Actions.fadeOut(0.2f)) }
+        hintIdx = hints.indexOfFirst { it.x > sim.player.x }.let { if (it < 0) hints.size else it }
     }
 
     private fun clearWait() { waitHint = null; hintBox.clearActions(); hintBox.addAction(Actions.sequence(Actions.delay(0.6f), Actions.fadeOut(0.3f))) }
@@ -402,7 +412,12 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
 
     override fun pause() { if (started && !paused && !finished) openPauseMenu() }
 
-    override fun onBack() { if (paused && started) return; openPauseMenu() }
+    override fun onBack() {
+        // başlangıç kartı açıkken geri tuşu bölüm seçimine döner (duraklatma menüsü henüz açılamaz)
+        if (!started && !finished) { quit(); return }
+        if (paused && started) return
+        openPauseMenu()
+    }
 
     private fun restart() {
         game.audio.resume()

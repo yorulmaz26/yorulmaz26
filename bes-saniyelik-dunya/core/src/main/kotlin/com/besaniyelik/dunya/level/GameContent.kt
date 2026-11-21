@@ -217,7 +217,7 @@ object GameContent {
 
     /**
      * Sürekli hedef zorluk (1..10), "testere dişi" eğrisi:
-     *  - her harita bir öncekinden 0,68 daha zor bir tabandan başlar ve harita boyunca 1,45 artar; yani yeni haritanın
+     *  - her harita bir öncekinden 0,62 daha zor bir tabandan başlar ve harita boyunca 1,45 artar; yani yeni haritanın
      *    ilk bölümleri önceki haritanın sonundan belirgin biçimde kolaydır (yeni tema + nefes alma),
      *  - her alanın 5 bölümü kendi içinde hafifçe zorlaşır, 5. bölüm (meydan okuma) bir basamak yukarıdadır,
      *  - yeni mekaniğin tanıtıldığı bölümler kolay, harita finalleri zordur.
@@ -228,7 +228,7 @@ object GameContent {
         val map = (levelId - 1) / LEVELS_PER_MAP
         val inMap = (levelId - 1) % LEVELS_PER_MAP
         val inArea = inMap % LEVELS_PER_AREA
-        var d = 1f + map * 0.68f + inMap / (LEVELS_PER_MAP - 1f) * 1.45f
+        var d = 1f + map * 0.62f + inMap / (LEVELS_PER_MAP - 1f) * 1.45f
         d += (inArea - 2) * 0.05f
         d += when (kindOf(levelId)) {
             LevelKind.CHALLENGE -> 0.45f

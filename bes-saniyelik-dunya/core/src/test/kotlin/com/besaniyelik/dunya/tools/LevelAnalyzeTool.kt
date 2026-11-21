@@ -22,7 +22,7 @@ object LevelAnalyzeTool {
         GdxNativesLoader.load(); Box2D.init()
         val assets = File(args.getOrElse(0) { "." })
         LevelRepository.reader = { File(assets, it).readText() }
-        val range = (args.getOrNull(1) ?: "1-500").split("-").let { it[0].toInt()..it[1].toInt() }
+        val range = (args.getOrNull(1) ?: "1-500").split("-").let { it[0].toInt()..it.last().toInt() }
         val humanize = args.getOrNull(2) == "1"
         val out = File(args.getOrElse(3) { File(assets, "../docs/difficulty_report.tsv").path })
         val dump = args.getOrNull(4)?.takeIf { it.isNotBlank() && it != "-" }?.let { File(it).apply { mkdirs() } }

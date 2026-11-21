@@ -41,6 +41,14 @@ class LevelsTest {
             // her bölüm, her zaman Normal Dünya olan bir bitiş düzlüğüyle biter
             assertEquals(RuleEffects.DEFAULT, RuleEffects.of(l.phases.last().rules), "bölüm ${l.id} Normal Dünya ile bitmeli")
             assertTrue(l.goalX - l.phases.last().x >= Physics.FINISH_LEN - 0.01f, "bölüm ${l.id} bitiş düzlüğü kısa")
+            // bitiş düzlüğü gerçekten düz: tek parça zemin, üstünde engel, ped ya da başka katı yok
+            val f0 = l.goalX - Physics.FINISH_LEN
+            assertTrue(l.solids.any { it.type == SolidType.GROUND && it.x <= f0 + 0.01f && it.x + it.w >= l.goalX && abs(it.y + it.h) < 0.01f },
+                "bölüm ${l.id} bitiş düzlüğü tek parça düz zemin değil")
+            assertTrue(l.hazards.none { it.x + it.w > f0 && it.x - it.w < l.goalX + 1f }, "bölüm ${l.id} bitiş düzlüğünde engel")
+            assertTrue(l.pads.none { it.x + it.w > f0 && it.x < l.goalX + 1f }, "bölüm ${l.id} bitiş düzlüğünde ped")
+            assertTrue(l.solids.none { it.type != SolidType.GROUND && it.type != SolidType.CEILING && it.x + it.w > f0 && it.x < l.goalX + 1f },
+                "bölüm ${l.id} bitiş düzlüğünde katı")
             assertEquals(GameContent.difficulty(l.id), l.difficulty, "bölüm ${l.id} zorluk etiketi")
             assertTrue(l.features.isNotEmpty(), "bölüm ${l.id} desen kaydı yok")
         }
@@ -147,7 +155,7 @@ class LevelsTest {
         assertTrue(failures.isEmpty(), failures.joinToString("\n"))
     }
 
-    @DisplayName("Bölüm tamamlama: kayıtlı çözüm gerçek oyun ayarlarıyla (3 can, güçlendirmeler açık) da biter")
+    @DisplayName("Bölüm tamamlama: kayıtlı çözüm 3 canlı oyun ayarıyla ölmeden biter (güçlendirme toplamadan)")
     @Test fun completionWithGameConfig() {
         for (id in listOf(1, 50, 137, 250, 333, 499, 500)) {
             val l = all[id - 1]

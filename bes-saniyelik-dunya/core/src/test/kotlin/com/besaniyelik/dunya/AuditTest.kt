@@ -93,25 +93,45 @@ class AuditTest {
         assertTrue(results.isEmpty(), results.take(30).joinToString("\n"))
     }
 
-    @DisplayName("Her kural aşamasında oynanacak bir şey var; kurala özgü desenler (hayalet, kayan, dar geçit) yerinde")
+    @DisplayName("Her kural aşamasında oynanacak bir şey var; kurala özgü nesneler (hayalet, kayan platform, dar geçit) gerçekten yerinde")
     @Test fun phasesHaveContent() {
-        var phases = 0; var empty = 0; var needDedicated = 0; var missing = 0
+        var phases = 0; var empty = 0
         val emptyList = ArrayList<String>()
+        // kural -> (o kuralı taşıyan aşama sayısı, dünyada karşılığı olmayan aşama sayısı)
+        val need = LinkedHashMap<String, IntArray>()
+        val missing = ArrayList<String>()
         for (l in all) {
-            for (i in 1 until l.phases.size - 1) { // ilk aşama (ısınma) ve bitiş düzlüğü hariç
-                val x0 = l.phases[i].x; val x1 = l.phases[i + 1].x
+            val finish = l.goalX - Physics.FINISH_LEN
+            for (i in 1 until l.phases.size) { // ilk aşama (ısınma) hariç
+                val x0 = l.phases[i].x
+                if (x0 >= finish - 0.01f) continue // bitiş düzlüğü
+                val x1 = if (i + 1 < l.phases.size) min(l.phases[i + 1].x, finish) else finish
                 val feats = l.features.filter { it.x >= x0 && it.x < x1 }.map { it.p }
                 phases++
                 if (feats.isEmpty()) { empty++; if (emptyList.size < 40) emptyList += "${l.id}@${x0.toInt()}(${l.phases[i].rules.joinToString("+") { it.name.take(4) }})" }
                 val e = RuleEffects.of(l.phases[i].rules)
-                val want = Patterns.dedicated(e)
-                if (want.isNotEmpty()) { needDedicated++; if (want.none { it in feats }) missing++ }
+                fun has(t: SolidType) = l.solids.any { it.type == t && it.x + it.w > x0 && it.x < x1 }
+                fun check(name: String, wanted: Boolean, present: Boolean) {
+                    if (!wanted) return
+                    val c = need.getOrPut(name) { IntArray(2) }
+                    c[0]++
+                    if (!present) { c[1]++; if (name == "kayan" || name == "hayalet") missing += "${l.id}@${x0.toInt()} $name (${(x1 - x0).toInt()} karo)" }
+                }
+                check("kayan", e.shifting, has(SolidType.SHIFT))
+                check("hayalet", e.ghost, has(SolidType.GHOST))
+                check("dar geçit", e.sizeScale < 1f && !e.reverseControl, has(SolidType.LOW))
+                check("asılı diken", e.reverseControl, Pattern.OVERHEAD in feats)
+                check("yüksek zıplama", e.jumpMul > 1.2f, Pattern.BOUNCY_WALL in feats)
             }
         }
-        println("Aşama denetimi: $phases aşama, boş $empty, kurala özgü deseni olmayan $missing / $needDedicated")
+        println("Aşama denetimi: $phases aşama, boş $empty")
+        for ((k, v) in need) println("  $k: ${v[1]} / ${v[0]} aşamada karşılığı yok")
         println("Boş aşamalar: $emptyList")
-        assertTrue(empty <= phases * 0.03, "boş aşama sayısı: $empty / $phases")
-        assertTrue(missing <= needDedicated * 0.12, "kurala özgü deseni olmayan aşama: $missing / $needDedicated")
+        println("Kayan/hayalet nesnesi olmayan aşamalar: ${missing.take(40)}")
+        assertTrue(empty <= phases * 0.02, "boş aşama sayısı: $empty / $phases")
+        // Dünyayı değiştiren kurallar (kayan platform, hayalet) duyurulduysa o aşamada mutlaka karşılığı bulunur
+        for (k in listOf("kayan", "hayalet")) need[k]?.let { assertTrue(it[1] <= it[0] * 0.02, "$k: ${it[1]} / ${it[0]} aşamada nesne yok: ${missing.take(20)}") }
+        for (k in listOf("dar geçit", "asılı diken", "yüksek zıplama")) need[k]?.let { assertTrue(it[1] <= it[0] * 0.25, "$k: ${it[1]} / ${it[0]} aşamada desen yok") }
     }
 
     @DisplayName("Kural çizgilerinin çevresi temiz: çizginin hemen önünde/arkasında engel yok, karakterden dar boşluk yok")
@@ -131,6 +151,26 @@ class AuditTest {
                 for ((a, b) in spans.zipWithNext()) {
                     val gap = b.x - (a.x + a.w)
                     if (gap > 0.02f && gap < Physics.PLAYER_W) errors += "${l.id}: kılcal boşluk x=${a.x + a.w} genişlik=$gap"
+                }
+            }
+            // hayalet köprü parçaları karakterden dar olamaz (yanıp sönen ama üstünden koşulan parça)
+            for (g in l.solids.filter { it.type == SolidType.GHOST }) {
+                if (g.w < Patterns.MIN_GAP) errors += "${l.id}: dar hayalet parça x=${g.x} genişlik=${g.w}"
+            }
+            // hareketli platformlar: zeminle/komşu platformla arasındaki boşluk ya yok ya da gerçek boşluk (>= MIN_GAP);
+            // yatay giden platform koşu hızının %65'inden hızlı gidemez
+            val grounds = l.solids.filter { it.type == SolidType.GROUND || it.type == SolidType.CEILING }
+            for (m in l.solids.filter { it.type == SolidType.MOVE }) {
+                if (m.ax > 0f) {
+                    val peak = 2f * Math.PI.toFloat() * m.ax / m.period
+                    if (peak > 0.66f * Physics.RUN_SPEED) errors += "${l.id}: hızlı platform x=${m.x} tepe hız=$peak"
+                    continue
+                }
+                val others = grounds + l.solids.filter { it.type == SolidType.MOVE && it !== m }
+                val left = others.filter { it.x + it.w <= m.x + 0.01f }.maxOfOrNull { it.x + it.w }
+                val right = others.filter { it.x >= m.x + m.w - 0.01f }.minOfOrNull { it.x }
+                for (gap in listOfNotNull(left?.let { m.x - it }, right?.let { it - (m.x + m.w) })) {
+                    if (gap > 0.02f && gap < Patterns.MIN_GAP - 0.01f) errors += "${l.id}: hareketli platform yanında dar boşluk x=${m.x} genişlik=$gap"
                 }
             }
             // ilk engel, başlangıç dokunuşundan en az ~1,5 sn sonra

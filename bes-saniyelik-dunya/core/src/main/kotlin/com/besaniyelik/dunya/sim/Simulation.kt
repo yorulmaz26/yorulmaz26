@@ -561,10 +561,11 @@ class Simulation(
         val hazardCause = cause == DeathCause.SPIKE || cause == DeathCause.SAW
         if (player.invuln > 0f && hazardCause) return
         // Dokunulmazlık boşluktan bir kez kurtarır ama süreyi uzatmaz (aksi halde sonsuz kurtarma döngüsü olur)
-        if (player.invuln > 0f && cause == DeathCause.FALL) { player.rescue(extend = false); return }
+        if (player.invuln > 0f && cause == DeathCause.FALL) { player.rescue(extend = false); pullChaserBack(); return }
         if (shield > 0 && cause != DeathCause.CHASER) {
             shield--
             player.rescue(extend = true)
+            pullChaserBack()
             listener.onShieldSave()
             return
         }
@@ -573,6 +574,11 @@ class Simulation(
         status = SimStatus.DYING
         dyingTimer = Physics.RESPAWN_DELAY
         listener.onDeath(cause)
+    }
+
+    /** Kurtarma oyuncuyu geriye taşır: Kaos Duvarı da geri çekilir, yoksa kurtarılan oyuncu duvarın içinde kalırdı. */
+    private fun pullChaserBack() {
+        if (chaserEnabled) chaserX = min(chaserX, player.x - Physics.CHASER_GAP)
     }
 
     private fun finishDeath() {
@@ -588,10 +594,13 @@ class Simulation(
     /** Sonsuz Dünya'da kontrol noktası yoktur: ekstra can, koşuyu geri sarmadan son güvenli zeminde diriltir. */
     private fun reviveInPlace() {
         player.rescue(extend = true)
+        pullChaserBack()
         player.prevInput = true
         player.buffer = 0f
         status = SimStatus.RUNNING
         deathCause = null
+        // ölüm, kural uyarısı sürerken olduysa uyarı yeniden verilir (arayüz önizlemeyi sıfırlar)
+        warnedPhase = -1
         listener.onRespawn()
     }
 

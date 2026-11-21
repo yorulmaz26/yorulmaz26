@@ -26,8 +26,21 @@ class EndlessGenerator(
 
     /** Parça k için kural seti (önceden planlanır, böylece sınır tamponları doğru kurulur). */
     fun rulesFor(k: Int): List<Mechanic> {
-        while (plan.size <= k) plan.add(planNext(plan.size))
+        while (plan.size <= k) plan.add(fit(planNext(plan.size), plan.size))
         return plan[k]
+    }
+
+    /** Hayalet / Kayan Platform kuralı, nesnesinin sığmayacağı kadar kısa parçalardan çıkarılır (bkz. LevelGenerator.fitRules). */
+    private fun fit(rules: List<Mechanic>, k: Int): List<Mechanic> {
+        if (k == 0) return rules
+        var r = rules
+        val prev = RuleEffects.of(plan[k - 1])
+        for ((m, p) in listOf(Mechanic.GHOST to Pattern.GHOST_BRIDGE, Mechanic.SHIFTING to Pattern.SHIFT_BRIDGE)) {
+            if (m !in r) continue
+            val e = RuleEffects.of(r)
+            if (LevelGenerator.zoneLength(prev, e, difficultyAt(k), false, false, speedAt(k)) < Patterns.minZone(p, e)) r = (r - m).ifEmpty { listOf(Mechanic.NORMAL) }
+        }
+        return r
     }
 
     private fun planNext(k: Int): List<Mechanic> {

@@ -10,7 +10,7 @@
 - [x] 8 güçlendirme (kalkan, mıknatıs, çift zıplama, dokunulmazlık, ekstra can, altın çarpanı, yıldız algılayıcı, kontrol noktası koruması)
 - [x] 20 ekran, programatik grafikler ve sesler
 - [x] Güvenilir kayıt (CRC, atomik yazma, yedek, sürüm göçü)
-- [x] Otomatik testler (39 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
+- [x] Otomatik testler (61 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
 - [x] Debug APK, release APK, release AAB
 
 ## Kullanıcı onayı / erişimi gerektiren
@@ -19,5 +19,7 @@
 - [ ] Gerçek Android cihazda test (bu ortamda cihaz/emülatör yok).
 
 ## İyileştirme fikirleri
-- [ ] 12 bölümde (bkz. `docs/level_report.tsv`, "dar") zamanlama penceresi ±2 tick hedefinin altında kalıyor; bölümler çözülebilir ama dardır.
+- [ ] Yüksek Zıplama / Küçük / Ters Kontrol aşamalarının %9–17'sinde kurala özgü desen (yüksek duvar, dar geçit, asılı diken) yer kalmadığı için yok; kural yine de karakterin kendisinde görünür. (Hayalet ve Değişen Platformlar aşamalarında eksik yok.)
+- [ ] 36 aşama (3 870'te) boş: yer çekimi dönüşü / boy değişimi sonrası çok kısa kalan Yavaş Zaman aşamaları.
+- [ ] Zorluk ölçümü bir oyuncu modelidir; gerçek oyuncu verisiyle (ölüm konumları, bölüm başına deneme sayısı) doğrulanması önerilir.
 - [ ] İsteğe bağlı bulut kaydı / liderlik tablosu (ilk sürümde çevrimdışı kalması istendi).

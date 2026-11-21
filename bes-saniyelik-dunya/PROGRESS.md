@@ -18,3 +18,12 @@ Ayrıntılı sonuçlar: `TEST_REPORT.md`. Mimari: `ARCHITECTURE.md`. Kalan işle
 * Sonuç pencereleri sabit boyutlu.
 * 102 bölüm (her alandan bir) oyun ekranında baştan sona oynatıldı: 102/102; bulunan görüntü hataları düzeltildi (süslerdeki çerçeve çizgileri, üst üste binen bildirimler, 2. harita zemini, eksik font simgeleri, profil metni).
 * Testler: 41/41.
+
+### 21 Kasım — bölüm mantığı denetimi ve zorluk kalibrasyonu
+
+* Dört mercekli denetim + kendi ölçümlerim: 17 mantık hatası düzeltildi (ters yer çekimiyle biten 99 bölüm, yükselen platformda zıplama, hareketli testere, kontrol noktası döngüsü, sonsuz modda ekstra can, çift sayım, hayalet kural değişimleri, Kaos Duvarı ...).
+* Dikenler/testereler kırmızı, konturlu ve iri; diğer nesneler büyütüldü.
+* `LevelAnalyzer` ile her bölüm insan gibi oynatılıp ölçülüyor; 500 bölüm testere dişi hedef eğrisine göre yeniden üretildi.
+* İkinci tur kod incelemesi (simülasyon + üretici/ölçüm): 12 bulgu + oyun ekranında 2 hata düzeltildi. Öne çıkanlar: "Değişen Platformlar"/"Hayalet Dünya" duyurulup nesnesi olmayan aşamalar (172 → 0), kalkan kurtarmasının Kaos Duvarı'nın içine bırakması, kurtarmanın önceki platforma dönmesi, dar hayalet parçaları, ölçüm modelindeki tutma payı ve çift zıplama hataları.
+* Üreticiye "yoğunluk" ayarı eklendi (üst zorluk engel sayısıyla artar, pay 6–7 tick'in altına inmez); hedef eğrisi ölçülebilir düzeye çekildi (harita basamağı 0,62). Sonuç: **500/500 bölüm hedef bandında**, en büyük sapma 0,9 puan.
+* Testler: 61/61.

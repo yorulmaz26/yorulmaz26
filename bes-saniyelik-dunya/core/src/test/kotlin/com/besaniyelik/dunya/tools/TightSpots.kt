@@ -14,7 +14,7 @@ object TightSpots {
         GdxNativesLoader.load(); Box2D.init()
         val assets = File(args[0])
         LevelRepository.reader = { File(assets, it).readText() }
-        val range = args[1].split("-").let { it[0].toInt()..it[1].toInt() }
+        val range = args[1].split("-").let { it[0].toInt()..it.last().toInt() }
         val pool = Executors.newFixedThreadPool(4)
         class Row(val pattern: String, val rules: String, val window: Int, val hold: Int, val id: Int, val x: Float)
         val futures = range.map { id -> pool.submit<List<Row>> {

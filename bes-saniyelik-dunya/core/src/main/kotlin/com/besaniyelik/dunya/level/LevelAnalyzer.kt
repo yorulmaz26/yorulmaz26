@@ -160,9 +160,11 @@ object LevelAnalyzer {
             }
             // Kurtarma refleksi: karakter bir basamağın duvarına takılıp kaldıysa insan beklemez, yeniden zıplar
             // (yakındaki planlı dokunuş bu zıplamayla harcanmış sayılır).
-            if (reflex && !down && tick > lastRelease + 1 && p.grounded && p.blocked > 0.2f && !sim.effects.reverseControl) {
+            // Yatay giden platformun geri salınımı da "takılma" sayılır; orada refleks çalışmaz (insan platformdan atlamaz).
+            if (reflex && !down && tick > lastRelease + 1 && p.grounded && p.blocked > 0.2f && !sim.effects.reverseControl &&
+                p.groundEntity?.def?.type != SolidType.MOVE) {
                 down = true; releaseAt = tick + 24
-                if (i < plan.size && !plan.timed[i] && plan.pressX[i] <= p.x + 0.6f) i++
+                if (i < plan.size && (if (plan.timed[i]) plan.pressT[i] <= tick + 30 else plan.pressX[i] <= p.x + 0.6f)) i++
             }
             return down
         }
@@ -258,7 +260,10 @@ object LevelAnalyzer {
             var free = false
             for (st in STEPS) {
                 val nh = h0 + (if (side == 0) -st else st)
-                if (nh < MIN_HOLD) { free = true; break } // insan daha kısa basamaz: bu yan serbest
+                if (nh < MIN_HOLD) {
+                    if (side == 0) { free = true; break } // insan daha kısa basamaz: kısa yan serbest
+                    continue // çözüm insanın basabileceğinden kısa tutuyor: uzun yan MIN_HOLD'dan başlayarak sınanır
+                }
                 val mod = plan.copy(); mod.hold[j] = nh
                 if (survives(sim, ref, mod, j, p0, p0 + max(h0, nh))) ok = st else break
                 if (st == STEPS.last()) free = true
@@ -398,10 +403,12 @@ object LevelAnalyzer {
                         else -> ((long - short) / 2f).toInt().coerceIn(-6, 6)
                     }
                 }
-                if (c != 0 || h != 0) {
+                // insanın basamayacağı kadar kısa dokunuş (1-4 tick) her durumda en az MIN_HOLD'a uzatılmaya çalışılır
+                val raise = plan.hold[j] < MIN_HOLD
+                if (c != 0 || h != 0 || raise) {
                     for (k in floatArrayOf(1f, 0.5f)) {
                         val ck = (c * k).toInt(); val hk = (h * k).toInt()
-                        if (ck == 0 && hk == 0) continue
+                        if (ck == 0 && hk == 0 && !(raise && k == 1f)) continue
                         val cand = plan.shifted(j, ck.toFloat())
                         if (plan.hold[j] < NONE) cand.hold[j] = max(MIN_HOLD, plan.hold[j] + hk)
                         // yalnızca bu dokunuştan sonrası yeniden oynatılır
@@ -425,6 +432,17 @@ object LevelAnalyzer {
         return if (replays(level, cur)) cur else toggles
     }
 
+    /**
+     * Tutma penceresi: insanın basabileceği sürelerden ([MIN_HOLD] ve üstü) kaç tanesi bölümü geçiriyor. Bir yanı
+     * serbest diye pencere sınırsız sayılmaz; yalnızca kısa dokunuşla geçilen zıplama dar pencere olarak görünür.
+     */
+    private fun holdWindow(h0: Int, sl: IntArray): Int {
+        if (h0 >= NONE) return FREE
+        val lo = if (sl[2] >= FREE_SIDE) MIN_HOLD else max(MIN_HOLD, h0 - sl[2])
+        val hi = if (sl[3] >= FREE_SIDE) h0 + STEPS.last() else h0 + sl[3]
+        return (hi - lo + 1).coerceIn(0, FREE)
+    }
+
     /** Çözücü çözümünü insanın oynayacağı çözüme çevirir: doğal dokunuşlar + pencere ortası. */
     fun humanize(level: LevelData, toggles: IntArray): IntArray = center(level, normalize(level, toggles))
 
@@ -439,7 +457,7 @@ object LevelAnalyzer {
             var w = FREE; var h = FREE
             for (j in 0 until plan.size) {
                 val sl = slackOf(sim, ref, plan, toggles, j)
-                w = min(w, sl[0] + sl[1] + 1); h = min(h, sl[2] + sl[3] + 1)
+                w = min(w, sl[0] + sl[1] + 1); h = min(h, holdWindow(plan.hold[j], sl))
             }
             return w to h
         } finally { sim.dispose() }
@@ -458,7 +476,7 @@ object LevelAnalyzer {
             val plan = planOf(toggles, ref)
             val sl = Array(plan.size) { slackOf(sim, ref, plan, toggles, it) }
             val windows = IntArray(sl.size) { min(FREE, sl[it][0] + sl[it][1] + 1) }
-            val holds = IntArray(sl.size) { min(FREE, sl[it][2] + sl[it][3] + 1) }
+            val holds = IntArray(sl.size) { holdWindow(plan.hold[it], sl[it]) }
             val jt = IntArray(plan.size) { toggles[2 * it] }
             if (gate != null && !gate(windows.minOrNull() ?: FREE, holds.minOrNull() ?: FREE)) {
                 return LevelMetrics(ref.endTick, plan.pressX.copyOf(), jt, windows, holds, floatArrayOf(0.004f, 0.004f, 0.004f), FloatArray(0), played = false)

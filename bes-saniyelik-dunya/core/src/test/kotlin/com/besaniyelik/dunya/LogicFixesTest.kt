@@ -205,6 +205,54 @@ class LogicFixesTest {
         sim.dispose()
     }
 
+    @DisplayName("Kaos Duvarı bölümünde kalkan kurtarması oyuncuyu duvarın içine koymaz")
+    @Test fun shieldRescueWithChaser() {
+        val sim = Simulation(flatLevel(floorGaps = listOf(30f to 60f)).copy(chaser = true), SimConfig(hearts = 2))
+        sim.activatePowerup(PowerupType.SHIELD)
+        var saves = 0; var cause: DeathCause? = null
+        sim.listener = object : SimListener {
+            override fun onShieldSave() { saves++ }
+            override fun onDeath(c: DeathCause) { cause = c }
+        }
+        var guard = 0
+        while (saves == 0 && guard++ < 2000) sim.step(false)
+        assertEquals(1, saves)
+        assertTrue(sim.player.x - sim.chaserX >= Physics.CHASER_GAP - 0.01f, "duvar kurtarılan oyuncunun gerisine çekilmeli")
+        // kurtarıldıktan sonra zıplayan oyuncu en az 1 sn yaşar (duvar hemen yakalamaz)
+        repeat(60) { sim.step(it < 20) }
+        assertNotEquals(DeathCause.CHASER, cause, "kurtarılan oyuncu Kaos Duvarı'na yem olmamalı")
+        sim.dispose()
+    }
+
+    @DisplayName("kalkan kurtarması aşılmış boşluğun gerisine dönmez: oyuncu son bastığı platformda kalır")
+    @Test fun rescueStaysOnLastPlatform() {
+        // zemin ..30 | boşluk 30-32 | platform 32-35,2 | boşluk 35,2-70
+        val sim = Simulation(flatLevel(floorGaps = listOf(30f to 32f, 35.2f to 70f)), SimConfig(hearts = 2))
+        sim.activatePowerup(PowerupType.SHIELD)
+        val rescues = ArrayList<Float>()
+        sim.listener = object : SimListener { override fun onShieldSave() { rescues += sim.player.x } }
+        // ilk boşluğun üstünden kısa bir zıplamayla platforma in, sonra hiç basma
+        runUntilX(sim, 29.3f)
+        run(sim, 8) { true }
+        var guard = 0
+        while (rescues.isEmpty() && guard++ < 2000) sim.step(false)
+        assertEquals(1, rescues.size, "kalkan bir kez kurtarmalı")
+        assertTrue(rescues[0] >= 32f, "kurtarma noktası son basılan platformda olmalı (önceki zeminde değil): ${rescues[0]}")
+        assertTrue(rescues[0] <= 34.9f, "kurtarma noktası platformun üstünde olmalı: ${rescues[0]}")
+        // ikinci düşüşte (dokunulmazlık kurtarması) de aynı platforma döner, kenara değil
+        val firstX = rescues[0]
+        var minAfter = Float.MAX_VALUE; var lastX = sim.player.x; var teleports = 0
+        guard = 0
+        while (sim.deaths == 0 && guard++ < 1200) {
+            sim.step(false)
+            if (sim.player.x < lastX - 0.5f) { teleports++; minAfter = minOf(minAfter, sim.player.x) }
+            lastX = sim.player.x
+        }
+        if (teleports > 0) assertTrue(minAfter >= 32f && minAfter <= firstX + 0.05f, "ikinci kurtarma da platformun gerisine olmalı: $minAfter")
+        assertEquals(1, sim.deaths, "kalkan tek sefer korur")
+        sim.dispose()
+    }
+
     @DisplayName("hedef zorluk eğrisi: harita içinde artar, yeni harita öncekinin sonundan kolay başlar, 1..10 aralığındadır")
     @Test fun targetCurveIsSawtooth() {
         for (id in 1..500) { val t = GameContent.targetDifficulty(id); assertTrue(t in 1f..10f, "bölüm $id hedef $t") }

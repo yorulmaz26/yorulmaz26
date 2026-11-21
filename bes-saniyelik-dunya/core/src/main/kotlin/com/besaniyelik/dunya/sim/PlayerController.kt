@@ -55,13 +55,24 @@ class PlayerController(private val sim: Simulation) {
     private val safeYs = FloatArray(16)
     private val safeSigns = IntArray(16)
     private val safePhases = IntArray(16)
+    private val safeEnts = arrayOfNulls<SolidEntity>(16)
+    private var safeEnt: SolidEntity? = null
     private var safeN = 0
     private var safeI = 0
     private var lastSampleX = Float.NEGATIVE_INFINITY
 
-    private fun resetSafe(x: Float, y: Float, sign: Int) {
+    private fun resetSafe(x: Float, y: Float, sign: Int, ent: SolidEntity? = null) {
         safeN = 0; safeI = 0; lastSampleX = Float.NEGATIVE_INFINITY
-        safeX = x; safeY = y; safeSign = sign
+        safeX = x; safeY = y; safeSign = sign; safeEnt = ent
+        // Kurtarma noktası ilk örnek olarak kalır: aynı zeminden ikinci kez düşülürse yine buraya dönülür
+        if (ent != null) addSample(x, y, sign, ent)
+    }
+
+    private fun addSample(x: Float, y: Float, sign: Int, ent: SolidEntity) {
+        lastSampleX = x
+        safeXs[safeI] = x; safeYs[safeI] = y; safeSigns[safeI] = sign; safePhases[safeI] = sim.phaseIdx; safeEnts[safeI] = ent
+        safeI = (safeI + 1) % safeXs.size
+        if (safeN < safeXs.size) safeN++
     }
 
     fun create(x: Float, y: Float) {
@@ -189,12 +200,9 @@ class PlayerController(private val sim: Simulation) {
             val ge = groundEntity
             if (ge != null && ge.def.type != SolidType.GHOST && !ge.moving && blocked <= 0f) {
                 safeX = x; safeY = y; safeSign = sign
-                if (x - lastSampleX >= 0.6f) {
-                    lastSampleX = x
-                    safeXs[safeI] = x; safeYs[safeI] = y; safeSigns[safeI] = sign; safePhases[safeI] = sim.phaseIdx
-                    safeI = (safeI + 1) % safeXs.size
-                    if (safeN < safeXs.size) safeN++
-                }
+                // yeni bir zemine basıldığında hemen, sonra 0,6 karoda bir örnek alınır
+                if (ge !== safeEnt || x - lastSampleX >= 0.6f) addSample(x, y, sign, ge)
+                safeEnt = ge
             }
         } else {
             airTime += Physics.TICK
@@ -338,12 +346,16 @@ class PlayerController(private val sim: Simulation) {
      */
     fun rescue(extend: Boolean = true) {
         var rx = safeX; var ry = safeY; var rs = safeSign
-        // Son güvenli zeminin 2-6 karo gerisinde, AYNI kural aşamasındaki en yeni örnek (yoksa son güvenli nokta)
+        // Son basılan zeminin ÜSTÜNDE, kenarın en az 2 karo gerisindeki en yeni örnek; o kadar gerisi yoksa aynı zemindeki
+        // en eski örnek (en uzun koşu payı). Önceki platforma (aşılmış bir boşluğun gerisine) asla dönülmez.
+        val ent = safeEnt
         for (k in 1..safeN) {
             val i = ((safeI - k) % safeXs.size + safeXs.size) % safeXs.size
+            if (safeEnts[i] !== ent || safePhases[i] != sim.phaseIdx) break
             val back = safeX - safeXs[i]
             if (back > 6f) break
-            if (back >= 2f && safePhases[i] == sim.phaseIdx) { rx = safeXs[i]; ry = safeYs[i]; rs = safeSigns[i]; break }
+            rx = safeXs[i]; ry = safeYs[i]; rs = safeSigns[i]
+            if (back >= 2f) break
         }
         body.setTransform(rx, ry, 0f)
         body.setLinearVelocity(vxCur, 0f)
@@ -353,7 +365,7 @@ class PlayerController(private val sim: Simulation) {
             // güvenli nokta farklı yer çekimindeydiyse en yakın yüzeye yakın bırak
             body.setTransform(rx, if (gravSign > 0) 1.5f else Physics.CEIL - 1.5f, 0f)
         }
-        resetSafe(rx, body.position.y, gravSign)
+        resetSafe(rx, body.position.y, gravSign, if (rs == gravSign) ent else null)
     }
 
     fun restore(s: SimSnapshot, e: RuleEffects) {
