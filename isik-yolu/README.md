@@ -13,13 +13,15 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.5.2.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.5.2-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.6.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.6.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
 | Motor testleri | `./gradlew :engine:test` |
 | Arayüz testleri + ekran görüntüleri | `./gradlew :app:testDebugUnitTest` → `docs/ekranlar/*.png` |
 | Bölümleri yeniden üret | `./gradlew :engine:generateLevels -Pfrom=1 -Pto=500` |
+| Bölüm denetimi (bütün durumlar) | `java -cp engine/build/classes/java/main com.isikyolu.engine.tools.Audit app/src/main/assets/levels.json rapor.txt` |
+| Bir bölümü komut satırından oyna | `java -cp engine/build/classes/java/main com.isikyolu.engine.tools.Play app/src/main/assets/levels.json 60 r:1,6 …` |
 | Sesleri yeniden üret | `java tools/SoundGen.java app/src/main/res/raw` |
 
 Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` içinde `sdk.dir` olmalı
@@ -71,7 +73,11 @@ devam fiyatı ikiye katlar. Ayrıntılar: `engine/Economy.java`, `docs/BUILD_RAP
 Oyun ekranında **MANTIK** etiketiyle gösterilir: 1. dünyada her grubun son 6 bölümü (1. grup hariç) ve
 101–500 arasının tamamı, toplam 454 bölüm. Bu bölümlerde bariz hamle genellikle çıkmaza götürür:
 - yanıltıcı döner aynalar ışını uzun ve inandırıcı yollara saptırır,
-- bazı aynaları iki ayrı ışın kullanır; birini düzeltmek ötekini bozabilir.
+- bazı aynaları iki ayrı ışın kullanır; birini düzeltmek ötekini bozabilir,
+- **canlı yemler:** çözüm yolundaki bazı döner aynalar zaten doğru durur. "Her döner aynaya bir kez dokun"
+  denemesi bu aynaları bozar; hangi aynaya dokunulmayacağını düşünmek gerekir. Her mantık bölümünde en az 1
+  (101–400: çoğunlukla 2, 401–500: çoğunlukla 3) canlı yem vardır; satır/sütun sırasıyla dokunmak ya da hepsini
+  çevirip blokları itmek hiçbir mantık bölümünü bitirmez (`engine/Shortcuts.java`, denetimde `kısayol` kontrolü).
 
 Üretici, ışını takip eden bir oyuncunun karar ağacını (`BeamFollower`) ölçer; ağacı küçük kalan adaylar
 reddedilir. Ayrıntılar ve ölçümler: `docs/TEST_RAPORU.md`.
@@ -159,7 +165,13 @@ Motor görselden tamamen bağımsızdır: `BoardView` yalnızca `GameSession`'ı
 5. Sonraki dünyalarda aynı ayarlar zorlaştırılır: daha büyük tahta, daha çok dönüş ve yanıltıcı nesne, daha
    yüksek optimum, 3. dünyadan itibaren grup başına ek düzenek. Bir bölüm istenen aralıkta üretilemezse aralık
    adım adım gevşetilir.
-6. Tohumlar sabittir; aynı komut aynı 500 bölümü üretir. İlk 100 bölüm önceki sürümle birebir aynıdır, kayıtlar bozulmaz.
+6. Hiçbir durumda ışık almayan döner aynalar sabitlenir (oyuncu boşa dokunmasın).
+7. Mantık bölümlerinde canlı yem şartı aranır (`Shortcuts.ensureLiveDecoys`): önce çözüm yolundaki sabit aynalar
+   (yönü zaten doğru) döner yapılır; yetmezse çözümün çevirdiği bir yol aynası başlangıçta doğru bırakılır.
+8. Tohumlar sabittir. 1.6.0 paketi, 1.5.2 paketinden deterministik adımlarla türetildi: `tools.FixDeadMirrors levels.json`,
+   `tools.AddLiveDecoys levels.json` ve `tools.RegenerateLevels levels.json levels.json 35 56 101 102 103 109 110 124 172 202`
+   (aynı girdiden birebir aynı dosya çıkar). `generateLevels` bugün çalıştırılırsa üretici canlı yem şartını
+   kendisi uygular ve farklı (yeni) bir paket üretir. Bölüm numaraları ve kayıtlar değişmedi; yıldızlar korunur.
 
 ## Unity terimlerinin karşılıkları
 
@@ -176,7 +188,9 @@ Motor görselden tamamen bağımsızdır: `BoardView` yalnızca `GameSession`'ı
 - Çizim sırasında bellek ayrılmaz; boyalar, `Path` ve `RectF` önceden oluşturulur. Parçacıklar sabit boyutlu havuzda tutulur (en fazla 280).
 - Işın yeniden yalnızca hamleden sonra hesaplanır; değişmeyen ışın parçaları yeniden animasyona girmez.
 - Arka plan 30 FPS, tahta 60 FPS (`postInvalidateOnAnimation`) çalışır. Tahta donanım katmanında çizilir.
-- İpucu BFS'i arka plan iş parçacığında çalışır. En büyük bölümün durum uzayı 79 872'dir (sınır 80 000).
+- İpucu ve akıllı plan arka plan iş parçacığında çalışır. Plan, geçmişteki bütün ara durumlardan tek bir çok kaynaklı BFS
+  yapar ve ilk çözüm katmanında durur (500 bölümde ortalama 2,8 ms; eski tam taramadan yaklaşık 14 kat hızlı).
+  En büyük bölümün durum uzayı 98 304'tür (üretim sınırı 100 000, ipucu sınırı 150 000).
 
 ## Gizlilik
 

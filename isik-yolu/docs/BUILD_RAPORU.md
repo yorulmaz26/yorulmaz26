@@ -1,6 +1,6 @@
-# Build Raporu — Işık Yolu 1.5.2
+# Build Raporu — Işık Yolu 1.6.0
 
-Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
+Tarih: 21 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
 ## Araç zinciri
 
@@ -16,6 +16,36 @@ Tarih: 18 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.6.0 değişiklikleri (bölüm denetimi)
+
+Bütün bölümler hem kodla (her bölümün ulaşılabilir bütün durumları) hem de çözüme bakmadan akıl yürüten oyuncu
+ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPORU.md` › Bölüm denetimi.
+
+- **Mantık bölümleri artık düşünmeden geçilemiyor.** 454 mantık bölümünün 411'i "her döner aynaya bir kez dokun"
+  ile (gerekirse blokları itip) bitiyordu, 55'i bu yolla 3 yıldız veriyordu. Çözüm yolunda zaten doğru duran döner
+  aynalar (canlı yem) eklendi: önce yoldaki sabit aynalar döner yapıldı, yetmezse bir yol aynası başlangıçta doğru
+  bırakıldı. 10 bölüm zorluk gevşetilmeden yeniden üretildi. Kısayol artık hiçbir mantık bölümünü bitirmiyor;
+  ortalama karar ağacı 39 → 49 yaprak. Bunun bedeli: mantık bölümlerinde en az hamle ortalaması 7,4 → 6,5.
+- Üretici ve günlük bulmaca aynı kuralı uyguluyor; denetime `kısayol` (HATA) ve `canlı-yem` (UYARI) eklendi.
+- İşlevsiz döner aynalar sabitlendi (384 bölümde 1003 ayna; hiçbir durumda ışık almıyorlardı).
+- **Akıllı ipucu:** Geri Al hak harcamadığı için gerekirse önce Geri Al önerir. Plan tek çok kaynaklı BFS ile ilk
+  çözüm katmanında durur (ortalama 2,8 ms, yaklaşık 14 kat hızlı), canlı tahtayı değiştirmez. Eşitlikte daha çok
+  geri alan yolu seçer, böylece yıldız kaybettirmez. Hak yetmeyecekse ipucu iade edilir ve "ipucu kullanıldı" sayılmaz.
+- **Oyun akışı:**
+  - Hak bitince geri/çıkış canı yakar; ertelenmiş pencereler ekran değişince iptal edilir.
+  - Kazanınca başarılar hemen verilir; Başarılar ekranı artık ödülsüz işaretlemez.
+  - Can 0'da "Tekrar Dene" bölümlere döner; can alınınca bölüm açılır.
+- **Dokunma:**
+  - Bir sürüklemede tek itme yapılır. Blok parmağın bıraktığı yerden kayar, sıçramaz.
+  - Pencere açıkken süren dokunma hamle yapmaz; giriş kapanınca sürükleme düzgün biter.
+  - Pencere kapanırken dokunuşlar yutulur. Düğmelerde çift tıklama koruması var; Geri Al'a art arda basılabilir.
+- **Saat ve gün:**
+  - Günlük bulmaca ve market günü güvenilir zamandan hesaplanır ve geri gitmez. Saati ya da saat dilimini
+    değiştirmek günlük sınırları sıfırlamaz.
+  - Gece yarısından önce başlanan günlük bulmaca ödülünü ve serisini korur.
+- Sabit aynaya dokununca kırmızı halka ve açıklama gösterilir. Prizma metni "gidiş yönüne göre" yapıldı;
+  öğretici 4 sayfa oldu.
 
 ## 1.5.2 değişiklikleri
 
