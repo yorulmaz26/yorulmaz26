@@ -30,6 +30,14 @@ class LevelBuilder {
 
     fun wy(sign: Int, yUp: Float): Float = if (sign > 0) yUp else Physics.CEIL - yUp
 
+    /** Geri alma noktası: bölgeden taşan desen [rollback] ile silinir. */
+    fun mark(): IntArray = intArrayOf(solids.size, hazards.size, pads.size, floor.size, ceil.size, features.size, coinHints.size)
+
+    fun rollback(m: IntArray) {
+        fun <T> cut(l: ArrayList<T>, n: Int) { while (l.size > n) l.removeAt(l.size - 1) }
+        cut(solids, m[0]); cut(hazards, m[1]); cut(pads, m[2]); cut(floor, m[3]); cut(ceil, m[4]); cut(features, m[5]); cut(coinHints, m[6])
+    }
+
     fun ground(sign: Int, x0: Float, x1: Float, hUp: Float = 0f) {
         if (x1 - x0 < 0.01f) return
         (if (sign > 0) floor else ceil).add(GroundSpan(x0, x1, hUp))
@@ -47,8 +55,8 @@ class LevelBuilder {
         hazards.add(HazardDef(HazardType.SPIKE, r2(x), r2(wy(sign, yUp)), r2(w), dir))
     }
 
-    fun saw(sign: Int, cx: Float, cyUp: Float, r: Float, ax: Float = 0f, ayUp: Float = 0f, period: Float = 0f, phase: Float = 0f) {
-        hazards.add(HazardDef(HazardType.SAW, r2(cx), r2(wy(sign, cyUp)), r2(r), sign, r2(ax), r2(ayUp * sign), r2(period), r2(phase)))
+    fun saw(sign: Int, cx: Float, cyUp: Float, r: Float, ax: Float = 0f, ayUp: Float = 0f, period: Float = 0f, phase: Float = 0f, sync: Boolean = false) {
+        hazards.add(HazardDef(HazardType.SAW, r2(cx), r2(wy(sign, cyUp)), r2(r), sign, r2(ax), r2(ayUp * sign), r2(period), r2(phase), sync))
     }
 
     fun pad(sign: Int, type: PadType, x: Float, yUp: Float, w: Float) {
@@ -80,6 +88,10 @@ class LevelBuilder {
                 } else if (last != null && s.x0 < last.x1 - 0.01f) {
                     // çakışma: yeni parçayı kırp
                     if (s.x1 > last.x1) out.add(GroundSpan(last.x1, s.x1, s.hUp))
+                } else if (last != null && s.x0 - last.x1 < 0.9f) {
+                    // karakterden dar "kılcal" boşluk: boşluk gibi görünür ama üstünden koşulur; komşu parçaya kat
+                    out[out.size - 1] = GroundSpan(last.x0, s.x0, last.hUp)
+                    out.add(s)
                 } else out.add(s)
             }
             return out
@@ -100,7 +112,13 @@ class PatternCtx(
     val speedMul: Float = 1f,
 ) {
     val sign get() = e.gravitySign
-    val vx get() = Physics.RUN_SPEED * speedMul
+    /** Gerçek koşu hızı (karo/dünya-sn): buzda seyir hızı daha yüksektir, desenler buna göre boyutlanır. */
+    val vx get() = Physics.RUN_SPEED * speedMul * (if (e.ice) Physics.ICE_SPEED_MUL else 1f)
+    /**
+     * Genişlik çarpanı: iniş alanları ve platformlar, oyuncunun GERÇEK zamanda aynı tepki payına sahip olması için
+     * buzda (daha hızlı) ve Hızlı Dünya'da (zaman 1,3 kat akar) orantılı olarak genişler.
+     */
+    val kw get() = (if (e.ice) Physics.ICE_SPEED_MUL else 1f) * kotlin.math.max(1f, e.timeScale)
     val jumpV get() = Physics.JUMP_V * e.jumpMul
     val airTime get() = 2f * jumpV / Physics.GRAVITY
     /** Tam zıplamanın yatay menzili (karo). */
@@ -110,6 +128,8 @@ class PatternCtx(
 
     fun rnd(a: Float, b: Float) = a + rng.nextFloat() * (b - a)
     fun lerp(a: Float, b: Float) = a + (b - a) * t
+    /** Zorluk 1'in ötesine (dökümhanenin sıkılaştırdığı adaylar) taşsa da değeri makul sınırda tutan sürüm. */
+    fun lerp(a: Float, b: Float, lo: Float, hi: Float = Float.MAX_VALUE) = (a + (b - a) * t).coerceIn(lo, hi)
     fun chance(p: Float) = rng.nextFloat() < p
 }
 
@@ -120,7 +140,7 @@ object Patterns {
         Pattern.SHIFT_BRIDGE -> e.shifting
         Pattern.LOW_TUNNEL -> e.sizeScale < 1f && !e.reverseControl
         Pattern.BOUNCY_WALL -> e.jumpMul > 1.2f
-        Pattern.CEILING_GAP -> !e.reverseControl && e.jumpMul < 1.2f
+        Pattern.CEILING_GAP -> !e.reverseControl && e.jumpMul < 1.2f && e.timeScale <= 1f
         Pattern.STEP, Pattern.STAIRS -> true
         else -> true
     }
@@ -128,17 +148,22 @@ object Patterns {
     /** Kurala özgü (zorunlu) desenler. */
     fun dedicated(e: RuleEffects): List<Pattern> {
         val out = ArrayList<Pattern>()
+        if (e.reverseControl) out.add(Pattern.OVERHEAD)
         if (e.ghost) out.add(Pattern.GHOST_BRIDGE)
         if (e.shifting) out.add(Pattern.SHIFT_BRIDGE)
         if (e.sizeScale < 1f && !e.reverseControl) out.add(Pattern.LOW_TUNNEL)
         if (e.jumpMul > 1.2f) out.add(Pattern.BOUNCY_WALL)
-        if (e.reverseControl) out.add(Pattern.OVERHEAD)
         return out
     }
 
+    /** Desenin sığabileceği en kısa bölge (alt sınır; taşan desen üretici tarafından geri alınır). */
     fun minLength(p: Pattern): Float = when (p) {
-        Pattern.GHOST_BRIDGE, Pattern.SHIFT_BRIDGE, Pattern.MOVING_PLATFORM -> 11f
-        Pattern.LOW_TUNNEL, Pattern.STAIRS, Pattern.SPRING_WALL, Pattern.BOUNCY_WALL, Pattern.FLOATING -> 10f
+        Pattern.MOVING_PLATFORM -> 11.5f
+        Pattern.STAIRS, Pattern.SPRING_WALL, Pattern.FLOATING -> 10f
+        Pattern.SHIFT_BRIDGE -> 8.5f
+        Pattern.GHOST_BRIDGE, Pattern.LOW_TUNNEL, Pattern.BOUNCY_WALL -> 7.5f
+        Pattern.BOOST_GAP -> 9f
+        Pattern.OVERHEAD, Pattern.SAW, Pattern.MOVING_SAW -> 7f
         else -> 6f
     }
 
@@ -155,7 +180,7 @@ object Patterns {
         Pattern.GHOST_BRIDGE -> ghostBridge(c, x, limit)
         Pattern.SHIFT_BRIDGE -> shiftBridge(c, x, limit)
         Pattern.LOW_TUNNEL -> lowTunnel(c, x, limit)
-        Pattern.BOUNCY_WALL -> bouncyWall(c, x)
+        Pattern.BOUNCY_WALL -> bouncyWall(c, x, limit)
         Pattern.OVERHEAD -> overhead(c, x)
         Pattern.CEILING_GAP -> ceilingGap(c, x)
         Pattern.STAIRS -> stairs(c, x, limit)
@@ -164,7 +189,10 @@ object Patterns {
 
     private fun flat(c: PatternCtx, x0: Float, x1: Float) = c.b.ground(c.sign, x0, x1)
 
-    fun gapWidth(c: PatternCtx): Float = min(c.lerp(1.5f, 0.6f * c.reach) * c.rnd(0.85f, 1f), 0.66f * c.reach)
+    /** Gerçek boşluk en az 1,8 karodur: daha darı boşluk gibi görünür ama karakter üstünden koşar. */
+    const val MIN_GAP = 1.8f
+
+    fun gapWidth(c: PatternCtx): Float = min(c.lerp(1.8f, 0.6f * c.reach) * c.rnd(0.9f, 1.05f), 0.66f * c.reach).coerceAtLeast(MIN_GAP)
 
     fun gap(c: PatternCtx, x: Float): Float {
         val w = gapWidth(c)
@@ -176,23 +204,29 @@ object Patterns {
     }
 
     fun spikes(c: PatternCtx, x: Float): Float {
-        val maxN = (0.5f * c.reach).toInt().coerceAtLeast(1)
-        val n = (1 + (c.rng.nextFloat() * (0.5f + c.t * 2.5f)).toInt()).coerceIn(1, maxN.coerceAtMost(3))
+        // Diken şeridinin genişliği zamanlama payını belirler: tam zıplamada ayaklar dikenlerin üstünde yaklaşık
+        // 0,855 x menzil boyunca kalır; şerit + gövde bundan "pay" kadar kısadır. Pay zorlukla 2,0 -> 0,8 karoya iner.
+        fun width(): Float {
+            val slack = c.lerp(2.0f, 0.8f, 0.55f) * c.kw * c.rnd(0.9f, 1.1f)
+            return r2(0.855f * c.reach - 0.53f - slack).coerceIn(0.9f, 3.4f)
+        }
+        val n = width()
         flat(c, x, x + 1.5f + n + 2.5f)
-        c.b.spikes(c.sign, x + 1.5f, 0f, n.toFloat())
+        c.b.spikes(c.sign, x + 1.5f, 0f, n)
         if (c.t > 0.45f && c.chance(0.4f)) {
-            // ikinci sıra
-            val x2 = x + 1.5f + n + 2.5f
-            val n2 = (1 + c.rng.nextInt(2)).coerceAtMost(maxN)
-            flat(c, x2, x2 + n2 + 2.5f)
-            c.b.spikes(c.sign, x2, 0f, n2.toFloat())
+            // ikinci sıra: arada zorlukla kısalan bir iniş alanı
+            val land = c.lerp(3.8f, 2.4f, 1.9f) * c.kw
+            val x2 = x + 1.5f + n + land
+            val n2 = width()
+            flat(c, x + 1.5f + n, x2 + n2 + 2.5f)
+            c.b.spikes(c.sign, x2, 0f, n2)
             return x2 + n2 + 2.5f
         }
         return x + 1.5f + n + 2.5f
     }
 
     fun step(c: PatternCtx, x: Float, limit: Float): Float {
-        val h = c.rnd(1f, min(2f, c.height - 0.9f)).coerceAtLeast(0.8f)
+        val h = c.rnd(c.lerp(0.8f, 1f), min(c.lerp(1.3f, 2f), c.height - 0.9f)).coerceAtLeast(0.8f)
         val len = c.rnd(4f, 7f)
         flat(c, x, x + 1.5f)
         c.b.ground(c.sign, x + 1.5f, x + 1.5f + len, h)
@@ -206,55 +240,66 @@ object Patterns {
         var px = x + 1.5f
         val k = 2 + (c.rng.nextFloat() * (1f + c.t * 2f)).toInt()
         var lastH = 0f
+        // Yükseklik farkı ve boşluk zorlukla büyür; düşük zorlukta platformlar geniş ve neredeyse aynı hizadadır.
+        val dh = c.lerp(0.45f, 1.05f)
         for (i in 0 until k) {
-            val g = min(c.lerp(1.3f, 0.5f * c.reach) * c.rnd(0.85f, 1f), 0.58f * c.reach)
-            val bw = c.rnd(2f, 3f)
-            val maxH = min(2.2f, c.height - 0.7f)
-            val h = (lastH + c.rnd(-1f, 1.2f)).coerceIn(0.6f, maxH)
+            val g = min(c.lerp(1.8f, 0.46f * c.reach) * c.rnd(0.95f, 1.05f), 0.5f * c.reach).coerceAtLeast(MIN_GAP)
+            val bw = c.rnd(c.lerp(3.0f, 2.3f, 1.9f), c.lerp(3.6f, 3.0f, 2.3f)) * c.kw
+            val maxH = min(2.0f, c.height - 0.8f)
+            val h = (lastH + c.rnd(-dh, dh)).coerceIn(0.6f, maxH)
             if (px + g + bw + 3f > limit) break
             c.b.box(c.sign, px + g, h - 0.7f, bw, h, SolidType.BLOCK)
             px += g + bw
             lastH = h
         }
-        val g = min(c.lerp(1.3f, 0.45f * c.reach), 0.5f * c.reach)
+        val g = min(c.lerp(1.8f, 0.45f * c.reach), 0.5f * c.reach).coerceAtLeast(MIN_GAP)
         flat(c, px + g, px + g + 2f)
         return px + g + 2f
     }
 
     fun saw(c: PatternCtx, x: Float): Float {
-        val r = c.rnd(0.5f, 0.7f)
-        flat(c, x, x + 5f)
-        c.b.saw(c.sign, x + 2.5f, 0.15f, r)
+        // Testereler karakterle boy ölçüşecek kadar büyüktür (çap 1,5-1,9 karo); yarısı zemine gömülüdür.
+        val r = c.lerp(0.75f, 1.0f, 0.7f, 1.08f) * c.rnd(0.95f, 1.03f)
+        flat(c, x, x + 5.5f)
+        c.b.saw(c.sign, x + 2.75f, 0.1f, r)
         if (c.t > 0.35f && c.chance(0.5f)) {
-            val d = c.rnd(2.8f, 3.6f)
-            flat(c, x + 5f, x + 5f + d)
-            c.b.saw(c.sign, x + 2.5f + d, 0.15f, r)
-            return x + 5f + d
+            // ikinci testere: arada rahat bir iniş alanı kalır
+            val d = 2f * (r * Physics.SAW_HIT + Physics.PLAYER_W / 2f) + c.rnd(c.lerp(2.6f, 1.7f, 1.4f), c.lerp(3.2f, 2.3f, 1.8f)) * c.kw
+            flat(c, x + 5.5f, x + 5.5f + d)
+            c.b.saw(c.sign, x + 2.75f + d, 0.1f, r)
+            return x + 5.5f + d
         }
-        return x + 5f
+        return x + 5.5f
     }
 
     fun movingSaw(c: PatternCtx, x: Float): Float {
         flat(c, x, x + 7f)
-        val period = c.rnd(1.8f, 2.6f)
-        c.b.saw(c.sign, x + 3.5f, 2.1f, 0.6f, 0f, 1.25f, period, c.rnd(0f, 6.28f))
+        // Oyuncuya kilitli salınan testere: oyuncu hizasına geldiğinde testere hep aynı (yukarıya yakın) konumdadır;
+        // altından koşulur, o sırada zıplanmaz. Zorluk arttıkça varış anındaki konum tepeden uzaklaşır (pay daralır).
+        val period = c.rnd(2.4f, 3.2f)
+        val off = c.lerp(0.25f, 1.0f) * c.rnd(0.5f, 1f) * (if (c.chance(0.5f)) 1f else -1f)
+        c.b.saw(c.sign, x + 3.5f, 2.3f, 0.85f, 0f, 1.3f, period, (Math.PI / 2).toFloat() + off, sync = true)
         return x + 7f
     }
 
     fun movingPlatform(c: PatternCtx, x: Float): Float {
-        val len = c.rnd(6.5f, 9f)
+        // Yatay giden platform yalnızca normal boyda ve buz dışında, çukur 7,6 karoyu aşmadan kullanılır (daha uzun
+        // çukurlarda ya da küçükken bazı varış anlarında geçilemiyordu); diğer durumlarda dikey platform çifti.
+        val horizontal = c.chance(0.5f) && c.e.sizeScale >= 1f && !c.e.ice
+        val len = if (horizontal) c.rnd(6.5f, 7.6f) else c.rnd(6.5f, 9f) * c.kw
         flat(c, x, x + 1.5f)
         val p0 = x + 1.5f
-        val w = 2.6f
-        if (c.chance(0.5f)) {
+        val w = c.lerp(3.4f, 2.8f, 2.4f)
+        if (horizontal) {
             val ax = (len - w) / 2f - 0.6f
-            c.b.box(c.sign, p0 + len / 2f - w / 2f, -0.7f, w, 0f, SolidType.MOVE, ax, 0f, c.rnd(2.4f, 3.2f), c.rnd(0f, 6.28f))
+            c.b.box(c.sign, p0 + len / 2f - w / 2f, -0.7f, w, 0f, SolidType.MOVE, ax, 0f, c.rnd(c.lerp(3.4f, 2.6f), c.lerp(4.0f, 3.2f)), c.rnd(0f, 6.28f))
         } else {
             // dikey hareket eden iki platform
-            val w2 = 2.2f
+            val w2 = c.lerp(2.7f, 2.3f, 2.0f) * c.kw
             val gap = (len - 2 * w2) / 3f
-            c.b.box(c.sign, p0 + gap, 0f, w2, 0.7f, SolidType.MOVE, 0f, 0.8f, c.rnd(2.2f, 2.8f), 0f)
-            c.b.box(c.sign, p0 + 2 * gap + w2, 0f, w2, 0.7f, SolidType.MOVE, 0f, 0.8f, c.rnd(2.2f, 2.8f), 3.14f)
+            val amp = c.lerp(0.5f, 0.8f, 0.4f, 1.0f)
+            c.b.box(c.sign, p0 + gap, 0f, w2, 0.7f, SolidType.MOVE, 0f, amp, c.rnd(2.6f, 3.2f), 0f)
+            c.b.box(c.sign, p0 + 2 * gap + w2, 0f, w2, 0.7f, SolidType.MOVE, 0f, amp, c.rnd(2.6f, 3.2f), 3.14f)
         }
         flat(c, p0 + len, p0 + len + 2f)
         return p0 + len + 2f
@@ -298,14 +343,16 @@ object Patterns {
         flat(c, x, x + 1.5f)
         var px = x + 1.5f
         val k = 2 + (c.t * 2.5f).toInt()
+        // Kayma genliği zorlukla büyür; platformlar geniş, boşluklar kısa tutulur ki iniş zamanlaması kare hassasiyeti istemesin.
+        val amp = c.lerp(0.45f, 0.8f, 0.4f, 1.0f)
         for (i in 0 until k) {
-            val g = c.rnd(0.9f, 1.4f)
-            val w = c.rnd(2.4f, 3.0f)
+            val g = c.rnd(MIN_GAP, c.lerp(2.0f, 2.3f))
+            val w = c.rnd(c.lerp(3.2f, 2.6f, 2.2f), c.lerp(3.8f, 3.2f, 2.6f)) * c.kw
             if (px + g + w + 3f > limit) break
-            c.b.box(c.sign, px + g, -0.2f, w, 0.5f, SolidType.SHIFT, 0f, 0.9f, c.rnd(2.6f, 3.4f), i * 1.9f)
+            c.b.box(c.sign, px + g, -0.2f, w, 0.5f, SolidType.SHIFT, 0f, amp, c.rnd(3.0f, 3.8f), i * 1.9f)
             px += g + w
         }
-        val g = 1.2f
+        val g = MIN_GAP
         flat(c, px + g, px + g + 2f)
         return px + g + 2f
     }
@@ -317,10 +364,11 @@ object Patterns {
         c.b.coinLine(c.sign, x + 2.3f, x + 1.7f + len, Physics.PLAYER_H * Physics.SMALL_SCALE / 2f)
         var end = x + 2f + len + 2f
         if (c.t > 0.4f && end + 9f < limit) {
-            val w = min(gapWidth(c), 0.55f * c.reach)
-            flat(c, end + w, end + w + 1.5f)
+            val w = min(gapWidth(c), 0.5f * c.reach)
+            val run = c.lerp(3.4f, 2.4f, 2.0f) * c.kw // boşluktan sonra, tünel ağzından önce iniş alanı
+            flat(c, end + w, end + w + run)
             val l2 = c.rnd(3f, 5f)
-            val x2 = end + w + 1.5f
+            val x2 = end + w + run
             flat(c, x2, x2 + l2 + 2f)
             c.b.box(c.sign, x2, Physics.LOW_CLEARANCE, l2, 4.2f, SolidType.LOW)
             end = x2 + l2 + 2f
@@ -328,10 +376,10 @@ object Patterns {
         return end
     }
 
-    fun bouncyWall(c: PatternCtx, x: Float): Float {
-        return if (c.chance(0.6f)) {
+    fun bouncyWall(c: PatternCtx, x: Float, limit: Float = Float.MAX_VALUE): Float {
+        val len = c.rnd(4f, 6f)
+        return if (c.chance(0.6f) && x + 2f + len + 2.5f <= limit) {
             val h = c.rnd(3.3f, min(4.2f, c.height - 0.7f))
-            val len = c.rnd(4f, 6f)
             flat(c, x, x + 2f)
             c.b.ground(c.sign, x + 2f, x + 2f + len, h)
             flat(c, x + 2f + len, x + 2f + len + 2.5f)
@@ -348,8 +396,10 @@ object Patterns {
     fun overhead(c: PatternCtx, x: Float): Float {
         val len = c.rnd(2.5f, 4.5f)
         flat(c, x, x + 2f + len + 2.5f)
-        c.b.box(c.sign, x + 2f, 2.25f, len, 2.85f, SolidType.BLOCK)
-        c.b.spikes(c.sign, x + 2f, 2.25f, len, up = false)
+        // Asılı dikenlerin ucu (blok altı - diken boyu) karakterin çizilen boyunun üstünde kalır
+        val oy = Physics.PLAYER_VISUAL_H + Physics.SPIKE_VISUAL_H + 0.18f
+        c.b.box(c.sign, x + 2f, oy, len, oy + 0.6f, SolidType.BLOCK)
+        c.b.spikes(c.sign, x + 2f, oy, len, up = false)
         c.b.coinLine(c.sign, x + 2.2f, x + 1.8f + len, Physics.PLAYER_H / 2f)
         var end = x + 2f + len + 2.5f
         if (c.t > 0.3f && c.chance(0.6f)) {
@@ -366,8 +416,10 @@ object Patterns {
         flat(c, x, x + 2f)
         val g0 = x + 2f
         flat(c, g0 + w, g0 + w + 2.5f)
-        c.b.box(c.sign, g0 - 0.8f, 3.5f, w + 1.6f, 4.0f, SolidType.BLOCK)
-        c.b.spikes(c.sign, g0 - 0.8f, 3.5f, w + 1.6f, up = false)
+        // Dikenlerin ucu zeminden 3,5 karo yukarıda: 0,2 saniyeye kadar basılı tutulan zıplamalar sığar, tam zıplama sığmaz
+        val cy = 3.5f + Physics.SPIKE_H
+        c.b.box(c.sign, g0 - 0.8f, cy, w + 1.6f, cy + 0.5f, SolidType.BLOCK)
+        c.b.spikes(c.sign, g0 - 0.8f, cy, w + 1.6f, up = false)
         return g0 + w + 2.5f
     }
 
@@ -377,16 +429,16 @@ object Patterns {
         var h = 0f
         val n = 3 + (c.t * 1.5f).toInt()
         for (i in 0 until n) {
-            val dh = c.rnd(0.9f, min(1.4f, c.height - 1f))
+            val dh = c.rnd(c.lerp(0.7f, 0.9f), min(c.lerp(1.0f, 1.4f), c.height - 1f))
             if (h + dh > 5f) break
             h += dh
-            val w = c.rnd(2.2f, 3f)
+            val w = c.rnd(c.lerp(3.0f, 2.2f, 1.9f), c.lerp(3.8f, 3f, 2.4f)) * c.kw
             if (px + w + 4f > limit) break
             c.b.ground(c.sign, px, px + w, h)
             px += w
         }
         // inişte küçük boşluk
-        val gw = if (c.t > 0.3f) c.rnd(1f, 1.8f) else 0f
+        val gw = if (c.t > 0.3f) c.rnd(MIN_GAP, 2.4f) else 0f
         flat(c, px + gw, px + gw + 2.5f)
         return px + gw + 2.5f
     }
@@ -395,7 +447,7 @@ object Patterns {
         val w = min(gapWidth(c), 0.5f * c.reach)
         flat(c, x, x + 1.5f)
         val g0 = x + 1.5f
-        val land = c.rnd(2.2f, 3f)
+        val land = c.rnd(c.lerp(3.6f, 2.3f, 1.9f), c.lerp(4.4f, 3.0f, 2.3f)) * c.kw
         val n = 1 + c.rng.nextInt(2)
         flat(c, g0 + w, g0 + w + land + n + 2.5f)
         c.b.spikes(c.sign, g0 + w + land, 0f, n.toFloat())

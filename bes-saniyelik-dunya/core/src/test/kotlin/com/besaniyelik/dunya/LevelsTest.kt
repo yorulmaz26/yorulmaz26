@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import java.util.concurrent.Executors
+import kotlin.math.abs
 import kotlin.test.*
 
 class LevelsTest {
@@ -37,6 +38,11 @@ class LevelsTest {
             assertTrue(l.phases.all { RuleCompatibility.isValid(it.rules, l.difficulty) || RuleCompatibility.isValid(it.rules) }, "bölüm ${l.id} geçersiz kural kombinasyonu")
             assertTrue(l.solution.isNotEmpty(), "bölüm ${l.id} çözüm kanıtı yok")
             assertEquals(GameContent.hasPiece(l.id), l.piece != null, "bölüm ${l.id} koleksiyon parçası")
+            // her bölüm, her zaman Normal Dünya olan bir bitiş düzlüğüyle biter
+            assertEquals(RuleEffects.DEFAULT, RuleEffects.of(l.phases.last().rules), "bölüm ${l.id} Normal Dünya ile bitmeli")
+            assertTrue(l.goalX - l.phases.last().x >= Physics.FINISH_LEN - 0.01f, "bölüm ${l.id} bitiş düzlüğü kısa")
+            assertEquals(GameContent.difficulty(l.id), l.difficulty, "bölüm ${l.id} zorluk etiketi")
+            assertTrue(l.features.isNotEmpty(), "bölüm ${l.id} desen kaydı yok")
         }
         assertEquals(50, all.count { it.piece != null })
         assertEquals(LevelKind.GRAND_FINAL, all[499].kind)
@@ -86,6 +92,8 @@ class LevelsTest {
             try {
                 val ok = LevelSolver.replay(sim, l.solution.toIntArray())
                 if (!ok) "${l.id}: tamamlanamadı (${sim.deathCause} x=${sim.player.x})"
+                else if (sim.effects != RuleEffects.DEFAULT || sim.player.scale != 1f) "${l.id}: kapıya Normal Dünya'da varılmadı"
+                else if (sim.player.y - sim.player.hh > 0.6f) "${l.id}: kapıya havada varıldı (y=${sim.player.y})"
                 else if (sim.starsCollected != 3) "${l.id}: yıldız ${sim.starsCollected}"
                 else if (l.piece != null && !sim.pieceCollected) "${l.id}: parça alınamadı"
                 else null
@@ -93,6 +101,36 @@ class LevelsTest {
         } }).mapNotNull { it.get() }
         pool.shutdown()
         assertTrue(failures.isEmpty(), failures.joinToString("\n"))
+    }
+
+    @DisplayName("Bütün 500 bölümde son kural çizgisinden sonra hiçbir tuşa basılmasa da kapıya Normal Dünya'da, yerde varılır")
+    @Test fun finishStretchNeedsNoInput() {
+        val bad = all.filter { !LevelForge.finishOk(it, it.solution.toIntArray()) }.map { it.id }
+        assertTrue(bad.isEmpty(), "bitiş düzlüğü sorunlu bölümler: $bad")
+    }
+
+    @DisplayName("Ölçülen zorluk hedef eğrisini izler: bölümler insan gibi (zamanlama hatalı) oynatılarak ölçülür")
+    @Test fun measuredDifficultyTracksTarget() {
+        val pool = Executors.newFixedThreadPool(4)
+        val ms = pool.invokeAll(all.map { l -> java.util.concurrent.Callable { l to LevelAnalyzer.measure(l, l.solution.toIntArray())!! } }).map { it.get() }
+        pool.shutdown()
+        // 1) hiçbir zıplama kare hassasiyeti istemez
+        val tight = ms.filter { (l, m) -> m.minWindow < LevelAnalyzer.minWindowFor(GameContent.targetDifficulty(l.id)) || m.minHold < LevelAnalyzer.minHoldFor(GameContent.targetDifficulty(l.id)) }
+        println("Dar pencereli bölümler (${tight.size}): " + tight.joinToString { (l, m) -> "${l.id}(${m.minWindow}/${m.minHold})" })
+        assertTrue(tight.size <= 15, "dar zamanlama penceresi olan bölüm sayısı: ${tight.size}")
+        assertTrue(ms.all { (_, m) -> m.minWindow >= 4 }, "kare hassasiyeti isteyen bölüm var: " + ms.filter { it.second.minWindow < 4 }.map { it.first.id })
+        // 2) ölçülen zorluk hedef bandında
+        val off = ms.filter { (l, m) -> val t = GameContent.targetDifficulty(l.id); abs(m.score - t) > LevelForge.tolerance(t) }
+        val far = ms.filter { (l, m) -> val t = GameContent.targetDifficulty(l.id); abs(m.score - t) > LevelForge.tolerance(t) * 2.2f }
+        println("Hedef bandı dışındaki bölümler (${off.size}); çok uzak (${far.size}): " + far.joinToString { (l, m) -> "${l.id}(${"%.1f".format(m.score)}/${"%.1f".format(GameContent.targetDifficulty(l.id))})" })
+        assertTrue(off.size <= 110, "hedef bandı dışındaki bölüm sayısı: ${off.size}")
+        assertTrue(far.size <= 25, "hedeften çok uzak bölüm sayısı: ${far.size}")
+        // 3) ilk bölümler herkesin geçebileceği kadar kolay; haritalar ilerledikçe ortalama zorluk artar
+        assertTrue(ms.take(10).all { (_, m) -> m.pComplete[1] >= 0.8f }, "ilk 10 bölüm orta oyuncu için kolay olmalı")
+        val byMap = (0 until 10).map { map -> ms.subList(map * 50, map * 50 + 50).map { it.second.score }.average() }
+        println("Harita başına ortalama ölçülen zorluk: " + byMap.joinToString { "%.2f".format(it) })
+        for (i in 1 until 10) assertTrue(byMap[i] > byMap[i - 1] - 0.15, "harita ${i + 1} ortalaması haritalar boyunca artmalı: $byMap")
+        assertTrue(byMap[9] - byMap[0] > 3.5, "son harita ilkinden belirgin biçimde zor olmalı")
     }
 
     @DisplayName("Bütün 500 bölüm çözücüyle sıfırdan (kayıtlı çözüm kullanmadan) çözülebilir")

@@ -135,27 +135,74 @@ object LevelGenerator {
         else -> true
     }
 
-    fun boundaryBuffer(a: RuleEffects, b: RuleEffects, speed: Float): Float {
-        val sec = when {
-            a.gravitySign != b.gravitySign -> 1.0f
-            a.sizeScale != b.sizeScale || a.reverseControl != b.reverseControl -> 0.65f
-            else -> 0.45f
-        }
-        return sec * speed
+    /** Tavandan zemine (ya da tersi) süzülürken kat edilen yatay yol: uçuş süresi dünya zamanında sabittir (~0,67 sn). */
+    private fun flipFlight(e: RuleEffects, speedMul: Float): Float =
+        0.673f * Physics.RUN_SPEED * speedMul * (if (e.ice) Physics.ICE_SPEED_MUL else 1f) + Physics.PLAYER_W
+
+    /**
+     * Kural çizgisinden SONRAKİ düz tampon (karo): oyuncunun yeni kuralı fark edip tepki vermesi için süre
+     * (zorlukla kısalır, mekaniğin tanıtıldığı bölümde uzundur) + yer çekimi dönüyorsa karşı yüzeye iniş mesafesi.
+     */
+    fun bufferIn(prev: RuleEffects, next: RuleEffects, speedNext: Float, t: Float, intro: Boolean = false, speedMul: Float = 1f): Float {
+        var react = if (intro) 1.5f else (1.05f - 0.4f * t).coerceAtLeast(0.6f)
+        if (prev.sizeScale != next.sizeScale || prev.reverseControl != next.reverseControl) react += 0.25f
+        val base = react * speedNext
+        return if (prev.gravitySign != next.gravitySign) flipFlight(next, speedMul) + base else base
     }
 
-    fun generate(levelId: Int, attempt: Int, difficultyDrop: Int = 0): LevelDraft {
+    /** Kural çizgisinden ÖNCEKİ düz tampon: son engelin üstünden atlayan oyuncu çizgiden önce yere insin. */
+    fun bufferOut(prev: RuleEffects, speedPrev: Float, speedMul: Float = 1f): Float {
+        val reach = Physics.RUN_SPEED * speedMul * (if (prev.ice) Physics.ICE_SPEED_MUL else 1f) * 2f * Physics.JUMP_V * prev.jumpMul / Physics.GRAVITY
+        return max(0.5f * speedPrev, 0.6f * reach)
+    }
+
+    /**
+     * Bir aşamanın engel bölgesini [zx0, zx1] desenlerle doldurur. Kurala özgü desenler önce denenir; sığmayan desen
+     * aşamayı boş bırakmaz (sıradaki denenir), bölgeden taşan desen geri alınır.
+     */
+    fun fillPhase(b: LevelBuilder, ctx: PatternCtx, zx0: Float, zx1: Float, dedicated: List<Pattern>, rest: () -> Float, coinChance: Float,
+                  pick: (avail: Float, tried: Set<Pattern>) -> Pattern?) {
+        val sign = ctx.sign
+        var cx = zx0
+        val queue = ArrayList(dedicated)
+        val tried = HashSet<Pattern>()
+        var guard = 0
+        var first = true
+        while (cx < zx1 - 4f && guard++ < 18) {
+            // aşamanın ilk deseninden önce ayrıca dinlenme boşluğu gerekmez: giriş tamponu zaten düzdür
+            val r = if (first) 0.5f else rest()
+            val avail = zx1 - (cx + r)
+            var p: Pattern? = null
+            while (queue.isNotEmpty() && p == null) { val q = queue.removeAt(0); if (Patterns.minLength(q) <= avail && q !in tried) p = q }
+            if (p == null) p = pick(avail, tried)
+            if (p == null) break
+            val mark = b.mark()
+            b.ground(sign, cx, cx + r)
+            if (r > 2.5f && ctx.chance(coinChance)) b.coinLine(sign, cx + 0.5f, cx + r - 0.5f, Physics.PLAYER_H * ctx.e.sizeScale / 2f)
+            val end = Patterns.place(p, ctx, cx + r, zx1)
+            if (end > zx1 + 0.01f) { b.rollback(mark); tried.add(p); continue }
+            tried.clear()
+            first = false
+            cx = end
+        }
+        b.ground(sign, cx, zx1)
+    }
+
+    fun generate(levelId: Int, attempt: Int, tShift: Float = 0f): LevelDraft {
         val seed = levelId * 7919L + attempt * 104729L
         val rng = Random(seed)
         val kind = GameContent.kindOf(levelId)
         val map = GameContent.mapOf(levelId)
         val stage = GameContent.stageOf(levelId)
-        val diff = (GameContent.difficulty(levelId) - difficultyDrop).coerceIn(1, 10)
-        val t = ((diff - 1) / 9f).coerceIn(0f, 1f)
+        val target = GameContent.targetDifficulty(levelId)
+        // Desen yoğunluğu parametresi: hedef zorluktan türetilir; dökümhane ölçülen zorluğa göre kaydırır (tShift).
+        val t = ((target - 1f) / 8.5f + tShift).coerceIn(0f, 1.6f)
+        val diff = GameContent.difficulty(levelId)
         val count = phaseCount(levelId, rng)
         val plan = PhasePlanner.plan(levelId, count, rng)
         val effects = plan.map { RuleEffects.of(it) }
         val b = LevelBuilder()
+        val intro = kind == LevelKind.TUTORIAL
 
         // Aşama sınırları
         val bounds = FloatArray(count + 1)
@@ -166,16 +213,18 @@ object LevelGenerator {
             x += len
         }
         bounds[count] = x
-        val goalX = x + 5f
+        // Bitiş düzlüğü: son kuraldan sonra dünya her zaman Normal'e döner; karakter kapıya yerde, normal boyda varır.
+        val goalX = x + Physics.FINISH_LEN
 
         // Tavan gereken aralıklar
         val needCeil = BooleanArray(count) { effects[it].gravitySign < 0 }
         fun ceilAt(i: Int) = needCeil[i] || (i > 0 && needCeil[i - 1]) || (i + 1 < count && needCeil[i + 1])
 
-        // Başlangıç ve bitiş zemini
-        b.ground(1, -10f, 0f)
-        b.ground(1, x, goalX + 16f)
-        if (needCeil[0]) b.ground(-1, -10f, 0f)
+        // Başlangıç ve bitiş zemini (geniş ekranlarda dünyanın kenarı görünmesin)
+        b.ground(1, -14f, 0f)
+        b.ground(1, x, goalX + 30f)
+        if (ceilAt(0)) b.ground(-1, -14f, 0f)
+        if (needCeil[count - 1]) b.ground(-1, x, goalX + 30f)
 
         val tutorial = tutorialPatterns(levelId)
         var tutorialIdx = 0
@@ -185,8 +234,8 @@ object LevelGenerator {
             val sp = Physics.realSpeed(e)
             val x0 = bounds[i]
             val x1 = bounds[i + 1]
-            val bufIn = if (i == 0) 6f else boundaryBuffer(effects[i - 1], e, sp)
-            val bufOut = if (i == count - 1) 3f else boundaryBuffer(e, effects[i + 1], sp)
+            val bufIn = if (i == 0) (11f - 1.5f * t).coerceAtLeast(9f) else bufferIn(effects[i - 1], e, sp, t, intro)
+            val bufOut = bufferOut(e, sp)
             val zx0 = x0 + bufIn
             val zx1 = x1 - bufOut
             phaseRanges.add(x0 to x1)
@@ -197,40 +246,32 @@ object LevelGenerator {
             b.ground(sign, x0, zx0)
             b.ground(sign, zx1, x1)
             val ctx = PatternCtx(b, rng, e, t)
-            var cx = zx0
-            val queue = ArrayList<Pattern>()
+            if (zx1 - zx0 < 4f) { b.ground(sign, zx0, zx1); continue }
             if (tutorial != null) {
-                if (i >= 1) {
-                    queue.add(tutorial[tutorialIdx++ % tutorial.size])
-                    if (i >= 2) queue.add(tutorial[tutorialIdx++ % tutorial.size])
-                }
+                val queue = ArrayList<Pattern>()
+                if (i >= 1 || levelId > 1) queue.add(tutorial[tutorialIdx++ % tutorial.size])
+                if (i >= 2) queue.add(tutorial[tutorialIdx++ % tutorial.size])
+                fillPhase(b, ctx, zx0, zx1, queue, { 3f }, 0.5f) { _, _ -> null }
             } else {
-                queue.addAll(Patterns.dedicated(e))
-            }
-            var guard = 0
-            while (cx < zx1 - 4f && guard++ < 12) {
-                val rest = if (tutorial != null) 3f else ctx.lerp(3f, 1.2f) * ctx.rnd(0.8f, 1.3f)
-                val avail = zx1 - (cx + rest)
-                val p: Pattern? = if (queue.isNotEmpty()) queue.removeAt(0) else if (tutorial != null) null else pick(ctx, stage, levelId, avail, kind)
-                if (p == null || avail < Patterns.minLength(p)) {
-                    break
+                fillPhase(b, ctx, zx0, zx1, Patterns.dedicated(e), { ctx.lerp(3.2f, 1.3f, 1.0f) * ctx.rnd(0.8f, 1.3f) }, 0.5f) { avail, tried ->
+                    pick(ctx, stage, levelId, avail, kind, tried)
                 }
-                b.ground(sign, cx, cx + rest)
-                if (rest > 2.5f && rng.nextFloat() < 0.5f) b.coinLine(sign, cx + 0.5f, cx + rest - 0.5f, 0.5f)
-                cx = Patterns.place(p, ctx, cx + rest, zx1)
             }
-            b.ground(sign, cx, zx1)
         }
         b.finalizeGround()
 
-        // Kontrol noktaları: her iki aşamada bir, tampon bölgede
+        // Kontrol noktaları: düzenli aralıklarla, kural çizgisinden hemen sonraki düz tamponda; son kontrol noktasından
+        // kapıya en fazla iki kural aşaması kalır (kapının önünde ölmek oyuncuyu çok geriye atmasın).
         val cps = ArrayList<Float>()
         val cpEvery = when (kind) { LevelKind.CHALLENGE -> 4; LevelKind.FINAL, LevelKind.GRAND_FINAL -> 3; else -> 2 }
         var i = cpEvery
-        while (i < count) { cps.add(r2(bounds[i] + 1.2f)); i += cpEvery }
-        if (kind == LevelKind.CHALLENGE && cps.isEmpty() && count > 3) cps.add(r2(bounds[count / 2] + 1.2f))
+        var lastCp = 0
+        while (i < count) { cps.add(r2(bounds[i] + 1.2f)); lastCp = i; i += cpEvery }
+        if (count - lastCp > 2) cps.add(r2(bounds[count - 2] + 1.2f))
 
-        val phases = (0 until count).map { PhaseDef(r2(bounds[it]), plan[it]) }
+        val planned = (0 until count).map { PhaseDef(r2(bounds[it]), plan[it]) }
+        val normal = listOf(Mechanic.NORMAL)
+        val phases = if (plan.last() == normal) planned else planned + PhaseDef(r2(x), normal)
         val hints = buildHints(levelId, b.features, phases)
         val mechanics = plan.flatten().filter { it != Mechanic.NORMAL }.distinct()
         val tutorialMech = if (kind == LevelKind.TUTORIAL && levelId > 1) Mechanic.entries.firstOrNull { it.unlockLevel == levelId } else null
@@ -241,17 +282,29 @@ object LevelGenerator {
             solids = b.solids, hazards = b.hazards, pads = b.pads,
             checkpoints = cps, phases = phases, mechanics = mechanics, tutorial = tutorialMech,
             hints = hints, chaser = kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL, seed = seed,
+            features = b.features.sortedBy { it.x }.map { FeatureMark(it.pattern, r2(it.x)) },
         )
         return LevelDraft(data, b.features.toList(), b.coinHints.toList(), phaseRanges)
     }
 
-    private fun pick(c: PatternCtx, stage: StageIdea, levelId: Int, avail: Float, kind: LevelKind): Pattern? {
+    private fun pick(c: PatternCtx, stage: StageIdea, levelId: Int, avail: Float, kind: LevelKind, tried: Set<Pattern> = emptySet()): Pattern? {
         val candidates = ArrayList<Pair<Pattern, Float>>()
         for (p in generalPatterns + stage.patterns) {
-            if (!Patterns.applicable(p, c.e) || !patternUnlocked(p, levelId)) continue
+            if (p in tried || !Patterns.applicable(p, c.e) || !patternUnlocked(p, levelId)) continue
             if (Patterns.minLength(p) > avail) continue
+            // hız pedinden sonra kural çizgisine kadar hızın sönmesi için yer kalmalı
+            if (p == Pattern.BOOST_GAP && avail < 15f) continue
             var w = 1f
             if (p in stage.patterns) w += 2.5f
+            // Yüksek zorlukta hassasiyet isteyen desenler ağırlık kazanır, kolay desenler azalır
+            if (c.t > 0.6f) {
+                val k = (c.t - 0.6f).coerceAtMost(0.8f)
+                when (p) {
+                    Pattern.SPIKES, Pattern.SAW, Pattern.SPIKE_GAP, Pattern.CEILING_GAP, Pattern.FLOATING -> w *= 1f + 2.2f * k
+                    Pattern.GAP, Pattern.STEP, Pattern.BOOST_GAP, Pattern.MOVING_SAW -> w *= 1f - 0.8f * k
+                    else -> {}
+                }
+            }
             if (c.e.reverseControl && (p == Pattern.FLOATING || p == Pattern.STAIRS || p == Pattern.STEP)) w *= 0.3f
             if (c.e.sizeScale < 1f && (p == Pattern.SPRING_WALL || p == Pattern.STAIRS)) w *= 0.3f
             candidates.add(p to w)
@@ -278,7 +331,10 @@ object LevelGenerator {
             6 -> first(Pattern.MOVING_PLATFORM)?.let { out.add(HintDef(it.x - 1.5f, "Hareketli platforma zamanında zıpla!", icon = "i_tap")) }
             7 -> first(Pattern.SPRING_WALL)?.let { out.add(HintDef(it.x - 1.5f, "Yaylar seni yükseğe fırlatır!", icon = "i_spring")) }
             8 -> first(Pattern.BOOST_GAP)?.let { out.add(HintDef(it.x - 1.5f, "Hız okları seni hızlandırır!", icon = "i_boost")) }
-            9 -> first(Pattern.OVERHEAD)?.let { out.add(HintDef(it.x - 1.5f, "Üstünde diken varken zıplama!", icon = "i_spike")) }
+            9 -> {
+                first(Pattern.OVERHEAD)?.let { out.add(HintDef(it.x - 1.5f, "Üstünde diken varken zıplama!", icon = "i_spike")) }
+                first(Pattern.CEILING_GAP)?.let { out.add(HintDef(it.x - 1.5f, "Kısa dokun: alçak zıpla!", icon = "i_tap")) }
+            }
             10 -> out.add(HintDef(3f, "Meydan okuma! Öğrendiklerini göster.", icon = "i_star"))
         }
         val m = Mechanic.entries.firstOrNull { it.unlockLevel == levelId && levelId > 1 }

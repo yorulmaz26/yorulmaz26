@@ -50,7 +50,11 @@ def override(atlas, name, img, split):
         return im, None
     if atlas == 'game' and name in OBJ:
         f, sz = OBJ[name]
-        im = user_art.obj(f, sz)
+        # Engeller kırmızı + koyu konturlu; kapı, yay ve hız pedi konturlu (ayrıntılı arka planlarda seçilsinler)
+        if name == 'spike': im = user_art.spike_sheet()
+        elif name == 'saw': im = user_art.hazard(f, sz)
+        elif name in ('goal', 'spring_0', 'spring_1', 'boost', 'flag_0', 'flag_1'): im = user_art.outlined(f, sz)
+        else: im = user_art.obj(f, sz)
         if im is not None: return im, None
     if atlas == 'game' and name.startswith('coin_') and COINS:
         return COINS[int(name[5:])], None

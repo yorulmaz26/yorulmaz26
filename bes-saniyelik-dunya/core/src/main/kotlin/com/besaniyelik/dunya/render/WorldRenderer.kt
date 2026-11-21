@@ -55,7 +55,10 @@ class WorldRenderer(
     private val decors = ArrayList<Decor>()
     private var decorProcessed = 0
 
-    private val spike = a.g("spike"); private val saw = a.g("saw"); private val spring0 = a.g("spring_0"); private val spring1 = a.g("spring_1")
+    private val spike = a.g("spike")
+    /** Diken görseli 5 eşit diş hücresidir (tools/art/user_art.py spike_sheet). */
+    private val spikeCells = Array(5) { TextureRegion(spike, it * (spike.regionWidth / 5), 0, spike.regionWidth / 5, spike.regionHeight) }
+    private val saw = a.g("saw"); private val spring0 = a.g("spring_0"); private val spring1 = a.g("spring_1")
     private val boost = a.g("boost"); private val flag0 = a.g("flag_0"); private val flag1 = a.g("flag_1"); private val goal = a.g("goal")
     private val chaser = a.g("chaser"); private val ghost = a.g("tile_ghost"); private val shift = a.g("tile_shift"); private val move = a.g("tile_move")
     private val coins = (0 until 6).map { a.g("coin_$it") }
@@ -153,7 +156,10 @@ class WorldRenderer(
     fun onPowerup() { val p = sim.player; particles.spawn(ring, p.x, p.y, 0f, 0f, 0.5f, 0.5f, 3.5f, Color.valueOf("58D6D0")) }
     fun onDeath() { val p = sim.player; particles.burst(starP, p.x, p.y, 18, 6f, 0.8f, 0.3f, bodyColor, colors = listOf(bodyColor, Color.WHITE)) }
     fun onRule() { val p = sim.player; particles.spawn(ring, p.x, p.y, 0f, 0f, 0.6f, 0.6f, 6f, Color(1f, 1f, 1f, 0.9f)); particles.burst(confetti, p.x, p.y, 14, 6f, 0.9f, 0.22f, Color.WHITE, -6f * sim.effects.gravitySign, confettiColors) }
-    fun onCheckpoint(x: Float) { particles.burst(starP, x, 1.5f, 10, 4f, 0.7f, 0.25f, Color.valueOf("73D65C")) }
+    fun onCheckpoint(x: Float) {
+        val down = sim.phases.lastOrNull { it.x <= x }?.let { RuleEffects.of(it.rules).gravitySign < 0 } == true
+        particles.burst(starP, x, if (down) Physics.CEIL - 1.5f else 1.5f, 10, 4f, 0.7f, 0.25f, Color.valueOf("73D65C"))
+    }
     fun onSpring() { squash = 0.8f }
     fun celebrate() {
         happy = true
@@ -193,9 +199,18 @@ class WorldRenderer(
         if ("particles" !in debugSkip) particles.draw(batch)
         if ("player" !in debugSkip) drawPlayer(batch)
         if (sim.chaserEnabled) {
-            val cw = 2.2f
-            var y = bottom - (bottom % 2.2f) - 2.2f
-            while (y < top) { batch.draw(chaser, sim.chaserX - cw * 2.6f, y, cw * 2.6f, 2.2f); y += 2.2f }
+            // Kaos Duvarı: görselin kendi oranıyla, dikeyde döşenerek; sağ kenarı chaserX'tedir
+            val ch = 3.3f
+            val cw = ch * chaser.regionWidth / chaser.regionHeight.toFloat()
+            var y = bottom - (bottom % ch) - ch
+            batch.setColor(0.55f, 0.2f, 0.75f, 0.55f)
+            batch.draw(glow, sim.chaserX - cw * 1.4f, bottom - 1f, cw * 2.4f, vh + 2f)
+            batch.setColor(1f, 1f, 1f, 1f)
+            while (y < top) {
+                batch.draw(chaser, sim.chaserX - cw * 2.1f, y + ch * 0.5f, cw, ch)
+                batch.draw(chaser, sim.chaserX - cw, y, cw, ch)
+                y += ch
+            }
         }
         batch.end()
     }
@@ -303,14 +318,16 @@ class WorldRenderer(
             when (d.type) {
                 PadType.SPRING -> {
                     val r = if (p.anim > 0f) spring1 else spring0
-                    val w = d.w + 0.2f
-                    val h = min(1.2f, w * r.regionHeight / r.regionWidth.toFloat())
-                    if (d.dir > 0) batch.draw(r, d.x - 0.1f, d.y - 0.05f, w, h) else batch.draw(r, d.x - 0.1f, d.y + 0.05f, w, -h)
+                    val w = d.w + 0.5f
+                    val h = min(1.5f, w * r.regionHeight / r.regionWidth.toFloat())
+                    if (d.dir > 0) batch.draw(r, d.x - 0.25f, d.y - 0.05f, w, h) else batch.draw(r, d.x - 0.25f, d.y + 0.05f, w, -h)
                 }
                 PadType.BOOST -> {
                     val pulse = 0.85f + 0.15f * sin(time * 10f)
+                    batch.setColor(0.3f, 1f, 0.95f, 0.45f * pulse)
+                    batch.draw(glow, d.x - 0.5f, d.y - 0.7f, d.w + 1f, 1.4f)
                     batch.setColor(1f, 1f, 1f, pulse)
-                    if (d.dir > 0) batch.draw(boost, d.x, d.y - 0.02f, d.w, 0.5f) else batch.draw(boost, d.x, d.y + 0.02f, d.w, -0.5f)
+                    if (d.dir > 0) batch.draw(boost, d.x - 0.15f, d.y - 0.03f, d.w + 0.3f, 0.66f) else batch.draw(boost, d.x - 0.15f, d.y + 0.03f, d.w + 0.3f, -0.66f)
                     batch.setColor(1f, 1f, 1f, 1f)
                 }
             }
@@ -324,8 +341,9 @@ class WorldRenderer(
             val ph = sim.phases.lastOrNull { it.x <= cp }
             val down = ph != null && RuleEffects.of(ph.rules).gravitySign < 0
             val r = if (passed) flag1 else flag0
-            val fw = 1.6f * r.regionWidth / r.regionHeight.toFloat()
-            if (down) batch.draw(r, cp - fw * 0.4f, Physics.CEIL, fw, -1.6f) else batch.draw(r, cp - fw * 0.4f, 0f, fw, 1.6f)
+            val fh = 2.1f
+            val fw = fh * r.regionWidth / r.regionHeight.toFloat()
+            if (down) batch.draw(r, cp - fw * 0.4f, Physics.CEIL, fw, -fh) else batch.draw(r, cp - fw * 0.4f, 0f, fw, fh)
         }
         if (sim.goalX < x1 + 3f && sim.goalX > x0 - 4f) {
             val gh = 3.95f; val gw = gh * goal.regionWidth / goal.regionHeight.toFloat()
@@ -337,20 +355,28 @@ class WorldRenderer(
         for (h in sim.hazards) {
             if (h.removed) continue
             val d = h.def
-            h.update(sim.time)
+            h.update(sim.time, sim.player.x)
             when (d.type) {
                 HazardType.SPIKE -> {
                     if (h.cx > x1 || h.cx + d.w < x0) continue
-                    var x = h.cx
-                    while (x < h.cx + d.w - 0.01f) {
-                        val w = min(1f, h.cx + d.w - x)
-                        if (d.dir > 0) batch.draw(spike, x, h.cy - 0.02f, w, 0.58f) else batch.draw(spike, x, h.cy + 0.02f, w, -0.58f)
-                        x += 1f
-                    }
+                    // kırmızı tehlike parıltısı + iri dişler (karo başına iki diş, karakterin yarı boyunda)
+                    val gh = Physics.SPIKE_VISUAL_H * 2.1f
+                    batch.setColor(1f, 0.22f, 0.18f, 0.42f + 0.1f * sin(time * 5f + h.cx))
+                    batch.draw(glow, h.cx - 0.5f, h.cy - gh / 2f, d.w + 1f, gh)
+                    batch.setColor(1f, 1f, 1f, 1f)
+                    val teeth = max(2, (d.w / 0.5f + 0.5f).toInt())
+                    val cw = d.w / teeth
+                    val sh = Physics.SPIKE_VISUAL_H * d.dir
+                    for (i in 0 until teeth) batch.draw(spikeCells[i % spikeCells.size], h.cx + i * cw, h.cy - 0.04f * d.dir, cw, sh)
                 }
                 HazardType.SAW -> {
                     if (h.cx - d.w > x1 || h.cx + d.w < x0) continue
-                    val s = d.w * 1.95f
+                    val gs = d.w * 3.1f
+                    batch.setColor(1f, 0.22f, 0.18f, 0.42f + 0.1f * sin(time * 5f + h.cx))
+                    batch.draw(glow, h.cx - gs / 2, h.cy - gs / 2, gs, gs)
+                    batch.setColor(1f, 1f, 1f, 1f)
+                    // çizilen yarıçap (diş uçları) d.w; isabet yarıçapı d.w * SAW_HIT
+                    val s = d.w * 2.08f
                     batch.draw(saw, h.cx - s / 2, h.cy - s / 2, s / 2, s / 2, s, s, 1f, 1f, -sim.time * 400f)
                 }
             }
@@ -382,23 +408,24 @@ class WorldRenderer(
             when (c.kind) {
                 CollectKind.COIN -> {
                     val f = ((time * 10f + c.x * 1.7f).toInt() % 6)
-                    batch.draw(coins[f], dx - 0.33f, dy - 0.33f + bob, 0.66f, 0.66f)
+                    batch.draw(coins[f], dx - 0.39f, dy - 0.39f + bob, 0.78f, 0.78f)
                 }
                 CollectKind.STAR -> {
                     batch.setColor(1f, 0.95f, 0.6f, 0.5f); batch.draw(glow, dx - 0.9f, dy - 0.9f + bob, 1.8f, 1.8f); batch.setColor(1f, 1f, 1f, 1f)
-                    val s = 0.95f + sin(time * 5f) * 0.05f
+                    val s = 1.12f + sin(time * 5f) * 0.06f
                     batch.draw(star, dx - 0.5f * s, dy - 0.5f * s + bob, 0.5f * s, 0.5f * s, s, s, 1f, 1f, sin(time * 2f) * 8f)
                 }
                 CollectKind.PIECE -> {
                     val near = abs(p.x - c.x) < 4f
                     batch.setColor(1f, 1f, 1f, if (finder || near) 1f else 0.3f)
-                    batch.draw(piece, dx - 0.5f, dy - 0.5f + bob, 1f, 1f)
+                    batch.draw(piece, dx - 0.58f, dy - 0.58f + bob, 1.16f, 1.16f)
                     batch.setColor(1f, 1f, 1f, 1f)
                 }
                 CollectKind.POWERUP -> {
                     val icon = a.g("b_" + (c.powerup?.icon ?: "p_shield"))
-                    batch.draw(icon, dx - 0.36f, dy - 0.36f + bob, 0.72f, 0.72f)
-                    batch.draw(bubble, dx - 0.5f, dy - 0.5f + bob, 1f, 1f)
+                    batch.setColor(0.5f, 1f, 0.95f, 0.5f); batch.draw(glow, dx - 1f, dy - 1f + bob, 2f, 2f); batch.setColor(1f, 1f, 1f, 1f)
+                    batch.draw(icon, dx - 0.43f, dy - 0.43f + bob, 0.86f, 0.86f)
+                    batch.draw(bubble, dx - 0.6f, dy - 0.6f + bob, 1.2f, 1.2f)
                 }
             }
         }

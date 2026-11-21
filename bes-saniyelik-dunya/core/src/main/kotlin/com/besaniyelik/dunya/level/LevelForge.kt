@@ -9,8 +9,13 @@ class ForgeReport(
     val attempts: Int,
     val nodes: Int,
     val solveTicks: Int,
+    /** Ölçülen zorluk hedef bandında ve bütün zamanlama pencereleri yeterince geniş mi? */
     val fair: Boolean,
-    val fairShift: Int,
+    val target: Float,
+    val measured: Float,
+    val minWindow: Int,
+    val minHold: Int,
+    val pComplete: FloatArray,
     val coins: Int,
     val note: String,
 )
@@ -18,41 +23,127 @@ class ForgeReport(
 class ForgeResult(val level: LevelData, val report: ForgeReport)
 
 /**
- * Bölüm dökümhanesi: taslağı üretir, katı modda çözer, çözüm yörüngesi üzerine altın/yıldız/parça yerleştirir,
- * ardından normal modda baştan oynatarak (ve zamanlamayı ±tick kaydırarak) doğrular.
+ * Bölüm dökümhanesi. Her aday bölüm için:
+ *  1. taslak üretilir ve katı modda çözücüyle çözülür,
+ *  2. çözüm insanın oynayacağı biçime çevrilir (doğal dokunuşlar, pencere ortası),
+ *  3. yörünge üzerine altın/yıldız/parça yerleştirilir ve baştan oynatılarak doğrulanır,
+ *  4. bölüm "insan gibi" (zamanlama hatalı) oynatılarak zorluğu ÖLÇÜLÜR,
+ *  5. ölçülen zorluk bölümün hedef zorluk bandına düşüyor ve hiçbir zıplama kare hassasiyeti istemiyorsa kabul edilir;
+ *     aksi halde desen yoğunluğu ölçüme göre ayarlanıp yeni aday üretilir.
  */
 object LevelForge {
     class TrajPoint(val x: Float, val y: Float, val grounded: Boolean, val sign: Int, val tick: Int)
 
-    fun forge(levelId: Int, maxAttempts: Int = 24, log: (String) -> Unit = {}): ForgeResult {
-        var fallback: ForgeResult? = null
+    private class Candidate(val result: ForgeResult, val err: Float, val windowsOk: Boolean) {
+        /** Küçük olan daha iyi: pencere ihlali her zaman zorluk sapmasından kötüdür. */
+        val penalty: Float get() = kotlin.math.abs(err) + (if (windowsOk) 0f else 5f)
+    }
+
+    // Üretim süresi dökümü (teşhis)
+    val tSolve = java.util.concurrent.atomic.AtomicLong(); val tNormalize = java.util.concurrent.atomic.AtomicLong()
+    val tCenter = java.util.concurrent.atomic.AtomicLong(); val tMeasure = java.util.concurrent.atomic.AtomicLong()
+
+    /** Kabul bandı: hedefin iki yanında izin verilen ölçülen zorluk sapması. */
+    fun tolerance(target: Float): Float = 0.55f + 0.05f * target
+
+    /** [seedOffset]: deneme tohumlarını kaydırır (aykırı çıkan bir bölümü farklı adaylarla yeniden üretmek için). */
+    fun forge(levelId: Int, maxAttempts: Int = 30, seedOffset: Int = 0, log: (String) -> Unit = {}): ForgeResult {
+        val target = GameContent.targetDifficulty(levelId)
+        val tol = tolerance(target)
+        val needWin = LevelAnalyzer.minWindowFor(target)
+        val needHold = LevelAnalyzer.minHoldFor(target)
+        val kind = GameContent.kindOf(levelId)
+        val nodeCap = if (kind == LevelKind.FINAL || kind == LevelKind.GRAND_FINAL) 350_000 else 160_000
+        var best: Candidate? = null
         var totalNodes = 0
+        var tShift = 0f
+        var unsolved = 0
         for (attempt in 0 until maxAttempts) {
-            val drop = when { attempt >= 16 -> 2; attempt >= 9 -> 1; else -> 0 }
-            val draft = LevelGenerator.generate(levelId, attempt, drop)
-            val res = trySolve(draft.data)
+            // Uzun süredir tam isabet yoksa, pencereleri uygun ve hedefe yeterince yakın en iyi adayla yetin
+            val b0 = best
+            if (attempt >= 14 && b0 != null && b0.windowsOk && kotlin.math.abs(b0.err) <= tol * 1.6f) break
+            val draft = LevelGenerator.generate(levelId, attempt + seedOffset, tShift)
+            val ts = System.nanoTime()
+            val res = trySolve(draft.data, nodeCap)
+            tSolve.addAndGet(System.nanoTime() - ts)
             totalNodes += res.nodes
-            if (!res.success) { log("  #$levelId deneme $attempt: çözülemedi (${res.reason})"); continue }
-            val toggles = res.toggles
+            if (!res.success) {
+                log("  #$levelId deneme $attempt: çözülemedi (${res.reason})")
+                if (++unsolved % 2 == 0) tShift = (tShift - 0.05f).coerceAtLeast(-0.6f)
+                continue
+            }
+            // çözümü insanın oynayacağı biçime çevir: doğal dokunuşlar + pencere ortası
+            var t0 = System.nanoTime()
+            val natural = LevelAnalyzer.normalize(draft.data, res.toggles)
+            tNormalize.addAndGet(System.nanoTime() - t0); t0 = System.nanoTime()
+            val toggles = LevelAnalyzer.center(draft.data, natural)
+            tCenter.addAndGet(System.nanoTime() - t0)
             val traj = trace(draft.data, toggles) ?: run { log("  #$levelId deneme $attempt: tekrar oynatma tutmadı"); null } ?: continue
             val withItems = placeItems(draft, traj, toggles, Random(draft.data.seed + 99))
             if (!verify(withItems, toggles)) { log("  #$levelId deneme $attempt: toplanabilir doğrulaması başarısız"); continue }
-            val kind = withItems.kind
-            val shift = if (kind == LevelKind.NORMAL || kind == LevelKind.TUTORIAL) 2 else 1
-            val fair = isFair(withItems, toggles, shift)
-            val report = ForgeReport(levelId, attempt + 1, totalNodes, res.ticks, fair, shift, withItems.coins.size, if (fair) "ok" else "dar zamanlama")
-            val result = ForgeResult(withItems, report)
-            if (fair) return result
-            log("  #$levelId deneme $attempt: zamanlama penceresi dar (±$shift)")
-            if (fallback == null) fallback = result
+            if (!finishOk(withItems, toggles)) { log("  #$levelId deneme $attempt: bitiş düzlüğü doğrulaması başarısız"); continue }
+            // 3) ölçüm: pencereler yetersizse ya da kaba puan banttan çok uzaksa erken kesilir
+            t0 = System.nanoTime()
+            val m = LevelAnalyzer.measure(withItems, toggles,
+                gate = { w, h -> w >= needWin && h >= needHold },
+                stopEarly = { rough -> kotlin.math.abs(rough - target) > tol + 1.3f })
+            tMeasure.addAndGet(System.nanoTime() - t0)
+            if (m == null) continue
+            val windowsOk = m.minWindow >= needWin && m.minHold >= needHold
+            val err = m.score - target
+            val fair = windowsOk && kotlin.math.abs(err) <= tol
+            val note = when {
+                fair -> "ok"
+                !windowsOk -> "dar pencere (${m.minWindow}/${m.minHold} tick)"
+                err > 0 -> "hedeften zor"
+                else -> "hedeften kolay"
+            }
+            val report = ForgeReport(levelId, attempt + 1, totalNodes, traj.last().tick, fair, target, m.score, m.minWindow, m.minHold, m.pComplete, withItems.coins.size, note)
+            val cand = Candidate(ForgeResult(withItems, report), err, windowsOk)
+            if (best == null || cand.penalty < best.penalty) best = cand
+            if (fair) return cand.result
+            log("  #$levelId deneme $attempt: ölçülen %.1f / hedef %.1f, pencere %d, tutma %d, t%+.2f -> %s".format(m.score, target, m.minWindow, m.minHold, tShift, note))
+            if (!windowsOk) for (jj in 0 until m.jumps) if (m.windows[jj] < needWin || m.holdWindows[jj] < needHold) {
+                val fx = m.jumpX[jj]
+                val f = withItems.features.lastOrNull { it.x <= fx + 0.5f }
+                val ph = withItems.phases.lastOrNull { it.x <= fx }
+                log("    DAR %s / %s w%d h%d dx%.1f".format(f?.p ?: "-", ph?.rules?.joinToString("+") { it.name.take(5) } ?: "-", m.windows[jj], m.holdWindows[jj], fx - (f?.x ?: fx)))
+            }
+            // Desen yoğunluğunu ölçüme göre ayarla: zor/dar çıktıysa azalt, kolay çıktıysa artır
+            val push = if (!windowsOk) -0.05f else (-0.08f * err.coerceIn(-3f, 3f))
+            tShift = (tShift + push).coerceIn(-0.6f, 0.9f)
         }
-        return fallback ?: throw IllegalStateException("Bölüm $levelId üretilemedi")
+        val b = best ?: throw IllegalStateException("Bölüm $levelId üretilemedi")
+        val r = b.result.report
+        return ForgeResult(b.result.level, ForgeReport(levelId, r.attempts, totalNodes, r.solveTicks, false, r.target, r.measured, r.minWindow, r.minHold, r.pComplete, r.coins, r.note))
     }
 
-    fun trySolve(level: LevelData): SolveResult {
+    fun trySolve(level: LevelData, maxNodes: Int = 350_000): SolveResult {
         val sim = Simulation(level, SimConfig(solver = true, powerups = false, strict = true))
         try {
-            return LevelSolver(maxNodes = 350_000).solve(sim)
+            return LevelSolver(maxNodes = maxNodes).solve(sim)
+        } finally { sim.dispose() }
+    }
+
+    /**
+     * Bitiş doğrulaması: çözüm oynatılır, son kural çizgisinden sonra hiçbir tuşa basılmaz. Karakter kapıya Normal
+     * Dünya'da, normal boyda ve yerde varmalıdır.
+     */
+    fun finishOk(level: LevelData, toggles: IntArray): Boolean {
+        val line = level.goalX - Physics.FINISH_LEN
+        val sim = Simulation(level, SimConfig(hearts = 1, powerups = false))
+        try {
+            val track = InputTrack(toggles)
+            while (sim.tick < 60 * 300) {
+                val inp = track.at(sim.tick) && sim.player.x < line
+                sim.step(inp)
+                if (sim.status == SimStatus.COMPLETE) {
+                    val p = sim.player
+                    return sim.effects == RuleEffects.DEFAULT && p.scale == 1f && p.y - p.hh < 0.6f
+                }
+                if (sim.status != SimStatus.RUNNING) return false
+            }
+            return false
         } finally { sim.dispose() }
     }
 
@@ -71,15 +162,6 @@ object LevelForge {
             val ok = LevelSolver.replay(sim, toggles)
             return ok && sim.starsCollected == level.stars.size && (level.piece == null || sim.pieceCollected)
         } finally { sim.dispose() }
-    }
-
-    fun isFair(level: LevelData, toggles: IntArray, shift: Int): Boolean {
-        for (s in intArrayOf(shift, -shift)) {
-            val sim = Simulation(level, SimConfig(hearts = 1, powerups = false))
-            val ok = try { LevelSolver.replay(sim, toggles, s) } finally { sim.dispose() }
-            if (!ok) return false
-        }
-        return true
     }
 
     private class Arc(val pts: List<TrajPoint>) {

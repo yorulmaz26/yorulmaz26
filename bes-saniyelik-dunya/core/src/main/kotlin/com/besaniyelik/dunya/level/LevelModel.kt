@@ -48,6 +48,11 @@ data class SolidDef(
 data class HazardDef(
     val type: HazardType, val x: Float, val y: Float, val w: Float, val dir: Int = 1,
     val ax: Float = 0f, val ay: Float = 0f, val period: Float = 0f, val phase: Float = 0f,
+    /**
+     * true ise salınım küresel zamana değil oyuncunun engele uzaklığına kilitlidir: oyuncu ne zaman gelirse gelsin
+     * engel aynı konumda olur (aksi halde hareketli testere bazı varış anlarında geçilemez oluyordu).
+     */
+    val sync: Boolean = false,
 )
 
 @Serializable
@@ -63,6 +68,10 @@ data class PhaseDef(val x: Float, val rules: List<Mechanic>)
 /** Bölüm içi ipucu tabelası. [waitTap] true ise oyun yavaşlar ve oyuncunun dokunması beklenir (etkileşimli eğitim). */
 @Serializable
 data class HintDef(val x: Float, val text: String, val waitTap: Boolean = false, val icon: String = "")
+
+/** Bölümdeki bir engel deseninin başladığı yer (analiz, rapor ve bölüm şeridi için). */
+@Serializable
+data class FeatureMark(val p: Pattern, val x: Float)
 
 @Serializable
 data class LevelData(
@@ -94,6 +103,7 @@ data class LevelData(
     val solution: List<Int> = emptyList(),
     val solveTicks: Int = 0,
     val seed: Long = 0,
+    val features: List<FeatureMark> = emptyList(),
 )
 
 @Serializable

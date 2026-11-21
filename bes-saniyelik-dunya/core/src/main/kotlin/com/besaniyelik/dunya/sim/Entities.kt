@@ -38,9 +38,12 @@ class HazardEntity(val def: HazardDef, val index: Int) {
     var cy = def.y
     var removed = false
 
-    fun update(time: Float) {
+    fun update(time: Float, playerX: Float) {
         if (def.period > 0f) {
-            val s = sin(TWO_PI * time / def.period + def.phase)
+            // sync: "zaman" oyuncunun engele uzaklığından türetilir (nominal koşu hızında saniye); oyuncu engelin
+            // hizasındayken faz tam def.phase olur.
+            val tau = if (def.sync) (playerX - def.x) / Physics.RUN_SPEED else time
+            val s = sin(TWO_PI * tau / def.period + def.phase)
             cx = def.x + def.ax * s
             cy = def.y + def.ay * s
         }
@@ -50,15 +53,15 @@ class HazardEntity(val def: HazardDef, val index: Int) {
     fun hits(px: Float, py: Float, hw: Float, hh: Float, m: Float = 0.08f): Boolean {
         return when (def.type) {
             HazardType.SPIKE -> {
-                val x0 = cx + 0.1f
-                val x1 = cx + def.w - 0.1f
+                val x0 = cx + 0.08f
+                val x1 = cx + def.w - 0.08f
                 val y0: Float
                 val y1: Float
-                if (def.dir > 0) { y0 = cy; y1 = cy + 0.52f } else { y0 = cy - 0.52f; y1 = cy }
+                if (def.dir > 0) { y0 = cy; y1 = cy + Physics.SPIKE_H } else { y0 = cy - Physics.SPIKE_H; y1 = cy }
                 px - hw + m < x1 && px + hw - m > x0 && py - hh + m < y1 && py + hh - m > y0
             }
             HazardType.SAW -> {
-                val r = def.w * 0.86f
+                val r = def.w * Physics.SAW_HIT
                 val nx = cx.coerceIn(px - hw + m, px + hw - m)
                 val ny = cy.coerceIn(py - hh + m, py + hh - m)
                 val dx = cx - nx

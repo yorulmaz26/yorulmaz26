@@ -37,6 +37,15 @@ object Physics {
     const val GHOST_SOLID = 1.5f
     const val GHOST_WARN = 0.4f
     const val RESPAWN_DELAY = 0.9f
+    /** Diken isabet yüksekliği ve çizim yüksekliği (karo). Dikenler karakterin yarı boyuna yakındır: uzaktan seçilir. */
+    const val SPIKE_H = 0.78f
+    const val SPIKE_VISUAL_H = 0.92f
+    /** Testerenin çizilen yarıçapına göre isabet yarıçapı oranı. */
+    const val SAW_HIT = 0.86f
+    /** Final bölümlerindeki Kaos Duvarı'nın oyuncunun en fazla ne kadar gerisinde kalabildiği (ekranın sol kenarında görünür). */
+    const val CHASER_GAP = 5.5f
+    /** Her bölümün sonundaki, her zaman Normal Dünya olan bitiş düzlüğünün uzunluğu (karo). */
+    const val FINISH_LEN = 12f
 
     /** Kural setinin nominal yatay hızı (dünya-saniyesi başına karo, zaman ölçeği dahil gerçek saniyeye göre). */
     fun realSpeed(e: RuleEffects, speedMul: Float = 1f): Float =

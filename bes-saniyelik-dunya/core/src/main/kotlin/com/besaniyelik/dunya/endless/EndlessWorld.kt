@@ -74,29 +74,21 @@ class EndlessGenerator(
         val needCeil = e.gravitySign < 0 || prevE.gravitySign < 0 || nextE.gravitySign < 0
         if (k == 0) b.ground(1, -12f, 0f)
         if (sign > 0) { if (needCeil) b.ground(-1, x0, x1) } else b.ground(1, x0, x1)
-        val bufIn = if (k == 0) 8f else LevelGenerator.boundaryBuffer(prevE, e, sp)
-        val bufOut = LevelGenerator.boundaryBuffer(e, nextE, sp)
+        val t = difficultyAt(k)
+        val bufIn = if (k == 0) 9f else LevelGenerator.bufferIn(prevE, e, sp, t, speedMul = mul)
+        val bufOut = LevelGenerator.bufferOut(e, sp, mul)
         b.ground(sign, x0, x0 + bufIn)
         b.ground(sign, x1 - bufOut, x1)
-        val t = difficultyAt(k)
         val ctx = PatternCtx(b, rng, e, t, mul)
-        var cx = x0 + bufIn
+        val zx0 = x0 + bufIn
         val zx1 = x1 - bufOut
-        val queue = ArrayList(Patterns.dedicated(e))
         val general = listOf(Pattern.GAP, Pattern.SPIKES, Pattern.STEP, Pattern.FLOATING, Pattern.SAW, Pattern.MOVING_SAW,
             Pattern.MOVING_PLATFORM, Pattern.SPRING_WALL, Pattern.BOOST_GAP, Pattern.OVERHEAD, Pattern.SPIKE_GAP, Pattern.STAIRS)
-        var guard = 0
-        while (cx < zx1 - 4f && guard++ < 10) {
-            val rest = ctx.lerp(3.2f, 1.4f) * ctx.rnd(0.8f, 1.3f)
-            val avail = zx1 - (cx + rest)
-            val p = if (queue.isNotEmpty()) queue.removeAt(0) else general.filter { Patterns.applicable(it, e) && Patterns.minLength(it) <= avail }
+        if (zx1 - zx0 < 4f) b.ground(sign, zx0, zx1)
+        else LevelGenerator.fillPhase(b, ctx, zx0, zx1, Patterns.dedicated(e), { ctx.lerp(3.2f, 1.4f, 1.0f) * ctx.rnd(0.8f, 1.3f) }, 0.6f) { avail, tried ->
+            general.filter { it !in tried && Patterns.applicable(it, e) && Patterns.minLength(it) <= avail && (it != Pattern.BOOST_GAP || avail >= 15f) }
                 .let { if (it.isEmpty()) null else it[rng.nextInt(it.size)] }
-            if (p == null || avail < Patterns.minLength(p)) break
-            b.ground(sign, cx, cx + rest)
-            if (rest > 2.5f && rng.nextFloat() < 0.6f) b.coinLine(sign, cx + 0.5f, cx + rest - 0.5f, 0.5f)
-            cx = Patterns.place(p, ctx, cx + rest, zx1)
         }
-        b.ground(sign, cx, zx1)
         b.finalizeGround()
 
         // Toplanabilirler: desenlerin altın ipuçları, ara sıra yıldız ve güçlendirme

@@ -215,21 +215,32 @@ object GameContent {
 
     fun pieceIndex(levelId: Int): Int = listOf(8, 18, 28, 38, 48).indexOf((levelId - 1) % LEVELS_PER_MAP + 1)
 
-    /** Bölümün zorluğu (1..10). */
-    fun difficulty(levelId: Int): Int {
-        val map = (levelId - 1) / 50
-        val inMap = (levelId - 1) % 50
-        val area = inMap / LEVELS_PER_AREA
+    /**
+     * Sürekli hedef zorluk (1..10), "testere dişi" eğrisi:
+     *  - her harita bir öncekinden 0,68 daha zor bir tabandan başlar ve harita boyunca 1,45 artar; yani yeni haritanın
+     *    ilk bölümleri önceki haritanın sonundan belirgin biçimde kolaydır (yeni tema + nefes alma),
+     *  - her alanın 5 bölümü kendi içinde hafifçe zorlaşır, 5. bölüm (meydan okuma) bir basamak yukarıdadır,
+     *  - yeni mekaniğin tanıtıldığı bölümler kolay, harita finalleri zordur.
+     * Dökümhane (LevelForge) her bölümü üretirken ÖLÇÜLEN zorluğu bu hedefe oturtur.
+     */
+    fun targetDifficulty(levelId: Int): Float {
+        if (levelId >= LEVEL_COUNT) return 9.5f
+        val map = (levelId - 1) / LEVELS_PER_MAP
+        val inMap = (levelId - 1) % LEVELS_PER_MAP
         val inArea = inMap % LEVELS_PER_AREA
-        val base = 1.0 + map * 0.85 + area * 0.11 + inArea * 0.1
-        val bonus = when (kindOf(levelId)) {
-            LevelKind.CHALLENGE -> 1.0
-            LevelKind.FINAL, LevelKind.GRAND_FINAL -> 1.2
-            LevelKind.TUTORIAL -> -0.8
-            LevelKind.NORMAL -> 0.0
+        var d = 1f + map * 0.68f + inMap / (LEVELS_PER_MAP - 1f) * 1.45f
+        d += (inArea - 2) * 0.05f
+        d += when (kindOf(levelId)) {
+            LevelKind.CHALLENGE -> 0.45f
+            LevelKind.FINAL, LevelKind.GRAND_FINAL -> 0.7f
+            LevelKind.TUTORIAL -> -0.5f
+            LevelKind.NORMAL -> 0f
         }
-        return (base + bonus).toInt().coerceIn(1, 10)
+        return d.coerceIn(1f, 9.5f)
     }
+
+    /** Bölümün zorluğu (1..10): hedef zorluğun yuvarlanmış hali (arayüz ve XP için). */
+    fun difficulty(levelId: Int): Int = Math.round(targetDifficulty(levelId)).coerceIn(1, 10)
 
     fun levelName(levelId: Int, rngSeed: Long): String {
         val kind = kindOf(levelId)

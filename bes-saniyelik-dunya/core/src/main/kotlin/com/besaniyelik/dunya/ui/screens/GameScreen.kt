@@ -84,7 +84,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             override fun onCheckpoint(x: Float) { game.audio.play(Sfx.CHECKPOINT); renderer.onCheckpoint(x) }
             override fun onShieldSave() { game.audio.play(Sfx.SHIELD); toast("Kalkan korudu!", "b_p_shield") }
             override fun onDeath(cause: DeathCause) { game.audio.play(Sfx.DEATH); renderer.onDeath(); game.vibrate(60); deathText(cause) }
-            override fun onRespawn() { refreshHearts() }
+            override fun onRespawn() { refreshHearts(); refreshRules(); ruleBanner(sim.activeRules); readyHold(0.8f) }
             override fun onComplete() { game.audio.play(Sfx.COMPLETE); renderer.celebrate(); completeTimer = 1.4f }
             override fun onGameOver() { game.audio.play(Sfx.FAIL); refreshHearts() }
         }
@@ -95,6 +95,24 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             override fun keyDown(keycode: Int): Boolean { if (keycode == Input.Keys.SPACE || keycode == Input.Keys.UP || keycode == Input.Keys.W) { press(true); return true }; return false }
             override fun keyUp(keycode: Int): Boolean { if (keycode == Input.Keys.SPACE || keycode == Input.Keys.UP || keycode == Input.Keys.W) { press(false); return true }; return false }
         })
+    }
+
+    /**
+     * Yeniden doğuşta kısa hazırlık duraklaması: oyuncu karakteri ekranda bulsun. Simülasyon bu sürede ilerlemez
+     * (yeniden doğuş dokunulmazlığı da duraklama bitince saymaya başlar).
+     */
+    private var respawnHold = 0f
+    private var readyLabel: Label? = null
+    private fun readyHold(seconds: Float) {
+        respawnHold = seconds
+        pressed = false
+        acc = 0f
+        readyLabel?.remove()
+        val l = kit.label("Hazır ol!", a.f36o, Color.WHITE)
+        readyLabel = l
+        l.pack(); l.setPosition((stage.width - l.width) / 2, stage.height * 0.6f)
+        l.addAction(Actions.sequence(Actions.delay(seconds * 0.6f), Actions.fadeOut(seconds * 0.4f), Actions.removeActor()))
+        stage.addActor(l)
     }
 
     private fun press(v: Boolean) {
@@ -157,7 +175,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             game.profile.markTutorialSeen("m_" + tut.name)
         } else if (level?.id == 1) {
             val lg = Image(a.ui("logo")); p.add(lg).size(420f, 420f * lg.prefHeight / lg.prefWidth).row()
-            p.add(kit.label("Karakterin kendiliğinden koşar.\nEkrana dokun: zıpla.\nBasılı tut: daha yükseğe zıpla.\nHer 5 saniyede dünyanın kuralları değişir!", a.f28, Palette.INK, wrap = true)).width(520f).padTop(10f).row()
+            p.add(kit.label("Karakterin kendiliğinden koşar.\nEkrana dokun: zıpla.\nBasılı tut: daha yükseğe zıpla.\nİlerledikçe her 5 saniyede dünyanın kuralları değişecek!", a.f28, Palette.INK, wrap = true)).width(520f).padTop(10f).row()
         } else {
             p.add(kit.label(if (endless) "Sonsuz Dünya" else level!!.name, a.f48, Palette.INK, wrap = true)).width(540f).row()
             if (!endless) p.add(kit.stars(d.stars(level!!.id), 54f)).padTop(8f).row()
@@ -196,7 +214,8 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         if (!paused && !finished) {
             // etkileşimli eğitim: ipucunda dokunuş beklenirken ağır çekim
             val slow = waitHint != null
-            if (!slow || frame % 7 == 0) {
+            if (respawnHold > 0f) respawnHold -= dt
+            else if (!slow || frame % 7 == 0) {
                 acc += if (slow) Physics.TICK else dt * timeScale
                 var steps = 0
                 val maxSteps = (5 * timeScale).toInt()
@@ -253,9 +272,11 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         if (sim.activeRules != lastRules) refreshRules()
         if (!endless) progress.value = ((sim.player.x - sim.startX) / (sim.goalX - sim.startX)).coerceIn(0f, 1f)
         else scoreLabel.setText("${score()} puan")
-        val s = sim.secondsToNextRule()
+        // Sayaç bir sonraki GERÇEK kural değişimine kalan süreyi gösterir; bitiş düzlüğünde kapıya kalan süreyi.
+        val toRule = sim.secondsToNextRule()
+        val s = if (toRule.isFinite() || endless) toRule else sim.secondsToGoal()
         if (s.isFinite()) { ruleTime.setText("%.1f".format(s)); ruleBar.value = 1f - sim.phaseProgress() } else { ruleTime.setText("—"); ruleBar.value = 0f }
-        ruleTime.color = if (s < Physics.WARNING_TIME) Palette.SUN else Color.WHITE
+        ruleTime.color = if (toRule < Physics.WARNING_TIME) Palette.SUN else Color.WHITE
         // aktif güçlendirmeler
         val pw = buildString {
             if (sim.shield > 0) append("S"); if (sim.magnet > 0) append("M"); if (sim.doubleJump > 0) append("D"); if (sim.player.invuln > 1.5f) append("I")
@@ -361,7 +382,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
 
     // ------------------------------------------------------------ menüler
     private fun openPauseMenu() {
-        if (finished || !started || paused) return
+        if (finished || !started || paused || sim.status == SimStatus.COMPLETE) return
         paused = true
         pressed = false
         game.audio.pause()
@@ -467,8 +488,9 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             }
             return
         }
-        val lv = level!!
-        game.profile.onLevelResult(LevelResult(lv, false, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, false))
+        // Başarısız deneme, oyuncu bölümden ÇIKARKEN bir kez işlenir ("Devam Et" ile sürdürülürse henüz işlenmez;
+        // aksi halde altınlar, görevler ve istatistikler iki kez sayılıyordu).
+        failCommitted = false
         dialog(resultW, resultH) { p, close ->
             p.add(kit.label("Canların Bitti", a.f48, Palette.INK)).row()
             p.add(Image(a.ui("b_heart_empty"))).size(80f).padTop(6f).row()
@@ -477,15 +499,27 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             val cont = kit.button("Devam Et (+2 can)  $cost", "purple", "b_gem") {
                 if (d.gems >= cost) {
                     d.gems -= cost; game.profile.save(); close()
-                    finished = false; overShown = false; sim.continueAfterGameOver(2); refreshHearts()
+                    finished = false; overShown = false; sim.continueAfterGameOver(2); refreshHearts(); readyHold(1.2f)
                 } else toast("Yeterli elmasın yok.", "b_gem")
             }
             cont.enabled = d.gems >= cost
             p.add(cont).width(520f).height(96f).padTop(12f).row()
-            p.add(kit.button("Tekrar Dene", "yellow", "g_retry") { close(); restart() }).width(520f).height(96f).padTop(8f).row()
-            p.add(kit.button("Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); quit() }).width(520f).height(96f).padTop(8f)
+            p.add(kit.button("Tekrar Dene", "yellow", "g_retry") { close(); commitFail(); restart() }).width(520f).height(96f).padTop(8f).row()
+            p.add(kit.button("Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); commitFail(); quit() }).width(520f).height(96f).padTop(8f)
         }
     }
 
-    override fun dispose() { super.dispose(); sim.dispose() }
+    private var failCommitted = true
+    private fun commitFail() {
+        val lv = level ?: return
+        if (failCommitted) return
+        failCommitted = true
+        game.profile.onLevelResult(LevelResult(lv, false, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, false))
+    }
+
+    override fun dispose() {
+        // oyun bitti ekranı açıkken uygulama kapanır ya da ekran değişirse deneme yine de işlenir
+        if (sim.status == SimStatus.GAME_OVER) commitFail()
+        super.dispose(); sim.dispose()
+    }
 }

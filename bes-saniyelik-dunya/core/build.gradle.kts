@@ -41,10 +41,35 @@ tasks.register<JavaExec>("generateLevels") {
     mainClass.set("com.besaniyelik.dunya.tools.LevelBuildTool")
     jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
     workingDir = rootProject.file("assets")
-    args = listOf(rootProject.file("assets/levels").absolutePath, (project.findProperty("levels") ?: "1-500").toString())
+    args = listOf(rootProject.file("assets/levels").absolutePath, (project.findProperty("levels") ?: "1-500").toString(),
+        (project.findProperty("offset") ?: "0").toString(), (project.findProperty("improve") ?: "0").toString())
     maxHeapSize = "3g"
 }
 
+// Zorluk analizi: her bölümü gürültülü (insan benzeri) girişlerle oynatıp ölçer.
+tasks.register<JavaExec>("analyzeLevels") {
+    group = "content"
+    dependsOn("testClasses")
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("com.besaniyelik.dunya.tools.LevelAnalyzeTool")
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8")
+    workingDir = rootProject.file("assets")
+    args = listOf(rootProject.file("assets").absolutePath, (project.findProperty("levels") ?: "1-500").toString(),
+        (project.findProperty("humanize") ?: "0").toString(), (project.findProperty("out") ?: rootProject.file("docs/difficulty_report.tsv").absolutePath).toString(),
+        (project.findProperty("dump") ?: "-").toString())
+    maxHeapSize = "3g"
+}
+
+tasks.register<JavaExec>("tightSpots") {
+    dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.TightSpots")
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8"); maxHeapSize = "3g"
+    args = listOf(rootProject.file("assets").absolutePath, (project.findProperty("levels") ?: "1-500").toString(), (project.findProperty("out") ?: "/tmp/tight.tsv").toString())
+}
+tasks.register<JavaExec>("probeAttempt") {
+    dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.ProbeAttempt")
+    jvmArgs("-Dstdout.encoding=UTF-8", "-Dstderr.encoding=UTF-8"); maxHeapSize = "3g"
+    args = (project.findProperty("a") ?: "1 GAP /tmp/probe").toString().split(" ")
+}
 tasks.register<JavaExec>("probe2") {
     dependsOn("testClasses"); classpath = sourceSets["test"].runtimeClasspath; mainClass.set("com.besaniyelik.dunya.tools.Probe2"); args = listOf((project.findProperty("lv") ?: "1").toString())
 }

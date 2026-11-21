@@ -33,9 +33,11 @@ class LevelSolver(
 ) {
     fun solve(sim: Simulation, untilX: Float = Float.MAX_VALUE): SolveResult {
         val visited = HashSet<Long>(1 shl 16)
-        class Frame(val snap: SimSnapshot, val input: Boolean, var next: Int)
+        // first: bu düğümde önce denenecek giriş. Normalde mevcut giriş sürdürülür; karakter bir duvara dayanmışsa
+        // önce giriş değiştirilir (çözümler duvar dibinde oyalanmasın).
+        class Frame(val snap: SimSnapshot, val input: Boolean, var next: Int, val first: Boolean)
         val stack = ArrayList<Frame>()
-        stack.add(Frame(sim.snapshot(), false, 0))
+        stack.add(Frame(sim.snapshot(), false, 0, false))
         var nodes = 0
         var bestX = 0f
         while (stack.isNotEmpty()) {
@@ -43,7 +45,7 @@ class LevelSolver(
             if (f.next >= 2) { stack.removeAt(stack.size - 1); continue }
             val choice = f.next++
             // Önce mevcut girişi sürdür, sonra değiştir
-            val input = if (choice == 0) f.input else !f.input
+            val input = if (choice == 0) f.first else !f.first
             sim.restore(f.snap)
             for (i in 0 until decision) {
                 sim.step(input)
@@ -59,7 +61,14 @@ class LevelSolver(
             if (sim.tick > maxTicks) continue
             val k = key(sim, input)
             if (!visited.add(k)) continue
-            stack.add(Frame(sim.snapshot(), input, 0))
+            // Ters Kontrol'de doğal oyun "basılı tut (yerde kal), zıplamak için bırak" biçimindedir: önce basılı tutmak denenir;
+            // böylece çözümler sürekli kendiliğinden zıplayan, zamanlamaya aşırı duyarlı çözümler olmaz.
+            val first = when {
+                sim.effects.reverseControl -> true
+                sim.player.blocked > 0.1f && sim.player.grounded -> !input
+                else -> input
+            }
+            stack.add(Frame(sim.snapshot(), input, 0, first))
         }
         return SolveResult(false, IntArray(0), 0, nodes, "çözüm yok (en iyi x=${"%.1f".format(bestX)})")
     }

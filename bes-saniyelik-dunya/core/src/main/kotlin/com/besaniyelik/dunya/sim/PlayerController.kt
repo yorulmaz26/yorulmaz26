@@ -39,6 +39,8 @@ class PlayerController(private val sim: Simulation) {
     var invuln = 0f
     var crushTicks = 0
     private var lastX = 0f
+    /** Fizik adımından önceki y (gömülme düzeltmesinin yönünü belirlemek için). */
+    private var prevY = 0f
 
     // Animasyon/görsel bilgileri (mantığı etkilemez)
     var airTime = 0f
@@ -47,6 +49,20 @@ class PlayerController(private val sim: Simulation) {
     var safeX = 0f
     var safeY = 0f
     var safeSign = 1
+    // Kurtarma için güvenli konum geçmişi (6 tick'te bir örnek, ~0,8 sn): kurtarılan oyuncu düştüğü kenara değil,
+    // biraz gerisine konur. Yalnızca gerçek oyunda (kalkan/dokunulmazlık) kullanılır; çözücü ve analiz hiç kurtarmaz.
+    private val safeXs = FloatArray(16)
+    private val safeYs = FloatArray(16)
+    private val safeSigns = IntArray(16)
+    private val safePhases = IntArray(16)
+    private var safeN = 0
+    private var safeI = 0
+    private var lastSampleX = Float.NEGATIVE_INFINITY
+
+    private fun resetSafe(x: Float, y: Float, sign: Int) {
+        safeN = 0; safeI = 0; lastSampleX = Float.NEGATIVE_INFINITY
+        safeX = x; safeY = y; safeSign = sign
+    }
 
     fun create(x: Float, y: Float) {
         val bd = BodyDef().apply {
@@ -59,7 +75,7 @@ class PlayerController(private val sim: Simulation) {
         body.gravityScale = 1f
         rebuildFixture()
         lastX = x
-        safeX = x; safeY = y
+        resetSafe(x, y, 1)
     }
 
     private fun rebuildFixture() {
@@ -108,14 +124,26 @@ class PlayerController(private val sim: Simulation) {
         val sign = gravSign
         val nh = Physics.PLAYER_H * target / 2f
         val nw = Physics.PLAYER_W * target / 2f
-        val feet = y - sign * hh
-        val ny = feet + sign * nh
-        val x0 = x - nw; val x1 = x + nw; val y0 = ny - nh; val y1 = ny + nh
-        for (s in sim.solidsNear(x0 - 1, x1 + 1)) {
-            if (!s.active || s.removed) continue
-            if (s.overlaps(x0 + 0.02f, y0 + 0.02f, x1 - 0.02f, y1 - 0.02f)) return
+        val x0 = x - nw; val x1 = x + nw
+        fun free(ny: Float): Boolean {
+            val y0 = ny - nh; val y1 = ny + nh
+            for (s in sim.solidsNear(x0 - 1, x1 + 1)) {
+                if (!s.active || s.removed) continue
+                if (s.overlaps(x0 + 0.02f, y0 + 0.02f, x1 - 0.02f, y1 - 0.02f)) return false
+            }
+            return true
         }
-        applyScale(target)
+        // Önce ayak tarafı sabit kalarak büyü; orası doluysa (ör. küçülme, yer çekimi dönüşüyle aynı anda bittiğinde
+        // karakter hâlâ eski yüzeyde durur) baş tarafı sabit kalarak büyü.
+        val feet = y - sign * hh
+        if (free(feet + sign * nh)) { applyScale(target); return }
+        val head = y + sign * hh
+        val ny2 = head - sign * nh
+        if (free(ny2)) {
+            scale = target
+            body.setTransform(x, ny2, 0f)
+            rebuildFixture()
+        }
     }
 
     private fun checkGround(): SolidEntity? {
@@ -142,7 +170,10 @@ class PlayerController(private val sim: Simulation) {
         val wasGrounded = grounded
         if (jumpLock > 0) { jumpLock--; grounded = false; groundEntity = null } else {
             val g = checkGround()
-            grounded = g != null && vyUp() <= 0.6f
+            // Hız, üstünde durulan platforma GÖRE ölçülür: yükselen (kayan/dikey hareketli) platformda da yerde sayılır,
+            // aksi halde platform yükselirken zıplama girişi boşa giderdi.
+            val gv = if (g != null && g.moving) (g.body?.linearVelocity?.y ?: 0f) * sign else 0f
+            grounded = g != null && vyUp() - gv <= 0.6f
             groundEntity = if (grounded) g else null
         }
         if (grounded && !wasGrounded) {
@@ -152,9 +183,19 @@ class PlayerController(private val sim: Simulation) {
         }
         if (grounded) {
             airTime = 0f
-            coyote = Physics.COYOTE
+            // Çözücü (katı mod) coyote payını kullanmaz: bu pay insana kalır ve çözümler kenardan düşüp son anda
+            // zıplayan türden olmaz.
+            coyote = if (sim.config.strict) 0f else Physics.COYOTE
             val ge = groundEntity
-            if (ge != null && ge.def.type != SolidType.GHOST && !ge.moving && blocked <= 0f) { safeX = x; safeY = y; safeSign = sign }
+            if (ge != null && ge.def.type != SolidType.GHOST && !ge.moving && blocked <= 0f) {
+                safeX = x; safeY = y; safeSign = sign
+                if (x - lastSampleX >= 0.6f) {
+                    lastSampleX = x
+                    safeXs[safeI] = x; safeYs[safeI] = y; safeSigns[safeI] = sign; safePhases[safeI] = sim.phaseIdx
+                    safeI = (safeI + 1) % safeXs.size
+                    if (safeN < safeXs.size) safeN++
+                }
+            }
         } else {
             airTime += Physics.TICK
             coyote -= Physics.TICK
@@ -167,7 +208,7 @@ class PlayerController(private val sim: Simulation) {
         val pressed = input && !prevInput
         var v = body.linearVelocity.y
         if (!e.reverseControl) {
-            if (pressed) buffer = Physics.JUMP_BUFFER
+            if (pressed) buffer = if (sim.config.strict) Physics.TICK * 1.5f else Physics.JUMP_BUFFER
             if (buffer > 0f && (grounded || coyote > 0f)) {
                 v = jump(sign, e); buffer = 0f
             } else if (pressed && !grounded && coyote <= 0f && airJumps > 0) {
@@ -190,14 +231,19 @@ class PlayerController(private val sim: Simulation) {
 
         // Yatay hız
         boost = max(0f, boost - dt)
-        val target = Physics.RUN_SPEED * sim.speedMul * (if (boost > 0f) Physics.BOOST_MUL else 1f) * (if (e.ice) Physics.ICE_SPEED_MUL else 1f)
+        // Hız pedi buzla çarpılmaz (aksi halde hız 2 katını aşıp iki kural boyunca sönmüyordu)
+        val base = Physics.RUN_SPEED * sim.speedMul
+        val cruise = base * (if (e.ice) Physics.ICE_SPEED_MUL else 1f)
+        val target = if (boost > 0f) base * Physics.BOOST_MUL else cruise
         val accel = when {
             boost > 0f -> 30f
             e.ice && grounded -> Physics.ICE_ACCEL
             e.ice -> Physics.ICE_ACCEL * 0.4f
             else -> Physics.NORMAL_ACCEL
         }
-        vxCur = if (vxCur < target) min(target, vxCur + accel * dt) else max(target, vxCur - (if (e.ice) Physics.ICE_ACCEL else Physics.NORMAL_ACCEL) * dt)
+        // Hedefin üstündeyken: buzda yalnızca buz seyir hızına kadarki fark yavaş söner; fazlası (hız pedi) çabuk söner
+        val decel = if (e.ice && vxCur <= cruise + 0.01f) Physics.ICE_ACCEL else if (e.ice) 14f else Physics.NORMAL_ACCEL
+        vxCur = if (vxCur < target) min(target, vxCur + accel * dt) else max(target, vxCur - decel * dt)
         var carry = 0f
         val ge = groundEntity
         if (ge != null && ge.def.type == SolidType.MOVE) carry = ge.body?.linearVelocity?.x ?: 0f
@@ -205,6 +251,7 @@ class PlayerController(private val sim: Simulation) {
         if (v * sign < -Physics.MAX_FALL) v = -Physics.MAX_FALL * sign
         body.setLinearVelocity(vxCur + carry, v)
         lastX = x
+        prevY = y
     }
 
     private fun jump(sign: Int, e: RuleEffects): Float {
@@ -238,6 +285,8 @@ class PlayerController(private val sim: Simulation) {
         } else blocked = max(0f, blocked - Physics.TICK * 2f)
         invuln = max(0f, invuln - Physics.TICK)
         if (blocked > Physics.STUCK_TIME) { sim.kill(DeathCause.STUCK); return }
+        // Çözücü duvar dibinde oyalanan çözümleri kabul etmez (insan beklemez; doğrulama doğal akış üzerinden yapılır)
+        if (sim.config.solver && blocked > 0.3f) { sim.kill(DeathCause.STUCK); return }
         depenetrate()
         // Ezilme: hareketli bir platform oyuncuyu bir katıya birkaç tick boyunca derinlemesine gömerse
         val m = 0.16f * scale + 0.05f
@@ -266,8 +315,13 @@ class PlayerController(private val sim: Simulation) {
             val top = s.y + s.h
             val oy = min(py + hh, top) - max(py - hh, s.y)
             if (oy <= 0.015f) continue
-            if (oy < ox && oy <= 0.45f) {
-                if (py > s.y + s.h / 2f) { py = top + hh; if (vy < 0f) vy = 0f } else { py = s.y - hh; if (vy > 0f) vy = 0f }
+            // Dikey düzeltme yalnızca yüzeye GERÇEKTEN üstten (ya da alttan) gelindiyse yapılır: adımdan önce ayaklar
+            // yüzeyin üstündeydi. Aksi halde (yandan, ayaklar kenarın altındayken) bu bir basamak tırmanması olurdu ve
+            // karakter dar boşlukların üstünden düşmeden koşardı.
+            val fromAbove = py > s.y + s.h / 2f && prevY - hh >= top - 0.03f
+            val fromBelow = py <= s.y + s.h / 2f && prevY + hh <= s.y + 0.03f
+            if (oy < ox && oy <= 0.45f && (fromAbove || fromBelow)) {
+                if (fromAbove) { py = top + hh; if (vy < 0f) vy = 0f } else { py = s.y - hh; if (vy > 0f) vy = 0f }
                 moved = true
             } else if (ox < oy && ox > 0.03f && ox <= 0.3f) {
                 // yandan duvara gömülme: geldiği tarafa it
@@ -278,16 +332,28 @@ class PlayerController(private val sim: Simulation) {
         if (moved) { body.setTransform(px, py, 0f); body.setLinearVelocity(body.linearVelocity.x, vy) }
     }
 
-    /** Kalkan veya dokunulmazlıkla kurtarma: son güvenli zemine taşı. */
-    fun rescue() {
-        body.setTransform(safeX, safeY, 0f)
-        body.setLinearVelocity(vxCur, 0f)
-        invuln = max(invuln, 1.6f)
-        blocked = 0f
-        if (safeSign != gravSign) {
-            // güvenli nokta farklı yer çekimindeydiyse en yakın yüzeye yakın bırak
-            body.setTransform(safeX, if (gravSign > 0) 1.5f else Physics.CEIL - 1.5f, 0f)
+    /**
+     * Kalkan veya dokunulmazlıkla kurtarma: yaklaşık yarım saniye önceki güvenli zemine taşı (düşülen kenarın gerisi).
+     * [extend] yalnızca kalkan kurtarmasında dokunulmazlık verir; dokunulmazlık kurtarması süreyi uzatmaz.
+     */
+    fun rescue(extend: Boolean = true) {
+        var rx = safeX; var ry = safeY; var rs = safeSign
+        // Son güvenli zeminin 2-6 karo gerisinde, AYNI kural aşamasındaki en yeni örnek (yoksa son güvenli nokta)
+        for (k in 1..safeN) {
+            val i = ((safeI - k) % safeXs.size + safeXs.size) % safeXs.size
+            val back = safeX - safeXs[i]
+            if (back > 6f) break
+            if (back >= 2f && safePhases[i] == sim.phaseIdx) { rx = safeXs[i]; ry = safeYs[i]; rs = safeSigns[i]; break }
         }
+        body.setTransform(rx, ry, 0f)
+        body.setLinearVelocity(vxCur, 0f)
+        if (extend) invuln = max(invuln, 1.6f)
+        blocked = 0f
+        if (rs != gravSign) {
+            // güvenli nokta farklı yer çekimindeydiyse en yakın yüzeye yakın bırak
+            body.setTransform(rx, if (gravSign > 0) 1.5f else Physics.CEIL - 1.5f, 0f)
+        }
+        resetSafe(rx, body.position.y, gravSign)
     }
 
     fun restore(s: SimSnapshot, e: RuleEffects) {
@@ -302,5 +368,6 @@ class PlayerController(private val sim: Simulation) {
         jumpLock = s.jumpLock; invuln = s.invuln; crushTicks = 0
         lastX = s.px
         groundEntity = null
+        resetSafe(s.px, s.py, e.gravitySign)
     }
 }

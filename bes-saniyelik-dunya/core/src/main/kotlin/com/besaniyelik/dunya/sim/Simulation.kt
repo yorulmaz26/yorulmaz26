@@ -132,6 +132,9 @@ class Simulation(
 
     val player = PlayerController(this)
     private var checkpointSnap: SimSnapshot? = null
+    private var cpRulesChanged = 0
+    private var cpPhasesPassed = 0
+    private var cpRuleBonus = 0
     var lastCheckpointX = Float.NEGATIVE_INFINITY
 
     // geçici
@@ -156,7 +159,7 @@ class Simulation(
         provider?.ensure(this, startX + 45f)
         player.create(startX, startY)
         applyPhase(0, initial = true)
-        chaserX = startX - 9f
+        chaserX = startX - Physics.CHASER_GAP
         checkpointSnap = snapshot()
     }
 
@@ -246,7 +249,45 @@ class Simulation(
     // ---------------------------------------------------------------- kurallar
 
     val currentPhase: PhaseDef? get() = phases.getOrNull(phaseIdx)
-    val nextPhase: PhaseDef? get() = phases.getOrNull(phaseIdx + 1)
+    /** Kuralları etkin kurallardan gerçekten FARKLI olan bir sonraki aşama (aynı kurallı ardışık aşamalar tek sayılır). */
+    val nextPhase: PhaseDef? get() = phases.getOrNull(nextChangeIdx())
+    /** Etkin kural dizisinin başladığı konum (ilerleme çubuğu için). */
+    var ruleStartX = 0f
+        private set
+    private var nextCacheFor = -2
+    private var nextCacheSize = -1
+    private var nextCache = -1
+
+    private fun rulesOf(i: Int): Set<Mechanic> = RuleCompatibility.resolve(phases[i].rules).toSet()
+
+    private fun nextChangeIdx(): Int {
+        if (nextCacheFor != phaseIdx || nextCacheSize != phases.size) {
+            val cur = activeRules.toSet()
+            var i = phaseIdx + 1
+            while (i < phases.size && rulesOf(i) == cur) i++
+            nextCache = if (i < phases.size) i else -1
+            nextCacheFor = phaseIdx; nextCacheSize = phases.size
+        }
+        return nextCache
+    }
+
+    private fun computeRuleStart() {
+        var i = phaseIdx
+        if (i >= phases.size) { ruleStartX = startX; return }
+        val cur = activeRules.toSet()
+        while (i > 0 && rulesOf(i - 1) == cur) i--
+        ruleStartX = phases.getOrNull(i)?.x ?: startX
+    }
+
+    /** Bölümün sonundaki bitiş düzlüğünde miyiz (artık kural değişmeyecek)? */
+    val inFinish: Boolean get() = level != null && nextPhase == null
+
+    /** Kapıya kalan süre (saniye, mevcut hızla). */
+    fun secondsToGoal(): Float {
+        if (goalX == Float.MAX_VALUE) return Float.POSITIVE_INFINITY
+        val sp = max(0.5f, Physics.realSpeed(effects, speedMul))
+        return max(0f, (goalX - player.x) / sp)
+    }
 
     /** Bir sonraki kural değişimine kalan süre (saniye, mevcut hızla). */
     fun secondsToNextRule(): Float {
@@ -257,9 +298,9 @@ class Simulation(
 
     /** Mevcut aşamanın ilerleme oranı (0..1). */
     fun phaseProgress(): Float {
-        val c = currentPhase ?: return 0f
-        val n = nextPhase ?: return 0f
-        return ((player.x - c.x) / (n.x - c.x)).coerceIn(0f, 1f)
+        val end = nextPhase?.x ?: if (level != null) goalX else return 0f
+        if (end <= ruleStartX) return 0f
+        return ((player.x - ruleStartX) / (end - ruleStartX)).coerceIn(0f, 1f)
     }
 
     private fun applyPhase(idx: Int, initial: Boolean = false) {
@@ -271,12 +312,18 @@ class Simulation(
         effects = RuleEffects.of(activeRules)
         world.gravity = Vector2(0f, -Physics.GRAVITY * effects.gravitySign)
         player.onEffectsChanged(old, effects, initial)
+        // Aynı kurallı ardışık aşamalar (ör. 1-10. bölümlerdeki Normal -> Normal) kural değişimi sayılmaz:
+        // uyarı, ses, titreşim ve sayaç yalnızca kurallar gerçekten değiştiğinde tetiklenir.
+        val changed = activeRules.toSet() != prev.toSet()
+        if (initial || changed) computeRuleStart()
         if (!initial) {
-            rulesChanged++
             phasesPassed++
-            val n = activeRules.count { it != Mechanic.NORMAL }.coerceAtLeast(1)
-            ruleBonus += (25 * n * (1f + phasesPassed * 0.05f)).toInt()
-            listener.onRuleChange(prev, activeRules)
+            if (changed) {
+                rulesChanged++
+                val n = activeRules.count { it != Mechanic.NORMAL }.coerceAtLeast(1)
+                ruleBonus += (25 * n * (1f + phasesPassed * 0.05f)).toInt()
+                listener.onRuleChange(prev, activeRules)
+            }
         }
     }
 
@@ -285,10 +332,10 @@ class Simulation(
         var idx = phaseIdx
         while (idx + 1 < phases.size && px >= phases[idx + 1].x) idx++
         if (idx != phaseIdx) applyPhase(idx)
-        val n = nextPhase
-        if (n != null && warnedPhase != phaseIdx + 1 && secondsToNextRule() <= Physics.WARNING_TIME) {
-            warnedPhase = phaseIdx + 1
-            listener.onRuleWarning(RuleCompatibility.resolve(n.rules))
+        val ni = nextChangeIdx()
+        if (ni >= 0 && warnedPhase != ni && secondsToNextRule() <= Physics.WARNING_TIME) {
+            warnedPhase = ni
+            listener.onRuleWarning(RuleCompatibility.resolve(phases[ni].rules))
         }
     }
 
@@ -296,7 +343,8 @@ class Simulation(
 
     fun step(input: Boolean) {
         when (status) {
-            SimStatus.COMPLETE, SimStatus.GAME_OVER -> return
+            SimStatus.GAME_OVER -> return
+            SimStatus.COMPLETE -> { settleAfterGoal(); return }
             SimStatus.DYING -> {
                 dyingTimer -= Physics.TICK
                 tick++
@@ -360,6 +408,22 @@ class Simulation(
         finder = max(0f, finder - Physics.TICK)
     }
 
+    /**
+     * Kapıdan zıplayarak geçen karakter havada donup kalmasın: bitişten sonra (yalnızca görsel) yere iner.
+     * Bitiş düzlüğü her zaman Normal Dünya ve düz zemindir (y = 0).
+     */
+    private fun settleAfterGoal() {
+        if (level == null || effects.gravitySign < 0) return
+        val b = player.body
+        val floorY = player.hh
+        if (b.position.y <= floorY + 0.001f) { player.grounded = true; return }
+        var vy = b.linearVelocity.y - Physics.GRAVITY * Physics.TICK
+        var ny = b.position.y + vy * Physics.TICK
+        if (ny <= floorY) { ny = floorY; vy = 0f; player.grounded = true }
+        b.setTransform(b.position.x, ny, 0f)
+        b.setLinearVelocity(0f, vy)
+    }
+
     private fun updateGhosts(e: RuleEffects) {
         for (g in ghostSolids) {
             if (g.removed) continue
@@ -392,7 +456,7 @@ class Simulation(
         // Engeller
         for (h in hazardsNear(px - 3f, px + 3f)) {
             if (h.removed) continue
-            h.update(time)
+            h.update(time, px)
             if (h.hits(px, py, hw, hh, if (config.strict) -0.1f else 0.08f)) {
                 kill(if (h.def.type == HazardType.SAW) DeathCause.SAW else DeathCause.SPIKE)
                 if (status != SimStatus.RUNNING || p.invuln > 0f) return
@@ -436,9 +500,13 @@ class Simulation(
         // Kontrol noktaları
         if (!config.solver) {
             for (cp in checkpoints) {
-                if (cp > lastCheckpointX && px >= cp && p.grounded) {
+                // Bayrak, geçildiği anda (havada olsa bile) kaydedilir ve yeniden doğuş her zaman BAYRAĞIN dibinde,
+                // yerde, standart duruşla olur. (Eskiden bayraktan sonraki ilk "yerde" an kaydediliyordu; bu an bir
+                // duvarın dibine denk gelirse sonsuz ölüm döngüsü oluşuyordu.)
+                if (cp > lastCheckpointX && px >= cp) {
                     lastCheckpointX = cp
-                    checkpointSnap = snapshot()
+                    checkpointSnap = flagSnapshot(cp)
+                    cpRulesChanged = rulesChanged; cpPhasesPassed = phasesPassed; cpRuleBonus = ruleBonus
                     listener.onCheckpoint(cp)
                 }
             }
@@ -446,7 +514,7 @@ class Simulation(
         // Kovalayan duvar
         if (chaserEnabled) {
             chaserX += dt * Physics.RUN_SPEED * 0.9f * (if (effects.ice) 1.15f else 1f) * speedMul
-            chaserX = max(chaserX, px - 12f)
+            chaserX = max(chaserX, px - Physics.CHASER_GAP)
             if (px - hw < chaserX + 0.3f) { kill(DeathCause.CHASER); return }
         }
         // Bitiş
@@ -492,10 +560,11 @@ class Simulation(
         if (config.solver) { failed = true; deathCause = cause; status = SimStatus.DYING; dyingTimer = 1e9f; return }
         val hazardCause = cause == DeathCause.SPIKE || cause == DeathCause.SAW
         if (player.invuln > 0f && hazardCause) return
-        if (player.invuln > 0f && cause == DeathCause.FALL) { player.rescue(); return }
+        // Dokunulmazlık boşluktan bir kez kurtarır ama süreyi uzatmaz (aksi halde sonsuz kurtarma döngüsü olur)
+        if (player.invuln > 0f && cause == DeathCause.FALL) { player.rescue(extend = false); return }
         if (shield > 0 && cause != DeathCause.CHASER) {
             shield--
-            player.rescue()
+            player.rescue(extend = true)
             listener.onShieldSave()
             return
         }
@@ -513,17 +582,43 @@ class Simulation(
             listener.onGameOver()
             return
         }
-        respawn()
+        if (provider != null) reviveInPlace() else respawn()
+    }
+
+    /** Sonsuz Dünya'da kontrol noktası yoktur: ekstra can, koşuyu geri sarmadan son güvenli zeminde diriltir. */
+    private fun reviveInPlace() {
+        player.rescue(extend = true)
+        player.prevInput = true
+        player.buffer = 0f
+        status = SimStatus.RUNNING
+        deathCause = null
+        listener.onRespawn()
+    }
+
+    /** Bayrağın dibinde, etkin yüzeyde, standart duruşla anlık görüntü (bayraklar her zaman düz tampon zeminindedir). */
+    private fun flagSnapshot(cp: Float): SimSnapshot {
+        val s = snapshot()
+        val hh = Physics.PLAYER_H * effects.sizeScale / 2f
+        val py = if (effects.gravitySign > 0) hh + 0.01f else Physics.CEIL - hh - 0.01f
+        val v = Physics.RUN_SPEED * speedMul
+        return SimSnapshot(
+            s.tick, s.time, s.shiftClock, s.shiftAmp, s.phaseIdx, s.warnedPhase, s.chaserX,
+            cp, py, v, 0f, effects.sizeScale, true, Physics.COYOTE, 0f, true, false,
+            0f, 0, 0f, 0f, v, 0, 0f, s.inactiveGhosts, s.distance, s.speedMul,
+        )
     }
 
     /** Son kontrol noktasından devam (oyun bitti ekranından "devam et" için de kullanılır). */
     fun respawn() {
         val snap = checkpointSnap ?: return
         restore(snap)
+        // geri sarılan kural değişimleri yeniden sayılmasın
+        rulesChanged = cpRulesChanged; phasesPassed = cpPhasesPassed; ruleBonus = cpRuleBonus
+        player.blocked = 0f
         player.invuln = max(player.invuln, 1.2f)
         player.prevInput = true
         player.buffer = 0f
-        if (chaserEnabled) chaserX = player.x - 9f
+        if (chaserEnabled) chaserX = player.x - Physics.CHASER_GAP
         status = SimStatus.RUNNING
         deathCause = null
         listener.onRespawn()
@@ -569,6 +664,8 @@ class Simulation(
             m.body?.setLinearVelocity(0f, 0f)
         }
         player.restore(s, effects)
+        nextCacheFor = -2
+        computeRuleStart()
         status = SimStatus.RUNNING
         failed = false
     }

@@ -17,9 +17,11 @@ Her 5 saniyede kuralların değiştiği, renkli bir **yatay** (landscape) Androi
 ```bash
 echo "sdk.dir=/ANDROID/SDK/YOLU" > local.properties
 ./gradlew :android:assembleRelease :android:bundleRelease   # APK + AAB
-./gradlew :core:test                                        # 39 test (500 bölüm doğrulaması dahil)
+./gradlew :core:test                                        # birim + entegrasyon testleri (500 bölüm doğrulaması dahil)
 ./gradlew :desktop:run                                      # masaüstünde oyna (assets klasöründen)
-./gradlew :core:generateLevels                              # 500 bölümü yeniden üret ve doğrula
+./gradlew :core:generateLevels                              # 500 bölümü yeniden üret, ölç ve hedef zorluğa oturt (~30 dk)
+./gradlew :core:analyzeLevels                               # 500 bölümü "insan gibi" oynatıp ölç -> docs/difficulty_report.tsv
+python3 tools/level_strip.py assets <dump> <çıktı>          # her bölümün şerit görseli (analyzeLevels -Pdump=<dump> ile)
 python3 tools/art/gen_art.py assets android/res             # grafikleri yeniden üret
 python3 tools/audio/gen_audio.py assets                     # sesleri yeniden üret (ffmpeg gerekir)
 ```

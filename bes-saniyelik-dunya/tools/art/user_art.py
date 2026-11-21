@@ -522,6 +522,63 @@ def obj(name, max_side):
     return im
 
 
+def outline(im, px, color=(46, 26, 58)):
+    """Nesnenin çevresine koyu kontur ekler: açık renkli, ayrıntılı arka planlarda seçilsin."""
+    a = im.getchannel('A')
+    d = a.filter(ImageFilter.MaxFilter(px * 2 + 1)).filter(ImageFilter.GaussianBlur(0.8))
+    out = Image.new('RGBA', im.size, color + (0,))
+    out.putalpha(d)
+    out.alpha_composite(im)
+    return out
+
+
+def recolor_danger(im):
+    """Soluk camgöbeği/mavi tonları canlı kırmızıya çevirir (gri metal ve sıcak renkler korunur): tehlike kırmızıdır."""
+    a = np.asarray(im).astype(np.float32) / 255
+    r, g, b = a[..., 0], a[..., 1], a[..., 2]
+    mx = a[..., :3].max(axis=2); mn = a[..., :3].min(axis=2)
+    sat = np.where(mx > 0, (mx - mn) / np.maximum(mx, 1e-6), 0)
+    k = np.clip((sat - 0.12) / 0.25, 0, 1) * ((b > r + 0.04) & (sat > 0.12))
+    v = mx
+    nr = np.clip(v * 1.05 + 0.10, 0, 1)
+    ng = np.clip(v * 0.42 - 0.02, 0, 1) * (0.55 + 0.45 * (1 - sat))
+    nb = np.clip(v * 0.40, 0, 1) * (0.6 + 0.4 * (1 - sat))
+    out = a.copy()
+    out[..., 0] = r * (1 - k) + nr * k; out[..., 1] = g * (1 - k) + ng * k; out[..., 2] = b * (1 - k) + nb * k
+    return Image.fromarray((np.clip(out, 0, 1) * 255).astype(np.uint8), 'RGBA')
+
+
+def spike_sheet(cell_w=96):
+    """Diken görselini 5 eşit diş hücresine böler (oyunda diş diş, iri çizilir), kırmızıya çevirir ve konturlar."""
+    im = obj('spike.png', 512)
+    if im is None: return None
+    a = np.asarray(im)[..., 3]
+    h = im.height
+    top = (a[:int(h * 0.55)] > 60).sum(axis=0)
+    cols = np.where(top > 0)[0]
+    x0, x1 = int(cols[0]), int(cols[-1]) + 1
+    p = (x1 - x0) / 5.0
+    ch = int(h * cell_w / p)
+    sheet = Image.new('RGBA', (cell_w * 5, ch), (0, 0, 0, 0))
+    for i in range(5):
+        c = im.crop((int(round(x0 + i * p)), 0, int(round(x0 + (i + 1) * p)), h)).resize((cell_w, ch), Image.LANCZOS)
+        sheet.alpha_composite(c, (i * cell_w, 0))
+    return outline(recolor_danger(sheet), 3)
+
+
+def hazard(name, max_side, px=4):
+    im = obj(name, max_side)
+    return None if im is None else outline(recolor_danger(im), px)
+
+
+def outlined(name, max_side, px=3):
+    im = obj(name, max_side)
+    if im is None: return None
+    pad = Image.new('RGBA', (im.width + 2 * px + 2, im.height + 2 * px + 2), (0, 0, 0, 0))
+    pad.alpha_composite(im, (px + 1, px + 1))
+    return outline(pad, px)
+
+
 def ui_plain(name, size):
     """Simge/glif: arka planı olduğu gibi, kare boyuta küçültür."""
     if not has(name): return None
