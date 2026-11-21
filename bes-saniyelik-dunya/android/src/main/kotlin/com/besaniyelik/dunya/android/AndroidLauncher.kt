@@ -9,6 +9,7 @@ import com.badlogic.gdx.backends.android.AndroidApplication
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.besaniyelik.dunya.BesSaniyelikDunya
 import com.besaniyelik.dunya.Platform
+import com.besaniyelik.dunya.ads.AdService
 
 class AndroidLauncher : AndroidApplication() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,8 +22,12 @@ class AndroidLauncher : AndroidApplication() {
             numSamples = 0
         }
         val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        // Reklam altyapısı kurulamazsa oyun reklamsız çalışır
+        val adService = try { AndroidAds(this) } catch (t: Throwable) { android.util.Log.w("Reklam", "reklam altyapısı kurulamadı", t); null }
+        androidAds = adService
         val platform = object : Platform {
             override val name = "android"
+            override val ads: AdService get() = adService ?: AdService.NONE
             override fun vibrate(ms: Int) {
                 val v = vibrator ?: return
                 try {
@@ -32,5 +37,14 @@ class AndroidLauncher : AndroidApplication() {
             }
         }
         initialize(BesSaniyelikDunya(platform), config)
+        // onay bilgisi -> (gerekirse) onay formu -> reklamların yüklenmesi; oyunu bekletmez
+        adService?.start()
+    }
+
+    private var androidAds: AndroidAds? = null
+
+    override fun onResume() {
+        super.onResume()
+        androidAds?.onHostResumed()
     }
 }

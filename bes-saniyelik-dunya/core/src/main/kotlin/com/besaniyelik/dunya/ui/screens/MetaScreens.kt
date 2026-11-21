@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Touchable
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
+import com.besaniyelik.dunya.ads.AdDirector
 import com.besaniyelik.dunya.BesSaniyelikDunya
 import com.besaniyelik.dunya.audio.Sfx
 import com.besaniyelik.dunya.level.GameContent
@@ -109,6 +110,19 @@ class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         val d = game.profile.data
         root.add(header("Mağaza")).growX().padTop(20f).row()
         val list = Table()
+        // İsteğe bağlı ödüllü reklam: günde sınırlı sayıda ücretsiz elmas (reklam hazır değilse kart gösterilmez)
+        if (game.ads.gemAdAvailable()) {
+            val free = Table().apply { background = kit.patch("panel_yellow"); pad(14f, 22f, 18f, 22f) }
+            free.add(Image(a.ui("b_gem"))).size(72f).padRight(16f)
+            val txt = Table()
+            txt.add(kit.label("Ücretsiz Elmas", a.f28, Palette.INK, Align.left)).left().row()
+            txt.add(kit.label("Kısa bir reklam izle, ${AdDirector.GEMS_PER_AD} elmas kazan. Bugün kalan: ${game.ads.gemAdsLeft()}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(430f).left()
+            free.add(txt).padRight(16f)
+            free.add(kit.button("Reklam izle: +${AdDirector.GEMS_PER_AD} elmas", "turq", "g_play", a.f28) {
+                watchAd { val g = game.ads.grantGemAd(); if (g > 0) { game.audio.play(Sfx.REWARD); toast("+$g elmas", "b_gem") }; rebuild() }
+            }).width(330f).height(92f)
+            list.add(free).padTop(6f).padBottom(10f).row()
+        }
         list.add(kit.label("Güçlendirmeler", a.f36, Palette.INK)).padTop(6f).row()
         list.add(kit.label("Bölüm başında en fazla 2 tane seçebilirsin. Hepsi oynayarak kazanılır; hiçbir bölüm güçlendirme gerektirmez.", a.f22, Palette.INK_SOFT, wrap = true)).width(620f).row()
         val grid = Table()
@@ -306,6 +320,8 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             rebuild()
         }).width(420f).height(96f).padTop(14f).row()
         side.add(kit.button("Gizlilik Politikası", "white", "g_info", a.f28, Palette.INK) { showPrivacy() }).width(420f).height(88f).padTop(14f).row()
+        // Reklam onayı gereken bölgelerde (ör. AB) oyuncu tercihini buradan değiştirebilir
+        if (game.ads.privacyOptionsRequired) side.add(kit.button("Reklam Tercihleri", "white", "g_info", a.f28, Palette.INK) { game.ads.showPrivacyOptions() }).width(420f).height(88f).padTop(10f).row()
         side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternet gerekmez, ilerlemen cihazında güvenle saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(14f)
         val body = Table()
         body.add(p).width(640f).padRight(24f)
@@ -319,25 +335,33 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             p.top()
             p.add(kit.label("Gizlilik Politikası", a.f48, Palette.INK)).padTop(4f).row()
             val box = Table().top().left()
-            box.add(kit.label(PRIVACY_POLICY_TR, a.f22, Palette.INK, Align.left, wrap = true)).width(resultW - 130f).left()
+            box.add(kit.label(privacyPolicyText(game.ads.childDirected), a.f22, Palette.INK, Align.left, wrap = true)).width(resultW - 130f).left()
             p.add(scroll(box)).width(resultW - 90f).expandY().fillY().padTop(8f).row()
             p.add(kit.button("Tamam", "green", "g_check") { close() }).width(300f).height(92f).padTop(10f)
         }
     }
 }
 
-/** Uygulama içi gizlilik politikası metni; mağaza sayfasına konacak sürümü docs/play_store/gizlilik_politikasi.md dosyasındadır. */
-const val PRIVACY_POLICY_TR = """5 Saniyelik Dünya tamamen çevrimdışı çalışan bir oyundur.
+/**
+ * Uygulama içi gizlilik politikası metni; mağaza sayfasına konacak sürümü docs/play_store/gizlilik_politikasi.md
+ * dosyasındadır. [childAds]: reklamlar çocuklara uygun modda mı isteniyor (ads.properties: audience).
+ */
+fun privacyPolicyText(childAds: Boolean): String = """5 Saniyelik Dünya çevrimdışı da oynanabilen bir oyundur. Oyunun kendisi sizden hiçbir kişisel bilgi istemez; hesap açmanız gerekmez.
 
-TOPLANAN VERİ: Yok. Oyun adınızı, e-posta adresinizi, konumunuzu, rehberinizi, reklam kimliğinizi veya cihaz bilgilerinizi toplamaz; hiçbir sunucuya veri göndermez ve internet izni istemez.
+REKLAMLAR: Oyunda Google AdMob reklamları gösterilir. Reklamı göstermek, ölçmek ve dolandırıcılığı önlemek için Google'ın reklam kitaplığı şu verileri otomatik olarak toplar ve Google ile paylaşır: IP adresi (yaklaşık konumu tahmin etmek için kullanılabilir), uygulama içi etkileşimler (uygulamanın açılması, dokunuşlar, reklam izlemeleri), tanılama bilgileri (açılış süresi, pil kullanımı gibi) ve cihaz kimlikleri. Google'ın bu verileri nasıl kullandığı: policies.google.com/technologies/partner-sites
 
-REKLAM VE SATIN ALMA: Oyunda reklam, gerçek parayla satın alma, analiz ya da izleme aracı yoktur. Mağazadaki altın ve elmaslar yalnızca oynayarak kazanılır.
+${if (childAds) "Bu sürümde reklamlar çocuklara uygun modda istenir: kişiselleştirilmez, cihazın reklam kimliği kullanılmaz ve yalnızca genel izleyiciye uygun reklamlar gösterilir."
+else "Onayınıza bağlı olarak reklamlar ilgi alanlarınıza göre kişiselleştirilebilir ve cihazınızın reklam kimliği kullanılabilir. Reklam kimliğini cihazınızın Ayarlar > Gizlilik > Reklamlar bölümünden sıfırlayabilir ya da silebilirsiniz. Onay gereken ülkelerde tercihinizi Ayarlar ekranındaki Reklam Tercihleri düğmesinden değiştirebilirsiniz."}
+
+ÖDÜLLÜ REKLAMLAR isteğe bağlıdır: yalnızca siz üzerinde "Reklam izle" yazan bir düğmeye bastığınızda gösterilir.
+
+SATIN ALMA: Gerçek parayla satın alma yoktur. Altın ve elmaslar oynayarak ya da isteğe bağlı reklam izleyerek kazanılır.
 
 KAYIT DOSYASI: İlerlemeniz (açılan bölümler, yıldızlar, ayarlar) yalnızca cihazınızda saklanır. Cihazınızda Android yedeklemesi açıksa bu dosya kendi Google hesabınızın yedeğine dahil edilebilir; geliştirici bu yedeğe erişemez. Kaydı Ayarlar ekranındaki İlerlemeyi Sıfırla düğmesiyle ya da uygulamayı kaldırarak silebilirsiniz.
 
-İZİNLER: Yalnızca titreşim. Ayarlar ekranından kapatılabilir.
+İZİNLER: Titreşim (Ayarlar ekranından kapatılabilir); reklamlar için internet erişimi ve ağ durumu.
 
-ÇOCUKLAR: Oyun hiç kimseden kişisel veri toplamadığı için çocuklardan da veri toplamaz.
+ÇOCUKLAR: Oyun çocuklardan bilerek kişisel bilgi istemez.
 
 DEĞİŞİKLİKLER: Bu politika değişirse güncel metin bu ekranda ve mağaza sayfasındaki bağlantıda yayımlanır.
 
@@ -372,8 +396,18 @@ class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean
                 rebuild()
             }).width(460f).height(130f).padTop(24f).row()
         } else {
-            root.add(kit.label("Bugünkü ödülünü aldın. Yarın yine gel!", a.f28, Palette.INK)).padTop(24f).row()
-            root.add(kit.button("Devam", "yellow", "g_next") { onBack() }).width(360f).height(110f).padTop(16f)
+            root.add(kit.label("Bugünkü ödülünü aldın. Yarın yine gel!", a.f28, Palette.INK)).padTop(8f).row()
+            val row = Table()
+            // İsteğe bağlı ödüllü reklam: bugünkü ödülü bir kez daha verir (günde bir kez); ödül düğmenin üstünde açıkça yazar
+            val canDouble = game.ads.loginDoubleAvailable()
+            if (canDouble) {
+                root.add(kit.label("Reklamı izlersen bugünkü ödülü bir kez daha alırsın: ${game.ads.todaysLoginReward().describe()}", a.f22, Palette.INK)).padTop(2f).row()
+                row.add(kit.button("Reklam izle: ödülü tekrar al", "turq", "g_play", a.f28) {
+                    watchAd { game.ads.grantLoginDouble()?.let { r -> game.audio.play(Sfx.REWARD); toast("Kazandın: ${r.describe()}", "b_gift") }; rebuild() }
+                }).width(500f).height(92f).pad(6f)
+            }
+            row.add(kit.button("Devam", "yellow", "g_next") { onBack() }).width(320f).height(92f).pad(6f)
+            root.add(row).padTop(2f).row()
         }
     }
     override fun onBack() { game.go(MainMenuScreen(game)) }

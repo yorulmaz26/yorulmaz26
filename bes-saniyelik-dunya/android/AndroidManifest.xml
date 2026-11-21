@@ -13,6 +13,10 @@
         android:appCategory="game"
         android:enableOnBackInvokedCallback="false"
         android:theme="@style/GdxTheme">
+        <!-- AdMob uygulama kimliği: ads.properties dosyasındaki admobAppId (yoksa Google'ın deneme kimliği) -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
         <activity
             android:name="com.besaniyelik.dunya.android.AndroidLauncher"
             android:exported="true"

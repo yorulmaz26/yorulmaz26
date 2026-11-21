@@ -71,6 +71,19 @@ data class Settings(
     var reducedEffects: Boolean = false,
 )
 
+/** Reklam sayaçları: günlük sınırlar ve toplamlar (reklam sıklığı kararları AdDirector'dadır). */
+@Serializable
+data class AdState(
+    /** Günlük sayaçların ait olduğu gün. */
+    var day: Long = -1,
+    /** Bugün "reklam izle, elmas kazan" kaç kez kullanıldı. */
+    var gemAdsToday: Int = 0,
+    /** Giriş ödülünün reklamla ikiye katlandığı son gün. */
+    var loginDoubledDay: Long = -1,
+    var rewardedTotal: Long = 0,
+    var interstitialTotal: Long = 0,
+)
+
 @Serializable
 data class EndlessRecord(
     val score: Int,
@@ -105,6 +118,7 @@ data class SaveData(
     var settings: Settings = Settings(),
     var seenTutorials: MutableSet<String> = mutableSetOf(),
     var levelRewardsClaimed: Int = 1,
+    var ads: AdState = AdState(),
 ) {
     val totalStars get() = levels.values.sumOf { it.stars }
     fun stars(id: Int) = levels[id]?.stars ?: 0

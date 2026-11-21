@@ -32,6 +32,8 @@ class BesSaniyelikDunya(val platform: Platform = Platform.NONE) : Game() {
     lateinit var audio: AudioManager
     lateinit var profile: ProfileService
     lateinit var kit: UiKit
+    /** Reklam yöneticisi: ne zaman reklam gösterileceğine ve günlük sınırlara karar verir. */
+    lateinit var ads: com.besaniyelik.dunya.ads.AdDirector
     lateinit var batch: SpriteBatch
     private var pending: BaseScreen? = null
 
@@ -42,6 +44,7 @@ class BesSaniyelikDunya(val platform: Platform = Platform.NONE) : Game() {
         batch = SpriteBatch(4000)
         assets = Assets()
         profile = ProfileService(SaveManager(GdxSaveStorage()))
+        ads = com.besaniyelik.dunya.ads.AdDirector(platform.ads, profile)
         audio = AudioManager { profile.data.settings }
         kit = UiKit(assets, audio)
         setScreen(IntroScreen(this))

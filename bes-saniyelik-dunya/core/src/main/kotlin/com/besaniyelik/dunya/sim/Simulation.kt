@@ -636,7 +636,8 @@ class Simulation(
     fun continueAfterGameOver(extraHearts: Int) {
         if (status != SimStatus.GAME_OVER) return
         hearts = extraHearts
-        respawn()
+        // Sonsuz Dünya'da kontrol noktası yoktur: koşu geri sarılmadan, son güvenli zeminde sürer
+        if (provider != null) reviveInPlace() else respawn()
     }
 
     // ---------------------------------------------------------------- anlık görüntü

@@ -34,3 +34,10 @@ Ayrıntılı sonuçlar: `TEST_REPORT.md`. Mimari: `ARCHITECTURE.md`. Kalan işle
 * Hedef API 36'ya çıkarıldı (SDK Platform 36 kuruldu); Android 16 için geri tuşu ve çentik payı düzenlendi; uygulama içi gizlilik politikası eklendi.
 * Mağaza için hazırlananlar: gizlilik politikası metni (TR/EN), mağaza metinleri (TR/EN), 8 adet 1920×1080 ekran görüntüsü, 32-bit simge, adım adım yayın rehberi (`docs/play_store/`).
 * Geliştiricide kalanlar: yükleme anahtarı, hesap, formlar, gerçek cihaz testi, 12 kişilik 14 günlük kapalı test.
+
+### 21 Kasım — reklam
+
+* Google AdMob eklendi: isteğe bağlı ödüllü reklamlar (canlar bitince +2 can, bölüm sonu ek altın, mağazada elmas, günlük ödül tekrarı, Sonsuz Dünya'da diriliş) ve yalnızca bölüm tamamlanınca, seyrek gösterilen geçiş reklamı. Afiş ve açılış reklamı yok.
+* Güncel politikalar ve kitaplık kullanımı araştırıldı (3 araştırma + doğrulama); geçiş reklamının yeri buna göre "düğmeye basınca" yerine "sonuç ekranından önce" yapıldı; varsayılan kitle modu çocuklara uygun.
+* Kotlin 2.2.21'e, en düşük Android sürümü 7.0'a yükseltildi. Paket deneme reklam kimlikleriyle derleniyor; gerçek kimlikler `ads.properties` dosyasına yazılacak.
+* Gizlilik politikası, mağaza metinleri ve yayın rehberi reklamlı duruma göre güncellendi; `docs/play_store/REKLAM_REHBERI.md` eklendi.

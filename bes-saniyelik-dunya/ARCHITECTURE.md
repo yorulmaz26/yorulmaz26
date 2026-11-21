@@ -92,9 +92,18 @@ Araçlar: `:core:analyzeLevels` (500 bölümü ölçer → `docs/difficulty_repo
 * Dünya `ExtendViewport(21 × 11.8)` (zemin ve tavan aynı anda görünür, oyuncu soldan %28'de), arayüz `ExtendViewport(1280 × 720)` → bütün yatay en-boy oranları desteklenir; menüler iki sütunlu, oyun göstergeleri tek üst satırdadır. Yazı tipleri ekran yoğunluğuna göre FreeType ile keskin üretilir (Türkçe karakterler dahil).
 * "Az efekt" ayarı parçacık sayısını düşürür (düşük segment cihazlar için).
 
+## Reklamlar
+
+Çekirdek oyun yalnızca `ads/Ads.kt` içindeki iki türü bilir:
+
+* `AdService`: platformun reklam altyapısı (ödüllü / geçiş reklamı hazır mı, göster, gizlilik tercihleri). Android'de `AndroidAds` (Google Mobile Ads 25.5.0 + UMP 4.0.0), masaüstünde `AdService.NONE`; deneme için `FakeAds` (`-Dads=fake`).
+* `AdDirector`: reklamın ne zaman gösterileceğine karar verir. Ödüllü reklam yalnızca oyuncu düğmeye basınca (`BaseScreen.watchAd`); geçiş reklamı yalnızca bölüm tamamlanınca, sonuç ekranından önce, sıklık sınırlarıyla (`atBreak`). Günlük sınırlar `SaveData.ads` içinde kalıcıdır.
+
+`AndroidAds`: bütün SDK çağrıları UI iş parçacığında, oyuna dönüşler `Gdx.app.postRunnable` ile ve gösterim başına tam bir kez; onay (UMP) → `canRequestAds()` → SDK başlatma → yükleme; reklam nesneleri tek kullanımlık, 55 dakikada eskir, başarısız yüklemede artan aralıklı sınırlı yeniden deneme; reklam ekrana gelmezse ya da kapanış bildirimi ulaşmazsa oyunu sürdüren güvenlik ağı. Ayarlar kökteki `ads.properties` dosyasından gelir (kimlikler, `audience`, `interstitials`); `audience=child` iken reklam kimliği izinleri `android/manifest-child/` kaplamasıyla paketten çıkarılır.
+
 ## Android paketi
 
-`targetSdk` / `compileSdk` 36 (Android 16), `minSdk` 21, AGP 8.11.1. Tek izin `VIBRATE`. `android:appCategory="game"` yatay kilidin Android 16'da büyük ekranlarda da geçerli kalmasını sağlar; `android:enableOnBackInvokedCallback="false"` Android 16'da geri tuşunun eski yoldan (`KEYCODE_BACK`) oyuna ulaşmasını korur (Google bu seçeneği geçici sayar; kalıcı çözüm libGDX 1.14.1+ sürümüne geçmektir). Oyun tam ekran ve kenardan kenara çizilir; `BaseScreen.applySafeArea` kök tabloyu `Gdx.graphics.safeInset*` kadar içeri alır (masaüstünde `-Dinsets=sol,üst,sağ,alt` ile denenir). İmza: `keystore.properties` varsa yükleme anahtarı, yoksa hata ayıklama anahtarı.
+`targetSdk` / `compileSdk` 36 (Android 16), `minSdk` 24 (reklam kitaplığı gerektiriyor), AGP 8.11.1, Kotlin 2.2.21. İzinler: `VIBRATE` ve reklam kitaplığının ekledikleri (`INTERNET`, `ACCESS_NETWORK_STATE`, reklam ölçümü). `android:appCategory="game"` yatay kilidin Android 16'da büyük ekranlarda da geçerli kalmasını sağlar; `android:enableOnBackInvokedCallback="false"` Android 16'da geri tuşunun eski yoldan (`KEYCODE_BACK`) oyuna ulaşmasını korur (Google bu seçeneği geçici sayar; kalıcı çözüm libGDX 1.14.1+ sürümüne geçmektir). Oyun tam ekran ve kenardan kenara çizilir; `BaseScreen.applySafeArea` kök tabloyu `Gdx.graphics.safeInset*` kadar içeri alır (masaüstünde `-Dinsets=sol,üst,sağ,alt` ile denenir). İmza: `keystore.properties` varsa yükleme anahtarı, yoksa hata ayıklama anahtarı.
 
 ## Açılış animasyonu (Magic Lumos Software)
 

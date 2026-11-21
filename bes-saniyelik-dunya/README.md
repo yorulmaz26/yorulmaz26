@@ -7,10 +7,11 @@ Her 5 saniyede kuralların değiştiği, renkli bir **yatay** (landscape) Androi
 * XP/seviye, yıldızlar, 20 karakter, 9 iz efekti, günlük/haftalık görevler, 50 başarı, gizli koleksiyon, 7 günlük giriş ödülü, mağaza, 8 güçlendirme
 * Açılışta oyuna özel **Magic Lumos Software** logo animasyonu (önizleme: `docs/intro_animasyon.gif`)
 * Yapay zekâ ile üretilmiş görseller (`art_input/`), otomatik temizleme ve atlas hattı (`tools/art/user_art.py`)
-* Tamamen çevrimdışı, Türkçe, açık renkli tasarım; grafikler ve sesler programatik üretildi
+* Çevrimdışı da oynanır; Türkçe, açık renkli tasarım; grafikler ve sesler programatik üretildi
+* Reklam: Google AdMob ile isteğe bağlı ödüllü reklamlar ve yalnızca bölüm tamamlanınca, seyrek gösterilen geçiş reklamı (afiş yok)
 
 ## Hazır dosyalar (`dist/`)
-* `5-saniyelik-dunya-1.0.0.apk` — telefona kurulabilir (release, R8; hata ayıklama anahtarıyla imzalı)
+* `5-saniyelik-dunya-1.0.0.apk` — telefona kurulabilir (release, R8; hata ayıklama anahtarıyla imzalı; **deneme** reklam kimlikleriyle, Android 7.0+)
 * `5-saniyelik-dunya-1.0.0.aab` — Google Play paketi (yüklemeden önce kendi anahtarınızla imzalayın)
 
 ## Derleme
@@ -27,4 +28,6 @@ python3 tools/audio/gen_audio.py assets                     # sesleri yeniden ü
 ```
 Play için imzalama: `keystore.properties.example` dosyasını `keystore.properties` olarak kopyalayıp doldurun.
 
-Belgeler: [ARCHITECTURE.md](ARCHITECTURE.md) · [TEST_REPORT.md](TEST_REPORT.md) · [PROGRESS.md](PROGRESS.md) · [TASKS.md](TASKS.md)
+Reklam: kökteki `ads.properties` dosyasına AdMob kimliklerinizi ve hedef kitleyi (`audience`) yazın; dosya Google'ın deneme kimlikleriyle gelir. Masaüstünde reklam akışlarını sahte reklamla denemek için: `./gradlew :desktop:run -Dads=fake -DtourAds=1 -Dshots=<klasör>`.
+
+Belgeler: [ARCHITECTURE.md](ARCHITECTURE.md) · [TEST_REPORT.md](TEST_REPORT.md) · [PROGRESS.md](PROGRESS.md) · [TASKS.md](TASKS.md) · [Yayın rehberi](docs/play_store/YAYIN_REHBERI.md) · [Reklam rehberi](docs/play_store/REKLAM_REHBERI.md)

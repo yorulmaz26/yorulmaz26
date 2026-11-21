@@ -1,6 +1,6 @@
 # Test Raporu — 5 Saniyelik Dünya 1.0.0
 
-Tarih: 2026-11-21 · Ortam: Linux bulut konteyneri, OpenJDK 21, Gradle 8.14.3, Android SDK 36 (derleme araçları 35.0.0), libGDX 1.13.1.
+Tarih: 2026-11-21 · Ortam: Linux bulut konteyneri, OpenJDK 21, Gradle 8.14.3, Kotlin 2.2.21, Android SDK 36 (derleme araçları 35.0.0), libGDX 1.13.1, Google Mobile Ads 25.5.0.
 Bütün sonuçlar bu ortamda **gerçekten çalıştırılmıştır**.
 
 ## Özet
@@ -28,12 +28,13 @@ Bütün sonuçlar bu ortamda **gerçekten çalıştırılmıştır**.
 | 19 | Menü geçişleri | ✅ | Masaüstü turu: 14 menü ekranı + oyun + sonsuz mod sırayla açıldı, ekran görüntüleri alındı |
 | 20 | Android derleme | ✅ | Debug APK, R8 küçültmeli release APK ve AAB üretildi; APK içeriği (4 ABI için libgdx/box2d/freetype .so, varlıklar) doğrulandı |
 
-**Otomatik birim/entegrasyon testleri: 61/61 geçti** (`./gradlew :core:test`, ~5 dk).
+**Otomatik birim/entegrasyon testleri: 69/69 geçti** (`./gradlew :core:test`, ~5 dk).
 
 | Test sınıfı | Test | Başarısız |
 |---|---|---|
 | SimulationTest | 19 | 0 |
 | LogicFixesTest (denetimde bulunan mantık hatalarının düzeltmeleri) | 15 | 0 |
+| AdsTest (reklam sıklık kuralları, ödüller, günlük sınırlar) | 8 | 0 |
 | LevelsTest | 11 | 0 |
 | ProgressTest | 11 | 0 |
 | AuditTest (görsel ↔ mantık, aşama içeriği, kural çizgileri, kontrol noktaları) | 5 | 0 |
@@ -120,7 +121,29 @@ Geri bildirim: "Bölümlerde mantık hataları var, örneğin kapıya gelince te
 
 Ölçüm bir **modeldir** (zamanlama hatası olan, yolu bilen bir oyuncu); gerçek oyuncuların algı ve öğrenme farklarını içermez. Mutlak yüzdeler değil, bölümler arası sıralama ve zamanlama payları güvenilirdir.
 
+## Reklam entegrasyonu (21 Kasım)
+
+İstek: "Oyuna reklam ekleyeceğim; kullanıcıyı sıkmayacak şekilde reklam geliri kazanmam için gerekli eklemeleri yap."
+
+**Ne eklendi:** Google AdMob (Google Mobile Ads 25.5.0 + UMP 4.0.0). Beş isteğe bağlı ödüllü reklam yerleşimi ve yalnızca bölüm tamamlanınca, sonuç ekranından önce, seyrek gösterilen tek geçiş reklamı; afiş ve açılış reklamı yok. Ayrıntı: `docs/play_store/REKLAM_REHBERI.md`.
+
+**Nasıl doğrulandı:**
+
+| Kontrol | Sonuç |
+|---|---|
+| Reklam kuralları (`AdsTest`, 8 test): geçiş reklamı ilk 10 bölümde, oturumun ilk 2 dakikasında, 3 bölümden ve 3 dakikadan sık, ödüllü reklamdan sonraki 3 dakikada gösterilmez; reklam hazır değilse oyun beklemez; ödül yalnızca reklam tamamlanınca verilir; günlük sınırlar; kayıt | 8/8 |
+| Bütün testler (Kotlin 2.2.21 ile) | 69/69 |
+| Masaüstünde sahte reklamla uçtan uca (`-Dads=fake -DtourAds=1`): mağaza +3 elmas, günlük ödül tekrarı, canlar bitince +2 canla devam (ikinci kez sunulmuyor), bölüm sonu geçiş reklamı ve ek altın, Sonsuz Dünya'da diriliş | 6 reklam gösterimi, hepsi beklenen sonucu verdi |
+| Reklamsız çalışma (masaüstü, reklam hizmeti yok): menüler, 3 bölüm, Sonsuz Dünya | reklam düğmesi çıkmıyor, akış aynı |
+| Android paketi: gerçek kitaplıkla derleme ve R8 küçültmesi; `aapt2`: `minSdk 24`, `targetSdk 36`, AdMob uygulama kimliği; `audience=child` iken reklam kimliği izinleri pakette yok; yeni `.so` yok, 16 KB hizası geçerli | geçti |
+
+**Araştırma:** güncel kitaplık kullanımı, Google Play / AdMob reklam politikaları ve AdMob hesap adımları üç araştırma ve bir doğrulamayla tarandı. Tasarımı değiştiren iki sonuç: geçiş reklamı "Sonraki" düğmesine basınca değil sonuç ekranından önce gösteriliyor (AdMob yerleşim önerisi ve Play'in "beklenmedik reklam" örneği); varsayılan kitle modu çocuklara uygun (kişiselleştirme ve reklam kimliği yok).
+
+**Yapılamayanlar:** reklamın gerçek bir telefonda yüklenmesi, gösterilmesi ve ödülün verilmesi denenemedi (cihaz yok). Reklam kodunun bağımsız incelemesi kullanım sınırı nedeniyle çalışmadı; kendi gözden geçirmemde bir hata bulunup düzeltildi (bölüm sonucu reklamdan sonra kaydediliyordu). Paket deneme reklam kimlikleriyle derlenmiştir.
+
 ## Google Play'e hazırlık denetimi (21 Kasım)
+
+Not: bu denetim reklam eklenmeden önce yapıldı; izinler, en düşük Android sürümü ve reklam durumu için bir üstteki bölüme bakın.
 
 Soru: "Uygulama Play Store'a yüklenmeye hazır mı, sıkıntı çıkar mı?" Paket yerinde denetlendi; güncel kurallar üç bağımsız araştırma ve bir doğrulama adımıyla kaynaklarından kontrol edildi (ayrıntı ve kaynaklar: `docs/play_store/YAYIN_REHBERI.md`).
 

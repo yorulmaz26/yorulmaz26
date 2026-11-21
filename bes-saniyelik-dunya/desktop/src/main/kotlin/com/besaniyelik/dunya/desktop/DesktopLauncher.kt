@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.PixmapIO
 import com.badlogic.gdx.utils.ScreenUtils
 import com.besaniyelik.dunya.BesSaniyelikDunya
+import com.besaniyelik.dunya.Platform
+import com.besaniyelik.dunya.ads.AdService
 import com.besaniyelik.dunya.level.LevelRepository
 import com.besaniyelik.dunya.ui.screens.*
 
@@ -20,13 +22,31 @@ fun main(args: Array<String>) {
         if (shots != null) setWindowedMode(960, 540)
         System.getProperty("win")?.split("x")?.let { setWindowedMode(it[0].toInt(), it[1].toInt()) }
     }
-    val game = BesSaniyelikDunya()
-    if (shots != null) game.debugHook = ScreenshotTour(shots)::step
+    // -Dads=fake : reklam akışlarını masaüstünde denemek için sahte reklam hizmeti (gerçek reklam yalnızca Android'de)
+    val fakeAds = if (System.getProperty("ads") == "fake") FakeAds() else null
+    val game = BesSaniyelikDunya(if (fakeAds != null) object : Platform {
+        override val name = "desktop"
+        override fun vibrate(ms: Int) {}
+        override val ads: AdService get() = fakeAds
+    } else Platform.NONE)
+    if (shots != null) game.debugHook = ScreenshotTour(shots, fakeAds)::step
     Lwjgl3Application(game, config)
 }
 
+/** Masaüstü denemesi için sahte reklam: her zaman "hazır", yarım saniye sonra "izlendi" sonucunu verir ve olayları kaydeder. */
+class FakeAds : AdService {
+    val events = ArrayList<String>()
+    private fun later(f: () -> Unit) { com.badlogic.gdx.utils.Timer.schedule(object : com.badlogic.gdx.utils.Timer.Task() { override fun run() = f() }, 0.5f) }
+    override fun rewardedReady() = true
+    override fun showRewarded(onResult: (Boolean) -> Unit) { events += "ödüllü reklam gösterildi"; later { onResult(true) } }
+    override fun interstitialReady() = true
+    override fun showInterstitial(onClosed: () -> Unit) { events += "geçiş reklamı gösterildi"; later(onClosed) }
+    override fun privacyOptionsRequired() = true
+    override fun showPrivacyOptions() { events += "gizlilik tercihleri açıldı" }
+}
+
 /** Ekranları sırayla açıp görüntü alır; bölümleri kayıtlı çözümle gerçek oyun ekranında baştan sona oynatır. */
-class ScreenshotTour(private val dir: String) {
+class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = null) {
     private sealed class Step {
         class Run(val action: (BesSaniyelikDunya) -> Unit) : Step()
         class Wait(val frames: Int) : Step()
@@ -81,7 +101,75 @@ class ScreenshotTour(private val dir: String) {
             screen("40_endless") { g -> g.go(GameScreen(g, null, 42L, emptyList())) }
             steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(150)); steps.add(Step.Shot("41_endless_run"))
         }
-        steps.add(Step.Run { java.io.File("$dir/tour_log.txt").writeText(log.toString()); Gdx.app.exit() })
+        if (System.getProperty("tourAds") == "1") adScenario()
+        steps.add(Step.Run {
+            fakeAds?.let { log.append("Reklam olayları: ${it.events}\n") }
+            java.io.File("$dir/tour_log.txt").writeText(log.toString()); Gdx.app.exit()
+        })
+    }
+
+    /** Metni içeren düğmeyi bulup gerçek dokunuş olayıyla tıklar (reklam düğmelerini uçtan uca denemek için). */
+    private fun click(game: BesSaniyelikDunya, text: String): Boolean {
+        val stage = (game.screen as? BaseScreen)?.stage ?: return false
+        var hit: com.badlogic.gdx.scenes.scene2d.Actor? = null
+        fun walk(a: com.badlogic.gdx.scenes.scene2d.Actor) {
+            if (a is com.badlogic.gdx.scenes.scene2d.ui.Label && a.text.toString().contains(text) && a.isVisible) hit = a
+            if (a is com.badlogic.gdx.scenes.scene2d.Group) a.children.forEach { walk(it) }
+        }
+        walk(stage.root)
+        val a = hit ?: run { log.append("  (düğme bulunamadı: $text)\n"); return false }
+        val v = a.localToStageCoordinates(com.badlogic.gdx.math.Vector2(a.width / 2f, a.height / 2f))
+        stage.stageToScreenCoordinates(v)
+        val p = Gdx.input.inputProcessor ?: return false
+        p.touchDown(v.x.toInt(), v.y.toInt(), 0, 0); p.touchUp(v.x.toInt(), v.y.toInt(), 0, 0)
+        return true
+    }
+
+    /** Reklam akışları: mağaza, günlük ödül, canlar bitince devam, bölüm sonu 2x altın, Sonsuz Dünya dirilişi. */
+    private fun adScenario() {
+        fun screen(name: String, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(45)); steps.add(Step.Shot(name)) }
+        fun sim(g: BesSaniyelikDunya) = (g.screen as? GameScreen)?.simulation
+        fun note(g: BesSaniyelikDunya, what: String) { val d = g.profile.data; log.append("$what -> altın ${d.coins}, elmas ${d.gems}, can ${sim(g)?.hearts ?: "-"}, durum ${sim(g)?.status ?: "-"}\n") }
+        fun killAll(n: Int) { repeat(n) { steps.add(Step.Run { g -> sim(g)?.kill(com.besaniyelik.dunya.sim.DeathCause.STUCK) }); steps.add(Step.Wait(170)) } }
+        // mağaza: ücretsiz elmas
+        screen("60_reklam_magaza") { it.go(ShopScreen(it)) }
+        steps.add(Step.Run { g -> note(g, "mağaza önce"); click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> note(g, "mağaza sonra") }); steps.add(Step.Shot("61_reklam_magaza_sonra"))
+        // günlük ödül: al, sonra ikiye katla
+        screen("62_gunluk") { it.go(DailyRewardScreen(it)) }
+        steps.add(Step.Run { g -> click(g, "Ödülü Al") }); steps.add(Step.Wait(40)); steps.add(Step.Shot("63_gunluk_katla"))
+        steps.add(Step.Run { g -> note(g, "günlük önce"); click(g, "ödülü tekrar al") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> note(g, "günlük sonra") }); steps.add(Step.Shot("64_gunluk_sonra"))
+        // bölüm: canlar bitince reklamla devam
+        steps.add(Step.Run { g -> g.go(GameScreen(g, LevelRepository.level(12), null, emptyList())) }); steps.add(Step.Wait(60))
+        steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(30))
+        killAll(3); steps.add(Step.Wait(60)); steps.add(Step.Shot("65_canlar_bitti"))
+        steps.add(Step.Run { g -> note(g, "devam önce"); click(g, "Reklam izle: +2 can") }); steps.add(Step.Wait(120))
+        steps.add(Step.Run { g -> note(g, "devam sonra") }); steps.add(Step.Shot("66_devam_edildi"))
+        killAll(2); steps.add(Step.Wait(60)); steps.add(Step.Shot("67_canlar_bitti_ikinci"))
+        steps.add(Step.Run { g -> note(g, "ikinci kez (reklam düğmesi olmamalı)"); if (click(g, "Reklam izle: +2 can")) log.append("  HATA: reklamla devam ikinci kez sunuldu\n") })
+        // bölüm sonu: geçiş reklamı (deneyimli oyuncu, sıklık koşulları sağlanmış) + ek altın
+        steps.add(Step.Run { g ->
+            val fa = fakeAds ?: return@Run
+            for (i in 20..32) g.profile.data.levels[i] = com.besaniyelik.dunya.progress.LevelProgress(completed = true)
+            var skew = 0L
+            g.ads = com.besaniyelik.dunya.ads.AdDirector(fa, g.profile) { System.currentTimeMillis() + skew }
+            skew = 10 * 60_000L // oturumun ilk dakikaları geçmiş say
+            repeat(2) { g.ads.onBreakEarned() }
+            log.append("geçiş reklamı koşulları hazırlandı (şu an gösterilebilir mi: ${g.ads.interstitialDue()})\n")
+        })
+        steps.add(Step.PlayLevel(3, 0))
+        steps.add(Step.Run { g -> note(g, "ek altın önce (kayıtlı tamamlanan bölüm: ${g.profile.data.stats.levelsCompleted})"); click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> note(g, "2x sonra") }); steps.add(Step.Shot("68_iki_kat_altin"))
+        // Sonsuz Dünya: diriliş
+        steps.add(Step.Run { g -> g.go(GameScreen(g, null, 42L, emptyList())) }); steps.add(Step.Wait(60))
+        steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(60))
+        killAll(1); steps.add(Step.Wait(40)); steps.add(Step.Shot("69_sonsuz_dirilis"))
+        steps.add(Step.Run { g -> note(g, "diriliş önce"); click(g, "Reklam izle: devam et") }); steps.add(Step.Wait(120))
+        steps.add(Step.Run { g -> note(g, "diriliş sonra") }); steps.add(Step.Shot("70_sonsuz_devam"))
+        killAll(1); steps.add(Step.Wait(60)); steps.add(Step.Run { g -> note(g, "sonsuz bitti") }); steps.add(Step.Shot("71_sonsuz_sonuc"))
+        // ayarlar: reklam tercihleri düğmesi
+        screen("72_ayarlar_reklam") { it.go(SettingsScreen(it)) }
     }
 
     private fun tap(down: Boolean) {

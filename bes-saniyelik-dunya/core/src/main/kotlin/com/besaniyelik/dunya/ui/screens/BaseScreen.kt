@@ -174,6 +174,21 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         root.pad(t * sy, l * sx, b * sy, r * sx)
     }
 
+    private var adBusy = false
+
+    /**
+     * İsteğe bağlı ödüllü reklam: yalnızca oyuncu, ödülü açıkça yazan bir düğmeye bastığında çağrılır. Aynı anda tek
+     * istek işlenir; reklam tamamlanmazsa ödül verilmez ve oyuncuya bildirilir.
+     */
+    fun watchAd(onEarned: () -> Unit) {
+        if (adBusy) return
+        adBusy = true
+        game.ads.showRewarded(
+            onEarned = { adBusy = false; if (game.screen === this) onEarned() },
+            onSkipped = { adBusy = false; if (game.screen === this) toast("Reklam tamamlanmadı ya da gösterilemedi; ödül verilmedi.") },
+        )
+    }
+
     companion object {
         /** Yalnızca masaüstü denemesi için: [sol, üst, sağ, alt] ekran kesiği (piksel). */
         var debugInsets: IntArray? = null

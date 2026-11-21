@@ -243,7 +243,10 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         renderer.update(if (paused) 0f else dt)
         renderer.render(game.batch)
         updateHud(dt)
-        if (completeTimer > 0f) { completeTimer -= dt; if (completeTimer <= 0f) showComplete() }
+        // Bölüm bitti: kutlama (1,4 sn, giriş yok) -> seyrek ve yalnızca koşullar uygunsa geçiş reklamı -> sonuç ekranı.
+        // Reklam bir düğmeye basılınca değil bu doğal arada gösterilir; sonuç ekranındaki düğmeler her zaman anında çalışır.
+        // Sonuç, reklamdan ÖNCE kaydedilir: reklam sırasında uygulama kapansa da ilerleme kaybolmaz.
+        if (completeTimer > 0f) { completeTimer -= dt; if (completeTimer <= 0f) { commitComplete(); game.ads.onBreakEarned(); game.ads.atBreak { showComplete() } } }
         if (sim.status == SimStatus.GAME_OVER && !overShown) { overShown = true; stage.addAction(Actions.delay(0.6f, Actions.run { showGameOver() })) }
     }
 
@@ -429,11 +432,22 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         if (endless) game.go(EndlessIntroScreen(game)) else game.go(LevelSelectScreen(game, map))
     }
 
+    private var completeResult: ResultSummary? = null
+
+    /** Tamamlanan bölümün sonucunu bir kez işler (kutlama bitince, olası geçiş reklamından önce ya da ekran kapanırken). */
+    private fun commitComplete(): ResultSummary? {
+        completeResult?.let { return it }
+        val lv = level ?: return null
+        if (sim.status != SimStatus.COMPLETE) return null
+        return game.profile.onLevelResult(LevelResult(lv, true, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, sim.pieceCollected))
+            .also { completeResult = it }
+    }
+
     private fun showComplete() {
         if (finished) return
         finished = true
         val lv = level ?: return
-        val res = game.profile.onLevelResult(LevelResult(lv, true, sim.starsCollected, sim.coinValue, sim.coinCount, sim.deaths, sim.tick, jumps, sim.rulesChanged, sim.powerupsUsed, sim.pieceCollected))
+        val res = commitComplete() ?: return
         dialog(resultW, resultH) { p, close ->
             p.top()
             p.add(kit.label("Bölüm Tamamlandı!", a.f48, Palette.INK)).colspan(2).padTop(4f).row()
@@ -470,6 +484,14 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
             p.add(left).width(resultW * 0.46f).top().padTop(6f).expandY().fillY()
             p.add(right).width(resultW * 0.46f).top().padTop(6f).expandY().fillY().row()
             val btns = Table()
+            // İsteğe bağlı ödüllü reklam: bu bölümde toplanan altınları ikiye katlar
+            if (res.coins > 0 && game.ads.rewardedReady) {
+                var dbl: Actor? = null
+                dbl = kit.button("Reklam izle: +${res.coins} altın", "purple", "g_play", a.f28) {
+                    watchAd { game.ads.grantBonusCoins(res.coins); dbl?.isVisible = false; game.audio.play(Sfx.REWARD); toast("+${res.coins} altın", "b_coin") }
+                }
+                btns.add(dbl).width(330f).height(112f).pad(8f)
+            }
             btns.add(kit.iconButton("g_retry", "yellow", 120f, 60f) { close(); restart() }).size(112f).pad(8f)
             btns.add(kit.iconButton("g_home", "white", 120f, 60f) { close(); quit() }).size(112f).pad(8f)
             if (lv.id < 500) btns.add(kit.button("Sonraki", "green", "g_next") { close(); game.go(GameScreen(game, LevelRepository.level(lv.id + 1), null, emptyList())) }).width(260f).height(112f).pad(8f)
@@ -477,9 +499,64 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         }
     }
 
+    /** Reklamla devam bir denemede / koşuda yalnızca bir kez kullanılabilir. */
+    private var adContinueUsed = false
+    private var endlessCommitted = false
+
+    private fun resumeAfterGameOver(hearts: Int) {
+        finished = false; overShown = false
+        sim.continueAfterGameOver(hearts); refreshHearts(); readyHold(1.2f)
+    }
+
     private fun showGameOver() {
         finished = true
         if (endless) {
+            // Koşu başına bir kez: reklam izleyerek kaldığın yerden devam etme seçeneği (isteğe bağlı)
+            if (!adContinueUsed && game.ads.rewardedReady) showEndlessRevive() else showEndlessResult()
+            return
+        }
+        // Başarısız deneme, oyuncu bölümden ÇIKARKEN bir kez işlenir ("Devam Et" ile sürdürülürse henüz işlenmez;
+        // aksi halde altınlar, görevler ve istatistikler iki kez sayılıyordu).
+        failCommitted = false
+        dialog(resultW, resultH) { p, close ->
+            p.add(kit.label("Canların Bitti", a.f48, Palette.INK)).colspan(2).row()
+            p.add(Image(a.ui("b_heart_empty"))).size(80f).padTop(6f).colspan(2).row()
+            p.add(kit.label("Pes etme! Her denemede daha iyi olursun.", a.f28, Palette.INK_SOFT, wrap = true)).width(640f).padTop(6f).colspan(2).row()
+            val conts = Table()
+            // İsteğe bağlı ödüllü reklam: deneme başına bir kez, +2 canla kaldığın kontrol noktasından devam
+            if (!adContinueUsed && game.ads.rewardedReady) {
+                conts.add(kit.button("Reklam izle: +2 can", "turq", "g_play", a.f28) {
+                    watchAd { adContinueUsed = true; close(); resumeAfterGameOver(2) }
+                }).width(430f).height(96f).pad(6f)
+            }
+            val cost = 10
+            val cont = kit.button("Devam Et (+2 can)  $cost", "purple", "b_gem", a.f28) {
+                if (d.gems >= cost) { d.gems -= cost; game.profile.save(); close(); resumeAfterGameOver(2) }
+                else toast("Yeterli elmasın yok.", "b_gem")
+            }
+            cont.enabled = d.gems >= cost
+            conts.add(cont).width(430f).height(96f).pad(6f)
+            p.add(conts).colspan(2).padTop(12f).row()
+            val exits = Table()
+            exits.add(kit.button("Tekrar Dene", "yellow", "g_retry", a.f28) { close(); commitFail(); restart() }).width(430f).height(96f).pad(6f)
+            exits.add(kit.button("Bölümler", "white", "g_home", a.f28, Palette.INK) { close(); commitFail(); quit() }).width(430f).height(96f).pad(6f)
+            p.add(exits).colspan(2)
+        }
+    }
+
+    private fun showEndlessRevive() {
+        dialog { p, close ->
+            p.add(kit.label("Devam etmek ister misin?", a.f48, Palette.INK)).row()
+            p.add(kit.label("Bir reklam izleyerek koşuna kaldığın yerden devam edebilirsin (koşu başına bir kez).", a.f28, Palette.INK_SOFT, wrap = true)).width(560f).padTop(8f).row()
+            p.add(kit.button("Reklam izle: devam et", "turq", "g_play") { watchAd { adContinueUsed = true; close(); resumeAfterGameOver(1) } }).width(520f).height(104f).padTop(16f).row()
+            p.add(kit.button("Hayır, bitir", "white", "g_check", a.f36, Palette.INK) { close(); showEndlessResult() }).width(520f).height(96f).padTop(8f)
+        }
+    }
+
+    private fun showEndlessResult() {
+        if (endlessCommitted) return
+        endlessCommitted = true
+        run {
             val sc = score()
             val res = game.profile.onEndlessResult(EndlessResult(sc, sim.tick / 60f, sim.distance, sim.coinValue, sim.starsCollected, jumps, sim.rulesChanged, sim.powerupsUsed))
             dialog(resultW, resultH) { p, close ->
@@ -501,27 +578,14 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
                 btns.add(kit.button("Menü", "white", "g_home", a.f36, Palette.INK) { close(); game.go(MainMenuScreen(game)) }).width(240f).height(116f).pad(8f)
                 p.add(btns).padTop(16f)
             }
-            return
         }
-        // Başarısız deneme, oyuncu bölümden ÇIKARKEN bir kez işlenir ("Devam Et" ile sürdürülürse henüz işlenmez;
-        // aksi halde altınlar, görevler ve istatistikler iki kez sayılıyordu).
-        failCommitted = false
-        dialog(resultW, resultH) { p, close ->
-            p.add(kit.label("Canların Bitti", a.f48, Palette.INK)).row()
-            p.add(Image(a.ui("b_heart_empty"))).size(80f).padTop(6f).row()
-            p.add(kit.label("Pes etme! Her denemede daha iyi olursun.", a.f28, Palette.INK_SOFT, wrap = true)).width(540f).padTop(6f).row()
-            val cost = 10
-            val cont = kit.button("Devam Et (+2 can)  $cost", "purple", "b_gem") {
-                if (d.gems >= cost) {
-                    d.gems -= cost; game.profile.save(); close()
-                    finished = false; overShown = false; sim.continueAfterGameOver(2); refreshHearts(); readyHold(1.2f)
-                } else toast("Yeterli elmasın yok.", "b_gem")
-            }
-            cont.enabled = d.gems >= cost
-            p.add(cont).width(520f).height(96f).padTop(12f).row()
-            p.add(kit.button("Tekrar Dene", "yellow", "g_retry") { close(); commitFail(); restart() }).width(520f).height(96f).padTop(8f).row()
-            p.add(kit.button("Bölümler", "white", "g_home", a.f36, Palette.INK) { close(); commitFail(); quit() }).width(520f).height(96f).padTop(8f)
-        }
+    }
+
+    /** Diriliş sorusu açıkken ekran kapanırsa koşu yine de kaydedilir. */
+    private fun showEndlessResultSilently() {
+        if (endlessCommitted) return
+        endlessCommitted = true
+        game.profile.onEndlessResult(EndlessResult(score(), sim.tick / 60f, sim.distance, sim.coinValue, sim.starsCollected, jumps, sim.rulesChanged, sim.powerupsUsed))
     }
 
     private var failCommitted = true
@@ -534,7 +598,9 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
 
     override fun dispose() {
         // oyun bitti ekranı açıkken uygulama kapanır ya da ekran değişirse deneme yine de işlenir
-        if (sim.status == SimStatus.GAME_OVER) commitFail()
+        if (sim.status == SimStatus.GAME_OVER) { if (endless) showEndlessResultSilently() else commitFail() }
+        // bölüm bitmiş ama sonuç ekranı henüz açılmamışken (kutlama ya da reklam sırasında) ekran kapanırsa sonuç yine de işlenir
+        if (sim.status == SimStatus.COMPLETE) commitComplete()
         super.dispose(); sim.dispose()
     }
 }

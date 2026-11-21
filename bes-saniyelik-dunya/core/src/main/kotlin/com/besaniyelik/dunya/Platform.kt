@@ -5,6 +5,9 @@ interface Platform {
     val name: String
     fun vibrate(ms: Int)
 
+    /** Reklam altyapısı; reklamsız platformlarda [AdService.NONE]. */
+    val ads: com.besaniyelik.dunya.ads.AdService get() = com.besaniyelik.dunya.ads.AdService.NONE
+
     companion object {
         val NONE = object : Platform {
             override val name = "none"
