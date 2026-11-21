@@ -597,7 +597,7 @@ public class UiFlowTest {
         use.invoke(gs);
         waitPlan(gs);
         idle(50);
-        assertEquals("başlangıca dönen çift dokunuş: iki ücretsiz Geri Al", 2, (int) (Integer) field(gs, "pendingUndoHint"));
+        assertEquals("(1,1) çözüm aynası: bir Geri Al çözüme bir hamle yaklaştırır", 1, (int) (Integer) field(gs, "pendingUndoHint"));
         assertTrue(gs.onRotate(5, 1));
         assertEquals(0, (int) (Integer) field(gs, "pendingUndoHint"));
     }
