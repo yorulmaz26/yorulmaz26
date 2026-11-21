@@ -27,3 +27,10 @@ Ayrıntılı sonuçlar: `TEST_REPORT.md`. Mimari: `ARCHITECTURE.md`. Kalan işle
 * İkinci tur kod incelemesi (simülasyon + üretici/ölçüm): 12 bulgu + oyun ekranında 2 hata düzeltildi. Öne çıkanlar: "Değişen Platformlar"/"Hayalet Dünya" duyurulup nesnesi olmayan aşamalar (172 → 0), kalkan kurtarmasının Kaos Duvarı'nın içine bırakması, kurtarmanın önceki platforma dönmesi, dar hayalet parçaları, ölçüm modelindeki tutma payı ve çift zıplama hataları.
 * Üreticiye "yoğunluk" ayarı eklendi (üst zorluk engel sayısıyla artar, pay 6–7 tick'in altına inmez); hedef eğrisi ölçülebilir düzeye çekildi (harita basamağı 0,62). Sonuç: **500/500 bölüm hedef bandında**, en büyük sapma 0,9 puan.
 * Testler: 61/61.
+
+### 21 Kasım — Google Play'e hazırlık
+
+* Paket ve güncel Play kuralları denetlendi. Yüklemeyi engelleyecek iki şey bulundu: hedef API 35 (artık 36 gerekli) ve hata ayıklama imzası.
+* Hedef API 36'ya çıkarıldı (SDK Platform 36 kuruldu); Android 16 için geri tuşu ve çentik payı düzenlendi; uygulama içi gizlilik politikası eklendi.
+* Mağaza için hazırlananlar: gizlilik politikası metni (TR/EN), mağaza metinleri (TR/EN), 8 adet 1920×1080 ekran görüntüsü, 32-bit simge, adım adım yayın rehberi (`docs/play_store/`).
+* Geliştiricide kalanlar: yükleme anahtarı, hesap, formlar, gerçek cihaz testi, 12 kişilik 14 günlük kapalı test.

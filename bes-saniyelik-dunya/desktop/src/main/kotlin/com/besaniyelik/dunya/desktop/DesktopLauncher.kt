@@ -44,6 +44,8 @@ class ScreenshotTour(private val dir: String) {
 
     init {
         com.besaniyelik.dunya.render.WorldRenderer.debugSkip = System.getProperty("skipLayers") ?: ""
+        // -Dinsets=sol,üst,sağ,alt : çentikli ekranı taklit eder (arayüzün güvenli alana çekildiğini denemek için)
+        System.getProperty("insets")?.split(",")?.map { it.trim().toInt() }?.takeIf { it.size == 4 }?.let { com.besaniyelik.dunya.ui.screens.BaseScreen.debugInsets = it.toIntArray() }
         fun screen(name: String, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(45)); steps.add(Step.Shot(name)) }
         if (System.getProperty("introGif") != null) {
             for (i in 0 until 115) { steps.add(Step.Wait(3)); steps.add(Step.Shot("gif_%03d".format(i))) }
@@ -69,6 +71,7 @@ class ScreenshotTour(private val dir: String) {
             screen("11_collection") { it.go(CollectionScreen(it)) }
             screen("12_profile") { it.go(ProfileScreen(it)) }
             screen("13_settings") { it.go(SettingsScreen(it)) }
+            steps.add(Step.Run { g -> (g.screen as? SettingsScreen)?.showPrivacy() }); steps.add(Step.Wait(30)); steps.add(Step.Shot("13b_privacy"))
             screen("14_daily") { it.go(DailyRewardScreen(it)) }
             screen("15_howto") { it.go(HowToPlayScreen(it)) }
         }

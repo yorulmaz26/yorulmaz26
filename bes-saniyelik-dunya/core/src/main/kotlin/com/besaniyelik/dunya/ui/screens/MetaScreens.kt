@@ -305,13 +305,45 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             if (confirmReset) { game.profile.resetAll(); toast("İlerleme sıfırlandı."); confirmReset = false } else confirmReset = true
             rebuild()
         }).width(420f).height(96f).padTop(14f).row()
-        side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternet gerekmez, ilerlemen cihazında güvenle saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(18f)
+        side.add(kit.button("Gizlilik Politikası", "white", "g_info", a.f28, Palette.INK) { showPrivacy() }).width(420f).height(88f).padTop(14f).row()
+        side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternet gerekmez, ilerlemen cihazında güvenle saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(14f)
         val body = Table()
         body.add(p).width(640f).padRight(24f)
         body.add(side).top()
         root.add(body).expand().center()
     }
+
+    /** Gizlilik politikası uygulamanın içinde de okunabilir (Google Play Kullanıcı Verileri politikası gereği). */
+    fun showPrivacy() {
+        dialog(resultW, resultH) { p, close ->
+            p.top()
+            p.add(kit.label("Gizlilik Politikası", a.f48, Palette.INK)).padTop(4f).row()
+            val box = Table().top().left()
+            box.add(kit.label(PRIVACY_POLICY_TR, a.f22, Palette.INK, Align.left, wrap = true)).width(resultW - 130f).left()
+            p.add(scroll(box)).width(resultW - 90f).expandY().fillY().padTop(8f).row()
+            p.add(kit.button("Tamam", "green", "g_check") { close() }).width(300f).height(92f).padTop(10f)
+        }
+    }
 }
+
+/** Uygulama içi gizlilik politikası metni; mağaza sayfasına konacak sürümü docs/play_store/gizlilik_politikasi.md dosyasındadır. */
+const val PRIVACY_POLICY_TR = """5 Saniyelik Dünya tamamen çevrimdışı çalışan bir oyundur.
+
+TOPLANAN VERİ: Yok. Oyun adınızı, e-posta adresinizi, konumunuzu, rehberinizi, reklam kimliğinizi veya cihaz bilgilerinizi toplamaz; hiçbir sunucuya veri göndermez ve internet izni istemez.
+
+REKLAM VE SATIN ALMA: Oyunda reklam, gerçek parayla satın alma, analiz ya da izleme aracı yoktur. Mağazadaki altın ve elmaslar yalnızca oynayarak kazanılır.
+
+KAYIT DOSYASI: İlerlemeniz (açılan bölümler, yıldızlar, ayarlar) yalnızca cihazınızda saklanır. Cihazınızda Android yedeklemesi açıksa bu dosya kendi Google hesabınızın yedeğine dahil edilebilir; geliştirici bu yedeğe erişemez. Kaydı Ayarlar ekranındaki İlerlemeyi Sıfırla düğmesiyle ya da uygulamayı kaldırarak silebilirsiniz.
+
+İZİNLER: Yalnızca titreşim. Ayarlar ekranından kapatılabilir.
+
+ÇOCUKLAR: Oyun hiç kimseden kişisel veri toplamadığı için çocuklardan da veri toplamaz.
+
+DEĞİŞİKLİKLER: Bu politika değişirse güncel metin bu ekranda ve mağaza sayfasındaki bağlantıda yayımlanır.
+
+İLETİŞİM: Google Play sayfasında yazan geliştirici e-posta adresi.
+
+Son güncelleme: 21 Kasım 2026"""
 
 class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean = false) : BaseScreen(game) {
     override fun build() {

@@ -92,6 +92,10 @@ Araçlar: `:core:analyzeLevels` (500 bölümü ölçer → `docs/difficulty_repo
 * Dünya `ExtendViewport(21 × 11.8)` (zemin ve tavan aynı anda görünür, oyuncu soldan %28'de), arayüz `ExtendViewport(1280 × 720)` → bütün yatay en-boy oranları desteklenir; menüler iki sütunlu, oyun göstergeleri tek üst satırdadır. Yazı tipleri ekran yoğunluğuna göre FreeType ile keskin üretilir (Türkçe karakterler dahil).
 * "Az efekt" ayarı parçacık sayısını düşürür (düşük segment cihazlar için).
 
+## Android paketi
+
+`targetSdk` / `compileSdk` 36 (Android 16), `minSdk` 21, AGP 8.11.1. Tek izin `VIBRATE`. `android:appCategory="game"` yatay kilidin Android 16'da büyük ekranlarda da geçerli kalmasını sağlar; `android:enableOnBackInvokedCallback="false"` Android 16'da geri tuşunun eski yoldan (`KEYCODE_BACK`) oyuna ulaşmasını korur (Google bu seçeneği geçici sayar; kalıcı çözüm libGDX 1.14.1+ sürümüne geçmektir). Oyun tam ekran ve kenardan kenara çizilir; `BaseScreen.applySafeArea` kök tabloyu `Gdx.graphics.safeInset*` kadar içeri alır (masaüstünde `-Dinsets=sol,üst,sağ,alt` ile denenir). İmza: `keystore.properties` varsa yükleme anahtarı, yoksa hata ayıklama anahtarı.
+
 ## Açılış animasyonu (Magic Lumos Software)
 
 `IntroScreen` uygulama açılışında ~7,4 sn oynar (dokununca geçilir). `tools/intro/extract_logo.py` şirket logosunu (`tools/intro/magic_lumos_logo.jpg`) parlaklık anahtarlamasıyla katmanlara ayırır: 10 harf, SOFTWARE'in 10 karakteri, köşeli parantezler, kod işaretleri ve kenarları yumuşatılmış devre çizgileri (`assets/intro/`, konumlar `layout.txt`). Animasyon oyunun diliyle kurgulanmıştır: devre çizgileri merkezden açılır → harfler zıplayarak düşer → oyunun karakteri harflerin üstünde zıplar → "Lumos" ışık patlaması → SOFTWARE ters yer çekimiyle baş aşağı gelip düzelir → ışık süzmesi ve "sunar".

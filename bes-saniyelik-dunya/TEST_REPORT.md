@@ -1,6 +1,6 @@
 # Test Raporu — 5 Saniyelik Dünya 1.0.0
 
-Tarih: 2026-11-21 · Ortam: Linux bulut konteyneri, OpenJDK 21, Gradle 8.14.3, Android SDK 35, libGDX 1.13.1.
+Tarih: 2026-11-21 · Ortam: Linux bulut konteyneri, OpenJDK 21, Gradle 8.14.3, Android SDK 36 (derleme araçları 35.0.0), libGDX 1.13.1.
 Bütün sonuçlar bu ortamda **gerçekten çalıştırılmıştır**.
 
 ## Özet
@@ -120,6 +120,23 @@ Geri bildirim: "Bölümlerde mantık hataları var, örneğin kapıya gelince te
 
 Ölçüm bir **modeldir** (zamanlama hatası olan, yolu bilen bir oyuncu); gerçek oyuncuların algı ve öğrenme farklarını içermez. Mutlak yüzdeler değil, bölümler arası sıralama ve zamanlama payları güvenilirdir.
 
+## Google Play'e hazırlık denetimi (21 Kasım)
+
+Soru: "Uygulama Play Store'a yüklenmeye hazır mı, sıkıntı çıkar mı?" Paket yerinde denetlendi; güncel kurallar üç bağımsız araştırma ve bir doğrulama adımıyla kaynaklarından kontrol edildi (ayrıntı ve kaynaklar: `docs/play_store/YAYIN_REHBERI.md`).
+
+| Bulgu | Önce | Şimdi |
+|---|---|---|
+| Hedef API (31 Ağustos 2026'dan beri yeni uygulamalar API 36 hedeflemeli; uzatma 1 Kasım'da bitti) | `targetSdk 35`: yükleme reddedilirdi | `targetSdk 36`, `compileSdk 36`; `aapt2 dump badging` ile doğrulandı |
+| Android 16'da geri tuşu (API 36 hedefinde KEYCODE_BACK varsayılan olarak gönderilmez) | Geri tuşu oyun menüsü yerine ana ekrana çıkarırdı | `enableOnBackInvokedCallback="false"` ile eski davranış korunuyor |
+| Kenardan kenara çizim / çentik | Üst köşedeki duraklat düğmesi kamera deliğinin altında kalabilirdi | Arayüz ekran kesiği kadar içeri çekiliyor (`BaseScreen.applySafeArea`); masaüstünde `-Dinsets=90,0,0,0` ile denendi |
+| Uygulama içinde gizlilik politikası | Yoktu | Ayarlar > Gizlilik Politikası |
+| Mağaza simgesi | 24-bit PNG | 32-bit, opak PNG |
+| Mağaza ekran görüntüleri | 960×540, eski görseller | 8 adet 1920×1080, güncel oyun (`docs/play_store/ekran_goruntuleri/`) |
+| 16 KB bellek sayfası, 64-bit, AAB, izinler | — | Uyumlu: LOAD hizası 0x4000; yalnızca `VIBRATE`; ağ, reklam, satın alma, analiz yok |
+| İmza | Hata ayıklama anahtarı | **Değişmedi: yükleme anahtarını geliştirici oluşturmalı** |
+
+Son derlemeden sonra: 61/61 test, 10 bölümlük 1920×1080 oyun turu (3, 60, 120, 180, 230, 290, 340, 390, 440, 500) 10/10 `TAMAMLANDI`.
+
 ## Çarpışma kutusu ↔ görsel uyumu ve tam oyun turu (20 Kasım)
 
 Geri bildirim: karakter büyüdüğü için dikenlere görsel olarak sürtüp ölmeden geçiyordu; bazı ödül ekranları büyüktü.
@@ -206,4 +223,6 @@ Masaüstünde (Xvfb + OpenGL) açılıştan oyunun splash ekranına kesintisiz g
 
 * **Gerçek Android cihaz veya emülatör testi yapılamadı**: bu konteynerde cihaz bağlı değil ve `/dev/kvm` yok. APK yapısal olarak doğrulandı (paket adı, etiket, başlatıcı aktivite, 4 ABI yerel kütüphaneleri, varlıklar); küçültme riskini azaltmak için oyun ve libGDX sınıfları R8'de korunuyor. Kurulumdan sonra ilk açılış, dokunma gecikmesi, ses ve 60 FPS performansının gerçek cihazda kontrol edilmesi önerilir.
 * Düşük/orta segment cihaz performans ölçümü yapılamadı (aynı sebep). Masaüstü yazılım GPU'sunda (llvmpipe) oyun akıcı çalıştı.
+* Android 16 davranışları (geri tuşu, kenardan kenara çizim, çentik payı) yalnızca manifest/kod düzeyinde ve masaüstü benzetimiyle doğrulandı; Android 16 cihazında denenmedi.
+* Play Console Yardım sayfaları (support.google.com) bu ortamdan açılamadı; hesap ve form kuralları arama sonucu alıntılarına dayanır (bkz. yayın rehberi, bölüm 5).
 * Release APK/AAB **hata ayıklama anahtarıyla** imzalı: kurulup denenebilir, Play Console'a yüklemek için kendi yükleme anahtarınızla yeniden derlenmeli (`keystore.properties`).

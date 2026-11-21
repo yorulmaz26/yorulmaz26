@@ -13,4 +13,4 @@ dependencies {
     implementation("com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop")
 }
 application { mainClass.set("com.besaniyelik.dunya.desktop.DesktopLauncherKt") }
-tasks.named<JavaExec>("run") { workingDir = rootProject.file("assets"); isIgnoreExitValue = true; listOf("shots", "tourLevels", "tourMenus", "tourEndless", "introGif", "win", "speed", "skipLayers").forEach { k -> System.getProperty(k)?.let { systemProperty(k, it) } } }
+tasks.named<JavaExec>("run") { workingDir = rootProject.file("assets"); isIgnoreExitValue = true; listOf("shots", "tourLevels", "tourMenus", "tourEndless", "introGif", "win", "speed", "skipLayers", "insets").forEach { k -> System.getProperty(k)?.let { systemProperty(k, it) } } }

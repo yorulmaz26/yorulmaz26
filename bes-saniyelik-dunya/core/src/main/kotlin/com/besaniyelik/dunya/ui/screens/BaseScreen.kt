@@ -155,6 +155,28 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     override fun resize(width: Int, height: Int) {
         stage.viewport.update(width, height, true)
         background?.resize(width, height)
+        applySafeArea()
+    }
+
+    /**
+     * Çentikli / kamera delikli ekranlarda arayüz güvenli alana çekilir. Android 15+ oyunu kenardan kenara çizer;
+     * köşedeki duraklat düğmesi ya da sayaçlar çentiğin altında kalmasın diye kök tablo, ekran kesiği kadar içeri alınır.
+     * Kesik olmayan ekranlarda (ve masaüstünde) pay sıfırdır.
+     */
+    private fun applySafeArea() {
+        val g = Gdx.graphics
+        if (g.width <= 0 || g.height <= 0) return
+        val d = debugInsets
+        val l = d?.get(0) ?: g.safeInsetLeft; val t = d?.get(1) ?: g.safeInsetTop
+        val r = d?.get(2) ?: g.safeInsetRight; val b = d?.get(3) ?: g.safeInsetBottom
+        val sx = stage.viewport.worldWidth / g.width
+        val sy = stage.viewport.worldHeight / g.height
+        root.pad(t * sy, l * sx, b * sy, r * sx)
+    }
+
+    companion object {
+        /** Yalnızca masaüstü denemesi için: [sol, üst, sağ, alt] ekran kesiği (piksel). */
+        var debugInsets: IntArray? = null
     }
 
     override fun dispose() { stage.dispose() }
@@ -188,7 +210,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
             add(kit.label(text, if (toastCompact) a.f22 else a.f28, Palette.INK, wrap = true)).width(if (toastCompact) 240f else 460f)
         }
         t.pack()
-        if (toastCompact) t.setPosition(24f, stage.height - 118f - t.height - toastY)
+        if (toastCompact) t.setPosition(24f + root.padLeft, stage.height - 118f - root.padTop - t.height - toastY)
         else t.setPosition((stage.width - t.width) / 2, stage.height - 150f - toastY)
         toastY += t.height + 10f
         t.color.a = 0f

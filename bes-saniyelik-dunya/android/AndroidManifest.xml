@@ -11,6 +11,7 @@
         android:label="@string/app_name"
         android:isGame="true"
         android:appCategory="game"
+        android:enableOnBackInvokedCallback="false"
         android:theme="@style/GdxTheme">
         <activity
             android:name="com.besaniyelik.dunya.android.AndroidLauncher"
