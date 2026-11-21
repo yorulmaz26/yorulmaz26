@@ -138,4 +138,60 @@ public class GameSessionTest {
         assertFalse("kalan 1 hak, en az " + pl.remaining + " gerekir", pl.feasible);
         assertTrue(Economy.continueMoves(pl.remaining) >= pl.remaining);
     }
+
+    /** Denetim 2: eşit uzaklıkta derin geri alma seçilir; aynı hak, daha az toplam hamle (yıldız kaybı yok). */
+    @Test public void planTieBreakPrefersDeeperUndo() throws Exception {
+        Level l = TestUtil.pack().get(120);
+        GameSession g = new GameSession(l, true);
+        Move probe = null;
+        for (Move m : g.board().legalMoves()) if (m.kind == Move.ROTATE) { probe = m; break; }
+        assertTrue(g.play(probe));
+        assertTrue(g.play(probe)); // başlangıca döndü
+        GameSession.Plan pl = g.plan(500_000);
+        assertEquals(2, pl.undos);
+        assertEquals(l.optimal, pl.remaining);
+        assertTrue(g.undo()); assertTrue(g.undo());
+        int guard = 0;
+        while (!g.isSolved() && guard++ < 60) { GameSession.Plan p = g.plan(500_000); assertEquals(0, p.undos); assertTrue(g.play(p.move)); }
+        assertEquals(3, g.stars());
+    }
+
+    /** Plan canlı tahtayı değiştirmez (arka plan iş parçacığında çalışır) ve kaba kuvvetle aynı sonucu verir. */
+    @Test public void planMatchesBruteForceAndKeepsBoard() throws Exception {
+        java.util.Random r = new java.util.Random(5);
+        for (int id : new int[]{12, 45, 79, 120, 238, 300, 375, 491}) {
+            Level l = TestUtil.pack().get(id);
+            GameSession g = new GameSession(l, false);
+            java.util.List<Move> hist = new java.util.ArrayList<>(); // en son hamle başta
+            for (int i = 0; i < 6; i++) {
+                java.util.List<Move> ms = g.board().legalMoves();
+                Move m = ms.get(r.nextInt(ms.size()));
+                Board t = g.board().copy(); t.apply(m);
+                if (BeamTracer.trace(t).solved) continue; // çözülmüş oturumda geri alınamaz
+                assertTrue(g.play(m)); hist.add(0, m);
+            }
+            long before = g.board().stateKey();
+            GameSession.Plan pl = g.plan(500_000);
+            assertEquals(before, g.board().stateKey());
+            java.util.Map<Long, Integer> dist = Solver.distancesToGoal(g.board(), 500_000);
+            Board b = g.board().copy();
+            int best = dist.get(b.stateKey()), bestUndo = 0, k = 0;
+            for (Move m : hist) { b.revert(m); k++; int d = dist.get(b.stateKey()); if (d <= best) { best = d; bestUndo = k; } }
+            assertEquals("bölüm " + id, best, pl.remaining);
+            assertEquals("bölüm " + id, bestUndo, pl.undos);
+            if (pl.undos == 0 && pl.remaining > 0) {
+                Board n = g.board().copy(); n.apply(pl.move);
+                assertEquals(best - 1, (int) dist.get(n.stateKey()));
+            }
+        }
+    }
+
+    @Test public void refundedHintIsNotCounted() throws Exception {
+        GameSession g = new GameSession(TestUtil.pack().get(12), true);
+        g.markHintUsed();
+        g.unmarkHintUsed();
+        assertEquals(0, g.hintsUsed());
+        g.unmarkHintUsed();
+        assertEquals(0, g.hintsUsed());
+    }
 }

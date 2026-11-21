@@ -215,4 +215,23 @@ public class EconomyTest {
         assertEquals(50, p.crystals);
         assertTrue(p.owned.isEmpty());
     }
+
+    /** Denetim 2: saat dilimini ileri-geri değiştirmek günlük alım sınırını sıfırlamaz. */
+    @Test public void zoneHoppingDoesNotResetDailyLimits() {
+        Progress p = new Progress();
+        p.crystals = 100_000;
+        long now = 1_800_000_000_000L, H = 3_600_000L;
+        Economy.Item hint = Economy.item("hint1");
+        int bought = 0;
+        for (int hop = 0; hop < 8; hop++) {
+            long zone = (hop % 2 == 0 ? 14 : -11) * H;
+            int day = Economy.monotonicDay(p, now + hop * 60_000L, zone);
+            while (Economy.blockReason(p, hint, day) == null) { assertTrue(Economy.buy(p, hint, day, new Lives.Clock(now, 0, -1, -1))); bought++; }
+        }
+        // +14 dilimi en fazla bir günü öne çeker: en çok iki günlük sınır
+        assertTrue("alınan " + bought, bought >= hint.dailyLimit && bought <= 2 * hint.dailyLimit);
+        int d0 = Economy.monotonicDay(p, now, -11 * H);
+        assertEquals(p.maxDay, d0);
+        assertTrue(Economy.msUntilNextMonotonicDay(p, now, -11 * H) > 24 * H);
+    }
 }

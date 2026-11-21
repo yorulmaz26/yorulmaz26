@@ -90,10 +90,11 @@ public final class DailyScreen extends Screen {
             if (busy) return;
             busy = true;
             playLabel.setText("Hazırlanıyor…");
-            GameLoader.background(() -> DailyPuzzle.generate(today), (Level l) -> {
+            final int day = Game.today(); // ekran gece yarısından önce açıldıysa da o anın günü oynanır
+            GameLoader.background(() -> DailyPuzzle.generate(day), (Level l) -> {
                 busy = false;
                 if (l == null) { playLabel.setText("Tekrar dene"); a.toast("Bulmaca hazırlanamadı"); return; }
-                a.goDailyGame(l, today);
+                a.goDailyGame(l, day);
             });
         });
         card.addView(play, new LinearLayout.LayoutParams(-1, Ui.dp(c, 58)));

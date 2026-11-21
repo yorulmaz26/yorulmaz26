@@ -23,7 +23,7 @@ public final class AchievementsScreen extends Screen {
         super(a);
         Context c = a;
         Progress p = Game.progress();
-        Achievements.update(p);
+        a.checkAchievements(); // yeni başarılar ödülleriyle birlikte verilir
         LinearLayout root = Ui.vertical(c);
         TextView count = Ui.text(c, p.achievements.size() + "/" + Achievements.ALL.size(), 15, Palette.GOLD, Ui.BOLD);
         root.addView(Ui.header(c, "Başarılar", v -> a.goMenu(), count));

@@ -13,6 +13,7 @@ import com.isikyolu.engine.LevelPack;
 import com.isikyolu.engine.Lives;
 import com.isikyolu.engine.Move;
 import com.isikyolu.engine.Piece;
+import com.isikyolu.engine.Shortcuts;
 import com.isikyolu.engine.Solver;
 import com.isikyolu.engine.StarRating;
 
@@ -201,8 +202,13 @@ public final class Audit {
             }
             int effort = BeamFollower.measure(new Board(l), 5000).leaves;
             if (Chapters.requiresLogic(id) && effort < 5) rep.add(id, "UYARI", "mantık-zayıf", "mantık bölümü ama karar ağacı " + effort);
+            int live = Shortcuts.liveDecoys(new Board(l), sol.moves);
+            if (Chapters.requiresLogic(id)) {
+                if (Shortcuts.thoughtless(new Board(l))) rep.add(id, "HATA", "kısayol", "her döner aynaya bir kez dokunmak (ya da satır/sütun sırasıyla dokunmak) bölümü bitiriyor");
+                if (live == 0) rep.add(id, "UYARI", "canlı-yem", "çözümde ışık alıp zaten doğru duran döner ayna yok");
+            }
             int w = Chapters.worldOf(id);
-            rep.table.append(String.format("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d%n", id, w, l.optimal, budget, dist.size(), goals.size(), worst, effort));
+            rep.table.append(String.format("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d%n", id, w, l.optimal, budget, dist.size(), goals.size(), worst, effort, live));
         }
         // ---- günlük bulmacalar ----
         int base = DailyPuzzle.today();
@@ -225,7 +231,7 @@ public final class Audit {
         sb.append("Bölüm: ").append(r.levels).append(" · gezilen durum: ").append(r.states).append(" · süre: ").append(r.ms / 1000).append(" sn · günlük: ").append(days).append(" gün\n");
         sb.append("HATA: ").append(r.count("HATA")).append(" · UYARI: ").append(r.count("UYARI")).append(" · BİLGİ: ").append(r.count("BİLGİ")).append('\n');
         for (Finding f : r.findings) sb.append(f).append('\n');
-        sb.append("\nid\tdünya\toptimum\thak\tdurum\tçözümDurumu\ten-uzak\tkararAğacı\n").append(r.table);
+        sb.append("\nid\tdünya\toptimum\thak\tdurum\tçözümDurumu\ten-uzak\tkararAğacı\tcanlıYem\n").append(r.table);
         String out = sb.toString();
         if (a.length > 1) Files.write(Paths.get(a[1]), out.getBytes(StandardCharsets.UTF_8));
         System.out.println(out.substring(0, Math.min(out.length(), 6000)));

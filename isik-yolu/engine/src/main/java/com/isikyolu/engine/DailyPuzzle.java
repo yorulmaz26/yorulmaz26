@@ -20,6 +20,7 @@ public final class DailyPuzzle {
             Chapters.mixed(c, r.nextInt(10));
             c.minOpt = 4; c.maxOpt = 8;
             c.stateCap = 40000;
+            c.liveDecoys = 1;
             if (c.blocks > 0) c.maxRot = 8;
             Level l = new LevelGenerator(c, new Random(r.nextLong())).generate(300);
             if (l != null) {

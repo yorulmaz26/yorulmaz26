@@ -76,7 +76,7 @@ public final class MenuScreen extends Screen {
         col.addView(Ui.button(a, "Nasıl Oynanır?", Ui.GHOST, Icon.HELP, v -> TutorialOverlay.full(a).show(a.overlayLayer())),
                 Ui.lpMargins(a, -1, -2, 0, 0, 0, 0));
         col.addView(Ui.space(a, 18));
-        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.5.2", 12, Palette.TEXT_FAINT, Ui.REGULAR);
+        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.6.0", 12, Palette.TEXT_FAINT, Ui.REGULAR);
         col.addView(foot);
         sv.addView(col, new ScrollView.LayoutParams(-1, -2));
         addView(sv, new LayoutParams(-1, -1));

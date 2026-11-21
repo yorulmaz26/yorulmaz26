@@ -39,6 +39,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
     private final Level level;
     private final boolean daily;
     private final int epochDay;
+    /** Günlük bulmacada ekranın açıldığı gün: gece yarısını geçse de o günün bulmacası ödül alır. */
+    private final int startDay;
     private final GameSession session;
     private final BoardView board;
     private final TextView movesText, movesLabel, goalText, hintBadge;
@@ -58,6 +60,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         this.level = lvl;
         this.daily = epochDay >= 0;
         this.epochDay = epochDay;
+        this.startDay = daily ? Game.today() : -1;
         this.session = new GameSession(lvl, !daily);
         Context c = a;
         LinearLayout root = Ui.vertical(c);
@@ -126,6 +129,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         bottom.setGravity(Gravity.CENTER);
         bottom.setPadding(Ui.dp(c, 16), Ui.dp(c, 4), Ui.dp(c, 16), Ui.dp(c, 18));
         undoButton = action(c, Icon.UNDO, "Geri Al", Ui.SECONDARY, v -> undo());
+        Ui.allowRepeat(undoButton.getChildAt(0)); // art arda Geri Al meşru (akıllı ipucu "N kez Geri Al" diyebilir)
         bottom.addView(undoButton, weightLp(c));
         bottom.addView(action(c, Icon.RESET, "Sıfırla", Ui.SECONDARY, v -> reset()), weightLp(c));
         FrameLayout hint = action(c, Icon.BULB, "İpucu", Ui.GOLD, v -> requestHint());
@@ -227,6 +231,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         Game.audio().play(Audio.ROTATE, 0.9f + (float) Math.random() * 0.25f);
         Game.haptics().move();
         board.onMove(session.lastMove(), false);
+        pendingUndoHint = 0; // ipucunun "önce Geri Al" talimatından sapıldı
         afterMove();
         return true;
     }
@@ -239,6 +244,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         Game.audio().play(Audio.PUSH);
         Game.haptics().move();
         board.onMove(session.lastMove(), false);
+        pendingUndoHint = 0;
         afterMove();
         return true;
     }
@@ -269,6 +275,9 @@ public final class GameScreen extends Screen implements BoardView.Host {
     }
 
     private boolean onScreen() { return act.currentScreen() == this; }
+
+    /** Tahtayı kaplayan bir pencere açıkken süren dokunma hamle yapmaz. */
+    @Override public boolean acceptsInput() { return !act.hasOverlay(); }
 
     @Override public void onBlockTapped() { act.toast("Altın bloğu bir kare sürükleyerek kaydır"); }
 
@@ -472,6 +481,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
     }
 
     private void refundHint(String msg) {
+        session.unmarkHintUsed(); // iade edilen ipucu bölümü "ipucuyla çözüldü" saymaz
         Game.progress().hints++;
         Game.progress().hintsUsedTotal = Math.max(0, Game.progress().hintsUsedTotal - 1);
         Game.save();
@@ -487,7 +497,12 @@ public final class GameScreen extends Screen implements BoardView.Host {
         GameLoader.background(() -> s.plan(HINT_CAP), pl -> {
             thinking = false;
             board.setInputEnabled(!finished);
-            if (pl != null && pl.feasible && pl.undos == 0 && pl.move != null) board.showHint(pl.move);
+            if (pl == null || !pl.feasible) return;
+            if (pl.undos == 0 && pl.move != null) board.showHint(pl.move);
+            else if (pl.undos > 0) {
+                pendingUndoHint = pl.undos;
+                act.toast("Önce " + pl.undos + " kez daha Geri Al'a dokun, sonra sıradaki hamle gösterilecek");
+            }
         });
     }
 
@@ -508,7 +523,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         Economy.Reward reward;
         if (daily) {
             // ödül yalnızca güvenilir "bugün"ün bulmacası için ve o gün ilk kez çözülünce
-            boolean isToday = epochDay == Game.today();
+            boolean isToday = epochDay == startDay || epochDay == Game.today();
             boolean firstToday = isToday && !p.dailyDone.contains(DailyPuzzle.keyFor(epochDay));
             if (isToday) p.dailyDone.add(DailyPuzzle.keyFor(epochDay)); // başka günün bulmacası seriye/başarılara sayılmaz
             reward = firstToday ? Economy.onDailyComplete(p, p.dailyStreak(epochDay)) : new Economy.Reward();
@@ -520,12 +535,12 @@ public final class GameScreen extends Screen implements BoardView.Host {
         }
         boolean rewarded = p.hints > hintsBefore;
         Game.save();
+        checkAchievements(); // hemen: pencere gelmeden çıkılsa da başarı ve ödülü kaybolmaz
         final boolean firstF = first;
         pendingOverlay = () -> {
             pendingOverlay = null;
             if (!onScreen()) return;
             showComplete(stars, firstF, rewarded, reward);
-            checkAchievements();
         };
         postDelayed(pendingOverlay, 1100);
     }
@@ -548,7 +563,11 @@ public final class GameScreen extends Screen implements BoardView.Host {
         if (!daily && Game.progress().bestMoves[level.id] > 0)
             b.append("\nEn iyi sonucun: ").append(Game.progress().bestMoves[level.id]).append(" hamle");
         if (stars < 3) b.append("\n3 yıldız için ").append(level.optimal).append(" hamlede bitir.");
-        if (daily) b.append("\nSeri: ").append(Game.progress().dailyStreak(epochDay)).append(" gün");
+        if (daily) {
+            if (Game.progress().dailyDone.contains(DailyPuzzle.keyFor(epochDay)))
+                b.append("\nSeri: ").append(Game.progress().dailyStreak(epochDay)).append(" gün");
+            else b.append("\nBu bulmaca bugünün değil: ödül ve seri yalnızca günün bulmacasında.");
+        }
         o.body(b.toString());
         if (reward.any()) {
             LinearLayout gain = Ui.horizontal(c);

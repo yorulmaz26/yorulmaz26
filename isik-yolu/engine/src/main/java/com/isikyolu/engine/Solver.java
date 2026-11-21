@@ -109,6 +109,67 @@ public final class Solver {
         return dist;
     }
 
+    /**
+     * Çok kaynaklı BFS: verilen durumlardan (aynı tahtanın durum anahtarları) çözüme en yakın olanı bulur.
+     * İlk çözüm katmanında durur. Eşit uzaklıkta en büyük kaynak indisi seçilir.
+     * @return {uzaklık, kaynak indisi}; çözüm yoksa ya da sınır aşılırsa null
+     */
+    public static int[] nearestGoal(Board start, long[] sources, int cap) {
+        Board work = start.copy();
+        BeamTracer tracer = new BeamTracer();
+        long[] queue = new long[Math.max(1024, sources.length)];
+        int[] label = new int[queue.length];
+        LongIntMap seen = new LongIntMap(1024);
+        int tail = 0;
+        for (int s = 0; s < sources.length; s++) {
+            int idx = seen.get(sources[s], -1);
+            if (idx >= 0) { label[idx] = Math.max(label[idx], s); continue; }
+            seen.putIfAbsent(sources[s], tail);
+            queue[tail] = sources[s]; label[tail] = s; tail++;
+        }
+        int from = 0, to = tail, depth = 0;
+        while (from < to) {
+            int best = -1;
+            for (int i = from; i < to; i++) {
+                work.applyKey(queue[i]);
+                if (tracer.isSolved(work)) best = Math.max(best, label[i]);
+            }
+            if (best >= 0) return new int[]{depth, best};
+            for (int i = from; i < to; i++) {
+                long key = queue[i];
+                work.applyKey(key);
+                int n = work.rotCells.length;
+                int pushes = 0;
+                long[] next = new long[n + 4 * work.blocks.length];
+                for (int j = 0; j < n; j++) next[pushes++] = key ^ (1L << j);
+                if (work.blocks.length > 0) {
+                    for (int bc : work.blocks.clone())
+                        for (int d = 0; d < 4; d++) {
+                            if (!work.canPush(bc, d)) continue;
+                            int nc = work.push(bc, d);
+                            next[pushes++] = work.stateKey();
+                            work.push(nc, Dir.opposite(d));
+                        }
+                }
+                for (int j = 0; j < pushes; j++) {
+                    long nk = next[j];
+                    int idx = seen.get(nk, -1);
+                    if (idx < 0) {
+                        if (tail >= cap) return null;
+                        if (tail == queue.length) {
+                            queue = java.util.Arrays.copyOf(queue, tail * 2);
+                            label = java.util.Arrays.copyOf(label, tail * 2);
+                        }
+                        seen.putIfAbsent(nk, tail);
+                        queue[tail] = nk; label[tail] = label[i]; tail++;
+                    } else if (idx >= to && label[i] > label[idx]) label[idx] = label[i];
+                }
+            }
+            from = to; to = tail; depth++;
+        }
+        return null;
+    }
+
     /** Başlangıçtan ulaşılabilen toplam durum sayısı (sınırla). */
     public static int countReachable(Board start, int stateCap) {
         Solution s = search(start, stateCap, false);

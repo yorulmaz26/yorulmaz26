@@ -38,6 +38,8 @@ public final class BoardView extends View {
         boolean onPush(int x, int y, int dir);
         void onBlockTapped();
         void onFixedMirrorTapped();
+        /** Hamle kabul ediliyor mu (ör. tahtanın üstünde pencere yokken). */
+        default boolean acceptsInput() { return true; }
     }
 
     private static final int MAXP = 280;
@@ -123,7 +125,10 @@ public final class BoardView extends View {
     }
 
     public void setHost(Host h) { host = h; }
-    public void setInputEnabled(boolean e) { inputEnabled = e; }
+    public void setInputEnabled(boolean e) {
+        if (!e) cancelTouch(); // süren sürükleme bloğu yarım kaymış bırakmasın
+        inputEnabled = e;
+    }
 
     /** Yeni oturum veya sıfırlama sonrasında tüm görsel durumu kurar. */
     public void bind(GameSession s) {
@@ -171,12 +176,10 @@ public final class BoardView extends View {
                 int from = undo ? b.cell(m.cell % gw + Dir.DX[m.dir], m.cell / gw + Dir.DY[m.dir]) : m.cell;
                 int to = undo ? m.cell : b.cell(m.cell % gw + Dir.DX[m.dir], m.cell / gw + Dir.DY[m.dir]);
                 int fx = from % gw, fy = from / gw, tx = to % gw, ty = to / gw;
-                if (!(dragging && !undo)) {
-                    blockOffX[to] = (fx - tx) * cell;
-                    blockOffY[to] = (fy - ty) * cell;
-                } else {
-                    blockOffX[to] = 0; blockOffY[to] = 0;
-                }
+                // sürüklenerek itildiyse blok parmağın bıraktığı yerden yeni hücreye kayar
+                boolean fromDrag = dragging && !undo && from == touchCell;
+                blockOffX[to] = (fx - tx) * cell + (fromDrag ? dragOffX : 0);
+                blockOffY[to] = (fy - ty) * cell + (fromDrag ? dragOffY : 0);
                 blockOffX[from] = 0; blockOffY[from] = 0;
             }
         } else {
@@ -837,6 +840,9 @@ public final class BoardView extends View {
 
     /** Süren dokunmayı iptal eder (ör. can kalmadığında). */
     public void cancelTouch() {
+        if (dragging && touchCell >= 0 && blockOffX != null && session != null && session.board().isMovable(touchCell)) {
+            blockOffX[touchCell] = dragOffX; blockOffY[touchCell] = dragOffY; // bırakılan yerden hücresine kayar
+        }
         dragging = false; pushed = true; dragOffX = dragOffY = 0; touchCell = -1;
         invalidate();
     }
@@ -876,10 +882,12 @@ public final class BoardView extends View {
                     float vis = Math.min(mag, lim);
                     dragOffX = Dir.DX[d] * vis; dragOffY = Dir.DY[d] * vis;
                     if (can && mag > cell * 0.5f && host != null) {
+                        if (!host.acceptsInput()) { cancelTouch(); return true; }
                         // bir dokunmada tek itme: titreme ya da uzun/eğik sürükleme fazladan hak yemez
                         pushed = true;
-                        int x = touchCell % gw, y = touchCell / gw;
+                        int from = touchCell, x = from % gw, y = from / gw;
                         if (host.onPush(x, y, d)) touchCell = b.cell(x + Dir.DX[d], y + Dir.DY[d]);
+                        else if (from >= 0) { blockOffX[from] = dragOffX; blockOffY[from] = dragOffY; } // reddedildi: geri kayar
                         dragOffX = dragOffY = 0;
                         dragging = false;
                     }
@@ -904,7 +912,7 @@ public final class BoardView extends View {
                     dragging = false; dragOffX = dragOffY = 0;
                 } else if (!pushed && Math.abs(ux - downX) < slop * 2 && Math.abs(uy - downY) < slop * 2) {
                     int c2 = cellAt(ux, uy);
-                    if (c2 >= 0 && c2 == touchCell && host != null) {
+                    if (c2 >= 0 && c2 == touchCell && host != null && host.acceptsInput()) {
                         if (b.isRotatable(c2)) host.onRotate(c2 % gw, c2 / gw);
                         else if (b.typeAt(c2) == Cell.MIRROR) {
                             pulse[c2] = 1f; // sabit ayna: kırmızı titreşim halkası çizilir
@@ -921,7 +929,8 @@ public final class BoardView extends View {
                 return true;
             }
             case MotionEvent.ACTION_CANCEL:
-                dragging = false; dragOffX = dragOffY = 0; touchCell = -1; pointerId = -1;
+                cancelTouch();
+                pointerId = -1;
                 return true;
             default:
                 return true;

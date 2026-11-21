@@ -39,6 +39,8 @@ public final class LevelGenerator {
         public boolean shareMirrors;
         /** Paylaşılan ayna olasılığı (her düğümde). */
         public double shareChance = 0.45;
+        /** En az canlı yem (çözümde ışık alıp zaten doğru duran döner ayna); 0 = şart yok. Kısayolları da kapatır. */
+        public int liveDecoys;
 
         public Config copy() {
             Config c = new Config();
@@ -48,7 +50,7 @@ public final class LevelGenerator {
             c.merge = merge; c.blocks = blocks; c.doors = doors; c.decoyRot = decoyRot; c.decoyFixed = decoyFixed;
             c.walls = walls; c.decoyFilters = decoyFilters; c.fixedFrac = fixedFrac; c.minOpt = minOpt;
             c.maxOpt = maxOpt; c.stateCap = stateCap; c.maxRot = maxRot;
-            c.minEffort = minEffort; c.shareMirrors = shareMirrors; c.shareChance = shareChance;
+            c.minEffort = minEffort; c.shareMirrors = shareMirrors; c.shareChance = shareChance; c.liveDecoys = liveDecoys;
             return c;
         }
     }
@@ -150,6 +152,9 @@ public final class LevelGenerator {
         level.optimal = sol.optimal;
         // hiç ışık alamayan döner aynalar oyuncuyu boşa dokundurur: sabitlenir (çözüm ve optimum değişmez)
         Solver.fixDeadMirrors(level, cfg.stateCap);
+        // "her döner aynaya bir kez dokun" kısayolu çözmesin: canlı yem şartı (ayrı tohum, üretim dizisi değişmez)
+        if (cfg.liveDecoys > 0 && !Shortcuts.ensureLiveDecoys(level, cfg.liveDecoys, cfg.stateCap, Math.max(cfg.maxRot, 40),
+                1, cfg.minOpt, new Random(level.signature().hashCode()))) return null;
         return level;
     }
 

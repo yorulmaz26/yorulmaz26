@@ -149,6 +149,11 @@ public final class Ui {
         return f;
     }
 
+    private static final Object NO_GUARD = new Object();
+
+    /** Art arda hızlı basılması meşru düğmeler (Geri Al) için çift tıklama korumasını kapatır. */
+    public static void allowRepeat(View v) { v.setTag(com.isikyolu.game.R.id.last_click, NO_GUARD); }
+
     /** Basma animasyonu + tık sesi. */
     public static void clickable(final View v, final View.OnClickListener l) {
         v.setClickable(true);
@@ -162,8 +167,10 @@ public final class Ui {
             // çift tıklama koruması: aynı düğmeye 400 ms içinde ikinci tıklama yok sayılır
             long now = android.os.SystemClock.uptimeMillis();
             Object last = view.getTag(com.isikyolu.game.R.id.last_click);
-            if (last instanceof Long && now - (Long) last < 400) return;
-            view.setTag(com.isikyolu.game.R.id.last_click, now);
+            if (last != NO_GUARD) {
+                if (last instanceof Long && now - (Long) last < 400) return;
+                view.setTag(com.isikyolu.game.R.id.last_click, now);
+            }
             Game.audio().play(com.isikyolu.game.Audio.CLICK);
             Game.haptics().tick();
             if (l != null) l.onClick(view);

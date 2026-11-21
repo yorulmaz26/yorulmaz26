@@ -513,6 +513,178 @@ public class UiFlowTest {
         assertTrue("bugünün bulmacası ödül vermeli", p.crystals > before);
     }
 
+    // ---------- denetim 2 bulgularının geri dönüş testleri ----------
+
+    private static Object field(Object o, String name) throws Exception {
+        java.lang.reflect.Field x = o.getClass().getDeclaredField(name); x.setAccessible(true); return x.get(o);
+    }
+
+    private static void setField(Object o, String name, Object v) throws Exception {
+        java.lang.reflect.Field x = o.getClass().getDeclaredField(name); x.setAccessible(true); x.set(o, v);
+    }
+
+    private void waitPlan(GameScreen gs) throws Exception {
+        waitFor("plan bitti", () -> { try { return !(Boolean) field(gs, "thinking"); } catch (Exception e) { return false; } });
+    }
+
+    /** Bulgu: 400 ms çift tıklama koruması art arda Geri Al'ı yutuyordu. */
+    @Test public void rapidUndoTapsAllCount() throws Exception {
+        start();
+        Game.progress().tutorialSeen = true;
+        GameScreen gs = openLevel(12);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) field(gs, "session");
+        for (int i = 0; i < 3; i++) assertTrue(gs.onRotate(1, 1));
+        View undo = ((ViewGroup) field(gs, "undoButton")).getChildAt(0);
+        for (int i = 0; i < 3; i++) { undo.performClick(); idle(150); }
+        assertEquals("üç hızlı Geri Al üç hamleyi geri almalı", 0, ses.moves());
+    }
+
+    /** Bulgu: gece yarısından önce açılan günlük bulmaca sonra çözülünce ödül/seri kayboluyordu. */
+    @Test public void dailyStartedBeforeMidnightStillRewards() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        int today = Game.today();
+        Level dl = DailyPuzzle.generate(today);
+        act.goDailyGame(dl, today);
+        idle(600);
+        GameScreen gs = (GameScreen) act.currentScreen();
+        p.trustWall += Game.msUntilNextDay() + 60_000; // güvenilir saat gece yarısını geçti
+        assertEquals(today + 1, Game.today());
+        int before = p.crystals;
+        solveThroughUi(gs, dl);
+        idle(1600);
+        assertTrue("başlandığı günün ödülü verilmeli", p.crystals > before);
+        assertTrue(p.dailyDone.contains(DailyPuzzle.keyFor(today)));
+        assertEquals(1, p.dailyStreak(today));
+    }
+
+    /** Bulgu: kazandıktan hemen sonra geri basılınca başarı ve ödülü atlanıyor, Başarılar ekranı ödülsüz işaretliyordu. */
+    @Test public void achievementsGrantedEvenOnQuickBack() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        assertFalse(p.achievements.contains("ilk_isik"));
+        GameScreen gs = openLevel(1);
+        int before = p.crystals;
+        solveThroughUi(gs, Game.levels().get(1));
+        idle(200);
+        assertTrue(act.currentScreen().onBack());
+        idle(400);
+        assertTrue(act.currentScreen() instanceof LevelSelectScreen);
+        assertTrue(p.achievements.contains("ilk_isik"));
+        assertTrue("başarı ödülü verilmeli", p.crystals >= before + 30);
+        // Başarılar ekranı yeni başarıyı ödülüyle verir
+        p.recordLevel(2, 3, Game.levels().get(2).optimal, false);
+        p.recordLevel(3, 3, Game.levels().get(3).optimal, false);
+        p.undoCount = 1000;
+        int c0 = p.crystals, a0 = p.achievements.size();
+        act.goAchievements();
+        idle(500);
+        if (p.achievements.size() > a0) assertTrue("Başarılar ekranı ödülsüz işaretlememeli", p.crystals > c0);
+    }
+
+    /** Bulgu: ipucunun "önce Geri Al" talimatından sapınca bekleyen sayaç sıfırlanmıyordu. */
+    @Test public void deviationClearsPendingUndoHint() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        p.hints = 5;
+        GameScreen gs = openLevel(12);
+        assertTrue(gs.onRotate(1, 1));
+        assertTrue(gs.onRotate(1, 1));
+        Method use = GameScreen.class.getDeclaredMethod("useHint");
+        use.setAccessible(true);
+        use.invoke(gs);
+        waitPlan(gs);
+        idle(50);
+        assertEquals("başlangıca dönen çift dokunuş: iki ücretsiz Geri Al", 2, (int) (Integer) field(gs, "pendingUndoHint"));
+        assertTrue(gs.onRotate(5, 1));
+        assertEquals(0, (int) (Integer) field(gs, "pendingUndoHint"));
+    }
+
+    /** Bulgu: iade edilen ipucu bölümü ipucuyla çözülmüş sayıyordu. */
+    @Test public void refundedHintKeepsNoHintCredit() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        p.hints = 5;
+        GameScreen gs = openLevel(12);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) field(gs, "session");
+        while (ses.budgetLeft() > 1) { assertTrue(gs.onRotate(1, 1)); }
+        Method use = GameScreen.class.getDeclaredMethod("useHint");
+        use.setAccessible(true);
+        use.invoke(gs);
+        waitPlan(gs);
+        assertEquals("ipucu iade edilmeli", 5, p.hints);
+        assertEquals(0, ses.hintsUsed());
+    }
+
+    private com.isikyolu.game.ui.BoardView boardOf(GameScreen gs) throws Exception { return (com.isikyolu.game.ui.BoardView) field(gs, "board"); }
+
+    /** Bulgu: Duraklat penceresi açıkken süren dokunma pencerenin altında hamle yapıp can yakıyordu. */
+    @Test public void touchUnderPauseDoesNotMove() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        p.shields = 0;
+        GameScreen gs = openLevel(12);
+        com.isikyolu.game.ui.BoardView bv = boardOf(gs);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) field(gs, "session");
+        float ox = f(bv, "ox"), oy = f(bv, "oy"), cell = f(bv, "cell");
+        float sx = ox + 1.5f * cell, sy = oy + 1.5f * cell;
+        long t = android.os.SystemClock.uptimeMillis();
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, sx, sy, 0));
+        act.onBackPressed(); // duraklat
+        idle(300);
+        assertNotNull(topOverlay());
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 400, android.view.MotionEvent.ACTION_UP, sx, sy, 0));
+        idle(100);
+        assertEquals("pencere altında hamle yapılmamalı", 0, ses.moves());
+        assertEquals(4, p.lives);
+        assertEquals(0, p.attemptLevel);
+    }
+
+    /** Bulgu: başarılı itmede blok yarım kare sıçrıyordu; giriş kapanınca sürükleme donuk kalıyordu. */
+    @Test public void blockSlidesSmoothlyAndDragEndsWhenInputOff() throws Exception {
+        start();
+        Game.progress().tutorialSeen = true;
+        GameScreen gs = openLevel(71);
+        com.isikyolu.game.ui.BoardView bv = boardOf(gs);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) field(gs, "session");
+        float ox = f(bv, "ox"), oy = f(bv, "oy"), cell = f(bv, "cell");
+        int w = ses.board().width;
+        int blk = ses.board().blockCells()[0];
+        int dir = -1;
+        for (int d = 0; d < 4; d++) if (ses.board().canPush(blk, d)) { dir = d; break; }
+        int[] DX = {0, 1, 0, -1}, DY = {-1, 0, 1, 0};
+        float sx = ox + (blk % w + 0.5f) * cell, sy = oy + (blk / w + 0.5f) * cell;
+        long t = android.os.SystemClock.uptimeMillis();
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, sx, sy, 0));
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 10, android.view.MotionEvent.ACTION_MOVE, sx + DX[dir] * 0.3f * cell, sy + DY[dir] * 0.3f * cell, 0));
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 20, android.view.MotionEvent.ACTION_MOVE, sx + DX[dir] * 0.52f * cell, sy + DY[dir] * 0.52f * cell, 0));
+        assertEquals(1, ses.actions());
+        int to = blk + DX[dir] + DY[dir] * w;
+        float[] bx = (float[]) field(bv, "blockOffX"), by = (float[]) field(bv, "blockOffY");
+        float off = DX[dir] != 0 ? bx[to] * DX[dir] : by[to] * DY[dir];
+        assertEquals("blok parmağın bıraktığı yerden kaymalı (sıçramamalı)", -0.48f * cell, off, 0.05f * cell);
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 30, android.view.MotionEvent.ACTION_UP, sx, sy, 0));
+        idle(600);
+        // ikinci sürükleme sırasında giriş kapanır
+        int b2 = ses.board().blockCells()[0];
+        int d2 = -1;
+        for (int d = 0; d < 4; d++) if (ses.board().canPush(b2, d)) { d2 = d; break; }
+        float s2x = ox + (b2 % w + 0.5f) * cell, s2y = oy + (b2 / w + 0.5f) * cell;
+        t = android.os.SystemClock.uptimeMillis();
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, s2x, s2y, 0));
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 10, android.view.MotionEvent.ACTION_MOVE, s2x + DX[d2] * 0.3f * cell, s2y + DY[d2] * 0.3f * cell, 0));
+        bv.setInputEnabled(false);
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 20, android.view.MotionEvent.ACTION_UP, s2x, s2y, 0));
+        bv.setInputEnabled(true);
+        assertFalse("sürükleme bitmeli", (Boolean) field(bv, "dragging"));
+        assertEquals(0f, f(bv, "dragOffX"), 0.001f);
+        assertEquals(1, ses.actions());
+    }
+
     @Test public void splashScreenRenders() throws Exception {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         assertTrue("önce stüdyo açılışı", act.currentScreen() instanceof com.isikyolu.game.screens.StudioIntroScreen);

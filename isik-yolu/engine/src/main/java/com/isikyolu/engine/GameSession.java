@@ -31,6 +31,8 @@ public final class GameSession {
     public boolean isSolved() { return result.solved; }
     public int hintsUsed() { return hintsUsed; }
     public void markHintUsed() { hintsUsed++; }
+    /** İade edilen ipucu sayılmaz. */
+    public void unmarkHintUsed() { if (hintsUsed > 0) hintsUsed--; }
 
     private int bonusBudget, continues;
 
@@ -104,33 +106,26 @@ public final class GameSession {
     }
 
     /**
-     * Geri Al hak harcamadığı için en iyi yol bazen önce geri almaktan geçer. Geçmişteki her ara
-     * durumun çözüme uzaklığına bakılır; en kısa olan (eşitlikte en az geri alan) seçilir.
+     * Geri Al hak harcamadığı için en iyi yol bazen önce geri almaktan geçer. Geçmişteki bütün ara
+     * durumlardan aynı anda arama yapılır; çözüme en yakın olan seçilir. Eşitlikte daha çok geri alan
+     * seçilir: hak aynı harcanır, toplam hamle (yıldız) daha iyi olur. Canlı tahta değiştirilmez
+     * (arka plan iş parçacığında güvenle çalışır).
      */
     public Plan plan(int stateCap) {
         Plan pl = new Plan();
-        java.util.Map<Long, Integer> dist = Solver.distancesToGoal(board, stateCap);
-        if (dist == null) return pl;
         Board b = board.copy();
-        Integer d0 = dist.get(b.stateKey());
-        int best = d0 == null ? Integer.MAX_VALUE : d0, bestUndo = 0, i = 0;
-        for (Move m : history) { // en son hamleden geriye
-            b.revert(m);
-            i++;
-            Integer d = dist.get(b.stateKey());
-            if (d != null && d < best) { best = d; bestUndo = i; }
-        }
-        if (best == Integer.MAX_VALUE) return pl;
-        pl.undos = bestUndo;
-        pl.remaining = best;
-        pl.feasible = !limited || best <= budgetLeft();
-        if (bestUndo == 0 && best > 0) {
-            for (Move m : board.legalMoves()) {
-                board.apply(m);
-                Integer d = dist.get(board.stateKey());
-                board.revert(m);
-                if (d != null && d == best - 1) { pl.move = m; break; }
-            }
+        long[] keys = new long[history.size() + 1];
+        keys[0] = b.stateKey();
+        int i = 0;
+        for (Move m : history) { b.revert(m); keys[++i] = b.stateKey(); } // en son hamleden geriye
+        int[] r = Solver.nearestGoal(board, keys, stateCap);
+        if (r == null) return pl;
+        pl.remaining = r[0];
+        pl.undos = r[1];
+        pl.feasible = !limited || pl.remaining <= budgetLeft();
+        if (pl.undos == 0 && pl.remaining > 0) {
+            Solver.Solution s = Solver.solve(board, stateCap);
+            if (s.solvable && !s.moves.isEmpty()) pl.move = s.moves.get(0);
         }
         return pl;
     }

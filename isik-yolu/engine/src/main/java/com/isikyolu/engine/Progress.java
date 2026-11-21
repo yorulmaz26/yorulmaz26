@@ -43,6 +43,8 @@ public final class Progress {
     public final Set<String> owned = new LinkedHashSet<>();
     public String mirrorSkin = Economy.DEFAULT_MIRROR, boardSkin = Economy.DEFAULT_BOARD, beamSkin = Economy.DEFAULT_BEAM;
     public int shopDay = -1;
+    /** Görülen en büyük yerel gün (bkz. Economy.monotonicDay). */
+    public int maxDay = -1;
     public final Map<String, Integer> shopBuys = new LinkedHashMap<>();
     public final Set<Integer> perfectChapters = new LinkedHashSet<>();
 
@@ -122,7 +124,7 @@ public final class Progress {
         dailyDone.clear(); achievements.clear(); tutorialSeen = false; lastPlayed = 1;
         lives = Lives.MAX; attemptLevel = 0; lifeBaseElapsed = Long.MIN_VALUE;
         crystals = Economy.START_CRYSTALS; gems = 0; tickets = 0; shields = 0; purchases = 0; crystalsEarned = 0;
-        owned.clear(); perfectChapters.clear(); shopBuys.clear(); shopDay = -1;
+        owned.clear(); perfectChapters.clear(); shopBuys.clear(); shopDay = -1; maxDay = -1;
         mirrorSkin = Economy.DEFAULT_MIRROR; boardSkin = Economy.DEFAULT_BOARD; beamSkin = Economy.DEFAULT_BEAM;
     }
 
@@ -165,6 +167,7 @@ public final class Progress {
         m.put("skB", boardSkin);
         m.put("skL", beamSkin);
         m.put("shopDay", shopDay);
+        m.put("md", maxDay);
         m.put("shopBuys", new LinkedHashMap<String, Object>(shopBuys));
         m.put("perf", new ArrayList<Object>(perfectChapters));
         return Json.write(m);
@@ -217,6 +220,7 @@ public final class Progress {
             p.boardSkin = Json.getString(m, "skB", Economy.DEFAULT_BOARD);
             p.beamSkin = Json.getString(m, "skL", Economy.DEFAULT_BEAM);
             p.shopDay = Json.getInt(m, "shopDay", -1);
+            p.maxDay = Json.getInt(m, "md", p.shopDay);
             Object sb = m.get("shopBuys");
             if (sb instanceof Map) for (Map.Entry<String, Object> e : ((Map<String, Object>) sb).entrySet())
                 if (e.getValue() instanceof Number) p.shopBuys.put(e.getKey(), ((Number) e.getValue()).intValue());

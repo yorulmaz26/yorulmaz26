@@ -79,12 +79,15 @@ public final class Chapters {
         if (k > 0) harden(c, k, (local - 1) / 10 + 1, (local - 1) % 10);
         c.minEffort = minEffort(levelId, c);
         if (c.minEffort > 0) { c.decoyRot += 1; c.decoyFixed += 1; }
+        c.liveDecoys = liveDecoys(levelId);
         c.shareMirrors = levelId > 100 || (levelId > 10 && (levelId - 1) % 10 >= 3);
         // Tek kaynaklı ayna bölümlerinde optimum, yoldaki ayna sayısını aşamaz.
         if (c.sourceColors.length == 1 && c.prismSources == 0 && c.blocks == 0 && c.doors == 0) {
             c.turnsMax = Math.max(c.turnsMax, c.minOpt + 1);
             c.turnsMin = Math.max(c.turnsMin, Math.min(c.minOpt, c.turnsMax));
         }
+        // canlı yemler yolda doğru duran aynalardır: yollar, optimumdan o kadar uzun olmalı
+        c.turnsMax += c.liveDecoys;
         return c;
     }
 
@@ -93,6 +96,12 @@ public final class Chapters {
      * yanlış ayna seçimleri uzun, inandırıcı çıkmazlara götürür; önceden plan yapmak gerekir.
      * İlk grup öğretici olduğu için hariçtir.
      */
+    /** Mantık bölümünde gereken en az canlı yem (bkz. {@link Shortcuts}). */
+    public static int liveDecoys(int levelId) {
+        if (!requiresLogic(levelId)) return 0;
+        return levelId > 400 ? 3 : levelId > 100 ? 2 : 1;
+    }
+
     public static boolean requiresLogic(int levelId) {
         if (levelId <= 10) return false;
         if (levelId > 100) return true;

@@ -91,9 +91,27 @@ public final class Economy {
         return DAY_MS - Math.floorMod(trustedWall + zoneOffsetMs, DAY_MS);
     }
 
-    /** Gün değiştiyse günlük alım sayaçları sıfırlanır. */
+    /**
+     * Geri gitmeyen gün: görülen en büyük gün saklanır. Saat dilimini ileri-geri değiştirmek günlük sınırları
+     * sıfırlamaz; en ileri dilime geçmek en fazla bir günü öne çeker, sonra gerçek günün gelmesi beklenir.
+     */
+    public static int monotonicDay(Progress p, long trustedWall, long zoneOffsetMs) {
+        int d = dayOf(trustedWall, zoneOffsetMs);
+        if (d < p.maxDay) return p.maxDay;
+        p.maxDay = d;
+        return d;
+    }
+
+    /** {@link #monotonicDay} için bir sonraki gün başına kalan süre. */
+    public static long msUntilNextMonotonicDay(Progress p, long trustedWall, long zoneOffsetMs) {
+        long t = trustedWall + zoneOffsetMs;
+        long next = (Math.max(Math.floorDiv(t, DAY_MS), (long) p.maxDay) + 1) * DAY_MS;
+        return next - t;
+    }
+
+    /** Yeni bir gün geldiyse günlük alım sayaçları sıfırlanır (geri giden gün sıfırlamaz). */
     static void rollDay(Progress p, int day) {
-        if (p.shopDay != day) {
+        if (day > p.shopDay) {
             p.shopDay = day;
             p.shopBuys.clear();
         }

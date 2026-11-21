@@ -408,7 +408,7 @@ public final class MarketScreen extends Screen {
 
     private void tickCountdown() {
         if (countdown == null) return;
-        long ms = Economy.msUntilNextDayAt(Game.trustedNow(), Game.zoneOffset());
+        long ms = Game.msUntilNextDay();
         long s = ms / 1000;
         countdown.setText(String.format(java.util.Locale.ROOT, "Yenilenme: %02d:%02d:%02d", s / 3600, (s / 60) % 60, s % 60));
         postDelayed(tick, 1000);

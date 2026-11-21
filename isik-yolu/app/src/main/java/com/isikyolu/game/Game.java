@@ -102,7 +102,10 @@ public final class Game {
     }
 
     /** Market ve günlük bulmaca günü (saat hilesine karşı güvenilir gün). */
-    public static int shopDay() { return com.isikyolu.engine.Economy.dayOf(trustedNow(), zoneOffset()); }
+    public static int shopDay() { return com.isikyolu.engine.Economy.monotonicDay(progress, trustedNow(), zoneOffset()); }
+
+    /** Bir sonraki market/günlük bulmaca gününe kalan süre. */
+    public static long msUntilNextDay() { return com.isikyolu.engine.Economy.msUntilNextMonotonicDay(progress, trustedNow(), zoneOffset()); }
 
     /** Günlük bulmacanın "bugün"ü. */
     public static int today() { return shopDay(); }
