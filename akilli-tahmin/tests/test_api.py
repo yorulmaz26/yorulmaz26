@@ -56,8 +56,14 @@ def test_recommendations_each_mode(client, mode):
 
 
 def test_balanced_empty_message(client):
-    data = client.get("/api/v1/recommendations?mode=balanced&date=1999-01-01").json()
-    assert data["items"] == [] and data["message"] == "Güvenilir ve avantajlı seçim bulunamadı."
+    data = client.get("/api/v1/recommendations?mode=balanced").json()
+    if not data["items"]:
+        assert data["summary"]["fixtures_scanned"] > 0
+        assert data["message"] == "Güvenilir ve avantajlı seçim bulunamadı."
+    # Hiç maç yoksa "seçim bulunamadı" değil, "yaklaşan maç yok" denir.
+    none = client.get("/api/v1/recommendations?mode=balanced&date=1999-01-01").json()
+    assert none["items"] == [] and none["summary"]["fixtures_scanned"] == 0
+    assert "yaklaşan maç yok" in none["message"]
 
 
 def test_rejections_endpoints(client):
