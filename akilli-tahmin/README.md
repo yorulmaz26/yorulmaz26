@@ -78,6 +78,15 @@ sayısı ve güven aralıkları maç düzeyinde kümelenmiş hatayla hesaplanır
 Modlar aynı moddan bağımsız değerlendirmeyi okur; mod değişimi MODEL A/B olasılıklarını değiştirmez.
 Uygun seçim yoksa Dengeli modda **"Güvenilir ve avantajlı seçim bulunamadı."** gösterilir.
 
+## Oranı elle girme ("Oran Gir" sayfası)
+
+İddaa'da (veya başka bir sitede) gördüğünüz oranı girersiniz; sistem kendi olasılığıyla karşılaştırır:
+başa baş oranı (1 ÷ olasılık), beklenen değer (EV = olasılık × oran − 1), belirsizlik altındaki ihtiyatlı EV,
+"Avantajlı / Belirsiz / Avantajsız" sonucu ve üç modun bu oranla seçim yapıp yapmayacağı. Oran
+"Elle girilen oran (kullanıcı)" olarak kaydedilir; İddaa'dan otomatik doğrulanmaz, karar kaydı oluşturmaz,
+MODEL A'yı etkilemez. API: `GET /api/v1/manual-odds/options`, `POST /api/v1/manual-odds`,
+`GET /api/v1/manual-odds/history`. Bu bir öneri değildir; pozitif EV kazanç garantisi değildir.
+
 ## Canlı Gol Radar
 
 Hedef: kalan normal sürede en az bir gol. Alarm şartları: MODEL A > %90, MODEL B > %90 (kullanıcı talebiyle

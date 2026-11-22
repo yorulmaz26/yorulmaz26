@@ -68,6 +68,9 @@ ODDS_SOURCES = (
      "reddedilir. İddaa oranı değildir."),
     ("iddaa", "İddaa (resmi)", "iddaa", 1, 0,
      "Resmi veri bağlantısı kurulmadan doğrulanmış sayılmaz."),
+    ("manual", "Elle girilen oran (kullanıcı)", "bookmaker", 0, 1,
+     "Kullanıcının bir bahis sitesinde (ör. İddaa) gördüğü ve elle girdiği oran; kullanıcının beyanıdır, "
+     "otomatik doğrulanmaz ve İddaa olarak gösterilmez."),
 )
 
 
@@ -150,7 +153,7 @@ def init_db(conn: sqlite3.Connection, now: str | None = None) -> None:
                 (code, label, typ, is_iddaa, verified, now if verified else None, notes),
             )
         for mk in MARKETS:
-            for source in ("standard", "synthetic-demo", "football-data-csv"):
+            for source in ("standard", "synthetic-demo", "football-data-csv", "manual"):
                 conn.execute(
                     "INSERT OR IGNORE INTO market_settlement_rules(market_id, source, rule_version, rule_text,"
                     " verified, verified_at, verified_by) VALUES (?,?,?,?,1,?,?)",

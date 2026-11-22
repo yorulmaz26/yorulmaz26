@@ -35,6 +35,12 @@ class PermissionBody(BaseModel):
     granted: bool
 
 
+class ManualOddsBody(BaseModel):
+    fixture_id: int
+    market_id: str
+    odds: dict[str, float]
+
+
 def _minute_now() -> str:
     return to_iso(utcnow().replace(second=0))
 
@@ -220,6 +226,33 @@ def create_app(db_path: str | None = None, *, auto_refresh_demo: bool = True) ->
         from ..radar.live_goal_radar import set_notification_permission
 
         return set_notification_permission(conn, user(x_user_id), body.granted, to_iso(utcnow()))
+
+    # ───────────── oranı elle girme ─────────────
+    @app.get("/api/v1/manual-odds/options")
+    @locked
+    def get_manual_options():
+        from . import manual_odds
+
+        return manual_odds.options(conn)
+
+    @app.post("/api/v1/manual-odds")
+    @locked
+    def post_manual_odds(body: ManualOddsBody):
+        from . import manual_odds
+
+        if not (1 <= body.fixture_id <= MAX_ID) or len(body.odds) > 40:
+            raise HTTPException(422, "Geçersiz istek.")
+        try:
+            return manual_odds.evaluate(conn, body.fixture_id, body.market_id, body.odds)
+        except manual_odds.ManualOddsError as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/v1/manual-odds/history")
+    @locked
+    def get_manual_history(limit: int = Query(20, ge=1, le=200)):
+        from . import manual_odds
+
+        return manual_odds.history(conn, limit)
 
     # ───────────── diğer ─────────────
     @app.get("/api/v1/leagues")
