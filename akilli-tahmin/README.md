@@ -22,6 +22,23 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m pytest -q                                # testler
 ```
 
+### Windows (cmd)
+
+Python 3.12 veya 3.13 kurulu olmalı (python.org; kurulumda "Add python.exe to PATH" işaretlenir). Komutlar
+`akilli-tahmin` klasöründe, cmd penceresinde yazılır (Linux'taki `.venv/bin/` yerine `.venv\Scripts\`):
+
+```bat
+cd C:\Users\KULLANICI\Downloads\akilli-tahmin
+python -m venv .venv
+.venv\Scripts\pip install -r requirements.txt
+.venv\Scripts\python -m akilli_tahmin real-data --db gercek.sqlite3
+set API_FOOTBALL_KEY=ANAHTARINIZ
+.venv\Scripts\python -m akilli_tahmin serve --db gercek.sqlite3
+```
+
+Son komut çalışırken cmd penceresi açık kalır; tarayıcıda `http://127.0.0.1:8000` açılır. Durdurmak için
+Ctrl+C. Sonraki açılışlarda yalnızca `cd`, `set` ve `serve` satırları yeterlidir.
+
 ### Ücretsiz gerçek veri
 
 ```bash
