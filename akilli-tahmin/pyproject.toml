@@ -1,0 +1,13 @@
+[project]
+name = "akilli-tahmin"
+version = "6.3.0"
+description = "Akıllı Tahmin — iki tahmin modeli, üç seçim modu, Canlı Gol Radar"
+requires-python = ">=3.11"
+dependencies = ["fastapi==0.115.6", "uvicorn==0.34.0", "numpy==2.2.1", "pydantic==2.10.4"]
+
+[project.optional-dependencies]
+test = ["pytest==8.3.4", "httpx==0.28.1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::RuntimeWarning"]

@@ -1,0 +1,45 @@
+name: Akıllı Tahmin
+
+on:
+  push:
+    paths:
+      - "akilli-tahmin/**"
+      - ".github/workflows/akilli-tahmin.yml"
+  pull_request:
+    paths:
+      - "akilli-tahmin/**"
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Python testleri ve arayüz duman testi
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: akilli-tahmin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Bağımlılıklar
+        run: pip install -r requirements.txt
+      - name: Testler
+        run: python -m pytest -q
+      - name: Demo veritabanı ve API duman testi
+        run: |
+          python -m akilli_tahmin demo --db demo.sqlite3
+          python -m akilli_tahmin serve --db demo.sqlite3 --port 8765 &
+          sleep 5
+          curl -fsS http://127.0.0.1:8765/api/v1/recommendations?mode=balanced > /dev/null
+          curl -fsS http://127.0.0.1:8765/api/v1/performance/selection-modes > /dev/null
+          curl -fsS http://127.0.0.1:8765/api/v1/radar/config > /dev/null
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Arayüz duman testi (Playwright)
+        run: |
+          npm install --no-save playwright@1.49.1
+          npx playwright install --with-deps chromium
+          node scripts/ui_smoke.js http://127.0.0.1:8765 --no-write --only mobile,desktop
