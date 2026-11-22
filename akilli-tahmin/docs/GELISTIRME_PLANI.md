@@ -8,6 +8,10 @@ Kod: `akilli_tahmin/` · Testler: `tests/`
 
 ## 0. Yeniden kurulum notu (önce okuyun)
 
+> **Kullanıcı kararı (2026-11-22):** v6.2 metni mevcut değildir. Aşağıdaki yeniden kurulmuş Aşama 1–65 ve
+> Aşama 66 bundan sonra **esas plandır**; Ek A'daki uzlaştırma tablosu kullanılmayacaktır. Radar eşiği %90
+> onaylandı. Oran kaynağı olarak İddaa seçildi (erişim yöntemi: `VARSAYIMLAR.md` §6).
+
 > **Aşama 1–65 yeniden kurulmuştur.** MASTER PROMPT v6.2 metni ve orijinal 65 aşamalı geliştirme listesi bu depoda
 > bulunamadı. Aşağıdaki Aşama 1–65, v6.3 metninin v6.2'ye yaptığı atıflardan yeniden kurulmuştur:
 > 21 futbol organizasyonu; yalnızca iki ana tahmin modeli (MODEL A = yalnızca futbol verisi, katı oran izolasyonu;

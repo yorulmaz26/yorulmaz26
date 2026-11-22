@@ -91,9 +91,20 @@ de anlamlı biçimde geçen) yoksa **ihtiyatlı en küçük** kuralı kullanıl�
 olasılığın küçüğü. Bu, iki modelin de desteklemesini şart koşan bir karar kuralıdır; ortalama değildir.
 İki model aynı veriden etkilenebildiği için bağımsız doğrulama sayılmaz (denetim notunda belirtilir).
 
-## 6. Kullanıcıya sorulacaklar
+## 6. Kullanıcı kararları (2026-11-22)
 
-1. Özgün v6.2 metni ve 65 aşamalı liste paylaşılırsa plan ve organizasyon listesi uzlaştırılacak.
-2. Gerçek veri sağlayıcısı (fikstür, sonuç, canlı veri, oran) ve İddaa verisine erişim yöntemi.
-3. Radar eşiğinin %90 olması (kullanıcı talebi) korunacak mı; "gevşetilmez" kuralı yalnızca modlara karşı mı?
-4. İstatistiksel politika değerleri (güven düzeyleri, en az örneklemler) için tercih.
+1. **v6.2 metni yok.** Yeniden kurulan 66 aşamalı plan (`GELISTIRME_PLANI.md`) ve 21 organizasyon listesi
+   bundan sonra esas alınır; uzlaştırma tablosu (Ek A) kullanılmayacaktır.
+2. **Canlı Gol Radar eşiği %90 onaylandı** (MODEL A > %90, MODEL B > %90; diğer şartlar aynen).
+3. **Oran kaynağı: İddaa.** Açık araştırma sonucu: İddaa / Spor Toto'nun herkese açık, belgelenmiş bir
+   geliştirici veri servisi bulunamadı. Seçenekler:
+   - İddaa'dan (Spor Toto Teşkilatı / iddaa.com) resmi veri ortaklığı veya lisanslı veri talebi;
+   - İddaa oranlarını sunduğunu belirten lisanslı bir oran veri sağlayıcısına abonelik (kapsam ve koşullar
+     sağlayıcının sitesinden doğrulanmalıdır; bu ortamın ağ politikası nedeniyle doğrulanamadı);
+   - iddaa.com sayfalarının veya belgelenmemiş uç noktalarının kazınması **önerilmez**: kullanım koşullarını
+     ihlal edebilir ve haber verilmeden bozulabilir.
+   Sistemde `iddaa` kaynağı yalnızca resmi/lisanslı bağlantı kurulup doğrulandığında `verified = 1` olur;
+   o zamana kadar hiçbir oran İddaa olarak gösterilmez.
+4. Fikstür, sonuç ve canlı maç verisi (dakika, skor, xG) için oran kaynağından ayrı bir futbol veri sağlayıcısı
+   gerekebilir; seçim, İddaa erişim yöntemi netleşince yapılacaktır.
+5. İstatistiksel politika değerleri (güven düzeyleri, en az örneklemler) varsayılan haliyle kullanılır.
