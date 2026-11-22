@@ -13,19 +13,29 @@ python3 tools/magaza/magaza.py --promo /tmp/kayit --fonts <Roboto klasörü> --s
 
 | Dosya | Boyut | Play Console alanı |
 |---|---|---|
-| `simge_512.png` | 512×512 PNG | Uygulama simgesi |
+| `simge_512.png` | 512×512, 32 bit PNG (RGBA) | Uygulama simgesi |
 | `one-cikan-gorsel_1024x500.png` | 1024×500 PNG (saydamlık yok) | Öne çıkan grafik |
 | `ekran-goruntuleri/01…08_*.png` | 1080×1920 PNG, Türkçe başlıklı | Telefon ekran görüntüleri (en az 4 tane, en fazla 8) |
-| `ekran-goruntuleri-yalin/01…08_*.png` | 1080×1920 PNG, başlıksız | Aynı görüntülerin yalın hâli: yedek ya da başka diller için |
+| `ekran-goruntuleri-yalin/01…08_*.png` | 1080×1920 PNG, başlıksız | Aynı görüntülerin başlıksız hâli (kendi başlık tasarımın için) |
+| `aciklama-kisa.txt`, `aciklama-tam.txt` | düz metin | Kısa ve tam açıklama: olduğu gibi kopyalanır |
 | `video/tanitim-30sn.mp4` | 1920×1080, 30 FPS, H.264 + AAC, tam 30 sn | Tanıtım videosu (YouTube) |
 | `video/tanitim-60sn.mp4` | 1920×1080, 30 FPS, H.264 + AAC, tam 60 sn | Tanıtım videosu (YouTube) |
 
-- **Video yükleme:** Play Console video dosyası kabul etmez, YouTube bağlantısı ister. Videoyu YouTube'a "Herkese
-  açık" ya da "Liste dışı" olarak yükle ve bağlantıyı "Tanıtım videosu" alanına yapıştır. Video, ekran görüntülerinin
-  başında gösterilir. Önerilen: 30 sn'lik sürüm. 60 sn'lik sürüm YouTube kanalı ve sosyal medya için uygun.
-- **Videonun içeriği:** Açılış kartıyla başlar ve gerçek oynanışı gösterir. Gösterilen mekanikler: aynalar, prizma,
-  renk karışımı, bloklar, kapı/anahtar, mantık bölümü ve görünümler. Ardından bölüm seçimi ile günlük bulmaca gelir,
-  kapanış kartıyla biter. Dokunuşlar beyaz halkayla gösterilir.
+- **Video yükleme:** Play Console video dosyası kabul etmez, YouTube bağlantısı ister.
+  1. Videoyu YouTube'a "Herkese açık" ya da "Liste dışı" olarak yükle. "Gizli" olursa Play'de oynamaz.
+  2. YouTube Studio'da bu videonun **para kazanmasını kapalı** tut. Açık olursa mağaza sayfasında videodan önce reklam
+     çıkabilir.
+  3. "Yerleştirmeye izin ver" açık olsun; yaş kısıtlaması koyma.
+  4. Tek videonun bağlantısını (`https://www.youtube.com/watch?v=…`) Play Console'daki "Tanıtım videosu" alanına yapıştır.
+     Oynatma listesi, kanal ya da Shorts bağlantısı olmasın. Videolar 16:9 olduğu için Shorts'a dönüşmez.
+  5. Bağlantıyı gizli pencerede açıp reklamsız başladığını kontrol et.
+  Önerilen: 30 sn'lik sürüm. 60 sn'lik sürüm YouTube kanalı ve sosyal medya için uygun.
+- **Videoların içeriği:** iki video da açılış kartıyla başlar ve 2–3 sn içinde gerçek oynanışa geçer. Dokunuşlar beyaz
+  halkayla gösterilir.
+  - **30 sn:** aynalar, prizma, renk karışımı, yıldızlar ("Kusursuz!" penceresi bir kez), bloklar, anahtar/kapı,
+    mantık bölümü, 5 dünya / bölüm seçimi, kapanış kartı.
+  - **60 sn:** 30 sn'deki her şeye ek olarak dünya 5 usta bölümü, iki bloklu bölüm, prizma + süzgeç + taş bölümü,
+    görünümler, günlük bulmaca ve ana menü ("İnternetsiz oyna").
 - **Ses:** oyunun kendi müziği ve ses efektleri. Lisans sorunu yok, hepsi oyun için üretildi.
 - **Yazı tipi:** Roboto, Apache 2.0 lisanslı; oyunun arayüzündeki yazı tipiyle aynı.
 
@@ -34,24 +44,11 @@ python3 tools/magaza/magaza.py --promo /tmp/kayit --fonts <Roboto klasörü> --s
 **Uygulama adı** (en fazla 30 karakter):
 > Işık Yolu: Ayna Bulmacası
 
-**Kısa açıklama** (en fazla 80 karakter):
+**Kısa açıklama** (en fazla 80 karakter; `aciklama-kisa.txt`):
 > Aynaları döndür, ışığı hedefe ulaştır! 500 bölümlük mantık bulmacası.
 
-**Tam açıklama:**
-> Işık Yolu, ışığı aynalarla yönlendirdiğin sakin ama düşündüren bir bulmaca oyunu.
->
-> Aynaları döndür, ışık hüzmesini hedeflere ulaştır. Prizmalarla beyaz ışığı renklerine ayır. Renkleri birleştirerek
-> sarıyı, pembeyi, camgöbeğini yak. Taşları kaydırıp yol aç, anahtarları ışıkla yakıp kapıları aç.
->
-> ★ 500 bölüm, 5 dünya: kolay başlangıçtan ustalık isteyen mantık bölümlerine
-> ★ Mantık bölümleri: rastgele dokunarak geçilmez, önce düşünmek gerekir
-> ★ Her bölümde en az hamleyle bitir, 3 yıldız topla
-> ★ Her gün yeni bir günlük bulmaca ve seri ödülleri
-> ★ Aynalar, tahtalar ve ışın efektleri için görünümler
-> ★ Takıldığında yol gösteren akıllı ipuçları
-> ★ İnternet olmadan oynanır
->
-> Kısa molalar için de, uzun düşünme oturumları için de uygun. Işığı yönlendir, bulmacayı çöz!
+**Tam açıklama:** `aciklama-tam.txt` dosyasındaki metni olduğu gibi kopyala. Satır sonları yalnızca paragraf ve madde
+aralarındadır.
 
 **Kategori:** Oyun › Bulmaca · **Etiketler:** Bulmaca, Mantık, Beyin oyunları
 
@@ -62,7 +59,7 @@ reklam gösterilmesi gerekmez. Uygulama içi satın alma yok: market yalnızca o
 
 ## Kontrol listesi (Play şartları)
 
-- [x] Simge 512×512, 32 bit PNG.
+- [x] Simge 512×512, 32 bit PNG (RGBA, opak kare; köşe maskesini Play uygular).
 - [x] Öne çıkan grafik 1024×500, saydamlıksız PNG.
 - [x] En az 4 telefon ekran görüntüsü:
   - 1080×1920 (9:16; uzun kenar kısa kenarın 2 katını geçmiyor),
@@ -70,5 +67,11 @@ reklam gösterilmesi gerekmez. Uygulama içi satın alma yok: market yalnızca o
   - tanıtım alanlarında öne çıkabilmek için en az 1080 px.
 - [x] Görüntüler ve video gerçek oynanışı gösterir; yanıltıcı içerik ya da reklam yoktur.
 - [x] Video 1920×1080. Play önerisine uygun olarak yatay, kısa ve ilk saniyelerde oynanışa geçiyor.
+- [x] Görsellerde cihaz çerçevesi, "hemen indir" türü eylem çağrısı, fiyat ve sıralama iddiası yok.
+- [ ] YouTube'da bu videonun para kazanması kapalı ve yerleştirme izni açık.
 - [ ] Videoyu YouTube'a yükle, bağlantıyı Play Console'a gir (senin hesabınla yapılmalı).
-- [ ] Gizlilik politikası adresi, reklam beyanı, veri güvenliği formu ve hedef kitle (Play Console).
+- [ ] Gizlilik politikası adresi (`docs/GIZLILIK.md` yayımlanmış hâli).
+- [ ] "Reklam içerir: Evet" beyanı.
+- [ ] Reklam kimliği beyanı: Evet. Uygulama `AD_ID` iznini AdMob için kullanıyor.
+- [ ] Veri güvenliği formu (AdMob: cihaz/reklam kimliği, uygulama etkileşimleri, tanılama, yaklaşık konum).
+- [ ] İçerik derecelendirmesi (IARC anketi) ve hedef kitle beyanı.

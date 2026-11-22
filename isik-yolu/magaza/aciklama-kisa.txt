@@ -1,0 +1,1 @@
+Aynaları döndür, ışığı hedefe ulaştır! 500 bölümlük mantık bulmacası.

@@ -224,7 +224,7 @@ public class PromoCaptureTest {
         warm(40);
         shot("09_menu");
         begin("menu");
-        rec(2.5);
+        rec(3.2);
         end();
 
         levelClip("a_temel", 12, 0.7, -1, null, null);
@@ -232,7 +232,10 @@ public class PromoCaptureTest {
         levelClip("c_renk", 40, 0.6, -1, null, "03_yildizlar");
         levelClip("d_blok", 74, 0.65, 2, "06_bloklar", null);
         levelClip("e_kapi", 86, 0.65, 3, "05_kapilar", null);
-        levelClip("f_mantik", 169, 0.55, 6, "01_mantik", null);
+        levelClip("f_mantik", 169, 0.55, 8, "01_mantik", null); // son hamleden hemen sonra: beş hedef birden yanarken
+        levelClip("x_usta", 457, 0.55, -1, null, null);
+        levelClip("z_blok2", 76, 0.6, -1, null, null);
+        levelClip("y_karma", 95, 0.6, -1, null, null);
         skins("mirror_rainbow", "board_galaxy", "beam_plasma");
         levelClip("g_gorunum", 60, 0.55, 5, "08_gorunumler", null);
         skins("mirror_gold", "board_sunset", "beam_stardust");
@@ -267,7 +270,7 @@ public class PromoCaptureTest {
         warm(30);
         shot("07_gunluk");
         begin("i_gunluk");
-        rec(2.2);
+        rec(3.2);
         end();
         assertTrue(new File(out, "clips/f_mantik/events.json").exists());
         assertTrue(act.currentScreen() instanceof com.isikyolu.game.screens.DailyScreen || act.currentScreen() instanceof LevelSelectScreen);

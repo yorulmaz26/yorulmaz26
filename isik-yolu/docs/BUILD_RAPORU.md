@@ -1,4 +1,4 @@
-# Build Raporu — Işık Yolu 1.7.0
+# Build Raporu — Işık Yolu 1.7.1
 
 Tarih: 22 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
@@ -16,6 +16,25 @@ Tarih: 22 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.7.1 değişiklikleri (Play Store malzemesi)
+
+- `magaza/`: Play Store görselleri ve tanıtım videoları (ayrıntı: `magaza/MAGAZA.md`). Hiçbirinde reklam yoktur.
+  - **Kayıt:** `PromoCaptureTest` oyunu Robolectric'te gerçek çizimle oynatır ve 30 FPS kare kaydeder. Yalnızca
+    `-PpromoDir` verilince çalışır.
+  - **Birleştirme:** `tools/magaza/magaza.py` kareleri başlık, dokunuş halkası, oyun müziği ve sesleriyle birleştirir.
+  - **Denetim:** bağımsız denetimde (her bulgu 2 şüpheciyle) 17 bulgu doğrulandı ve hepsi giderildi.
+    - Simge 32 bit yapıldı.
+    - Ses efektleri 0,33 sn erken çalıyordu; senkron düzeltildi.
+    - "Kusursuz!" penceresi videoda bir kez ve yıldızlar dolana dek gösteriliyor.
+    - Cihaz çerçevesi kaldırıldı.
+    - Başlık hizası sabitlendi.
+    - İlk ekran görüntüsü bütün hedefler yanarken alındı.
+    - YouTube'da reklamları kapatma adımları rehbere eklendi.
+- **Oyun düzeltmeleri** (kayıt sırasında bulundu):
+  - Bitiş penceresindeki yıldız parıltısı düz gri disk gibi çizilip kesiliyordu; artık yumuşak bir hale.
+  - 360 dp genişlikte "Bölümler" başlığı ikiye bölünüyordu.
+  - Günlük seri, bugünün bulmacası çözülene kadar 0 görünüyordu.
 
 ## 1.7.0 değişiklikleri (reklamlar)
 
@@ -187,12 +206,12 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.7.0.apk` (release, R8 küçültme + kaynak küçültme) | 4 410 279 bayt | `0064821f21864255b9990651d0d6c600715e2c39b02406431bbb809f857b1980` |
-| `teslimat/IsikYolu-1.7.0-debug.apk` | 9 099 161 bayt | `942d6dc9ec850e9e98be1f24993622ebeb3382f388e74f8c72bf9eac99b4f2cc` |
+| `teslimat/IsikYolu-1.7.1.apk` (release, R8 küçültme + kaynak küçültme) | 4 410 475 bayt | `748bdf58a1b96a598784038232e4b427a9b1723ca9372fa4eeb5d400a980429f` |
+| `teslimat/IsikYolu-1.7.1-debug.apk` | 9 099 693 bayt | `7f096797b13183040206c365be1a9e8977adf00890ad92e0085a3bc17696fa60` |
 
 APK, reklam SDK'sı ve bağımlılıkları (AndroidX, Kotlin standart kitaplığı) yüzünden 2,0 MB'tan 4,4 MB'a büyüdü.
 
-- Paket: `com.isikyolu.game`, sürüm kodu 10, sürüm adı 1.7.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 11, sürüm adı 1.7.1 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler:
   - Uygulamanın kendisi: `VIBRATE`, `INTERNET`, `ACCESS_NETWORK_STATE`.
   - Reklam SDK'sının eklediği: `AD_ID`, `ACCESS_ADSERVICES_*`, `WAKE_LOCK`, `FOREGROUND_SERVICE`.
@@ -204,7 +223,7 @@ APK, reklam SDK'sı ve bağımlılıkları (AndroidX, Kotlin standart kitaplığ
 
 ```
 ./gradlew clean :engine:test :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest
-BUILD SUCCESSFUL in 6m 3s    (115 test, 0 hata)
+BUILD SUCCESSFUL in 5m 53s    (116 test geçti, 2 kayıt testi bilerek atlandı, 0 hata)
 ```
 
 `./gradlew :app:lintDebug` sonucu: **0 hata**, 32 uyarı. Uyarılar şu türden:

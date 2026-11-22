@@ -57,14 +57,13 @@ def rounded_mask(size, radius):
 
 def phone_layer(canvas_size, box, radius):
     """Telefon gövdesi (gölge + koyu çerçeve + ince kenar). box = ekranın yeri (x, y, w, h)."""
+    # Play önerisi: cihaz görüntüsü yok. Yalnızca ekranın altında yumuşak gölge ve ince açık kenar.
     x, y, w, h = box
-    pad = max(10, w // 30)
     layer = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
     sh = Image.new("RGBA", canvas_size, (0, 0, 0, 0))
-    ImageDraw.Draw(sh).rounded_rectangle([x - pad + 10, y - pad + 24, x + w + pad + 10, y + h + pad + 24], radius=radius + pad, fill=(5, 8, 24, 150))
-    layer = Image.alpha_composite(layer, sh.filter(ImageFilter.GaussianBlur(28)))
-    d = ImageDraw.Draw(layer)
-    d.rounded_rectangle([x - pad, y - pad, x + w + pad, y + h + pad], radius=radius + pad, fill=(14, 22, 48, 255), outline=(0x55, 0x69, 0x95, 255), width=3)
+    ImageDraw.Draw(sh).rounded_rectangle([x + 6, y + 18, x + w + 6, y + h + 18], radius=radius, fill=(5, 8, 24, 140))
+    layer = Image.alpha_composite(layer, sh.filter(ImageFilter.GaussianBlur(24)))
+    ImageDraw.Draw(layer).rounded_rectangle([x - 3, y - 3, x + w + 3, y + h + 3], radius=radius + 3, outline=(0x7C, 0x8F, 0xBE, 200), width=3)
     return layer
 
 
@@ -123,10 +122,11 @@ def screenshots(promo, fonts, out):
         c = Image.alpha_composite(c, phone).convert("RGB")
         paste_screen(c, src, box, 40)
         d = ImageDraw.Draw(c)
-        y = 70
-        y += text_center(d, W / 2, y, title, ft, WHITE) + 26
-        d.rounded_rectangle([W / 2 - 60, y, W / 2 + 60, y + 7], radius=4, fill=GOLD)
-        text_center(d, W / 2, y + 30, sub, fs, DIM)
+        asc, desc = ft.getmetrics()
+        text_center(d, W / 2, 70, title, ft, WHITE)
+        line_y = 70 + asc + desc + 12  # her görselde aynı yükseklik
+        d.rounded_rectangle([W / 2 - 60, line_y, W / 2 + 60, line_y + 7], radius=4, fill=GOLD)
+        text_center(d, W / 2, line_y + 30, sub, fs, DIM)
         c.save(os.path.join(out, "ekran-goruntuleri", f"{i:02d}_{name[3:]}.png"))
     print("ekran görüntüleri:", len(SHOTS))
 
@@ -151,7 +151,7 @@ def feature_graphic(promo, fonts, out):
     paste_screen(c, shot, box, 26)
     c = c.convert("RGB")
     c.save(os.path.join(out, "one-cikan-gorsel_1024x500.png"))
-    Image.open(os.path.join(promo, "icon", "icon_512.png")).convert("RGB").save(os.path.join(out, "simge_512.png"))
+    Image.open(os.path.join(promo, "icon", "icon_512.png")).convert("RGBA").save(os.path.join(out, "simge_512.png"))  # Play: 32 bit PNG
     print("öne çıkan görsel ve simge")
 
 
@@ -163,6 +163,10 @@ class Clip:
         self.dir = os.path.join(promo, "clips", name)
         meta = json.load(open(os.path.join(self.dir, "events.json"), encoding="utf-8"))
         self.frames, self.events, self.w, self.h = meta["frames"], meta["events"], meta["w"], meta["h"]
+
+    def win_frame(self):
+        w = [e["f"] for e in self.events if e["k"] == "win"]
+        return w[0] if w else None
 
     def frame(self, i):
         i = max(0, min(self.frames - 1, i))
@@ -281,7 +285,7 @@ def render(video, segments, path_mp4, sounds, total_seconds, xfade=10):
             nonlocal count, last
             f.write(fr.tobytes()); count += 1; last = fr
         for si, (gen, events) in enumerate(segments):
-            offset = count - len(tail)  # bu bölümün ilk karesi, önceki bölümün kuyruğuyla üst üste biner
+            offset = count  # önceki bölümün kuyruğu henüz yazılmadı: bu bölümün ilk karesi (karışmış hâliyle) 'count' konumuna yazılır
             for (fi, name) in events:
                 sfx.append((offset + fi, name))
             buf = deque()
@@ -357,16 +361,30 @@ def clip_events(clip, start=0, end=None):
 
 def videos(promo, fonts, sounds, out, xfade=10):
     v = Video(promo, fonts, sounds)
-    names = ["menu", "a_temel", "b_prizma", "c_renk", "d_blok", "e_kapi", "f_mantik", "g_gorunum", "g2_gorunum", "h_bolumler", "i_gunluk"]
+    names = ["menu", "a_temel", "b_prizma", "c_renk", "d_blok", "e_kapi", "f_mantik", "x_usta", "z_blok2", "y_karma",
+             "g_gorunum", "g2_gorunum", "h_bolumler", "i_gunluk"]
     C = {n: Clip(promo, n) for n in names}
     title = [("Işık Yolu", font(fonts, "Roboto-Black.ttf", 140), WHITE), ("Işığı yönlendir. Bulmacayı çöz.", font(fonts, "Roboto-Medium.ttf", 54), DIM)]
     endc = [("Işık Yolu", font(fonts, "Roboto-Black.ttf", 130), WHITE),
             ("500 bölüm · 5 dünya · internetsiz oyna", font(fonts, "Roboto-Medium.ttf", 50), DIM)]
+    AFTER_WIN = 20  # hedefler yandıktan sonra ~0,7 sn kutlama; 'Kusursuz!' penceresi win+22'de açılır
 
     def clip(name, t, s, start=0, cut_end=0):
         c = C[name]
         e = c.frames - cut_end
         return (e - start, lambda: v.clip_frames(c, t, s, start, e), clip_events(c, start, e))
+
+    def play(name, t, s, start=0):
+        """Bölüm klibi: çözüm biter bitmez (pencere açılmadan) kesilir."""
+        c = C[name]
+        e = min(c.frames, c.win_frame() + AFTER_WIN)
+        return (e - start, lambda: v.clip_frames(c, t, s, start, e), clip_events(c, start, e))
+
+    def stars(name, t, s):
+        """Tamamlandı penceresi bir kez, üç yıldız dolana dek."""
+        c = C[name]
+        st = c.win_frame() + 18
+        return (c.frames - st, lambda: v.clip_frames(c, t, s, st, c.frames), clip_events(c, st, c.frames) + [(5, "star"), (14, "star"), (23, "star")])  # yıldızlar win+23/+32/+41
 
     def card(sec, lines, end_card=False, sound=None):
         n = int(round(sec * FPS))
@@ -378,33 +396,40 @@ def videos(promo, fonts, sounds, out, xfade=10):
         n = len(specs) + 1
         used = sum(sp[0] for sp in specs) - xfade * (n - 1)
         end_len = total - used
-        if end_len < int(3.0 * FPS) or end_len > int(6.5 * FPS):
+        if end_len < int(3.0 * FPS) or end_len > int(5.5 * FPS):
             raise SystemExit(f"{path}: kapanış kartı {end_len / FPS:.1f} sn olurdu; bölüm seçimini ayarla")
         segs = [(gen, ev) for (_, gen, ev) in specs] + [card(end_len / FPS, endc, end_card=True)[1:]]
         render(v, segs, path, sounds, seconds, xfade)
 
     os.makedirs(out, exist_ok=True)
     s60 = [
-        card(3.4, title, sound="intro"),
-        clip("a_temel", "Aynaları döndür", "Işığı hedefe ulaştır"),
-        clip("b_prizma", "Prizmalar", "Beyaz ışık renklerine ayrılır"),
-        clip("c_renk", "Renkleri karıştır", "Kırmızı ile yeşil sarıyı yakar"),
-        clip("d_blok", "Taşları kaydır", "Işığa yol aç"),
-        clip("e_kapi", "Anahtarlar ve kapılar", "Anahtarı yak, kapı açılsın"),
-        clip("f_mantik", "Mantık bölümleri", "Önce düşün, sonra dokun"),
-        clip("g_gorunum", "Kendi tarzın", "Ayna, tahta ve ışın görünümleri"),
-        clip("g2_gorunum", "Kendi tarzın", "Ayna, tahta ve ışın görünümleri", 6, 48),
+        card(2.6, title, sound="intro"),
+        play("a_temel", "Aynaları döndür", "Işığı hedefe ulaştır"),
+        play("b_prizma", "Prizmalar", "Beyaz ışık renklerine ayrılır"),
+        play("c_renk", "Renkleri karıştır", "Kırmızı ile yeşil sarıyı yakar"),
+        stars("c_renk", "Yıldızları topla", "En az hamleyle bitir, 3 yıldız kazan"),
+        play("d_blok", "Taşları kaydır", "Işığa yol aç"),
+        play("e_kapi", "Anahtarlar ve kapılar", "Anahtarı ışıkla yak, kapı açılsın"),
+        play("f_mantik", "Mantık bölümleri", "Önce düşün, sonra dokun"),
+        play("x_usta", "Usta bölümleri", "Prizma, süzgeç ve kesişen ışınlar"),
+        play("z_blok2", "Her bölüm yeni bir bulmaca", "Bloklar, aynalar ve renkler bir arada"),
+        play("y_karma", "Hepsi bir arada", "Prizma, süzgeç ve taşlar aynı bölümde"),
+        play("g_gorunum", "Kendi tarzın", "Ayna, tahta ve ışın görünümleri"),
+        play("g2_gorunum", "Kendi tarzın", "Ayna, tahta ve ışın görünümleri", 6),
         clip("h_bolumler", "5 dünya, 500 bölüm", "Kolaydan ustalığa"),
         clip("i_gunluk", "Her gün yeni bulmaca", "Seriyi sürdür, ödülleri topla"),
         clip("menu", "İnternetsiz oyna", "Her yerde, her an"),
     ]
     build(s60, 60.0, os.path.join(out, "tanitim-60sn.mp4"))
     s30 = [
-        card(2.6, title, sound="intro"),
-        clip("a_temel", "Aynaları döndür", "Işığı hedefe ulaştır", 6, 40),
-        clip("b_prizma", "Prizmalar ve renkler", "Beyaz ışık renklerine ayrılır", 6, 40),
-        clip("c_renk", "Renkleri karıştır", "Kırmızı ile yeşil sarıyı yakar", 6, 40),
-        clip("f_mantik", "Mantık bölümleri", "Önce düşün, sonra dokun", 6),
+        card(2.2, title, sound="intro"),
+        play("a_temel", "Aynaları döndür", "Işığı hedefe ulaştır", 6),
+        play("b_prizma", "Prizmalar ve renkler", "Beyaz ışık renklerine ayrılır", 6),
+        play("c_renk", "Renkleri karıştır", "Kırmızı ile yeşil sarıyı yakar", 6),
+        stars("c_renk", "Yıldızları topla", "En az hamleyle bitir, 3 yıldız kazan"),
+        play("d_blok", "Taşları kaydır", "Işığa yol aç", 6),
+        play("e_kapi", "Anahtarlar ve kapılar", "Anahtarı ışıkla yak, kapı açılsın", 6),
+        play("f_mantik", "Mantık bölümleri", "Önce düşün, sonra dokun", 6),
         clip("h_bolumler", "5 dünya, 500 bölüm", "Kolaydan ustalığa", 10, 10),
     ]
     build(s30, 30.0, os.path.join(out, "tanitim-30sn.mp4"))

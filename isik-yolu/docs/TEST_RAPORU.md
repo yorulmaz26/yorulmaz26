@@ -1,8 +1,8 @@
-# Test Raporu — Işık Yolu 1.7.0
+# Test Raporu — Işık Yolu 1.7.1
 
 Tarih: 22 Kasım 2026 · Komut: `./gradlew clean :engine:test :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest`
 
-**Sonuç: 115 testin 115'i geçti, 0 hata.**
+**Sonuç: 116 test geçti, 0 hata.** `PromoCaptureTest`'in 2 kayıt testi yalnızca `-PpromoDir` verilince çalışır, normalde atlanır.
 - 1.7.0: reklamlar ve Android 16 hedefi (aşağıda "Reklamlar ve Android 16").
 - 1.6.0: bölüm denetimi (aşağıda "Bölüm denetimi").
 
@@ -23,7 +23,7 @@ Tarih: 22 Kasım 2026 · Komut: `./gradlew clean :engine:test :app:assembleDebug
 | `LivesTest` (can sistemi, saat hilesi) | 11 | ✅ | <0,01 sn |
 | `EconomyTest` (market, ekonomi, saat dilimi) | 15 | ✅ | 0,02 sn |
 | `AdPolicyTest` (reklam sıklığı ve video sınırları) | 6 | ✅ | 0,02 sn |
-| `UiFlowTest` (Robolectric, gerçek çizim; denetim ve reklam testleri) | 31 | ✅ | ~300 sn |
+| `UiFlowTest` (Robolectric, gerçek çizim; denetim, reklam ve dar ekran testleri) | 32 | ✅ | ~300 sn |
 
 ## İstenen 10 kontrol
 

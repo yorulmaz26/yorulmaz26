@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.7.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.7.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.7.1.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.7.1-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -57,6 +57,18 @@ Ekonomi bilerek dar tutuldu:
 
 Market günü saat hilesine karşı korumalıdır. Hak bitince bilet veya kristalle +5 hak ile devam edilebilir; her
 devam fiyatı ikiye katlar. Ayrıntılar: `engine/Economy.java`, `docs/BUILD_RAPORU.md`.
+
+## Play Store malzemesi
+
+`magaza/` klasöründe:
+- simge (512),
+- öne çıkan görsel (1024×500),
+- 8 adet 1080×1920 ekran görüntüsü (başlıklı ve başlıksız),
+- 30 ve 60 sn'lik 1920×1080 tanıtım videoları,
+- önerilen ad ve açıklamalar.
+
+Görsellerde ve videolarda reklam yok. Ayrıntılar ve Play Console'daki yerleri: `magaza/MAGAZA.md`. Yeniden üretmek için
+`PromoCaptureTest` (oyunu gerçek çizimle oynatıp kare kaydeder) ve `tools/magaza/magaza.py` kullanılır.
 
 ## Reklamlar (Google AdMob)
 
