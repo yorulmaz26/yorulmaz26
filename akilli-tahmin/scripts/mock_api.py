@@ -101,22 +101,7 @@ class Api:
                     resp["items"] = [i for i in resp["items"] if i["fixture"]["league"]["id"] == league]
                 return resp
             if path == "/recommendations/rejections":
-                mode = check_mode(first(qs, "mode"), user)
-                limit = max(1, min(500, as_int(first(qs, "limit"), "limit", 50)))
-                fixture_id = as_int(first(qs, "fixture_id"), "fixture_id")
-                resp = copy.deepcopy(d["rejections"][mode])
-                items = resp["items"]
-                if fixture_id is not None:
-                    items = [i for i in items if i["fixture"]["id"] == fixture_id]
-                    counts: dict[str, dict] = {}
-                    for it in items:
-                        for fc in it["failed_checks"]:
-                            entry = counts.setdefault(fc["code"], {"code": fc["code"], "label": fc["label"], "count": 0})
-                            entry["count"] += 1
-                    resp["reason_counts"] = sorted(counts.values(), key=lambda c: -c["count"])
-                    resp["total"] = len(items)
-                resp["items"] = items[:limit]
-                return resp
+                return self.rejections(qs, user)
             if path == "/recommendations/modes/comparison":
                 period = check_period(first(qs, "period"))
                 return copy.deepcopy(d["comparison"][period])
@@ -138,10 +123,7 @@ class Api:
                 return item
             m = re.fullmatch(r"/recommendations/(\d+)/rejection-reasons", path)
             if m:
-                item = d["rejection_reasons"].get(m.group(1))
-                if item is None:
-                    raise ApiError(404, "Elenen aday bulunamadı.")
-                return item
+                return self.rejection_reasons(int(m.group(1)))
             if path == "/performance/selection-modes":
                 return d["performance_selection_modes"]
             if path == "/settings":
@@ -173,6 +155,63 @@ class Api:
             return {"user_id": user, "granted": granted}
         raise ApiError(404, "Not Found")
 
+    def rejections(self, qs: dict, user: str) -> dict:
+        """Elenen adaylar: total, reason_counts ve fixtures kayıtlardan türetilir (gerçek API ile aynı anlam).
+
+        `fixtures` limit/offset'ten bağımsız olarak o moddaki elenen adayı olan BÜTÜN maçları listeler.
+        """
+        mode = check_mode(first(qs, "mode"), user)
+        limit = as_int(first(qs, "limit"), "limit", 50)
+        offset = as_int(first(qs, "offset"), "offset", 0)
+        if not 1 <= limit <= 500:
+            raise ApiError(422, "'limit' 1 ile 500 arasında olmalıdır.")
+        if offset < 0:
+            raise ApiError(422, "'offset' negatif olamaz.")
+        fixture_id = as_int(first(qs, "fixture_id"), "fixture_id")
+        src = self.data["rejections"][mode]
+        all_items = src["items"]
+        fixtures: dict[int, dict] = {}
+        for it in all_items:
+            fx = it["fixture"]
+            entry = fixtures.setdefault(fx["id"], {"id": fx["id"], "home": fx.get("home"), "away": fx.get("away"),
+                                                   "kickoff_at": fx.get("kickoff_at"), "count": 0})
+            entry["count"] += 1
+        items = all_items if fixture_id is None else [i for i in all_items if i["fixture"]["id"] == fixture_id]
+        counts: dict[str, dict] = {}
+        for it in items:
+            for fc in it["failed_checks"]:
+                entry = counts.setdefault(fc["code"], {"code": fc["code"], "label": fc["label"], "count": 0})
+                entry["count"] += 1
+        page = []
+        for it in items[offset:offset + limit]:
+            row = copy.deepcopy(it)
+            row["failed_checks"] = [{"code": fc["code"], "label": fc["label"], "detail": fc.get("detail")}
+                                    for fc in it["failed_checks"]]
+            page.append(row)
+        return {
+            "mode": mode,
+            "run_id": src.get("run_id"),
+            "total": len(items),
+            "reason_counts": sorted(counts.values(), key=lambda c: -c["count"]),
+            "fixtures": sorted(fixtures.values(), key=lambda f: (f["kickoff_at"] or "", f["id"])),
+            "items": page,
+        }
+
+    def rejection_reasons(self, cid: int) -> dict:
+        for mode, src in self.data["rejections"].items():
+            for it in src["items"]:
+                if it["id"] == cid:
+                    return {
+                        "id": cid, "mode": mode, "selected": False,
+                        "fixture": {k: it["fixture"].get(k) for k in ("id", "home", "away")},
+                        "market": it["market"], "outcome": it["outcome"],
+                        "failed_checks": [{"code": fc["code"], "label": fc["label"], "passed": False,
+                                           "detail": fc.get("detail"), "value": fc.get("value"),
+                                           "threshold": fc.get("threshold")} for fc in it["failed_checks"]],
+                        "reason_text": it.get("reason_text"),
+                    }
+        raise ApiError(404, "Elenen aday bulunamadı.")
+
     def radar_live(self, user: str) -> dict:
         resp = copy.deepcopy(self.data["radar_live"])
         resp["evaluated_at"] = _now_iso()
@@ -185,7 +224,7 @@ class Api:
             if not granted and item.get("alarm") and not item.get("blocked_reason"):
                 item["alarm"] = False
                 item["alert_id"] = None
-                item["blocked_reason"] = "Bildirim izni verilmediği için alarm üretilmedi."
+                item["blocked_reason"] = "Sağlanmayan koşul: Bildirim izni."
         return resp
 
 
@@ -235,6 +274,12 @@ class Handler(BaseHTTPRequestHandler):
                 time.sleep(self.delay_ms / 1000)
             sub = path[len("/api/v1"):].rstrip("/") or "/"
             body = None
+            if method in ("POST", "PUT"):
+                # Gerçek sunucu gibi: durum değiştiren istekler yalnızca application/json kabul eder
+                # (CORS-basit, içerik türü olmayan çapraz site isteklerini engeller).
+                ctype = (self.headers.get("Content-Type") or "").split(";")[0].strip().lower()
+                if ctype != "application/json":
+                    return self._json(415, {"detail": "İstek gövdesi application/json olmalıdır."})
             length = int(self.headers.get("Content-Length") or 0)
             if length:
                 raw = self.rfile.read(length)

@@ -34,6 +34,7 @@ import numpy as np
 from ..db.database import insert_many, transaction
 from ..domain.markets import MARKETS_BY_ID
 
+
 def _fetchall(conn: sqlite3.Connection, sql: str, params: tuple = ()) -> list:
     """Sorguyu çalıştırır, bütün satırları okur ve imleci hemen kapatır (açık imleç bırakmaz)."""
     cur = conn.execute(sql, params)
@@ -125,8 +126,8 @@ def historical_snapshots(conn: sqlite3.Connection, cutoff: str,
       - maç sonu (MS) ve ilk yarı (İY) skoru dolu, İY ≤ MS (iki takım için ayrı ayrı);
       - gol dakikaları MS skoruyla (takım başına gol sayısı) VE İY skoruyla (45. dakikaya kadarki goller)
         tutarlı. 0-0 / İY 0-0 maçlar gol kaydı olmadan tutarlıdır.
-    Örneğin demo canlı kupa maçları son canlı skorla, İY skoru ve gol dakikası olmadan bitirildiyse
-    (gözlenmeyen dakikalar için sonuç bilinmez) hiç anlık durum üretmez. Sıralama: başlama saati, fikstür,
+    Örneğin demo canlı kupa maçları İY skoru ve gol dakikası yazılmadan bitirildiyse (gözlenmeyen
+    dakikalardaki gollerin zamanı bilinmez) hiç anlık durum üretmez. Sıralama: başlama saati, fikstür,
     dakika. Sonuç deterministiktir.
     """
     minutes = tuple(int(m) for m in minutes)

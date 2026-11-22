@@ -1710,11 +1710,11 @@
         ['Kâr (birim)', (m) => fmtSigned(m.profit_units, 1)],
       ];
       const thead = h('thead', null, h('tr', null, h('th', { scope: 'col', class: 'sticky-col' }, 'Mod'), cols.map(([label]) => h('th', { scope: 'col' }, label))));
-      const tbody = h('tbody', null, rows.map((r) => h('tr', null,
+      const tbody = h('tbody', null, rows.map((r) => h('tr', { dataset: { mode: String(r.code) } },
         h('th', { scope: 'row', class: 'sticky-col' }, h('span', { class: 'mode-cell' }, swatch(r.code), r.name)),
         cols.map(([, fn]) => h('td', null, fn(r.metrics || {}))))));
       if (baseline) {
-        tbody.append(h('tr', { class: 'row-baseline' },
+        tbody.append(h('tr', { class: 'row-baseline', dataset: { mode: 'baseline' } },
           h('th', { scope: 'row', class: 'sticky-col' }, h('span', { class: 'mode-cell' }, swatch('baseline'), 'Tüm adaylar'), h('span', { class: 'ci' }, baselineNote(baseline.label))),
           cols.map(([, fn]) => h('td', null, fn(baseline.metrics || {})))));
       }
