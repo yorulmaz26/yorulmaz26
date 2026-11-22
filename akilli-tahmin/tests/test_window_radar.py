@@ -188,8 +188,9 @@ def test_client_never_records_key():
 # ───────────────────────── planlama ve tik ─────────────────────────
 
 def test_threshold_90_sends_no_requests(demo_conn):
-    """Varsayılan %90 eşiğinde hiçbir maç eşiğe ulaşamadığı için istek gönderilmez."""
+    """%90 eşiğinde hiçbir maç eşiğe ulaşamadığı için istek gönderilmez."""
     fx = _fixture(demo_conn)
+    _set_cfg(demo_conn, threshold=0.90)
     now = iso_add(fx["kickoff"], minutes=H2.nominal_offset + W.BATCH_MINUTES)
     W.plan(demo_conn, iso_add(fx["kickoff"], hours=-1))
     rows = demo_conn.execute("SELECT status, reach_probability FROM window_radar_targets").fetchall()
@@ -301,7 +302,7 @@ def test_settlement_from_live_and_results(demo_conn):
 def test_threshold_change_replans_targets(demo_conn):
     fx = _fixture(demo_conn)
     now = iso_add(fx["kickoff"], hours=-1)
-    W.plan(demo_conn, now)
+    W.update_config(demo_conn, {"threshold": 0.90}, now)
     assert demo_conn.execute("SELECT COUNT(*) FROM window_radar_targets WHERE status='pending'").fetchone()[0] == 0
     W.update_config(demo_conn, {"threshold": 0.35}, now)
     assert demo_conn.execute("SELECT COUNT(*) FROM window_radar_targets WHERE status='pending'").fetchone()[0] > 0
@@ -322,7 +323,7 @@ def test_window_radar_api(demo_copy_path):
     client = TestClient(app)
     data = client.get("/api/v1/radar/windows").json()
     assert {"config", "budget", "targets", "evaluations", "alerts", "probability_scale", "models"} <= set(data)
-    assert data["config"]["threshold"] == 0.90 and data["budget"]["daily_limit"] == 100
+    assert data["config"]["threshold"] == 0.60 and data["budget"]["daily_limit"] == 100
     assert client.put("/api/v1/radar/windows/settings", json={"threshold": 0.1}).status_code == 422
     r = client.put("/api/v1/radar/windows/settings", json={"threshold": 0.6, "enabled": False})
     assert r.status_code == 200 and r.json()["threshold"] == 0.6 and r.json()["enabled"] is False

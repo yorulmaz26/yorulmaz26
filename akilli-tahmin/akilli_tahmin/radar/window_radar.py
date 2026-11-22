@@ -14,7 +14,7 @@ Değerlendirme pencerenin başında yapılır (H1 ≈ 31', H2 ≈ 76'); kalan s�
 -------------------------------------
 1. Kapı (istek yok): maç öncesi MODEL A ile her maç ve pencere için "eşiğe ulaşma şansı" hesaplanır:
    pencere başına kadar atılabilecek gol sayısının dağılımı (gama–Poisson) üzerinden, canlı MODEL A
-   olasılığının eşiğe (varsayılan %90) ulaşma olasılığı. Bu şans `min_reach`'in (varsayılan %1) altındaysa o
+   olasılığının eşiğe (varsayılan %60) ulaşma olasılığı. Bu şans `min_reach`'in (varsayılan %1) altındaysa o
    maç için istek GÖNDERİLMEZ.
 2. Kapı (1 istek): pencere başladığında tek `/fixtures?live=...` isteği o anda oynanan bütün maçları getirir;
    canlı skor, dakika ve kırmızı kartlarla MODEL A pencere olasılığı hesaplanır.
@@ -76,8 +76,9 @@ from .live_goal_radar import (DEFAULT_DISPERSION, RED_CARD_OPPONENT_FACTOR, RED_
 SETTINGS_KEY = "window_radar"
 DEFAULT_CONFIG: dict[str, Any] = {
     "enabled": True,
-    #: Kullanıcı talebi: gol olasılığı %90 ve üstü (≥).
-    "threshold": 0.90,
+    #: Kullanıcı talebi: gol olasılığı eşik ve üstü (≥). İlk talep %90'dı; %90 pratikte hiç ulaşılamadığı için
+    #: kullanıcı 2026-11-22'de %60'a indirdi.
+    "threshold": 0.60,
     "daily_limit": 100,
     #: Elle kontrol veya beklenmedik durumlar için dokunulmayan istek yedeği.
     "reserve": 5,
@@ -888,7 +889,7 @@ def status(conn: sqlite3.Connection, now: str, settings: Settings = SETTINGS) ->
             "max_prematch_probability": max(pres) if pres else None,
             "mean_prematch_probability": float(np.mean(pres)) if pres else None,
             "note": ("15 dakikalık bir pencerede gol olasılığı genellikle %35–%55 arasındadır; %90 için maçta "
-                     "yaklaşık 10 gol beklentisi gerekir. Bu nedenle %90 eşiğinde istek ve bildirim çok nadirdir."),
+                     "yaklaşık 10 gol beklentisi gerekir. Bu nedenle yüksek eşiklerde istek ve bildirim çok nadirdir."),
         },
         "threshold_preview": preview,
         "targets": [{

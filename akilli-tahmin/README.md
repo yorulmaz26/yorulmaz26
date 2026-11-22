@@ -116,7 +116,7 @@ Kalite Kapısı, bildirim izni, mükerrer alarm engeli. Seçim modları bu şart
 İki pencere: **ilk yarının son 15 dakikası (31'–45+')** ve **maçın son 15 dakikası (76'–90+')**. Ücretsiz
 API-Football planı günde 100 istekle sınırlı olduğundan istekler kapılıdır:
 
-1. Maç öncesi MODEL A, canlı gol olasılığının eşiğe (**varsayılan ≥ %90**) ulaşma şansını hesaplar; şans %1'in
+1. Maç öncesi MODEL A, canlı gol olasılığının eşiğe (**varsayılan ≥ %60**; kullanıcı kararıyla %90'dan indirildi) ulaşma şansını hesaplar; şans %1'in
    altındaysa o maç için **istek gönderilmez**.
 2. Pencere başında tek istek (`/fixtures?live=…`) o anda oynanan bütün maçları getirir; MODEL A pencere
    olasılığı canlı skor, dakika ve kırmızı kartla hesaplanır.
@@ -125,7 +125,7 @@ API-Football planı günde 100 istekle sınırlı olduğundan istekler kapılıd
    engeli) sağlanınca verilir.
 
 **Gerçekçi beklenti:** 15 dakikada gol olasılığı tipik maçta %35–%55'tir; %90 için ~10 gol beklentisi gerekir.
-Bu yüzden %90 eşiğinde radar pratikte hiç istek göndermez ve bildirim üretmez. Eşik, Canlı Gol Radar
+Bu yüzden %90 eşiğinde radar pratikte hiç istek göndermez; varsayılan eşik %60'tır. Eşik, Canlı Gol Radar
 sayfasından değiştirilebilir; sayfa her eşikte kaç maç için istek gönderileceğini gösterir.
 
 ```bash

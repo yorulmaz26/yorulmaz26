@@ -265,7 +265,7 @@ def main(argv: list[str] | None = None) -> None:
     sp.add_argument("--port", type=int, default=8000)
     sp = add("window-radar", cmd_window_radar, "Son 15 dakika radarı (API-Football)")
     sp.add_argument("--plan", action="store_true", help="Yalnızca istek planını göster (istek göndermez)")
-    sp.add_argument("--threshold", type=float, default=None, help="Eşik (0,30–0,99); varsayılan kayıtlı ayar (0,90)")
+    sp.add_argument("--threshold", type=float, default=None, help="Eşik (0,30–0,99); varsayılan kayıtlı ayar (0,60)")
     a = p.parse_args(argv)
     a.fn(a)
 

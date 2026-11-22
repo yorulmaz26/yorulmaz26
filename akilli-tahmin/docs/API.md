@@ -426,14 +426,14 @@ cümledir: `"Sağlanmayan koşul: MODEL A > %90."` (koşulun ayrıntısı eklene
 ## Son 15 Dakika Radarı (API-Football)
 
 İki pencere: `H1` = ilk yarının son 15 dakikası (31'–45+'), `H2` = maçın son 15 dakikası (76'–90+'). Eşik
-büyük-eşittir (≥), varsayılan 0,90. Seçim modları etkilemez. Ayrıntılar: `docs/VARSAYIMLAR.md` §8.
+büyük-eşittir (≥), varsayılan 0,60 (kullanıcı kararıyla 0,90'dan indirildi). Seçim modları etkilemez. Ayrıntılar: `docs/VARSAYIMLAR.md` §8.
 
 `GET /api/v1/radar/windows` → durum (istek göndermez; yalnızca planı günceller)
 
 ```json
 {
   "name": "Son 15 Dakika Radarı",
-  "config": {"enabled": true, "threshold": 0.9, "daily_limit": 100, "reserve": 5, "min_reach": 0.01,
+  "config": {"enabled": true, "threshold": 0.6, "daily_limit": 100, "reserve": 5, "min_reach": 0.01,
              "min_remaining_minutes": 10},
   "budget": {"day": "2026-11-22", "daily_limit": 100, "reserve": 5, "used": 3, "remaining": 97, "usable": 92,
              "provider_remaining": 97},

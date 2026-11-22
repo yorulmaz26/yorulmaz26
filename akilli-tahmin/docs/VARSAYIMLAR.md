@@ -152,6 +152,10 @@ istek ile sınırlı olduğu için gol olma ihtimali yüzde 90 ve üstü ise ist
   ortalama %39,8 (H1) / %46,0 (H2), en çok %61,6 / %67,3; hiçbir maç %90'a yaklaşmadı. Bu yüzden %90 eşiğinde radar **pratikte hiç istek göndermez ve
   bildirim üretmez**. 2026-11-22 planında 47 pencere için istek sayısı: %90 → 0, %80 → 0, %70 → 2, %60 → 12,
   %50 → 33.
+- **Eşik %60'a indirildi (kullanıcı kararı, 2026-11-22):** %90'ın pratikte hiç istek ve bildirim üretmediği
+  gösterildikten sonra kullanıcı "60 a indir" dedi; varsayılan eşik ≥ %60. 22–23 Kasım'daki 22 maçta 44
+  bölümün 12'si canlı izlenir. Bildirim için MODEL B ≥ %60 ve iki modelin nadir olay kalibrasyonu yine
+  gereklidir; radar yeterli geçmiş toplayana kadar (MODEL B için ≥ 300 oranlı örnek) bildirim üretmez.
 - **Pencere payları (yaklaşık, literatür):** yarının gollerinin %42'si (H1) ve %41'i (H2) son 15 dakika +
   uzatmada; ortalama uzatma 2 (H1) ve 4 (H2) dakika. Tempo dağılımı κ = 10 (ihtiyatlı). Radar kendi
   değerlendirmelerini sonuçlandırdıkça (canlı yanıttaki devre/maç sonu skoru veya football-data.co.uk sonucu)
