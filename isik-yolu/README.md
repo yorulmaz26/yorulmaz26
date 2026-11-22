@@ -13,7 +13,7 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.6.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.6.0-debug.apk` |
+| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.7.0.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.7.0-debug.apk` |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -57,6 +57,45 @@ Ekonomi bilerek dar tutuldu:
 
 Market günü saat hilesine karşı korumalıdır. Hak bitince bilet veya kristalle +5 hak ile devam edilebilir; her
 devam fiyatı ikiye katlar. Ayrıntılar: `engine/Economy.java`, `docs/BUILD_RAPORU.md`.
+
+## Reklamlar (Google AdMob)
+
+Reklamlar oyun akışını bozmayacak biçimde yerleştirildi:
+
+| Tür | Nerede | Kurallar |
+|---|---|---|
+| **Banner** (uyarlanabilir) | Ekranın en altı: ana menü, bölümler, günlük bulmaca, başarılar, oyun ekranı | İlk 3 bölüm bitene kadar hiç yok. Açılışta, markette ve ayarlarda yok. Oyun düğmelerinden ince bir ayraçla ayrı. Ekranla çakışmaz: tahta banner'ın üstünde kalır. Yüklenmezse (internet yoksa) yer kaplamaz. |
+| **Geçiş reklamı (resim)** | Yalnızca bölüm bitince, "Sonraki Bölüm / Tekrar Oyna / Bölümler" ile sonraki ekrana geçerken | Oyun sırasında asla çıkmaz. İlk 10 (öğretici) bölümde yok. En az 3 tamamlanan bölüm ve 4 dakika arayla gösterilir; ödüllü videodan sonraki 3 dakikada gösterilmez. |
+| **Ödüllü video** | İsteğe bağlı düğmeler: can bitince "+1 can", ipucu bitince "+1 ipucu", hamle hakkı bitince "+N hak", markette "+25 kristal" | Ödül yalnızca video sonuna kadar izlenince verilir. Günlük sınırlar: can 3, ipucu 3, hak 5, kristal 3. Videoyla alınan ek hak kristalli devamın fiyatını artırmaz. |
+
+- **İzin:** Google UMP izin formu ilk ana menüde (açılış animasyonundan sonra) gösterilir. Form yalnızca gereken
+  bölgelerde (AB/İngiltere) çıkar. İzin yoksa reklam istenmez. Gerekiyorsa Ayarlar'da "Reklam Gizlilik Seçenekleri"
+  düğmesi çıkar.
+- **İçerik:** reklam içeriği "PG" ile sınırlıdır.
+- **Çevrimdışı:** oyun internet olmadan tamamen oynanır. Reklam yüklenmezse banner görünmez, geçişler bekletilmez,
+  video düğmeleri gösterilmez.
+- Kurallar: `engine/AdPolicy.java`. Sağlayıcı: `app/.../ads/AdMobProvider.java`. Testlerde sahte sağlayıcı kullanılır.
+
+### Kendi AdMob kimliklerin
+
+Varsayılan kimlikler Google'ın resmi **test** kimlikleridir. Bunlar "Test Ad" etiketli reklam gösterir ve gelir
+getirmez. Gelir için:
+1. AdMob'da uygulamayı ve 3 reklam birimini (Banner, Geçiş, Ödüllü) oluştur.
+2. Kimlikleri `~/.gradle/gradle.properties` dosyasına yaz (depoya koyma):
+   ```
+   admobAppId=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
+   admobBanner=ca-app-pub-XXXXXXXXXXXXXXXX/1111111111
+   admobInterstitial=ca-app-pub-XXXXXXXXXXXXXXXX/2222222222
+   admobRewarded=ca-app-pub-XXXXXXXXXXXXXXXX/3333333333
+   ```
+3. `./gradlew :app:assembleRelease` (ya da Play için `bundleRelease`) ile derle. Debug derlemesi her zaman test
+   kimliklerini kullanır: kendi reklamına tıklamak AdMob kurallarına aykırıdır.
+
+Play Console'da yapılması gerekenler:
+- "Uygulama reklam içeriyor" beyanı.
+- Veri güvenliği formunda reklam kimliği ve AdMob'un topladığı veriler.
+- Hedef kitle beyanı.
+- Uygulama çocuklara yönelikse Aileler politikası; bu durumda reklam isteklerine çocuk etiketi eklenmeli.
 
 ## Canlar (bölüm modu)
 
@@ -195,4 +234,7 @@ Motor görselden tamamen bağımsızdır: `BoardView` yalnızca `GameSession`'ı
 
 ## Gizlilik
 
-İnternet izni yoktur; reklam ve veri toplama yoktur. Yalnızca titreşim izni istenir.
+- **İzinler:** titreşim, internet ve ağ durumu (yalnızca reklamlar için). Google Mobile Ads SDK reklam kimliği
+  iznini (AD_ID) kendisi ekler.
+- **Reklamlar:** Google AdMob. Kişiselleştirme, Google UMP izin formuyla kullanıcının seçimine bağlıdır.
+- **İlerleme:** yalnızca cihazda saklanır; oyunun kendisi veri toplamaz ya da sunucuya göndermez.

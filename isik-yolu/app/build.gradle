@@ -16,7 +16,7 @@ def adId = { String key, boolean release -> release && project.hasProperty(key) 
 
 android {
     namespace 'com.isikyolu.game'
-    compileSdk 34
+    compileSdk 35
     buildToolsVersion '34.0.0'
 
     defaultConfig {
