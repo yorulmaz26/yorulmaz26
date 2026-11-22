@@ -248,6 +248,10 @@ class Engine:
         pa_dw, _ = fit.predict_draws(home, away, self.n_draws, seed=int(rng.integers(1 << 31)))
         records = self.football.match_records(f["league_id"], cutoff)
         feats = football_features(records, home, away)
+        # İlk yarı skoru tutulmayan liglerde (ör. ek lig dosyaları) ilk yarı marketleri sonuçlandırılamaz.
+        recent = records[-200:]
+        ht_coverage = (sum(1 for r in recent if r.ht_home is not None and r.ht_away is not None) / len(recent)
+                       if recent else 0.0)
         signal = signals_for(feats.form_diff, feats.goal_dev)
         # 2 + 10 — oranlar, marj, adil olasılık
         odds = np.full(K, np.nan)
@@ -358,6 +362,9 @@ class Engine:
                               fit.invalid_reason or f"Takım başına en az {dp.min_team_matches} geçmiş maç gerekli."))
             gate.append(Check("settlement_rules", (mid, "standard") in rules, None, None,
                               "Market için doğrulanmış sonuçlandırma kuralı yok."))
+            gate.append(Check("halftime_data", (not mk.needs_halftime) or ht_coverage >= 0.9,
+                              round(ht_coverage, 3) if mk.needs_halftime else None, 0.9 if mk.needs_halftime else None,
+                              "Bu organizasyonda ilk yarı skorları tutulmuyor; ilk yarı marketi sonuçlandırılamaz."))
             gate.append(Check("model_a_valid", fit.valid and bool(np.isfinite(pa_w[i])), MODEL_A_VERSION, None,
                               fit.invalid_reason or "MODEL A tahmini üretilemedi."))
             b_ok = models.model_b.family_valid(fam) and bool(np.isfinite(pb_w[i]))
@@ -656,7 +663,8 @@ def settle_fixture_results(conn: sqlite3.Connection, history: History, as_of: st
     from ..domain.markets import settle
 
     rows = conn.execute(
-        "SELECT d.id, d.market_id, d.outcome_id, d.decimal_odds, f.status, f.ft_home, f.ft_away, f.ht_home,"
+        "SELECT d.id, d.market_id, d.outcome_id, d.decimal_odds, d.selection_timestamp, f.kickoff_at, f.status,"
+        " f.ft_home, f.ft_away, f.ht_home,"
         " f.ht_away, f.result_recorded_at FROM selection_mode_decisions d JOIN fixtures f ON f.id=d.fixture_id"
         " WHERE d.settlement_status='pending' AND f.result_recorded_at IS NOT NULL AND f.result_recorded_at<=?",
         (as_of,),
@@ -665,7 +673,8 @@ def settle_fixture_results(conn: sqlite3.Connection, history: History, as_of: st
     with transaction(conn):
         for r in rows:
             res = MatchResult(r["status"], r["ft_home"], r["ft_away"], r["ht_home"], r["ht_away"])
-            s = settle(r["market_id"], r["outcome_id"], res)
+            # Başlama saati sonradan öne çekildiyse ve seçim maç başladıktan sonra yapılmışsa karar iade sayılır.
+            s = "void" if r["selection_timestamp"] >= r["kickoff_at"] else settle(r["market_id"], r["outcome_id"], res)
             if s == "unresolved":
                 continue
             o = r["decimal_odds"]

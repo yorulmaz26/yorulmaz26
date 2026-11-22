@@ -146,3 +146,151 @@ def test_lean_backtest_skips_ineligible_rows(tmp_path):
                        " ON m.id=d.candidate_id WHERE m.id IS NULL").fetchone()[0]
     assert orphan == 0
     assert np.isfinite(n_eval)
+
+
+# ───────────── inceleme düzeltmeleri: ertelenen maçlar, önbellek, karışık fiyat, lig seçimi ─────────────
+
+def _fx_row(date, time_, home, away, o=(2.0, 3.4, 3.9)):
+    return f"T1,{date},{time_},{home},{away},,{o[0]},{o[1]},{o[2]},{o[0]},{o[1]},{o[2]},1.9,1.9"
+
+
+def test_rescheduled_match_keeps_one_row_and_postponed_is_voided(conn):
+    from akilli_tahmin.data.football_data_csv import mark_postponed
+
+    fx1 = "\n".join([FIX_HEADER, _fx_row("29/11/2026", "16:00", "Fenerbahce", "Galatasaray"),
+                     _fx_row("23/11/2026", "16:00", "Trabzonspor", "Eyupspor")])
+    import_rows(conn, read_csv_text(fx1), "tr-super-lig", "2026", as_of=AS_OF, upcoming=True)
+    # Derbi 4 gün ileri alındı: yeni kayıt değil, aynı kayıt taşınır.
+    fx2 = "\n".join([FIX_HEADER, _fx_row("03/12/2026", "16:00", "Fenerbahce", "Galatasaray")])
+    later = "2026-11-27T09:00:00Z"
+    import_rows(conn, read_csv_text(fx2), "tr-super-lig", "2026", as_of=later, upcoming=True)
+    rows = conn.execute("SELECT kickoff_at, status FROM fixtures WHERE home_team_id=(SELECT id FROM teams WHERE"
+                        " name='Fenerbahce')").fetchall()
+    assert [tuple(r) for r in rows] == [("2026-12-03T16:00:00Z", "scheduled")]
+    # Oynanmayan maç 3 gün sonra ertelenmiş sayılır; kararları iade edilebilir.
+    assert mark_postponed(conn, "tr-super-lig", later) == 1
+    st = conn.execute("SELECT status, result_recorded_at FROM fixtures WHERE home_team_id=(SELECT id FROM teams"
+                      " WHERE name='Trabzonspor')").fetchone()
+    assert st["status"] == "postponed" and st["result_recorded_at"] == later
+    from akilli_tahmin.domain.markets import MatchResult, settle
+
+    assert settle("1X2", "1", MatchResult("postponed", None, None)) == "void"
+
+
+def test_kickoff_moved_earlier_and_passed_drops_from_upcoming(conn):
+    import_rows(conn, read_csv_text("\n".join([FIX_HEADER, _fx_row("23/11/2026", "17:00", "Buyuksehyr", "Corum")])),
+                "tr-super-lig", "2026", as_of=AS_OF, upcoming=True)
+    import_rows(conn, read_csv_text("\n".join([FIX_HEADER, _fx_row("22/11/2026", "13:00", "Buyuksehyr", "Corum")])),
+                "tr-super-lig", "2026", as_of="2026-11-22T20:00:00Z", upcoming=True)
+    ko = conn.execute("SELECT kickoff_at FROM fixtures").fetchone()[0]
+    assert ko == "2026-11-22T13:00:00Z"  # artık yaklaşan maç değil
+
+
+def test_odds_are_written_per_market_snapshot(conn):
+    up = lambda o, at: import_rows(conn, read_csv_text("\n".join([FIX_HEADER, _fx_row("29/11/2026", "16:00", "A", "B", o)])),
+                                   "tr-super-lig", "2026", as_of=at, upcoming=True)
+    up((2.0, 3.4, 3.9), "2026-11-20T09:00:00Z")
+    up((1.8, 3.4, 4.6), "2026-11-23T09:00:00Z")  # yalnızca 1 ve 2 değişti
+    fid = conn.execute("SELECT id FROM fixtures").fetchone()[0]
+    q = latest_quotes(conn, [fid], "2026-11-29T15:00:00Z")[fid]
+    caps = {q[("1X2", o)].captured_at for o in ("1", "X", "2")}
+    assert caps == {"2026-11-23T09:00:00Z"}  # aynı anlık görüntüden üç fiyat
+    assert [q[("1X2", o)].decimal_odds for o in ("1", "X", "2")] == [1.8, 3.4, 4.6]
+
+
+def test_bad_rows_and_foreign_rows_do_not_abort(conn, tmp_path):
+    from akilli_tahmin.data.football_data_csv import import_csv
+
+    text = "\n".join([MAIN_HEADER,
+                      "T1,31/11/2026,18:00,A,B,1,0,H,0,0,D,2,3,4,2,3,4,1.9,1.9,,,",
+                      "T1,01/11/2026,24:00,A,B,1,0,H,0,0,D,2,3,4,2,3,4,1.9,1.9,,,",
+                      "E0,01/11/2026,15:00,Arsenal,Chelsea,1,0,H,0,0,D,2,3,4,2,3,4,1.9,1.9,,,",
+                      "T1,02/11/2026,18:00,C,D,2,2,D,1,1,D,2,3,4,2,3,4,1.9,1.9,,,"])
+    res = import_rows(conn, read_csv_text(text), "tr-super-lig", "2026", as_of=AS_OF)
+    assert res["invalid"] == 2 and res["foreign"] == 1 and res["inserted"] == 1
+    p = tmp_path / "e0.csv"
+    p.write_text("\n".join([MAIN_HEADER, "E0,01/11/2026,15:00,Arsenal,Chelsea,1,0,H,0,0,D,2,3,4,2,3,4,1.9,1.9,,,"]))
+    with pytest.raises(ValueError):
+        import_csv(conn, p, "tr-super-lig", "2026")
+
+
+def test_current_season_is_never_cached(tmp_path, monkeypatch):
+    import io
+    import urllib.request
+
+    served = {"v": "Div,Date\nT1,10/05/2026\n"}
+
+    class Resp(io.BytesIO):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+    monkeypatch.setattr(urllib.request, "urlopen", lambda req, timeout=0: Resp(served["v"].encode()))
+    f = Fetcher(tmp_path)
+    f.get("mmz4281/2526/T1.csv", cache=False)  # sezon sürerken
+    assert not list(tmp_path.iterdir())
+    served["v"] = "Div,Date\nT1,10/05/2026\nT1,17/05/2026\n"
+    text = f.get("mmz4281/2526/T1.csv", cache=True)  # sezon bittikten sonra ilk okuma güncel dosyayı indirir
+    assert "17/05/2026" in text and len(list(tmp_path.iterdir())) == 1
+
+
+def test_extra_league_rows_filtered_by_league_and_brazil_calendar_season(conn):
+    from akilli_tahmin.data.football_data_feed import EXTRA_LEAGUES
+
+    assert EXTRA_LEAGUES["SWZ"][1] == "Super League"
+    files = {
+        "new/SWZ.csv": "\n".join([NEW_HEADER,
+                                  "Switzerland,Super League,2026/2027,01/11/2026,16:00,Basel,Young Boys,1,1,D,2,3,3,2,3,3",
+                                  "Switzerland,Challenge League,2026/2027,02/11/2026,16:00,Thun,Sion,2,0,H,2,3,3,2,3,3"]),
+        "new_league_fixtures.csv": "Country,League,Date,Time,Home,Away,PSH,PSD,PSA,AvgH,AvgD,AvgA,B365H,B365D,B365A\n"
+                                   "Brazil,Serie A,14/02/2027,20:00,Flamengo RJ,Gremio,1.6,3.9,5.5,1.6,3.9,5.5,1.6,3.9,5.5",
+        "new/BRA.csv": NEW_HEADER + "\n",
+    }
+    sync(conn, as_of="2027-02-10T09:00:00Z", codes=(), seasons=1, include_extra=("SWZ", "BRA"), fetcher=FakeFetcher(files))
+    names = {r[0] for r in conn.execute("SELECT name FROM teams WHERE league_id='ch-super-league'")}
+    assert names == {"Basel", "Young Boys"}
+    assert conn.execute("SELECT season FROM fixtures WHERE league_id='br-serie-a'").fetchone()[0] == "2027"
+
+
+def test_server_refresh_uses_configured_leagues_only(tmp_path, monkeypatch):
+    from akilli_tahmin.data import football_data_feed as feed
+    from akilli_tahmin.runtime import Runtime
+
+    db = tmp_path / "r.sqlite3"
+    c = connect(db)
+    init_db(c, AS_OF)
+    feed.save_config(c, (), ("AUT",), AS_OF)
+    c.close()
+    asked: list[str] = []
+
+    def fake_get(self, path, *, cache):
+        asked.append(path)
+        if path == "new/AUT.csv":
+            return NEW_HEADER + "\nAustria,Bundesliga,2026/2027,08/11/2026,16:00,Sturm Graz,Salzburg,3,4,A,2.6,3.8,2.5,2.5,3.6,2.4"
+        return "Country,League,Date,Time,Home,Away\n"
+
+    monkeypatch.setattr(feed.Fetcher, "get", fake_get)
+    rt = Runtime(str(db))
+    assert rt.refresh_real_if_stale(AS_OF, background=False) is True
+    assert asked and all("AUT" in p or p == "new_league_fixtures.csv" for p in asked)  # T1/E0... istenmez
+    assert rt.last_refresh_report["ok"] is True
+    # Başarısız/yakın tarihli denemeden sonra bir saat içinde yeniden denenmez.
+    assert rt.refresh_real_if_stale("2026-11-22T09:30:00Z", background=False) is False
+
+
+def test_halftime_markets_blocked_without_halftime_data(tmp_path):
+    from akilli_tahmin.data.synthetic import generate_demo
+    from akilli_tahmin.selection.engine import Engine
+
+    c = connect(tmp_path / "ht.sqlite3")
+    init_db(c, "2026-11-21T17:00:00Z")
+    generate_demo(c, "2026-11-21T17:00:00Z", leagues=("tr-super-lig",), history_seasons=1, live_fixtures=False)
+    c.execute("UPDATE fixtures SET ht_home=NULL, ht_away=NULL")
+    Engine(c, n_draws=30).run("2026-11-21T17:00:00Z")
+    rows = c.execute("SELECT market_id, gate_failed FROM candidate_evaluations").fetchall()
+    assert rows
+    for r in rows:
+        failed = {x[0] for x in __import__("json").loads(r["gate_failed"])}
+        assert ("halftime_data" in failed) == r["market_id"].startswith(("HT_", "HTFT"))

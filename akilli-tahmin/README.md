@@ -27,8 +27,8 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```bash
 .venv/bin/python -m akilli_tahmin real-data --db gercek.sqlite3      # varsayılan: T1,E0,SP1,I1,D1,F1; 3 sezon
 .venv/bin/python -m akilli_tahmin real-data --db tr.sqlite3 --leagues T1   # yalnızca Süper Lig (~2 dk)
-.venv/bin/python -m akilli_tahmin update-data --db gercek.sqlite3    # yeni sonuçlar ve yaklaşan maçlar
-.venv/bin/python -m akilli_tahmin serve --db gercek.sqlite3          # sunucu 6 saatte bir kendisi günceller
+.venv/bin/python -m akilli_tahmin update-data --db gercek.sqlite3    # yeni sonuçlar ve yaklaşan maçlar (kurulumdaki ligler)
+.venv/bin/python -m akilli_tahmin serve --db gercek.sqlite3          # veri 6 saatten eskiyse arka planda günceller
 ```
 
 Kaynak: [football-data.co.uk](https://www.football-data.co.uk) ücretsiz dosyaları (21 organizasyonun 16'sı).

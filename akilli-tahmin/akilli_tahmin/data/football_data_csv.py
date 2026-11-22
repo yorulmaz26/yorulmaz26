@@ -31,6 +31,18 @@ SOURCE = "football-data-csv"
 UK = ZoneInfo("Europe/London")
 RESULT_DELAY = timedelta(hours=2, minutes=5)
 PREMATCH_CAPTURE_LEAD = timedelta(hours=24)
+#: Aynı eşleşmenin ertelenmiş/öne alınmış planlı kaydı bu kadar gün içinde aranır.
+RESCHEDULE_WINDOW = timedelta(days=45)
+#: Takvim yılı sezonu kullanan organizasyonlar (sezon etiketi başlama yılıdır).
+CALENDAR_YEAR_LEAGUES = frozenset({"br-serie-a"})
+#: football-data.co.uk ana biçim bölüm kodu → organizasyon (dosya/organizasyon uyuşma denetimi için).
+DIV_TO_LEAGUE = {
+    "T1": "tr-super-lig", "E0": "en-premier-league", "E1": "en-championship", "SP1": "es-la-liga",
+    "I1": "it-serie-a", "D1": "de-bundesliga", "F1": "fr-ligue-1", "N1": "nl-eredivisie",
+    "P1": "pt-primeira-liga", "B1": "be-pro-league", "SC0": "sco-premiership", "G1": "gr-super-league",
+}
+COUNTRY_TO_LEAGUE = {"Austria": "at-bundesliga", "Switzerland": "ch-super-league", "Denmark": "dk-superliga",
+                     "Brazil": "br-serie-a"}
 
 #: Bir marketin bütün seçenekleri aynı kaynaktan alınır (marjdan arındırma için); öncelik sırası.
 PREMATCH_ODDS = {
@@ -58,7 +70,9 @@ def parse_kickoff(date: str, time: str | None) -> datetime:
         try:
             hh, mm = (int(x) for x in time.strip().split(":")[:2])
         except ValueError:
-            pass
+            hh, mm = 15, 0
+        if not (0 <= hh <= 23 and 0 <= mm <= 59):
+            raise ValueError(f"Saat çözümlenemedi: {time}")
     return d.replace(hour=hh, minute=mm, tzinfo=UK).astimezone(timezone.utc)
 
 
@@ -106,12 +120,16 @@ def _normalize(row: dict) -> dict | None:
         "ft_home": fh, "ft_away": fa, "ht_home": _int(row.get("HTHG")), "ht_away": _int(row.get("HTAG")),
         "prematch": _market_quotes(row, PREMATCH_ODDS), "closing": _market_quotes(row, CLOSING_ODDS),
         "season_label": (row.get("Season") or "").strip(),
+        "div": (row.get("Div") or "").strip(), "country": (row.get("Country") or "").strip(),
+        "league_name": (row.get("League") or "").strip(),
     }
 
 
-def _season_from_label(label: str, fallback: str) -> str:
-    if label:
-        return label.split("/")[0].strip()
+def _season_for(rec: dict, league_id: str, fallback: str) -> str:
+    if rec["season_label"]:
+        return rec["season_label"].split("/")[0].strip()
+    if league_id in CALENDAR_YEAR_LEAGUES:
+        return str(rec["kickoff"].year)
     return fallback
 
 
@@ -121,7 +139,7 @@ class _Importer:
         self.league_id = league_id
         self.as_of = as_of
         self.team_ids: dict[str, int] = {}
-        self.stats = {"inserted": 0, "updated": 0, "unchanged": 0, "odds": 0}
+        self.stats = {"inserted": 0, "updated": 0, "unchanged": 0, "odds": 0, "invalid": 0, "foreign": 0}
 
     def team(self, name: str) -> int:
         if name not in self.team_ids:
@@ -129,15 +147,42 @@ class _Importer:
             self.team_ids[name] = r[0] if r else insert(self.conn, "teams", {"league_id": self.league_id, "name": name})
         return self.team_ids[name]
 
+    def find(self, ht: int, at: int, ko: datetime) -> sqlite3.Row | None:
+        """Aynı maçın kaydı: ±2 günde herhangi bir kayıt; yoksa ±45 günde sonucu olmayan planlı kayıt
+        (ertelenmiş ya da öne alınmış maç; aynı eşleşme sezonda bir kez daha oynanabilir, en yakını seçilir)."""
+        near = self.conn.execute(
+            "SELECT id, status, kickoff_at, season FROM fixtures WHERE league_id=? AND home_team_id=? AND away_team_id=?"
+            " AND kickoff_at BETWEEN ? AND ? ORDER BY abs(julianday(kickoff_at) - julianday(?)) LIMIT 1",
+            (self.league_id, ht, at, to_iso(ko - timedelta(days=2)), to_iso(ko + timedelta(days=2)), to_iso(ko)),
+        ).fetchone()
+        if near is not None:
+            return near
+        return self.conn.execute(
+            "SELECT id, status, kickoff_at, season FROM fixtures WHERE league_id=? AND home_team_id=? AND away_team_id=?"
+            " AND status IN ('scheduled', 'postponed') AND ft_home IS NULL AND kickoff_at BETWEEN ? AND ?"
+            " ORDER BY abs(julianday(kickoff_at) - julianday(?)) LIMIT 1",
+            (self.league_id, ht, at, to_iso(ko - RESCHEDULE_WINDOW), to_iso(ko + RESCHEDULE_WINDOW), to_iso(ko)),
+        ).fetchone()
+
+    def revise(self, fid: int, field: str, old, new) -> None:
+        self.conn.execute(
+            "INSERT INTO data_revisions(entity, entity_id, field, old_value, new_value, recorded_at)"
+            " VALUES ('fixture', ?, ?, ?, ?, ?)", (fid, field, None if old is None else str(old), str(new), self.as_of))
+
+    def reschedule_only(self, rec: dict) -> None:
+        """Yaklaşan maç dosyasında başlama saati geçmiş satır: mevcut planlı kaydın saatini düzeltir (eklemez)."""
+        ht, at = self.team(rec["home"]), self.team(rec["away"])
+        row = self.find(ht, at, rec["kickoff"])
+        if row is not None and row["status"] == "scheduled" and row["kickoff_at"] != to_iso(rec["kickoff"]):
+            self.conn.execute("UPDATE fixtures SET kickoff_at=? WHERE id=?", (to_iso(rec["kickoff"]), row["id"]))
+            self.revise(row["id"], "kickoff_at", row["kickoff_at"], to_iso(rec["kickoff"]))
+            self.stats["updated"] += 1
+
     def upsert(self, rec: dict, season: str) -> int:
-        """Aynı maç (lig, ev, deplasman, ±2 gün) varsa günceller; yoksa ekler. Dönüş: fikstür kimliği."""
+        """Aynı maç varsa günceller (sonuç, saat, sezon), yoksa ekler. Dönüş: fikstür kimliği."""
         ht, at = self.team(rec["home"]), self.team(rec["away"])
         ko = rec["kickoff"]
-        lo, hi = to_iso(ko - timedelta(days=2)), to_iso(ko + timedelta(days=2))
-        row = self.conn.execute(
-            "SELECT id, status, kickoff_at FROM fixtures WHERE league_id=? AND home_team_id=? AND away_team_id=?"
-            " AND kickoff_at BETWEEN ? AND ? ORDER BY kickoff_at LIMIT 1", (self.league_id, ht, at, lo, hi),
-        ).fetchone()
+        row = self.find(ht, at, ko)
         has_result = rec["ft_home"] is not None and rec["ft_away"] is not None
         if row is None:
             fid = insert(self.conn, "fixtures", {
@@ -150,45 +195,54 @@ class _Importer:
             })
             self.stats["inserted"] += 1
             return fid
-        fid, status, old_ko = row[0], row[1], row[2]
+        fid, status, old_ko, old_season = row["id"], row["status"], row["kickoff_at"], row["season"]
         if has_result and status != "finished":
             self.conn.execute(
                 "UPDATE fixtures SET status='finished', kickoff_at=?, ft_home=?, ft_away=?, ht_home=?, ht_away=?,"
-                " result_recorded_at=? WHERE id=?",
+                " result_recorded_at=?, season=? WHERE id=?",
                 (to_iso(ko), rec["ft_home"], rec["ft_away"], rec["ht_home"], rec["ht_away"],
-                 to_iso(ko + RESULT_DELAY), fid))
-            self.conn.execute(
-                "INSERT INTO data_revisions(entity, entity_id, field, old_value, new_value, recorded_at)"
-                " VALUES ('fixture', ?, 'result', ?, ?, ?)",
-                (fid, status, f"{rec['ft_home']}-{rec['ft_away']}", self.as_of))
+                 to_iso(ko + RESULT_DELAY), season, fid))
+            self.revise(fid, "result", status, f"{rec['ft_home']}-{rec['ft_away']}")
+            if old_ko != to_iso(ko):
+                self.revise(fid, "kickoff_at", old_ko, to_iso(ko))
             self.stats["updated"] += 1
-        elif not has_result and status == "scheduled" and old_ko != to_iso(ko):
-            self.conn.execute("UPDATE fixtures SET kickoff_at=? WHERE id=?", (to_iso(ko), fid))
-            self.conn.execute(
-                "INSERT INTO data_revisions(entity, entity_id, field, old_value, new_value, recorded_at)"
-                " VALUES ('fixture', ?, 'kickoff_at', ?, ?, ?)", (fid, old_ko, to_iso(ko), self.as_of))
+        elif not has_result and status in ("scheduled", "postponed") and (old_ko != to_iso(ko) or status != "scheduled"):
+            self.conn.execute("UPDATE fixtures SET kickoff_at=?, status='scheduled' WHERE id=?", (to_iso(ko), fid))
+            self.revise(fid, "kickoff_at", old_ko, to_iso(ko))
             self.stats["updated"] += 1
         else:
+            if rec["season_label"] and old_season != season:
+                self.conn.execute("UPDATE fixtures SET season=? WHERE id=?", (season, fid))
             self.stats["unchanged"] += 1
         return fid
 
     def add_odds(self, fid: int, quotes: dict[tuple[str, str], float], captured_at: str) -> None:
+        """Bir marketin bütün seçenekleri tek anlık görüntü olarak birlikte yazılır (karışık fiyat kümesi oluşmaz)."""
         rows = []
+        by_market: dict[str, dict[str, float]] = {}
         for (mid, oid), price in quotes.items():
-            last = self.conn.execute(
-                "SELECT decimal_odds, captured_at FROM odds_snapshots WHERE fixture_id=? AND market_id=? AND outcome_id=?"
-                " AND source=? ORDER BY captured_at DESC LIMIT 1", (fid, mid, oid, SOURCE)).fetchone()
-            if last is not None and (abs(last[0] - price) < 1e-9 or last[1] >= captured_at):
-                continue  # aynı fiyat veya daha yeni anlık görüntü zaten var
-            rows.append({"fixture_id": fid, "market_id": mid, "outcome_id": oid, "decimal_odds": price,
-                         "source": SOURCE, "captured_at": captured_at, "is_live": 0, "minute": None,
-                         "timestamp_precision": "approximate", "ingested_at": self.as_of})
+            by_market.setdefault(mid, {})[oid] = price
+        for mid, prices in by_market.items():
+            latest = {}
+            for oid in prices:
+                last = self.conn.execute(
+                    "SELECT decimal_odds, captured_at FROM odds_snapshots WHERE fixture_id=? AND market_id=?"
+                    " AND outcome_id=? AND source=? ORDER BY captured_at DESC LIMIT 1", (fid, mid, oid, SOURCE)).fetchone()
+                latest[oid] = last
+            if all(v is not None and v[1] >= captured_at for v in latest.values()):
+                continue  # her seçenek için daha yeni anlık görüntü var
+            if all(v is not None and abs(v[0] - prices[o]) < 1e-9 for o, v in latest.items()):
+                continue  # fiyatlar değişmemiş
+            for oid, price in prices.items():
+                rows.append({"fixture_id": fid, "market_id": mid, "outcome_id": oid, "decimal_odds": price,
+                             "source": SOURCE, "captured_at": captured_at, "is_live": 0, "minute": None,
+                             "timestamp_precision": "approximate", "ingested_at": self.as_of})
         insert_many(self.conn, "odds_snapshots", rows)
         self.stats["odds"] += len(rows)
 
 
 def import_rows(conn: sqlite3.Connection, rows: list[dict], league_id: str, season: str, *, as_of: str,
-                upcoming: bool = False) -> dict:
+                upcoming: bool = False, league_name: str | None = None) -> dict:
     """Satırları içe aktarır. `upcoming=True`: yaklaşan maç dosyası (oranlar indirme anına tarihlenir)."""
     from ..leagues import LEAGUES_BY_ID
 
@@ -196,16 +250,28 @@ def import_rows(conn: sqlite3.Connection, rows: list[dict], league_id: str, seas
         valid = ", ".join(sorted(LEAGUES_BY_ID))
         raise ValueError(f"Bilinmeyen organizasyon kodu: {league_id!r}. Geçerli kodlar: {valid}")
     imp = _Importer(conn, league_id, as_of)
+    now = datetime.fromisoformat(as_of.replace("Z", "+00:00"))
     with transaction(conn):
         for raw in rows:
-            rec = _normalize(raw)
+            try:
+                rec = _normalize(raw)
+            except ValueError:
+                imp.stats["invalid"] += 1  # bozuk tarih/saat: satır atlanır, içe aktarma sürer
+                continue
             if rec is None:
+                continue
+            # Dosya başka bir organizasyona aitse (Div/Country/League uyuşmazlığı) satır alınmaz.
+            if (rec["div"] and DIV_TO_LEAGUE.get(rec["div"]) != league_id) or \
+                    (rec["country"] and COUNTRY_TO_LEAGUE.get(rec["country"]) != league_id) or \
+                    (league_name and rec["league_name"] and rec["league_name"] != league_name):
+                imp.stats["foreign"] += 1
                 continue
             if rec["ft_home"] is None and not upcoming:
                 continue  # sonuç dosyasında sonucu olmayan satır (ertelenmiş vb.)
-            if upcoming and rec["kickoff"] <= datetime.fromisoformat(as_of.replace("Z", "+00:00")):
-                continue  # başlamış veya geçmiş maç yaklaşan maç sayılmaz
-            fid = imp.upsert(rec, _season_from_label(rec["season_label"], season))
+            if upcoming and rec["kickoff"] <= now:
+                imp.reschedule_only(rec)  # başlamış maç eklenmez; mevcut kaydın saati düzeltilir
+                continue
+            fid = imp.upsert(rec, _season_for(rec, league_id, season))
             ko = rec["kickoff"]
             if upcoming:
                 cap = as_of  # yaklaşık: dosyadaki fiyatların gerçek yakalanma anı bilinmiyor (≤ indirme anı)
@@ -232,5 +298,25 @@ def import_csv(conn: sqlite3.Connection, path: str | Path, league_id: str, seaso
     with open(path, newline="", encoding="utf-8-sig") as fh:
         rows = list(csv.DictReader(fh))
     res = import_rows(conn, rows, league_id, season, as_of=as_of or to_iso(utcnow()))
+    if res["foreign"] and not (res["inserted"] or res["updated"] or res["unchanged"]):
+        raise ValueError(f"Dosyadaki maçlar {league_id} organizasyonuna ait değil (Div/Country uyuşmuyor).")
     res["fixtures"] = res["inserted"]
     return res
+
+
+def mark_postponed(conn: sqlite3.Connection, league_id: str, as_of: str, *, grace_days: int = 3) -> int:
+    """Başlama saatinin üzerinden `grace_days` gün geçmiş, sonucu gelmemiş planlı maçlar ertelenmiş sayılır.
+
+    Kararları sonuçlandırmada iade (void) edilir; maç daha sonra oynanırsa sonucu ±45 gün içinde aynı kayda
+    işlenir (yeniden planlanır) ya da yeni kayıt olarak eklenir.
+    """
+    cut = to_iso(datetime.fromisoformat(as_of.replace("Z", "+00:00")) - timedelta(days=grace_days))
+    rows = conn.execute("SELECT id, kickoff_at FROM fixtures WHERE league_id=? AND status='scheduled' AND source=?"
+                        " AND ft_home IS NULL AND kickoff_at < ?", (league_id, SOURCE, cut)).fetchall()
+    with transaction(conn):
+        for fid, ko in rows:
+            conn.execute("UPDATE fixtures SET status='postponed', result_recorded_at=? WHERE id=?", (as_of, fid))
+            conn.execute(
+                "INSERT INTO data_revisions(entity, entity_id, field, old_value, new_value, recorded_at)"
+                " VALUES ('fixture', ?, 'status', 'scheduled', 'postponed', ?)", (fid, as_of))
+    return len(rows)

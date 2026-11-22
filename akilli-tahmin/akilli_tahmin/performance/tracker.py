@@ -484,8 +484,9 @@ def _pool_hash(fids: np.ndarray) -> str:
 
 
 def _league_name(league_id: str) -> str:
-    lg = LEAGUES_BY_ID.get(league_id)
-    return lg.name if lg else league_id
+    from ..leagues import display_name
+
+    return display_name(league_id)
 
 
 def _by_league(data: _Data, mode: str, pm: np.ndarray, dm: np.ndarray) -> list[dict]:

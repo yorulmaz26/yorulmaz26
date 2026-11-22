@@ -89,37 +89,54 @@ def cmd_import(a) -> None:
     init_db(conn)
     try:
         print(json.dumps(import_csv(conn, a.file, a.league, a.season), ensure_ascii=False))
-    except ValueError as exc:
+    except (ValueError, OSError) as exc:
         sys.exit(str(exc))
 
 
-def _codes(a) -> tuple[tuple[str, ...], tuple[str, ...]]:
+def _codes(spec: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
     from .data.football_data_feed import EXTRA_LEAGUES, MAIN_DIVISIONS
 
-    wanted = [c.strip().upper() for c in a.leagues.split(",") if c.strip()]
+    wanted = [c.strip().upper() for c in spec.split(",") if c.strip()]
     bad = [c for c in wanted if c not in MAIN_DIVISIONS and c not in EXTRA_LEAGUES]
-    if bad:
-        sys.exit(f"Bilinmeyen lig kodu: {', '.join(bad)}. Geçerli: {', '.join(list(MAIN_DIVISIONS) + list(EXTRA_LEAGUES))}")
+    if bad or not wanted:
+        sys.exit(f"Bilinmeyen lig kodu: {', '.join(bad) or '(boş)'}. Geçerli: "
+                 f"{', '.join(list(MAIN_DIVISIONS) + list(EXTRA_LEAGUES))}")
     return (tuple(c for c in wanted if c in MAIN_DIVISIONS), tuple(c for c in wanted if c in EXTRA_LEAGUES))
+
+
+def _report_errors(rep: dict) -> None:
+    for e in rep["errors"]:
+        print(f"  ! {e}", file=sys.stderr)
+    if rep.get("invalid_rows"):
+        print(f"  ! {rep['invalid_rows']} bozuk satır atlandı", file=sys.stderr)
 
 
 def cmd_real_data(a) -> None:
     from .backtest.walk_forward import run_backtest
-    from .data.football_data_feed import sync
+    from .data.football_data_feed import save_config, sync
     from .performance.tracker import snapshot_performance
     from .selection.engine import settle_fixture_results
 
+    main_codes, extra = _codes(a.leagues)  # bağımsız değişkenler veritabanı oluşturulmadan doğrulanır
+    if a.seasons < 1:
+        sys.exit("--seasons en az 1 olmalı.")
     as_of = _now_minute()
     conn = connect(a.db)
     init_db(conn, as_of)
     if conn.execute("SELECT 1 FROM fixtures WHERE is_synthetic=1 LIMIT 1").fetchone():
         sys.exit("Bu veritabanında sentetik demo verisi var; gerçek veri için yeni bir dosya kullanın (--db).")
-    main_codes, extra = _codes(a)
+    if conn.execute("SELECT 1 FROM prediction_runs WHERE kind='backtest' LIMIT 1").fetchone():
+        sys.exit("Bu veritabanı zaten kurulmuş (geriye dönük test kayıtları var). Güncellemek için: "
+                 f"python -m akilli_tahmin update-data --db {a.db}")
     t0 = time.time()
     rep = sync(conn, as_of=as_of, codes=main_codes, seasons=a.seasons, include_extra=extra,
                cache_dir=a.db + ".cache")
-    n = conn.execute("SELECT status, COUNT(*) FROM fixtures GROUP BY status").fetchall()
-    print("Veri: " + ", ".join(f"{s}={c}" for s, c in n) + (f"; hatalar: {rep['errors']}" if rep["errors"] else ""))
+    _report_errors(rep)
+    n = dict(conn.execute("SELECT status, COUNT(*) FROM fixtures GROUP BY status").fetchall())
+    print("Veri: " + (", ".join(f"{k}={v}" for k, v in n.items()) or "yok"))
+    if not n.get("finished") or (rep["errors"] and not a.allow_partial):
+        sys.exit("Veri indirilemedi veya eksik indi; kurulum yapılmadı (ağı kontrol edin ya da --allow-partial).")
+    save_config(conn, main_codes, extra, as_of)
     bt, engine = run_backtest(conn, as_of, lean=not a.full_history)
     print(f"Geriye dönük test: {bt.runs} çalıştırma, {bt.fixtures} maç, seçimler {bt.selected}, {bt.seconds:.0f} sn.")
     settle_fixture_results(conn, engine.history, as_of)
@@ -131,17 +148,37 @@ def cmd_real_data(a) -> None:
 
 
 def cmd_update_data(a) -> None:
-    from .data.football_data_feed import sync
+    from .data.football_data_feed import codes_for_leagues, load_config, sync
     from .runtime import Runtime
 
+    if a.seasons < 1:
+        sys.exit("--seasons en az 1 olmalı.")
     as_of = _now_minute()
     rt = Runtime(a.db)
-    main_codes, extra = _codes(a)
+    if rt.is_synthetic():
+        sys.exit("Bu bir sentetik demo veritabanı; gerçek veri eklenemez. Yeni dosyayla: real-data --db ...")
+    cfg = load_config(rt.conn) or codes_for_leagues(
+        {r[0] for r in rt.conn.execute("SELECT DISTINCT league_id FROM fixtures WHERE source='football-data-csv'")})
+    if a.leagues:
+        main_codes, extra = _codes(a.leagues)
+        new = (set(main_codes) | set(extra)) - (set(cfg[0]) | set(cfg[1]))
+        if new and not a.allow_new:
+            sys.exit(f"Geriye dönük testi yapılmamış lig: {', '.join(sorted(new))}. Bu liglerin eşikleri ve "
+                     "kalibrasyonu doğrulanmadı; yine de eklemek için --allow-new kullanın (önerilen: yeni dosyayla "
+                     "real-data).")
+    else:
+        main_codes, extra = cfg
+    if not main_codes and not extra:
+        sys.exit("Güncellenecek football-data.co.uk ligi yok; önce: real-data --db ...")
     with rt.lock:
         rep = sync(rt.conn, as_of=as_of, codes=main_codes, seasons=a.seasons, include_extra=extra,
                    cache_dir=a.db + ".cache")
         rt.engine.football.invalidate()
-    print(json.dumps({"errors": rep["errors"], **rt.run_prematch(as_of)}, ensure_ascii=False))
+    _report_errors(rep)
+    out = rt.run_prematch(as_of)
+    print(json.dumps({"errors": rep["errors"], "postponed": rep.get("postponed", 0), **out}, ensure_ascii=False))
+    if rep["errors"]:
+        sys.exit(2)
 
 
 def cmd_serve(a) -> None:
@@ -178,16 +215,18 @@ def main(argv: list[str] | None = None) -> None:
     sp.add_argument("file")
     sp.add_argument("--league", required=True)
     sp.add_argument("--season", required=True)
-    for name, fn, help_ in (("real-data", cmd_real_data, "Ücretsiz gerçek veriyle kur"),
-                            ("update-data", cmd_update_data, "Gerçek veriyi güncelle")):
-        sp = add(name, fn, help_)
-        sp.add_argument("--leagues", default="T1,E0,SP1,I1,D1,F1",
-                        help="football-data.co.uk kodları (T1=Süper Lig, E0, E1, SP1, I1, D1, F1, N1, P1, B1, SC0, "
-                             "G1, AUT, SWZ, DNK, BRA)")
-        sp.add_argument("--seasons", type=int, default=3, help="Geçmiş + güncel sezon sayısı")
-        if name == "real-data":
-            sp.add_argument("--full-history", action="store_true",
-                            help="Geçmiş testte uygun olmayan adayları ve retleri de kaydet (büyük dosya)")
+    leagues_help = ("football-data.co.uk kodları (T1=Süper Lig, E0, E1, SP1, I1, D1, F1, N1, P1, B1, SC0, G1, "
+                    "AUT, SWZ, DNK, BRA)")
+    sp = add("real-data", cmd_real_data, "Ücretsiz gerçek veriyle kur")
+    sp.add_argument("--leagues", default="T1,E0,SP1,I1,D1,F1", help=leagues_help)
+    sp.add_argument("--seasons", type=int, default=3, help="Geçmiş + güncel sezon sayısı (en az 1)")
+    sp.add_argument("--full-history", action="store_true",
+                    help="Geriye dönük testte uygun olmayan adayları ve retleri de kaydet (büyük dosya)")
+    sp.add_argument("--allow-partial", action="store_true", help="Bazı dosyalar indirilemese de kur")
+    sp = add("update-data", cmd_update_data, "Gerçek veriyi güncelle")
+    sp.add_argument("--leagues", default=None, help="Varsayılan: kurulumdaki ligler. " + leagues_help)
+    sp.add_argument("--seasons", type=int, default=2, help="Güncel + önceki sezon (sezon geçişi için)")
+    sp.add_argument("--allow-new", action="store_true", help="Geriye dönük testi yapılmamış lig eklemeye izin ver")
     sp = add("serve", cmd_serve, "API ve arayüzü başlat")
     sp.add_argument("--host", default="127.0.0.1")
     sp.add_argument("--port", type=int, default=8000)

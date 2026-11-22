@@ -111,9 +111,13 @@ olasılığın küçüğü. Bu, iki modelin de desteklemesini şart koşan bir k
 ## 7. Ücretsiz kaynak kararı (kullanıcı: "ücretsiz olanları kullan")
 
 - **football-data.co.uk — kullanılıyor.** Herkesin indirebileceği ücretsiz CSV dosyaları: 21 organizasyonun
-  16'sı için geçmiş ve güncel sezon sonuçları, ilk yarı skorları ve yaklaşan maçlar; maç öncesi oranlar
-  (Bet365 / piyasa ortalaması / Pinnacle). Kurulum: `python -m akilli_tahmin real-data --db gercek.sqlite3`,
-  güncelleme: `update-data` (sunucu da 6 saatte bir kendisi günceller). Sınırlar:
+  16'sı için geçmiş ve güncel sezon sonuçları ve yaklaşan maçlar; maç öncesi oranlar (Bet365 / piyasa
+  ortalaması / Pinnacle). İlk yarı skorları 12 ana ligde vardır; Avusturya, İsviçre, Danimarka ve Brezilya
+  dosyalarında yoktur, bu liglerde ilk yarı marketleri Kalite Kapısı'nda reddedilir. Kurulum:
+  `python -m akilli_tahmin real-data --db gercek.sqlite3`, güncelleme: `update-data` (kurulumdaki liglerle; yeni
+  lig yalnızca `--allow-new` ile). Sunucu, son çalıştırma 6 saatten eskiyse bir sonraki istekte arka planda
+  günceller (istekleri bekletmez; hata olursa bir saat sonra yeniden dener). Ertelenen maçlar 3 gün sonra
+  "ertelendi" sayılır ve kararları iade edilir; tarihi değişen maç aynı kayıtta taşınır. Sınırlar:
   - İddaa oranı değildir; kartta kaynak "football-data.co.uk (Bet365 / piyasa ortalaması)" olarak görünür.
   - Oranların yakalanma anı bilinmez (`approximate`): geriye dönük testte kullanılır, güncel öneride reddedilir.
     Bu nedenle gerçek veride En Avantajlı ve Dengeli güncel seçim üretmez; En Güvenilir oran gerektirmez.

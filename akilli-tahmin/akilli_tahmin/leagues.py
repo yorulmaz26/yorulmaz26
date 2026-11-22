@@ -44,6 +44,18 @@ LEAGUES: tuple[League, ...] = (
 
 LEAGUES_BY_ID = {league.id: league for league in LEAGUES}
 
+_NAME_COUNT: dict[str, int] = {}
+for _lg in LEAGUES:
+    _NAME_COUNT[_lg.name] = _NAME_COUNT.get(_lg.name, 0) + 1
+
+
+def display_name(league_id: str) -> str:
+    """Aynı adı taşıyan organizasyonlar ülkeyle ayrılır (ör. "Bundesliga (Avusturya)")."""
+    lg = LEAGUES_BY_ID.get(league_id)
+    if lg is None:
+        return league_id
+    return f"{lg.name} ({lg.country})" if _NAME_COUNT[lg.name] > 1 else lg.name
+
 assert len(LEAGUES) == 21, "Sistem 21 futbol organizasyonunu destekler"
 assert len(LEAGUES_BY_ID) == 21, "Lig kodları benzersiz olmalı"
 

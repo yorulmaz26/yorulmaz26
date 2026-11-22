@@ -14,6 +14,7 @@ CHECK_LABELS: dict[str, str] = {
     "data_fresh": "Veri güncel",
     "data_sufficient": "Veri yeterli",
     "settlement_rules": "Market sonuçlandırma kuralları doğrulandı",
+    "halftime_data": "İlk yarı verisi mevcut (sonuçlandırılabilir)",
     "model_a_valid": "MODEL A geçerli",
     "model_b_valid": "MODEL B geçerli",
     "probability_consistency": "Olasılık tutarlılığı",
@@ -37,7 +38,8 @@ CHECK_LABELS: dict[str, str] = {
 
 #: Tahmin Kalite Kapısı'nın moddan bağımsız kontrolleri (sırasıyla).
 CORE_CHECKS: tuple[str, ...] = (
-    "fixture_ok", "data_fresh", "data_sufficient", "settlement_rules", "model_a_valid", "model_b_valid",
+    "fixture_ok", "data_fresh", "data_sufficient", "settlement_rules", "halftime_data", "model_a_valid",
+    "model_b_valid",
     "probability_consistency", "calibration_a", "calibration_b", "prediction_valid",
 )
 ODDS_CHECKS: tuple[str, ...] = ("odds_valid", "odds_settlement_rules")
@@ -45,7 +47,7 @@ ODDS_CHECKS: tuple[str, ...] = ("odds_valid", "odds_settlement_rules")
 #: Dengeli modun 10 koşulu → kontrol kodları (arayüzde numaralı gösterim için).
 BALANCED_CONDITIONS: tuple[tuple[int, str, tuple[str, ...]], ...] = (
     (1, "Veri güncel ve yeterli", ("fixture_ok", "data_fresh", "data_sufficient")),
-    (2, "Market sonuçlandırma kuralları doğrulandı", ("settlement_rules", "odds_settlement_rules")),
+    (2, "Market sonuçlandırma kuralları doğrulandı", ("settlement_rules", "halftime_data", "odds_settlement_rules")),
     (3, "MODEL A ve MODEL B geçerli", ("model_a_valid", "model_b_valid", "probability_consistency")),
     (4, "Kalibrasyon yeterli", ("calibration_a", "calibration_b")),
     (5, "Belirsizlik kabul edilebilir", ("uncertainty", "prob_lower")),

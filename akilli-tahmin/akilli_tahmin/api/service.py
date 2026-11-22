@@ -11,7 +11,7 @@ from collections import Counter
 from ..config import SETTINGS, VERSION
 from ..db.database import DEFAULT_MODE, MODE_CODES, SELECTION_MODES, from_iso, loads, to_iso, utcnow
 from ..domain.markets import FAMILY_NAMES, get_market
-from ..leagues import LEAGUES_BY_ID
+from ..leagues import LEAGUES_BY_ID, display_name
 from ..models.model_a import ROBUSTNESS_SCENARIOS
 from ..selection.checks import (BALANCED_CONDITIONS, CHECK_LABELS, CORE_CHECKS, ODDS_CHECKS, Check, describe,
                                 fmt_num, fmt_pct, unpack)
@@ -149,7 +149,7 @@ def _fixture_payload(r: sqlite3.Row) -> dict:
     lg = LEAGUES_BY_ID.get(r["league_id"])
     return {
         "id": r["fixture_id"], "home": r["home_name"], "away": r["away_name"],
-        "league": {"id": r["league_id"], "name": lg.name if lg else r["league_id"], "country": lg.country if lg else ""},
+        "league": {"id": r["league_id"], "name": display_name(r["league_id"]), "country": lg.country if lg else ""},
         "kickoff_at": r["kickoff_at"],
     }
 
@@ -382,9 +382,13 @@ def recommendations(conn: sqlite3.Connection, mode: str, *, now: str | None = No
         "SELECT COUNT(*), SUM(c.eligible), COUNT(DISTINCT c.fixture_id) FROM selection_mode_candidates c"
         " JOIN fixtures f ON f.id=c.fixture_id WHERE " + " AND ".join(swhere), sparams).fetchone()
     with_sel = len({it["fixture"]["id"] for it in items})
+    message = None if items else EMPTY_MESSAGES[mode]
+    if not items and not (stats[2] or 0):
+        message = ("Değerlendirilecek yaklaşan maç yok (önümüzdeki günler için veri kaynağında maç listelenmemiş"
+                   " olabilir); seçim üretilmedi.")
     return {
         **base, "run_id": run["id"], "generated_at": run["finished_at"], "data_cutoff_at": run["data_cutoff_at"],
-        "message": None if items else EMPTY_MESSAGES[mode],
+        "message": message,
         "summary": {"fixtures_scanned": stats[2] or 0, "candidates": stats[0] or 0, "eligible": stats[1] or 0,
                     "selected": len(items), "fixtures_without_selection": (stats[2] or 0) - with_sel},
         "items": items,
