@@ -208,8 +208,6 @@ public final class GameScreen extends Screen implements BoardView.Host {
         return true;
     }
 
-    @Override public boolean wantsBanner() { return true; }
-
     @Override public void onAppPause() {
         if (!finished && !act.hasOverlay()) showPause();
     }

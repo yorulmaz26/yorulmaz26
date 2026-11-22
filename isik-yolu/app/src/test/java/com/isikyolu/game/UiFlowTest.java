@@ -776,10 +776,19 @@ public class UiFlowTest {
         assertTrue("banner ince bir şerit (" + act.bannerHeight() / dens + " dp)", act.bannerHeight() < 80 * dens);
         assertTrue("ekranın büyük kısmı oyuna kalır", stage.getHeight() > act.overlayLayer().getHeight() * 0.85f);
         shot("20_reklam_banner_bolumler");
+        // pencere açılınca banner gizlenir (yer tutar, karartmanın altında reklam kalmaz)
+        p.lives = 0;
+        act.showNoLives(0);
+        idle(400);
+        assertTrue("pencere açıkken banner gizli", act.bannerCovered());
+        closeOverlays();
+        idle(300);
+        assertTrue("pencere kapanınca banner geri gelir", act.bannerHeight() > 0);
+        p.lives = 4;
         GameScreen gs = openLevel(4);
         idle(400);
-        assertTrue("oyun ekranında banner", act.bannerHeight() > 0);
-        shot("20b_reklam_banner_oyun");
+        assertEquals("oyun ekranında banner yok (düğmelere yakın, yanlışlıkla tıklama)", 0, act.bannerHeight());
+        shot("20b_oyun_ekrani_reklamsiz");
         act.goMarket(0);
         idle(600);
         assertEquals("markette banner yok", 0, act.bannerHeight());
@@ -870,7 +879,7 @@ public class UiFlowTest {
         waitFor("hak bitti penceresi", () -> topButton("Video izle · +") != null);
         ads.completeVideo = false;
         topButton("Video izle · +").performClick();
-        idle(500); // çift tıklama korumasından uzun
+        idle(1500); // çift tıklama koruması ve yeniden yükleme
         assertEquals("yarım video ödül vermez", 0, ses.budgetLeft());
         ads.completeVideo = true;
         topButton("Video izle · +").performClick();
@@ -901,12 +910,16 @@ public class UiFlowTest {
         assertTrue("ipucu tahtada", boardOf(gs).hasHint());
         act.goMarket(0);
         idle(600);
+        assertNull("ipucu videosu az önce izlendi: yenisi yüklenene kadar düğme yok", findText(act.currentScreen(), "Video izle · +25 kristal"));
+        idle(1200); // yeni video yüklenince market kendini yeniler
         int kr = p.crystals;
         for (int k = 0; k < 3; k++) {
             View v = findText(act.currentScreen(), "Video izle · +25 kristal");
-            assertNotNull(v);
+            assertNotNull("video düğmesi (yeniden yüklenince geri gelir) " + k, v);
             ((View) v.getParent()).performClick();
-            idle(500);
+            idle(300);
+            if (k < 2) assertNull("video tükendi: düğme yeniden yüklenene kadar yok", findText(act.currentScreen(), "Video izle · +25 kristal"));
+            idle(1200);
         }
         assertEquals(kr + 75, p.crystals);
         assertNull("günde 3", findText(act.currentScreen(), "Video izle · +25 kristal"));
@@ -930,6 +943,60 @@ public class UiFlowTest {
         ctl.pause();
         idle(200);
         assertNotNull("normal arka plana geçişte duraklatılır", topOverlay());
+    }
+
+    /** Video açılamazsa doğru mesaj ve ödül yok; gizlilik politikası ayarlardan okunur. */
+    @Test public void failedVideoAndPrivacyPolicy() throws Exception {
+        FakeAds ads = fakeAds();
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        complete(p, 11);
+        act.goMarket(0);
+        idle(600);
+        int kr = p.crystals;
+        ads.failToShow = true;
+        ((View) findText(act.currentScreen(), "Video izle · +25 kristal").getParent()).performClick();
+        idle(300);
+        assertEquals("açılamayan video ödül vermez", kr, p.crystals);
+        assertNotNull("doğru uyarı", findText(act.overlayLayer(), "Video açılamadı"));
+        act.goSettings();
+        idle(600);
+        ((View) findText(act.currentScreen(), "Gizlilik Politikası").getParent()).performClick();
+        idle(400);
+        assertNotNull(topOverlay());
+        assertNotNull("AdMob açıklaması", findText(topOverlay(), "Işık Yolu bir bulmaca oyunudur"));
+        shot("21_gizlilik");
+    }
+
+    /** Kenardan kenara çizim: içerik durum ve gezinme çubuğunun altına girmez. */
+    @Test public void contentStaysInsideSystemBars() throws Exception {
+        start();
+        View decor = act.getWindow().getDecorView();
+        android.view.WindowInsets in = new android.view.WindowInsets.Builder()
+                .setInsets(android.view.WindowInsets.Type.systemBars(), android.graphics.Insets.of(0, 96, 0, 144)).build();
+        decor.dispatchApplyWindowInsets(in);
+        idle(100);
+        assertEquals(96, act.overlayLayer().getPaddingTop());
+        assertEquals(144, act.overlayLayer().getPaddingBottom());
+        int[] ls = new int[2];
+        View stage = (View) act.currentScreen().getParent();
+        stage.getLocationInWindow(ls);
+        assertTrue("ekran durum çubuğunun altında başlar", ls[1] >= 96);
+        assertTrue("ekran gezinme çubuğunun üstünde biter", ls[1] + stage.getHeight() <= decor.getHeight() - 144);
+    }
+
+    /** Android 16: büyük ekranda dikey kilit yok sayılır; yatay tablette oyun açılır ve oynanır. */
+    @Test @Config(qualifiers = "w1280dp-h800dp-land-xhdpi")
+    public void tabletLandscapeWorks() throws Exception {
+        start();
+        Game.progress().tutorialSeen = true;
+        GameScreen gs = openLevel(12);
+        com.isikyolu.game.ui.BoardView bv = boardOf(gs);
+        assertTrue("tahta ekrana sığar", bv.getHeight() > 0 && bv.getHeight() <= act.overlayLayer().getHeight());
+        solveThroughUi(gs, Game.levels().get(12));
+        idle(1500);
+        assertNotNull("tamamlandı penceresi", findText(act.overlayLayer(), "Sonraki Bölüm"));
+        shot("22_tablet_yatay");
     }
 
     @Test public void splashScreenRenders() throws Exception {

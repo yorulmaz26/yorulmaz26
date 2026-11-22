@@ -25,33 +25,82 @@ import com.isikyolu.game.ui.Ui;
 
 /** Tek etkinlik: ekranlar arasında animasyonlu geçiş yapar. */
 public final class MainActivity extends Activity {
-    private FrameLayout root, stage, bannerHost;
+    /** frame: pencerenin tamamı (arka plan sistem çubuklarının altına da uzanır); root: çubukların içindeki içerik. */
+    private FrameLayout frame, root, stage, bannerHost;
+    private View barTop, barBottom;
     private Screen current;
     private View banner;
-    private boolean bannerLoaded, adsStarted;
+    private boolean bannerLoaded, adsStarted, bannerRunning, resumed;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
         Game.init(this);
+        // kenardan kenara çizim (Android 15+ zorunlu): içerik sistem çubuklarının iç boşluğu kadar içeride
+        frame = new FrameLayout(this);
+        frame.addView(new BackgroundView(this), new FrameLayout.LayoutParams(-1, -1));
+        barTop = new View(this);
+        barBottom = new View(this);
+        frame.addView(barTop, new FrameLayout.LayoutParams(-1, 0, Gravity.TOP));
+        frame.addView(barBottom, new FrameLayout.LayoutParams(-1, 0, Gravity.BOTTOM));
+        setBarColors(0xFF3D4D92, 0xFF213062);
         root = new FrameLayout(this);
-        root.addView(new BackgroundView(this), new FrameLayout.LayoutParams(-1, -1));
+        frame.addView(root, new FrameLayout.LayoutParams(-1, -1));
         stage = new FrameLayout(this);
         root.addView(stage, new FrameLayout.LayoutParams(-1, -1));
-        // banner yuvası: ekranın en altında, oyun düğmelerinden ince bir ayraçla ayrı; pencereler üstünü örter
+        // banner yuvası: ekranın en altında, üstte görünür bir ayraç ve boşlukla içerikten ayrı
         bannerHost = new FrameLayout(this);
         bannerHost.setBackgroundColor(0xFF1A2547);
-        bannerHost.setPadding(0, Ui.dp(this, 6), 0, 0);
+        bannerHost.setPadding(0, Ui.dp(this, 9), 0, 0);
         View divider = new View(this);
-        divider.setBackgroundColor(0x334A5C87);
+        divider.setBackgroundColor(0x664A5C87);
         bannerHost.addView(divider, new FrameLayout.LayoutParams(-1, Ui.dp(this, 1), Gravity.TOP));
+        bannerHost.setClipToPadding(false);
+        ((FrameLayout.LayoutParams) divider.getLayoutParams()).topMargin = -Ui.dp(this, 9); // ayraç reklamın dışında, en üstte
         bannerHost.setVisibility(View.GONE);
         bannerHost.addOnLayoutChangeListener((v, l, t, r, btm, ol, ot, or, ob) -> fitStage());
         root.addView(bannerHost, new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM));
-        setContentView(root);
+        setContentView(frame);
+        enableEdgeToEdge();
+        if (android.os.Build.VERSION.SDK_INT >= 33) // tahmine dayalı geri hareketi (Android 13+; 16'da zorunlu)
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::handleBack);
         show(new com.isikyolu.game.screens.StudioIntroScreen(this), true);
     }
 
     public FrameLayout overlayLayer() { return root; }
+
+    /** Pencere sistem çubuklarının altına çizilir; içerik onların iç boşluğu kadar içeri alınır (tüm sürümlerde aynı). */
+    @SuppressWarnings("deprecation")
+    private void enableEdgeToEdge() {
+        android.view.Window w = getWindow();
+        if (android.os.Build.VERSION.SDK_INT >= 30) w.setDecorFitsSystemWindows(false);
+        else w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        if (android.os.Build.VERSION.SDK_INT < 35) { w.setStatusBarColor(0); w.setNavigationBarColor(0); }
+        if (android.os.Build.VERSION.SDK_INT >= 28)
+            w.getAttributes().layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        frame.setOnApplyWindowInsetsListener((v, in) -> {
+            int l, t, r, b;
+            if (android.os.Build.VERSION.SDK_INT >= 30) {
+                android.graphics.Insets i = in.getInsets(android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+                l = i.left; t = i.top; r = i.right; b = i.bottom;
+            } else {
+                l = in.getSystemWindowInsetLeft(); t = in.getSystemWindowInsetTop(); r = in.getSystemWindowInsetRight(); b = in.getSystemWindowInsetBottom();
+            }
+            root.setPadding(l, t, r, b);
+            barTop.getLayoutParams().height = t;
+            barBottom.getLayoutParams().height = b;
+            barTop.requestLayout();
+            barBottom.requestLayout();
+            return in;
+        });
+        frame.requestApplyInsets();
+    }
+
+    /** Durum ve gezinme çubuğunun arkasındaki renkler (stüdyo açılışında logo rengi). */
+    public void setBarColors(int top, int bottom) {
+        barTop.setBackgroundColor(top);
+        barBottom.setBackgroundColor(bottom);
+    }
 
     public Screen currentScreen() { return current; }
 
@@ -62,29 +111,51 @@ public final class MainActivity extends Activity {
         if (adsStarted) return;
         adsStarted = true;
         com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
+        ads.setOnAvailabilityChanged(() -> { if (current != null) current.onAdsChanged(); });
         ads.start(this);
         int widthDp = (int) (getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density);
         banner = ads.createBanner(this, widthDp, () -> { bannerLoaded = true; updateBanner(); }, () -> { bannerLoaded = false; updateBanner(); });
         if (banner != null) bannerHost.addView(banner, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
     }
 
-    /** Banner yalnızca yüklendiyse ve ekran istiyorsa görünür (açılış, market, ayarlar ve öğreticide yok). */
+    /** İlk menüde başlatılmış reklamlar için: izin isteği başarısız kaldıysa (çevrimdışı açılış) yeniden dene. */
+    public void retryAds() { if (adsStarted) com.isikyolu.game.ads.Ads.get().retryConsent(this); }
+
+    /**
+     * Banner yalnızca yüklendiyse ve ekran istiyorsa görünür (oyun ekranı, açılış, market ve ayarlarda yok).
+     * Bir pencere açıkken yer tutar ama görünmez ve duraklatılır (karartmanın altında reklam kalmaz).
+     */
     private void updateBanner() {
         boolean show = banner != null && bannerLoaded && current != null && current.wantsBanner()
                 && com.isikyolu.engine.AdPolicy.bannersAllowed(Game.progress());
-        bannerHost.setVisibility(show ? View.VISIBLE : View.GONE);
+        boolean covered = show && hasOverlay();
+        bannerHost.setVisibility(!show ? View.GONE : covered ? View.INVISIBLE : View.VISIBLE);
+        setBannerRunning(show && !covered && resumed);
         fitStage();
     }
 
+    private void setBannerRunning(boolean run) {
+        if (banner == null || run == bannerRunning) return;
+        bannerRunning = run;
+        if (run) com.isikyolu.game.ads.Ads.get().resume(banner);
+        else com.isikyolu.game.ads.Ads.get().pause(banner);
+    }
+
+    /** Overlay açıldı ya da kapanmaya başladı. */
+    public void onOverlaysChanged() { updateBanner(); }
+
     /** Ekran banner'ın altında kalmasın: sahnenin alt boşluğu banner yüksekliği kadar. */
     private void fitStage() {
-        int h = bannerHost.getVisibility() == View.VISIBLE ? bannerHost.getHeight() : 0;
+        int h = bannerHost.getVisibility() != View.GONE ? bannerHost.getHeight() : 0;
         FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) stage.getLayoutParams();
         if (lp.bottomMargin != h) { lp.bottomMargin = h; stage.setLayoutParams(lp); }
     }
 
     /** Görünür banner yüksekliği (testler ve yerleşim için). */
     public int bannerHeight() { return bannerHost.getVisibility() == View.VISIBLE ? bannerHost.getHeight() : 0; }
+
+    /** Banner yer kaplıyor ama bir pencerenin arkasında gizli mi (testler için). */
+    public boolean bannerCovered() { return bannerHost.getVisibility() == View.INVISIBLE; }
 
     /**
      * Bölüm bitince sonraki ekrana geçiş: zamanı geldiyse önce geçiş (resim) reklamı, kapanınca devam.
@@ -95,9 +166,8 @@ public final class MainActivity extends Activity {
         long now = Game.trustedNow();
         com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
         if (com.isikyolu.engine.AdPolicy.interstitialDue(p, levelId, now) && ads.interstitialReady()) {
-            com.isikyolu.engine.AdPolicy.onInterstitialShown(p, now);
-            Game.save();
-            ads.showInterstitial(this, next);
+            // sayaç yalnızca reklam gerçekten ekrana gelince ilerler
+            ads.showInterstitial(this, () -> { com.isikyolu.engine.AdPolicy.onInterstitialShown(Game.progress(), Game.trustedNow()); Game.save(); }, next);
         } else next.run();
     }
 
@@ -123,9 +193,13 @@ public final class MainActivity extends Activity {
         ads.showRewarded(this, () -> {
             granted[0] = com.isikyolu.engine.AdPolicy.grant(Game.progress(), r, Game.shopDay(), Game.trustedNow(), Game.clock());
             Game.save();
-        }, earned -> {
+        }, result -> {
             if (granted[0]) { Game.audio().play(Audio.HINT); onGranted.run(); }
-            else toast("Ödül için videoyu sonuna kadar izlemelisin");
+            else if (result == com.isikyolu.game.ads.AdProvider.VideoResult.FAILED) toast("Video açılamadı. Biraz sonra tekrar dene.");
+            else if (result == com.isikyolu.game.ads.AdProvider.VideoResult.SKIPPED) toast("Ödül için videoyu sonuna kadar izlemelisin");
+            else toast(r == com.isikyolu.engine.AdPolicy.Reward.LIFE && Game.progress().lives >= com.isikyolu.engine.Lives.MAX
+                    ? "Canların zaten doldu" : "Bugünlük video ödülü sınırı doldu");
+            if (current != null) current.onAdsChanged();
         });
     }
 
@@ -277,7 +351,10 @@ public final class MainActivity extends Activity {
     }
 
     @SuppressWarnings("deprecation")
-    @Override public void onBackPressed() {
+    @Override public void onBackPressed() { handleBack(); }
+
+    /** Geri: açık pencereyi kapatır, yoksa ekrana sorar; ana menüde uygulamadan çıkar. */
+    public void handleBack() {
         // önce açık pencereyi kapat
         for (int i = root.getChildCount() - 1; i >= 0; i--) {
             View v = root.getChildAt(i);
@@ -294,8 +371,10 @@ public final class MainActivity extends Activity {
 
     @Override protected void onResume() {
         super.onResume();
+        resumed = true;
         Game.audio().onResume();
-        com.isikyolu.game.ads.Ads.get().resume(banner);
+        updateBanner();
+        retryAds();
         if (current != null) current.onAppResume();
     }
 
@@ -303,7 +382,8 @@ public final class MainActivity extends Activity {
         super.onPause();
         Game.save();
         Game.audio().onPause();
-        com.isikyolu.game.ads.Ads.get().pause(banner);
+        resumed = false;
+        setBannerRunning(false);
         // tam ekran reklam açıldı: oyun duraklatma penceresi açılmasın
         if (current != null && !com.isikyolu.game.ads.Ads.get().fullscreenShowing()) current.onAppPause();
     }

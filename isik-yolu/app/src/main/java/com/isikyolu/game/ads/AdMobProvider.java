@@ -41,7 +41,10 @@ public final class AdMobProvider implements AdProvider {
     private final Handler main = new Handler(Looper.getMainLooper());
     private Context app;
     private ConsentInformation consent;
-    private boolean started, initStarted, ready, fullscreen;
+    private boolean initStarted, ready, fullscreen, consentInFlight;
+    private long lastConsentRequest;
+    private Runnable onAvailability = () -> { };
+    private final java.util.Map<AdView, Runnable> bannerRetry = new java.util.HashMap<>();
     private final List<AdView> pending = new ArrayList<>();
 
     private InterstitialAd interstitial;
@@ -49,17 +52,39 @@ public final class AdMobProvider implements AdProvider {
     private boolean loadingInterstitial, loadingRewarded;
     private long retryInterstitial = RETRY_MIN_MS, retryRewarded = RETRY_MIN_MS;
 
+    @Override public void setOnAvailabilityChanged(Runnable r) { onAvailability = r == null ? () -> { } : r; }
+
     @Override public void start(Activity a) {
-        if (started) return;
-        started = true;
-        app = a.getApplicationContext();
-        consent = UserMessagingPlatform.getConsentInformation(a);
+        if (app == null) {
+            app = a.getApplicationContext();
+            consent = UserMessagingPlatform.getConsentInformation(a);
+            // daha önce izin verildiyse beklemeden başla
+            if (consent.canRequestAds()) initSdk();
+        }
+        requestConsent(a);
+    }
+
+    /** Google'ın önerisi: izin bilgisi her açılışta güncellenir; başarısızsa (çevrimdışı) sonra yeniden denenir. */
+    private void requestConsent(Activity a) {
+        if (consentInFlight) return;
+        consentInFlight = true;
+        lastConsentRequest = android.os.SystemClock.elapsedRealtime();
         ConsentRequestParameters params = new ConsentRequestParameters.Builder().build();
         consent.requestConsentInfoUpdate(a, params,
-                () -> UserMessagingPlatform.loadAndShowConsentFormIfRequired(a, err -> { if (consent.canRequestAds()) initSdk(); }),
-                err -> { if (consent.canRequestAds()) initSdk(); });
-        // daha önce izin verildiyse beklemeden başla
-        if (consent.canRequestAds()) initSdk();
+                () -> UserMessagingPlatform.loadAndShowConsentFormIfRequired(a, err -> {
+                    consentInFlight = false;
+                    if (consent.canRequestAds()) initSdk();
+                }),
+                err -> {
+                    consentInFlight = false;
+                    if (consent.canRequestAds()) initSdk();
+                });
+    }
+
+    @Override public void retryConsent(Activity a) {
+        if (app == null || initStarted || consentInFlight) return;
+        if (android.os.SystemClock.elapsedRealtime() - lastConsentRequest < 30_000) return;
+        requestConsent(a);
     }
 
     private void initSdk() {
@@ -76,6 +101,7 @@ public final class AdMobProvider implements AdProvider {
         ready = true;
         for (AdView v : pending) v.loadAd(new AdRequest.Builder().build());
         pending.clear();
+        onAvailability.run();
         loadInterstitial();
         loadRewarded();
     }
@@ -85,10 +111,22 @@ public final class AdMobProvider implements AdProvider {
     @Override public View createBanner(Activity a, int widthDp, Runnable onReady, Runnable onGone) {
         AdView v = new AdView(a);
         v.setAdUnitId(BuildConfig.AD_BANNER);
-        v.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(a, widthDp));
+        v.setAdSize(AdSize.getLargeAnchoredAdaptiveBannerAdSize(a, widthDp));
+        boolean[] everLoaded = {false};
+        long[] retry = {RETRY_MIN_MS};
         v.setAdListener(new AdListener() {
-            @Override public void onAdLoaded() { onReady.run(); }
-            @Override public void onAdFailedToLoad(@NonNull LoadAdError e) { onGone.run(); }
+            @Override public void onAdLoaded() { everLoaded[0] = true; retry[0] = RETRY_MIN_MS; onReady.run(); }
+
+            @Override public void onAdFailedToLoad(@NonNull LoadAdError e) {
+                // yüklü banner'ın yenilemesi başarısızsa eski reklam görünmeye devam eder: gizleme (tahta sıçramasın)
+                if (everLoaded[0]) return;
+                onGone.run();
+                // hiç yüklenemediyse (ör. çevrimdışı) artan aralıklarla yeniden dene
+                Runnable again = () -> { bannerRetry.remove(v); v.loadAd(new AdRequest.Builder().build()); };
+                bannerRetry.put(v, again);
+                main.postDelayed(again, retry[0]);
+                retry[0] = Math.min(RETRY_MAX_MS, retry[0] * 2);
+            }
         });
         if (ready) v.loadAd(new AdRequest.Builder().build());
         else pending.add(v);
@@ -98,6 +136,8 @@ public final class AdMobProvider implements AdProvider {
     @Override public void destroyBanner(View banner) {
         if (!(banner instanceof AdView)) return;
         pending.remove(banner);
+        Runnable r = bannerRetry.remove(banner);
+        if (r != null) main.removeCallbacks(r);
         ((AdView) banner).destroy();
     }
 
@@ -115,6 +155,7 @@ public final class AdMobProvider implements AdProvider {
                 loadingInterstitial = false;
                 interstitial = ad;
                 retryInterstitial = RETRY_MIN_MS;
+                onAvailability.run();
             }
 
             @Override public void onAdFailedToLoad(@NonNull LoadAdError e) {
@@ -127,7 +168,7 @@ public final class AdMobProvider implements AdProvider {
 
     @Override public boolean interstitialReady() { return interstitial != null; }
 
-    @Override public void showInterstitial(Activity a, Runnable onClosed) {
+    @Override public void showInterstitial(Activity a, Runnable onShown, Runnable onClosed) {
         InterstitialAd ad = interstitial;
         if (ad == null) { onClosed.run(); return; }
         interstitial = null;
@@ -140,7 +181,7 @@ public final class AdMobProvider implements AdProvider {
             onClosed.run();
         };
         ad.setFullScreenContentCallback(new FullScreenContentCallback() {
-            @Override public void onAdShowedFullScreenContent() { fullscreen = true; }
+            @Override public void onAdShowedFullScreenContent() { fullscreen = true; onShown.run(); }
             @Override public void onAdDismissedFullScreenContent() { finish.run(); }
             @Override public void onAdFailedToShowFullScreenContent(@NonNull AdError e) { finish.run(); }
         });
@@ -158,6 +199,7 @@ public final class AdMobProvider implements AdProvider {
                 loadingRewarded = false;
                 rewarded = ad;
                 retryRewarded = RETRY_MIN_MS;
+                onAvailability.run();
             }
 
             @Override public void onAdFailedToLoad(@NonNull LoadAdError e) {
@@ -170,20 +212,20 @@ public final class AdMobProvider implements AdProvider {
 
     @Override public boolean rewardedReady() { return rewarded != null; }
 
-    @Override public void showRewarded(Activity a, Runnable onEarned, Consumer<Boolean> onClosed) {
+    @Override public void showRewarded(Activity a, Runnable onEarned, Consumer<VideoResult> onClosed) {
         RewardedAd ad = rewarded;
-        if (ad == null) { onClosed.accept(false); return; }
+        if (ad == null) { onClosed.accept(VideoResult.FAILED); return; }
         rewarded = null;
-        boolean[] earned = {false}, done = {false};
+        boolean[] earned = {false}, done = {false}, shown = {false};
         Runnable finish = () -> {
             if (done[0]) return;
             done[0] = true;
             fullscreen = false;
             loadRewarded();
-            onClosed.accept(earned[0]);
+            onClosed.accept(earned[0] ? VideoResult.EARNED : shown[0] ? VideoResult.SKIPPED : VideoResult.FAILED);
         };
         ad.setFullScreenContentCallback(new FullScreenContentCallback() {
-            @Override public void onAdShowedFullScreenContent() { fullscreen = true; }
+            @Override public void onAdShowedFullScreenContent() { fullscreen = true; shown[0] = true; }
             @Override public void onAdDismissedFullScreenContent() { finish.run(); }
             @Override public void onAdFailedToShowFullScreenContent(@NonNull AdError e) { finish.run(); }
         });

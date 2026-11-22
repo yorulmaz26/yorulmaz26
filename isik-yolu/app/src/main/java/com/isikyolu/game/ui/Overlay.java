@@ -59,11 +59,18 @@ public class Overlay extends FrameLayout {
         animate().alpha(1f).setDuration(180).start();
         card.setScaleX(0.88f); card.setScaleY(0.88f);
         card.animate().scaleX(1f).scaleY(1f).setDuration(320).setInterpolator(new OvershootInterpolator(1.4f)).start();
+        notifyHost();
+    }
+
+    /** Etkinliğe haber ver: pencere açıkken banner reklam gizlenir. */
+    private void notifyHost() {
+        if (getContext() instanceof com.isikyolu.game.MainActivity) ((com.isikyolu.game.MainActivity) getContext()).onOverlaysChanged();
     }
 
     public void dismiss() {
         if (closing) return;
         closing = true;
+        notifyHost();
         card.animate().scaleX(0.92f).scaleY(0.92f).setDuration(160).start();
         animate().alpha(0f).setDuration(160).setInterpolator(new DecelerateInterpolator()).withEndAction(() -> {
             ViewGroup p = (ViewGroup) getParent();

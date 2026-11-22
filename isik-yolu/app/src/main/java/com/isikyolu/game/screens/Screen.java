@@ -27,4 +27,7 @@ public abstract class Screen extends FrameLayout {
 
     /** Ekranın altında banner reklam gösterilsin mi (oyun akışını bozmayan ekranlar). */
     public boolean wantsBanner() { return false; }
+
+    /** Bir reklam yüklendi ya da video izlendi: reklam düğmeleri olan ekran kendini yenileyebilir. */
+    public void onAdsChanged() {}
 }

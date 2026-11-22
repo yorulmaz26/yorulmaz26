@@ -10,9 +10,14 @@ import java.util.function.Consumer;
 /** Testler için sahte reklam sağlayıcısı: her şey anında "yüklü", gösterimler sayılır. */
 public class FakeAds implements AdProvider {
     public int interstitials, rewardedShown, bannersCreated, starts;
-    public boolean interstitialLoaded = true, rewardedLoaded = true, completeVideo = true, fullscreen;
+    public boolean interstitialLoaded = true, rewardedLoaded = true, completeVideo = true, failToShow, fullscreen;
+    /** Gerçek SDK gibi: gösterilen reklam tükenir, yenisi biraz sonra yüklenir. */
+    public long reloadMs = 1000;
+    private Runnable onAvailability = () -> { };
+    private final android.os.Handler main = new android.os.Handler(android.os.Looper.getMainLooper());
 
     @Override public void start(Activity a) { starts++; }
+    @Override public void setOnAvailabilityChanged(Runnable r) { onAvailability = r; }
 
     @Override public View createBanner(Activity a, int widthDp, Runnable onReady, Runnable onGone) {
         bannersCreated++;
@@ -40,17 +45,21 @@ public class FakeAds implements AdProvider {
     @Override public void resume(View banner) {}
     @Override public boolean interstitialReady() { return interstitialLoaded; }
 
-    @Override public void showInterstitial(Activity a, Runnable onClosed) {
+    @Override public void showInterstitial(Activity a, Runnable onShown, Runnable onClosed) {
         interstitials++;
+        onShown.run();
         onClosed.run();
     }
 
     @Override public boolean rewardedReady() { return rewardedLoaded; }
 
-    @Override public void showRewarded(Activity a, Runnable onEarned, Consumer<Boolean> onClosed) {
+    @Override public void showRewarded(Activity a, Runnable onEarned, Consumer<VideoResult> onClosed) {
         rewardedShown++;
+        rewardedLoaded = false;
+        main.postDelayed(() -> { rewardedLoaded = true; onAvailability.run(); }, reloadMs);
+        if (failToShow) { onClosed.accept(VideoResult.FAILED); return; }
         if (completeVideo) onEarned.run();
-        onClosed.accept(completeVideo);
+        onClosed.accept(completeVideo ? VideoResult.EARNED : VideoResult.SKIPPED);
     }
 
     @Override public boolean fullscreenShowing() { return fullscreen; }

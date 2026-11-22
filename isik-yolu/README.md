@@ -64,13 +64,15 @@ Reklamlar oyun akışını bozmayacak biçimde yerleştirildi:
 
 | Tür | Nerede | Kurallar |
 |---|---|---|
-| **Banner** (uyarlanabilir) | Ekranın en altı: ana menü, bölümler, günlük bulmaca, başarılar, oyun ekranı | İlk 3 bölüm bitene kadar hiç yok. Açılışta, markette ve ayarlarda yok. Oyun düğmelerinden ince bir ayraçla ayrı. Ekranla çakışmaz: tahta banner'ın üstünde kalır. Yüklenmezse (internet yoksa) yer kaplamaz. |
+| **Banner** (büyük uyarlanabilir) | Ekranın en altı: ana menü, bölümler, günlük bulmaca, başarılar | İlk 3 bölüm bitene kadar hiç yok. **Oyun ekranında yok:** sürekli dokunulan oyun düğmelerine yakın olurdu. Açılışta, markette ve ayarlarda da yok. İçerikten ayraçla ayrı ve ekranla çakışmaz. Bir pencere açıkken gizlenir ve duraklatılır. Hiç yüklenmezse (internet yoksa) yer kaplamaz ve artan aralıklarla yeniden denenir. Yüklendikten sonra yenileme başarısız olursa eski reklam kalır, ekran sıçramaz. |
 | **Geçiş reklamı (resim)** | Yalnızca bölüm bitince, "Sonraki Bölüm / Tekrar Oyna / Bölümler" ile sonraki ekrana geçerken | Oyun sırasında asla çıkmaz. İlk 10 (öğretici) bölümde yok. En az 3 tamamlanan bölüm ve 4 dakika arayla gösterilir; ödüllü videodan sonraki 3 dakikada gösterilmez. |
-| **Ödüllü video** | İsteğe bağlı düğmeler: can bitince "+1 can", ipucu bitince "+1 ipucu", hamle hakkı bitince "+N hak", markette "+25 kristal" | Ödül yalnızca video sonuna kadar izlenince verilir. Günlük sınırlar: can 3, ipucu 3, hak 5, kristal 3. Videoyla alınan ek hak kristalli devamın fiyatını artırmaz. |
+| **Ödüllü video** | İsteğe bağlı düğmeler: can bitince "+1 can", ipucu bitince "+1 ipucu", hamle hakkı bitince "+N hak", markette "+25 kristal" | Ödül yalnızca video sonuna kadar izlenince verilir. Günlük sınırlar: can 3, ipucu 3, hak 5, kristal 3. Videoyla alınan ek hak kristalli devamın fiyatını artırmaz. Video izlenince yenisi yüklenene dek düğme kalkar, yüklenince ekran kendini yeniler. Video açılamazsa ya da yarıda kapatılırsa ayrı ayrı uyarı verilir. |
 
 - **İzin:** Google UMP izin formu ilk ana menüde (açılış animasyonundan sonra) gösterilir. Form yalnızca gereken
-  bölgelerde (AB/İngiltere) çıkar. İzin yoksa reklam istenmez. Gerekiyorsa Ayarlar'da "Reklam Gizlilik Seçenekleri"
-  düğmesi çıkar.
+  bölgelerde (AB/İngiltere) çıkar. İzin yoksa reklam istenmez. İzin bilgisi alınamazsa (çevrimdışı açılış) uygulamaya
+  her dönüşte yeniden denenir. Gerekiyorsa Ayarlar'da "Reklam Gizlilik Seçenekleri" düğmesi çıkar.
+- **Gizlilik politikası:** oyun içinde Ayarlar > Gizlilik Politikası. Web'de yayımlanacak metin
+  `docs/GIZLILIK.md`'de; adresi `privacyPolicyUrl` gradle özelliğine yazılır.
 - **İçerik:** reklam içeriği "PG" ile sınırlıdır.
 - **Çevrimdışı:** oyun internet olmadan tamamen oynanır. Reklam yüklenmezse banner görünmez, geçişler bekletilmez,
   video düğmeleri gösterilmez.
@@ -88,6 +90,8 @@ getirmez. Gelir için:
    admobInterstitial=ca-app-pub-XXXXXXXXXXXXXXXX/2222222222
    admobRewarded=ca-app-pub-XXXXXXXXXXXXXXXX/3333333333
    ```
+   Dört kimliğin hepsi birlikte verilmeli; eksik kalırsa derleme durur. Hiçbiri verilmezse test kimlikleri kullanılır ve
+   Ayarlar'da "test reklamları" notu görünür.
 3. `./gradlew :app:assembleRelease` (ya da Play için `bundleRelease`) ile derle. Debug derlemesi her zaman test
    kimliklerini kullanır: kendi reklamına tıklamak AdMob kurallarına aykırıdır.
 
@@ -96,6 +100,14 @@ Play Console'da yapılması gerekenler:
 - Veri güvenliği formunda reklam kimliği ve AdMob'un topladığı veriler.
 - Hedef kitle beyanı.
 - Uygulama çocuklara yönelikse Aileler politikası; bu durumda reklam isteklerine çocuk etiketi eklenmeli.
+- Gizlilik politikası adresi.
+- AdMob'da "Gizlilik ve mesajlaşma" altında GDPR mesajı oluşturulmalı (yoksa izin formu çıkmaz).
+- app-ads.txt dosyası yayımlanmalı.
+
+Uygulama **Android 16 (API 36) hedefler** (Play'in 2026 şartı):
+- Kenardan kenara çizim: içerik durum ve gezinme çubuklarının içinde kalır.
+- Geri hareketi yeni API ile karşılanır.
+- Tablette yatay kullanımda da oynanır (Android 16 büyük ekranda dikey kilidi yok sayar).
 
 ## Canlar (bölüm modu)
 

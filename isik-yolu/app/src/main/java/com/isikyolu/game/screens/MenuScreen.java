@@ -86,6 +86,7 @@ public final class MenuScreen extends Screen {
 
     @Override public void onShow() {
         act.startAds(); // ilk ana menüde (açılış animasyonu bölünmez); izin formu gerekirse burada açılır
+        act.retryAds();
         if (Game.takeAbandonedNotice())
             act.toast(Game.abandonedShieldUsed() ? "Yarım bırakılan bölümde Can Kalkanı canını korudu" : "Yarım bırakılan bölüm için 1 can harcandı");
     }

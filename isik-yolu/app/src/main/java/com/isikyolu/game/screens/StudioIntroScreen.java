@@ -21,12 +21,7 @@ public final class StudioIntroScreen extends Screen {
         addView(v, new LayoutParams(-1, -1));
     }
 
-    private void bars(int top, int bottom) {
-        try {
-            act.getWindow().setStatusBarColor(top);
-            act.getWindow().setNavigationBarColor(bottom);
-        } catch (RuntimeException ignored) { }
-    }
+    private void bars(int top, int bottom) { act.setBarColors(top, bottom); }
 
     @Override public void onShow() {
         bars(StudioIntroView.BG, StudioIntroView.BG);

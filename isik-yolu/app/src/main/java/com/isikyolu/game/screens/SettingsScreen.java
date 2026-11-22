@@ -57,6 +57,8 @@ public final class SettingsScreen extends Screen {
                 Ui.lpMargins(c, -1, -2, 0, 16, 0, 0));
         col.addView(Ui.button(c, "İlerlemeyi Sıfırla", Ui.SECONDARY, Icon.RESET, v -> confirmReset(a)),
                 Ui.lpMargins(c, -1, -2, 0, 10, 0, 0));
+        col.addView(Ui.button(c, "Gizlilik Politikası", Ui.SECONDARY, Icon.HELP, v -> showPrivacy(a)),
+                Ui.lpMargins(c, -1, -2, 0, 10, 0, 0));
         if (com.isikyolu.game.ads.Ads.get().privacyOptionsRequired()) // AB/İngiltere: reklam izni değiştirilebilir
             col.addView(Ui.button(c, "Reklam Gizlilik Seçenekleri", Ui.SECONDARY, Icon.HELP, v -> com.isikyolu.game.ads.Ads.get().showPrivacyOptions(a)),
                     Ui.lpMargins(c, -1, -2, 0, 10, 0, 0));
@@ -69,7 +71,8 @@ public final class SettingsScreen extends Screen {
         about.addView(Ui.text(c, "Sürüm 1.7.0", 13, Palette.TURQUOISE, Ui.MEDIUM));
         TextView info = Ui.text(c, Progress.LEVEL_COUNT + " bölüm · 5 dünya · " + Achievements.ALL.size() + " başarı · günlük bulmaca\n"
                 + "Oyun çevrimdışı oynanır. İnternet varken reklamlar Google AdMob ile gösterilir; video izlemek isteğe bağlıdır.\n"
-                + "İlerlemen yalnızca cihazına kaydedilir.", 13, Palette.TEXT_DIM, Ui.REGULAR);
+                + "İlerlemen yalnızca cihazına kaydedilir."
+                + (com.isikyolu.game.BuildConfig.AD_TEST_IDS ? "\n(Bu derleme Google test reklamlarını gösterir.)" : ""), 13, Palette.TEXT_DIM, Ui.REGULAR);
         info.setGravity(Gravity.CENTER);
         info.setLineSpacing(0, 1.2f);
         about.addView(info, Ui.lpMargins(c, -2, -2, 0, 10, 0, 0));
@@ -114,4 +117,33 @@ public final class SettingsScreen extends Screen {
         o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
         o.show(a.overlayLayer());
     }
+
+    /** Gizlilik politikası: uygulama içinde (çevrimdışı da okunur); adres tanımlıysa web'de açılabilir. */
+    static void showPrivacy(MainActivity a) {
+        com.isikyolu.game.ui.Overlay o = new com.isikyolu.game.ui.Overlay(a);
+        o.title("Gizlilik Politikası");
+        TextView body = o.body(PRIVACY_TEXT);
+        body.setGravity(Gravity.START);
+        body.setTextSize(13);
+        String url = com.isikyolu.game.BuildConfig.PRIVACY_URL;
+        if (!url.isEmpty()) o.button("Web'de Aç", Ui.PRIMARY, Icon.NEXT, v -> {
+            try { a.startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, android.net.Uri.parse(url))); }
+            catch (RuntimeException e) { a.toast(url); }
+        });
+        o.button("Tamam", Ui.SECONDARY, -1, v -> o.dismiss());
+        o.show(a.overlayLayer());
+    }
+
+    static final String PRIVACY_TEXT =
+            "Işık Yolu bir bulmaca oyunudur. Oyunun kendisi hesap açtırmaz, kişisel veri istemez ve sunucuya veri göndermez. "
+            + "İlerlemen, ayarların, canların ve satın aldığın oyun içi ürünler yalnızca cihazında saklanır.\n\n"
+            + "Reklamlar: İnternet bağlantısı varken reklamlar Google AdMob ile gösterilir. Google; reklam kimliği, cihaz ve uygulama "
+            + "bilgileri, IP adresinden yaklaşık konum ve reklam etkileşimleri gibi verileri reklam sunmak, ölçmek ve kötüye kullanımı "
+            + "önlemek için işleyebilir. Ayrıntılar: policies.google.com/technologies/ads\n\n"
+            + "İzin: Gereken bölgelerde (ör. AB, İngiltere) reklamlardan önce Google'ın izin formu gösterilir; seçimini Ayarlar'daki "
+            + "\"Reklam Gizlilik Seçenekleri\" ile değiştirebilirsin. Reklam kimliğini cihazının Ayarlar > Gizlilik > Reklamlar "
+            + "bölümünden sıfırlayabilir ya da silebilirsin.\n\n"
+            + "Ödüllü videolar isteğe bağlıdır. Oyun internet olmadan da tamamen oynanır.\n\n"
+            + "Çocuklar: Oyun genel kitleye yöneliktir; reklam içeriği \"PG\" ile sınırlıdır.\n\n"
+            + "Verilerini silmek için Ayarlar > İlerlemeyi Sıfırla'yı kullanabilir ya da uygulamayı kaldırabilirsin.";
 }

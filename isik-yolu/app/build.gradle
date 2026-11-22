@@ -12,22 +12,27 @@ def TEST_ADS = [
         admobInterstitial: 'ca-app-pub-3940256099942544/1033173712',
         admobRewarded    : 'ca-app-pub-3940256099942544/5224354917',
 ]
-def adId = { String key, boolean release -> release && project.hasProperty(key) ? project.property(key).toString() : TEST_ADS[key] }
+def realAdKeys = TEST_ADS.keySet().findAll { project.hasProperty(it) && project.property(it).toString().trim() }
+if (!realAdKeys.isEmpty() && realAdKeys.size() != TEST_ADS.size())
+    throw new GradleException("AdMob kimlikleri eksik: ${TEST_ADS.keySet() - realAdKeys} (dördü birlikte verilmeli; hiçbiri verilmezse test kimlikleri kullanılır)")
+def adId = { String key, boolean release -> release && !realAdKeys.isEmpty() ? project.property(key).toString().trim() : TEST_ADS[key] }
+// Gizlilik politikası adresi (Play Console'a da girilir): privacyPolicyUrl=https://...
+def privacyUrl = project.hasProperty('privacyPolicyUrl') ? project.property('privacyPolicyUrl').toString().trim() : ''
 
 android {
     namespace 'com.isikyolu.game'
-    compileSdk 35
-    buildToolsVersion '34.0.0'
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.isikyolu.game'
         minSdk 26
-        targetSdk 34
+        targetSdk 36
         versionCode 10
         versionName '1.7.0'
     }
 
     buildFeatures { buildConfig true }
+    defaultConfig.buildConfigField 'String', 'PRIVACY_URL', "\"${privacyUrl}\""
 
     signingConfigs {
         // Yerel test dağıtımı için sürüm APK'sı da imzalanır (keystore depoya konmaz, debug anahtarı kullanılır).
@@ -52,7 +57,7 @@ android {
             buildConfigField 'String', 'AD_BANNER', "\"${adId('admobBanner', true)}\""
             buildConfigField 'String', 'AD_INTERSTITIAL', "\"${adId('admobInterstitial', true)}\""
             buildConfigField 'String', 'AD_REWARDED', "\"${adId('admobRewarded', true)}\""
-            buildConfigField 'boolean', 'AD_TEST_IDS', "${!project.hasProperty('admobAppId')}"
+            buildConfigField 'boolean', 'AD_TEST_IDS', "${realAdKeys.isEmpty()}"
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

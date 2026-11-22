@@ -1,21 +1,57 @@
-# Build Raporu — Işık Yolu 1.6.0
+# Build Raporu — Işık Yolu 1.7.0
 
-Tarih: 21 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
+Tarih: 22 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJDK 21, Gradle 8.14.3
 
 ## Araç zinciri
 
 | Bileşen | Sürüm |
 |---|---|
-| Android Gradle Plugin | 8.7.3 |
-| compileSdk / targetSdk | 34 |
+| Android Gradle Plugin | 8.13.2 |
+| compileSdk / targetSdk | 36 / 36 (Android 16) |
 | minSdk | 26 (Android 8.0) |
-| Build tools | 34.0.0 |
+| Build tools | 35.0.0 |
 | Java kaynak/hedef | 17 |
-| Bağımlılıklar (uygulama) | yok (yalnızca Android çerçevesi + `:engine` modülü) |
+| Bağımlılıklar (uygulama) | `:engine` modülü, Google Mobile Ads 25.5.0, Google UMP 4.0.0 (reklam ve izin) |
 | Test bağımlılıkları | JUnit 4.13.2, Robolectric 4.14.1 |
 
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
+
+## 1.7.0 değişiklikleri (reklamlar)
+
+- **Google AdMob reklamları:** Google Mobile Ads SDK 25.5.0 ve izin için Google UMP 4.0.0. Ayrıntı: README › Reklamlar.
+  - **Banner:** büyük uyarlanabilir boyutta; ekranın en altında, içerikten ayraçla ayrı.
+    - Menü, bölümler, günlük bulmaca ve başarılar ekranında görünür.
+    - Oyun ekranında yoktur: sürekli dokunulan oyun düğmelerine yakın olurdu.
+    - İlk 3 bölüm bitene kadar gösterilmez. Açılışta, markette ve ayarlarda yoktur.
+    - Bir pencere açıkken gizlenir ve duraklatılır.
+    - Hiç yüklenemezse artan aralıklarla yeniden denenir. Yenileme başarısız olursa eski reklam kalır.
+  - **Geçiş (resim) reklamı:** yalnızca bölüm bittikten sonra, sonraki ekrana geçerken.
+    - Öğretici 10 bölümde yoktur.
+    - En az 3 bölüm ve 4 dakika arayla gösterilir; ödüllü videodan sonraki 3 dakikada gösterilmez.
+  - **Ödüllü video:** isteğe bağlıdır. Ödüller: +1 can, +1 ipucu, ek hamle hakkı, +25 kristal.
+    - Günlük sınırlar vardır; ödül yalnızca video sonuna kadar izlenince verilir.
+  - İçerik "PG" ile sınırlıdır.
+  - İzin olmadan reklam istenmez. Gerektiğinde Ayarlar'da gizlilik seçenekleri düğmesi çıkar.
+- **Reklam kimlikleri:**
+  - Varsayılan olarak Google'ın test kimlikleri kullanılır.
+  - Gerçek kimlikler yalnızca release derlemesinde, `admobAppId`, `admobBanner`, `admobInterstitial` ve
+    `admobRewarded` gradle özellikleriyle verilir.
+  - `BuildConfig.AD_TEST_IDS` hangi kimliklerin kullanıldığını gösterir.
+- **Android 16 (API 36) hedefi:** Google Play 31 Ağustos 2026'dan beri güncellemelerde bunu istiyor. AGP 8.7.3 →
+  8.13.2, compileSdk ve targetSdk 36.
+  - **Kenardan kenara çizim:** arka plan sistem çubuklarının altına uzanır; içerik çubukların iç boşluğu kadar
+    içeride kalır. Stüdyo açılışında çubukların arkası logo rengindedir.
+  - **Geri hareketi:** `OnBackInvokedCallback` ile karşılanır.
+  - **Başlatma modu:** `singleTop`. `singleTask` simgeden dönüşte açık reklamı kapatıyordu.
+  - **Tablet:** yatay tablette de oynanır.
+- **Gizlilik politikası:** Ayarlar'da uygulama içi metin; web için `docs/GIZLILIK.md` (`privacyPolicyUrl`).
+- **Reklam kimlikleri:** dördü birlikte verilmezse derleme durur.
+- **İzin isteği:** çevrimdışı ilk açılıştan sonra yeniden denenir.
+- **Ödüllü video:** sonuç üç durumludur (kazanıldı / yarıda kapatıldı / açılamadı) ve her biri için doğru uyarı verilir.
+- **Geçiş reklamı:** sayacı yalnızca reklam gerçekten gösterilince ilerler.
+- **İzinler:** titreşime ek olarak internet ve ağ durumu eklendi. AD_ID izni SDK tarafından eklenir.
+- Kurallar motor tarafında, `engine/AdPolicy.java`. İlerleme kaydına reklam sayaçları eklendi; eski kayıtlar okunur.
 
 ## 1.6.0 değişiklikleri (bölüm denetimi)
 
@@ -147,7 +183,9 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 | `teslimat/IsikYolu-1.6.0-debug.apk` | 2 127 820 bayt | `f6bd466954d0dbc9beadd107e89e5b3ff20842eb70c39a0c019c04aff9784600` |
 
 - Paket: `com.isikyolu.game`, sürüm kodu 9, sürüm adı 1.6.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
-- İzinler: yalnızca `android.permission.VIBRATE`.
+- İzinler:
+  - Uygulamanın kendisi: `VIBRATE`, `INTERNET`, `ACCESS_NETWORK_STATE`.
+  - Reklam SDK'sının eklediği: `AD_ID`, `ACCESS_ADSERVICES_*`, `WAKE_LOCK`, `FOREGROUND_SERVICE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.
 - APK içeriği: `assets/levels.json` (500 bölüm), 11 WAV ses (müzik 1,4 MB), vektör ikon ve amblem.

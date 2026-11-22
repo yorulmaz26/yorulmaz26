@@ -425,4 +425,7 @@ public final class MarketScreen extends Screen {
     }
 
     @Override public void onHide() { removeCallbacks(tick); }
+
+    /** Ödüllü video yeniden hazır olunca "Video izle" düğmesi Teklifler sekmesinde yeniden görünsün. */
+    @Override public void onAdsChanged() { if (tab == 0) render(false); }
 }
