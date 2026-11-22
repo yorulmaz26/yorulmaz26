@@ -56,6 +56,32 @@
     max_shift: ['Azami senaryo sapması', 'dec'],
   };
 
+  // Kontrol kodlarının Türkçe adları (sunucu yanıtında etiketi olmayan kodlar için yedek; selection/checks.py ile aynı).
+  const CHECK_LABELS = {
+    fixture_ok: 'Fikstür ve veri durumu doğrulandı',
+    data_fresh: 'Veri güncel',
+    data_sufficient: 'Veri yeterli',
+    settlement_rules: 'Market sonuçlandırma kuralları doğrulandı',
+    model_a_valid: 'MODEL A geçerli',
+    model_b_valid: 'MODEL B geçerli',
+    probability_consistency: 'Olasılık tutarlılığı',
+    calibration_a: 'MODEL A kalibrasyonu yeterli',
+    calibration_b: 'MODEL B kalibrasyonu yeterli',
+    prediction_valid: 'Tahmin geçerli',
+    odds_valid: 'Gerçek, doğrulanmış ve güncel oran',
+    odds_settlement_rules: 'Oran kaynağının sonuçlandırma kuralları doğrulandı',
+    thresholds_established: 'Eşikler kronolojik doğrulamayla belirlendi',
+    prob_lower: 'Kalibre olasılığın ihtiyatlı alt sınırı',
+    ev_models_positive: 'MODEL A ve MODEL B ayrı ayrı pozitif EV',
+    ev_lower: 'Belirsizlik altında EV avantajı',
+    uncertainty: 'Belirsizlik kabul edilebilir düzeyde',
+    disagreement: 'Model uyuşmazlığı kontrolü',
+    market_reference: 'Marjdan arındırılmış piyasa referansıyla uyum',
+    robustness: 'Tahmin dayanıklılık testi',
+    nested_duplicate: 'İç içe market tekrarı yok',
+    audit: 'Bağımsız seçim denetimi',
+  };
+
   const STATUS_TONES = {
     uncertainty: { low: 'good', medium: 'warn', high: 'bad' },
     robustness: { robust: 'good', fragile: 'bad' },
@@ -994,7 +1020,8 @@
       }
       if (!changed) return;
       renderModeInfo();
-      loadInto(resultsEl, () => api('/recommendations?mode=' + encodeURIComponent(code)), (data) => renderResults(data, code), { loadingText: 'Seçimler yükleniyor…' });
+      // Aynı kapsayıcıya yeni yükleme önceki modun süren isteğini iptal eder.
+      loadInto(resultsEl, (signal) => api('/recommendations?mode=' + encodeURIComponent(code), { signal }), (data) => renderResults(data, code), { loadingText: 'Seçimler yükleniyor…' });
       rejectionsEl.replaceChildren(RejectionsSection(code));
     }
 
@@ -1291,7 +1318,7 @@
     explain.addEventListener('toggle', () => {
       if (!explain.open || explainStarted) return;
       explainStarted = true;
-      loadInto(explainBody, () => api('/recommendations/' + encodeURIComponent(item.id) + '/decision-explanation'), (data) => renderExplanation(explainBody, data, item), { loadingText: 'Karar açıklaması yükleniyor…' });
+      loadInto(explainBody, (signal) => api('/recommendations/' + encodeURIComponent(item.id) + '/decision-explanation', { signal }), (data) => renderExplanation(explainBody, data, item), { loadingText: 'Karar açıklaması yükleniyor…' });
     });
 
     return h('article', { class: 'rec-card', 'aria-labelledby': titleId, style: '--mode-color:' + modeVar(code), dataset: { id: String(item.id) } },
@@ -1315,7 +1342,7 @@
         code: c.code,
         label: (isNum(c.no) ? c.no + '. ' : '') + (c.label || 'Koşul'),
         passed: c.passed === true ? true : c.passed === false ? false : null,
-        detail: Array.isArray(c.codes) && c.codes.length ? 'Kontroller: ' + c.codes.map((x) => labelOf.get(x) || x).join(', ') : c.detail || null,
+        detail: Array.isArray(c.codes) && c.codes.length ? 'Kontroller: ' + c.codes.map((x) => labelOf.get(x) || CHECK_LABELS[x] || String(x).replace(/_/g, ' ')).join(', ') : c.detail || null,
       }));
       body.append(h('div', null,
         h('p', { class: 'sub-heading' }, 'Dengeli modun koşulları', h('span', { class: 'muted small' }, checkCountText(rows))),
@@ -1410,7 +1437,8 @@
         fixtureId ? h('span', { class: 'muted small' }, ' · seçili maç') : null));
       if (counts.length) {
         listWrap.append(h('div', null,
-          h('p', { class: 'sub-heading' }, 'Eleme nedenleri'),
+          // Etiketler koşulun sağlanması gereken hâlini adlandırır; başlık bunu "sağlanmayan" olarak çerçeveler.
+          h('p', { class: 'sub-heading' }, 'Sağlanmayan koşullar'),
           h('ul', { class: 'bar-list' }, counts.map((r) => h('li', { class: 'bar-row' },
             h('span', null, r.label || r.code),
             h('span', { class: 'bar-count' }, fmtInt(r.count) + (total ? ' · ' + fmtPct(r.count / total) : '')),
@@ -2048,10 +2076,13 @@
       ]);
     }
 
+    let browserResult = null; // son requestPermission() sonucu
     function updateBrowserNote(el) {
       let text = '';
       try {
-        if ('Notification' in window && window.Notification.permission === 'denied') {
+        // Bazı tarayıcılar (ör. başsız Chromium) izin verildikten sonra da permission'ı 'denied' bildirir;
+        // son istek 'granted' döndüyse engel notu gösterilmez.
+        if ('Notification' in window && window.Notification.permission === 'denied' && browserResult !== 'granted') {
           text = 'Tarayıcı bildirimleri bu site için engellenmiş; tarayıcı ayarlarından izin verebilirsiniz.';
         }
       } catch (e) {
@@ -2082,6 +2113,7 @@
       if (want) {
         if ('Notification' in window && typeof window.Notification.requestPermission === 'function') {
           const res = await requestBrowserPermission();
+          browserResult = res;
           if (res !== 'granted') {
             value = false;
             note = res === 'error' ? ' Tarayıcı bildirim izni istenemedi.' : ' Tarayıcı bildirim iznini vermedi; radar alarmları bildirim olarak gönderilemez.';

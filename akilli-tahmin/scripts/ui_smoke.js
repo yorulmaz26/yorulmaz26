@@ -354,7 +354,7 @@ async function runViewport(browser, vp) {
     const fRes = await getJson(page, `api/v1/recommendations/rejections?mode=${rejMode}&limit=50&offset=0&fixture_id=${value}`);
     check(titles.length === (fRes.items || []).length, `Neden elendi?: filtreli ilk sayfa ${titles.length} ≠ ${(fRes.items || []).length}`);
     if (fx && typeof fx.count === 'number') check(fx.count === fRes.total, `Neden elendi?: fixtures.count (${fx.count}) filtreli total (${fRes.total}) ile aynı olmalı`);
-    if ((fRes.items || []).length < fRes.total) {
+    if ((fRes.items || []).length < fRes.total && check((await moreBtn.count()) === 1, 'Neden elendi?: filtreli listede "Daha fazla göster" görünmeli')) {
       await moreBtn.click();
       const want = Math.min(fRes.total, 100);
       await page.waitForFunction((n) => document.querySelectorAll('details.rejections .reject-item').length >= n, want, { timeout: 60000 }).catch(() => {});
@@ -404,7 +404,9 @@ async function runViewport(browser, vp) {
       const cell = (await page.locator(`#success-panel tr[data-mode="${m.code}"] td`).last().innerText().catch(() => '')).trim();
       const legend = (await page.locator(`#success-panel .legend li[data-mode="${m.code}"] .legend-value`).innerText().catch(() => '')).trim().replace(/ birim$/, '');
       check(cell === fmtSigned1(m.metrics && m.metrics.profit_units), `Seçim Modları (${p}): ${m.code} tablo kârı ${cell} ≠ API ${fmtSigned1(m.metrics && m.metrics.profit_units)}`);
-      if (hasTimeline) check(legend === cell, `Seçim Modları (${p}): ${m.code} kâr grafiği lejantı (${legend}) tablodaki "Kâr (birim)" (${cell}) ile aynı olmalı`);
+      // Dönemde sonuçlanmış seçim yoksa lejant "veri yok", tablo "—" gösterir; ikisi de veri yok demektir.
+      const noData = (t) => t === 'veri yok' || t === '—' || t === '';
+      if (hasTimeline) check(legend === cell || (noData(legend) && noData(cell)), `Seçim Modları (${p}): ${m.code} kâr grafiği lejantı (${legend}) tablodaki "Kâr (birim)" (${cell}) ile aynı olmalı`);
     }
     if (!hasTimeline) {
       console.log(`  i ${p}: sunucu /modes/comparison yanıtında timeline yok; eski seri yeniden tabanlanıyor (geri dönüş).`);

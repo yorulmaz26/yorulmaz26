@@ -192,6 +192,8 @@ class Api:
             "mode": mode,
             "run_id": src.get("run_id"),
             "total": len(items),
+            "offset": offset,
+            "limit": limit,
             "reason_counts": sorted(counts.values(), key=lambda c: -c["count"]),
             "fixtures": sorted(fixtures.values(), key=lambda f: (f["kickoff_at"] or "", f["id"])),
             "items": page,
