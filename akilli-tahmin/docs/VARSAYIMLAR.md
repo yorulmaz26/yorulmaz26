@@ -64,9 +64,25 @@ Sabit kalan değerler seçim eşiği değil, **istatistiksel politika** değerle
 düzeyleri (%95 güven aralıkları, %70/%80/%90 tek yönlü alt sınır adayları), en az örneklem sayıları,
 veri/oran güncellik süreleri. Bunlar gerekirse kullanıcıyla birlikte değiştirilebilir.
 
-"Güvenilir avantaj" kuralı: oranlı modlar doğrulama penceresinde teorik birim ROI'nin tek yönlü %95 alt
-sınırı > 0 olmadıkça kurulmaz (Dengeli için ek olarak Kelly log büyümesinin alt sınırı > 0). Bu bilinçli
-olarak ihtiyatlıdır; verimli piyasalarda çoğu zaman seçim yapılmaması beklenir.
+"Güvenilir avantaj" kuralı: oranlı modlar (En Avantajlı, Dengeli) doğrulama penceresinin ayar diliminde
+teorik birim ROI'nin tek yönlü %95 alt sınırı > 0 olmadıkça ve bağımsız teyit diliminde getiri pozitif
+kalmadıkça kurulmaz. Dengeli ek olarak yalnızca p > 0,5 alanında çalışır ve isabet alt sınırının pozitif EV
+havuzunun isabet oranından düşük olmamasını ister; çalışma anında ihtiyatlı Kelly oranıyla sıralar. Kelly log
+büyümesi raporlanır ama kurulma koşulu değildir. Bütün güven aralıkları ve en az örneklem koşulları maç
+düzeyinde kümelenir (bir maçın ~92 seçeneği bağımsız gözlem sayılmaz). Bu bilinçli olarak ihtiyatlıdır;
+verimli piyasalarda çoğu zaman seçim yapılmaması beklenir.
+
+Yaklaşık zamanlı geçmiş CSV oranları yalnızca geriye dönük testte, yaş sınırı uygulanmadan maç öncesi fiyat
+olarak kabul edilir; güncel öneride reddedilir. En Güvenilir modunda oran zorunlu değildir: doğrulamadan
+geçmeyen bir oran kartta "gerçek oran" olarak gösterilmez ve kararla birlikte kaydedilmez (bu kararlar
+isabet oranına katılır, ROI'ye katılmaz).
+
+## 4.1 Birleştirici ve tutarlılık
+
+Yığınlama birleştiricisi yalnızca maç düzeyinde kümelenmiş eşleştirilmiş log loss testinde her iki modeli de
+geçerse etkinleşir; çıktısı market kurallarıyla tutarlı hale getirilir. Farklı marketlerdeki mantıksal olarak
+aynı olaylar (ÇŞ 1X = Handikap(+1) 1, ÇŞ X2 = Handikap(−1) 2, Alt 0,5 = Skor 0-0, Alt 1,5 = Toplam Gol 0-1,
+Üst 5,5 = Toplam Gol 6+) tek bir kanonik olasılık taşır; olasılık tutarlılığı kontrolü bunu da sınar.
 
 ## 5. MODEL A/B birleşimi
 

@@ -63,6 +63,8 @@ class _Index:
     k_1x2: tuple[int, int, int]
     dc: tuple[int, int, int]
     dnb: tuple[int, int]
+    #: Farklı marketlerde mantıksal olarak *aynı* olaylar: (kanonik, ikiz) dizin çiftleri.
+    identities: tuple[tuple[int, int], ...]
 
 
 def _build_index() -> _Index:
@@ -83,6 +85,22 @@ def _build_index() -> _Index:
         lines = sorted((mk.line, mk.id) for mk in MARKETS if mk.id.startswith(prefix))
         chains.append((np.array([pos[(mid, "OVER")] for _, mid in lines]),
                        np.array([pos[(mid, "UNDER")] for _, mid in lines])))
+    # Aynı olay: kazanma ve iade maskeleri ızgarada birebir aynı olan seçenekler (ör. ÇŞ 1X = Handikap(+1) 1,
+    # Alt 0,5 = Skor 0-0, Alt 1,5 = TG 0-1, Üst 5,5 = TG 6+). Kanonik olan, öncelikli ailedekidir.
+    _, win, void = outcome_index()
+    prio = {f: i for i, f in enumerate(("result", "double_chance", "totals", "team_totals", "halftime",
+                                         "halftime_totals", "btts", "goal_range", "handicap", "htft",
+                                         "correct_score", "odd_even", "dnb"))}
+    sig: dict[bytes, list[int]] = {}
+    for i in range(len(keys)):
+        sig.setdefault(win[i].tobytes() + void[i].tobytes(), []).append(i)
+    identities = []
+    for members in sig.values():
+        if len(members) < 2:
+            continue
+        members.sort(key=lambda i: (prio.get(fam[i], 99), i))
+        canon = members[0]
+        identities.extend((canon, j) for j in members[1:])
     return _Index(
         keys=keys, family=fam, kind=np.array(kinds, dtype=object), direction=np.array(dirs),
         families=tuple(sorted({str(x) for x in fam})), exhaustive_groups=tuple(groups), ou_chains=tuple(chains),
@@ -92,6 +110,7 @@ def _build_index() -> _Index:
         k_1x2=(pos[("1X2", "1")], pos[("1X2", "X")], pos[("1X2", "2")]),
         dc=(pos[("DC", "1X")], pos[("DC", "12")], pos[("DC", "X2")]),
         dnb=(pos[("DNB", "1")], pos[("DNB", "2")]),
+        identities=tuple(identities),
     )
 
 
@@ -107,11 +126,25 @@ def signals_for(form_diff: float, goal_dev: float) -> np.ndarray:
     return base * INDEX.direction
 
 
+N_FEATURES = 7
+#: Önsel ortalama: oran varken ve yokken MODEL B, MODEL A'ya yakın başlar.
+PRIOR_MEAN = np.array([0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
+PRIOR_RIDGE = np.array([0.5, 2.0, 2.0, 0.5, 2.0, 4.0, 4.0])
+
+
 def design(pa: np.ndarray, fair: np.ndarray, signal: np.ndarray) -> np.ndarray:
-    """pa, fair, signal: (..., m) → (..., m, 5) tasarım matrisi."""
+    """pa, fair, signal: (..., m) → (..., m, 7) tasarım matrisi.
+
+    Oran bulunan ve bulunmayan rejimler ayrı katsayılarla modellenir:
+    [1, var·logit p_A, var·logit p_piyasa, var, var·sinyal, yok·logit p_A, yok·sinyal].
+    Böylece oranla eğitilmiş (MODEL A'ya düşük ağırlık veren) katsayılar oransız bir markete
+    uygulanıp anlamsız olasılık üretmez; oransız rejimde önsel MODEL A'yı korur.
+    """
     has = np.isfinite(fair).astype(float)
+    no = 1.0 - has
     fm = np.where(np.isfinite(fair), fair, 0.5)
-    return np.stack([np.ones_like(pa), logit(pa), has * logit(fm), has, signal], axis=-1)
+    la = logit(pa)
+    return np.stack([np.ones_like(pa), has * la, has * logit(fm), has, has * signal, no * la, no * signal], axis=-1)
 
 
 @dataclass
@@ -157,7 +190,7 @@ class ModelB:
                 f = self.market_fits.get(mid) or self.fits[fam]
                 idx = INDEX.market_idx[mid]
                 if coef_draws and rng is not None:
-                    coefs = f.draw_coefs(S, rng)  # (S × 5)
+                    coefs = f.draw_coefs(S, rng)  # (S × N_FEATURES)
                     z = np.einsum("smk,sk->sm", X[:, idx, :], coefs)
                 else:
                     z = X[:, idx, :] @ f.coef
@@ -191,6 +224,22 @@ def enforce_consistency(p: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         p[:, n2] = p[:, i2]
         void[:, n1] = p[:, ix]
         void[:, n2] = p[:, ix]
+    # Aynı olay farklı marketlerde aynı olasılığı taşır; ikizin bulunduğu dışlayıcı market,
+    # sabitlenen ikiz dışındaki seçenekler yeniden ölçeklenerek tekrar 1'e tamamlanır.
+    fixed = np.zeros(p.shape[1], bool)
+    for canon, twin in INDEX.identities:
+        if np.all(np.isfinite(p[:, canon])) and np.all(np.isfinite(p[:, twin])):
+            p[:, twin] = p[:, canon]
+            fixed[twin] = True
+    if fixed.any():
+        for g in INDEX.exhaustive_groups:
+            fx = fixed[g]
+            if not fx.any() or fx.all() or not np.all(np.isfinite(p[:, g])):
+                continue
+            free = g[~fx]
+            rest = np.clip(1.0 - p[:, g[fx]].sum(axis=1), 0.0, 1.0)
+            tot = p[:, free].sum(axis=1)
+            p[:, free] = p[:, free] * (rest / np.maximum(tot, 1e-12))[:, None]
     return np.clip(p, 0.0, 1.0), void
 
 
@@ -212,7 +261,8 @@ def _pav_decreasing(x: np.ndarray) -> np.ndarray:
 
 
 def consistency_report(p_win: np.ndarray, p_void: np.ndarray, tol: float = 1e-6) -> dict:
-    """Adım 5 — olasılık tutarlılığı: dışlayıcı marketlerin toplamı, türetilmiş marketler, monotonluk."""
+    """Adım 5 — olasılık tutarlılığı: dışlayıcı marketlerin toplamı, türetilmiş marketler, farklı
+    marketlerdeki aynı olayların eşitliği ve Alt/Üst monotonluğu."""
     p_win = np.atleast_2d(p_win)[0]
     p_void = np.atleast_2d(p_void)[0]
     worst = 0.0
@@ -230,6 +280,9 @@ def consistency_report(p_win: np.ndarray, p_void: np.ndarray, tol: float = 1e-6)
     if np.all(np.isfinite(p_win[[i1, ix, i2, d1x]])):
         worst = max(worst, abs(p_win[d1x] - p_win[i1] - p_win[ix]), abs(p_win[dx2] - p_win[ix] - p_win[i2]),
                     abs(p_win[d12] - p_win[i1] - p_win[i2]))
+    for canon, twin in INDEX.identities:
+        if np.isfinite(p_win[canon]) and np.isfinite(p_win[twin]):
+            worst = max(worst, abs(p_win[canon] - p_win[twin]))
     mono_ok = True
     for over_idx, _ in INDEX.ou_chains:
         ov = p_win[over_idx]
@@ -243,8 +296,8 @@ def train_model_b(rows_by_family: dict[str, TrainingRows], cutoff: str, *, min_s
     market_fits: dict[str, LogisticFit] = {}
     n_rows: dict[str, int] = {}
     reasons: dict[str, str] = {}
-    prior = np.array([0.0, 1.0, 0.0, 0.0, 0.0])
-    ridge = np.array([0.5, 2.0, 2.0, 0.5, 2.0])
+    prior = PRIOR_MEAN
+    ridge = PRIOR_RIDGE
     for fam in INDEX.families:
         if fam in DERIVED_FAMILIES:
             continue
@@ -266,5 +319,6 @@ def train_model_b(rows_by_family: dict[str, TrainingRows], cutoff: str, *, min_s
                 m = rows.market == mid
                 if m.sum() >= min_samples:
                     # aile katsayılarına doğru büzülen market modeli
-                    market_fits[mid] = fit_logistic(X[m], rows.y[m], ridge=np.full(5, 25.0), prior_mean=fam_fit.coef)
+                    market_fits[mid] = fit_logistic(X[m], rows.y[m], ridge=np.full(N_FEATURES, 25.0),
+                                                    prior_mean=fam_fit.coef)
     return ModelB(cutoff, fits, n_rows, reasons, market_fits)

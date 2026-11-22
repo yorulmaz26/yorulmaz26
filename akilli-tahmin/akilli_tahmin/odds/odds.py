@@ -62,6 +62,10 @@ def validate_quote(quote: OddsQuote | None, at: str, max_age_seconds: float, *, 
     age = (from_iso(at) - from_iso(quote.captured_at)).total_seconds()
     if age < 0:
         return OddsValidation(False, "odds_from_future", "Oran değerlendirme anından sonra yakalanmış.", age)
+    if quote.timestamp_precision != "exact" and allow_approximate:
+        # Yaklaşık zamanlı geçmiş oranlar (ör. football-data.co.uk) maç öncesi fiyat kabul edilir;
+        # yakalanma anı bilinmediği için yaş sınırı uygulanmaz, yalnızca geçmiş testte.
+        return OddsValidation(True, "ok_approximate", "Yaklaşık zamanlı geçmiş oran (yalnızca geçmiş test).", age)
     if age > max_age_seconds:
         return OddsValidation(False, "odds_stale", f"Oran {int(age)} sn önce alınmış; sınır {int(max_age_seconds)} sn.", age)
     return OddsValidation(True, "ok", "Doğrulanmış ve güncel oran.", age)

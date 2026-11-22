@@ -51,12 +51,26 @@ MODEL B (canlı) — futbol verisi + out-of-fold MODEL A + tahmin anında biline
     κ ise o maçın ayından önce sonucu bilinen anlık durumlardan kestirilir. Örneklem yetersizse MODEL B
     geçersizdir → alarm verilmez.
 
-Nadir olay kalibrasyonu: geçmiş anlık durumlarda modelin eşik üstü (> %90) tahminleri için örnek sayısı,
-ortalama tahmin, gözlenen oran ve %95 Wilson aralığı. Yeterli ⇔ n ≥ min_rare_event_samples VE aralık
-ortalama tahmini içerir (ne aşırı ne yetersiz güvenli). İki model için de aylık genişleyen pencereyle
-(yalnızca o aydan önce sonucu kaydedilmiş maçlarla kestirilip/eğitilip o ay tahmin edilerek) üretilmiş
-kronolojik out-of-fold tahminler kullanılır. Sonuçlar her kalibrasyon çalıştırmasında model başına bir
-satır olarak `radar_calibration` tablosuna yazılır ve süreç içinde kesim günü başına önbelleğe alınır.
+Nadir olay kalibrasyonu: geçmiş anlık durumlarda modelin eşik üstü (> %90, kesin büyüktür) tahminleri.
+Bir maçın 5–75. dakika anlık durumları büyük ölçüde aynı sonucu paylaştığından (aynı gol hepsini 1 yapar)
+bağımsız deneme birimi anlık durum değil MAÇTIR:
+  - örneklem büyüklüğü n = bölgede en az bir anlık durumu olan farklı maç sayısı (G);
+    yeterlilik için G ≥ min_rare_event_samples gerekir (anlık durum sayısı yalnızca ayrıntıda gösterilir);
+  - fark d = gözlenen oran − ortalama tahmin; standart hatası maç kümeli (küme-sağlam, G/(G−1)
+    düzeltmeli) sandviç kestiricisidir: SE² = G/(G−1) · Σ_g (Σ_{i∈g} (r_i − d))² / N², r_i = y_i − p_i,
+    N = bölgedeki anlık durum sayısı;
+  - Yeterli ⇔ G ≥ min_rare_event_samples VE d'nin %95 maç kümeli aralığı (d ± 1,96·SE) 0'ı içerir.
+    Aralık tamamen 0'ın altındaysa aşırı güvenli, üstündeyse yetersiz güvenli.
+Raporlanan ci_low/ci_high gözlenen oranın aynı yöntemle (maç kümeli) %95 aralığıdır. İki model için de
+aylık genişleyen pencereyle (yalnızca o aydan önce sonucu kaydedilmiş maçlarla kestirilip/eğitilip o ay
+tahmin edilerek) üretilmiş kronolojik out-of-fold tahminler kullanılır. Sonuçlar her kalibrasyon
+çalıştırmasında model başına bir satır olarak `radar_calibration` tablosuna yazılır (n = maç sayısı) ve
+süreç içinde kesim günü başına önbelleğe alınır.
+
+Veritabanı erişimi: modül kendi iş parçacığı kilidini kurmaz (API katmanı bütün erişimi sıralar). Her
+sorgunun imleci sonuç okunur okunmaz kapatılır; çağrılar arasında açık imleç kalmaz. `evaluate_live`
+bütün okumaları ve hesaplamaları önce yapar, yazmaları (kalibrasyon satırları, değerlendirmeler,
+alarmlar) tek ve kısa bir işlemde topluca uygular.
 """
 from __future__ import annotations
 
@@ -68,7 +82,6 @@ from typing import Any, Mapping
 
 import numpy as np
 
-from ..calibration.metrics import wilson_interval
 from ..config import SETTINGS, Settings
 from ..data.point_in_time import FootballDataView
 from ..data.synthetic_live import historical_snapshots
@@ -103,8 +116,11 @@ LIVE_MARKET_MARGIN = 0.06
 #: MODEL B canlı lojistik birleştiricisinin önsel ortalaması ve sırt cezası: [sabit, logit p_A, logit p_piyasa].
 MODEL_B_PRIOR = (0.0, 1.0, 0.0)
 MODEL_B_RIDGE = (0.5, 2.0, 2.0)
+#: İki yönlü %95 aralık için standart normal çeyreklik.
+Z95 = 1.959963984540054
 
-#: Şartlar bu sırayla değerlendirilir; `blocked_reason` ilk sağlanmayan şartın etiketidir.
+#: Şartlar bu sırayla değerlendirilir; `blocked_reason` ilk sağlanmayan şartı olumsuz bir cümleyle
+#: bildirir ("Sağlanmayan koşul: <etiket>"; mükerrer alarmda yeni alarmın neden oluşturulmadığı).
 CONDITION_CODES: tuple[str, ...] = (
     "model_a_threshold", "model_b_threshold", "remaining_time", "live_data_fresh", "live_odds_fresh",
     "rare_event_calibration", "quality_gate", "notification_permission", "duplicate_block",
@@ -124,6 +140,37 @@ def _pct(x: float | None, digits: int = 1) -> str:
     if x is None or not math.isfinite(x):
         return "—"
     return "%" + f"{100 * x:.{digits}f}".replace(".", ",")
+
+
+def _signed_pp(x: float | None, digits: int = 1) -> str:
+    """İşaretli yüzde puanı (ör. +0,9 / −1,2)."""
+    if x is None or not math.isfinite(x):
+        return "—"
+    return f"{100 * x:+.{digits}f}".replace(".", ",").replace("-", "−")
+
+
+# ───────────────────────── veritabanı yardımcıları ─────────────────────────
+# Her sorgu kendi imlecini açar, sonucu okur ve imleci hemen kapatır: çağrılar arasında açık imleç
+# (ve onun tuttuğu okuma anlık görüntüsü) kalmaz.
+
+def _fetchall(conn: sqlite3.Connection, sql: str, params: tuple | list = ()) -> list:
+    cur = conn.execute(sql, params)
+    try:
+        return cur.fetchall()
+    finally:
+        cur.close()
+
+
+def _fetchone(conn: sqlite3.Connection, sql: str, params: tuple | list = ()) -> Any:
+    cur = conn.execute(sql, params)
+    try:
+        return cur.fetchone()
+    finally:
+        cur.close()
+
+
+def _execute(conn: sqlite3.Connection, sql: str, params: tuple | list = ()) -> None:
+    conn.execute(sql, params).close()
 
 
 def condition_labels(settings: Settings = SETTINGS) -> dict[str, str]:
@@ -305,46 +352,97 @@ def model_b_live_probability(fit: LogisticFit | None, p_a: float | None, decimal
 
 @dataclass(frozen=True)
 class RareEventCalibration:
+    """Nadir olay bölgesi (p > region_low) kalibrasyon özeti. Birim maçtır: `n` farklı maç sayısıdır."""
+
     model: str
     region_low: float
+    #: Bölgede en az bir anlık durumu olan farklı maç sayısı (yeterlilik bu sayıyla sınanır).
     n: int
     mean_predicted: float | None
     observed_rate: float | None
+    #: Gözlenen oranın %95 maç kümeli (küme-sağlam, G/(G−1) düzeltmeli) aralığı, [0, 1]'e kırpılmış.
     ci_low: float | None
     ci_high: float | None
     adequate: bool
     reason: str
     data_cutoff_at: str
+    #: Bölgedeki anlık durum sayısı (bilgi amaçlı; bağımsız örnek sayısı değildir).
+    n_snapshots: int = 0
+    #: Gözlenen − ortalama tahmin farkının %95 maç kümeli aralığı (yeterlilik kararı buna dayanır).
+    diff_low: float | None = None
+    diff_high: float | None = None
+
+    @property
+    def difference(self) -> float | None:
+        if self.observed_rate is None or self.mean_predicted is None:
+            return None
+        return self.observed_rate - self.mean_predicted
 
     def detail(self) -> str:
         if self.n == 0:
             return f"MODEL {self.model}: {self.reason}"
-        return (f"MODEL {self.model}: {self.reason} — n = {self.n}, ortalama tahmin {_pct(self.mean_predicted)}, "
-                f"gözlenen {_pct(self.observed_rate)} (%95 Wilson {_pct(self.ci_low)}–{_pct(self.ci_high)})")
+        text = (f"MODEL {self.model}: {self.reason} — n = {self.n} maç ({self.n_snapshots} anlık durum), "
+                f"ortalama tahmin {_pct(self.mean_predicted)}, gözlenen {_pct(self.observed_rate)} "
+                f"(%95 maç kümeli aralık {_pct(self.ci_low)}–{_pct(self.ci_high)})")
+        if self.diff_low is not None and self.diff_high is not None:
+            text += (f"; gözlenen − tahmin {_signed_pp(self.difference)} puan "
+                     f"(%95 aralık {_signed_pp(self.diff_low)} … {_signed_pp(self.diff_high)} puan)")
+        return text
 
 
-def rare_event_summary(model: str, p: np.ndarray, y: np.ndarray, *, threshold: float, min_samples: int,
-                       data_cutoff_at: str) -> RareEventCalibration:
-    """Eşik üstü (p > threshold) "nadir olay" bölgesinde kalibrasyon yeterliliği."""
+def _cluster_se_of_mean(values: np.ndarray, cluster: np.ndarray, n_clusters: int) -> float:
+    """Ortalamanın küme-sağlam (sandviç) standart hatası, G/(G−1) küçük örneklem düzeltmeli.
+
+    SE² = G/(G−1) · Σ_g (Σ_{i∈g} (x_i − x̄))² / N². Her küme tek bir bağımsız birim sayılır; küme içi
+    ilişki ne kadar güçlü olursa olsun etkin örneklem büyüklüğü küme sayısını aşamaz.
+    """
+    n = values.size
+    sums = np.bincount(cluster, weights=values - values.mean(), minlength=n_clusters)
+    return math.sqrt(n_clusters / (n_clusters - 1) * float(np.dot(sums, sums))) / n
+
+
+def rare_event_summary(model: str, p: np.ndarray, y: np.ndarray, groups: np.ndarray, *, threshold: float,
+                       min_samples: int, data_cutoff_at: str) -> RareEventCalibration:
+    """Eşik üstü (p > threshold, kesin büyüktür) "nadir olay" bölgesinde kalibrasyon yeterliliği.
+
+    `groups`: her anlık durumun maç (fikstür) kimliği — bağımsız birim maçtır. Yeterli ⇔ bölgedeki farklı
+    maç sayısı G ≥ `min_samples` VE gözlenen − ortalama tahmin farkının %95 maç kümeli aralığı 0'ı içerir.
+    """
     p, y = np.asarray(p, float), np.asarray(y, float)
+    groups = np.asarray(groups)
+    if not (p.shape == y.shape == groups.shape):
+        raise ValueError("p, y ve groups aynı uzunlukta olmalı")
     ok = np.isfinite(p) & np.isfinite(y)
     m = ok & (p > threshold)
-    n = int(m.sum())
-    if n == 0:
+    n_snap = int(m.sum())
+    if n_snap == 0:
         return RareEventCalibration(model, threshold, 0, None, None, None, None, False,
-                                    f"Nadir olay bölgesinde (> %{_pct_label(threshold)}) geçmiş örnek yok", data_cutoff_at)
-    k = int(y[m].sum())
-    mean_pred = float(p[m].mean())
-    lo, hi = wilson_interval(k, n)
-    if n < min_samples:
-        adequate, reason = False, f"Örneklem yetersiz ({n} < {min_samples})"
-    elif mean_pred > hi:
-        adequate, reason = False, "Aşırı güvenli: ortalama tahmin güven aralığının üstünde"
-    elif mean_pred < lo:
-        adequate, reason = False, "Yetersiz güvenli: ortalama tahmin güven aralığının altında"
+                                    f"Nadir olay bölgesinde (> %{_pct_label(threshold)}) geçmiş örnek yok",
+                                    data_cutoff_at, n_snapshots=0)
+    _, cluster = np.unique(groups[m], return_inverse=True)
+    cluster = cluster.reshape(-1)
+    n_matches = int(cluster.max()) + 1
+    pm, ym = p[m], y[m]
+    observed, mean_pred = float(ym.mean()), float(pm.mean())
+    diff = observed - mean_pred
+    lo = hi = d_lo = d_hi = None
+    if n_matches >= 2:
+        se_obs = _cluster_se_of_mean(ym, cluster, n_matches)
+        se_diff = _cluster_se_of_mean(ym - pm, cluster, n_matches)
+        lo, hi = max(0.0, observed - Z95 * se_obs), min(1.0, observed + Z95 * se_obs)
+        d_lo, d_hi = diff - Z95 * se_diff, diff + Z95 * se_diff
+    if n_matches < max(min_samples, 2) or d_lo is None or d_hi is None:
+        adequate, reason = False, f"Örneklem yetersiz ({n_matches} < {max(min_samples, 2)} maç)"
+    elif d_hi < 0.0:
+        adequate, reason = False, ("Aşırı güvenli: gözlenen oran ortalama tahminin altında "
+                                   "(farkın %95 maç kümeli aralığı 0'ın altında)")
+    elif d_lo > 0.0:
+        adequate, reason = False, ("Yetersiz güvenli: gözlenen oran ortalama tahminin üstünde "
+                                   "(farkın %95 maç kümeli aralığı 0'ın üstünde)")
     else:
         adequate, reason = True, "Yeterli"
-    return RareEventCalibration(model, threshold, n, mean_pred, k / n, lo, hi, adequate, reason, data_cutoff_at)
+    return RareEventCalibration(model, threshold, n_matches, mean_pred, observed, lo, hi, adequate, reason,
+                                data_cutoff_at, n_snapshots=n_snap, diff_low=d_lo, diff_high=d_hi)
 
 
 @dataclass
@@ -360,6 +458,8 @@ class LiveHistory:
     model_b_rows: int
     model_b_reason: str | None
     calibration: dict[str, RareEventCalibration]
+    #: Bu özetin kalibrasyon satırları `radar_calibration` tablosuna yazıldı mı (önbellek girdisi başına).
+    stored: bool = False
 
 
 def calibration_cutoff(now: str) -> str:
@@ -372,35 +472,46 @@ def clear_cache() -> None:
 
 
 def _cache_key(conn: sqlite3.Connection, cutoff: str, settings: Settings) -> tuple:
-    db = conn.execute("PRAGMA database_list").fetchone()
-    path = db[2] if db is not None else ""
+    dbs = _fetchall(conn, "PRAGMA database_list")
+    main = next((r for r in dbs if r[1] == "main"), dbs[0] if dbs else None)
+    path = main[2] if main is not None else ""
     ident = path or f"memory:{id(conn)}"
-    fx = tuple(conn.execute(
-        "SELECT COUNT(*), MAX(result_recorded_at), MAX(id) FROM fixtures"
-        " WHERE result_recorded_at IS NOT NULL AND result_recorded_at <= ?", (cutoff,)).fetchone())
-    ge = tuple(conn.execute("SELECT COUNT(*), MAX(id) FROM goal_events").fetchone())
+    fx = tuple(_fetchone(
+        conn, "SELECT COUNT(*), MAX(result_recorded_at), MAX(id) FROM fixtures"
+              " WHERE result_recorded_at IS NOT NULL AND result_recorded_at <= ?", (cutoff,)))
+    ge = tuple(_fetchone(conn, "SELECT COUNT(*), MAX(id) FROM goal_events"))
     return (ident, cutoff, fx, ge, settings.radar, settings.data, settings.stats.min_model_b_samples)
 
 
-def live_history(conn: sqlite3.Connection, cutoff: str, *, settings: Settings = SETTINGS) -> LiveHistory:
-    """Kesime ait geçmiş canlı özetler (önbellekli). İlk hesaplamada `radar_calibration` satırları yazılır."""
+def _cached_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) -> LiveHistory:
+    """Kesime ait geçmiş canlı özetler (önbellekli); veritabanına yazmaz."""
     key = _cache_key(conn, cutoff, settings)
     hit = _HISTORY_CACHE.get(key)
     if hit is not None:
         _HISTORY_CACHE.move_to_end(key)
         return hit
     hist = _build_history(conn, cutoff, settings)
-    _store_calibration(conn, hist.calibration.values())
     _HISTORY_CACHE[key] = hist
     while len(_HISTORY_CACHE) > _CACHE_SIZE:
         _HISTORY_CACHE.popitem(last=False)
     return hist
 
 
+def live_history(conn: sqlite3.Connection, cutoff: str, *, settings: Settings = SETTINGS) -> LiveHistory:
+    """Kesime ait geçmiş canlı özetler (önbellekli). İlk hesaplamada `radar_calibration` satırları kısa bir
+    işlemle yazılır (`evaluate_live` bunu kendi tek işleminin içinde yapar)."""
+    hist = _cached_history(conn, cutoff, settings)
+    if not hist.stored:
+        with transaction(conn):
+            _store_calibration(conn, hist.calibration.values())
+        hist.stored = True
+    return hist
+
+
 def rare_event_calibration(conn: sqlite3.Connection, cutoff: str, *,
                            settings: Settings = SETTINGS) -> dict[str, RareEventCalibration]:
-    """İki model için nadir olay kalibrasyonu: {"A": …, "B": …}."""
-    return live_history(conn, cutoff, settings=settings).calibration
+    """İki model için nadir olay kalibrasyonu: {"A": …, "B": …} (önbellekli; veritabanına yazmaz)."""
+    return _cached_history(conn, cutoff, settings).calibration
 
 
 def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) -> LiveHistory:
@@ -408,11 +519,11 @@ def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) ->
     min_rows = settings.stats.min_model_b_samples
     snaps = historical_snapshots(conn, cutoff)
     view = FootballDataView(conn)
-    team_league = {int(r[0]): r[1] for r in conn.execute("SELECT id, league_id FROM teams")}
+    team_league = {int(r[0]): r[1] for r in _fetchall(conn, "SELECT id, league_id FROM teams")}
     fits: dict[tuple[str, str], ModelAFit] = {}
     pre: dict[int, tuple[float, float, float] | None] = {}
     states: list[LiveFootballState] = []
-    lam_pre, ys, odds, known, kick, ident = [], [], [], [], [], []
+    lam_pre, ys, odds, known, kick, ident, match = [], [], [], [], [], [], []
     for s in snaps:
         fid, home, away = s["fixture_id"], s["home_team_id"], s["away_team_id"]
         if fid not in pre:
@@ -433,6 +544,7 @@ def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) ->
         known.append(s["result_recorded_at"])
         kick.append(s["kickoff_at"])
         ident.append(f"{fid}@{s['minute']}")
+        match.append(int(fid))
     assert_football_only(states, context="MODEL A (canlı geçmiş)")
     inten = np.array([_live_intensity(lh, la, st.minute, st.home_xg, st.away_xg, st.home_red, st.away_red, ht)
                       for st, (lh, la, ht) in zip(states, lam_pre)], dtype=float).reshape(-1, 2)
@@ -442,6 +554,7 @@ def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) ->
     odds_arr = np.array(odds, dtype=float)
     known_arr = np.array(known, dtype=object)
     ident_arr = np.array(ident, dtype=object)
+    match_arr = np.array(match, dtype=np.int64)
     month = np.array([k[:7] for k in kick], dtype=object)
     has_odds = np.isfinite(odds_arr)
     pm = np.full(y.size, np.nan)
@@ -468,9 +581,10 @@ def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) ->
             f = train_live_model_b(pa_oof[tr_b], pm[tr_b], y[tr_b], min_samples=min_rows)
             if f is not None:
                 pb_oof[te_b] = f.predict(model_b_design(pa_oof[te_b], pm[te_b]))
-    cal_a = rare_event_summary("A", pa_oof, y, threshold=rp.model_a_min_probability,
+    # Nadir olay kalibrasyonu: bağımsız birim maçtır (aynı maçın anlık durumları tek küme).
+    cal_a = rare_event_summary("A", pa_oof, y, match_arr, threshold=rp.model_a_min_probability,
                                min_samples=rp.min_rare_event_samples, data_cutoff_at=cutoff)
-    cal_b = rare_event_summary("B", pb_oof, y, threshold=rp.model_b_min_probability,
+    cal_b = rare_event_summary("B", pb_oof, y, match_arr, threshold=rp.model_b_min_probability,
                                min_samples=rp.min_rare_event_samples, data_cutoff_at=cutoff)
 
     # Canlı değerlendirmede kullanılan son modeller: kesime kadar bilinen bütün geçmiş.
@@ -491,47 +605,44 @@ def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) ->
 
 
 def _store_calibration(conn: sqlite3.Connection, cals) -> None:
+    """Kalibrasyon satırlarını yazar (aynı çalıştırma zaten yazılmışsa atlar). Çağıran işlemi açar."""
     now = to_iso(utcnow())
-    with transaction(conn):
-        for c in cals:
-            exists = conn.execute(
-                "SELECT 1 FROM radar_calibration WHERE model=? AND region_low=? AND data_cutoff_at=? AND n=?"
-                " AND adequate=? LIMIT 1", (c.model, c.region_low, c.data_cutoff_at, c.n, int(c.adequate)),
-            ).fetchone()
-            if exists:
-                continue
-            insert(conn, "radar_calibration", {
-                "model": c.model, "region_low": c.region_low, "n": c.n, "mean_predicted": c.mean_predicted,
-                "observed_rate": c.observed_rate, "ci_low": c.ci_low,
-                "ci_high": getattr(c, "ci_high", None), "adequate": int(c.adequate),
-                "data_cutoff_at": c.data_cutoff_at, "created_at": now,
-            })
+    for c in cals:
+        exists = _fetchone(
+            conn, "SELECT 1 FROM radar_calibration WHERE model=? AND region_low=? AND data_cutoff_at=? AND n=?"
+                  " AND adequate=? LIMIT 1", (c.model, c.region_low, c.data_cutoff_at, c.n, int(c.adequate)))
+        if exists:
+            continue
+        insert(conn, "radar_calibration", {
+            "model": c.model, "region_low": c.region_low, "n": c.n, "mean_predicted": c.mean_predicted,
+            "observed_rate": c.observed_rate, "ci_low": c.ci_low, "ci_high": c.ci_high,
+            "adequate": int(c.adequate), "data_cutoff_at": c.data_cutoff_at, "created_at": now,
+        })
 
 
 # ───────────────────────── bildirim izni ve alarmlar ─────────────────────────
 
 def notification_permission_granted(conn: sqlite3.Connection, user_id: str) -> bool:
-    row = conn.execute("SELECT granted FROM notification_permissions WHERE user_id=?", (user_id,)).fetchone()
+    row = _fetchone(conn, "SELECT granted FROM notification_permissions WHERE user_id=?", (user_id,))
     return bool(row[0]) if row is not None else False
 
 
 def set_notification_permission(conn: sqlite3.Connection, user_id: str, granted: bool, now: str) -> dict:
     """POST /api/v1/radar/notifications/permission."""
-    conn.execute(
-        "INSERT INTO notification_permissions(user_id, granted, updated_at) VALUES (?,?,?)"
-        " ON CONFLICT(user_id) DO UPDATE SET granted=excluded.granted, updated_at=excluded.updated_at",
-        (user_id, 1 if granted else 0, now),
-    )
+    with transaction(conn):
+        _execute(
+            conn, "INSERT INTO notification_permissions(user_id, granted, updated_at) VALUES (?,?,?)"
+                  " ON CONFLICT(user_id) DO UPDATE SET granted=excluded.granted, updated_at=excluded.updated_at",
+            (user_id, 1 if granted else 0, now))
     return {"user_id": user_id, "granted": bool(granted)}
 
 
 def list_alerts(conn: sqlite3.Connection, limit: int = 50) -> dict:
     """GET /api/v1/radar/alerts — en yeni alarmlar önce."""
     limit = max(1, min(int(limit), 500))
-    rows = conn.execute(
-        "SELECT id, fixture_id, minute, model_a_probability, model_b_probability, created_at, notified"
-        " FROM radar_alerts ORDER BY created_at DESC, id DESC LIMIT ?", (limit,),
-    ).fetchall()
+    rows = _fetchall(
+        conn, "SELECT id, fixture_id, minute, model_a_probability, model_b_probability, created_at, notified"
+              " FROM radar_alerts ORDER BY created_at DESC, id DESC LIMIT ?", (limit,))
     return {"items": [{
         "id": r[0], "fixture_id": r[1], "minute": r[2], "model_a_probability": r[3],
         "model_b_probability": r[4], "created_at": r[5], "notified": bool(r[6]),
@@ -547,10 +658,9 @@ def dedupe_key(fixture_id: int, home_goals: int, away_goals: int) -> str:
 
 def _latest_state(conn: sqlite3.Connection, fixture_id: int, now: str) -> tuple[sqlite3.Row | None, int | None]:
     """Son canlı durum ve mevcut skorun ilk gözlendiği dakika (son ardışık aynı skorlu kayıtlar)."""
-    rows = conn.execute(
-        "SELECT * FROM live_states WHERE fixture_id=? AND captured_at<=? ORDER BY captured_at DESC, id DESC LIMIT 50",
-        (fixture_id, now),
-    ).fetchall()
+    rows = _fetchall(
+        conn, "SELECT * FROM live_states WHERE fixture_id=? AND captured_at<=?"
+              " ORDER BY captured_at DESC, id DESC LIMIT 50", (fixture_id, now))
     if not rows:
         return None, None
     since = rows[0]["minute"]
@@ -562,7 +672,8 @@ def _latest_state(conn: sqlite3.Connection, fixture_id: int, now: str) -> tuple[
 
 
 def _live_quotes(conn: sqlite3.Connection, fixture_id: int, market_id: str, now: str) -> list[tuple[OddsQuote, int | None]]:
-    rows = conn.execute(
+    rows = _fetchall(
+        conn,
         """
         SELECT o.id, o.fixture_id, o.market_id, o.outcome_id, o.decimal_odds, o.source, s.label, s.source_type,
                s.is_iddaa, s.verified, o.captured_at, o.is_live, o.timestamp_precision, o.minute
@@ -571,7 +682,7 @@ def _live_quotes(conn: sqlite3.Connection, fixture_id: int, market_id: str, now:
         ORDER BY o.captured_at DESC, o.id DESC LIMIT 20
         """,
         (fixture_id, market_id, now),
-    ).fetchall()
+    )
     return [(OddsQuote(snapshot_id=r[0], fixture_id=r[1], market_id=r[2], outcome_id=r[3], decimal_odds=float(r[4]),
                        source=r[5], source_label=r[6], source_type=r[7], is_iddaa=bool(r[8]),
                        source_verified=bool(r[9]), captured_at=r[10], is_live=bool(r[11]),
@@ -601,6 +712,23 @@ def _pick_quote(quotes: list[tuple[OddsQuote, int | None]], now: str, max_age: f
     return first[0], False, first[1], first[2]
 
 
+@dataclass
+class _Assessment:
+    """Bir canlı maçın yazmadan önceki değerlendirmesi (yalnızca okumalar ve hesaplamalar)."""
+
+    fixture: sqlite3.Row
+    state_id: int | None
+    minute: int | None
+    home_goals: int | None
+    away_goals: int | None
+    remaining: int | None
+    p_a: float | None
+    p_b: float | None
+    quote: OddsQuote | None
+    #: Mükerrer alarm engeli dışındaki sekiz şart: kod → (sağlandı mı, ayrıntı).
+    checks: dict[str, tuple[bool, str]]
+
+
 def evaluate_live(conn: sqlite3.Connection, now: str, *, user_id: str = "local",
                   settings: Settings = SETTINGS) -> dict:
     """GET /api/v1/radar/live — canlı maçların radar değerlendirmesi.
@@ -608,40 +736,53 @@ def evaluate_live(conn: sqlite3.Connection, now: str, *, user_id: str = "local",
     Her maç için `radar_evaluations` satırı yazılır; dokuz şartın tamamı sağlanırsa `radar_alerts`
     satırı oluşturulur. Aynı maç + hedef + skor için alarm daha önce verilmişse yeni alarm oluşmaz:
     öğe mevcut alarmı (`alert_id`) gösterir; diğer sekiz şart hâlâ sağlanıyorsa `alarm` true kalır
-    (alarm geçerli), `blocked_reason` "Mükerrer alarm engeli" olur.
+    (alarm geçerli), `blocked_reason` yeni alarmın neden oluşturulmadığını söyler.
+
+    Önce bütün okumalar ve model hesaplamaları yapılır (yazma yok); ardından kalibrasyon satırları,
+    değerlendirmeler ve alarmlar TEK ve kısa bir işlemde yazılır. Mükerrer alarm denetimi aynı işlemin
+    içinde yapılır. Modül kendi kilidini kurmaz; eşzamanlı erişimi çağıran (API) sıralar.
     """
     labels = condition_labels(settings)
-    fixtures = conn.execute(
+    fixtures = _fetchall(
+        conn,
         """
         SELECT f.id, f.league_id, f.home_team_id, f.away_team_id, f.kickoff_at, f.status,
                l.name AS league_name, th.name AS home_name, ta.name AS away_name, th.league_id AS home_league
         FROM fixtures f JOIN leagues l ON l.id = f.league_id
              JOIN teams th ON th.id = f.home_team_id JOIN teams ta ON ta.id = f.away_team_id
         WHERE f.status = 'live' ORDER BY f.kickoff_at, f.id
-        """
-    ).fetchall()
+        """,
+    )
     if not fixtures:
         return {"evaluated_at": now, "items": []}
 
+    # 1) Okumalar ve hesaplamalar — veritabanına yazılmaz.
     cal_cut = calibration_cutoff(now)
-    hist = live_history(conn, cal_cut, settings=settings)
+    hist = _cached_history(conn, cal_cut, settings)
     calib = rare_event_calibration(conn, cal_cut, settings=settings)
     permitted = notification_permission_granted(conn, user_id)
     view = FootballDataView(conn)
     fits: dict[str, ModelAFit] = {}
-    items = []
+    assessed: list[_Assessment] = []
+    for f in fixtures:
+        lg = f["home_league"]
+        if lg not in fits:
+            fits[lg] = fit_model_a(view.all_records(lg), now, lg, min_matches=settings.data.min_league_matches)
+        assessed.append(_assess_fixture(conn, f, now, user_id, settings, hist, calib, permitted, fits[lg]))
+
+    # 2) Yazmalar — tek kısa işlem.
     with transaction(conn):
-        for f in fixtures:
-            lg = f["home_league"]
-            if lg not in fits:
-                fits[lg] = fit_model_a(view.all_records(lg), now, lg, min_matches=settings.data.min_league_matches)
-            items.append(_evaluate_fixture(conn, f, now, user_id, settings, labels, hist, calib, permitted, fits[lg]))
+        if not hist.stored:
+            _store_calibration(conn, hist.calibration.values())
+        items = [_record_fixture(conn, a, now, settings, labels) for a in assessed]
+    hist.stored = True
     return {"evaluated_at": now, "items": items}
 
 
-def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_id: str, settings: Settings,
-                      labels: dict[str, str], hist: LiveHistory, calib: dict[str, RareEventCalibration],
-                      permitted: bool, fit: ModelAFit) -> dict:
+def _assess_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_id: str, settings: Settings,
+                    hist: LiveHistory, calib: dict[str, RareEventCalibration], permitted: bool,
+                    fit: ModelAFit) -> _Assessment:
+    """Mükerrer alarm engeli dışındaki sekiz şartı değerlendirir (yalnızca okuma)."""
     rp = settings.radar
     fid, home, away = f["id"], f["home_team_id"], f["away_team_id"]
     state, score_since = _latest_state(conn, fid, now)
@@ -722,7 +863,7 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
     # 5: gerekli güncel canlı oran
     checks["live_odds_fresh"] = (odds_ok, odds_detail)
 
-    # 6: nadir olay kalibrasyonu (iki model)
+    # 6: nadir olay kalibrasyonu (iki model; birim maçtır)
     ca, cb = calib.get("A"), calib.get("B")
     cal_ok = bool(ca is not None and ca.adequate and cb is not None and cb.adequate)
     checks["rare_event_calibration"] = (cal_ok, " · ".join(
@@ -745,11 +886,32 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
     checks["notification_permission"] = (permitted, "Bildirim izni verildi." if permitted
                                          else f"'{user_id}' kullanıcısı bildirim izni vermedi (varsayılan: izin yok).")
 
-    # 9: mükerrer alarm engeli
+    return _Assessment(f, state["id"] if state is not None else None, minute, hg, ag, remaining, p_a, p_b, quote, checks)
+
+
+def _blocked_reason(failed: list[dict], existing_alert: tuple | None) -> str | None:
+    """İlk sağlanmayan şartı olumsuz bir cümleyle bildirir; bütün şartlar sağlandıysa None."""
+    if not failed:
+        return None
+    first = failed[0]
+    if first["code"] == "duplicate_block" and existing_alert is not None:
+        return (f"Yeni alarm oluşturulmadı: bu maç, hedef ve skor durumu için alarm #{existing_alert[0]} "
+                f"{existing_alert[1]}. dakikada zaten verildi (mükerrer alarm engeli).")
+    return f"Sağlanmayan koşul: {first['label']}"
+
+
+def _record_fixture(conn: sqlite3.Connection, a: _Assessment, now: str, settings: Settings,
+                    labels: dict[str, str]) -> dict:
+    """Mükerrer alarm engelini denetler, değerlendirmeyi ve gerekiyorsa alarmı yazar (çağıranın işleminde)."""
+    rp = settings.radar
+    f, hg, ag = a.fixture, a.home_goals, a.away_goals
+    fid = f["id"]
+    checks = dict(a.checks)
+
+    # 9: mükerrer alarm engeli (yazmalarla aynı işlemde okunur)
     existing = None
-    if state is not None and rp.duplicate_block:
-        existing = conn.execute("SELECT id, minute FROM radar_alerts WHERE dedupe_key=?",
-                                (dedupe_key(fid, hg, ag),)).fetchone()
+    if a.state_id is not None and rp.duplicate_block:
+        existing = _fetchone(conn, "SELECT id, minute FROM radar_alerts WHERE dedupe_key=?", (dedupe_key(fid, hg, ag),))
     if not rp.duplicate_block:
         checks["duplicate_block"] = (True, "Mükerrer alarm engeli devre dışı.")
     elif existing is not None:
@@ -757,7 +919,7 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
                                             f"{existing[1]}. dakikada verildi; yeni alarm oluşturulmadı.")
     else:
         checks["duplicate_block"] = (True, f"Bu maç, hedef ve skor ({hg}-{ag}) için önceki alarm yok."
-                                     if state is not None else "Canlı durum yok.")
+                                     if a.state_id is not None else "Canlı durum yok.")
 
     conditions = [{"code": c, "label": labels[c], "passed": bool(checks[c][0]), "detail": checks[c][1]}
                   for c in CONDITION_CODES]
@@ -765,12 +927,13 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
     others_ok = all(c["passed"] for c in conditions if c["code"] != "duplicate_block")
     fire = not failed
     alarm = fire or (others_ok and existing is not None)
-    blocked_reason = failed[0]["label"] if failed else None
+    blocked_reason = _blocked_reason(failed, existing)
 
+    quote = a.quote
     eval_id = insert(conn, "radar_evaluations", {
-        "fixture_id": fid, "live_state_id": state["id"] if state is not None else None,
-        "minute": minute if minute is not None else 0,
-        "model_a_probability": p_a, "model_b_probability": p_b,
+        "fixture_id": fid, "live_state_id": a.state_id,
+        "minute": a.minute if a.minute is not None else 0,
+        "model_a_probability": a.p_a, "model_b_probability": a.p_b,
         "odds_snapshot_id": quote.snapshot_id if quote is not None else None,
         "conditions": dumps([{"code": c["code"], "passed": c["passed"], "detail": c["detail"]} for c in conditions]),
         "alarm": int(alarm), "blocked_reason": blocked_reason, "evaluated_at": now,
@@ -778,13 +941,14 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
     alert_id = existing[0] if existing is not None else None
     if fire:
         key = dedupe_key(fid, hg, ag) if rp.duplicate_block else f"{dedupe_key(fid, hg, ag)}:{eval_id}"
-        conn.execute(
+        _execute(
+            conn,
             "INSERT INTO radar_alerts(fixture_id, evaluation_id, target, minute, model_a_probability,"
             " model_b_probability, odds_snapshot_id, created_at, notified, dedupe_key)"
             " VALUES (?,?,?,?,?,?,?,?,?,?) ON CONFLICT(dedupe_key) DO NOTHING",
-            (fid, eval_id, RADAR_TARGET, minute, p_a, p_b, quote.snapshot_id if quote else None, now, 1, key),
+            (fid, eval_id, RADAR_TARGET, a.minute, a.p_a, a.p_b, quote.snapshot_id if quote else None, now, 1, key),
         )
-        alert_id = conn.execute("SELECT id FROM radar_alerts WHERE dedupe_key=?", (key,)).fetchone()[0]
+        alert_id = _fetchone(conn, "SELECT id FROM radar_alerts WHERE dedupe_key=?", (key,))[0]
 
     odds_obj = None
     if quote is not None:
@@ -793,11 +957,11 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
     return {
         "fixture": {"id": fid, "home": f["home_name"], "away": f["away_name"],
                     "league": {"id": f["league_id"], "name": f["league_name"]}},
-        "minute": minute,
-        "score": f"{hg}-{ag}" if state is not None else None,
-        "remaining_minutes": remaining,
-        "model_a_probability": None if p_a is None else round(p_a, 4),
-        "model_b_probability": None if p_b is None else round(p_b, 4),
+        "minute": a.minute,
+        "score": f"{hg}-{ag}" if a.state_id is not None else None,
+        "remaining_minutes": a.remaining,
+        "model_a_probability": None if a.p_a is None else round(a.p_a, 4),
+        "model_b_probability": None if a.p_b is None else round(a.p_b, 4),
         "odds": odds_obj,
         "conditions": conditions,
         "alarm": bool(alarm),

@@ -105,8 +105,10 @@ def audit_candidate(conn: sqlite3.Connection, candidate_id: int, settings: Setti
         detail = "Oran anlık görüntüsü yok."
         if snap is not None:
             age = (_ts(e["evaluated_at"]) - _ts(snap["captured_at"])).total_seconds()
+            approx_ok = allow_approx and snap["timestamp_precision"] != "exact"
             odds_ok = (snap["fixture_id"] == c["fixture_id"] and snap["market_id"] == c["market_id"]
-                       and snap["outcome_id"] == c["outcome_id"] and 0 <= age <= settings.data.max_prematch_odds_age_seconds
+                       and snap["outcome_id"] == c["outcome_id"]
+                       and 0 <= age and (approx_ok or age <= settings.data.max_prematch_odds_age_seconds)
                        and snap["verified"] == 1 and snap["is_live"] == 0
                        and (snap["timestamp_precision"] == "exact" or allow_approx)
                        and snap["decimal_odds"] > 1.0 and abs(snap["decimal_odds"] - (e["decimal_odds"] or 0)) < 1e-9)

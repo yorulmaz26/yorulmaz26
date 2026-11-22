@@ -576,7 +576,9 @@ def _comparison(data: _Data, period: str) -> dict:
     modes = []
     for mode in MODE_CODES:
         m, _ = _mode_metrics(data, mode, pm, dm)
-        modes.append({"code": mode, "name": MODE_INFO[mode]["name"], "metrics": m})
+        # Kâr eğrisi tablodaki metriklerle AYNI kararlar kümesinden (dönem + havuz) üretilir.
+        modes.append({"code": mode, "name": MODE_INFO[mode]["name"], "metrics": m,
+                      "timeline": _timeline(data, mode, dm)})
     notes = [
         "Seçim kapsamı modlar arasında farklıdır; isabet oranları farklı sayıda seçim üzerinden hesaplanmıştır.",
         "Üç mod aynı zaman aralığı ve aynı maç havuzu üzerinde karşılaştırılır; havuz, her maçın başlama "

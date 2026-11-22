@@ -15,7 +15,8 @@ from ..leagues import LEAGUES_BY_ID
 from ..models.model_a import ROBUSTNESS_SCENARIOS
 from ..selection.checks import (BALANCED_CONDITIONS, CHECK_LABELS, CORE_CHECKS, ODDS_CHECKS, Check, describe,
                                 fmt_num, fmt_pct, unpack)
-from ..selection.modes import BALANCED, BEST_VALUE, EMPTY_MESSAGES, HIGHEST_PROBABILITY, normalize_mode
+from ..selection.modes import (BALANCED, BEST_VALUE, EMPTY_MESSAGES, HIGHEST_PROBABILITY, USES_ODDS,
+                               normalize_mode)
 from ..selection.history import QUANTILES
 
 DISCLAIMER = ("Tahminler olasılık tahminidir; yüksek isabet oranı veya pozitif beklenen değer kazanç garantisi "
@@ -164,12 +165,19 @@ def _mode_checks(r: sqlite3.Row) -> tuple[list[Check], dict]:
     return unpack(mc.get("checks")), mc
 
 
-def _core_checks(r: sqlite3.Row) -> list[Check]:
+def _core_checks(r: sqlite3.Row, mode: str | None = None) -> list[Check]:
+    """Kalite Kapısı kontrolleri; oran kontrolleri yalnızca oran gerektiren modlarda listelenir."""
+    mode = mode or r["selection_mode"]
     failed = {c.code: c for c in unpack(loads(r["gate_failed"], []))}
-    out = []
-    for code in CORE_CHECKS + ODDS_CHECKS:
-        out.append(failed.get(code) or Check(code, True, None, None, "Sağlandı."))
-    return out
+    codes = CORE_CHECKS + (ODDS_CHECKS if mode in USES_ODDS else ())
+    return [failed.get(code) or Check(code, True, None, None, "Sağlandı.") for code in codes]
+
+
+def _negative_reason(code: str, detail: str | None = None) -> str:
+    text = f"Sağlanmayan koşul: {CHECK_LABELS.get(code, code)}."
+    if detail and detail not in ("Sağlanmadı.",):
+        text += f" {detail.rstrip('.')}."
+    return text
 
 
 def _uncertainty(r: sqlite3.Row, th: dict) -> dict:
@@ -211,7 +219,8 @@ def _robustness(r: sqlite3.Row, th: dict, mode: str, checks: list[Check]) -> dic
 
 
 def _odds_payload(r: sqlite3.Row, now: str) -> dict | None:
-    if r["snap_odds"] is None:
+    # Doğrulamadan geçmeyen (eski, doğrulanmamış, yaklaşık zamanlı) oran "gerçek oran" olarak gösterilmez.
+    if r["snap_odds"] is None or not r["odds_valid"]:
         return None
     return {
         "decimal": r["snap_odds"], "source": r["odds_source"], "source_label": r["source_label"],
@@ -282,6 +291,8 @@ def _item(conn: sqlite3.Connection, r: sqlite3.Row, now: str, cfg_cache: dict) -
     data_ok = all(c.passed for c in core if c.code in ("data_fresh", "data_sufficient"))
     odds_age = odds["age_seconds"] if odds else None
     odds_fresh_now = odds_age is not None and odds_age <= SETTINGS.data.max_prematch_odds_age_seconds
+    odds_matter = mode in USES_ODDS
+    fresh_ok = data_ok and (odds_fresh_now or not odds_matter)
     reasons = []
     if now >= r["kickoff_at"]:
         reasons.append("Maç başladı.")
@@ -294,6 +305,11 @@ def _item(conn: sqlite3.Connection, r: sqlite3.Row, now: str, cfg_cache: dict) -
     lg = LEAGUES_BY_ID.get(r["league_id"])
     return {
         "id": r["cid"], "decision_id": dec["id"] if dec else None, "rank": r["rank"], "rank_score": r["rank_score"],
+        "decision": ({"id": dec["id"], "first_decision": dec["candidate_id"] == r["cid"],
+                      "recorded_odds": dec["decimal_odds"], "recorded_probability": dec["estimated_probability"],
+                      "selection_timestamp": dec["selection_timestamp"],
+                      "note": None if dec["candidate_id"] == r["cid"] else
+                      "Performans, bu seçimin ilk kararındaki oran ve olasılıkla sayılır."} if dec else None),
         "fixture": _fixture_payload(r), "market": market, "outcome": outcome, "odds": odds,
         "model_a": {"prediction_id": r["model_a_prediction_id"], "raw": r["pa_raw_p"], "calibrated": r["pa_cal_p"],
                     "lower": r["pa_lo"], "upper": r["pa_hi"], "ev": r["ev_model_a"] if odds else None},
@@ -305,8 +321,8 @@ def _item(conn: sqlite3.Connection, r: sqlite3.Row, now: str, cfg_cache: dict) -
                             "model_b": r["ev_model_b"]} if odds else None),
         "uncertainty": _uncertainty(r, th),
         "robustness": _robustness(r, th, mode, checks),
-        "data_freshness": {"status": "fresh" if data_ok and (odds_fresh_now or odds is None) else "stale",
-                           "label": "Güncel" if data_ok and (odds_fresh_now or odds is None) else "Eski",
+        "data_freshness": {"status": "fresh" if fresh_ok else "stale",
+                           "label": "Güncel" if fresh_ok else "Eski",
                            "last_result_at": fresh.get("last_result_at"), "odds_age_seconds": odds_age,
                            "team_matches": fresh.get("team_matches")},
         "validity": {"status": "expired" if reasons else "valid", "label": "Süresi doldu" if reasons else "Geçerli",
@@ -354,9 +370,17 @@ def recommendations(conn: sqlite3.Connection, mode: str, *, now: str | None = No
         items.append(_item(conn, r, now, cfg_cache))
     for i, it in enumerate(items, start=1):
         it["rank"] = i
+    swhere = ["c.run_id=?", "c.selection_mode=?"]
+    sparams: list = [run["id"], mode]
+    if league:
+        swhere.append("f.league_id=?")
+        sparams.append(league)
+    if date:
+        swhere.append("substr(f.kickoff_at,1,10)=?")
+        sparams.append(date)
     stats = conn.execute(
-        "SELECT COUNT(*), SUM(eligible), COUNT(DISTINCT fixture_id) FROM selection_mode_candidates WHERE run_id=?"
-        " AND selection_mode=?", (run["id"], mode)).fetchone()
+        "SELECT COUNT(*), SUM(c.eligible), COUNT(DISTINCT c.fixture_id) FROM selection_mode_candidates c"
+        " JOIN fixtures f ON f.id=c.fixture_id WHERE " + " AND ".join(swhere), sparams).fetchone()
     with_sel = len({it["fixture"]["id"] for it in items})
     return {
         **base, "run_id": run["id"], "generated_at": run["finished_at"], "data_cutoff_at": run["data_cutoff_at"],
@@ -387,8 +411,9 @@ def decision_explanation(conn: sqlite3.Connection, cid: int) -> dict:
                     for a in loads(audit["checks"], [])] if audit else []
     all_checks = core + [c for c in mode_checks if c.code not in {x.code for x in core}]
     if audit:
-        all_checks.append(Check("audit", audit["status"] == "passed", audit["id"], None,
-                                "Bağımsız denetimden geçti." if audit["status"] == "passed" else "Bağımsız denetimden kaldı."))
+        all_checks.append(Check("audit", audit["status"] == "passed", None, None,
+                                (f"Bağımsız denetimden geçti (denetim #{audit['id']})." if audit["status"] == "passed"
+                                 else f"Bağımsız denetimden kaldı (denetim #{audit['id']}).")))
     dec = _decision_for(conn, r)
     selected = bool(r["selected"]) and audit is not None and audit["status"] == "passed"
     payload = {
@@ -404,11 +429,21 @@ def decision_explanation(conn: sqlite3.Connection, cid: int) -> dict:
     }
     if mode == BALANCED:
         by_code = {c.code: c for c in all_checks}
-        payload["conditions"] = [
-            {"no": no, "label": label, "codes": list(codes),
-             "passed": all(by_code[c].passed for c in codes if c in by_code) and any(c in by_code for c in codes)}
-            for no, label, codes in BALANCED_CONDITIONS
-        ]
+        established = not any(c.code == "thresholds_established" and not c.passed for c in mode_checks)
+        conds = []
+        for no, label, codes in BALANCED_CONDITIONS:
+            present = [by_code[c] for c in codes if c in by_code]
+            if any(not c.passed for c in present):
+                passed = False
+            elif r["eligible"] or (present and len(present) == len(codes)):
+                passed = True
+            elif not established and not present:
+                passed = None  # eşikler kurulmadığı için bu koşul değerlendirilmedi
+            else:
+                # uygun olmayan adaylarda yalnızca sağlanmayan mod kontrolleri saklanır; yoksa sağlanmıştır
+                passed = True if established else None
+            conds.append({"no": no, "label": label, "codes": list(codes), "passed": passed})
+        payload["conditions"] = conds
     return payload
 
 
@@ -431,7 +466,7 @@ def rejection_reasons(conn: sqlite3.Connection, cid: int) -> dict:
         "fixture": {"id": fx["id"], "home": fx["home"], "away": fx["away"], "kickoff_at": fx["kickoff_at"]},
         "market": {"id": market["id"], "name": market["name"]}, "outcome": outcome,
         "failed_checks": [c.as_api() for c in failed],
-        "reason_text": (rej["reason_text"] or CHECK_LABELS.get(rej["primary_reason_code"], rej["primary_reason_code"]))
+        "reason_text": (rej["reason_text"] or _negative_reason(rej["primary_reason_code"]))
         if rej else "Aday seçildi; elenme gerekçesi yok.",
     }
 
@@ -441,7 +476,8 @@ def rejections(conn: sqlite3.Connection, mode: str, *, fixture_id: int | None = 
     mode = normalize_mode(mode)
     run = latest_run(conn)
     if run is None:
-        return {"mode": mode, "run_id": None, "total": 0, "reason_counts": [], "items": []}
+        return {"mode": mode, "run_id": None, "total": 0, "offset": offset, "limit": limit, "fixtures": [],
+            "reason_counts": [], "items": []}
     where, params = "j.run_id=? AND j.selection_mode=?", [run["id"], mode]
     if fixture_id is not None:
         where += " AND j.fixture_id=?"
@@ -451,6 +487,15 @@ def rejections(conn: sqlite3.Connection, mode: str, *, fixture_id: int | None = 
         for c in set(loads(codes, [])):
             counts[c] += 1
     total = conn.execute(f"SELECT COUNT(*) FROM selection_mode_rejections j WHERE {where}", params).fetchone()[0]
+    fixtures = [
+        {"id": f[0], "home": f[1], "away": f[2], "kickoff_at": f[3], "count": f[4]}
+        for f in conn.execute(
+            """SELECT j.fixture_id, ht.name, at.name, fx.kickoff_at, COUNT(*)
+               FROM selection_mode_rejections j JOIN fixtures fx ON fx.id = j.fixture_id
+               JOIN teams ht ON ht.id = fx.home_team_id JOIN teams at ON at.id = fx.away_team_id
+               WHERE j.run_id=? AND j.selection_mode=? GROUP BY j.fixture_id ORDER BY fx.kickoff_at, j.fixture_id""",
+            (run["id"], mode))
+    ]
     rows = conn.execute(
         f"""SELECT j.*, e.estimated_probability, e.decimal_odds, c.ev_lower, f.kickoff_at, ht.name AS home_name,
                    at.name AS away_name, e.gate_failed, c.mode_checks
@@ -465,8 +510,10 @@ def rejections(conn: sqlite3.Connection, mode: str, *, fixture_id: int | None = 
     items = []
     for r in rows:
         market, outcome = _market_payload(r["market_id"], r["outcome_id"])
-        failed = unpack(loads(r["gate_failed"], [])) + [c for c in unpack(loads(r["mode_checks"], {}).get("checks"))
-                                                        if not c.passed]
+        gate = [c for c in unpack(loads(r["gate_failed"], [])) if mode in USES_ODDS or c.code not in ODDS_CHECKS]
+        seen = {c.code for c in gate}
+        failed = gate + [c for c in unpack(loads(r["mode_checks"], {}).get("checks"))
+                         if not c.passed and c.code not in seen]
         codes = loads(r["failed_checks"], [])
         for code in ("audit", "nested_duplicate"):
             if code in codes and not any(c.code == code for c in failed):
@@ -477,10 +524,11 @@ def rejections(conn: sqlite3.Connection, mode: str, *, fixture_id: int | None = 
             "market": {"id": market["id"], "name": market["name"]}, "outcome": outcome,
             "estimated_probability": r["estimated_probability"], "odds": r["decimal_odds"], "ev_lower": r["ev_lower"],
             "failed_checks": [{"code": c.code, "label": CHECK_LABELS.get(c.code, c.code), "detail": c.detail} for c in failed],
-            "reason_text": r["reason_text"] or CHECK_LABELS.get(r["primary_reason_code"], r["primary_reason_code"]),
+            "reason_text": r["reason_text"] or _negative_reason(r["primary_reason_code"]),
         })
     return {
-        "mode": mode, "run_id": run["id"], "total": total,
+        "mode": mode, "run_id": run["id"], "total": total, "offset": offset, "limit": limit,
+        "fixtures": fixtures,
         "reason_counts": [{"code": c, "label": CHECK_LABELS.get(c, c), "count": n} for c, n in counts.most_common()],
         "items": items,
     }

@@ -115,3 +115,49 @@ def test_misc_endpoints(client):
     r = client.get("/")
     assert r.status_code == 200 and "Akıllı" in r.text
     assert client.get("/static/app.js").status_code == 200
+
+
+def test_concurrent_requests_are_serialized(client):
+    """Tek bağlantı paylaşılan iş parçacıkları arasında bozulmaz (bütün erişim kilitle sıralanır)."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    urls = ["/api/v1/radar/live", "/api/v1/recommendations/modes", "/api/v1/recommendations/rejections?limit=5",
+            "/api/v1/system/status", "/api/v1/radar/alerts", "/api/v1/recommendations?mode=highest_probability"] * 4
+    with ThreadPoolExecutor(max_workers=12) as ex:
+        codes = list(ex.map(lambda u: client.get(u).status_code, urls))
+    assert codes == [200] * len(urls)
+    assert client.put("/api/v1/settings", json={"default_mode": "best_value"}).status_code == 200
+    assert client.get("/api/v1/settings").json()["default_mode"] == "best_value"
+
+
+def test_state_changes_require_json_and_same_origin(client):
+    r = client.post("/api/v1/radar/notifications/permission", content=b'{"granted": true}')
+    assert r.status_code == 415
+    r = client.post("/api/v1/radar/notifications/permission", json={"granted": True},
+                    headers={"Sec-Fetch-Site": "cross-site"})
+    assert r.status_code == 403
+    r = client.put("/api/v1/settings", json={"default_mode": "balanced"}, headers={"Origin": "http://evil.example"})
+    assert r.status_code == 403
+
+
+def test_out_of_range_ids_are_rejected(client):
+    big = 2**63
+    assert client.get(f"/api/v1/recommendations/{big}/decision-explanation").status_code == 422
+    assert client.get(f"/api/v1/recommendations/rejections?offset={big}").status_code == 422
+
+
+def test_rejection_reasons_are_negative_and_paged(client):
+    data = client.get("/api/v1/recommendations/rejections?mode=balanced&limit=5&offset=5").json()
+    assert data["offset"] == 5 and data["fixtures"]
+    assert sum(f["count"] for f in data["fixtures"]) == data["total"]
+    for it in data["items"]:
+        assert it["reason_text"].startswith("Sağlanmayan koşul:")
+
+
+def test_comparison_timeline_matches_table(client):
+    cmp_ = client.get("/api/v1/recommendations/modes/comparison?period=all").json()
+    for m in cmp_["modes"]:
+        tl = m.get("timeline") or []
+        profit = m["metrics"].get("profit_units")
+        if tl and profit is not None:
+            assert tl[-1]["cumulative_profit"] == pytest.approx(profit, abs=1e-3)

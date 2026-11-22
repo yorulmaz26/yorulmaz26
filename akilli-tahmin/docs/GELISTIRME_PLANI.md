@@ -120,7 +120,7 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 | 40 | Kapanış oranı (CLV) ve oran hareketi analizi | Seçim ve Kalite | Planlandı |
 | 41 | REST API çekirdeği | Arayüz ve API | Tamamlandı (temel) |
 | 42 | Kullanıcı ayarları ve varsayılan mod tercihi | Arayüz ve API | Tamamlandı (temel) |
-| 43 | Akıllı Tahminler arayüzü | Arayüz ve API | Tamamlandı (temel) |
+| 43 | Akıllı Tahminler arayüzü | Arayüz ve API | Kısmen |
 | 44 | Maç detayı ve tüm market tarama görünümü | Arayüz ve API | Kısmen |
 | 45 | Lig, organizasyon ve fikstür görünümleri | Arayüz ve API | Kısmen |
 | 46 | Türkçe yerelleştirme, erişilebilirlik ve duyarlı tasarım | Arayüz ve API | Kısmen |
@@ -967,9 +967,13 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 
 | Faz | Durum | Modül |
 |---|---|---|
-| Arayüz ve API | Tamamlandı (temel) | `web/static` |
+| Arayüz ve API | Kısmen | `web/static`, `scripts/ui_smoke.js` |
 
 **Amaç:** Seçimleri gerekçeleri, belirsizlikleri ve uyarılarıyla birlikte anlaşılır biçimde göstermek.
+
+> Durum notu: arayüz tamamlandı; arayüz testleri şu an Playwright ile çalışan duman testi
+> (`scripts/ui_smoke.js`, CI'da gerçek sunucuya karşı) düzeyindedir. Ayrıntılı DOM/etkileşim testleri
+> (aşağıdaki "arayüz testi" kriterleri için ayrı test paketi) henüz yazılmadı.
 
 **Çıktılar:**
 - Akıllı Tahminler sayfası, seçim kartları, uyarı metinleri ve sentetik veri etiketi.

@@ -35,9 +35,9 @@ from ..models.model_b import (INDEX, MODEL_B_INPUTS, MODEL_B_VERSION, ModelB, Tr
 from ..models.score_grid import joint_weights, outcome_index
 from ..odds.odds import expected_value, fair_probabilities, overround, validate_quote
 from .audit import audit_candidate
-from .checks import Check
+from .checks import ODDS_CHECKS, Check, describe
 from .history import QUANTILES, FixtureRecord, History
-from .modes import (CandidateMetrics, ModeConfig, ModeThresholds, evaluate_mode)
+from .modes import (USES_ODDS, CandidateMetrics, ModeConfig, ModeThresholds, evaluate_mode)
 from .thresholds import tune_mode
 
 K = len(INDEX.keys)
@@ -115,7 +115,7 @@ class Engine:
                                        alpha=st.calibration_alpha)
         model_b = train_model_b(rows, cutoff, min_samples=st.min_model_b_samples)
         combiner = fit_combiner(view.stacked("pa_cal"), view.stacked("pb_cal"), y,
-                                min_samples=st.min_calibration_samples, alpha=st.calibration_alpha)
+                                min_samples=st.min_calibration_samples, alpha=st.calibration_alpha, groups=fids)
         configs = {mode: self._mode_config(mode, cutoff) for mode in MODE_CODES}
         return CutoffModels(cutoff, model_b, cal_a, cal_b, combiner, configs)
 
@@ -286,6 +286,11 @@ class Engine:
         ca, ca_v, cb, cb_v = ca[0], ca_v[0], cb[0], cb_v[0]
         p_est, p_void = models.combiner.combine(ca, cb, ca_v, cb_v)
         p_est_d, _ = models.combiner.combine(ca_d, cb_d, ca_dv, cb_dv, rng)
+        if models.combiner.method == "stacked":
+            # Yığınlanmış çıktı da market kurallarıyla tutarlı hale getirilir (toplam 1, ÇŞ = 1+X, monotonluk).
+            pe2, pv2 = enforce_consistency(p_est[None, :])
+            p_est, p_void = pe2[0], pv2[0]
+            p_est_d, _ = enforce_consistency(p_est_d)
         with np.errstate(invalid="ignore"):
             pq = np.nanquantile(np.where(np.isfinite(p_est_d), p_est_d, np.nan), QUANTILES, axis=0) \
                 if np.isfinite(p_est_d).any() else np.full((len(QUANTILES), K), np.nan)
@@ -305,6 +310,8 @@ class Engine:
             sca, scav = self._calibrate(models.cal_a, sa[None, :])
             scb, scbv = self._calibrate(models.cal_b, sb)
             sp, _ = models.combiner.combine(sca[0], scb[0], scav[0], scbv[0])
+            if models.combiner.method == "stacked":
+                sp = enforce_consistency(sp[None, :])[0][0]
             scen_p.append(sp)
         scen_p = np.array(scen_p)
         with np.errstate(invalid="ignore"):
@@ -384,7 +391,9 @@ class Engine:
                 dis=_f(dis[i]), market_dev=_f(market_dev[i]),
                 ev_a=_f(ev_a[i]) if odds_ok else None, ev_b=_f(ev_b[i]) if odds_ok else None,
                 odds=_f(odds[i]) if odds_ok else None, robust_down=_f(robust_down[i]),
-                core_failed=[c.code for c in gate if not c.passed],
+                core_failed=[c.code for c in gate if not c.passed and c.code not in ODDS_CHECKS],
+                odds_failed=[c.code for c in gate if not c.passed and c.code in ODDS_CHECKS],
+                failed_details={c.code: c.detail for c in gate if not c.passed},
             )
             metrics_list.append(metrics)
             unc = {"q": {f"{qq:.1f}": _r(pq[j, i]) for j, qq in enumerate(QUANTILES)}}
@@ -478,17 +487,20 @@ class Engine:
             rej_rows = []
             for i, e in enumerate(evals):
                 cid = cand_ids[INDEX.keys[i]]
-                failed = [c for c in metrics_list[i].core_failed]
+                mt = metrics_list[i]
+                # Oran yalnızca oranlı modlarda zorunludur; En Güvenilir'de ret gerekçesi sayılmaz.
+                failed = list(mt.core_failed) + (list(mt.odds_failed) if mode in USES_ODDS else [])
                 if i in rank:
                     # 13 — bağımsız denetim; 14 — karar kaydı
                     audit = audit_candidate(self.conn, cid, self.s)
                     if audit.passed:
                         self._record_decision(cid, audit.audit_id, mode, cfg, run_id, fid, i, a_ids, b_ids,
-                                              snap, odds, p_est, p_void, ev, cutoff, as_of, rank[i], e, unc_q=pq)
+                                              snap, odds, p_est, p_void, ev, cutoff, as_of, rank[i], e, unc_q=pq,
+                                              odds_ok=mt.odds_valid)
                         n_sel += 1
                         continue
                     failed = ["audit"]
-                    detail = "; ".join(audit.failed_details())
+                    detail = _reason_text("audit", "; ".join(audit.failed_details()))
                 else:
                     detail = ""
                 mode_failed = [c.code for c in e.checks if not c.passed]
@@ -496,11 +508,22 @@ class Engine:
                     mode_failed.append("nested_duplicate")
                 all_failed = failed + [c for c in mode_failed if c not in failed]
                 primary = all_failed[0] if all_failed else "not_ranked"
+                if not detail:
+                    first = next((c for c in e.checks if c.code == primary and not c.passed), None)
+                    if primary in mt.failed_details and mt.failed_details[primary]:
+                        detail = mt.failed_details[primary]
+                    elif first is not None:
+                        detail = describe(first.code, False, first.value, first.threshold)
+                    elif primary == "nested_duplicate":
+                        b = nested_block.get(i)
+                        detail = (f"Daha üst sıradaki {INDEX.keys[b][0]}·{INDEX.keys[b][1]} seçimiyle iç içe."
+                                  if b is not None else describe("nested_duplicate", False, None, None))
+                    detail = _reason_text(primary, detail)
                 rej_rows.append({
                     "candidate_id": cid, "run_id": run_id, "selection_mode": mode, "fixture_id": fid,
                     "market_id": INDEX.keys[i][0], "outcome_id": INDEX.keys[i][1],
                     "failed_checks": dumps(all_failed), "primary_reason_code": primary,
-                    "reason_text": detail or "", "created_at": as_of,
+                    "reason_text": detail, "created_at": as_of,
                 })
             insert_many(self.conn, "selection_mode_rejections", rej_rows)
             out[mode] = (n_sel, sum(1 for e in evals if e.eligible))
@@ -563,7 +586,7 @@ class Engine:
         return a_ids, b_ids
 
     def _record_decision(self, cid, audit_id, mode, cfg: ModeConfig, run_id, fid, i, a_ids, b_ids, snap, odds,
-                         p_est, p_void, ev, cutoff, as_of, rank, e, unc_q) -> None:
+                         p_est, p_void, ev, cutoff, as_of, rank, e, unc_q, odds_ok: bool = True) -> None:
         mid, oid = INDEX.keys[i]
         exists = self.conn.execute(
             "SELECT id FROM selection_mode_decisions WHERE selection_mode=? AND fixture_id=? AND market_id=?"
@@ -574,9 +597,11 @@ class Engine:
             "candidate_id": cid, "audit_id": audit_id, "run_id": run_id, "config_id": cfg.db_id,
             "fixture_id": fid, "market_id": mid, "outcome_id": oid,
             "model_a_prediction_id": a_ids[i], "model_b_prediction_id": b_ids[i], "selection_mode": mode,
-            "selection_timestamp": as_of, "odds_snapshot_id": int(snap[i]) if snap[i] else None,
-            "decimal_odds": _f(odds[i]), "data_cutoff_at": cutoff, "estimated_probability": float(p_est[i]),
-            "void_probability": float(p_void[i] or 0.0), "estimated_ev": _f(ev[i]),
+            # Doğrulanmamış/eski oran kararla birlikte kaydedilmez: getiri ve EV yalnızca geçerli orandan hesaplanır.
+            "selection_timestamp": as_of, "odds_snapshot_id": int(snap[i]) if (snap[i] and odds_ok) else None,
+            "decimal_odds": _f(odds[i]) if odds_ok else None, "data_cutoff_at": cutoff,
+            "estimated_probability": float(p_est[i]),
+            "void_probability": float(p_void[i] or 0.0), "estimated_ev": _f(ev[i]) if odds_ok else None,
             "uncertainty_metrics": dumps({"q": {f"{qq:.1f}": _f(unc_q[j, i]) for j, qq in enumerate(QUANTILES)},
                                           "p_low": e.p_low, "ev_low": e.ev_low, "p_low_rob": e.p_low_robust,
                                           "ev_low_rob": e.ev_low_robust}),
@@ -601,10 +626,15 @@ def _r(x, nd: int = 5):
     return None if v is None else round(v, nd)
 
 
-def _reason_text(code: str) -> str:
+def _reason_text(code: str, detail: str | None = None) -> str:
+    """Olumsuz ifadeli ret gerekçesi: hangi koşulun sağlanmadığını ve nedenini söyler."""
     from .checks import CHECK_LABELS
 
-    return f"Sağlanmayan koşul: {CHECK_LABELS.get(code, code)}."
+    label = CHECK_LABELS.get(code, code)
+    text = f"Sağlanmayan koşul: {label}."
+    if detail:
+        text += f" {detail.rstrip('.')}."
+    return text[:400]
 
 
 def _config_from_row(row: sqlite3.Row) -> ModeConfig:

@@ -16,7 +16,6 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from ..calibration.calibrate import hosmer_lemeshow
 from .logistic import LogisticFit, fit_logistic, logit, sigmoid
 
 
@@ -46,15 +45,53 @@ class Combiner:
         return p, v
 
 
+def _cluster_mean_z(values: np.ndarray, groups: np.ndarray) -> tuple[float, int]:
+    """Kümeli (maç düzeyinde) ortalama ve z istatistiği: her maç tek bir gözlem birimidir."""
+    uniq, inv = np.unique(groups, return_inverse=True)
+    sums = np.bincount(inv, weights=values)
+    counts = np.bincount(inv)
+    means = sums / counts
+    g = means.size
+    if g < 2:
+        return 0.0, g
+    se = means.std(ddof=1) / np.sqrt(g)
+    return (float(means.mean() / se) if se > 0 else 0.0), g
+
+
+def _cluster_calibration_z(p: np.ndarray, y: np.ndarray, groups: np.ndarray) -> float:
+    """Kümeli kalibrasyon-büyüklük testi: Σ(y − p) / Σn, maç düzeyinde sağlam standart hatayla."""
+    uniq, inv = np.unique(groups, return_inverse=True)
+    r = np.bincount(inv, weights=y - p)
+    n = np.bincount(inv).astype(float)
+    g = r.size
+    if g < 2:
+        return 0.0
+    mean = r.sum() / n.sum()
+    var = g / (g - 1) * np.sum((r - mean * n) ** 2) / n.sum() ** 2
+    return float(mean / np.sqrt(var)) if var > 0 else 0.0
+
+
 def fit_combiner(pa_cal: np.ndarray, pb_cal: np.ndarray, y: np.ndarray, *, min_samples: int,
-                 alpha: float) -> Combiner:
-    """Girdiler zaman sırasında (eskiden yeniye) olmalıdır."""
+                 alpha: float, groups: np.ndarray | None = None) -> Combiner:
+    """Girdiler zaman sırasında (eskiden yeniye) olmalıdır; `groups` her satırın maç kimliğidir.
+
+    Bir maçın ~92 seçeneği aynı sonuca bağlı olduğundan çıkarım satır değil *maç* düzeyinde yapılır:
+    log loss farkları maç başına ortalanır ve z testi maçlar üzerinden kurulur; kalibrasyon da
+    maç düzeyinde sağlam (kümeli) standart hatayla sınanır.
+    """
     ok = np.isfinite(pa_cal) & np.isfinite(pb_cal) & np.isfinite(y)
-    pa, pb, yy = pa_cal[ok], pb_cal[ok], y[ok]
+    if groups is None:
+        groups = np.arange(y.size)
+    pa, pb, yy, gg = pa_cal[ok], pb_cal[ok], y[ok], np.asarray(groups)[ok]
     n = int(yy.size)
-    if n < 2 * min_samples:
-        return Combiner("conservative_min", None, {"n": n, "reason": "Birleştirici için doğrulama verisi yetersiz"})
+    n_fixtures = int(np.unique(gg).size)
+    if n < 2 * min_samples or n_fixtures < 2 * 30:
+        return Combiner("conservative_min", None, {"n": n, "fixtures": n_fixtures,
+                                                   "reason": "Birleştirici için doğrulama verisi yetersiz"})
+    # kronolojik bölme maç sınırında yapılır (aynı maçın seçenekleri iki tarafa düşmez)
     split = int(n * 0.7)
+    while 0 < split < n and gg[split] == gg[split - 1]:
+        split += 1
     X = np.column_stack([np.ones(n), logit(pa), logit(pb)])
     f = fit_logistic(X[:split], yy[:split], ridge=np.array([1e-3, 1.0, 1.0]), prior_mean=np.array([0, 0.5, 0.5]))
     ho = slice(split, n)
@@ -65,21 +102,19 @@ def fit_combiner(pa_cal: np.ndarray, pb_cal: np.ndarray, y: np.ndarray, *, min_s
         return -(yy[ho] * np.log(p) + (1 - yy[ho]) * np.log(1 - p))
 
     l_s, l_a, l_b = ll(ps), ll(pa[ho]), ll(pb[ho])
-    z_scores = {}
-    for name, other in (("A", l_a), ("B", l_b)):
-        d = l_s - other
-        se = d.std(ddof=1) / np.sqrt(d.size) if d.size > 1 else np.inf
-        z_scores[name] = float(d.mean() / se) if se > 0 else 0.0
-    _, _, hl_p = hosmer_lemeshow(ps, yy[ho])
+    z_a, g_ho = _cluster_mean_z(l_s - l_a, gg[ho])
+    z_b, _ = _cluster_mean_z(l_s - l_b, gg[ho])
+    z_cal = _cluster_calibration_z(ps, yy[ho], gg[ho])
     validation = {
-        "n": n, "n_holdout": n - split, "ll_stacked": float(l_s.mean()), "ll_a": float(l_a.mean()),
-        "ll_b": float(l_b.mean()), "z_vs_a": z_scores["A"], "z_vs_b": z_scores["B"], "hl_p": hl_p,
+        "n": n, "n_holdout": n - split, "holdout_fixtures": g_ho, "ll_stacked": float(l_s.mean()),
+        "ll_a": float(l_a.mean()), "ll_b": float(l_b.mean()), "z_vs_a": z_a, "z_vs_b": z_b,
+        "calibration_z": z_cal, "inference": "maç düzeyinde kümeli",
     }
     z_crit = -1.6448536269514722
-    if z_scores["A"] < z_crit and z_scores["B"] < z_crit and hl_p >= alpha:
+    if z_a < z_crit and z_b < z_crit and abs(z_cal) < 1.959963984540054:
         final = fit_logistic(X, yy, ridge=np.array([1e-3, 1.0, 1.0]), prior_mean=np.array([0, 0.5, 0.5]))
         validation["enabled"] = True
         return Combiner("stacked", final, validation)
     validation["enabled"] = False
-    validation["reason"] = "Yığınlama kronolojik doğrulamada iki modeli de anlamlı biçimde geçemedi"
+    validation["reason"] = "Yığınlama kronolojik doğrulamada (maç düzeyinde) iki modeli de anlamlı biçimde geçemedi"
     return Combiner("conservative_min", None, validation)

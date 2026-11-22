@@ -89,6 +89,9 @@ class CandidateMetrics:
     odds: float | None
     robust_down: float | None
     core_failed: list[str]
+    odds_failed: list[str] = field(default_factory=list)
+    #: Sağlanmayan Kalite Kapısı kontrollerinin ayrıntıları (kod → metin), ret gerekçesi için.
+    failed_details: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -115,7 +118,7 @@ def evaluate_mode(mode: str, m: CandidateMetrics, cfg: ModeConfig) -> ModeEvalua
         return ModeEvaluation(mode, checks, False, None, None, None, None, None)
     th = cfg.thresholds
     assert th is not None
-    checks.append(Check("thresholds_established", True, cfg.db_id, None))
+    checks.append(Check("thresholds_established", True, None, None))
     qi = level_to_q_index(th.level)
     p_low = m.p_q[qi] if m.p_q and _finite(m.p_q[qi]) else None
     down = min(0.0, m.robust_down) if _finite(m.robust_down) else None

@@ -46,6 +46,11 @@ def _parse_dt(date: str, time: str | None) -> datetime:
 
 
 def import_csv(conn: sqlite3.Connection, path: str | Path, league_id: str, season: str) -> dict:
+    from ..leagues import LEAGUES_BY_ID
+
+    if league_id not in LEAGUES_BY_ID:
+        valid = ", ".join(sorted(LEAGUES_BY_ID))
+        raise ValueError(f"Bilinmeyen organizasyon kodu: {league_id!r}. Geçerli kodlar: {valid}")
     n_fx = n_odds = 0
     with open(path, newline="", encoding="utf-8-sig") as fh:
         rows = list(csv.DictReader(fh))

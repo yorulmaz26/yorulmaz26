@@ -15,7 +15,7 @@ DEMO_REFRESH_MINUTES = 15
 class Runtime:
     db_path: str
     settings: Settings = SETTINGS
-    _lock: threading.RLock = field(default_factory=threading.RLock)
+    lock: threading.RLock = field(default_factory=threading.RLock)
     _engine: Engine | None = None
 
     def __post_init__(self) -> None:
@@ -41,7 +41,7 @@ class Runtime:
     def run_prematch(self, now: str | None = None) -> dict:
         """Gerçek veriyle çalışan üretim döngüsü: sonuçları işle, yaklaşan maçları değerlendir, performansı kaydet."""
         now = now or to_iso(utcnow())
-        with self._lock:
+        with self.lock:
             settle_fixture_results(self.conn, self.engine.history, now)
             summary = self.engine.run(now)
             self._snapshot(now)
@@ -52,14 +52,20 @@ class Runtime:
         now = now or to_iso(utcnow())
         if not self.is_synthetic():
             return False
-        with self._lock:
+        with self.lock:
             row = self.conn.execute(
                 "SELECT as_of FROM prediction_runs WHERE kind='prematch' AND status='finished' ORDER BY as_of DESC LIMIT 1"
             ).fetchone()
             if row and (from_iso(now) - from_iso(row[0])).total_seconds() < DEMO_REFRESH_MINUTES * 60:
                 return False
-            from .data.synthetic import refresh_prematch_odds
+            from .data.synthetic import play_due_fixtures, refresh_prematch_odds
+            from .data.synthetic_live import generate_goal_events
 
+            # Sentetik akış: başlama saati geçmiş demo maçları oynatılır (sonuçlar kaydedilir, kararlar
+            # sonuçlanır), yaklaşan maçlar için yeni oran anlık görüntüsü eklenir, ardından süreç çalışır.
+            if play_due_fixtures(self.conn, now):
+                generate_goal_events(self.conn, now)
+                self.engine.football.invalidate()
             refresh_prematch_odds(self.conn, now)
             self.run_prematch(now)
             return True
@@ -70,7 +76,7 @@ class Runtime:
             return 0
         from .data.synthetic import ensure_live_demo, simulate_live_tick
 
-        with self._lock:
+        with self.lock:
             started = ensure_live_demo(self.conn, now)
             return started + simulate_live_tick(self.conn, now)
 

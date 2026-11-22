@@ -53,6 +53,24 @@ def _wilson(k: np.ndarray, n: np.ndarray, z: float = Z95) -> tuple[np.ndarray, n
     return np.where(n > 0, centre - half, np.nan), np.where(n > 0, centre + half, np.nan)
 
 
+def _cluster_stats(M: np.ndarray, values: np.ndarray, bounds: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Maç düzeyinde kümeli oran tahmini.
+
+    M: (C × N) seçim maskesi (satırlar maça göre sıralı), values: (N,), bounds: her maçın ilk satırı.
+    Dönüş: (oran = Σv/Σn, kümeli standart hata, seçim içeren maç sayısı) — her biri (C,).
+    Aynı maçın seçenekleri aynı sonuca bağlı olduğu için bağımsız gözlem birimi maçtır.
+    """
+    sv = np.add.reduceat(M * values[None, :], bounds, axis=1)
+    sn = np.add.reduceat(M, bounds, axis=1)
+    n = sn.sum(axis=1)
+    g = (sn > 0).sum(axis=1)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        rate = np.where(n > 0, sv.sum(axis=1) / np.maximum(n, 1), np.nan)
+        resid = sv - rate[:, None] * sn
+        var = np.where(g > 1, g / np.maximum(g - 1, 1) * (resid ** 2).sum(axis=1) / np.maximum(n, 1) ** 2, np.nan)
+    return rate, np.sqrt(var), g
+
+
 def _unique_grid(values: np.ndarray, qs: tuple[float, ...]) -> list[float]:
     if values.size == 0:
         return []
@@ -90,19 +108,26 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                           {"reason": f"Doğrulama örneklemi yetersiz ({n_valid} < {n_min}).",
                            "n": n_valid})
 
+    # satırlar maça göre gruplanır (kümeli çıkarım için); maçlar zaman sırasındadır
     idx = np.where(valid)[0]
+    fids = view.fixture_ids()[idx]
+    order = np.lexsort((np.arange(idx.size), fids, view.kickoffs()[idx]))
+    idx, fids = idx[order], fids[order]
+    bounds = np.r_[0, np.where(fids[1:] != fids[:-1])[0] + 1]
     kick = view.kickoffs()[idx]
     times = np.unique(kick)
     split_time = times[int(len(times) * 2 / 3)] if len(times) >= 3 else times[-1]
-    tune = (kick < split_time).astype(np.float32)
-    conf = kick >= split_time
+    tune_b = kick < split_time
+    tune = tune_b.astype(np.float32)
+    conf = ~tune_b
     n_conf_min = max(20, n_min // 3)
     y_v = y[idx]
     won = (y_v == 1).astype(float)
     p_cond = p_est[idx] / np.maximum(1e-9, 1 - p_void[idx])
-    w_grid = _unique_grid(width[idx], (0.5, 0.75, 1.0))
-    d_grid = _unique_grid(dis[idx], (0.75, 1.0))
-    m_grid = _unique_grid(mdev[idx], (0.5, 0.75, 1.0)) if uses_odds else [None]
+    # Izgara adayları yalnızca ayar diliminden üretilir (teyit dilimi bağımsız kalır).
+    w_grid = _unique_grid(width[idx][tune_b], (0.5, 0.75, 1.0))
+    d_grid = _unique_grid(dis[idx][tune_b], (0.75, 1.0))
+    m_grid = _unique_grid(mdev[idx][tune_b], (0.5, 0.75, 1.0)) if uses_odds else [None]
     if uses_odds:
         o = odds[idx]
         ret = np.where(y_v == 1, o - 1.0, -1.0)
@@ -114,11 +139,10 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
     best = None
     for level in CONFIDENCE_LEVELS:
         qi = level_to_q_index(level)
-        p_low = pq[qi, idx]
-        p_rob = p_low + down[idx]
+        p_rob = pq[qi, idx] + down[idx]
         ok_p = np.isfinite(p_rob)
         ev_rob = p_rob * odds[idx] + p_void[idx] - 1.0 if uses_odds else np.full(idx.size, np.nan)
-        likely = ok_p & (p_rob > MORE_LIKELY_THAN_NOT)
+        likely = ok_p & (p_rob > MORE_LIKELY_THAN_NOT) & tune_b
         if mode == HIGHEST_PROBABILITY:
             p_grid = _unique_grid(p_rob[likely], (0.0, 0.25, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95))
         elif mode == BALANCED:
@@ -128,20 +152,21 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
         if mode != BEST_VALUE and not p_grid:
             continue
         if uses_odds:
-            pos_mask = ok_p & pos_ev & (ev_rob > 0)
+            pos_mask = ok_p & pos_ev & (ev_rob > 0) & tune_b
             e_grid = [0.0] + [v for v in _unique_grid(ev_rob[pos_mask], (0.25, 0.5, 0.75)) if v > 0]
             baseline_hit = float(won[pos_mask].mean()) if pos_mask.any() else None
         else:
             e_grid = [None]
             baseline_hit = None
         combos = [(tp, te) for tp in p_grid for te in e_grid]
-        for tw, td, tm in ((a, b, c) for a in w_grid for b in d_grid for c in m_grid):
+        for tw, td, tm in ((a_, b_, c_) for a_ in w_grid for b_ in d_grid for c_ in m_grid):
             base = ok_p & (width[idx] <= tw + 1e-12) & (dis[idx] <= td + 1e-12)
             if uses_odds:
                 base &= pos_ev & (mdev[idx] <= tm + 1e-12)
+            base &= tune_b  # istatistikler yalnızca ayar diliminde
             if not base.any():
                 continue
-            M = np.zeros((len(combos), idx.size), dtype=np.float32)
+            M = np.zeros((len(combos), idx.size), dtype=np.float64)
             for ci, (tp, te) in enumerate(combos):
                 mk = base.copy()
                 if tp is not None:
@@ -149,31 +174,23 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                 if te is not None:
                     mk &= ev_rob > te
                 M[ci] = mk
-            M *= tune[None, :]  # istatistikler yalnızca ayar diliminde
             n = M.sum(axis=1)
-            k = M @ won
+            hit, hit_se, g = _cluster_stats(M, won, bounds)
+            mean_p, _, _ = _cluster_stats(M, p_cond, bounds)
+            lo, hi = hit - Z95 * hit_se, hit + Z95 * hit_se
+            if uses_odds:
+                roi, roi_se, _ = _cluster_stats(M, ret, bounds)
+                roi_lb = roi - Z_ONE_SIDED_95 * roi_se
+            else:
+                roi = roi_lb = np.full(len(combos), np.nan)
             if mode == BALANCED:
                 f = np.clip((p_rob * (o - 1.0) - (1.0 - p_rob - p_void[idx])) / np.maximum(o - 1.0, 1e-9), 0.0, 0.99)
-                g = np.where(y_v == 1, np.log1p(f * (o - 1.0)), np.log1p(-f))
-                gs = M @ np.nan_to_num(g)
-                gs2 = M @ np.nan_to_num(g * g)
-            rs = M @ ret
-            rs2 = M @ (ret * ret)
-            ps = M @ p_cond
-            lo, hi = _wilson(k, n)
-            with np.errstate(invalid="ignore", divide="ignore"):
-                roi = np.where(n > 0, rs / np.maximum(n, 1), np.nan)
-                var = np.maximum(0.0, rs2 / np.maximum(n, 1) - roi * roi)
-                roi_lb = roi - Z_ONE_SIDED_95 * np.sqrt(var / np.maximum(n, 1))
-                mean_p = np.where(n > 0, ps / np.maximum(n, 1), np.nan)
-            if mode == BALANCED:
-                with np.errstate(invalid="ignore", divide="ignore"):
-                    gm = gs / np.maximum(n, 1)
-                    gvar = np.maximum(0.0, gs2 / np.maximum(n, 1) - gm * gm)
-                    g_lb = gm - Z_ONE_SIDED_95 * np.sqrt(gvar / np.maximum(n, 1))
+                gg = np.where(y_v == 1, np.log1p(f * (o - 1.0)), np.log1p(-f))
+                gm, g_se, _ = _cluster_stats(M, np.nan_to_num(gg), bounds)
+                g_lb = gm - Z_ONE_SIDED_95 * g_se
             for ci, (tp, te) in enumerate(combos):
-                if n[ci] < n_min:
-                    continue
+                if g[ci] < n_min or not np.isfinite(hit_se[ci]):
+                    continue  # en az örneklem MAÇ sayısıyla ölçülür
                 if bool(hi[ci] < mean_p[ci]):
                     continue  # aşırı güven: tahmini olasılık gözlenen oranın üst sınırını aşıyor
                 if mode == HIGHEST_PROBABILITY:
@@ -184,6 +201,8 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                     if baseline_hit is None or lo[ci] < baseline_hit:
                         continue
                     score = (float(roi_lb[ci]), float(n[ci]))
+                if not np.isfinite(score[0]):
+                    continue
                 if best is None or score > best[0]:
                     best = (score, ModeThresholds(
                         level=level, max_relative_width=float(tw), max_disagreement=float(td),
@@ -191,15 +210,16 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                         min_probability_lower=None if tp is None else float(tp),
                         min_ev_lower=None if te is None else float(te),
                     ), {
-                        "n": int(n[ci]), "hit_rate": float(k[ci] / n[ci]), "hit_rate_lower": float(lo[ci]),
-                        "hit_rate_upper": float(hi[ci]), "mean_probability": float(mean_p[ci]),
+                        "n": int(n[ci]), "fixtures": int(g[ci]), "hit_rate": float(hit[ci]),
+                        "hit_rate_lower": float(lo[ci]), "hit_rate_upper": float(hi[ci]),
+                        "mean_probability": float(mean_p[ci]),
                         "roi": float(roi[ci]) if uses_odds else None,
                         "roi_lower": float(roi_lb[ci]) if uses_odds else None,
                         "baseline_hit_rate": baseline_hit, "n_validation_pool": n_valid,
                         "log_growth": float(gm[ci]) if mode == BALANCED else None,
                         "log_growth_lower": float(g_lb[ci]) if mode == BALANCED else None,
                         "grid_size": len(combos) * len(w_grid) * len(d_grid) * len(m_grid) * len(CONFIDENCE_LEVELS),
-                        "tuning_until": str(split_time),
+                        "tuning_until": str(split_time), "inference": "maç düzeyinde kümeli",
                     })
     if best is None:
         return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end,
@@ -214,17 +234,19 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
     if uses_odds:
         ev_rob = p_rob * odds[idx] + p_void[idx] - 1.0
         mk &= pos_ev & (mdev[idx] <= th.max_market_deviation + 1e-12) & (ev_rob > th.min_ev_lower)
+    Mc = mk.astype(np.float64)[None, :]
+    hit_c, hit_c_se, g_c = _cluster_stats(Mc, won, bounds)
+    mean_c, _, _ = _cluster_stats(Mc, p_cond, bounds)
     n_c = int(mk.sum())
     metrics["confirm_n"] = n_c
-    if n_c < n_conf_min:
-        metrics["reason"] = f"Bağımsız teyit diliminde yeterli seçim yok ({n_c} < {n_conf_min})."
+    metrics["confirm_fixtures"] = int(g_c[0])
+    if g_c[0] < n_conf_min or not np.isfinite(hit_c_se[0]):
+        metrics["reason"] = f"Bağımsız teyit diliminde yeterli seçim yok ({int(g_c[0])} maç < {n_conf_min})."
         return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end, metrics)
-    k_c = float(won[mk].sum())
-    lo_c, hi_c = _wilson(np.array([k_c]), np.array([float(n_c)]))
-    mean_c = float(p_cond[mk].mean())
-    metrics.update({"confirm_hit_rate": k_c / n_c, "confirm_hit_rate_upper": float(hi_c[0]),
-                    "confirm_mean_probability": mean_c})
-    if hi_c[0] < mean_c:
+    hi_c = float(hit_c[0] + Z95 * hit_c_se[0])
+    metrics.update({"confirm_hit_rate": float(hit_c[0]), "confirm_hit_rate_upper": hi_c,
+                    "confirm_mean_probability": float(mean_c[0])})
+    if hi_c < mean_c[0]:
         metrics["reason"] = ("Bağımsız teyit diliminde tahmini olasılık gözlenen isabetin üst güven sınırını aştı "
                              "(aşırı güven).")
         return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end, metrics)

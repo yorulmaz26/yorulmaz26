@@ -10,6 +10,8 @@ Radar'ın MODEL B eğitimi ve nadir olay kalibrasyonu bu modülün ürettiği se
 - `historical_snapshots`: bu maçların belirli dakikalardaki durumunu (o ana kadarki skor, sentetik
   canlı xG, kalan süre) ve hedefin gerçekleşip gerçekleşmediğini (dakikadan sonra 90. dakikaya kadar
   en az bir gol) döndürür. Her anlık durum için o andaki canlı "Üst" fiyatı da sentetik olarak üretilir.
+  Yalnızca maç sonuna kadar gözlenmiş maçlar (İY ve MS skoru dolu, gol dakikaları ikisiyle tutarlı)
+  kullanılır; eksik kayıtlı bir maç için "gol olmadı" sonucu uydurulmaz.
 
 Zaman sızıntısı yoktur: anlık durumun girdileri (skor, xG, fiyat) yalnızca o dakikaya kadar oluşmuş
 bilgiden ve maç öncesi bilgiden türetilir; dakikadan sonraki goller yalnızca hedef değişkene (`outcome`)
@@ -31,6 +33,15 @@ import numpy as np
 
 from ..db.database import insert_many, transaction
 from ..domain.markets import MARKETS_BY_ID
+
+def _fetchall(conn: sqlite3.Connection, sql: str, params: tuple = ()) -> list:
+    """Sorguyu çalıştırır, bütün satırları okur ve imleci hemen kapatır (açık imleç bırakmaz)."""
+    cur = conn.execute(sql, params)
+    try:
+        return cur.fetchall()
+    finally:
+        cur.close()
+
 
 #: Varsayılan anlık durum dakikaları (5, 10, …, 75): normal sürede en az 15 dakika kalan dakikalar.
 DEFAULT_MINUTES: tuple[int, ...] = tuple(range(5, 80, 5))
@@ -63,7 +74,8 @@ def generate_goal_events(conn: sqlite3.Connection, as_of: str, seed: int = 11) -
     işlem sırasından bağımsızdır. İşlem idempotenttir: gol dakikası olan maçlar atlanır (0-0 biten
     maçlara hiç kayıt eklenmez). Dönüş: eklenen gol kaydı sayısı.
     """
-    rows = conn.execute(
+    rows = _fetchall(
+        conn,
         """
         SELECT f.id, f.ht_home, f.ht_away, f.ft_home, f.ft_away, f.result_recorded_at
         FROM fixtures f
@@ -75,7 +87,7 @@ def generate_goal_events(conn: sqlite3.Connection, as_of: str, seed: int = 11) -
         ORDER BY f.id
         """,
         (as_of,),
-    ).fetchall()
+    )
     out: list[dict] = []
     for fid, hth, hta, fth, fta, recorded in rows:
         sh, sa = fth - hth, fta - hta
@@ -108,26 +120,38 @@ def historical_snapshots(conn: sqlite3.Connection, cutoff: str,
       market_id (o skordaki "kalan sürede gol" marketi: OU_{toplam+0,5}; 5,5 üstü çizgi yoksa None),
       over_odds (o andaki sentetik canlı Üst fiyatı; market yoksa veya fiyatlanmadıysa None).
 
-    Yalnızca gol dakikaları maç sonucu skoruyla tutarlı olan maçlar döndürülür (0-0 maçlar gol kaydı
-    olmadan tutarlıdır). Sıralama: başlama saati, fikstür, dakika. Sonuç deterministiktir.
+    Yalnızca normal süre sonuna kadar gözlenmiş, tam kaydı olan maçlar kullanılır ("gol yok" sonucu
+    uydurulmaz):
+      - maç sonu (MS) ve ilk yarı (İY) skoru dolu, İY ≤ MS (iki takım için ayrı ayrı);
+      - gol dakikaları MS skoruyla (takım başına gol sayısı) VE İY skoruyla (45. dakikaya kadarki goller)
+        tutarlı. 0-0 / İY 0-0 maçlar gol kaydı olmadan tutarlıdır.
+    Örneğin demo canlı kupa maçları son canlı skorla, İY skoru ve gol dakikası olmadan bitirildiyse
+    (gözlenmeyen dakikalar için sonuç bilinmez) hiç anlık durum üretmez. Sıralama: başlama saati, fikstür,
+    dakika. Sonuç deterministiktir.
     """
     minutes = tuple(int(m) for m in minutes)
-    fixtures = conn.execute(
+    # Tam sonucu (MS + tutarlı İY) olan maçlar; xG dayanağı (`_football_expectations`) da yalnızca
+    # bunları kullanır. Gol dakikası tutarlılığı aşağıda, anlık durum üretilirken ayrıca denetlenir.
+    fixtures = _fetchall(
+        conn,
         """
         SELECT f.id, f.league_id, f.home_team_id, f.away_team_id, f.kickoff_at, f.result_recorded_at,
-               f.ft_home, f.ft_away
+               f.ft_home, f.ft_away, f.ht_home, f.ht_away
         FROM fixtures f
         WHERE f.is_synthetic = 1 AND f.status = 'finished'
           AND f.result_recorded_at IS NOT NULL AND f.result_recorded_at <= ?
           AND f.ft_home IS NOT NULL AND f.ft_away IS NOT NULL
+          AND f.ht_home IS NOT NULL AND f.ht_away IS NOT NULL
+          AND f.ht_home <= f.ft_home AND f.ht_away <= f.ft_away
         ORDER BY f.kickoff_at, f.id
         """,
         (cutoff,),
-    ).fetchall()
+    )
     if not fixtures:
         return []
     events: dict[int, list[tuple[int, str]]] = defaultdict(list)
-    for fid, minute, side in conn.execute(
+    for fid, minute, side in _fetchall(
+        conn,
         """
         SELECT g.fixture_id, g.minute, g.side FROM goal_events g JOIN fixtures f ON f.id = g.fixture_id
         WHERE f.is_synthetic = 1 AND f.result_recorded_at IS NOT NULL AND f.result_recorded_at <= ?
@@ -137,14 +161,14 @@ def historical_snapshots(conn: sqlite3.Connection, cutoff: str,
         (cutoff, cutoff),
     ):
         events[fid].append((int(minute), side))
-    football = _football_expectations(fixtures)
+    football = _football_expectations([tuple(r[:8]) for r in fixtures])
     market = _market_lambdas(conn, cutoff)
 
     out: list[dict] = []
-    for fid, league, home, away, ko, recorded, fth, fta in fixtures:
+    for fid, league, home, away, ko, recorded, fth, fta, hth, hta in fixtures:
         ev = events.get(fid, [])
-        if sum(1 for _, s in ev if s == "home") != fth or sum(1 for _, s in ev if s == "away") != fta:
-            continue  # gol dakikaları eksik veya skorla tutarsız
+        if not _events_consistent(ev, fth, fta, hth, hta):
+            continue  # gol dakikaları eksik veya İY/MS skoruyla tutarsız: maç sonuna kadar gözlenmemiş
         lh_pre, la_pre = football[fid]
         lam_mkt = market.get(fid)
         rng = np.random.default_rng([int(seed), int(fid)])
@@ -173,6 +197,15 @@ def historical_snapshots(conn: sqlite3.Connection, cutoff: str,
                 "market_id": market_id, "over_odds": over_odds,
             })
     return out
+
+
+def _events_consistent(events: list[tuple[int, str]], ft_home: int, ft_away: int, ht_home: int, ht_away: int) -> bool:
+    """Gol dakikaları MS ve İY skoruyla tutarlı mı (takım başına toplam ve 45. dakikaya kadarki goller)."""
+    for side, ft, ht in (("home", ft_home, ht_home), ("away", ft_away, ht_away)):
+        mins = [m for m, s in events if s == side]
+        if len(mins) != ft or sum(1 for m in mins if m <= HALF_TIME) != ht:
+            return False
+    return all(s in ("home", "away") and m >= 1 for m, s in events)
 
 
 def live_over_price(lam_remaining: float, margin: float = LIVE_MARGIN) -> float | None:
@@ -230,7 +263,8 @@ def _market_lambdas(conn: sqlite3.Connection, cutoff: str) -> dict[int, float]:
     marj arındırma) çıkarılan toplam gol beklentisi λ; P(Poisson(λ) ≥ 3) = p_Üst denklemi ikiye bölmeyle
     çözülür. Geçmiş maçlarda gerçek gol yoğunluğu saklanmadığından canlı fiyatın dayanağı budur."""
     last: dict[tuple[int, str], float] = {}
-    for fid, outcome, price in conn.execute(
+    for fid, outcome, price in _fetchall(
+        conn,
         """
         SELECT o.fixture_id, o.outcome_id, o.decimal_odds FROM odds_snapshots o JOIN fixtures f ON f.id = o.fixture_id
         WHERE o.market_id = 'OU_2.5' AND o.is_live = 0 AND o.captured_at <= f.kickoff_at AND o.captured_at <= ?

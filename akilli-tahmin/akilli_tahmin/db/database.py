@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -157,30 +158,53 @@ def init_db(conn: sqlite3.Connection, now: str | None = None) -> None:
 
 
 class transaction:
-    """`isolation_level=None` bağlantıda açık BEGIN/COMMIT; iç içe kullanımda SAVEPOINT."""
+    """`isolation_level=None` bağlantıda açık BEGIN/COMMIT; iç içe kullanımda SAVEPOINT.
+
+    İç içelik derinliği iş parçacığına ve bağlantıya özeldir. Bir bağlantının aynı anda birden çok
+    iş parçacığından kullanılması desteklenmez: API katmanı bütün veritabanı erişimini tek kilitle
+    sıralar (`Runtime.lock`).
+    """
 
     def __init__(self, conn: sqlite3.Connection):
         self.conn = conn
 
     def __enter__(self) -> sqlite3.Connection:
-        depth = _DEPTH.get(id(self.conn), 0)
+        depths = _depths()
+        depth = depths.get(id(self.conn), 0)
+        if depth == 0 and self.conn.in_transaction:
+            # Dışarıda açık kalmış bir işlem varsa iç içe kabul edilir (kaydetme noktasıyla).
+            depth = 1
+            depths[id(self.conn)] = 1
+            self._adopted = True
+        else:
+            self._adopted = False
         self.conn.execute("BEGIN" if depth == 0 else f"SAVEPOINT sp{depth}")
-        _DEPTH[id(self.conn)] = depth + 1
+        depths[id(self.conn)] = depth + 1
         return self.conn
 
     def __exit__(self, exc_type, exc, tb) -> bool:
-        depth = _DEPTH.get(id(self.conn), 1) - 1
-        _DEPTH[id(self.conn)] = depth
+        depths = _depths()
+        depth = max(0, depths.get(id(self.conn), 1) - 1)
+        depths[id(self.conn)] = depth
         if depth == 0:
             self.conn.execute("ROLLBACK" if exc_type else "COMMIT")
         else:
             if exc_type:
                 self.conn.execute(f"ROLLBACK TO sp{depth}")
             self.conn.execute(f"RELEASE sp{depth}")
+            if self._adopted and depth == 1:
+                depths[id(self.conn)] = 0
         return False
 
 
-_DEPTH: dict[int, int] = {}
+_LOCAL = threading.local()
+
+
+def _depths() -> dict[int, int]:
+    d = getattr(_LOCAL, "depths", None)
+    if d is None:
+        d = _LOCAL.depths = {}
+    return d
 
 
 def insert(conn: sqlite3.Connection, table: str, row: dict[str, Any]) -> int:

@@ -85,7 +85,10 @@ def cmd_import(a) -> None:
 
     conn = connect(a.db)
     init_db(conn)
-    print(json.dumps(import_csv(conn, a.file, a.league, a.season), ensure_ascii=False))
+    try:
+        print(json.dumps(import_csv(conn, a.file, a.league, a.season), ensure_ascii=False))
+    except ValueError as exc:
+        sys.exit(str(exc))
 
 
 def cmd_serve(a) -> None:

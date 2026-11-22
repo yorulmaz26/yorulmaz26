@@ -246,6 +246,12 @@ def generate_demo(conn: sqlite3.Connection, as_of: str, *, seed: int = 7,
                                 "created_at": to_iso(ko - timedelta(days=30)),
                             })
                             upcoming += 1
+                            # Demo akışı bu maçı başlama saati geçince "oynatabilsin" diye gerçek beklenen goller saklanır.
+                            conn.execute(
+                                "INSERT INTO data_revisions(entity, entity_id, field, old_value, new_value, recorded_at)"
+                                " VALUES ('fixture', ?, 'true_lambda', NULL, ?, ?)",
+                                (fid, dumps({"lh": lh, "la": la}), as_of),
+                            )
                         # maç öncesi oranlar: 2 gün önce (eski) ve başlama saatinden 45 dk önce
                         early = ko - timedelta(days=2)
                         late = ko - timedelta(minutes=45)
@@ -408,29 +414,69 @@ def refresh_prematch_odds(conn: sqlite3.Connection, now: str, seed: int = 5) -> 
     return len(out)
 
 
+def _team_pool(conn: sqlite3.Connection) -> list[int]:
+    """Canlı demo için takım havuzu: sentetik ligler içinde en çok takımı olan lig."""
+    row = conn.execute(
+        "SELECT t.league_id, COUNT(*) n FROM teams t WHERE EXISTS (SELECT 1 FROM fixtures f WHERE f.is_synthetic=1"
+        " AND f.home_team_id=t.id) GROUP BY t.league_id ORDER BY n DESC, t.league_id LIMIT 1").fetchone()
+    if row is None:
+        return []
+    return [r[0] for r in conn.execute("SELECT id FROM teams WHERE league_id=? ORDER BY id", (row[0],))]
+
+
+def _finish_live_fixture(conn: sqlite3.Connection, rng: np.random.Generator, fid: int, kickoff: datetime,
+                         now: str) -> None:
+    """Sentetik canlı maçı son gözlenen durumdan 90. dakikaya kadar simüle ederek bitirir.
+
+    İlk yarı skoru ve gol dakikaları gözlenmediği için yazılmaz; bu maçlar radar geçmişine
+    (gol dakikası ve İY skoru gerektirir) girmez, yalnızca sonucu kaydedilir.
+    """
+    last = conn.execute("SELECT minute, home_goals, away_goals FROM live_states WHERE fixture_id=?"
+                        " ORDER BY captured_at DESC LIMIT 1", (fid,)).fetchone()
+    lam = conn.execute("SELECT new_value FROM data_revisions WHERE entity='fixture' AND entity_id=?"
+                       " AND field='live_lambda' ORDER BY id DESC LIMIT 1", (fid,)).fetchone()
+    minute, hg, ag = (last[0], last[1], last[2]) if last else (0, 0, 0)
+    if lam is not None:
+        import json
+
+        lv = json.loads(lam[0])
+        frac = max(0.0, (90 - minute) / 90.0)
+        hg += int(rng.poisson(lv["lh"] * frac))
+        ag += int(rng.poisson(lv["la"] * frac))
+    recorded = to_iso(max(from_iso(now), kickoff + timedelta(hours=1, minutes=50)))
+    conn.execute("UPDATE fixtures SET status='finished', ft_home=?, ft_away=?, result_recorded_at=? WHERE id=?",
+                 (hg, ag, recorded, fid))
+    conn.execute(
+        "INSERT INTO data_revisions(entity, entity_id, field, old_value, new_value, recorded_at)"
+        " VALUES ('fixture', ?, 'demo_finished', NULL, ?, ?)",
+        (fid, dumps({"observed_until_minute": minute, "ft": [hg, ag]}), now),
+    )
+
+
 def ensure_live_demo(conn: sqlite3.Connection, now: str, seed: int = 21) -> int:
     """Sentetik canlı demo maçlarını gerçek saate hizalar.
 
-    Bütün sentetik canlı maçlar normal süreyi doldurduysa onları son canlı skorla bitirir ve
-    `now` anına göre 4 yeni sentetik kupa maçı başlatır. Yalnızca demo verisinde çalışır.
+    Normal süresi dolan sentetik canlı maçlar 90. dakikaya kadar simüle edilerek bitirilir; hiç
+    canlı maç kalmadıysa `now` anına göre 4 yeni sentetik kupa maçı başlatılır. Yalnızca demo verisi.
     Dönüş: yeni başlatılan maç sayısı.
     """
     nowdt = from_iso(now)
+    rng = np.random.default_rng(abs(hash((now[:16], seed))) % (2**32))
     live = conn.execute("SELECT id, kickoff_at FROM fixtures WHERE status='live' AND is_synthetic=1").fetchall()
+    expired = [r for r in live if (nowdt - from_iso(r[1])).total_seconds() >= 95 * 60]
     running = [r for r in live if (nowdt - from_iso(r[1])).total_seconds() < 88 * 60]
+    with transaction(conn):
+        for fid, ko in expired:
+            _finish_live_fixture(conn, rng, fid, from_iso(ko), now)
     if running:
         return 0
-    teams = conn.execute("SELECT id FROM teams WHERE league_id='tr-super-lig' ORDER BY id").fetchall()
-    if len(teams) < 8:
+    ids = _team_pool(conn)
+    if len(ids) < 8:
         return 0
-    rng = np.random.default_rng(abs(hash((now[:16], seed))) % (2**32))
     with transaction(conn):
-        for (fid, _ko) in live:
-            last = conn.execute("SELECT home_goals, away_goals FROM live_states WHERE fixture_id=?"
-                                " ORDER BY captured_at DESC LIMIT 1", (fid,)).fetchone()
-            conn.execute("UPDATE fixtures SET status='finished', ft_home=?, ft_away=?, result_recorded_at=?"
-                         " WHERE id=?", (last[0] if last else 0, last[1] if last else 0, now, fid))
-        ids = [t[0] for t in teams]
+        for fid, ko in live:
+            if (fid, ko) not in expired:
+                _finish_live_fixture(conn, rng, fid, from_iso(ko), now)
         order = rng.permutation(len(ids))
         for k in range(4):
             h, a = ids[order[2 * k]], ids[order[2 * k + 1]]
@@ -445,3 +491,29 @@ def ensure_live_demo(conn: sqlite3.Connection, now: str, seed: int = 21) -> int:
             })
             _seed_live_state(conn, rng, fid, ko, nowdt, lh, la)
     return 4
+
+
+def play_due_fixtures(conn: sqlite3.Connection, now: str, seed: int = 31) -> int:
+    """Sentetik demo: başlama saatinin üzerinden 2 sa 5 dk geçmiş planlı lig maçlarını oynatır.
+
+    Skor, üretimde saklanan gerçek beklenen gollerden (true_lambda) örneklenir; sonuç başlama + 2 sa 5 dk
+    anında kaydedilmiş sayılır. Yalnızca `is_synthetic = 1` fikstürlere uygulanır. Dönüş: oynatılan maç sayısı.
+    """
+    import json
+
+    rows = conn.execute(
+        "SELECT f.id, f.kickoff_at, r.new_value FROM fixtures f JOIN data_revisions r ON r.entity='fixture'"
+        " AND r.entity_id=f.id AND r.field='true_lambda' WHERE f.is_synthetic=1 AND f.status='scheduled'"
+        " AND f.kickoff_at<=?", (to_iso(from_iso(now) - timedelta(hours=2, minutes=5)),),
+    ).fetchall()
+    if not rows:
+        return 0
+    with transaction(conn):
+        for fid, ko, lam_json in rows:
+            lv = json.loads(lam_json)
+            rng = np.random.default_rng(fid * 104729 + seed)
+            hh, ha, fh, fa = _sample_score(rng, lv["lh"], lv["la"])
+            conn.execute("UPDATE fixtures SET status='finished', ft_home=?, ft_away=?, ht_home=?, ht_away=?,"
+                         " result_recorded_at=? WHERE id=?",
+                         (fh, fa, hh, ha, to_iso(from_iso(ko) + timedelta(hours=2, minutes=5)), fid))
+    return len(rows)

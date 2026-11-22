@@ -83,12 +83,8 @@ def test_mode_switch_does_not_change_model_probabilities(demo_conn):
     from akilli_tahmin.api import service
 
     before = _prediction_digest(demo_conn)
-    per_mode = {}
     for mode in MODE_CODES:
-        res = service.recommendations(demo_conn, mode, now="2026-11-21T17:05:00Z")
-        per_mode[mode] = {(it["fixture"]["id"], it["market"]["id"], it["outcome"]["id"]):
-                          (it["model_a"]["calibrated"], it["model_b"]["calibrated"], it["model_a"]["raw"],
-                           it["model_b"]["raw"]) for it in res["items"]}
+        service.recommendations(demo_conn, mode, now="2026-11-21T17:05:00Z")
         service.put_settings(demo_conn, "local", mode)
     assert _prediction_digest(demo_conn) == before
     run = _latest_run(demo_conn)
@@ -98,11 +94,20 @@ def test_mode_switch_does_not_change_model_probabilities(demo_conn):
         " FROM selection_mode_candidates WHERE run_id=? GROUP BY fixture_id, market_id, outcome_id", (run["id"],)
     ).fetchall()
     assert rows and all(r[3] == 1 and r[4] == 3 for r in rows)
-    # Farklı modlarda görünen aynı seçimin MODEL A/B olasılıkları birebir aynıdır.
-    common = set.intersection(*(set(v) for v in per_mode.values())) if all(per_mode.values()) else set()
-    for key in common:
-        vals = {per_mode[m][key] for m in MODE_CODES}
-        assert len(vals) == 1
+    # API: aynı seçenek üç modda da birebir aynı MODEL A/B olasılıklarıyla açıklanır (seçilmiş olsun olmasın).
+    sample = demo_conn.execute(
+        "SELECT fixture_id, market_id, outcome_id FROM selection_mode_candidates WHERE run_id=? AND selected=1"
+        " UNION SELECT fixture_id, market_id, outcome_id FROM selection_mode_candidates WHERE run_id=? LIMIT 25",
+        (run["id"], run["id"])).fetchall()
+    assert sample
+    for fx, mk, oc in sample:
+        models = []
+        for mode in MODE_CODES:
+            cid = demo_conn.execute("SELECT id FROM selection_mode_candidates WHERE run_id=? AND selection_mode=?"
+                                    " AND fixture_id=? AND market_id=? AND outcome_id=?",
+                                    (run["id"], mode, fx, mk, oc)).fetchone()[0]
+            models.append(service.decision_explanation(demo_conn, cid)["models"])
+        assert models[0] == models[1] == models[2]
 
 
 # ───────────────────────── 3. En Güvenilir kör seçim yapmamalı ─────────────────────────
@@ -124,21 +129,41 @@ def test_highest_probability_does_not_rank_by_raw_probability():
     assert not evaluate_mode(HIGHEST_PROBABILITY, a3, cfg).eligible
 
 
-def test_highest_probability_selection_in_run_is_not_raw_argmax(demo_conn):
-    run = _latest_run(demo_conn)
+def test_highest_probability_ranks_by_conservative_probability(demo_conn):
+    """Seçimler kalibre + belirsizlik/dayanıklılık düzeltilmiş alt sınıra göre sıralanır, ham olasılığa göre değil."""
     rows = demo_conn.execute(
-        "SELECT c.fixture_id, c.selected, e.p_a_raw, e.core_pass FROM selection_mode_candidates c JOIN"
-        " candidate_evaluations e ON e.id=c.evaluation_id WHERE c.run_id=? AND c.selection_mode=?",
-        (run["id"], HIGHEST_PROBABILITY)).fetchall()
+        "SELECT c.run_id, c.fixture_id, c.rank, c.rank_score, c.mode_checks, c.eligible, c.selected, e.p_a_raw,"
+        " e.estimated_probability FROM selection_mode_candidates c JOIN candidate_evaluations e"
+        " ON e.id=c.evaluation_id WHERE c.selection_mode=? AND c.selected=1", (HIGHEST_PROBABILITY,)).fetchall()
     assert rows
-    by_fx: dict[int, list] = {}
     for r in rows:
-        by_fx.setdefault(r["fixture_id"], []).append(r)
-    # En yüksek ham MODEL A olasılığına sahip seçeneklerin hepsi otomatik seçilmiyor.
-    tops = [max(v, key=lambda r: r["p_a_raw"]) for v in by_fx.values()]
-    assert any(not t["selected"] for t in tops)
-    # Seçilenlerin hepsi Kalite Kapısı'ndan geçmiş.
-    assert all(r["core_pass"] for r in rows if r["selected"])
+        mc = loads(r["mode_checks"])
+        assert r["rank_score"] == pytest.approx(mc["p_low_rob"], abs=1e-4)
+        assert r["rank_score"] <= r["estimated_probability"] + 1e-9  # alt sınır ≤ nokta tahmini
+        assert r["rank_score"] > 0.5
+    by_fixture: dict = {}
+    for r in rows:
+        by_fixture.setdefault((r["run_id"], r["fixture_id"]), []).append(r)
+    disagree = 0
+    for group in by_fixture.values():
+        group.sort(key=lambda r: r["rank"])
+        scores = [g["rank_score"] for g in group]
+        assert scores == sorted(scores, reverse=True)
+        if len(group) > 1 and max(group, key=lambda g: g["p_a_raw"])["rank"] != 1:
+            disagree += 1
+    # Ham olasılık sıralaması ile seçim sıralaması en az bir maçta ayrışır (kör ham-olasılık seçimi yok).
+    assert disagree > 0 or all(len(g) == 1 for g in by_fixture.values())
+
+
+def test_highest_probability_rejections_do_not_blame_odds(demo_conn):
+    run = _latest_run(demo_conn)
+    rows = demo_conn.execute("SELECT failed_checks, primary_reason_code, reason_text FROM selection_mode_rejections"
+                             " WHERE run_id=? AND selection_mode=?", (run["id"], HIGHEST_PROBABILITY)).fetchall()
+    assert rows
+    for r in rows:
+        codes = loads(r["failed_checks"])
+        assert "odds_valid" not in codes and "odds_settlement_rules" not in codes
+        assert r["reason_text"].startswith("Sağlanmayan koşul:")
 
 
 # ───────────────────────── 4. En Avantajlı geçersiz oran kullanmamalı ─────────────────────────
@@ -525,3 +550,82 @@ def test_settlement_rules_match_prediction_rules():
     assert settle("BTTS", "YES", r) == "won"
     assert settle("1X2", "1", MatchResult("postponed", None, None)) == "void"
     assert settle("HT_1X2", "X", MatchResult("finished", 2, 1, None, None)) == "unresolved"
+
+
+def test_identical_events_share_probability(demo_conn):
+    from akilli_tahmin.models.model_b import INDEX
+
+    run = _latest_run(demo_conn)
+    pairs = [(INDEX.keys[a], INDEX.keys[b]) for a, b in INDEX.identities]
+    assert len(pairs) >= 5
+    for (m1, o1), (m2, o2) in pairs:
+        rows = demo_conn.execute(
+            "SELECT a.p_a_cal, b.p_a_cal, a.p_b_cal, b.p_b_cal, a.estimated_probability, b.estimated_probability"
+            " FROM candidate_evaluations a JOIN candidate_evaluations b ON a.run_id=b.run_id AND a.fixture_id=b.fixture_id"
+            " WHERE a.run_id=? AND a.market_id=? AND a.outcome_id=? AND b.market_id=? AND b.outcome_id=?",
+            (run["id"], m1, o1, m2, o2)).fetchall()
+        assert rows
+        for r in rows:
+            for i in (0, 2, 4):
+                if r[i] is not None and r[i + 1] is not None:
+                    assert r[i] == pytest.approx(r[i + 1], abs=1e-9), ((m1, o1), (m2, o2))
+
+
+def test_combiner_inference_is_fixture_level():
+    """Aynı maçın satırlarını çoğaltmak birleştiriciyi 'doğrulanmış' yapamaz (sahte tekrar yok)."""
+    from akilli_tahmin.models.combiner import fit_combiner
+
+    rng = np.random.default_rng(5)
+    G, R = 200, 40
+    p_true = rng.uniform(0.2, 0.8, G)
+    y_fx = (rng.uniform(size=G) < p_true).astype(float)
+    pa = np.clip(p_true + rng.normal(0, 0.05, G), 0.02, 0.98)
+    pb = np.clip(p_true + rng.normal(0, 0.05, G), 0.02, 0.98)
+    rep = lambda v: np.repeat(v, R)  # noqa: E731 — her maçın R özdeş satırı
+    c = fit_combiner(rep(pa), rep(pb), rep(y_fx), min_samples=300, alpha=0.05, groups=np.repeat(np.arange(G), R))
+    assert c.method == "conservative_min"
+    assert c.validation.get("inference") == "maç düzeyinde kümeli"
+
+
+def test_csv_history_odds_usable_in_backtest(tmp_path):
+    """football-data biçimli geçmiş oranlar geriye dönük testte (yalnızca orada) geçerli oran sayılır."""
+    import csv
+
+    from akilli_tahmin.backtest.walk_forward import run_backtest
+    from akilli_tahmin.data.football_data_csv import import_csv
+    from akilli_tahmin.db.database import connect, init_db
+
+    rng = np.random.default_rng(2)
+    teams = [f"T{i}" for i in range(10)]
+    rows = []
+    day = 0
+    for rnd in range(18):
+        order = rng.permutation(10)
+        for k in range(5):
+            h, a = teams[order[2 * k]], teams[order[2 * k + 1]]
+            fh, fa = int(rng.poisson(1.5)), int(rng.poisson(1.1))
+            hh, ha = min(fh, int(rng.poisson(0.6))), min(fa, int(rng.poisson(0.5)))
+            d = 1 + (day % 28)
+            m = 1 + (day // 28) % 12
+            rows.append({"Date": f"{d:02d}/{m:02d}/2025", "Time": f"{13 + k}:00", "HomeTeam": h, "AwayTeam": a,
+                         "FTHG": fh, "FTAG": fa, "HTHG": hh, "HTAG": ha, "B365H": 2.1, "B365D": 3.4, "B365A": 3.6,
+                         "B365>2.5": 1.9, "B365<2.5": 1.95})
+        day += 7
+    path = tmp_path / "E0.csv"
+    with open(path, "w", newline="") as fh:
+        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+        w.writeheader()
+        w.writerows(rows)
+    conn = connect(tmp_path / "csv.sqlite3")
+    init_db(conn)
+    with pytest.raises(ValueError):
+        import_csv(conn, path, "E0", "2025")
+    assert import_csv(conn, path, "en-premier-league", "2025")["fixtures"] == 90
+    run_backtest(conn, "2026-12-31T00:00:00Z", n_draws=40)
+    ok = conn.execute("SELECT COUNT(*) FROM candidate_evaluations WHERE market_id='1X2' AND odds_valid=1").fetchone()[0]
+    assert ok > 0
+    # Güncel öneri üretiminde yaklaşık zamanlı oran kabul edilmez.
+    q = OddsQuote(1, 1, "1X2", "1", 2.1, "football-data-csv", "x", "historical_csv", False, True,
+                  "2026-11-20T15:00:00Z", False, "approximate")
+    assert not validate_quote(q, AS_OF, 1800).valid
+    assert validate_quote(q, AS_OF, 1800, allow_approximate=True).valid

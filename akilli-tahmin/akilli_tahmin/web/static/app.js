@@ -23,7 +23,13 @@
   const PERIODS = [['7d', 'Son 7 gün'], ['30d', 'Son 30 gün'], ['90d', 'Son 90 gün'], ['all', 'Tümü']];
   const PERIOD_LABEL = Object.fromEntries(PERIODS);
   const RADAR_REFRESH_MS = 30000;
+  const API_TIMEOUT_MS = 20000;
+  // Başarı Merkezi uçları bütün kayıt havuzunu tarar; gerçek veride 20 sn'yi aşabilir.
+  const PERF_TIMEOUT_MS = 45000;
+  const REJECTION_PAGE_SIZE = 50;
   const SMALL_SAMPLE = 30;
+  // Bu kontrollerin `value` alanı ölçüm değil kayıt kimliğidir (eski sunucu sürümleri); "Değer" olarak gösterilmez.
+  const REF_VALUE_CODES = new Set(['audit', 'thresholds_established']);
   const TR_MONTHS = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
   const SVG_NS = 'http://www.w3.org/2000/svg';
   const PAGE_TITLES = {
@@ -307,47 +313,81 @@
     if (status === 404) return 'İstenen kayıt bulunamadı' + (detail && detail !== 'Not Found' ? ' (' + detail + ')' : '') + '.';
     if (status === 400 || status === 422) return 'Geçersiz istek' + (detail ? ': ' + detail : '.');
     if (status === 401 || status === 403) return 'Bu işlem için yetkiniz yok (HTTP ' + status + ').';
+    if (status === 415) return 'Sunucu istek biçimini kabul etmedi (HTTP 415).';
     if (status >= 500) return 'Sunucu hatası oluştu (HTTP ' + status + '). Lütfen biraz sonra tekrar deneyin.';
     return 'Beklenmeyen sunucu yanıtı (HTTP ' + status + ').';
   }
 
+  /** Çağıranın iptal ettiği istek (dönem değişti, sayfadan çıkıldı vb.); kullanıcıya hata olarak gösterilmez. */
+  function isAbortError(err) {
+    return !!(err && err.aborted === true);
+  }
+
+  /**
+   * JSON API çağrısı. options: method, body (JSON'a çevrilir; Content-Type: application/json gönderilir —
+   * sunucu durum değiştiren isteklerde başka içerik türünü 415 ile reddeder), timeout (ms),
+   * signal (dış AbortSignal: iptal edilirse `aborted: true` işaretli ApiError fırlatılır).
+   * Zaman aşımı yanıt gövdesinin okunmasını da kapsar.
+   */
   async function api(path, options) {
     const opts = options || {};
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), opts.timeout || 20000);
+    const outer = opts.signal || null;
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      ctrl.abort();
+    }, opts.timeout || API_TIMEOUT_MS);
+    const onOuterAbort = () => ctrl.abort();
+    if (outer) {
+      if (outer.aborted) ctrl.abort();
+      else outer.addEventListener('abort', onOuterAbort);
+    }
+    const failure = (message, status) => {
+      if (timedOut) return new ApiError('Sunucu zamanında yanıt vermedi.', 0);
+      if (outer && outer.aborted) {
+        const err = new ApiError('İstek iptal edildi.', 0);
+        err.aborted = true;
+        return err;
+      }
+      return new ApiError(message, status || 0);
+    };
     const headers = { Accept: 'application/json' };
     if (opts.body !== undefined) headers['Content-Type'] = 'application/json';
-    let res;
     try {
-      res = await fetch(API_BASE + path, {
-        method: opts.method || 'GET',
-        headers,
-        body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
-        signal: ctrl.signal,
-        credentials: 'same-origin',
-        cache: 'no-store',
-      });
-    } catch (e) {
-      throw new ApiError(ctrl.signal.aborted ? 'Sunucu zamanında yanıt vermedi.' : 'Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.', 0);
+      let res;
+      try {
+        res = await fetch(API_BASE + path, {
+          method: opts.method || 'GET',
+          headers,
+          body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
+          signal: ctrl.signal,
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+      } catch (e) {
+        throw failure('Sunucuya ulaşılamadı. Bağlantınızı kontrol edin.', 0);
+      }
+      let text = '';
+      try {
+        text = await res.text();
+      } catch (e) {
+        throw failure('Sunucu yanıtı okunamadı.', res.status);
+      }
+      let data = null;
+      if (text) {
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          if (res.ok) throw new ApiError('Sunucudan geçersiz yanıt alındı.', res.status);
+        }
+      }
+      if (!res.ok) throw new ApiError(httpMessage(res.status, data), res.status);
+      return data;
     } finally {
       clearTimeout(timer);
+      if (outer) outer.removeEventListener('abort', onOuterAbort);
     }
-    let data = null;
-    let text = '';
-    try {
-      text = await res.text();
-    } catch (e) {
-      text = '';
-    }
-    if (text) {
-      try {
-        data = JSON.parse(text);
-      } catch (e) {
-        if (res.ok) throw new ApiError('Sunucudan geçersiz yanıt alındı.', res.status);
-      }
-    }
-    if (!res.ok) throw new ApiError(httpMessage(res.status, data), res.status);
-    return data;
   }
 
   function getModes(force) {
@@ -391,22 +431,28 @@
 
   /**
    * Bir kapsayıcıya veri yükler: yükleniyor → içerik | hata + "Tekrar dene".
-   * Eski yanıtlar (yarış durumu) yok sayılır. keepFrame: yenilemede eski içeriği soluk tut.
+   * load(signal) her çalıştırmada yeni bir AbortSignal alır; kapsayıcı yeniden yüklenince önceki
+   * çalıştırmanın isteği iptal edilir ve eski yanıtlar (yarış durumu) yok sayılır.
+   * keepFrame: yenilemede eski içeriği soluk tut. Dönen run() yeniden yükler, run.abort() durdurur.
    */
   function loadInto(container, load, render, options) {
     const opts = options || {};
     const run = () => {
+      if (container._loadCtrl) container._loadCtrl.abort();
+      const ctrl = new AbortController();
       const t = {};
       container._loadToken = t;
+      container._loadCtrl = ctrl;
       const hadContent = opts.keepFrame && container._hasContent;
       if (hadContent) container.classList.add('is-refreshing');
       else container.replaceChildren(loadingView(opts.loadingText));
       container.setAttribute('aria-busy', 'true');
       Promise.resolve()
-        .then(load)
+        .then(() => load(ctrl.signal))
         .then(
           (data) => {
             if (container._loadToken !== t) return;
+            container._loadCtrl = null;
             container.removeAttribute('aria-busy');
             container.classList.remove('is-refreshing');
             container.replaceChildren();
@@ -421,6 +467,7 @@
           },
           (err) => {
             if (container._loadToken !== t) return;
+            container._loadCtrl = null;
             container.removeAttribute('aria-busy');
             container.classList.remove('is-refreshing');
             if (hadContent) {
@@ -432,6 +479,13 @@
             }
           }
         );
+    };
+    run.abort = () => {
+      // Yalnızca kapsayıcı kaldırılırken (sekme/sayfa değişimi) kullanılır.
+      container._loadToken = null;
+      if (container._loadCtrl) container._loadCtrl.abort();
+      container._loadCtrl = null;
+      container.removeAttribute('aria-busy');
     };
     run();
     return run;
@@ -793,19 +847,47 @@
     return String(v);
   }
 
-  function checkList(checks) {
+  /** passed: true → Geçti, false → Geçmedi, null/eksik → nötr (varsayılan "Değerlendirilmedi"). */
+  function checkStatusText(st, nullText) {
+    return st === 'pass' ? 'Geçti' : st === 'fail' ? 'Geçmedi' : nullText || 'Değerlendirilmedi';
+  }
+
+  function checkIcon(st) {
+    return st === 'pass' ? '✓' : st === 'fail' ? '✗' : '–';
+  }
+
+  /** "Değer … · Eşik …": yalnızca null olmayan parçalar; kayıt kimliği taşıyan değerler gösterilmez. */
+  function checkValuesText(c) {
+    if (!c) return null;
+    const parts = [];
+    if (c.value != null && !REF_VALUE_CODES.has(c.code)) parts.push('Değer ' + fmtValue(c.value));
+    if (c.threshold != null) parts.push('Eşik ' + fmtValue(c.threshold));
+    return parts.length ? parts.join(' · ') : null;
+  }
+
+  function checkList(checks, options) {
+    const opts = options || {};
     const list = Array.isArray(checks) ? checks : [];
-    if (!list.length) return h('p', { class: 'muted small' }, 'Kontrol kaydı yok.');
-    return h('ul', { class: 'check-list' }, list.map((c) => {
+    if (!list.length) return h('p', { class: 'muted small' }, opts.emptyText || 'Kontrol kaydı yok.');
+    return h(opts.ordered ? 'ol' : 'ul', { class: 'check-list' }, list.map((c) => {
       const st = checkStatus(c);
-      const stText = st === 'pass' ? 'Geçti' : st === 'fail' ? 'Geçmedi' : 'Bekliyor';
-      const hasValues = c && (c.value != null || c.threshold != null);
+      const stText = checkStatusText(st, opts.nullText);
+      const values = checkValuesText(c);
       return h('li', { class: 'check ' + st },
-        h('span', { class: 'check-icon', 'aria-hidden': 'true', title: stText }, st === 'pass' ? '✓' : st === 'fail' ? '✗' : '…'),
+        h('span', { class: 'check-icon', 'aria-hidden': 'true', title: stText }, checkIcon(st)),
         h('span', { class: 'check-label' }, h('span', { class: 'visually-hidden' }, stText + ': '), (c && (c.label || c.code)) || 'Kontrol'),
+        st === 'pending' ? h('span', { class: 'check-detail' }, stText + '.') : null,
         c && c.detail ? h('span', { class: 'check-detail' }, c.detail) : null,
-        hasValues ? h('span', { class: 'check-values' }, 'Değer ' + fmtValue(c.value) + ' · Eşik ' + fmtValue(c.threshold)) : null);
+        values ? h('span', { class: 'check-values' }, values) : null);
     }));
+  }
+
+  /** "8 / 10 koşul sağlandı · 2 değerlendirilmedi" */
+  function checkCountText(list, noun) {
+    const items = Array.isArray(list) ? list : [];
+    const passed = items.filter((c) => c && c.passed === true).length;
+    const skipped = items.filter((c) => !c || (c.passed !== true && c.passed !== false)).length;
+    return fmtInt(passed) + ' / ' + fmtInt(items.length) + ' ' + (noun || 'koşul') + ' sağlandı' + (skipped ? ' · ' + fmtInt(skipped) + ' değerlendirilmedi' : '');
   }
 
   function formatThreshold(key, value) {
@@ -956,15 +1038,33 @@
         thresholdsView(m.thresholds)));
     }
 
-    function thresholdsView(t) {
-      if (!t || t.status !== 'established') {
-        return notice('warn', '!', 'Eşikler henüz belirlenmedi',
-          h('p', null, 'Bu modun olasılık, beklenen değer ve belirsizlik eşikleri henüz kronolojik doğrulama verileriyle belirlenmedi. Rastgele sabit eşik dayatılmadığı için bu mod şu anda seçim üretmez.'));
+    function thresholdsView(thr) {
+      const t = thr && typeof thr === 'object' ? thr : {};
+      const win = t.validation_window && typeof t.validation_window === 'object' ? t.validation_window : {};
+      const vm = t.validation_metrics && typeof t.validation_metrics === 'object' ? t.validation_metrics : {};
+      const hasWindow = !!(win.start || win.end);
+      const reason = typeof t.reason === 'string' && t.reason.trim() ? t.reason.trim() : null;
+      if (t.status !== 'established') {
+        const noSelection = h('p', { class: 'small' }, 'Rastgele sabit eşik dayatılmadığı için bu mod şu anda seçim üretmez.');
+        if (!hasWindow) {
+          // Doğrulama hiç yapılamadı (ör. yeterli kronolojik veri yok).
+          return notice('warn', '!', 'Eşikler henüz belirlenmedi',
+            h('p', null, 'Bu modun eşikleri için henüz kronolojik doğrulama yapılmadı.' + (reason ? ' ' + reason : '')),
+            noSelection);
+        }
+        // Doğrulama yapıldı ama güvenilir eşik/avantaj bulunamadı: sunucunun gerçek gerekçesini göster.
+        const facts = ['Doğrulama penceresi: ' + fmtDate(win.start) + ' – ' + fmtDate(win.end)];
+        if (isNum(vm.n)) facts.push('n = ' + fmtInt(vm.n));
+        if (isNum(vm.confirm_n)) {
+          facts.push('bağımsız teyit dilimi n = ' + fmtInt(vm.confirm_n) + (isNum(vm.confirm_roi) ? ', teorik ROI ' + fmtSignedPct(vm.confirm_roi) : ''));
+        }
+        return notice('warn', '!', 'Eşikler belirlenemedi',
+          h('p', { class: 'threshold-reason' }, reason || 'Kronolojik doğrulama yapıldı, ancak güvenilir eşikler belirlenemedi.'),
+          h('p', { class: 'small' }, facts.join(' · ')),
+          noSelection);
       }
-      const win = t.validation_window || {};
-      const vm = t.validation_metrics || {};
       const parts = [];
-      if (win.start || win.end) parts.push('Doğrulama penceresi: ' + fmtDate(win.start) + ' – ' + fmtDate(win.end));
+      if (hasWindow) parts.push('Doğrulama penceresi: ' + fmtDate(win.start) + ' – ' + fmtDate(win.end));
       if (isNum(vm.n)) parts.push('n = ' + fmtInt(vm.n));
       if (isNum(vm.hit_rate_lower)) parts.push('isabet alt sınırı ' + fmtPct(vm.hit_rate_lower));
       if (isNum(vm.roi_lower)) parts.push('ROI alt sınırı ' + fmtSignedPct(vm.roi_lower));
@@ -1056,7 +1156,7 @@
   function oddsBox(odds, code) {
     if (!odds || typeof odds !== 'object') {
       return h('div', { class: 'odds-box' }, h('span', { class: 'field-label' }, 'Gerçek oran'),
-        h('span', { class: 'odds-none' }, code === 'highest_probability' ? 'Oran gerekli değil (En Güvenilir modu)' : 'Oran bilgisi yok'));
+        h('span', { class: 'odds-none' }, code === 'highest_probability' ? 'Geçerli oran yok (bu modda zorunlu değil)' : 'Oran bilgisi yok'));
     }
     const extras = [];
     if (isNum(odds.margin)) extras.push('marj ' + fmtPct(odds.margin));
@@ -1087,6 +1187,18 @@
       validated_blend: 'kronolojik doğrulanmış birleşim',
     };
     return map[method] || (method ? String(method) : 'yöntem belirtilmedi');
+  }
+
+  /**
+   * Aynı seçim daha önce kaydedilmişse (first_decision === false) performans ilk karardaki
+   * oran ve olasılıkla sayılır; kartta gösterilen güncel değerlerle karıştırılmaması için not düşülür.
+   */
+  function decisionNote(dec) {
+    if (!dec || typeof dec !== 'object' || dec.first_decision !== false) return null;
+    const when = dec.selection_timestamp ? fmtDateTime(dec.selection_timestamp) : null;
+    const values = 'kayıtlı oran ' + (isNum(dec.recorded_odds) ? fmtOdds(dec.recorded_odds) : 'yok') + ', kayıtlı olasılık ' + fmtPct(dec.recorded_probability);
+    return h('p', { class: 'decision-note', role: 'note' },
+      'Performans ilk karardaki oran ve olasılıkla' + (when && when !== '—' ? ' (' + when + ' tarihinde)' : '') + ' sayılır: ' + values + '.');
   }
 
   function fact(label, wide, ...content) {
@@ -1133,7 +1245,7 @@
 
     let evContent;
     if (!ev || typeof ev !== 'object') {
-      evContent = [h('span', { class: 'fact-main' }, '—'), h('span', { class: 'fact-sub' }, item.odds ? 'Beklenen değer hesaplanmadı.' : 'Oran olmadan beklenen değer hesaplanmaz.')];
+      evContent = [h('span', { class: 'fact-main' }, '—'), h('span', { class: 'fact-sub' }, item.odds ? 'Beklenen değer hesaplanmadı.' : 'Geçerli oran olmadan beklenen değer hesaplanmaz.')];
     } else {
       evContent = [
         h('span', { class: 'fact-line' }, h('span', { class: 'fact-main' }, fmtSignedPct(ev.point)), h('span', { class: 'fact-sub' }, 'nokta tahmini')),
@@ -1193,21 +1305,34 @@
     });
 
     return h('article', { class: 'rec-card', 'aria-labelledby': titleId, style: '--mode-color:' + modeVar(code), dataset: { id: String(item.id) } },
-      head, pick, models, h('section', { class: 'rec-details', 'aria-label': 'Ayrıntılar' }, facts), explain);
+      head, pick, decisionNote(item.decision), models, h('section', { class: 'rec-details', 'aria-label': 'Ayrıntılar' }, facts), explain);
   }
 
   function renderExplanation(body, data, item) {
     const d = data && typeof data === 'object' ? data : {};
     const checks = Array.isArray(d.checks) ? d.checks : [];
-    const passed = checks.filter((c) => c && c.passed === true).length;
     if (d.summary) body.append(h('p', null, d.summary));
-    if (d.thresholds && Object.keys(d.thresholds).length) {
+    if (d.thresholds && typeof d.thresholds === 'object' && Object.keys(d.thresholds).length) {
       body.append(h('div', null,
         h('p', { class: 'sub-heading' }, 'Uygulanan eşikler', d.config_id != null ? h('span', { class: 'muted small' }, 'yapılandırma #' + d.config_id) : null),
         thresholdGrid(d.thresholds)));
     }
+    // Dengeli: numaralı koşullar. passed === null → "Değerlendirilmedi" (nötr; başarısız sayılmaz).
+    const conditions = (Array.isArray(d.conditions) ? d.conditions : []).filter((c) => c && typeof c === 'object');
+    if (conditions.length) {
+      const labelOf = new Map(checks.filter((c) => c && c.code).map((c) => [c.code, c.label || c.code]));
+      const rows = conditions.map((c) => ({
+        code: c.code,
+        label: (isNum(c.no) ? c.no + '. ' : '') + (c.label || 'Koşul'),
+        passed: c.passed === true ? true : c.passed === false ? false : null,
+        detail: Array.isArray(c.codes) && c.codes.length ? 'Kontroller: ' + c.codes.map((x) => labelOf.get(x) || x).join(', ') : c.detail || null,
+      }));
+      body.append(h('div', null,
+        h('p', { class: 'sub-heading' }, 'Dengeli modun koşulları', h('span', { class: 'muted small' }, checkCountText(rows))),
+        checkList(rows, { ordered: true })));
+    }
     body.append(h('div', null,
-      h('p', { class: 'sub-heading' }, 'Seçim koşulları', h('span', { class: 'muted small' }, fmtInt(passed) + ' / ' + fmtInt(checks.length) + ' koşul sağlandı')),
+      h('p', { class: 'sub-heading' }, conditions.length ? 'Ayrıntılı kontroller' : 'Seçim koşulları', h('span', { class: 'muted small' }, checkCountText(checks, conditions.length ? 'kontrol' : 'koşul'))),
       checkList(checks)));
     const scenarios = item && item.robustness && Array.isArray(item.robustness.scenarios) ? item.robustness.scenarios : [];
     if (scenarios.length) {
@@ -1218,7 +1343,7 @@
     const audit = d.audit && typeof d.audit === 'object' ? d.audit : {};
     body.append(h('div', null,
       h('p', { class: 'sub-heading' }, 'Bağımsız denetim', statusBadge('audit', audit)),
-      checkList(audit.checks)));
+      checkList(audit.checks, { nullText: audit.status === 'pending' ? 'Bekliyor' : null })));
   }
 
   // ---------- "Neden elendi?"

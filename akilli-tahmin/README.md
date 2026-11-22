@@ -17,7 +17,7 @@ Belgeler: [`docs/MASTER_PROMPT_v6.3.md`](docs/MASTER_PROMPT_v6.3.md) (talimat) �
 ```bash
 cd akilli-tahmin
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
-.venv/bin/python -m akilli_tahmin demo --db demo.sqlite3     # ~2 dk: sentetik veri + kronolojik geriye dönük test
+.venv/bin/python -m akilli_tahmin demo --db demo.sqlite3     # ~3-4 dk, ~300 MB: 4 sentetik lig + kronolojik geriye dönük test
 .venv/bin/python -m akilli_tahmin serve --db demo.sqlite3    # http://127.0.0.1:8000
 .venv/bin/python -m pytest -q                                # testler
 ```
@@ -55,7 +55,12 @@ eğilimli piyasa; `--market efficient`: verimli piyasa, oranlı modlar seçim ü
 | Ana ölçüt | Kalibre olasılığın alt sınırı | EV alt sınırı (EV = p × oran − 1) | Olasılık alt sınırı **ve** EV alt sınırı |
 | Sıralama | Olasılık alt sınırı (ham olasılık değil) | EV alt sınırı | İhtiyatlı Kelly oranı |
 | Eşikler | Kronolojik doğrulama | Kronolojik doğrulama | Kronolojik doğrulama |
-| Kurulma koşulu | Doğrulamada isabet alt sınırı en yüksek, aşırı güven yok | ROI %95 alt sınırı > 0 | ROI ve Kelly büyümesi %95 alt sınırı > 0 |
+| Olasılık alanı | p > 0,5 (gerçekleşmesi daha olası) | — | p > 0,5 |
+| Kurulma koşulu | Doğrulamada isabet alt sınırı en yüksek, aşırı güven yok, bağımsız teyit | ROI %95 alt sınırı > 0, teyit diliminde getiri > 0 | En Avantajlı ile aynı + isabet alt sınırı ≥ pozitif EV havuzu |
+
+Eşik ayarında bağımsız birim **maçtır**: bir maçın seçenekleri aynı sonuca bağlı olduğu için örneklem
+sayısı ve güven aralıkları maç düzeyinde kümelenmiş hatayla hesaplanır. Eşikler doğrulama penceresinin ilk
+2/3'ünde seçilir, son 1/3'te (bağımsız teyit dilimi) yeniden sınanır.
 
 Modlar aynı moddan bağımsız değerlendirmeyi okur; mod değişimi MODEL A/B olasılıklarını değiştirmez.
 Uygun seçim yoksa Dengeli modda **"Güvenilir ve avantajlı seçim bulunamadı."** gösterilir.
