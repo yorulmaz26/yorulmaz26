@@ -406,17 +406,6 @@
     return state.modesPromise;
   }
 
-  function cachedFetch(cache, key, path) {
-    if (!cache.has(key)) {
-      const p = api(path).catch((err) => {
-        cache.delete(key);
-        throw err;
-      });
-      cache.set(key, p);
-    }
-    return cache.get(key);
-  }
-
   // ------------------------------------------------------------------ yükleme / hata / boş durumları
   function loadingView(text) {
     return h('div', { class: 'state state-loading', role: 'status' }, h('span', { class: 'spinner', 'aria-hidden': 'true' }), h('span', null, text || 'Yükleniyor…'));
@@ -876,8 +865,9 @@
       return h('li', { class: 'check ' + st },
         h('span', { class: 'check-icon', 'aria-hidden': 'true', title: stText }, checkIcon(st)),
         h('span', { class: 'check-label' }, h('span', { class: 'visually-hidden' }, stText + ': '), (c && (c.label || c.code)) || 'Kontrol'),
-        st === 'pending' ? h('span', { class: 'check-detail' }, stText + '.') : null,
-        c && c.detail ? h('span', { class: 'check-detail' }, c.detail) : null,
+        st === 'pending'
+          ? h('span', { class: 'check-detail' }, stText + (c && c.detail ? ' · ' + c.detail : '.'))
+          : c && c.detail ? h('span', { class: 'check-detail' }, c.detail) : null,
         values ? h('span', { class: 'check-values' }, values) : null);
     }));
   }
@@ -1355,42 +1345,69 @@
     body.append(h('p', { class: 'small muted' }, 'Bir aday, seçim koşullarından en az biri sağlanmadığında elenir. Gerekçeler her mod için ayrı kaydedilir.'), filterRow, listWrap);
     details.append(body);
     let fixtureId = '';
-    let fixtures = null;
+    let filterBuilt = false;
     let started = false;
+    let reload = null;
+    let moreCtrl = null;
 
     const select = h('select', { id: 'reject-fixture-' + code, class: 'select' });
     select.addEventListener('change', () => {
+      // Maç değişince liste baştan (offset 0) ve yalnızca o maç için yüklenir.
       fixtureId = select.value;
       load();
     });
 
-    function load() {
-      const q = '/recommendations/rejections?mode=' + encodeURIComponent(code) + '&limit=50' + (fixtureId ? '&fixture_id=' + encodeURIComponent(fixtureId) : '');
-      return loadInto(listWrap, () => api(q), render, { loadingText: 'Elenen adaylar yükleniyor…', keepFrame: true });
+    function query(fx, offset) {
+      return '/recommendations/rejections?mode=' + encodeURIComponent(code) + '&limit=' + REJECTION_PAGE_SIZE + '&offset=' + offset
+        + (fx ? '&fixture_id=' + encodeURIComponent(fx) : '');
     }
 
-    function buildFilter(items) {
-      if (fixtures) return;
-      fixtures = new Map();
-      for (const it of items) {
-        const fx = it && it.fixture;
-        if (fx && fx.id != null && !fixtures.has(String(fx.id))) fixtures.set(String(fx.id), teamsLabel(fx));
+    function load() {
+      if (moreCtrl) moreCtrl.abort();
+      moreCtrl = null;
+      if (reload) reload();
+      else reload = loadInto(listWrap, (signal) => api(query(fixtureId, 0), { signal }), render, { loadingText: 'Elenen adaylar yükleniyor…', keepFrame: true });
+    }
+
+    function fixtureOptionLabel(fx) {
+      const parts = [teamsLabel(fx)];
+      if (fx.kickoff_at) parts.push(fmtDateTime(fx.kickoff_at));
+      if (isNum(fx.count)) parts.push(fmtInt(fx.count) + ' aday');
+      return parts.join(' · ');
+    }
+
+    /**
+     * Maç filtresi sunucunun `fixtures` listesinden (çalıştırmadaki elenen adayı olan BÜTÜN maçlar) kurulur.
+     * Eski sunucularda bu alan yoksa yalnızca ilk sayfadaki maçlarla yetinilir ve bu açıkça belirtilir.
+     */
+    function buildFilter(d, items, total) {
+      if (filterBuilt) return;
+      const fromServer = Array.isArray(d.fixtures);
+      const options = [];
+      const seen = new Set();
+      const source = fromServer ? d.fixtures : items.map((it) => it && it.fixture);
+      for (const fx of source) {
+        if (!fx || fx.id == null || seen.has(String(fx.id))) continue;
+        seen.add(String(fx.id));
+        options.push([String(fx.id), fromServer ? fixtureOptionLabel(fx) : teamsLabel(fx)]);
       }
-      if (!fixtures.size) return;
-      select.append(h('option', { value: '' }, 'Tüm maçlar'));
-      for (const [id, label] of fixtures) select.append(h('option', { value: id }, label));
+      if (!options.length) return;
+      filterBuilt = true;
+      select.append(h('option', { value: '' }, 'Tüm maçlar (' + fmtInt(options.length) + ' maç · ' + fmtInt(total) + ' aday)'));
+      for (const [id, label] of options) select.append(h('option', { value: id }, label));
       filterRow.append(h('label', { for: select.id }, 'Maç filtresi'), select);
+      if (!fromServer) filterRow.append(h('p', { class: 'small muted filter-note' }, 'Maç listesi yalnızca ilk sayfadaki adaylardan oluşturuldu.'));
     }
 
     function render(data) {
       const d = data && typeof data === 'object' ? data : {};
       const items = Array.isArray(d.items) ? d.items : [];
-      if (!fixtureId) buildFilter(items);
-      const counts = (Array.isArray(d.reason_counts) ? d.reason_counts : []).filter((r) => r && isNum(r.count)).sort((a, b) => b.count - a.count);
       const total = isNum(d.total) ? d.total : items.length;
+      if (!fixtureId) buildFilter(d, items, total);
+      const counts = (Array.isArray(d.reason_counts) ? d.reason_counts : []).filter((r) => r && isNum(r.count)).sort((a, b) => b.count - a.count);
       const maxCount = Math.max(1, ...counts.map((r) => r.count));
       listWrap.append(h('p', null, h('strong', null, fmtInt(total) + ' aday elendi'),
-        items.length < total ? h('span', { class: 'muted small' }, ' · ilk ' + fmtInt(items.length) + ' gösteriliyor') : null));
+        fixtureId ? h('span', { class: 'muted small' }, ' · seçili maç') : null));
       if (counts.length) {
         listWrap.append(h('div', null,
           h('p', { class: 'sub-heading' }, 'Eleme nedenleri'),
@@ -1404,7 +1421,59 @@
         listWrap.append(h('p', { class: 'muted' }, 'Gösterilecek elenen aday yok.'));
         return;
       }
-      listWrap.append(h('p', { class: 'sub-heading' }, 'Elenen adaylar'), h('ul', { class: 'reject-list' }, items.map((it) => h('li', null, rejectRow(it)))));
+      const page = {
+        fixture: fixtureId,
+        loaded: items.length,
+        total: Math.max(total, items.length),
+        list: h('ul', { class: 'reject-list' }, items.map((it) => h('li', null, rejectRow(it)))),
+        shown: h('p', { class: 'small muted reject-shown', 'aria-live': 'polite' }),
+        pager: h('div', { class: 'load-more' }),
+      };
+      listWrap.append(h('p', { class: 'sub-heading' }, 'Elenen adaylar'), page.list, page.shown, page.pager);
+      updatePager(page);
+    }
+
+    function updatePager(page) {
+      page.shown.textContent = fmtInt(page.loaded) + ' / ' + fmtInt(page.total) + ' aday gösteriliyor';
+      page.pager.replaceChildren();
+      if (page.loaded >= page.total) return;
+      const btn = h('button', { type: 'button', class: 'btn btn-small load-more-btn' }, 'Daha fazla göster');
+      btn.addEventListener('click', () => loadMore(page, btn));
+      page.pager.append(btn);
+    }
+
+    async function loadMore(page, btn) {
+      if (moreCtrl) moreCtrl.abort();
+      const ctrl = new AbortController();
+      moreCtrl = ctrl;
+      btn.disabled = true;
+      btn.textContent = 'Yükleniyor…';
+      const oldErr = page.pager.querySelector('.form-status');
+      if (oldErr) oldErr.remove();
+      page.pager.setAttribute('aria-busy', 'true');
+      try {
+        const data = await api(query(page.fixture, page.loaded), { signal: ctrl.signal });
+        if (moreCtrl !== ctrl || !page.list.isConnected) return;
+        const d = data && typeof data === 'object' ? data : {};
+        const items = Array.isArray(d.items) ? d.items : [];
+        const rows = items.map((it) => h('li', null, rejectRow(it)));
+        page.list.append(...rows);
+        page.loaded += items.length;
+        if (isNum(d.total)) page.total = Math.max(d.total, page.loaded);
+        if (!items.length) page.total = page.loaded; // sunucu yeni satır vermedi: sonsuz "daha fazla" döngüsünü önle
+        updatePager(page);
+        // Klavye kullanıcıları yeni satırlardan devam edebilsin.
+        const first = rows[0] && rows[0].querySelector('summary');
+        if (first) first.focus();
+      } catch (e) {
+        if (moreCtrl !== ctrl || isAbortError(e)) return;
+        btn.disabled = false;
+        btn.textContent = 'Daha fazla göster';
+        page.pager.append(h('p', { class: 'form-status err', role: 'alert' }, 'Daha fazla aday yüklenemedi: ' + ((e && e.message) || 'bilinmeyen hata')));
+      } finally {
+        page.pager.removeAttribute('aria-busy');
+        if (moreCtrl === ctrl) moreCtrl = null;
+      }
     }
 
     function rejectRow(it) {
@@ -1424,7 +1493,7 @@
       row.addEventListener('toggle', () => {
         if (!row.open || done) return;
         done = true;
-        loadInto(rb, () => api('/recommendations/' + encodeURIComponent(item.id) + '/rejection-reasons'), (data) => {
+        loadInto(rb, (signal) => api('/recommendations/' + encodeURIComponent(item.id) + '/rejection-reasons', { signal }), (data) => {
           const dd = data && typeof data === 'object' ? data : {};
           rb.append(h('p', { class: 'sub-heading' }, 'Başarısız koşullar'), checkList(dd.failed_checks));
           if (dd.reason_text) rb.append(h('p', { class: 'small' }, dd.reason_text));
@@ -1449,16 +1518,41 @@
     let period = store.get('period', 'all');
     if (!PERIOD_LABEL[period]) period = 'all';
     let detailMode = isValidMode(state.lastMode) ? state.lastMode : DEFAULT_MODE;
-    const compCache = new Map();
-    let perfPromise = null;
-    const getPerf = () => {
-      if (!perfPromise) perfPromise = api('/performance/selection-modes').catch((e) => {
-        perfPromise = null;
-        throw e;
-      });
-      return perfPromise;
+    // Paylaşılan istekler: aynı veri için ikinci paralel istek açılmaz (ui-03). Her kaydın kendi
+    // AbortController'ı vardır; dönem değişince eski dönemin süren isteği iptal edilir.
+    const shared = new Map(); // anahtar → { promise, ctrl, settled }
+    const sharedFetch = (key, path) => {
+      let entry = shared.get(key);
+      if (!entry) {
+        const ctrl = new AbortController();
+        const e = { ctrl, settled: false, promise: null };
+        e.promise = api(path, { signal: ctrl.signal, timeout: PERF_TIMEOUT_MS }).then(
+          (data) => {
+            e.settled = true;
+            return data;
+          },
+          (err) => {
+            if (shared.get(key) === e) shared.delete(key);
+            throw err;
+          }
+        );
+        shared.set(key, e);
+        entry = e;
+      }
+      return entry.promise;
     };
-    const getComp = (p) => cachedFetch(compCache, p, '/recommendations/modes/comparison?period=' + encodeURIComponent(p));
+    const getPerf = () => sharedFetch('perf', '/performance/selection-modes');
+    const getComp = (p) => sharedFetch('comp:' + p, '/recommendations/modes/comparison?period=' + encodeURIComponent(p));
+    /** Süren ve `keep` dışında kalan karşılaştırma isteklerini iptal et (tamamlananlar önbellekte kalır). */
+    const abortStaleComp = (keep) => {
+      for (const [key, e] of shared) {
+        if (key.startsWith('comp:') && key !== 'comp:' + keep && !e.settled) {
+          e.ctrl.abort();
+          shared.delete(key);
+        }
+      }
+    };
+    let viewLoaders = []; // etkin alt sekmenin loadInto çalıştırıcıları (sekme/sayfa değişiminde durdurulur)
 
     const tabList = h('div', { class: 'subtabs', role: 'tablist', 'aria-label': 'Başarı Merkezi bölümleri' });
     const tabBtns = {};
@@ -1489,17 +1583,25 @@
         tabBtns[c].setAttribute('tabindex', c === code ? '0' : '-1');
       }
       content.setAttribute('aria-labelledby', 'subtab-' + code);
+      stopViewLoaders();
       content.replaceChildren();
       if (code === 'genel') renderGeneral();
       else renderModes();
+    }
+
+    function stopViewLoaders() {
+      for (const run of viewLoaders) run.abort();
+      viewLoaders = [];
     }
 
     // ---- Seçim Modları
     function renderModes() {
       const toolbar = h('div', { class: 'toolbar' }, h('span', { class: 'toolbar-label', id: 'period-label' }, 'Dönem'),
         periodSeg(period, (p) => {
+          if (p === period) return; // aynı dönem: yeni istek açma
           period = p;
           store.set('period', p);
+          abortStaleComp(p);
           reloadComp();
           reloadProfit();
           reloadDetail();
@@ -1532,13 +1634,25 @@
           h('div', { class: 'panel-title' }, h('h2', { class: 'section-title', id: 'detail-title' }, 'Mod ayrıntısı: lig ve market bazlı başarı')),
           detailSeg, detailBody));
 
-      const reloadComp = () => loadInto(compWrap, () => getComp(period), (comp) => renderComparison(compWrap, comp), { keepFrame: true, loadingText: 'Karşılaştırma yükleniyor…' });
-      const reloadProfit = () => loadInto(profitWrap, () => Promise.all([getPerf(), getComp(period)]), ([perf, comp]) => renderProfit(profitWrap, perf, comp), { keepFrame: true });
-      const reloadDetail = () => loadInto(detailBody, () => api('/recommendations/modes/performance?mode=' + encodeURIComponent(detailMode) + '&period=' + encodeURIComponent(period)), (d) => renderDetail(detailBody, d), { keepFrame: true, loadingText: 'Mod ayrıntısı yükleniyor…' });
-      reloadComp();
-      reloadProfit();
-      reloadDetail();
-      loadInto(seasonWrap, getPerf, (perf) => {
+      // Her kapsayıcı tek bir loadInto çalıştırıcısına sahiptir; yeniden çalıştırma önceki isteği iptal eder.
+      // Karşılaştırma ve kâr grafiği aynı /modes/comparison isteğini paylaşır.
+      const runComp = loadInto(compWrap, () => getComp(period), (comp) => renderComparison(compWrap, comp), { keepFrame: true, loadingText: 'Karşılaştırma yükleniyor…' });
+      const runProfit = loadInto(profitWrap, () => {
+        const p = period;
+        return getComp(p).then((comp) => (hasModeTimelines(comp) ? [comp, null, p] : getPerf().then((perf) => [comp, perf, p])));
+      }, ([comp, perf, p]) => renderProfit(profitWrap, comp, perf, p), { keepFrame: true, loadingText: 'Kâr grafiği yükleniyor…' });
+      // Ağır uçlar sunucuda aynı kayıt havuzunu tarar: ayrıntı ve sezon istekleri, o dönemin karşılaştırma
+      // isteği bitene (ya da başarısız olana) kadar bekler; böylece aynı anda en fazla iki ağır istek açılır.
+      const afterComp = (p) => getComp(p).then(() => undefined, () => undefined);
+      const runDetail = loadInto(detailBody, (signal) => {
+        const p = period;
+        const m = detailMode;
+        return afterComp(p).then(() => api('/recommendations/modes/performance?mode=' + encodeURIComponent(m) + '&period=' + encodeURIComponent(p), { signal, timeout: PERF_TIMEOUT_MS }));
+      }, (d) => renderDetail(detailBody, d), { keepFrame: true, loadingText: 'Mod ayrıntısı yükleniyor…' });
+      const reloadComp = () => runComp();
+      const reloadProfit = () => runProfit();
+      const reloadDetail = () => runDetail();
+      const runSeason = loadInto(seasonWrap, () => afterComp(period).then(getPerf), (perf) => {
         renderSeasons(seasonWrap, perf);
         bannerWrap.replaceChildren();
         if (perf && perf.is_synthetic_data) {
@@ -1548,6 +1662,7 @@
         const notes = perf && Array.isArray(perf.notes) ? perf.notes.filter(Boolean) : [];
         if (notes.length) bannerWrap.append(h('div', { class: 'small muted', style: 'margin-top:8px' }, notes.join(' ')));
       });
+      viewLoaders = [runComp, runProfit, runDetail, runSeason];
     }
 
     function rowsFor(comp) {
@@ -1640,41 +1755,77 @@
         multiples));
     }
 
-    function renderProfit(wrap, perf, comp) {
-      const modes = Array.isArray(perf && perf.modes) ? perf.modes : [];
+    function cleanTimeline(tl) {
+      return (Array.isArray(tl) ? tl : []).filter((p) => p && parseDay(p.date) && isNum(p.cumulative_profit))
+        .slice().sort((a, b) => parseDay(a.date).ms - parseDay(b.date).ms);
+    }
+
+    /**
+     * Kümülatif kâr. Öncelik: /modes/comparison yanıtındaki mod başına `timeline` — tablodaki
+     * "Kâr (birim)" ile aynı kararlar (aynı pencere ve havuz), sonuçlanma gününe göre birikimli,
+     * pencere başında 0'dan. Bu alan yoksa (eski sunucu) tüm dönem serisi (/performance/selection-modes)
+     * dönem başına göre yeniden tabanlanır ve tabloyla farklı olabileceği belirtilir.
+     */
+    function renderProfit(wrap, comp, perf, p) {
+      const per = p || (comp && comp.period) || period;
       const win = (comp && comp.window) || {};
-      const startDay = period !== 'all' && win.start ? String(win.start).slice(0, 10) : null;
+      const winStartDay = win.start ? String(win.start).slice(0, 10) : null;
+      const fromComp = hasModeTimelines(comp);
+      const compModes = Array.isArray(comp && comp.modes) ? comp.modes : [];
       const series = [];
       for (const code of MODE_ORDER) {
+        if (fromComp) {
+          const m = compModes.find((x) => x && x.code === code);
+          if (!m) continue;
+          const points = cleanTimeline(m.timeline).map((pt) => ({ ms: parseDay(pt.date).ms, value: pt.cumulative_profit, n: isNum(pt.n) ? pt.n : null }));
+          const origin = parseDay(winStartDay || (points.length ? new Date(points[0].ms).toISOString() : null));
+          if (points.length && origin && origin.ms <= points[0].ms && !(origin.ms === points[0].ms && points[0].value === 0)) {
+            points.unshift({ ms: origin.ms, value: 0, n: 0 });
+          }
+          const profit = m.metrics && isNum(m.metrics.profit_units) ? m.metrics.profit_units : null;
+          series.push({ code, name: modeShort(code), points, profit });
+          continue;
+        }
+        const modes = Array.isArray(perf && perf.modes) ? perf.modes : [];
         const m = modes.find((x) => x && x.code === code);
         if (!m) continue;
-        const tl = (Array.isArray(m.timeline) ? m.timeline : []).filter((p) => p && parseDay(p.date) && isNum(p.cumulative_profit));
+        const startDay = per !== 'all' ? winStartDay : null;
+        const tl = cleanTimeline(m.timeline);
         let baseValue = 0;
         let baseN = 0;
         let pts = tl;
         if (startDay) {
-          const before = tl.filter((p) => p.date <= startDay);
+          const before = tl.filter((pt) => pt.date <= startDay);
           if (before.length) {
             baseValue = before[before.length - 1].cumulative_profit;
             baseN = isNum(before[before.length - 1].n) ? before[before.length - 1].n : 0;
           }
-          pts = tl.filter((p) => p.date > startDay);
+          pts = tl.filter((pt) => pt.date > startDay);
         }
-        const points = pts.map((p) => ({ ms: parseDay(p.date).ms, value: p.cumulative_profit - baseValue, n: isNum(p.n) ? p.n - baseN : null }));
-        const originDay = parseDay(startDay || (win.start ? String(win.start).slice(0, 10) : (tl[0] && tl[0].date)));
+        const points = pts.map((pt) => ({ ms: parseDay(pt.date).ms, value: pt.cumulative_profit - baseValue, n: isNum(pt.n) ? pt.n - baseN : null }));
+        const originDay = parseDay(startDay || winStartDay || (tl[0] && tl[0].date));
         if (points.length && originDay && originDay.ms < points[0].ms) points.unshift({ ms: originDay.ms, value: 0, n: 0 });
-        series.push({ code, name: modeShort(code), points });
+        series.push({ code, name: modeShort(code), points, profit: null });
       }
-      const legend = h('ul', { class: 'legend' }, series.map((s) => {
+      const endValue = (s) => {
         const last = s.points[s.points.length - 1];
-        return h('li', null, h('span', { class: 'line-key', style: 'border-color:' + modeVar(s.code), 'aria-hidden': 'true' }), h('span', null, s.name),
-          h('span', { class: 'legend-value' }, last ? fmtSigned(last.value, 1) + ' birim' : 'veri yok'));
+        if (last) return last.value;
+        return isNum(s.profit) ? s.profit : null;
+      };
+      const legend = h('ul', { class: 'legend' }, series.map((s) => {
+        const v = endValue(s);
+        return h('li', { dataset: { mode: s.code } }, h('span', { class: 'line-key', style: 'border-color:' + modeVar(s.code), 'aria-hidden': 'true' }), h('span', null, s.name),
+          h('span', { class: 'legend-value' }, v == null ? 'veri yok' : fmtSigned(v, 1) + ' birim'));
       }));
       const chartBox = h('div', { class: 'chart' });
       wrap.append(legend, chartBox);
-      const label = 'Kümülatif teorik kâr: ' + series.map((s) => s.name + ' ' + (s.points.length ? fmtSigned(s.points[s.points.length - 1].value, 1) : '—') + ' birim').join(', ');
+      const label = 'Kümülatif teorik kâr, ' + (PERIOD_LABEL[per] || per) + ': ' + series.map((s) => s.name + ' ' + (endValue(s) == null ? '—' : fmtSigned(endValue(s), 1)) + ' birim').join(', ');
       lineChart(chartBox, { series, yLabel: 'birim', label });
-      wrap.append(h('p', { class: 'small muted', style: 'margin-top:8px' }, 'Geçmiş kâr geleceği garanti etmez. Çizgiler yalnızca o modun kendi kayıtlı seçimlerinden hesaplanır.'));
+      const notes = [];
+      if (fromComp) notes.push('Çizgiler, karşılaştırma tablosundaki seçimlerin aynısından (aynı zaman aralığı ve maç havuzu) sonuçlanma gününe göre birikimli hesaplanır; son değer tablodaki “Kâr (birim)” ile aynıdır.');
+      else if (per !== 'all') notes.push('Bu dönemin kâr serisi sunucudan alınamadı; tüm dönem serisi dönem başına göre yeniden tabanlandı. Değerler karşılaştırma tablosundaki “Kâr (birim)” ile farklı olabilir.');
+      notes.push('Geçmiş kâr geleceği garanti etmez. Çizgiler yalnızca o modun kendi kayıtlı seçimlerinden hesaplanır.');
+      wrap.append(h('p', { class: 'small muted', style: 'margin-top:8px' }, notes.join(' ')));
     }
 
     function renderSeasons(wrap, perf) {
@@ -1779,7 +1930,19 @@
       update(newSub) {
         if (SUBS.some((s) => s[0] === newSub) && newSub !== current) go(newSub);
       },
+      destroy() {
+        // Sayfadan çıkılınca süren bütün Başarı Merkezi isteklerini iptal et.
+        stopViewLoaders();
+        for (const e of shared.values()) if (!e.settled) e.ctrl.abort();
+        shared.clear();
+      },
     };
+  }
+
+  /** /modes/comparison yanıtı mod başına dönem zaman serisi (`timeline`) içeriyor mu? */
+  function hasModeTimelines(comp) {
+    const modes = Array.isArray(comp && comp.modes) ? comp.modes : [];
+    return modes.some((m) => m && MODE_ORDER.includes(m.code) && Array.isArray(m.timeline));
   }
 
   /** "Tüm adaylar (seçim yapılmadan, MODEL B)" → "seçim yapılmadan, MODEL B" (başlık zaten "Tüm adaylar"). */
@@ -1927,24 +2090,28 @@
           note = ' Bu tarayıcı bildirimleri desteklemiyor; alarmlar yalnızca bu sayfada görünür.';
         }
       }
+      let res;
       try {
-        const res = await api('/radar/notifications/permission', { method: 'POST', body: { granted: value } });
-        granted = !!(res && res.granted === true);
-        store.set('radarNotifications', granted);
-        btn.setAttribute('aria-checked', String(granted));
-        const lbl = btn.querySelector('.switch-label');
-        if (lbl) lbl.textContent = granted ? 'Radar bildirimleri açık' : 'Radar bildirimleri kapalı';
-        status.className = 'form-status ' + (granted || !want ? 'ok' : 'err');
-        status.textContent = (granted ? 'Bildirim izni kaydedildi.' : 'Bildirimler kapalı olarak kaydedildi.') + note;
-        refresh();
-        const note = notifyWrap.querySelector('.browser-note');
-        if (note) updateBrowserNote(note);
+        // api() gövdeyi JSON olarak ve Content-Type: application/json ile gönderir (sunucu diğerlerini 415 ile reddeder).
+        res = await api('/radar/notifications/permission', { method: 'POST', body: { granted: value } });
       } catch (e) {
         status.className = 'form-status err';
         status.textContent = 'İzin kaydedilemedi: ' + ((e && e.message) || 'bilinmeyen hata');
-      } finally {
         btn.disabled = false;
+        return;
       }
+      // Kayıt başarılı: buradan sonraki arayüz güncellemeleri "kaydedilemedi" olarak raporlanmamalı.
+      granted = !!(res && res.granted === true);
+      store.set('radarNotifications', granted);
+      btn.setAttribute('aria-checked', String(granted));
+      const lbl = btn.querySelector('.switch-label');
+      if (lbl) lbl.textContent = granted ? 'Radar bildirimleri açık' : 'Radar bildirimleri kapalı';
+      status.className = 'form-status ' + (granted || !want ? 'ok' : 'err');
+      status.textContent = (granted ? 'Bildirim izni kaydedildi.' : 'Bildirimler kapalı olarak kaydedildi.') + note;
+      btn.disabled = false;
+      const noteEl = notifyWrap.querySelector('.browser-note');
+      if (noteEl) updateBrowserNote(noteEl);
+      refresh(); // "Bildirim izni" koşulu canlı kartlarda hemen yeniden değerlendirilsin
     }
 
     function setLiveNames(live) {
@@ -1968,7 +2135,6 @@
       const item = it && typeof it === 'object' ? it : {};
       const fx = item.fixture || {};
       const conds = Array.isArray(item.conditions) ? item.conditions : [];
-      const passed = conds.filter((c) => c && c.passed === true).length;
       const odds = item.odds && typeof item.odds === 'object' ? item.odds : null;
       const alarm = item.alarm === true;
       const condDetails = h('details', null, h('summary', { class: 'small' }, 'Koşul ayrıntıları'), h('div', { class: 'details-body' }, checkList(conds)));
@@ -1985,13 +2151,13 @@
             odds ? h('span', { class: 'muted small' }, ' · ' + (odds.source_label || 'kaynak?') + ' · ' + fmtAge(odds.age_seconds)) : null)),
         h('div', { class: 'fact-line' },
           alarm ? badge('info', 'Alarm verildi' + (item.alert_id != null ? ' · #' + item.alert_id : ''), 'alarm-badge') : badge('neutral', 'Alarm yok', 'alarm-badge'),
-          h('span', { class: 'small muted' }, fmtInt(passed) + ' / ' + fmtInt(conds.length) + ' koşul sağlandı')),
+          h('span', { class: 'small muted' }, checkCountText(conds))),
         item.blocked_reason ? h('p', { class: 'small', style: 'color:var(--warn-ink)' }, item.blocked_reason) : null,
         h('ul', { class: 'chip-list', 'aria-label': 'Radar koşulları' }, conds.map((c) => {
           const st = checkStatus(c);
           return h('li', { class: 'chip ' + st, title: (c && c.detail) || '' },
-            h('span', { class: 'chip-icon', 'aria-hidden': 'true' }, st === 'pass' ? '✓' : st === 'fail' ? '✗' : '…'),
-            h('span', { class: 'visually-hidden' }, st === 'pass' ? 'Geçti: ' : st === 'fail' ? 'Geçmedi: ' : 'Bekliyor: '),
+            h('span', { class: 'chip-icon', 'aria-hidden': 'true' }, checkIcon(st)),
+            h('span', { class: 'visually-hidden' }, checkStatusText(st) + ': '),
             (c && (c.label || c.code)) || 'Koşul');
         })),
         condDetails);

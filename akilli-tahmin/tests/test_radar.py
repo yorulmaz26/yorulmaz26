@@ -178,14 +178,14 @@ def test_probability_of_exactly_90_percent_does_not_alarm(iconn, passing):
     it = item_for(R.evaluate_live(iconn, NOW), f_a)
     assert it["alarm"] is False and it["alert_id"] is None
     assert failed_codes(it) == ["model_a_threshold"]
-    assert it["blocked_reason"] == "MODEL A > %90"
+    assert it["blocked_reason"] == "Sağlanmayan koşul: MODEL A > %90"
     assert "kesin büyüktür" in cond(it, "model_a_threshold")["detail"]
 
     f_b = add_live_fixture(iconn, score=(0, 1))
     set_probs(passing, 0.95, 0.90)
     it = item_for(R.evaluate_live(iconn, iso_add(NOW, seconds=1)), f_b)
     assert it["alarm"] is False and failed_codes(it) == ["model_b_threshold"]
-    assert it["blocked_reason"] == "MODEL B > %90"
+    assert it["blocked_reason"] == "Sağlanmayan koşul: MODEL B > %90"
 
     f_c = add_live_fixture(iconn, score=(2, 2))
     set_probs(passing, 0.9000001, 0.9000001)
@@ -202,7 +202,7 @@ def test_less_than_15_minutes_remaining_blocks(iconn, passing):
     assert ok["remaining_minutes"] == 15 and ok["alarm"] is True
     assert late["remaining_minutes"] == 14 and late["alarm"] is False
     assert failed_codes(late) == ["remaining_time"]
-    assert late["blocked_reason"] == "≥ 15 dk kalan normal süre"
+    assert late["blocked_reason"] == "Sağlanmayan koşul: ≥ 15 dk kalan normal süre"
 
 
 def test_stale_live_data_blocks(iconn, passing):
@@ -213,7 +213,7 @@ def test_stale_live_data_blocks(iconn, passing):
     assert item_for(res, fresh)["alarm"] is True
     it = item_for(res, stale)
     assert it["alarm"] is False and failed_codes(it) == ["live_data_fresh"]
-    assert it["blocked_reason"] == "Güncel canlı veri"
+    assert it["blocked_reason"] == "Sağlanmayan koşul: Güncel canlı veri"
 
 
 def test_live_state_after_evaluation_time_is_not_used(iconn, passing):
@@ -248,7 +248,7 @@ def test_missing_or_stale_live_odds_block(iconn, passing):
     assert item_for(res, missing)["odds"] is None
     st = item_for(res, stale)
     assert st["odds"]["age_seconds"] == 61 and failed_codes(st) == ["live_odds_fresh"]
-    assert st["blocked_reason"] == "Gerekli güncel canlı oran"
+    assert st["blocked_reason"] == "Sağlanmayan koşul: Gerekli güncel canlı oran"
     assert "marketi yok" in cond(item_for(res, no_market), "live_odds_fresh")["detail"]
     assert "doğrulanmamış" in cond(item_for(res, unverified), "live_odds_fresh")["detail"]
     assert "yaklaşık" in cond(item_for(res, approximate), "live_odds_fresh")["detail"]
@@ -264,7 +264,7 @@ def test_insufficient_rare_event_calibration_blocks(iconn, passing):
                     lambda conn, cutoff, settings=SETTINGS: _calibration(cutoff, b_ok=False))
     it = item_for(R.evaluate_live(iconn, NOW), fid)
     assert it["alarm"] is False and failed_codes(it) == ["rare_event_calibration"]
-    assert it["blocked_reason"] == "Yeterli nadir olay kalibrasyonu"
+    assert it["blocked_reason"] == "Sağlanmayan koşul: Yeterli nadir olay kalibrasyonu"
     assert iconn.execute("SELECT COUNT(*) FROM radar_alerts").fetchone()[0] == 0
 
 
@@ -272,17 +272,89 @@ def test_rare_event_summary_rules():
     rng = np.random.default_rng(0)
     kw = dict(threshold=0.90, min_samples=150, data_cutoff_at=DAY_CUTOFF)
     p = rng.uniform(0.91, 0.99, 3000)
-    good = R.rare_event_summary("A", p, rng.random(p.size) < p, **kw)
-    assert good.adequate and good.n == 3000 and good.ci_low <= good.mean_predicted <= good.ci_high
-    over = R.rare_event_summary("A", p, rng.random(p.size) < p - 0.08, **kw)
-    assert not over.adequate and over.mean_predicted > over.ci_high and "Aşırı güvenli" in over.reason
-    under = R.rare_event_summary("B", p * 0 + 0.92, rng.random(p.size) < 0.99, **kw)
-    assert not under.adequate and under.mean_predicted < under.ci_low
-    few = R.rare_event_summary("B", p[:149], np.ones(149), **kw)
-    assert not few.adequate and few.n == 149 and "yetersiz" in few.reason
+    own = np.arange(p.size)  # her anlık durum ayrı maç (bağımsız)
+    good = R.rare_event_summary("A", p, rng.random(p.size) < p, own, **kw)
+    assert good.adequate and good.n == 3000 and good.n_snapshots == 3000
+    assert good.diff_low <= 0.0 <= good.diff_high and good.ci_low <= good.observed_rate <= good.ci_high
+    over = R.rare_event_summary("A", p, rng.random(p.size) < p - 0.08, own, **kw)
+    assert not over.adequate and over.diff_high < 0 and "Aşırı güvenli" in over.reason
+    under = R.rare_event_summary("B", p * 0 + 0.92, rng.random(p.size) < 0.99, own, **kw)
+    assert not under.adequate and under.diff_low > 0 and "Yetersiz güvenli" in under.reason
+    few = R.rare_event_summary("B", p[:149], np.ones(149), own[:149], **kw)
+    assert not few.adequate and few.n == 149 and "yetersiz" in few.reason and "149 < 150 maç" in few.reason
     # bölge kesin büyüktür: tam 0,90 tahminler nadir olay bölgesine girmez
-    edge = R.rare_event_summary("A", np.full(500, 0.90), np.ones(500), **kw)
-    assert edge.n == 0 and not edge.adequate
+    edge = R.rare_event_summary("A", np.full(500, 0.90), np.ones(500), np.arange(500), **kw)
+    assert edge.n == 0 and edge.n_snapshots == 0 and not edge.adequate
+    with pytest.raises(ValueError):
+        R.rare_event_summary("A", p, np.ones(p.size), own[:10], **kw)
+
+
+def _clustered(n_matches: int, per_match: int, p: float, n_goal_matches: int) -> tuple[np.ndarray, ...]:
+    """Her maçın bütün anlık durumları aynı tahmini ve aynı sonucu paylaşır (tam küme içi ilişki)."""
+    groups = np.repeat(np.arange(1000, 1000 + n_matches), per_match)
+    y = np.repeat((np.arange(n_matches) < n_goal_matches).astype(float), per_match)
+    return np.full(groups.size, p), y, groups
+
+
+def test_rare_event_sample_minimum_counts_matches_not_snapshots():
+    kw = dict(threshold=0.90, min_samples=SETTINGS.radar.min_rare_event_samples, data_cutoff_at=DAY_CUTOFF)
+    # 20 maçtan 13'er anlık durum = 260 anlık durum ≥ 150, ama yalnızca 20 bağımsız maç → yetersiz
+    p, y, g = _clustered(20, 13, 0.95, 19)
+    few = R.rare_event_summary("A", p, y, g, **kw)
+    assert few.n == 20 and few.n_snapshots == 260 and not few.adequate
+    assert few.reason == "Örneklem yetersiz (20 < 150 maç)"
+    assert "n = 20 maç (260 anlık durum)" in few.detail()
+    # Aynı oranlar 149 maçta da yetmez, 150 maçta yeter (sınır maç sayısıdır, kesin değil ≥)
+    p, y, g = _clustered(149, 13, 0.94, 140)
+    assert R.rare_event_summary("A", p, y, g, **kw).n == 149 and not R.rare_event_summary("A", p, y, g, **kw).adequate
+    p, y, g = _clustered(150, 1, 0.94, 141)  # gözlenen = tahmin = %94
+    ok = R.rare_event_summary("A", p, y, g, **kw)
+    assert ok.n == 150 and ok.n_snapshots == 150 and ok.adequate
+    # bölgenin dışında kalan anlık durumlar maç sayısına katılmaz
+    p2 = np.concatenate([p, np.full(400, 0.85)])
+    y2 = np.concatenate([y, np.ones(400)])
+    g2 = np.concatenate([g, np.arange(5000, 5400)])
+    assert R.rare_event_summary("A", p2, y2, g2, **kw).n == 150
+
+
+def test_rare_event_clustered_interval_accepts_well_calibrated_correlated_outcomes():
+    kw = dict(threshold=0.90, min_samples=150, data_cutoff_at=DAY_CUTOFF)
+    # 300 maç × 12 anlık durum, tahmin %95, 279 maçta gol (gözlenen %93): tek maç birimiyle olağan dalgalanma
+    p, y, g = _clustered(300, 12, 0.95, 279)
+    cl = R.rare_event_summary("A", p, y, g, **kw)
+    assert cl.adequate and cl.reason == "Yeterli" and cl.n == 300 and cl.n_snapshots == 3600
+    assert cl.observed_rate == pytest.approx(0.93) and cl.mean_predicted == pytest.approx(0.95)
+    # elle hesap: SE² = G/(G−1)·Σ_g (Σ_i (r_i − d))² / N², r = y − p, d = gözlenen − tahmin
+    d = 0.93 - 0.95
+    cluster_sums = np.array([12 * ((1.0 if i < 279 else 0.0) - 0.95 - d) for i in range(300)])
+    se = math.sqrt(300 / 299 * float(np.sum(cluster_sums ** 2))) / 3600
+    assert cl.diff_low == pytest.approx(d - R.Z95 * se) and cl.diff_high == pytest.approx(d + R.Z95 * se)
+    assert cl.diff_low < 0 < cl.diff_high
+    # gözlenen oranın maç kümeli aralığı (aynı yöntem, aynı küme toplamları)
+    assert cl.ci_low == pytest.approx(0.93 - R.Z95 * se) and cl.ci_high == pytest.approx(0.93 + R.Z95 * se)
+    # anlık durumları bağımsız sayan (eski) yaklaşım aynı veriyi yanlışlıkla reddeder
+    iid = R.rare_event_summary("A", p, y, np.arange(p.size), **kw)
+    assert not iid.adequate and "Aşırı güvenli" in iid.reason
+    from akilli_tahmin.calibration.metrics import wilson_interval
+    assert 0.95 > wilson_interval(int(y.sum()), y.size)[1]  # Wilson (n = 3600) ortalama tahmini dışlar
+
+
+def test_rare_event_clustered_rule_has_nominal_acceptance_for_calibrated_model():
+    """İyi kalibre model, maç içi güçlü ilişkiyle: kümeli kural ≈ %95 kabul; anlık durum-iid kural çok reddeder."""
+    rng = np.random.default_rng(2026)
+    kw = dict(threshold=0.90, min_samples=150, data_cutoff_at=DAY_CUTOFF)
+    reps, clustered_ok, iid_ok = 300, 0, 0
+    for _ in range(reps):
+        sizes = rng.integers(8, 14, 200)                      # 200 maç, maç başına 8–13 anlık durum
+        p_match = rng.uniform(0.91, 0.99, 200)
+        y_match = (rng.random(200) < p_match).astype(float)   # sonuç maç başına tek: tam ilişki
+        groups = np.repeat(np.arange(200), sizes)
+        p = np.clip(np.repeat(p_match, sizes) + rng.normal(0, 0.005, sizes.sum()), 0.905, 0.995)
+        y = np.repeat(y_match, sizes)
+        clustered_ok += R.rare_event_summary("A", p, y, groups, **kw).adequate
+        iid_ok += R.rare_event_summary("A", p, y, np.arange(p.size), **kw).adequate
+    assert clustered_ok / reps >= 0.90
+    assert iid_ok / reps <= 0.65
 
 
 def test_notification_permission_required_then_alarm(iconn, passing):
@@ -290,7 +362,7 @@ def test_notification_permission_required_then_alarm(iconn, passing):
     assert R.notification_permission_granted(iconn, "local") is False  # varsayılan: izin yok
     it = item_for(R.evaluate_live(iconn, NOW), fid)
     assert it["alarm"] is False and failed_codes(it) == ["notification_permission"]
-    assert it["blocked_reason"] == "Bildirim izni" and it["alert_id"] is None
+    assert it["blocked_reason"] == "Sağlanmayan koşul: Bildirim izni" and it["alert_id"] is None
     assert R.list_alerts(iconn) == {"items": []}
 
     assert grant(iconn) == {"user_id": "local", "granted": True}
@@ -303,7 +375,8 @@ def test_notification_permission_required_then_alarm(iconn, passing):
                        "model_b_probability": 0.95, "created_at": t1, "notified": True}]
     # başka kullanıcı izin vermediyse onun için alarm yok
     other = item_for(R.evaluate_live(iconn, t1, user_id="ayse"), fid)
-    assert not cond(other, "notification_permission")["passed"] and other["blocked_reason"] == "Bildirim izni"
+    assert not cond(other, "notification_permission")["passed"]
+    assert other["blocked_reason"] == "Sağlanmayan koşul: Bildirim izni"
     # izin geri alınınca tekrar engellenir
     assert grant(iconn, granted=False) == {"user_id": "local", "granted": False}
     assert not cond(item_for(R.evaluate_live(iconn, t1), fid), "notification_permission")["passed"]
@@ -316,7 +389,9 @@ def test_duplicate_block_prevents_second_alert(iconn, passing):
     assert first["alarm"] is True and first["alert_id"] is not None
     second = item_for(R.evaluate_live(iconn, iso_add(NOW, seconds=20)), fid)
     assert second["alert_id"] == first["alert_id"]
-    assert failed_codes(second) == ["duplicate_block"] and second["blocked_reason"] == "Mükerrer alarm engeli"
+    assert failed_codes(second) == ["duplicate_block"]
+    assert second["blocked_reason"] == (f"Yeni alarm oluşturulmadı: bu maç, hedef ve skor durumu için alarm "
+                                        f"#{first['alert_id']} 30. dakikada zaten verildi (mükerrer alarm engeli).")
     assert second["alarm"] is True  # mevcut alarm geçerli; yeni alarm oluşturulmadı
     assert iconn.execute("SELECT COUNT(*) FROM radar_alerts WHERE fixture_id=?", (fid,)).fetchone()[0] == 1
     # veritabanı düzeyinde de tek alarm: aynı anahtar ikinci kez eklenemez
@@ -336,6 +411,71 @@ def test_duplicate_block_prevents_second_alert(iconn, passing):
     assert iconn.execute("SELECT COUNT(*) FROM radar_alerts WHERE fixture_id=?", (fid,)).fetchone()[0] == 2
     # her değerlendirme kaydedilir
     assert iconn.execute("SELECT COUNT(*) FROM radar_evaluations WHERE fixture_id=?", (fid,)).fetchone()[0] == 3
+
+
+def test_blocked_reason_is_a_negative_sentence(iconn, passing):
+    """blocked_reason sağlanan şartın adını değil, sağlanmayan şartı bildirir (ui-05)."""
+    labels = R.condition_labels()
+    fids = {
+        "model_a_threshold": add_live_fixture(iconn, score=(0, 0)),
+        "remaining_time": add_live_fixture(iconn, minute=80, score=(1, 0)),
+        "live_data_fresh": add_live_fixture(iconn, state_age=600, odds_age=5, score=(0, 1)),
+        "live_odds_fresh": add_live_fixture(iconn, odds_age=61, score=(1, 1)),
+        "notification_permission": add_live_fixture(iconn, score=(2, 0)),
+    }
+    target = fids["model_a_threshold"]
+    passing.setattr(R, "model_a_live_probability",
+                    lambda lh, la, st, **kw: 0.5 if st.fixture_id == target else 0.95)
+    res = R.evaluate_live(iconn, NOW)
+    stored = dict(iconn.execute("SELECT fixture_id, blocked_reason FROM radar_evaluations").fetchall())
+    for code, fid in fids.items():
+        it = item_for(res, fid)
+        assert failed_codes(it)[0] == code, (code, failed_codes(it))
+        reason = it["blocked_reason"]
+        assert reason == f"Sağlanmayan koşul: {labels[code]}", reason
+        assert reason not in labels.values()  # çıplak (olumlu) etiket gerekçe olarak verilmez
+        assert stored[fid] == reason
+    # bütün şartlar sağlanınca gerekçe yok
+    grant(iconn)
+    ok = add_live_fixture(iconn, score=(3, 0))
+    assert item_for(R.evaluate_live(iconn, iso_add(NOW, seconds=1)), ok)["blocked_reason"] is None
+
+
+def test_evaluate_live_writes_in_single_short_transaction(iconn, passing):
+    grant(iconn)
+    a = add_live_fixture(iconn, score=(1, 0))
+    b = add_live_fixture(iconn, score=(0, 0), odds=None)
+    statements: list[str] = []
+    iconn.set_trace_callback(statements.append)
+    try:
+        res = R.evaluate_live(iconn, NOW)
+    finally:
+        iconn.set_trace_callback(None)
+    assert item_for(res, a)["alarm"] is True and item_for(res, b)["alarm"] is False
+    norm = [" ".join(st.split()).upper() for st in statements]
+    begins = [i for i, st in enumerate(norm) if st.startswith("BEGIN")]
+    commits = [i for i, st in enumerate(norm) if st.startswith("COMMIT")]
+    assert len(begins) == 1 and len(commits) == 1 and begins[0] < commits[0], norm
+    writes = [i for i, st in enumerate(norm) if st.startswith(("INSERT", "UPDATE", "DELETE", "REPLACE"))]
+    assert writes and all(begins[0] < i < commits[0] for i in writes)
+    # işlemin içinde yalnızca yazmalar ve küçük anahtar okumaları var: model kurma sorguları işlemden önce
+    inside = norm[begins[0] + 1:commits[0]]
+    assert not any("FROM FIXTURES" in st or "FROM LIVE_STATES" in st or "FROM ODDS_SNAPSHOTS" in st
+                   for st in inside), inside
+    assert not any(st.startswith(("SAVEPOINT", "ROLLBACK")) for st in norm)
+    # ilk çalıştırmada kalibrasyon satırları da aynı işlemde yazıldı
+    assert any("INTO RADAR_CALIBRATION" in norm[i] for i in writes)
+    assert iconn.in_transaction is False
+    # çağrıdan sonra açık imleç / okuma anlık görüntüsü yok: başka bağlantı WAL'ı tamamen boşaltabilir
+    path = iconn.execute("PRAGMA database_list").fetchall()[0][2]
+    R.list_alerts(iconn)
+    R.rare_event_calibration(iconn, DAY_CUTOFF)
+    other = sqlite3.connect(path)
+    try:
+        busy, _log, _ckpt = other.execute("PRAGMA wal_checkpoint(TRUNCATE)").fetchone()
+    finally:
+        other.close()
+    assert busy == 0
 
 
 # ───────────────────────── MODEL A oran izolasyonu ─────────────────────────
@@ -482,6 +622,14 @@ def test_live_history_models_and_cache(conn):
     assert hist.dispersion > 0 and hist.dispersion_rows >= SETTINGS.stats.min_model_b_samples
     cal = R.rare_event_calibration(conn, DAY_CUTOFF)
     assert set(cal) == {"A", "B"} and all(c.n > 0 and c.region_low == 0.90 for c in cal.values())
+    # n bağımsız maç sayısıdır (anlık durum sayısı değil); veritabanına da maç sayısı yazılır
+    matches = {s["fixture_id"] for s in historical_snapshots(conn, DAY_CUTOFF)}
+    for c in cal.values():
+        assert c.n <= len(matches) and c.n < c.n_snapshots <= 15 * c.n
+        assert "maç" in c.detail() and f"({c.n_snapshots} anlık durum)" in c.detail()
+    stored = dict(conn.execute("SELECT model, n FROM radar_calibration WHERE data_cutoff_at=?",
+                               (DAY_CUTOFF,)).fetchall())
+    assert stored == {"A": cal["A"].n, "B": cal["B"].n}
     # daha erken kesim: daha az geçmiş, ayrı kalibrasyon çalıştırması
     early = R.live_history(conn, "2026-02-01T00:00:00Z")
     assert early.n_snapshots < hist.n_snapshots
@@ -550,3 +698,86 @@ def test_historical_snapshots_point_in_time_and_deterministic(conn):
     # aynı maçın anlık durumları kesimden bağımsızdır (yalnızca maç öncesi + o dakikaya kadarki bilgi)
     by_key = {(s["fixture_id"], s["minute"]): s for s in snaps}
     assert all(by_key[(s["fixture_id"], s["minute"])] == s for s in early)
+
+
+def _finished_cup(conn, *, ft: tuple[int, int], ht: tuple[int, int] | None, goals=(), kickoff="2026-11-20T18:00:00Z"):
+    """Sonucu kaydedilmiş sentetik kupa maçı ve (verilirse) gol dakikaları."""
+    teams = _teams(conn)
+    recorded = iso_add(kickoff, hours=2)
+    fid = insert(conn, "fixtures", {
+        "league_id": "tr-kupa", "season": "2026", "round": 1, "home_team_id": teams[2], "away_team_id": teams[3],
+        "kickoff_at": kickoff, "status": "finished", "ft_home": ft[0], "ft_away": ft[1],
+        "ht_home": ht[0] if ht else None, "ht_away": ht[1] if ht else None, "result_recorded_at": recorded,
+        "source": "synthetic", "is_synthetic": 1, "created_at": iso_add(kickoff, days=-3),
+    })
+    for minute, side in goals:
+        insert(conn, "goal_events", {"fixture_id": fid, "minute": minute, "side": side, "recorded_at": recorded})
+    return fid
+
+
+def test_historical_snapshots_require_half_time_score_and_goal_events(conn):
+    """bugs-4: maç sonuna kadar gözlenmemiş (İY skoru / gol dakikası olmayan) maçlar 'gol yok' sonucu üretmez."""
+    before = historical_snapshots(conn, DAY_CUTOFF)
+    no_ht_00 = _finished_cup(conn, ft=(0, 0), ht=None)                   # demo kupa bitirişi: İY yok, gol kaydı yok
+    no_ht_10 = _finished_cup(conn, ft=(1, 0), ht=None)
+    no_events = _finished_cup(conn, ft=(2, 0), ht=(1, 0))                 # İY var, gol dakikası yok
+    missing_one = _finished_cup(conn, ft=(2, 0), ht=(1, 0), goals=[(20, "home")])
+    wrong_half = _finished_cup(conn, ft=(1, 1), ht=(1, 0), goals=[(60, "home"), (70, "away")])
+    ht_gt_ft = _finished_cup(conn, ft=(0, 0), ht=(1, 0))
+    real_00 = _finished_cup(conn, ft=(0, 0), ht=(0, 0))                   # gerçek 0-0: gol kaydı olmadan tutarlı
+    full = _finished_cup(conn, ft=(2, 1), ht=(1, 0), goals=[(20, "home"), (70, "home"), (80, "away")])
+    snaps = historical_snapshots(conn, DAY_CUTOFF)
+    by_fid: dict[int, list[dict]] = {}
+    for s_ in snaps:
+        by_fid.setdefault(s_["fixture_id"], []).append(s_)
+    for fid in (no_ht_00, no_ht_10, no_events, missing_one, wrong_half, ht_gt_ft):
+        assert fid not in by_fid, fid
+    assert [s_["outcome"] for s_ in by_fid[real_00]] == [0] * 15
+    f = {s_["minute"]: s_ for s_ in by_fid[full]}
+    assert len(f) == 15 and (f[15]["home_goals"], f[15]["away_goals"]) == (0, 0)
+    assert (f[20]["home_goals"], f[20]["away_goals"]) == (1, 0)  # 20. dk golü o dakikanın skoruna dahil
+    assert (f[75]["home_goals"], f[75]["away_goals"]) == (2, 0) and f[75]["outcome"] == 1
+    assert f[5]["outcome"] == 1 and f[20]["outcome"] == 1
+    # geçersiz maçlar xG dayanağına da girmez: önceki maçların anlık durumları değişmez
+    assert [s_ for s_ in snaps if s_["fixture_id"] not in (real_00, full)] == before
+    # radar geçmişi de bu maçları kullanmaz
+    R.clear_cache()
+    hist = R.live_history(conn, DAY_CUTOFF)
+    assert hist.n_snapshots == len(snaps)
+
+
+def test_demo_cup_fixtures_finished_without_full_record_are_excluded(conn):
+    """Demo canlı kupa maçları son canlı skorla bitirildiğinde, tam kaydı olmayanlar radar geçmişine girmez."""
+    from akilli_tahmin.data.synthetic import ensure_live_demo
+
+    live = [r[0] for r in conn.execute("SELECT id FROM fixtures WHERE status='live' AND is_synthetic=1 ORDER BY id")]
+    assert live
+    # Bir maç 0-0 bitsin (son canlı durum 90. dk, 0-0; İY skoru ve gol dakikası yok): eski kod bu maçı
+    # 15 adet "gol yok" sonucuyla radar geçmişine alıyordu.
+    conn.execute("UPDATE live_states SET home_goals=0, away_goals=0, minute=90 WHERE fixture_id=?", (live[0],))
+    later = iso_add(AS_OF, hours=3)  # bütün demo canlı maçları ≥ 88 dk önce başlamış olur
+    ensure_live_demo(conn, later)
+    cutoff = iso_add(AS_OF, days=1)
+    snaps = historical_snapshots(conn, cutoff)
+    included = {s_["fixture_id"] for s_ in snaps}
+    rows = {r[0]: r for r in conn.execute(
+        "SELECT f.id, f.status, f.ht_home, f.ht_away, f.ft_home, f.ft_away FROM fixtures f WHERE f.id IN (%s)"
+        % ",".join("?" * len(live)), live)}
+    for fid in live:
+        _id, status, hth, hta, fth, fta = rows[fid]
+        if status != "finished" or hth is None or hta is None:
+            assert fid not in included, fid  # gözlenmeyen dakikalar için "gol yok" uydurulmaz
+    assert rows[live[0]][1] == "finished" and (rows[live[0]][4], rows[live[0]][5]) == (0, 0)
+    # dahil edilen her maçın İY skoru dolu ve gol dakikaları MS/İY ile tutarlı
+    ev: dict[int, list[tuple[int, str]]] = {}
+    for fid, minute, side in conn.execute("SELECT fixture_id, minute, side FROM goal_events"):
+        ev.setdefault(fid, []).append((minute, side))
+    meta = {r[0]: r[1:] for r in conn.execute("SELECT id, ht_home, ht_away, ft_home, ft_away FROM fixtures")}
+    for fid in included:
+        hth, hta, fth, fta = meta[fid]
+        assert hth is not None and hta is not None, fid
+        goals = ev.get(fid, [])
+        for side, ft_, ht_ in (("home", fth, hth), ("away", fta, hta)):
+            assert sum(1 for _, sd in goals if sd == side) == ft_, fid
+            assert sum(1 for m, sd in goals if sd == side and m <= 45) == ht_, fid
+

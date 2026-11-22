@@ -207,11 +207,16 @@ def test_unverified_iddaa_source_never_shown_as_iddaa(empty_conn):
 
 
 def test_selected_odds_are_valid_in_run(demo_conn):
+    """Kararla kaydedilen her oran doğrulanmış, İddaa dışı ve seçim anından önce yakalanmıştır; oranlı
+    modların her kararında oran vardır (oransız karar yalnızca En Güvenilir'de olabilir)."""
     rows = demo_conn.execute(
         "SELECT d.*, o.captured_at, o.source, s.verified, s.is_iddaa FROM selection_mode_decisions d"
-        " JOIN odds_snapshots o ON o.id=d.odds_snapshot_id JOIN odds_sources s ON s.code=o.source"
-        " WHERE d.selection_mode IN ('best_value','balanced')").fetchall()
+        " JOIN odds_snapshots o ON o.id=d.odds_snapshot_id JOIN odds_sources s ON s.code=o.source").fetchall()
     assert rows
+    no_odds = demo_conn.execute("SELECT COUNT(*) FROM selection_mode_decisions WHERE selection_mode IN"
+                                " ('best_value','balanced') AND (odds_snapshot_id IS NULL OR decimal_odds IS NULL)"
+                                ).fetchone()[0]
+    assert no_odds == 0
     for r in rows:
         assert r["verified"] == 1 and r["is_iddaa"] == 0
         assert r["captured_at"] <= r["selection_timestamp"]
@@ -452,7 +457,10 @@ def test_audit_detects_tampering(demo_conn):
 
 def test_mode_records_are_separate(demo_conn):
     counts = dict(demo_conn.execute("SELECT selection_mode, COUNT(*) FROM selection_mode_decisions GROUP BY 1"))
-    assert set(counts) <= set(MODE_CODES) and len(counts) >= 2
+    assert set(counts) <= set(MODE_CODES) and counts
+    # Her modun kendi eşik yapılandırma geçmişi ayrı kaydedilir (kurulmamış olsa bile).
+    cfg_modes = {r[0] for r in demo_conn.execute("SELECT DISTINCT mode FROM selection_mode_configs")}
+    assert cfg_modes == set(MODE_CODES)
     dup = demo_conn.execute(
         "SELECT selection_mode, fixture_id, market_id, outcome_id, COUNT(*) FROM selection_mode_decisions"
         " GROUP BY 1,2,3,4 HAVING COUNT(*) > 1").fetchall()
