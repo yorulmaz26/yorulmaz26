@@ -464,7 +464,12 @@ def _mode_metrics(data: _Data, mode: str, pm: np.ndarray, dm: np.ndarray) -> tup
 
 
 def _baseline_metrics(data: _Data, pm: np.ndarray) -> dict:
-    """Taban çizgisi: seçim yapılmadan, ortak kontrollerden geçen ve geçerli oranı olan bütün adaylar (MODEL B)."""
+    """Taban çizgisi: seçim yapılmadan, ortak kontrollerden geçen ve geçerli oranı olan bütün adaylar (MODEL B).
+
+    Olasılık `p_b_cal`, EV `ev_model_b`; kalibrasyondaki iade olasılığı değerlendirmenin ortak `p_void`
+    değeridir (kararlarda saklanan `void_probability` ile aynı kaynak). Sonuç, maçın `as_of` anında bilinen
+    sonucundan aynı sonuçlandırma kurallarıyla hesaplanır; birim bahis kârı `decimal_odds` üzerindendir.
+    """
     b = pm & data.p_base
     st = data.p_st[b]
     odds = data.p_odds[b]
