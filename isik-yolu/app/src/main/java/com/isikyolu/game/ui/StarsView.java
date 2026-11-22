@@ -53,8 +53,13 @@ public final class StarsView extends View {
                 float sc = local < 1f ? (float) (1.0 + 0.35 * Math.sin(Math.min(1f, local) * Math.PI)) * Math.min(1f, local * 1.5f) : 1f;
                 c.save();
                 c.scale(sc, sc, cx, cy);
-                glow.setColor(0x40F5C542);
-                c.drawCircle(cx, cy, r * 1.15f, glow);
+                // parıltı: merkezden saydama giden yumuşak hale; görünümün üst/alt kenarında düz kesilmez
+                float gr = Math.min(r * 1.3f, Math.min(cy, h - cy) / Math.max(1f, sc));
+                if (gr > 1f) {
+                    glow.setShader(new android.graphics.RadialGradient(cx, cy, gr, new int[]{0x70F5C542, 0x30F5C542, 0x00F5C542},
+                            new float[]{0f, 0.55f, 1f}, android.graphics.Shader.TileMode.CLAMP));
+                    c.drawCircle(cx, cy, gr, glow);
+                }
                 fill.setColor(Palette.GOLD);
                 c.drawPath(p, fill);
                 fill.setColor(0x66FFFFFF);
