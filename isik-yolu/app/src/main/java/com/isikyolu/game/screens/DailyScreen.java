@@ -61,7 +61,7 @@ public final class DailyScreen extends Screen {
 
         // seri ve toplam
         LinearLayout stats = Ui.horizontal(c);
-        stats.addView(stat(c, Icon.FLAME, 0xFFFF9F43, String.valueOf(p.dailyStreak(today)), "Günlük seri"), new LinearLayout.LayoutParams(0, -2, 1f));
+        stats.addView(stat(c, Icon.FLAME, 0xFFFF9F43, String.valueOf(p.currentDailyStreak(today)), "Günlük seri"), new LinearLayout.LayoutParams(0, -2, 1f));
         stats.addView(stat(c, Icon.CHECK, Palette.TURQUOISE, String.valueOf(p.dailyDone.size()), "Toplam çözülen"), new LinearLayout.LayoutParams(0, -2, 1f));
         card.addView(stats, Ui.lpMargins(c, -1, -2, 0, 0, 0, 16));
 

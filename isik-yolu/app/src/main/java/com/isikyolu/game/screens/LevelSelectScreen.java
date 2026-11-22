@@ -35,7 +35,9 @@ public final class LevelSelectScreen extends Screen {
         pill.setBackground(Ui.round(0x22F5C542, Ui.dp(a, 14)));
         pill.setPadding(Ui.dp(a, 10), Ui.dp(a, 5), Ui.dp(a, 12), Ui.dp(a, 5));
         pill.addView(Ui.icon(a, Icon.STAR, Palette.GOLD, 16));
-        pill.addView(Ui.text(a, " " + p.totalStars() + "/" + Progress.LEVEL_COUNT * 3, 14, Palette.GOLD, Ui.BOLD));
+        // dar ekranda (ör. 360 dp) başlık sığsın diye yalnızca toplam yıldız
+        boolean narrow = a.getResources().getConfiguration().screenWidthDp < 400;
+        pill.addView(Ui.text(a, " " + p.totalStars() + (narrow ? "" : "/" + Progress.LEVEL_COUNT * 3), 14, Palette.GOLD, Ui.BOLD));
         LinearLayout right = Ui.horizontal(a);
         right.addView(new com.isikyolu.game.ui.LivesBadge(a));
         LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(-2, -2);

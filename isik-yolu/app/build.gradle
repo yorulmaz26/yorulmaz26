@@ -76,6 +76,7 @@ android {
             all {
                 maxHeapSize = '2g'
                 systemProperty 'screens.dir', rootProject.file('docs/ekranlar').absolutePath
+                if (project.hasProperty('promoDir')) systemProperty 'promo.dir', project.property('promoDir').toString()
                 testLogging { events 'passed', 'failed'; exceptionFormat 'full'; showStandardStreams = true }
             }
         }

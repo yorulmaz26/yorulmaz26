@@ -218,6 +218,10 @@ public final class Ui {
         h.addView(iconButton(c, Icon.BACK, SECONDARY, 46, back));
         TextView t = text(c, title, 22, Palette.WHITE, BOLD);
         t.setPadding(dp(c, 14), 0, 0, 0);
+        // dar ekranda sağdaki göstergelerle birlikte sığmazsa ikiye bölünmesin: küçülerek tek satırda kalır
+        t.setSingleLine(true);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        t.setAutoSizeTextTypeUniformWithConfiguration(14, 22, 1, android.util.TypedValue.COMPLEX_UNIT_SP);
         h.addView(t, new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
         if (right != null) h.addView(right);
         return h;

@@ -123,6 +123,11 @@ public final class Progress {
         return s;
     }
 
+    /** Gösterilecek seri: bugünkü henüz çözülmediyse dünkü seri hâlâ sürüyor sayılır (gün içinde 0 görünmez). */
+    public int currentDailyStreak(int todayEpochDay) {
+        return dailyDone.contains(DailyPuzzle.keyFor(todayEpochDay)) ? dailyStreak(todayEpochDay) : dailyStreak(todayEpochDay - 1);
+    }
+
     public void resetAll() {
         Progress fresh = new Progress();
         System.arraycopy(fresh.stars, 0, stars, 0, stars.length);

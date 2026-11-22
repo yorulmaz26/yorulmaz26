@@ -100,6 +100,7 @@ public class ProgressTest {
     @Test public void dailyStreak() {
         Progress p = new Progress();
         int today = 20_000;
+        assertEquals("bugün henüz çözülmedi: seri 0 görünmemeli", 0, p.currentDailyStreak(today));
         p.dailyDone.add(DailyPuzzle.keyFor(today));
         p.dailyDone.add(DailyPuzzle.keyFor(today - 1));
         p.dailyDone.add(DailyPuzzle.keyFor(today - 3));

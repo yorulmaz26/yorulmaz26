@@ -1063,6 +1063,19 @@ public class UiFlowTest {
         assertTrue(ads.bannersCreated >= 2);
     }
 
+    /** Bulgu: 360 dp genişlikte "Bölümler" başlığı ikiye bölünüyor ya da kesiliyordu. */
+    @Test @Config(qualifiers = "w360dp-h640dp-xxhdpi")
+    public void narrowScreenHeaderFits() throws Exception {
+        start();
+        complete(Game.progress(), 268);
+        act.goLevels();
+        idle(800);
+        android.widget.TextView t = (android.widget.TextView) findText(act.currentScreen(), "Bölümler");
+        assertNotNull(t);
+        assertEquals("tek satır", 1, t.getLineCount());
+        assertEquals("kesilmeden sığar", 0, t.getLayout().getEllipsisCount(0));
+    }
+
     @Test public void splashScreenRenders() throws Exception {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         assertTrue("önce stüdyo açılışı", act.currentScreen() instanceof com.isikyolu.game.screens.StudioIntroScreen);
