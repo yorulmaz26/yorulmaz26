@@ -886,8 +886,9 @@ public final class BoardView extends View {
                         // bir dokunmada tek itme: titreme ya da uzun/eğik sürükleme fazladan hak yemez
                         pushed = true;
                         int from = touchCell, x = from % gw, y = from / gw;
+                        float relX = dragOffX, relY = dragOffY; // onPush içinde cancelTouch sıfırlayabilir
                         if (host.onPush(x, y, d)) touchCell = b.cell(x + Dir.DX[d], y + Dir.DY[d]);
-                        else if (from >= 0) { blockOffX[from] = dragOffX; blockOffY[from] = dragOffY; } // reddedildi: geri kayar
+                        else if (from >= 0 && session.board().isMovable(from)) { blockOffX[from] = relX; blockOffY[from] = relY; } // reddedildi: geri kayar
                         dragOffX = dragOffY = 0;
                         dragging = false;
                     }

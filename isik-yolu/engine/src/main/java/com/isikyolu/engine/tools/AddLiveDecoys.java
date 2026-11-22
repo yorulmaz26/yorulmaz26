@@ -40,9 +40,13 @@ public final class AddLiveDecoys {
             bad++;
             int before = b.rotatableCount();
             int oldOpt = l.optimal;
-            boolean done = false;
-            for (int k = need(l.id); k >= 1 && !done; k--) // olmazsa daha az canlı yemle
-                done = Shortcuts.ensureLiveDecoys(l, k, CAP, 40, MAX_REDUCE, Math.max(3, oldOpt - MAX_REDUCE), new Random(l.id * 7919L));
+            // önce yalnızca sabit yol aynalarıyla (optimum değişmez); olmazsa en az 1 canlı yem için en çok 2 hamle
+            // kısaltılır, sonra kalan yemler yine optimumu değiştirmeden eklenir
+            boolean done = Shortcuts.ensureLiveDecoys(l, need(l.id), CAP, 40, 0, oldOpt, new Random(l.id * 7919L));
+            if (!done) {
+                done = Shortcuts.ensureLiveDecoys(l, 1, CAP, 40, MAX_REDUCE, Math.max(3, oldOpt - MAX_REDUCE), new Random(l.id * 7919L));
+                if (done && need(l.id) > 1) Shortcuts.ensureLiveDecoys(l, need(l.id), CAP, 40, 0, l.optimal, new Random(l.id * 104729L));
+            }
             reducedTotal += oldOpt - l.optimal;
             if (oldOpt != l.optimal) reducedLevels++;
             if (done) {
@@ -59,13 +63,16 @@ public final class AddLiveDecoys {
         }
         // 5. dünya: zorluk eğrisi düşmesin diye sabit yol aynalarından ek canlı yem (optimum değişmez)
         int boosted = 0;
-        for (Level l : p.levels) {
-            if (l.id <= 400 || !Chapters.requiresLogic(l.id)) continue;
-            Board b = new Board(l);
-            int live = Shortcuts.liveDecoys(b, Solver.solve(b, CAP).moves), before = b.rotatableCount();
-            for (int k = live + 2; k > live; k--)
-                if (Shortcuts.ensureLiveDecoys(l, k, CAP, 40, 0, l.optimal, new Random(l.id * 31L))) break;
-            if (new Board(l).rotatableCount() > before) boosted++;
+        for (int round = 0, changed = 1; round < 5 && changed > 0; round++) { // değişiklik kalmayana dek
+            changed = 0;
+            for (Level l : p.levels) {
+                if (l.id <= 400 || !Chapters.requiresLogic(l.id)) continue;
+                Board b = new Board(l);
+                int live = Shortcuts.liveDecoys(b, Solver.solve(b, CAP).moves), before = b.rotatableCount();
+                for (int k = live + 2; k > live; k--)
+                    if (Shortcuts.ensureLiveDecoys(l, k, CAP, 40, 0, l.optimal, new Random(l.id * 31L + round))) break;
+                if (new Board(l).rotatableCount() > before) { boosted++; changed++; }
+            }
         }
         System.out.println("5. dünyada ek canlı yem: " + boosted + " bölüm");
         System.out.println("mantık bölümü " + logic + " · kısayollu/yemsiz " + bad + " · düzeltilen " + fixed

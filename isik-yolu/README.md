@@ -76,8 +76,8 @@ Oyun ekranında **MANTIK** etiketiyle gösterilir: 1. dünyada her grubun son 6 
 - bazı aynaları iki ayrı ışın kullanır; birini düzeltmek ötekini bozabilir,
 - **canlı yemler:** çözüm yolundaki bazı döner aynalar zaten doğru durur. "Her döner aynaya bir kez dokun"
   denemesi bu aynaları bozar; hangi aynaya dokunulmayacağını düşünmek gerekir. Her mantık bölümünde en az 1
-  (101–400: çoğunlukla 2, 401–500: çoğunlukla 3) canlı yem vardır; satır/sütun sırasıyla dokunmak ya da hepsini
-  çevirip blokları itmek hiçbir mantık bölümünü bitirmez (`engine/Shortcuts.java`, denetimde `kısayol` kontrolü).
+  canlı yem vardır (5. dünyada ortalama 2,2). Satır/sütun sırasıyla dokunmak ya da hepsini çevirip blokları itmek
+  hiçbir mantık bölümünü bitirmez (`engine/Shortcuts.java`, denetimde `kısayol` kontrolü).
 
 Üretici, ışını takip eden bir oyuncunun karar ağacını (`BeamFollower`) ölçer; ağacı küçük kalan adaylar
 reddedilir. Ayrıntılar ve ölçümler: `docs/TEST_RAPORU.md`.
@@ -167,7 +167,8 @@ Motor görselden tamamen bağımsızdır: `BoardView` yalnızca `GameSession`'ı
    adım adım gevşetilir.
 6. Hiçbir durumda ışık almayan döner aynalar sabitlenir (oyuncu boşa dokunmasın).
 7. Mantık bölümlerinde canlı yem şartı aranır (`Shortcuts.ensureLiveDecoys`): önce çözüm yolundaki sabit aynalar
-   (yönü zaten doğru) döner yapılır; yetmezse çözümün çevirdiği bir yol aynası başlangıçta doğru bırakılır.
+   (yönü zaten doğru) döner yapılır; yetmezse çözümün çevirdiği bir yol aynası başlangıçta doğru bırakılır (en az
+   hamle 1 azalır). Canlı yem yalnızca tek başına çevrilince çözümü bozan ayna sayılır.
 8. Tohumlar sabittir. 1.6.0 paketi, 1.5.2 paketinden deterministik adımlarla türetildi: `tools.FixDeadMirrors levels.json`,
    `tools.AddLiveDecoys levels.json` ve `tools.RegenerateLevels levels.json levels.json 35 56 101 102 103 109 110 124 172 202`
    (aynı girdiden birebir aynı dosya çıkar). `generateLevels` bugün çalıştırılırsa üretici canlı yem şartını

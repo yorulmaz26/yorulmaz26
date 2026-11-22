@@ -158,6 +158,7 @@ public final class MainActivity extends Activity {
         lp.topMargin = Ui.dp(this, 16);
         lp.leftMargin = lp.rightMargin = Ui.dp(this, 16);
         root.addView(box, lp);
+        box.setTranslationZ(Ui.dp(this, 40)); // sonradan açılan pencerelerin (ör. Tamamlandı) üstünde kalır
         box.setTranslationY(-Ui.dp(this, 120));
         box.animate().translationY(0).setDuration(380).setInterpolator(new DecelerateInterpolator()).start();
         box.postDelayed(() -> box.animate().translationY(-Ui.dp(this, 140)).alpha(0f).setDuration(320)
@@ -174,6 +175,7 @@ public final class MainActivity extends Activity {
         lp.bottomMargin = Ui.dp(this, 120);
         lp.leftMargin = lp.rightMargin = Ui.dp(this, 24);
         root.addView(t, lp);
+        t.setTranslationZ(Ui.dp(this, 40));
         t.setAlpha(0f);
         t.animate().alpha(1f).setDuration(160).start();
         t.postDelayed(() -> t.animate().alpha(0f).setDuration(220).withEndAction(() -> root.removeView(t)).start(), 1800);

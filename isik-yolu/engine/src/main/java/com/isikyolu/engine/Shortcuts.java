@@ -82,14 +82,24 @@ public final class Shortcuts {
         return false;
     }
 
-    /** Çözüm durumunda ışık alan ama çözümde (tek sayıda) çevrilmeyen döner aynaların sayısı. */
+    /**
+     * Canlı yem sayısı: çözüm durumunda ışık alan, çözümde (tek sayıda) çevrilmeyen ve tek başına çevrilince
+     * çözümü bozan döner aynalar (dokunan oyuncu gerçekten yolu bozar).
+     */
     public static int liveDecoys(Board start, List<Move> solution) {
         Board fin = start.copy();
         int[] flips = new int[fin.width * fin.height];
         for (Move m : solution) { fin.apply(m); if (m.kind == Move.ROTATE) flips[m.cell] ^= 1; }
+        BeamTracer tr = new BeamTracer();
         BeamTracer.Result r = BeamTracer.trace(fin);
         int n = 0;
-        for (int c : fin.rotCells) if (flips[c] == 0 && r.lit[c] != 0) n++;
+        for (int c : fin.rotCells) {
+            if (flips[c] != 0 || r.lit[c] == 0) continue;
+            fin.rotate(c);
+            boolean still = tr.isSolved(fin);
+            fin.rotate(c);
+            if (!still) n++;
+        }
         return n;
     }
 
@@ -121,12 +131,11 @@ public final class Shortcuts {
             Piece pick = null;
             boolean pickBreaks = false;
             for (Piece p : cands) {
-                tried.add(p);
                 p.rotatable = true;
                 boolean ok = valid(level, cap, maxRot, level.optimal);
                 boolean breaks = ok && !thoughtless(new Board(level));
                 p.rotatable = false;
-                if (!ok) continue;
+                if (!ok) { tried.add(p); continue; } // geçerli ama seçilmeyen aday sonraki turda yine denenir
                 if (pick == null || (breaks && !pickBreaks)) { pick = p; pickBreaks = breaks; }
                 if (pickBreaks) break;
             }

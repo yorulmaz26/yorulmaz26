@@ -24,9 +24,10 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 
 - **Mantık bölümleri artık düşünmeden geçilemiyor.** 454 mantık bölümünün 411'i "her döner aynaya bir kez dokun"
   ile (gerekirse blokları itip) bitiyordu, 55'i bu yolla 3 yıldız veriyordu. Çözüm yolunda zaten doğru duran döner
-  aynalar (canlı yem) eklendi: önce yoldaki sabit aynalar döner yapıldı, yetmezse bir yol aynası başlangıçta doğru
-  bırakıldı. 10 bölüm zorluk gevşetilmeden yeniden üretildi. Kısayol artık hiçbir mantık bölümünü bitirmiyor;
-  ortalama karar ağacı 39 → 49 yaprak. Bunun bedeli: mantık bölümlerinde en az hamle ortalaması 7,4 → 6,5.
+  aynalar (canlı yem) eklendi: önce yoldaki sabit aynalar döner yapıldı (372 ayna, optimum değişmez); yetmeyen 207
+  bölümde bir yol aynası başlangıçta doğru bırakıldı (1 hamle kısaldı). 10 bölüm zorluk gevşetilmeden yeniden
+  üretildi. Kısayol artık hiçbir mantık bölümünü bitirmiyor; ortalama karar ağacı 39 → 51 yaprak. Mantık
+  bölümlerinde en az hamle ortalaması 7,41 → 6,97.
 - Üretici ve günlük bulmaca aynı kuralı uyguluyor; denetime `kısayol` (HATA) ve `canlı-yem` (UYARI) eklendi.
 - İşlevsiz döner aynalar sabitlendi (384 bölümde 1003 ayna; hiçbir durumda ışık almıyorlardı).
 - **Akıllı ipucu:** Geri Al hak harcamadığı için gerekirse önce Geri Al önerir. Plan tek çok kaynaklı BFS ile ilk
@@ -142,10 +143,10 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.5.2.apk` (release, R8 küçültme + kaynak küçültme) | 1 987 794 bayt | `975665a869adf0adfb43b6ddee007fddf92e247563460ebee665d46ded21dbe9` |
-| `teslimat/IsikYolu-1.5.2-debug.apk` | 2 101 684 bayt | `ca456f45b699f2c25330061403bf652e47d7fd3b8c3d38f1d3b3679e47637dd9` |
+| `teslimat/IsikYolu-1.6.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 993 634 bayt | `f960d98e381c85f0ff606ac18f4a5ad3868743be3c400c006a3e191d60251c54` |
+| `teslimat/IsikYolu-1.6.0-debug.apk` | 2 127 820 bayt | `f6bd466954d0dbc9beadd107e89e5b3ff20842eb70c39a0c019c04aff9784600` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 8, sürüm adı 1.5.2 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+- Paket: `com.isikyolu.game`, sürüm kodu 9, sürüm adı 1.6.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler: yalnızca `android.permission.VIBRATE`.
 - İmza: iki APK da Android debug sertifikasıyla imzalı (`CN=Android Debug`). Test için doğrudan kurulabilir.
   Google Play'e yüklemek için kendi yükleme anahtarınla imzalanmalıdır.
@@ -155,7 +156,7 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 
 ```
 ./gradlew clean :engine:test :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest
-BUILD SUCCESSFUL in 1m 6s
+BUILD SUCCESSFUL in 4m 21s    (98 test, 0 hata)
 ```
 
 `./gradlew :app:lintDebug` sonucu: **0 hata**, 32 uyarı. Uyarılar şu türden:

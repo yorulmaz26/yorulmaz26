@@ -685,6 +685,57 @@ public class UiFlowTest {
         assertEquals(1, ses.actions());
     }
 
+    // ---------- denetim 3 ----------
+
+    private static View findText(View v, String prefix) {
+        if (v instanceof android.widget.TextView && ((android.widget.TextView) v).getText().toString().startsWith(prefix)) return v;
+        if (v instanceof ViewGroup) for (int i = 0; i < ((ViewGroup) v).getChildCount(); i++) {
+            View r = findText(((ViewGroup) v).getChildAt(i), prefix);
+            if (r != null) return r;
+        }
+        return null;
+    }
+
+    /** Bulgu: kazanınca hemen gelen başarı afişi sonradan açılan Tamamlandı penceresinin altında kalıyordu. */
+    @Test public void achievementBannerStaysAboveCompleteOverlay() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        GameScreen gs = openLevel(1);
+        solveThroughUi(gs, Game.levels().get(1));
+        idle(1500);
+        Overlay done = topOverlay();
+        assertNotNull("tamamlandı penceresi", done);
+        View title = findText(act.overlayLayer(), "Başarı: İlk Işık");
+        assertNotNull("başarı afişi", title);
+        View banner = (View) title.getParent().getParent();
+        assertTrue("afiş pencerenin üstünde çizilmeli", banner.getZ() > done.getZ());
+    }
+
+    /** Bulgu: can yokken reddedilen itmede blok kayarak dönmüyor, anında geri sıçrıyordu. */
+    @Test public void rejectedPushSlidesBack() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        GameScreen gs = openLevel(71);
+        p.lives = 0;
+        com.isikyolu.game.ui.BoardView bv = boardOf(gs);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) field(gs, "session");
+        float ox = f(bv, "ox"), oy = f(bv, "oy"), cell = f(bv, "cell");
+        int w = ses.board().width, blk = ses.board().blockCells()[0], dir = -1;
+        for (int d = 0; d < 4; d++) if (ses.board().canPush(blk, d)) { dir = d; break; }
+        int[] DX = {0, 1, 0, -1}, DY = {-1, 0, 1, 0};
+        float sx = ox + (blk % w + 0.5f) * cell, sy = oy + (blk / w + 0.5f) * cell;
+        long t = android.os.SystemClock.uptimeMillis();
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t, android.view.MotionEvent.ACTION_DOWN, sx, sy, 0));
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 10, android.view.MotionEvent.ACTION_MOVE, sx + DX[dir] * 0.3f * cell, sy + DY[dir] * 0.3f * cell, 0));
+        bv.dispatchTouchEvent(android.view.MotionEvent.obtain(t, t + 20, android.view.MotionEvent.ACTION_MOVE, sx + DX[dir] * 0.52f * cell, sy + DY[dir] * 0.52f * cell, 0));
+        assertEquals("can yok: itme yapılmamalı", 0, ses.actions());
+        float[] bx = (float[]) field(bv, "blockOffX"), by = (float[]) field(bv, "blockOffY");
+        float off = DX[dir] != 0 ? bx[blk] * DX[dir] : by[blk] * DY[dir];
+        assertTrue("blok bırakıldığı yerden geri kaymalı (" + off / cell + " hücre)", off > 0.4f * cell);
+    }
+
     @Test public void splashScreenRenders() throws Exception {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         assertTrue("önce stüdyo açılışı", act.currentScreen() instanceof com.isikyolu.game.screens.StudioIntroScreen);
