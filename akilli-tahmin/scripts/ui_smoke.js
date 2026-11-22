@@ -7,8 +7,9 @@
  *
  *   BASE_URL     Varsayılan http://127.0.0.1:8765/ (scripts/mock_api.py). Gerçek backend için de çalışır.
  *   --out        Ekran görüntülerinin yazılacağı dizin (varsayılan: <tmp>/akilli-tahmin-ui).
- *   --no-write   Durum değiştiren istekler (PUT /settings, POST bildirim izni) sunucuya gönderilmez;
- *                tarayıcıda yerel olarak yanıtlanır. Arayüz akışı (durum metni, anahtar) yine doğrulanır.
+ *   --no-write   Durum değiştiren istekler (PUT /settings, POST bildirim izni, POST /manual-odds) sunucuya
+ *                gönderilmez; tarayıcıda yerel olarak yanıtlanır. Arayüz akışı (durum metni, anahtar, Oran Gir
+ *                sonucu ve 422 mesajı) yine doğrulanır.
  *
  * Kontroller sözleşme odaklıdır: beklenen kart sayısı, boş durum mesajı, İddaa rozeti vb. aynı
  * uçlardan alınan yanıtlarla karşılaştırılır; böylece betik mock dışında da anlamlı kalır.
@@ -135,6 +136,95 @@ async function routeWritesLocally(page) {
   });
 }
 
+/** Uygulamadaki fmtNum(v, 2) ile aynı (2,35 / 13,58 / 1.234,50). */
+function fmtNum2(v) {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return '—';
+  const fixed = Math.abs(v).toFixed(2);
+  const neg = v < 0 && Number(fixed) !== 0;
+  const [i, f] = fixed.split('.');
+  return (neg ? '−' : '') + i.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + ',' + f;
+}
+
+/** Uygulamadaki fmtPct(v, 1) ile aynı (%6,5); eksi işaretinden sonra kelime birleştirici vardır. */
+function fmtPct1(v) {
+  if (typeof v !== 'number' || !Number.isFinite(v)) return '—';
+  const body = (Math.abs(v) * 100).toFixed(1).replace('.', ',');
+  return (v < 0 && body !== '0,0' ? '−⁠' : '') + '%' + body;
+}
+
+const MO_VERDICT_TONES = { value: 'good', uncertain: 'warn', no_value: 'bad', unavailable: 'neutral' };
+const isManualPost = (r) => new URL(r.url()).pathname === '/api/v1/manual-odds' && r.request().method() === 'POST';
+
+/**
+ * --no-write: Oran Gir POST'unu tarayıcıda yanıtla (oran sunucuya kaydedilmez). Sunucunun doğrulama
+ * mesajlarını (422) ve içerik türü kuralını (415) taklit eder; olasılıklar girilen oranlardan türetilen
+ * yapay değerlerdir (yalnızca arayüz akışını sınamak için).
+ */
+async function routeManualOddsLocally(page) {
+  let options = null;
+  await page.route((u) => new URL(u).pathname === '/api/v1/manual-odds', async (route) => {
+    const req = route.request();
+    if (req.method() !== 'POST') return route.continue();
+    const reply = (status, json) => route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(json) });
+    const ctype = (req.headers()['content-type'] || '').split(';')[0].trim();
+    if (ctype !== 'application/json') return reply(415, { detail: 'application/json gerekli' });
+    let body = {};
+    try {
+      body = JSON.parse(req.postData() || '{}');
+    } catch (e) {
+      return reply(422, { detail: 'Geçersiz JSON gövdesi.' });
+    }
+    if (!options) options = await getJson(page, 'api/v1/manual-odds/options');
+    const fx = (options.fixtures || []).find((f) => f.id === body.fixture_id);
+    const mk = (options.markets || []).find((m) => m.id === body.market_id);
+    const odds = body.odds && typeof body.odds === 'object' ? body.odds : {};
+    if (!Number.isInteger(body.fixture_id)) return reply(422, { detail: 'Geçersiz istek.' });
+    if (!mk) return reply(422, { detail: 'Bilinmeyen market: ' + body.market_id });
+    if (!Object.keys(odds).length) return reply(422, { detail: 'En az bir seçenek için oran girin.' });
+    for (const [oid, v] of Object.entries(odds)) {
+      const oc = mk.outcomes.find((o) => o.id === oid);
+      if (!oc) return reply(422, { detail: `${mk.name} marketinde '${oid}' seçeneği yok.` });
+      if (typeof v !== 'number' || !(v > 1 && v <= 1000)) return reply(422, { detail: `Geçersiz oran (${oc.name}): 1,01 ile 1000 arasında olmalı.` });
+    }
+    if (!fx) return reply(422, { detail: 'Maç bulunamadı.' });
+    const entered = mk.outcomes.filter((o) => o.id in odds);
+    const complete = entered.length === mk.outcomes.length && mk.family !== 'dnb' && mk.family !== 'double_chance';
+    const inv = Object.fromEntries(entered.map((o) => [o.id, 1 / (Math.round(odds[o.id] * 100) / 100)]));
+    const total = Object.values(inv).reduce((a, b) => a + b, 0);
+    const level = 0.8;
+    const outcomes = entered.map((o, i) => {
+      const price = Math.round(odds[o.id] * 100) / 100;
+      const base = complete ? inv[o.id] / total : inv[o.id] / 1.05;
+      const p = Math.min(0.97, Math.max(0.02, base * (i === 0 ? 1.3 : 0.9)));
+      const pa = Math.min(0.98, p + 0.01);
+      const pLow = Math.max(0.01, p - 0.04);
+      const ev = (q) => q * price - 1;
+      const item = {
+        id: o.id, name: o.name, odds: price, fair_probability: complete ? inv[o.id] / total : null,
+        model_a: pa, model_b: p, estimated_probability: p, probability_lower: pLow, confidence_level: level,
+        void_probability: 0, break_even_odds: Math.round((1 / p) * 1000) / 1000, ev: ev(p), ev_lower: ev(pLow),
+        ev_model_a: ev(pa), ev_model_b: ev(p), quality_issues: [],
+      };
+      if (item.ev_lower > 0 && item.ev_model_a > 0 && item.ev_model_b > 0) Object.assign(item, { verdict: 'value', verdict_label: 'Avantajlı görünüyor' });
+      else if (item.ev > 0) Object.assign(item, { verdict: 'uncertain', verdict_label: 'Belirsiz (avantaj belirsizlik altında desteklenmiyor)' });
+      else Object.assign(item, { verdict: 'no_value', verdict_label: 'Avantajsız' });
+      const reason = 'Yerel test yanıtı (--no-write): modlar değerlendirilmedi.';
+      item.modes = [['highest_probability', 'En Güvenilir'], ['best_value', 'En Avantajlı'], ['balanced', 'Dengeli']].map(([code, name]) => ({
+        code, name, status: 'not_established', eligible: false, reason,
+        failed: [{ code: 'thresholds_established', label: 'Eşikler kronolojik doğrulamayla belirlendi', detail: reason }],
+      }));
+      return item;
+    });
+    return reply(200, {
+      fixture: { id: fx.id, home: fx.home, away: fx.away, kickoff_at: fx.kickoff_at, league: fx.league },
+      market: { id: mk.id, name: mk.name }, entered_at: new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+      source_label: 'Elle girilen oran (kullanıcı)', complete_market: complete, margin: complete ? total - 1 : null,
+      run_id: options.run_id, outcomes,
+      notes: ['Yerel test yanıtı (--no-write): oran sunucuya gönderilmedi; olasılıklar yapaydır.'],
+    });
+  });
+}
+
 async function assertNoOverflow(page, label) {
   const m = await page.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: window.innerWidth }));
   check(m.sw <= m.iw, `${label}: yatay taşma (scrollWidth ${m.sw} > innerWidth ${m.iw})`);
@@ -171,7 +261,10 @@ async function runViewport(browser, vp) {
     check(consoleErrors.length === 0, `${label}: konsol hatası: ${consoleErrors.join(' | ')}`);
     consoleErrors.length = 0;
   };
-  if (!allowWrite) await routeWritesLocally(page);
+  if (!allowWrite) {
+    await routeWritesLocally(page);
+    await routeManualOddsLocally(page);
+  }
 
   // ---- Akıllı Tahminler: varsayılan mod
   const modes = await getJson(page, 'api/v1/recommendations/modes');
@@ -184,7 +277,7 @@ async function runViewport(browser, vp) {
   const tabLabels = await page.$$eval('.mode-switch [role="tab"]', (els) => els.map((e) => e.textContent.trim()));
   check(JSON.stringify(tabLabels) === JSON.stringify(['En Güvenilir', 'En Avantajlı', 'Dengeli']), 'mod anahtarı sırası/etiketleri: ' + tabLabels.join(', '));
   const navLabels = await page.$$eval('.nav-tab', (els) => els.map((e) => e.textContent.trim()));
-  check(JSON.stringify(navLabels) === JSON.stringify(['Akıllı Tahminler', 'Başarı Merkezi', 'Canlı Gol Radar', 'Ayarlar']), 'ana menü etiketleri: ' + navLabels.join(', '));
+  check(JSON.stringify(navLabels) === JSON.stringify(['Akıllı Tahminler', 'Oran Gir', 'Başarı Merkezi', 'Canlı Gol Radar', 'Ayarlar']), 'ana menü etiketleri: ' + navLabels.join(', '));
   await assertNoOverflow(page, 'tahminler ilk açılış');
   expectNoConsoleErrors('tahminler ilk açılış');
 
@@ -423,7 +516,14 @@ async function runViewport(browser, vp) {
   }
   check(cmpText.includes('Karşılaştırma kapsamı'), 'Seçim Modları: havuz açıklaması ve notlar gösterilmeli');
   const svgCount = await page.locator('#success-panel .chart svg').count();
-  check(svgCount >= 5, `Seçim Modları: en az 5 SVG grafik (4 güvenilirlik + 1 kâr) bekleniyordu, bulunan ${svgCount}`);
+  // Beklenen grafik sayısı veriden çıkarılır: kalibrasyon bölmesi olan her mod (+ taban çizgisi) için bir
+  // güvenilirlik grafiği ve kâr eğrisi olan en az bir mod varsa bir kâr grafiği. Verisi olmayan mod için
+  // "kalibrasyon verisi yok" kutusu gösterilir (grafik çizilmez).
+  const cmpAll = await getJson(page, 'api/v1/recommendations/modes/comparison?period=all');
+  const withTimeline = (cmpAll.modes || []).some((m) => (m.timeline || []).length) ? 1 : 0;
+  const expectedSvg = (cmpAll.modes || []).filter((m) => ((m.metrics || {}).calibration_bins || []).length).length
+    + ((((cmpAll.baseline || {}).metrics || {}).calibration_bins || []).length ? 1 : 0) + withTimeline;
+  check(svgCount >= expectedSvg, `Seçim Modları: verisi olan her mod için grafik bekleniyordu (${expectedSvg}), bulunan ${svgCount}`);
   check((await page.locator('#success-panel .legend li').count()) === 3, 'kâr grafiği lejantı 3 mod içermeli');
   await legendMatchesTable('all');
   await page.click('.seg-btn[data-period="30d"]');
@@ -518,6 +618,9 @@ async function runViewport(browser, vp) {
   await toggleOnce('aç/kapat 2 (geri al)');
   expectNoConsoleErrors('radar geri al');
 
+  // ---- Oran Gir
+  await manualOdds(page, vp, expectNoConsoleErrors, consoleErrors);
+
   // ---- Ayarlar
   await navTo(page, 'ayarlar');
   const settings = await getJson(page, 'api/v1/settings');
@@ -552,6 +655,180 @@ async function runViewport(browser, vp) {
 
   if (vp.robustness) await robustness(context, vp);
   await context.close();
+}
+
+// ---------------------------------------------------------------- Oran Gir
+/** "Son girdiğiniz oranlar": Maç Sonucu satırlarında seçenekler market sırasıyla (1, X, 2) gösterilmeli. */
+async function checkHistoryOrder(page, label) {
+  const groups = await page.$$eval('.mo-hist-item', (els) => els.map((el) => ({
+    meta: (el.querySelector('.mo-hist-meta') || {}).textContent || '',
+    codes: Array.from(el.querySelectorAll('.mo-hist-oc')).map((x) => x.textContent.trim()),
+  })));
+  const rank = { 1: 0, X: 1, 2: 2 };
+  const bad = groups.filter((g) => g.meta.startsWith('Maç Sonucu') && g.codes.some((c, i) => i > 0 && rank[c] < rank[g.codes[i - 1]]));
+  check(!bad.length, `Oran Gir (${label}): son girişlerde seçenekler market sırasında olmalı (${bad.map((g) => g.codes.join(' ')).join(' | ')})`);
+}
+
+async function manualOdds(page, vp, expectNoConsoleErrors, consoleErrors) {
+  await navTo(page, 'oran-gir');
+  check((await page.evaluate(() => location.hash)) === '#oran-gir', 'Oran Gir: hash #oran-gir olmalı');
+  const opts = await getJson(page, 'api/v1/manual-odds/options');
+  const text = await page.innerText('#main');
+  check(text.includes('İddaa’da (veya başka bir sitede) gördüğünüz oranı girin; sistem kendi olasılığıyla karşılaştırıp avantajlı olup olmadığını hesaplasın.'), 'Oran Gir: giriş metni');
+  check(text.includes('Bu bir öneri değildir') && text.includes('kazanç garantisi değildir'), 'Oran Gir: öneri değildir / garanti değildir uyarısı');
+  check(text.includes('Son girdiğiniz oranlar'), 'Oran Gir: son girilen oranlar bölümü');
+  await checkHistoryOrder(page, 'ilk açılış');
+  const fixtures = Array.isArray(opts.fixtures) ? opts.fixtures : [];
+  const markets = Array.isArray(opts.markets) ? opts.markets : [];
+  if (!fixtures.length) {
+    check(text.includes('Şu an değerlendirilecek yaklaşan maç yok.'), 'Oran Gir: maç yokken boş durum mesajı');
+    console.log('  i Oran Gir: yaklaşan maç yok; form akışı atlandı.');
+    await assertNoOverflow(page, 'oran gir (boş)');
+    await shot(page, vp, '10-oran-gir');
+    return;
+  }
+  // Form: maç, market (varsayılan Maç Sonucu), her seçenek için ondalık giriş.
+  check((await page.locator('#mo-fixture option').count()) === fixtures.length, `Oran Gir: maç listesi ${fixtures.length} maç içermeli`);
+  const fx0 = fixtures[0];
+  const label0 = (await page.locator('#mo-fixture option').first().innerText()).trim();
+  check(label0.startsWith(`${fx0.home} – ${fx0.away}`) && (!fx0.league || label0.includes(fx0.league.name)) && /\d{2}:\d{2}$/.test(label0), `Oran Gir: maç etiketi "ev – deplasman · lig · tarih saat" olmalı ("${label0}")`);
+  check((await page.locator('#mo-market option').count()) === markets.length, `Oran Gir: market listesi ${markets.length} market içermeli`);
+  check((await page.inputValue('#mo-market')) === '1X2', 'Oran Gir: varsayılan market Maç Sonucu (1X2)');
+  const mk = markets.find((m) => m.id === '1X2') || markets[0];
+  const inputs = page.locator('.mo-input');
+  check((await inputs.count()) === mk.outcomes.length, `Oran Gir: ${mk.outcomes.length} oran kutusu olmalı`);
+  const inputMeta = await inputs.evaluateAll((els) => els.map((e) => ({ mode: e.getAttribute('inputmode'), label: !!document.querySelector(`label[for="${e.id}"]`) })));
+  check(inputMeta.every((m) => m.mode === 'decimal' && m.label), 'Oran Gir: oran kutuları inputmode="decimal" ve etiketli olmalı');
+  check(text.includes('Marjı hesaplamak için bütün seçenekleri girin.'), 'Oran Gir: marj ipucu');
+  const cs = markets.find((m) => m.id === 'CS');
+  if (cs) {
+    await page.selectOption('#mo-market', 'CS');
+    check((await inputs.count()) === cs.outcomes.length, `Oran Gir: Skor marketinde ${cs.outcomes.length} oran kutusu olmalı`);
+    await assertNoOverflow(page, 'oran gir (skor marketi)');
+    await page.selectOption('#mo-market', mk.id);
+  }
+  await assertNoOverflow(page, 'oran gir');
+  expectNoConsoleErrors('oran gir');
+  await shot(page, vp, '10-oran-gir');
+
+  let posts = 0;
+  const onReq = (r) => {
+    if (new URL(r.url()).pathname === '/api/v1/manual-odds' && r.method() === 'POST') posts++;
+  };
+  page.on('request', onReq);
+  const errText = async () => (await page.locator('.mo-error .mo-error-text').innerText().catch(() => '')).trim();
+  // a) boş form ve sayı olmayan değer: istemcide yakalanır, istek gönderilmez.
+  await page.click('.mo-submit');
+  check((await errText()) === 'En az bir seçenek için oran girin.', `Oran Gir: boş formda "En az bir seçenek için oran girin." (bulunan "${await errText()}")`);
+  await inputs.first().fill('abc');
+  await page.click('.mo-submit');
+  check((await inputs.first().getAttribute('aria-invalid')) === 'true' && (await errText()).startsWith('Geçersiz oran'), 'Oran Gir: sayı olmayan değer işaretlenmeli');
+  check(posts === 0, `Oran Gir: istemci doğrulamasında sunucuya istek gitmemeli (${posts})`);
+  // b) 0,5 → sunucu 422; Türkçe açıklama olduğu gibi gösterilmeli.
+  await inputs.first().fill('0,5');
+  const [bad] = await Promise.all([page.waitForResponse(isManualPost), page.click('.mo-submit')]);
+  check(bad.status() === 422, `Oran Gir: 0,5 için HTTP 422 beklenirdi (bulunan ${bad.status()})`);
+  const badDetail = ((await bad.json().catch(() => ({}))) || {}).detail;
+  await page.waitForFunction(() => !document.querySelector('.mo-form[aria-busy="true"]'), null, { timeout: 10000 });
+  check(typeof badDetail === 'string' && badDetail.includes('Geçersiz oran') && (await errText()) === badDetail, `Oran Gir: 422 mesajı gösterilmeli ("${badDetail}" / "${await errText()}")`);
+  check(!(await page.isDisabled('.mo-submit')), 'Oran Gir: hata sonrası "Hesapla" yeniden etkin olmalı');
+  // Tarayıcı beklenen 422 yanıtını konsola "Failed to load resource" olarak yazar; bu kasıtlı hata sayılmaz.
+  await page.waitForTimeout(100);
+  for (let i = consoleErrors.length - 1; i >= 0; i--) if (/Failed to load resource.*\b422\b/.test(consoleErrors[i])) consoleErrors.splice(i, 1);
+  check((await page.locator('.mo-card').count()) === 0, 'Oran Gir: 422 sonrası sonuç kartı olmamalı');
+  await assertNoOverflow(page, 'oran gir (422)');
+  // c) virgüllü ondalıklarla geçerli giriş
+  const typed = ['2,35', '3,40', '2,90', '1,85', '4,10', '6,50'];
+  const n = await inputs.count();
+  for (let i = 0; i < n; i++) await inputs.nth(i).fill(i < typed.length ? typed[i] : '');
+  const [resp] = await Promise.all([page.waitForResponse(isManualPost), page.click('.mo-submit')]);
+  check(resp.ok(), `Oran Gir: POST /manual-odds başarılı olmalı (HTTP ${resp.status()})`);
+  const ctype = (resp.request().headers()['content-type'] || '').split(';')[0].trim();
+  check(ctype === 'application/json', `Oran Gir: POST Content-Type application/json olmalı ("${ctype}")`);
+  const sent = JSON.parse(resp.request().postData() || '{}');
+  const wantOdds = Object.fromEntries(mk.outcomes.slice(0, typed.length).map((o, i) => [o.id, Number(typed[i].replace(',', '.'))]));
+  check(sent.fixture_id === fx0.id && sent.market_id === mk.id && JSON.stringify(sent.odds) === JSON.stringify(wantOdds), `Oran Gir: gönderilen gövde (virgüllü ondalık sayıya çevrilmeli): ${JSON.stringify(sent)}`);
+  const res = await resp.json();
+  await page.waitForSelector('.mo-card', { timeout: 10000 });
+  await waitIdle(page);
+  const outs = Array.isArray(res.outcomes) ? res.outcomes : [];
+  check((await page.locator('.mo-card').count()) === outs.length, `Oran Gir: ${outs.length} sonuç kartı olmalı`);
+  // "Hesapla"dan hemen sonra telefonda görünen ekran: sonuç başlığına kaydırılmış olmalı (kaydırma bitene kadar bekle).
+  await page.waitForFunction(() => new Promise((r) => {
+    const y = window.scrollY;
+    setTimeout(() => r(window.scrollY === y), 150);
+  }), null, { timeout: 5000 }).catch(() => {});
+  const headTop = await page.$eval('.mo-result', (el) => el.getBoundingClientRect().top);
+  check(headTop >= -2 && headTop < 160, `Oran Gir: sonuç görünür alana kaydırılmalı (üst kenar ${Math.round(headTop)} px)`);
+  check(await page.evaluate(() => document.activeElement && document.activeElement.id === 'mo-result-title'), 'Oran Gir: odak sonuç başlığına taşınmalı');
+  await shot(page, vp, '11-oran-gir-sonuc-ekran', { fullPage: false });
+  for (const o of outs) {
+    const card = page.locator(`.mo-card[data-outcome="${o.id}"]`);
+    const v = card.locator('.mo-verdict');
+    check((await v.getAttribute('data-verdict')) === o.verdict, `Oran Gir (${o.id}): karar ${o.verdict} olmalı`);
+    check(((await v.getAttribute('class')) || '').includes('tone-' + MO_VERDICT_TONES[o.verdict]), `Oran Gir (${o.id}): karar rozeti rengi ${MO_VERDICT_TONES[o.verdict]} olmalı`);
+    // "Belirsiz (avantaj … desteklenmiyor)": kısa başlık büyük yazılır, parantez içi açıklamanın başına taşınır.
+    const lm = /^(.+?)\s*\((.+)\)$/.exec(String(o.verdict_label || '').trim());
+    const head = (await v.locator('.mo-verdict-label').innerText()).trim();
+    const why = (await v.locator('.mo-verdict-why').innerText()).trim();
+    check(head === (lm ? lm[1] : o.verdict_label) && (!lm || why.toLocaleLowerCase('tr-TR').includes(lm[2].toLocaleLowerCase('tr-TR'))), `Oran Gir (${o.id}): karar etiketi "${o.verdict_label}" (bulunan "${head}" / "${why}")`);
+    const be = (await card.locator('.mo-fact-be .mo-fact-value').innerText()).trim();
+    check(be === fmtNum2(o.break_even_odds), `Oran Gir (${o.id}): başa baş oranı ${be} ≠ ${fmtNum2(o.break_even_odds)}`);
+    const ct = await card.innerText();
+    check(ct.includes('bu orandan yüksekse kârlı'), `Oran Gir (${o.id}): başa baş açıklaması`);
+    check(ct.includes('MODEL A ' + fmtPct1(o.model_a)) && ct.includes('MODEL B ' + fmtPct1(o.model_b)), `Oran Gir (${o.id}): MODEL A ve MODEL B ayrı gösterilmeli`);
+    check(ct.includes(`İhtiyatlı EV (%${Math.round(o.confidence_level * 100)} güven)`), `Oran Gir (${o.id}): ihtiyatlı EV etiketi güven düzeyini içermeli`);
+    check((await card.locator('.mo-entered-value').innerText()).trim() === fmtNum2(o.odds), `Oran Gir (${o.id}): girilen oran gösterilmeli`);
+    if (typeof o.fair_probability === 'number') check(ct.includes(fmtPct1(o.fair_probability)), `Oran Gir (${o.id}): marjsız olasılık gösterilmeli`);
+    if (o.verdict === 'unavailable' && (o.quality_issues || []).length) check((await card.locator('.mo-issues .check').count()) === o.quality_issues.length, `Oran Gir (${o.id}): değerlendirilemez nedenleri listelenmeli`);
+  }
+  const resText = await page.innerText('.mo-result');
+  if (res.complete_market && typeof res.margin === 'number') check(resText.includes('Bahis sitesinin marjı ' + fmtPct1(res.margin)), `Oran Gir: marj "${fmtPct1(res.margin)}" gösterilmeli`);
+  // Notlardaki ISO zamanlar İstanbul saatine çevrilerek gösterilir; geri kalan metin aynen görünmeli.
+  const ISO = /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})/;
+  for (const note of res.notes || []) {
+    const parts = note.split(ISO).map((x) => x.trim()).filter(Boolean);
+    check(parts.every((x) => resText.includes(x)) && !(ISO.test(note) && ISO.test(resText)), `Oran Gir: not gösterilmeli ("${note.slice(0, 40)}…")`);
+  }
+  if (outs.length) {
+    const first = page.locator('.mo-card').first();
+    await first.locator('details.mo-modes > summary').click();
+    const modes = outs[0].modes || [];
+    check((await first.locator('.mo-mode').count()) === modes.length, `Oran Gir: "Modlar bu oranla ne derdi?" ${modes.length} mod listelemeli`);
+    check((await first.locator('.mo-mode .tone-good').count()) === modes.filter((m) => m.eligible === true).length, 'Oran Gir: uygun mod sayısı (Evet) yanıtla aynı olmalı');
+    const failedShown = await first.locator('.mo-mode .check.fail').count();
+    const failedWant = modes.reduce((a, m) => a + (m.failed || []).filter((c) => m.status === 'established' || c.code !== 'thresholds_established').length, 0);
+    check(failedShown === failedWant, `Oran Gir: modların sağlanmayan kontrolleri (${failedShown} ≠ ${failedWant})`);
+  }
+  // Son girilen oranlar yenilenmeli (yazma kapalıysa sunucuya kayıt gitmedi).
+  await page.waitForFunction(() => !document.querySelector('#main [aria-busy="true"]'), null, { timeout: 20000 });
+  const hist = await getJson(page, 'api/v1/manual-odds/history?limit=20');
+  const histItems = await page.locator('.mo-hist-item').count();
+  if (!(hist.items || []).length) check((await page.innerText('#main')).includes('Henüz oran girmediniz.'), 'Oran Gir: geçmiş boşken mesaj');
+  else check(histItems > 0, 'Oran Gir: son girilen oranlar listelenmeli');
+  if (allowWrite) {
+    const top = (await page.locator('.mo-hist-item').first().innerText().catch(() => '')).replace(/\s+/g, ' ');
+    check(top.includes(`${res.fixture.home} – ${res.fixture.away}`) && top.includes('2,35'), `Oran Gir: yeni giriş "Son girdiğiniz oranlar" listesinin başında olmalı ("${top}")`);
+    await checkHistoryOrder(page, 'giriş sonrası');
+  }
+  await assertNoOverflow(page, 'oran gir sonuç');
+  expectNoConsoleErrors('oran gir sonuç');
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await shot(page, vp, '11-oran-gir-sonuc');
+  // d) kısmi giriş (yalnızca bir seçenek): marj hesaplanmaz, tek kart.
+  if (vp.robustness && n > 1) {
+    await page.click('.mo-form button.btn:not(.mo-submit)');
+    await inputs.nth(1).fill('3.5');
+    const [r2] = await Promise.all([page.waitForResponse(isManualPost), page.click('.mo-submit')]);
+    const res2 = await r2.json();
+    await page.waitForSelector('.mo-card');
+    await waitIdle(page);
+    check(JSON.stringify(JSON.parse(r2.request().postData()).odds) === JSON.stringify({ [mk.outcomes[1].id]: 3.5 }), 'Oran Gir: noktalı ondalık da kabul edilmeli; yalnızca dolu kutu gönderilmeli');
+    check((await page.locator('.mo-card').count()) === 1 && res2.complete_market === false, 'Oran Gir: kısmi girişte tek kart');
+    check((await page.innerText('.mo-result')).includes('Marj hesaplanmadı'), 'Oran Gir: kısmi girişte marj hesaplanmadı notu');
+    expectNoConsoleErrors('oran gir kısmi');
+  }
+  page.off('request', onReq);
 }
 
 // ---------------------------------------------------------------- hata/boş/null senaryoları (route ile)
@@ -689,6 +966,36 @@ async function robustness(context, vp) {
   check((await page.locator('.rec-card img').count()) === 0 && (await page.innerText('#main')).includes('<img src=x'), 'API metni kaçışlanmalı (HTML olarak yorumlanmamalı)');
   await assertNoOverflow(page, 'null alanlar');
   await page.unroute(isRecs);
+
+  // d2) Oran Gir: yaklaşan maç yokken boş durum; POST sunucu hatasında mesaj ve "Hesapla" yeniden etkin
+  const isMoOpts = (u) => new URL(u).pathname === '/api/v1/manual-odds/options';
+  await page.route(isMoOpts, async (route) => {
+    const res = await route.fetch();
+    const json = await res.json();
+    json.fixtures = [];
+    await route.fulfill({ response: res, json });
+  });
+  await page.goto(base + '#oran-gir', { waitUntil: 'domcontentloaded' });
+  await page.reload({ waitUntil: 'domcontentloaded' });
+  await waitIdle(page);
+  check((await page.innerText('#main')).includes('Şu an değerlendirilecek yaklaşan maç yok.'), 'Oran Gir: maç yokken "Şu an değerlendirilecek yaklaşan maç yok." gösterilmeli');
+  check((await page.locator('.mo-form').count()) === 0, 'Oran Gir: maç yokken form gösterilmemeli');
+  await page.unroute(isMoOpts);
+  const moOpts = await (await page.request.get(base + 'api/v1/manual-odds/options')).json();
+  if ((moOpts.fixtures || []).length) {
+    const isMoPost = (u) => new URL(u).pathname === '/api/v1/manual-odds';
+    await page.route(isMoPost, (route) => (route.request().method() === 'POST'
+      ? route.fulfill({ status: 503, contentType: 'application/json', body: '{"detail":"bakım"}' })
+      : route.continue()));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    await waitIdle(page);
+    await page.locator('.mo-input').first().fill('2,10');
+    await page.click('.mo-submit');
+    await page.waitForSelector('.mo-error .mo-error-text', { timeout: 10000 });
+    check((await page.innerText('.mo-error')).includes('Sunucu hatası'), 'Oran Gir: sunucu hatası kullanıcıya gösterilmeli');
+    check(!(await page.isDisabled('.mo-submit')), 'Oran Gir: sunucu hatası sonrası "Hesapla" yeniden etkin olmalı');
+    await page.unroute(isMoPost);
+  }
 
   // e) klavye: mod sekmeleri ok tuşlarıyla gezilebilmeli
   await page.goto(base + '#tahminler/balanced', { waitUntil: 'domcontentloaded' });

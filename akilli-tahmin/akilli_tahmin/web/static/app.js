@@ -36,6 +36,7 @@
     tahminler: 'Akıllı Tahminler',
     basari: 'Başarı Merkezi',
     radar: 'Canlı Gol Radar',
+    'oran-gir': 'Oran Gir',
     ayarlar: 'Ayarlar',
   };
 
@@ -408,7 +409,12 @@
           if (res.ok) throw new ApiError('Sunucudan geçersiz yanıt alındı.', res.status);
         }
       }
-      if (!res.ok) throw new ApiError(httpMessage(res.status, data), res.status);
+      if (!res.ok) {
+        const err = new ApiError(httpMessage(res.status, data), res.status);
+        // Sunucunun Türkçe açıklaması (ör. 422 doğrulama mesajı) olduğu gibi gösterilebilsin.
+        if (data && typeof data.detail === 'string' && data.detail.trim()) err.detail = data.detail.trim();
+        throw err;
+      }
       return data;
     } finally {
       clearTimeout(timer);
@@ -2223,6 +2229,461 @@
     };
   }
 
+  // ================================================================== SAYFA: Oran Gir (oranı elle girme)
+  // Market grupları (seçim listesinde <optgroup>); bilinmeyen aileler "Diğer" altında listelenir.
+  const MARKET_GROUPS = [
+    ['Maç sonucu', ['result', 'double_chance', 'dnb', 'handicap']],
+    ['Goller', ['totals', 'btts', 'goal_range', 'odd_even']],
+    ['Takım golleri', ['team_totals']],
+    ['İlk yarı', ['halftime', 'halftime_totals', 'htft']],
+    ['Skor', ['correct_score']],
+  ];
+  const DEFAULT_MARKET = '1X2';
+  const VERDICTS = {
+    value: { tone: 'good', icon: '✓', label: 'Avantajlı görünüyor' },
+    uncertain: { tone: 'warn', icon: '?', label: 'Belirsiz' },
+    no_value: { tone: 'bad', icon: '✗', label: 'Avantajsız' },
+    unavailable: { tone: 'neutral', icon: '–', label: 'Değerlendirilemez' },
+  };
+  const MO_INTRO = 'İddaa’da (veya başka bir sitede) gördüğünüz oranı girin; sistem kendi olasılığıyla karşılaştırıp avantajlı olup olmadığını hesaplasın.';
+
+  /** "2,35" / "2.35" / " 2,35 " → 2.35; boş → null; sayı değilse NaN. */
+  function parseDecimal(raw) {
+    const s = String(raw == null ? '' : raw).replace(/\s+/g, '').replace(',', '.');
+    if (!s) return null;
+    if (!/^(\d+\.?\d*|\.\d+)$/.test(s)) return NaN;
+    return Number(s);
+  }
+
+  /** "1", "X", "2", "1X" gibi kısa İddaa kodları seçenek adının önünde gösterilir (adla aynıysa gösterilmez). */
+  function outcomeCode(oc) {
+    const id = String((oc && oc.id) || '');
+    const name = String((oc && oc.name) || '');
+    return /^[12X]{1,2}$/.test(id) && name.replace(/[-\s]/g, '') !== id ? id : null;
+  }
+
+  function outcomeTitle(oc) {
+    const code = outcomeCode(oc);
+    return [code ? h('span', { class: 'mo-code', 'aria-hidden': 'true' }, code) : null, h('span', null, (oc && oc.name) || (oc && oc.id) || 'Seçenek')];
+  }
+
+  function moFixtureLabel(fx) {
+    const league = fx && fx.league && fx.league.name;
+    return [teamsLabel(fx), league, fx && fx.kickoff_at ? fmtDateTime(fx.kickoff_at) : null].filter(Boolean).join(' · ');
+  }
+
+  function evClass(v) {
+    return isNum(v) ? (v > 0 ? ' pos' : v < 0 ? ' neg' : '') : '';
+  }
+
+  /** "Belirsiz (avantaj … desteklenmiyor)" → ["Belirsiz", "Avantaj … desteklenmiyor"]: kısa başlık büyük, açıklama altta. */
+  function splitVerdictLabel(label) {
+    const text = String(label || '').trim();
+    const m = /^(.+?)\s*\((.+)\)$/.exec(text);
+    if (!m) return [text, null];
+    return [m[1], m[2].charAt(0).toLocaleUpperCase('tr-TR') + m[2].slice(1)];
+  }
+
+  /** Sunucu notlarındaki ISO zamanları ("2026-11-22T09:01:00Z") İstanbul saatiyle okunur biçime çevirir. */
+  function humanizeTimes(text) {
+    return String(text).replace(/\b\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})/g, (iso) => {
+      const out = fmtDateTime(iso);
+      return out === '—' ? iso : out;
+    });
+  }
+
+  function ManualOddsPage(root) {
+    const pageCtrl = new AbortController();
+    let options = null;
+    let markets = [];
+    let busy = false;
+    let lastHistory = null;
+
+    const formWrap = h('div', { class: 'mo-form-wrap' });
+    // Sonuç gelince odak sonuç başlığına taşınır (ekran okuyucu oradan devam eder); bütün kartı canlı bölge olarak okutmayız.
+    const resultWrap = h('div', { class: 'mo-result-wrap' });
+    const historyWrap = h('div');
+    root.append(h('section', { class: 'page', 'aria-labelledby': 'mo-title' },
+      h('div', { class: 'page-head' }, h('h1', { id: 'mo-title' }, 'Oran Gir'), h('p', null, MO_INTRO)),
+      h('div', { class: 'notice notice-neutral disclaimer', role: 'note' },
+        h('span', { class: 'notice-icon', 'aria-hidden': 'true' }, 'i'),
+        h('div', { class: 'notice-body' },
+          h('p', { class: 'notice-title' }, 'Bu bir öneri değildir.'),
+          h('p', null, 'Hesap, sistemin olasılık tahminini girdiğiniz oranla karşılaştırır; avantaj yalnızca tahmin doğruysa geçerlidir. Pozitif beklenen değer (EV) kazanç garantisi değildir.'))),
+      h('section', { class: 'panel', 'aria-labelledby': 'mo-form-title' },
+        h('h2', { class: 'section-title', id: 'mo-form-title' }, 'Gördüğünüz oranı girin'),
+        formWrap),
+      resultWrap,
+      h('section', { class: 'panel', 'aria-labelledby': 'mo-hist-title' },
+        h('div', { class: 'panel-title' },
+          h('h2', { class: 'section-title', id: 'mo-hist-title' }, 'Son girdiğiniz oranlar'),
+          h('button', { type: 'button', class: 'btn btn-small', onclick: () => reloadHistory() }, 'Yenile')),
+        historyWrap)));
+
+    const formLoader = loadInto(formWrap, (signal) => api('/manual-odds/options', { signal }), renderForm, { loadingText: 'Maçlar yükleniyor…' });
+    const reloadHistory = loadInto(historyWrap, (signal) => api('/manual-odds/history?limit=20', { signal }), renderHistory, { keepFrame: true, loadingText: 'Son girişler yükleniyor…' });
+
+    function marketById(id) {
+      return markets.find((m) => m.id === id) || null;
+    }
+
+    function renderForm(data) {
+      options = data && typeof data === 'object' ? data : {};
+      const fixtures = (Array.isArray(options.fixtures) ? options.fixtures : []).filter((f) => f && f.id != null);
+      markets = (Array.isArray(options.markets) ? options.markets : []).filter((m) => m && m.id && Array.isArray(m.outcomes) && m.outcomes.length);
+      // Son girişler market listesinden önce geldiyse seçenek sırası (1, X, 2 …) için yeniden çiz.
+      if (lastHistory && markets.length && historyWrap.getAttribute('aria-busy') !== 'true') {
+        historyWrap.replaceChildren();
+        renderHistory(lastHistory);
+      }
+      if (!fixtures.length) {
+        formWrap.append(h('div', { class: 'empty-state', role: 'status' },
+          h('p', { class: 'empty-message' }, 'Şu an değerlendirilecek yaklaşan maç yok.'),
+          h('p', { class: 'muted' }, options.run_id == null
+            ? 'Henüz maç öncesi değerlendirme yapılmadı; veriler güncellendikten sonra tekrar deneyin.'
+            : 'Oran yalnızca sistemin son değerlendirmesinde yer alan ve henüz başlamamış maçlar için hesaplanabilir.')));
+        return;
+      }
+      if (!markets.length) {
+        formWrap.append(errorView({ message: 'Sunucu market listesini göndermedi.' }, formLoader, 'Form kurulamadı.'));
+        return;
+      }
+
+      const fxSel = h('select', { id: 'mo-fixture', name: 'fixture_id', class: 'select' },
+        fixtures.map((f) => h('option', { value: String(f.id) }, moFixtureLabel(f))));
+      const mkSel = h('select', { id: 'mo-market', name: 'market_id', class: 'select' });
+      const used = new Set();
+      for (const [label, families] of MARKET_GROUPS) {
+        const list = markets.filter((m) => families.includes(m.family));
+        if (!list.length) continue;
+        list.forEach((m) => used.add(m.id));
+        mkSel.append(h('optgroup', { label }, list.map((m) => h('option', { value: m.id }, m.name || m.id))));
+      }
+      const rest = markets.filter((m) => !used.has(m.id));
+      if (rest.length) mkSel.append(h('optgroup', { label: 'Diğer' }, rest.map((m) => h('option', { value: m.id }, m.name || m.id))));
+      mkSel.value = marketById(DEFAULT_MARKET) ? DEFAULT_MARKET : markets[0].id;
+
+      const oddsGrid = h('div', { class: 'mo-odds-grid' });
+      const legend = h('legend', { class: 'mo-legend' }, 'Oranlar');
+      const errEl = h('div', { class: 'mo-error', role: 'alert' });
+      const submitBtn = h('button', { type: 'submit', class: 'btn btn-primary mo-submit' }, 'Hesapla');
+      const clearBtn = h('button', { type: 'button', class: 'btn' }, 'Temizle');
+      const meta = [];
+      if (options.generated_at) meta.push('Olasılıklar sistemin son değerlendirmesinden alınır (' + fmtDateTime(options.generated_at) + ', İstanbul saati).');
+      if (isNum(options.max_age_minutes)) meta.push('Girdiğiniz oran giriş anına tarihlenir ve en fazla ' + fmtInt(options.max_age_minutes) + ' dakika güncel sayılır; oran değişirse yeniden girin.');
+
+      const form = h('form', { class: 'mo-form', novalidate: true },
+        h('div', { class: 'mo-field' }, h('label', { for: 'mo-fixture' }, 'Maç'), fxSel),
+        h('div', { class: 'mo-field' }, h('label', { for: 'mo-market' }, 'Market'), mkSel),
+        h('fieldset', { class: 'mo-odds' }, legend, oddsGrid),
+        h('p', { id: 'mo-hint', class: 'mo-hint' },
+          'Ondalık oranı yazın; virgül veya nokta kullanabilirsiniz (ör. 2,35). Boş bıraktığınız seçenekler hesaba katılmaz. ',
+          h('strong', null, 'Marjı hesaplamak için bütün seçenekleri girin.')),
+        h('div', { class: 'form-actions' }, submitBtn, clearBtn),
+        errEl,
+        meta.length ? h('p', { class: 'small muted' }, meta.join(' ')) : null);
+
+      function renderInputs() {
+        const mk = marketById(mkSel.value) || markets[0];
+        legend.textContent = 'Oranlar · ' + (mk.name || mk.id);
+        oddsGrid.classList.toggle('is-many', mk.outcomes.length > 6);
+        oddsGrid.replaceChildren(...mk.outcomes.map((oc, i) => {
+          const id = 'mo-odd-' + i;
+          return h('div', { class: 'mo-odd' },
+            h('label', { for: id, class: 'mo-odd-label' }, outcomeTitle(oc)),
+            h('input', {
+              id, type: 'text', inputmode: 'decimal', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false',
+              enterkeyhint: 'done', placeholder: 'ör. 2,35', class: 'mo-input num', maxlength: '8', 'aria-describedby': 'mo-hint',
+              dataset: { outcome: String(oc.id), name: oc.name || String(oc.id) },
+            }));
+        }));
+      }
+
+      function showError(message) {
+        errEl.replaceChildren(h('div', { class: 'notice notice-bad' },
+          h('span', { class: 'notice-icon', 'aria-hidden': 'true' }, '!'),
+          h('div', { class: 'notice-body' }, h('p', { class: 'notice-title' }, 'Hesaplanamadı'), h('p', { class: 'mo-error-text' }, message))));
+      }
+
+      function clearError() {
+        errEl.replaceChildren();
+        for (const input of oddsGrid.querySelectorAll('input')) input.removeAttribute('aria-invalid');
+      }
+
+      function setBusy(on) {
+        busy = on;
+        submitBtn.disabled = on;
+        clearBtn.disabled = on;
+        submitBtn.textContent = on ? 'Hesaplanıyor…' : 'Hesapla';
+        if (on) form.setAttribute('aria-busy', 'true');
+        else form.removeAttribute('aria-busy');
+      }
+
+      mkSel.addEventListener('change', () => {
+        clearError();
+        renderInputs();
+      });
+      fxSel.addEventListener('change', clearError);
+      oddsGrid.addEventListener('input', (e) => {
+        if (e.target && e.target.getAttribute('aria-invalid')) e.target.removeAttribute('aria-invalid');
+      });
+      clearBtn.addEventListener('click', () => {
+        clearError();
+        for (const input of oddsGrid.querySelectorAll('input')) input.value = '';
+        const first = oddsGrid.querySelector('input');
+        if (first) first.focus();
+      });
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (busy) return;
+        clearError();
+        const odds = {};
+        let bad = null;
+        const inputs = Array.from(oddsGrid.querySelectorAll('input'));
+        for (const input of inputs) {
+          const v = parseDecimal(input.value);
+          if (v === null) continue;
+          if (Number.isNaN(v)) {
+            input.setAttribute('aria-invalid', 'true');
+            if (!bad) bad = input;
+            continue;
+          }
+          odds[input.dataset.outcome] = v;
+        }
+        if (bad) {
+          showError('Geçersiz oran (' + bad.dataset.name + '): sayı girin, ör. 2,35.');
+          bad.focus();
+          return;
+        }
+        if (!Object.keys(odds).length) {
+          showError('En az bir seçenek için oran girin.');
+          if (inputs[0]) inputs[0].focus();
+          return;
+        }
+        setBusy(true);
+        resultWrap.replaceChildren(loadingView('Hesaplanıyor…'));
+        try {
+          // api() gövdeyi JSON olarak ve Content-Type: application/json ile gönderir (aksi hâlde sunucu 415 döner).
+          const res = await api('/manual-odds', { method: 'POST', body: { fixture_id: Number(fxSel.value), market_id: mkSel.value, odds }, signal: pageCtrl.signal });
+          resultWrap.replaceChildren();
+          try {
+            renderResult(res);
+          } catch (err) {
+            console.error('Akıllı Tahmin: sonuç görüntülenemedi', err);
+            resultWrap.replaceChildren(errorView({ message: 'Sonuç görüntülenemedi. Yanıt beklenen biçimde değil.' }, null, 'Sonuç gösterilemedi.'));
+          }
+          reloadHistory();
+        } catch (err) {
+          if (isAbortError(err)) return;
+          resultWrap.replaceChildren();
+          // 422: sunucunun Türkçe doğrulama mesajı (ör. "Geçersiz oran (Ev Sahibi): 1,01 ile 1000 arasında olmalı.").
+          showError((err.status === 422 || err.status === 400) && err.detail ? err.detail : (err && err.message) || 'Beklenmeyen bir hata oluştu.');
+        } finally {
+          setBusy(false);
+        }
+      });
+
+      renderInputs();
+      formWrap.append(form);
+    }
+
+    // ---------- sonuç
+    function renderResult(data) {
+      const r = data && typeof data === 'object' ? data : {};
+      const fx = r.fixture || {};
+      const mk = r.market || {};
+      const mkDef = marketById(mk.id);
+      const outcomes = (Array.isArray(r.outcomes) ? r.outcomes : []).filter((o) => o && typeof o === 'object');
+      const notes = (Array.isArray(r.notes) ? r.notes : []).filter((n) => typeof n === 'string' && n.trim());
+      const winners = outcomes.filter((o) => o.verdict === 'value');
+      const unsure = outcomes.filter((o) => o.verdict === 'uncertain');
+      const pickText = (list) => list.map((o) => (outcomeCode(o) ? outcomeCode(o) + ' ' : '') + (o.name || o.id) + ' (' + fmtOdds(o.odds) + ')').join(', ');
+      const allEntered = mkDef ? outcomes.length === mkDef.outcomes.length : false;
+
+      const title = h('h2', { class: 'mo-result-title', id: 'mo-result-title', tabindex: '-1' }, teamsLabel(fx));
+      let summary;
+      if (winners.length) {
+        summary = h('p', { class: 'mo-summary tone-good' }, h('span', { class: 'mo-summary-icon', 'aria-hidden': 'true' }, '✓'),
+          h('span', null, (winners.length === 1 ? 'Avantajlı görünen seçenek: ' : 'Avantajlı görünen seçenekler: '), h('strong', null, pickText(winners)), '.'));
+      } else if (unsure.length) {
+        summary = h('p', { class: 'mo-summary tone-warn' }, h('span', { class: 'mo-summary-icon', 'aria-hidden': 'true' }, '?'),
+          h('span', null, 'Güvenilir bir avantaj yok. ', h('strong', null, pickText(unsure)), ' için avantaj belirsiz.'));
+      } else if (outcomes.length && outcomes.every((o) => o.verdict === 'unavailable')) {
+        summary = h('p', { class: 'mo-summary tone-neutral' }, h('span', { class: 'mo-summary-icon', 'aria-hidden': 'true' }, '–'),
+          h('span', null, 'Sistem ' + (outcomes.length === 1 ? 'bu seçenek' : 'bu seçenekler') + ' için güvenilir bir değerlendirme yapamıyor; nedenleri aşağıda.'));
+      } else {
+        summary = h('p', { class: 'mo-summary tone-neutral' }, h('span', { class: 'mo-summary-icon', 'aria-hidden': 'true' }, '–'),
+          h('span', null, 'Girdiğiniz ' + (outcomes.length === 1 ? 'oranda' : 'oranlarda') + ' sisteme göre avantajlı görünen seçenek yok.'));
+      }
+      let margin;
+      if (r.complete_market === true && isNum(r.margin)) {
+        margin = h('p', { class: 'mo-margin' }, 'Bahis sitesinin marjı ', h('strong', { class: 'num' }, fmtPct(r.margin)),
+          h('span', { class: 'muted' }, ' · oranlara gömülü pay; ne kadar düşükse sizin için o kadar iyi.'));
+      } else {
+        margin = h('p', { class: 'mo-margin muted' }, allEntered
+          ? 'Bu market için marj hesaplanmaz.'
+          : 'Marj hesaplanmadı: bunun için marketin bütün seçeneklerini girin.');
+      }
+      const section = h('section', { class: 'page mo-result', 'aria-labelledby': 'mo-result-title' },
+        h('header', { class: 'panel mo-result-head' },
+          h('p', { class: 'mo-result-kicker' }, 'Sonuç · ' + (mk.name || mk.id || 'Market')),
+          title,
+          h('p', { class: 'small muted' }, [fx.league && fx.league.name, fx.kickoff_at ? fmtDateTime(fx.kickoff_at) : null].filter(Boolean).join(' · ')),
+          summary,
+          margin,
+          h('p', { class: 'small muted' }, 'Girildi ' + fmtDateTime(r.entered_at) + ' · ' + (r.source_label || 'Elle girilen oran'))),
+        h('div', { class: 'mo-cards', dataset: { count: String(outcomes.length) } }, outcomes.map((o, i) => outcomeCard(o, i))),
+        notes.length ? h('section', { class: 'panel mo-notes', 'aria-label': 'Notlar' },
+          h('ul', { class: 'warning-list' }, notes.map((n) => h('li', null, humanizeTimes(n))))) : null);
+      resultWrap.append(section);
+      try {
+        title.focus({ preventScroll: true });
+      } catch (e) {
+        title.focus();
+      }
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      section.scrollIntoView({ block: 'start', behavior: reduce ? 'auto' : 'smooth' });
+    }
+
+    function verdictWhy(o) {
+      const odds = fmtOdds(o.odds);
+      const be = isNum(o.break_even_odds) ? fmtOdds(o.break_even_odds) : '—';
+      if (o.verdict === 'value') {
+        return 'Girdiğiniz oran (' + odds + ') başa baş oranından (' + be + ') yüksek. Belirsizlik hesaba katıldığında da avantaj sürüyor ve MODEL A ile MODEL B ayrı ayrı pozitif.';
+      }
+      if (o.verdict === 'uncertain') {
+        const why = [];
+        if (!isNum(o.ev_lower) || o.ev_lower <= 0) why.push('ihtiyatlı hesapta avantaj yok (' + fmtSignedPct(o.ev_lower) + ')');
+        if (!isNum(o.ev_model_a) || o.ev_model_a <= 0) why.push('MODEL A’ya göre EV ' + fmtSignedPct(o.ev_model_a));
+        if (!isNum(o.ev_model_b) || o.ev_model_b <= 0) why.push('MODEL B’ye göre EV ' + fmtSignedPct(o.ev_model_b));
+        return 'Ortalama hesapta avantaj var (EV ' + fmtSignedPct(o.ev) + '), ancak ' + (why.length ? why.join(', ') : 'avantaj güvenilir değil') + '.';
+      }
+      if (o.verdict === 'no_value') {
+        return 'Girdiğiniz oran (' + odds + ') başa baş oranını (' + be + ') geçmiyor; bu oranla beklenen değer ' + (isNum(o.ev) && o.ev < 0 ? 'negatif' : 'pozitif değil') + ' (' + fmtSignedPct(o.ev) + ').';
+      }
+      if (o.verdict === 'unavailable') {
+        return isNum(o.estimated_probability)
+          ? 'Sistemin bu seçenek için olasılığı kalite kontrolünden geçmedi; bu yüzden avantaj değerlendirilmedi. Aşağıdaki sayılar yalnızca bilgi içindir.'
+          : 'Sistemin bu seçenek için olasılığı yok; avantaj hesaplanamadı.';
+      }
+      return '';
+    }
+
+    function moFact(label, value, cls, ...subs) {
+      return h('div', { class: 'mo-fact' + (cls ? ' ' + cls : '') },
+        h('dt', null, label),
+        h('dd', null, h('span', { class: 'mo-fact-value num' }, value), subs.filter(Boolean).map((s) => h('span', { class: 'mo-fact-sub' }, s))));
+    }
+
+    function outcomeCard(o, index) {
+      const v = VERDICTS[o.verdict] || VERDICTS.unavailable;
+      const titleId = 'mo-oc-' + index;
+      const unreliable = o.verdict === 'unavailable';
+      const issues = (Array.isArray(o.quality_issues) ? o.quality_issues : []).filter((c) => c && typeof c === 'object');
+      const level = isNum(o.confidence_level) ? o.confidence_level : null;
+      const pv = isNum(o.void_probability) ? o.void_probability : 0;
+      const p = o.estimated_probability;
+      const usesMin = isNum(p) && isNum(o.model_a) && isNum(o.model_b) && o.model_a !== o.model_b && Math.abs(p - Math.min(o.model_a, o.model_b)) < 1e-9;
+      const [head, headSub] = splitVerdictLabel(o.verdict_label || v.label);
+      const facts = h('dl', { class: 'mo-facts' + (unreliable ? ' is-unreliable' : '') },
+        moFact('Sistemin olasılığı', fmtPct(o.estimated_probability), 'mo-fact-prob',
+          h('span', { class: 'mo-models' },
+            h('span', null, 'MODEL A ', h('strong', { class: 'num' }, fmtPct(o.model_a))),
+            h('span', null, 'MODEL B ', h('strong', { class: 'num' }, fmtPct(o.model_b)))),
+          usesMin ? 'İhtiyatlı olmak için iki modelden düşük olanı kullanılır.' : null),
+        moFact('Başa baş oranı', isNum(o.break_even_odds) ? fmtOdds(o.break_even_odds) : '—', 'mo-fact-be',
+          'Girdiğiniz oran bu orandan yüksekse kârlı (tahmin doğruysa).'),
+        moFact('Beklenen değer (EV)', fmtSignedPct(o.ev), 'mo-fact-ev' + evClass(o.ev),
+          isNum(o.ev) ? '100 TL’lik bahiste ortalama ' + fmtSigned(o.ev * 100, 2) + ' TL' : null,
+          'MODEL A ' + fmtSignedPct(o.ev_model_a) + ' · MODEL B ' + fmtSignedPct(o.ev_model_b)),
+        moFact('İhtiyatlı EV (' + (level != null ? fmtPct(level, 0) : '%—') + ' güven)', fmtSignedPct(o.ev_lower), 'mo-fact-evl' + evClass(o.ev_lower),
+          isNum(o.probability_lower) ? 'Olasılığın ihtiyatlı alt sınırıyla (' + fmtPct(o.probability_lower) + ')' : 'Belirsizlik hesaba katılarak'),
+        isNum(o.fair_probability)
+          ? moFact('Oranın ima ettiği olasılık', fmtPct(o.fair_probability), 'mo-fact-fair', 'Girdiğiniz oranlardan, sitenin marjı çıkarılarak')
+          : moFact('Oranın ima ettiği olasılık', '—', 'mo-fact-fair', 'Marketin bütün seçenekleri girildiğinde hesaplanır'),
+        pv > 0 ? moFact('İade olasılığı', fmtPct(pv), 'mo-fact-void', 'Bahsin iade edilme olasılığı (ör. beraberlikte)') : null);
+      return h('article', { class: 'mo-card verdict-' + safeId(o.verdict || 'unavailable'), 'aria-labelledby': titleId, dataset: { outcome: String(o.id), verdict: String(o.verdict || '') } },
+        h('header', { class: 'mo-card-head' },
+          h('h3', { class: 'mo-outcome', id: titleId }, outcomeTitle(o)),
+          h('div', { class: 'mo-entered' }, h('span', { class: 'field-label' }, 'Girdiğiniz oran'), h('span', { class: 'mo-entered-value num' }, fmtOdds(o.odds)))),
+        h('div', { class: 'mo-verdict tone-' + v.tone, dataset: { verdict: String(o.verdict || '') } },
+          h('span', { class: 'mo-verdict-icon', 'aria-hidden': 'true' }, v.icon),
+          h('div', { class: 'mo-verdict-body' },
+            h('p', { class: 'mo-verdict-label' }, head || v.label),
+            h('p', { class: 'mo-verdict-why' }, (headSub ? headSub + '. ' : '') + verdictWhy(o)))),
+        issues.length ? h('div', { class: 'mo-issues' }, h('p', { class: 'sub-heading' }, 'Neden değerlendirilemedi?'),
+          checkList(issues.map((c) => ({ code: c.code, label: c.label || CHECK_LABELS[c.code] || c.code, detail: c.detail, passed: false })))) : null,
+        facts,
+        modesDetails(o));
+    }
+
+    function modesDetails(o) {
+      const modes = (Array.isArray(o.modes) ? o.modes : []).filter((m) => m && typeof m === 'object');
+      const yes = modes.filter((m) => m.eligible === true).length;
+      return h('details', { class: 'mo-modes' },
+        h('summary', null, h('span', { class: 'summary-text' }, 'Modlar bu oranla ne derdi?',
+          h('span', { class: 'summary-hint' }, yes ? fmtInt(yes) + ' mod seçerdi' : 'Hiçbir mod seçmezdi'))),
+        h('div', { class: 'details-body' },
+          h('p', { class: 'small muted' }, 'Üç seçim modunun kurulu eşikleriyle bu oranın seçilip seçilmeyeceği. Karar kaydı oluşturulmaz.'),
+          h('ul', { class: 'mo-mode-list' }, modes.map((m) => {
+            const established = m.status === 'established';
+            const failed = (Array.isArray(m.failed) ? m.failed : []).filter((c) => c && typeof c === 'object');
+            const thr = failed.find((c) => c.code === 'thresholds_established');
+            const reason = !established ? (m.reason || (thr && thr.detail) || 'Eşikler henüz kronolojik doğrulamayla belirlenmedi.') : null;
+            const shown = established ? failed : failed.filter((c) => c.code !== 'thresholds_established');
+            const name = (MODE_FALLBACK[m.code] && MODE_FALLBACK[m.code].name) || m.name || m.code;
+            return h('li', { class: 'mo-mode', dataset: { mode: String(m.code || '') } },
+              h('div', { class: 'mo-mode-head' }, swatch(m.code), h('span', { class: 'mo-mode-name' }, name),
+                m.eligible === true ? badge('good', 'Uygun: Evet, seçerdi', 'mo-eligible') : badge('neutral', 'Uygun: Hayır', 'mo-eligible')),
+              reason ? h('p', { class: 'mo-mode-reason' }, 'Eşikler belirlenmedi: ' + reason) : null,
+              shown.length
+                ? checkList(shown.map((c) => ({ code: c.code, label: c.label || CHECK_LABELS[c.code] || c.code, detail: c.detail, passed: false })))
+                : m.eligible === true ? h('p', { class: 'small' }, 'Bu modun bütün koşulları sağlanıyor.') : null);
+          }))));
+    }
+
+    // ---------- son girişler
+    function renderHistory(data) {
+      lastHistory = data;
+      const items = (Array.isArray(data && data.items) ? data.items : []).filter((it) => it && typeof it === 'object');
+      if (!items.length) {
+        historyWrap.append(h('p', { class: 'muted' }, 'Henüz oran girmediniz.'));
+        return;
+      }
+      // Aynı anda girilen (aynı maç, market, zaman) oranlar tek satırda gösterilir.
+      const groups = [];
+      for (const it of items) {
+        const fx = it.fixture || {};
+        const mk = it.market || {};
+        const key = [fx.id, mk.id, it.entered_at].join('|');
+        const last = groups[groups.length - 1];
+        if (last && last.key === key) last.items.push(it);
+        else groups.push({ key, fixture: fx, market: mk, entered_at: it.entered_at, items: [it] });
+      }
+      historyWrap.append(h('ul', { class: 'mo-history' }, groups.map((g) => {
+        const def = marketById(g.market.id);
+        const order = (id) => (def ? def.outcomes.findIndex((oc) => oc.id === id) : 0);
+        const sorted = g.items.slice().sort((a, b) => order((a.outcome || {}).id) - order((b.outcome || {}).id));
+        return h('li', { class: 'mo-hist-item' },
+          h('div', { class: 'mo-hist-main' },
+            h('span', { class: 'mo-hist-match' }, teamsLabel(g.fixture)),
+            h('span', { class: 'mo-hist-meta' }, (g.market.name || g.market.id || 'Market') + ' · ' + fmtDateTime(g.entered_at))),
+          h('ul', { class: 'mo-hist-odds', 'aria-label': 'Girilen oranlar' }, sorted.map((it) => {
+            const oc = it.outcome || {};
+            return h('li', null, h('span', { class: 'mo-hist-oc' }, outcomeCode(oc) || oc.name || oc.id || '?'), ' ', h('strong', { class: 'num' }, fmtOdds(it.odds)));
+          })));
+      })));
+    }
+
+    return {
+      destroy() {
+        pageCtrl.abort();
+        formLoader.abort();
+        reloadHistory.abort();
+      },
+    };
+  }
+
   // ================================================================== SAYFA: Ayarlar
   function SettingsPage(root) {
     const formWrap = h('div');
@@ -2298,7 +2759,7 @@
   }
 
   // ================================================================== yönlendirme
-  const PAGES = { tahminler: PredictionsPage, basari: SuccessPage, radar: RadarPage, ayarlar: SettingsPage };
+  const PAGES = { tahminler: PredictionsPage, basari: SuccessPage, radar: RadarPage, 'oran-gir': ManualOddsPage, ayarlar: SettingsPage };
 
   function parseHash() {
     let raw = '';

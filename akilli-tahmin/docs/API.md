@@ -4,8 +4,8 @@ Tüm uçlar `/api/v1` altındadır, JSON döner, zamanlar ISO‑8601 UTC (`2026-
 Olasılıklar 0–1 arası ondalık, beklenen değer (EV) birim bahis başına ondalık getiridir (`0.05` = %5).
 Kullanıcı kimliği `X-User-Id` başlığıyla gelir; yoksa `local` kabul edilir.
 
-Durum değiştiren istekler (`PUT /api/v1/settings`, `POST /api/v1/radar/notifications/permission`) gövdeyi JSON
-olarak ve `Content-Type: application/json` başlığıyla göndermelidir; başka içerik türü (ya da içerik türü olmayan
+Durum değiştiren istekler (`PUT /api/v1/settings`, `POST /api/v1/radar/notifications/permission`,
+`POST /api/v1/manual-odds`) gövdeyi JSON olarak ve `Content-Type: application/json` başlığıyla göndermelidir; başka içerik türü (ya da içerik türü olmayan
 istek) `415 Unsupported Media Type` ile reddedilir. Bu, başka bir siteden ön kontrolsüz (CORS-basit) gönderilen
 isteklerin kullanıcı ayarlarını değiştirmesini engeller.
 
@@ -420,6 +420,116 @@ cümledir: `"Sağlanmayan koşul: MODEL A > %90."` (koşulun ayrıntısı eklene
 
 `POST /api/v1/radar/notifications/permission` gövde `{"granted": true}` (`Content-Type: application/json`; aksi hâlde
 `415`) → `{"user_id": "local", "granted": true}`
+
+---
+
+## Oranı elle girme (Oran Gir)
+
+Kullanıcının bir bahis sitesinde (ör. İddaa) gördüğü oranı sistemin olasılıklarıyla karşılaştırır. Girilen oran
+`manual` kaynağıyla, giriş anına tarihlenmiş (kesin zaman damgası) olarak kaydedilir; kullanıcının beyanıdır, İddaa'dan
+doğrulanmaz ve İddaa olarak gösterilmez. Olasılıklar yeniden hesaplanmaz: en son maç öncesi çalıştırmanın kayıtlı
+MODEL A / MODEL B kalibre olasılıkları, belirsizlik yüzdelikleri ve dayanıklılık değerleri kullanılır (oran MODEL A'yı
+etkilemez). Bu bir öneri değildir; pozitif EV kazanç garantisi değildir. Web arayüzünde "Oran Gir" sekmesi (`#oran-gir`).
+
+`GET /api/v1/manual-odds/options` → oran girilebilecek maçlar (son çalıştırmada adayı olan, henüz başlamamış maçlar;
+başlama saatine göre sıralı) ve 26 market:
+
+```json
+{
+  "run_id": 519, "generated_at": "2026-11-22T09:02:52Z", "max_age_minutes": 30,
+  "fixtures": [{"id": 749, "home": "Kasimpasa", "away": "Alanyaspor", "kickoff_at": "2026-11-22T13:00:00Z",
+                "league": {"id": "tr-super-lig", "name": "Süper Lig"}}],
+  "markets": [{"id": "1X2", "name": "Maç Sonucu", "family": "result",
+               "outcomes": [{"id": "1", "name": "Ev Sahibi"}, {"id": "X", "name": "Beraberlik"}, {"id": "2", "name": "Deplasman"}]}]
+}
+```
+
+Henüz çalıştırma yoksa `run_id`/`generated_at` `null`, `fixtures` boştur. `max_age_minutes` maç öncesi oranın güncel
+sayıldığı azami süredir (dakika).
+
+`POST /api/v1/manual-odds` gövde (`Content-Type: application/json`; aksi hâlde `415`):
+
+```json
+{"fixture_id": 749, "market_id": "1X2", "odds": {"1": 2.35, "X": 3.40, "2": 2.90}}
+```
+
+`odds` yalnızca girilen seçenekleri içerir (en az bir, en fazla 40); oranlar ondalıktır ve `1 < oran ≤ 1000` olmalıdır
+(iki ondalığa yuvarlanır). Geçersiz girişte `422` ve Türkçe açıklama döner; arayüz bu metni olduğu gibi gösterir:
+
+| Durum | `detail` |
+|---|---|
+| Hiç oran yok | `En az bir seçenek için oran girin.` |
+| Aralık dışı oran | `Geçersiz oran (Ev Sahibi): 1,01 ile 1000 arasında olmalı.` |
+| Bilinmeyen market / seçenek | `Bilinmeyen market: XX` · `Maç Sonucu marketinde 'Y' seçeneği yok.` |
+| Maç yok / başlamış | `Maç bulunamadı.` · `Maç başlamış veya planlı değil; oran değerlendirilemez.` |
+| Değerlendirme yok | `Henüz maç öncesi değerlendirme yok; önce veriyi güncelleyin.` · `Bu maç için güncel değerlendirme yok (son çalıştırmada bulunmuyor).` |
+
+Gövde şemaya uymazsa (ör. `fixture_id` sayı değil) FastAPI'nin standart `422` yanıtı döner (`detail` bir listedir).
+
+Yanıt:
+
+```json
+{
+  "fixture": {"id": 749, "home": "Kasimpasa", "away": "Alanyaspor", "kickoff_at": "2026-11-22T13:00:00Z",
+              "league": {"id": "tr-super-lig", "name": "Süper Lig"}},
+  "market": {"id": "1X2", "name": "Maç Sonucu"},
+  "entered_at": "2026-11-22T10:35:51Z", "source_label": "Elle girilen oran (kullanıcı)",
+  "complete_market": true, "margin": 0.0645, "run_id": 519,
+  "outcomes": [
+    {"id": "1", "name": "Ev Sahibi", "odds": 2.35, "fair_probability": 0.40,
+     "model_a": 0.585, "model_b": 0.552, "estimated_probability": 0.552,
+     "probability_lower": 0.517, "confidence_level": 0.8, "void_probability": 0.0,
+     "break_even_odds": 1.812, "ev": 0.297, "ev_lower": 0.214, "ev_model_a": 0.375, "ev_model_b": 0.297,
+     "verdict": "value", "verdict_label": "Avantajlı görünüyor", "quality_issues": [],
+     "modes": [
+       {"code": "highest_probability", "name": "En Güvenilir", "status": "established", "eligible": false, "reason": null,
+        "failed": [{"code": "prob_lower", "label": "Kalibre olasılığın ihtiyatlı alt sınırı",
+                    "detail": "Olasılık alt sınırı (%80 güven) 0,517 < 0,620"}]},
+       {"code": "best_value", "name": "En Avantajlı", "status": "established", "eligible": true, "reason": null, "failed": []},
+       {"code": "balanced", "name": "Dengeli", "status": "not_established", "eligible": false,
+        "reason": "Doğrulama penceresinde koşulları sağlayan eşik kümesi bulunamadı.",
+        "failed": [{"code": "thresholds_established", "label": "Eşikler kronolojik doğrulamayla belirlendi",
+                    "detail": "Doğrulama penceresinde koşulları sağlayan eşik kümesi bulunamadı."}]}
+     ]}
+  ],
+  "notes": ["Bu bir öneri değildir. …", "Girdiğiniz oran 'Elle girilen oran (kullanıcı)' olarak kaydedildi; …"]
+}
+```
+
+- `outcomes` yalnızca girilen seçenekleri market sırasıyla içerir.
+- `complete_market`: marketin bütün seçenekleri girildi ve market birbirini dışlayan/kapsayan seçeneklerden oluşuyor
+  (Çifte Şans ve Beraberlikte İade hariç). Yalnızca o zaman `margin` (Σ 1/oran − 1) ve `fair_probability` (marjdan
+  arındırılmış olasılık, güç yöntemi) doldurulur; aksi hâlde `null`.
+- `estimated_probability` sistemin olasılığıdır (MODEL A / MODEL B ayrıca verilir); `probability_lower` bunun
+  `confidence_level` tek yönlü güven düzeyindeki alt sınırıdır. `void_probability` iade olasılığıdır (ör. Beraberlikte İade).
+- `break_even_odds = (1 − void) / p`: girilen oran bundan yüksekse EV pozitiftir. `ev = p × oran + void − 1`;
+  `ev_lower` aynı hesabın `probability_lower` ile yapılmışıdır ("İhtiyatlı EV"); `ev_model_a` / `ev_model_b` modellerin ayrı EV'sidir.
+- `verdict`:
+
+| Kod | `verdict_label` | Koşul |
+|---|---|---|
+| `value` | Avantajlı görünüyor | `ev_lower > 0` ve `ev_model_a > 0` ve `ev_model_b > 0` |
+| `uncertain` | Belirsiz (avantaj belirsizlik altında desteklenmiyor) | `ev > 0` ama yukarıdaki koşul sağlanmıyor |
+| `no_value` | Avantajsız | `ev ≤ 0` |
+| `unavailable` | Değerlendirilemez | Olasılık yok veya Kalite Kapısı kontrolü sağlanmıyor (`quality_issues`) |
+
+- `quality_issues[]`: sağlanmayan Kalite Kapısı kontrolleri (`code`, `label`, `detail`); oran kontrolleri hariç.
+- `modes[]`: üç modun kurulu eşikleriyle bu oranla seçim yapıp yapmayacağı (karar kaydı **oluşturulmaz**). `failed[]`
+  sağlanmayan kontrollerdir; eşikleri belirlenmemiş modda `status: "not_established"`, `reason` gerekçedir ve `failed`
+  `thresholds_established` kontrolünü içerir.
+
+`GET /api/v1/manual-odds/history?limit=20` (`1 ≤ limit ≤ 200`) → elle girilen son oranlar, en yeni başta (her satır bir seçenek;
+aynı anda girilenler aynı `entered_at` değerini taşır):
+
+```json
+{"items": [{"fixture": {"id": 749, "home": "Kasimpasa", "away": "Alanyaspor", "kickoff_at": "2026-11-22T13:00:00Z",
+                        "league": {"id": "tr-super-lig", "name": "Süper Lig"}},
+            "market": {"id": "1X2", "name": "Maç Sonucu"}, "outcome": {"id": "2", "name": "Deplasman"},
+            "odds": 2.9, "entered_at": "2026-11-22T10:35:51Z"}]}
+```
+
+Geliştirme: `scripts/mock_api.py` bu uçları sabit verilerden (`tests/web/mock_api.json` › `manual_odds`) sunar; POST
+yanıtı maç başına sabit beklenen gol değerlerinden (Poisson) türetilen olasılıklarla hesaplanır, girişler yalnızca bellekte tutulur.
 
 ---
 
