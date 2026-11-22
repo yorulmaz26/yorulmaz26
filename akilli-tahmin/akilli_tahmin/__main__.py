@@ -181,6 +181,27 @@ def cmd_update_data(a) -> None:
         sys.exit(2)
 
 
+def cmd_setup(a) -> None:
+    """Tek komutla kurulum (Windows kur.bat): veritabanı kurulmamışsa real-data, kurulmuşsa update-data."""
+    from pathlib import Path
+
+    installed = False
+    if Path(a.db).exists():
+        try:
+            c = connect(a.db)
+            installed = c.execute("SELECT 1 FROM prediction_runs WHERE kind='backtest' LIMIT 1").fetchone() is not None
+            c.close()
+        except Exception:  # yarım kalmış/boş dosya: yeniden kurulur
+            installed = False
+    if installed:
+        print("Veritabanı kurulu; yeni sonuçlar ve güncel maç programı alınıyor...")
+        cmd_update_data(argparse.Namespace(db=a.db, leagues=None, seasons=2, allow_new=False))
+    else:
+        print("İlk kurulum: maç verileri indiriliyor ve model kuruluyor. Bu 10-20 dakika sürebilir; pencereyi kapatmayın...")
+        cmd_real_data(argparse.Namespace(db=a.db, leagues=a.leagues, seasons=3, full_history=False,
+                                         allow_partial=False))
+
+
 def cmd_serve(a) -> None:
     import uvicorn
 
@@ -260,6 +281,8 @@ def main(argv: list[str] | None = None) -> None:
     sp.add_argument("--leagues", default=None, help="Varsayılan: kurulumdaki ligler. " + leagues_help)
     sp.add_argument("--seasons", type=int, default=2, help="Güncel + önceki sezon (sezon geçişi için)")
     sp.add_argument("--allow-new", action="store_true", help="Geriye dönük testi yapılmamış lig eklemeye izin ver")
+    sp = add("kurulum", cmd_setup, "Tek komutla kur veya güncelle (gerçek veri)")
+    sp.add_argument("--leagues", default="T1,E0,SP1,I1,D1,F1", help="İlk kurulumda ligler. " + leagues_help)
     sp = add("serve", cmd_serve, "API ve arayüzü başlat")
     sp.add_argument("--host", default="127.0.0.1")
     sp.add_argument("--port", type=int, default=8000)

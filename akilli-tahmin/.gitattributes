@@ -1,0 +1,2 @@
+# Windows komut dosyaları CRLF satır sonuyla saklanır (dönüştürülmez).
+*.bat -text

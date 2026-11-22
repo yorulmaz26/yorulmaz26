@@ -22,22 +22,22 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m pytest -q                                # testler
 ```
 
-### Windows (cmd)
+### Windows (komut yazmadan)
 
-Python 3.12 veya 3.13 kurulu olmalı (python.org; kurulumda "Add python.exe to PATH" işaretlenir). Komutlar
-`akilli-tahmin` klasöründe, cmd penceresinde yazılır (Linux'taki `.venv/bin/` yerine `.venv\Scripts\`):
+1. python.org/downloads/windows adresinden **Python 3.13** kurun (en yeni sürüm 3.14 veya üstüyse listeden
+   3.13'ü seçin; paketler 3.10–3.13 ile uyumludur). Kurulumun ilk ekranında "Add python.exe to PATH" işaretlenir.
+2. Projeyi GitHub'dan ZIP olarak indirip "Tümünü ayıkla" ile açın.
+3. `akilli-tahmin` klasöründeki **`kur.bat`** dosyasına çift tıklayın (ilk kurulum 10–20 dakika sürebilir;
+   sonraki çalıştırmalar yalnızca günceller). Windows "bilgisayarınızı korudu" uyarısı verirse "Ek bilgi" →
+   "Yine de çalıştır".
+4. **`baslat.bat`** dosyasına çift tıklayın. İlk seferde API-Football anahtarı sorulur (Windows kullanıcı
+   ayarlarına kaydedilir; boş bırakılırsa canlı radar kapalı çalışır). Tarayıcı `http://127.0.0.1:8000`
+   adresini açar; pencere açık kaldığı sürece program çalışır.
 
-```bat
-cd C:\Users\KULLANICI\Downloads\akilli-tahmin
-python -m venv .venv
-.venv\Scripts\pip install -r requirements.txt
-.venv\Scripts\python -m akilli_tahmin real-data --db gercek.sqlite3
-set API_FOOTBALL_KEY=ANAHTARINIZ
-.venv\Scripts\python -m akilli_tahmin serve --db gercek.sqlite3
-```
-
-Son komut çalışırken cmd penceresi açık kalır; tarayıcıda `http://127.0.0.1:8000` açılır. Durdurmak için
-Ctrl+C. Sonraki açılışlarda yalnızca `cd`, `set` ve `serve` satırları yeterlidir.
+Elle (cmd'de): `python -m venv .venv`, `.venv\Scripts\pip install -r requirements.txt`,
+`.venv\Scripts\python -m akilli_tahmin kurulum --db gercek.sqlite3`,
+`.venv\Scripts\python -m akilli_tahmin serve --db gercek.sqlite3`. Komutlar `>>>` ile başlayan Python
+penceresine değil, cmd penceresine yazılır.
 
 ### Ücretsiz gerçek veri
 
