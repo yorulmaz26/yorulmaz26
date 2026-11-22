@@ -423,6 +423,55 @@ cümledir: `"Sağlanmayan koşul: MODEL A > %90."` (koşulun ayrıntısı eklene
 
 ---
 
+## Son 15 Dakika Radarı (API-Football)
+
+İki pencere: `H1` = ilk yarının son 15 dakikası (31'–45+'), `H2` = maçın son 15 dakikası (76'–90+'). Eşik
+büyük-eşittir (≥), varsayılan 0,90. Seçim modları etkilemez. Ayrıntılar: `docs/VARSAYIMLAR.md` §8.
+
+`GET /api/v1/radar/windows` → durum (istek göndermez; yalnızca planı günceller)
+
+```json
+{
+  "name": "Son 15 Dakika Radarı",
+  "config": {"enabled": true, "threshold": 0.9, "daily_limit": 100, "reserve": 5, "min_reach": 0.01,
+             "min_remaining_minutes": 10},
+  "budget": {"day": "2026-11-22", "daily_limit": 100, "reserve": 5, "used": 3, "remaining": 97, "usable": 92,
+             "provider_remaining": 97},
+  "planned_requests": {"live": 0, "note": "…"},
+  "probability_scale": {"targets": 48, "max_prematch_probability": 0.59, "mean_prematch_probability": 0.45, "note": "…"},
+  "threshold_preview": [{"threshold": 0.9, "windows_with_request": 0, "windows": 47}, {"threshold": 0.6, "windows_with_request": 12, "windows": 47}],
+  "targets": [{"fixture_id": 4752, "fixture": {"home": "…", "away": "…", "league": "…", "kickoff_at": "…"},
+               "window": "H2", "window_label": "Maçın son 15 dakikası (76'–90+')", "due_at": "…",
+               "prematch_probability": 0.44, "reach_probability": 1e-08, "status": "gated",
+               "note": "İstek gönderilmeyecek: …", "will_request": false}],
+  "evaluations": [{"id": 1, "fixture_id": 4752, "window": "H1", "minute": 39, "score": "0-0",
+                   "remaining_minutes": 8, "model_a_probability": 0.19, "market_probability": null,
+                   "model_b_probability": null, "alarm": false, "blocked_reason": "Bildirim gönderilmedi — …",
+                   "conditions": [{"code": "model_a_threshold", "label": "MODEL A ≥ eşik", "passed": false, "detail": "…"}],
+                   "outcome": null}],
+  "alerts": [],
+  "models": {"settled_evaluations": 0, "with_market": 0, "model_b_ready": false, "model_b_min_samples": 300,
+             "calibration": ["…", "…"]},
+  "recent_requests": [{"id": 1, "endpoint": "/fixtures", "params": {"live": "39-203"}, "purpose": "…",
+                       "requested_at": "…", "status": "ok", "results": 12, "error": null}]
+}
+```
+
+`targets[].status`: `pending` (pencere başında istek gönderilecek), `gated` (eşiğe ulaşma şansı < `min_reach`;
+istek gönderilmeyecek), `no_model` (maç öncesi MODEL A yok veya Kalite Kapısı'ndan geçmiyor; istek
+gönderilmeyecek), `evaluated`, `missed`.
+
+`PUT /api/v1/radar/windows/settings` gövde `{"threshold": 0.6, "enabled": true}` (alanlar isteğe bağlı; ayrıca
+`daily_limit`, `reserve`) → güncel `config`. Eşik 0,30–0,99 dışında → `422`. İstek harcanmamış hedefler yeni
+eşikle yeniden planlanır.
+
+`GET /api/v1/radar/windows/alerts?after_id=0&limit=20` → `{"items": [{"id": 1, "fixture_id": 4752, "fixture": {…},
+"window": "H2", "window_label": "…", "target": "Normal süre bitmeden en az bir gol", "minute": 76,
+"model_a_probability": 0.91, "model_b_probability": 0.92, "created_at": "…"}]}` (arayüz yeni bildirimleri bununla
+yoklar; API-Football kotası harcamaz).
+
+---
+
 ## Oranı elle girme (Oran Gir)
 
 Kullanıcının bir bahis sitesinde (ör. İddaa) gördüğü oranı sistemin olasılıklarıyla karşılaştırır. Girilen oran

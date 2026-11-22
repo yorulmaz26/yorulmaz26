@@ -38,6 +38,7 @@ PERIODS = ("7d", "30d", "90d", "all")
 _lock = threading.Lock()
 _settings: dict[str, str] = {}          # user_id -> default_mode
 _notification_permission: dict[str, bool] = {}
+_window_cfg: dict = {}                   # Son 15 dakika radarı ayarları (bellekte)
 _manual_history: list[dict] = []   # POST /manual-odds ile girilen oranlar (en yeni başta)
 
 
@@ -292,6 +293,13 @@ class Api:
             if path == "/radar/alerts":
                 limit = max(1, min(500, as_int(first(qs, "limit"), "limit", 50)))
                 return {"items": d["radar_alerts"]["items"][:limit]}
+            if path == "/radar/windows":
+                resp = copy.deepcopy(d["radar_windows"])
+                with _lock:
+                    resp["config"].update(_window_cfg)
+                return resp
+            if path == "/radar/windows/alerts":
+                return {"items": []}
             if path == "/leagues":
                 return d["leagues"]
             if path == "/system/status":
@@ -317,6 +325,18 @@ class Api:
             with _lock:
                 _notification_permission[user] = granted
             return {"user_id": user, "granted": granted}
+        if method == "PUT" and path == "/radar/windows/settings":
+            b = body if isinstance(body, dict) else {}
+            thr = b.get("threshold")
+            if thr is not None and not (isinstance(thr, (int, float)) and 0.30 <= thr <= 0.99):
+                raise ApiError(422, "Eşik %30 ile %99 arasında olmalı.")
+            with _lock:
+                if thr is not None:
+                    _window_cfg["threshold"] = float(thr)
+                if isinstance(b.get("enabled"), bool):
+                    _window_cfg["enabled"] = b["enabled"]
+                cfg = dict(self.data["radar_windows"]["config"], **_window_cfg)
+            return cfg
         if method == "POST" and path == "/manual-odds":
             return self.manual_evaluate(body)
         raise ApiError(404, "Not Found")

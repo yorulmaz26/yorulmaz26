@@ -189,6 +189,39 @@ def cmd_serve(a) -> None:
     uvicorn.run(create_app(a.db), host=a.host, port=a.port)
 
 
+def cmd_window_radar(a) -> None:
+    """Son 15 Dakika Radarı: planı göster (--plan) veya ön planda çalıştır. İstekler bütçe kapılarından geçer."""
+    import time
+
+    from .data.api_football import Client
+    from .db.database import connect, init_db, to_iso, utcnow
+    from .radar import window_radar as W
+
+    conn = connect(a.db)
+    init_db(conn)
+    if a.threshold is not None:
+        W.update_config(conn, {"threshold": a.threshold}, to_iso(utcnow()))
+    st = W.status(conn, to_iso(utcnow()))
+    b = st["budget"]
+    print(f"Eşik: %{st['config']['threshold'] * 100:.0f} ve üstü · bugün istek {b['used']}/{b['daily_limit']}"
+          f" (kullanılabilir {b['usable']})")
+    for t in st["targets"]:
+        if t["status"] in ("pending", "gated", "no_model") and t["fixture"]:
+            fx = t["fixture"]
+            print(f"  {t['due_at']}  {fx['home']} – {fx['away']}  {t['window']}  maç öncesi "
+                  f"%{100 * (t['prematch_probability'] or 0):.0f}  → {'İSTEK' if t['will_request'] else 'istek yok'}")
+    if a.plan:
+        return
+    client = Client()
+    print("Radar çalışıyor (Ctrl+C ile durdurun)…")
+    while True:
+        out = W.tick(conn, client)
+        if out.get("requests") or out.get("alerts"):
+            print(to_iso(utcnow()), f"istek: {out['requests']}, değerlendirme: {len(out.get('evaluations', []))},"
+                                    f" bildirim: {len(out.get('alerts', []))}")
+        time.sleep(30)
+
+
 def main(argv: list[str] | None = None) -> None:
     p = argparse.ArgumentParser(prog="akilli_tahmin", description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -230,6 +263,9 @@ def main(argv: list[str] | None = None) -> None:
     sp = add("serve", cmd_serve, "API ve arayüzü başlat")
     sp.add_argument("--host", default="127.0.0.1")
     sp.add_argument("--port", type=int, default=8000)
+    sp = add("window-radar", cmd_window_radar, "Son 15 dakika radarı (API-Football)")
+    sp.add_argument("--plan", action="store_true", help="Yalnızca istek planını göster (istek göndermez)")
+    sp.add_argument("--threshold", type=float, default=None, help="Eşik (0,30–0,99); varsayılan kayıtlı ayar (0,90)")
     a = p.parse_args(argv)
     a.fn(a)
 

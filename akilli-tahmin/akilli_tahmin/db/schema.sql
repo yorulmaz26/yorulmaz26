@@ -448,6 +448,103 @@ CREATE TABLE IF NOT EXISTS notification_permissions (
     updated_at  TEXT NOT NULL
 );
 
+-- ───────────────────────── Son 15 Dakika Radarı (API-Football) ─────────────────────────
+
+-- Uygulama ayarları (anahtar → JSON değer). API anahtarı burada TUTULMAZ.
+CREATE TABLE IF NOT EXISTS app_settings (
+    key         TEXT PRIMARY KEY,
+    value       TEXT NOT NULL,
+    updated_at  TEXT NOT NULL
+);
+
+-- Dış veri sağlayıcı istek kaydı (günlük istek bütçesi). İstek gönderilmeden ÖNCE yazılır; başlık ve
+-- anahtar kaydedilmez.
+CREATE TABLE IF NOT EXISTS api_requests (
+    id              INTEGER PRIMARY KEY,
+    provider        TEXT NOT NULL,
+    endpoint        TEXT NOT NULL,
+    params          TEXT NOT NULL,
+    purpose         TEXT NOT NULL,
+    day             TEXT NOT NULL,
+    requested_at    TEXT NOT NULL,
+    status          TEXT NOT NULL DEFAULT 'sent' CHECK (status IN ('sent', 'ok', 'error')),
+    results         INTEGER,
+    provider_remaining INTEGER,
+    error           TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_api_requests_day ON api_requests(provider, day);
+
+-- API-Football maçı ↔ yerel maç eşleşmesi (takım adı benzerliği + lig + başlama saati).
+CREATE TABLE IF NOT EXISTS apif_fixture_links (
+    apif_fixture_id INTEGER PRIMARY KEY,
+    fixture_id      INTEGER NOT NULL REFERENCES fixtures(id),
+    apif_home       TEXT NOT NULL,
+    apif_away       TEXT NOT NULL,
+    similarity      REAL NOT NULL,
+    linked_at       TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_apif_links_fixture ON apif_fixture_links(fixture_id);
+
+-- Pencere hedefleri: maç başına iki pencere (H1 = 31'–45+', H2 = 76'–90+'). İstek planı buradan çıkar.
+CREATE TABLE IF NOT EXISTS window_radar_targets (
+    fixture_id          INTEGER NOT NULL REFERENCES fixtures(id),
+    window              TEXT NOT NULL CHECK (window IN ('H1', 'H2')),
+    due_at              TEXT NOT NULL,
+    prematch_probability REAL,
+    reach_probability   REAL,
+    threshold           REAL NOT NULL,
+    status              TEXT NOT NULL CHECK (status IN ('pending', 'gated', 'evaluated', 'missed', 'no_model')),
+    attempts            INTEGER NOT NULL DEFAULT 0,
+    note                TEXT,
+    updated_at          TEXT NOT NULL,
+    PRIMARY KEY (fixture_id, window)
+);
+CREATE INDEX IF NOT EXISTS ix_window_targets_due ON window_radar_targets(status, due_at);
+
+CREATE TABLE IF NOT EXISTS window_radar_evaluations (
+    id                  INTEGER PRIMARY KEY,
+    fixture_id          INTEGER NOT NULL REFERENCES fixtures(id),
+    apif_fixture_id     INTEGER NOT NULL,
+    window              TEXT NOT NULL CHECK (window IN ('H1', 'H2')),
+    minute              INTEGER NOT NULL,
+    extra_minute        INTEGER,
+    home_goals          INTEGER NOT NULL,
+    away_goals          INTEGER NOT NULL,
+    home_red            INTEGER NOT NULL DEFAULT 0,
+    away_red            INTEGER NOT NULL DEFAULT 0,
+    remaining_minutes   REAL NOT NULL,
+    model_a_probability REAL NOT NULL,
+    market_probability  REAL,
+    market_odds         TEXT,
+    odds_updated_at     TEXT,
+    model_b_probability REAL,
+    threshold           REAL NOT NULL,
+    conditions          TEXT NOT NULL,
+    alarm               INTEGER NOT NULL,
+    blocked_reason      TEXT,
+    live_request_id     INTEGER REFERENCES api_requests(id),
+    odds_request_id     INTEGER REFERENCES api_requests(id),
+    evaluated_at        TEXT NOT NULL,
+    -- Sonuç: pencerede (değerlendirme anından devre sonuna kadar) gol oldu mu. Bir kez yazılır.
+    outcome             INTEGER CHECK (outcome IN (0, 1)),
+    settled_at          TEXT,
+    settled_by          TEXT
+);
+CREATE INDEX IF NOT EXISTS ix_window_evals_fixture ON window_radar_evaluations(fixture_id, window);
+
+CREATE TABLE IF NOT EXISTS window_radar_alerts (
+    id                  INTEGER PRIMARY KEY,
+    evaluation_id       INTEGER NOT NULL REFERENCES window_radar_evaluations(id),
+    fixture_id          INTEGER NOT NULL REFERENCES fixtures(id),
+    window              TEXT NOT NULL,
+    minute              INTEGER NOT NULL,
+    model_a_probability REAL NOT NULL,
+    model_b_probability REAL NOT NULL,
+    created_at          TEXT NOT NULL,
+    -- Mükerrer bildirim engeli: maç + pencere başına tek bildirim.
+    dedupe_key          TEXT NOT NULL UNIQUE
+);
+
 -- ───────────────────────── Değişmezlik tetikleyicileri ─────────────────────────
 
 CREATE TRIGGER IF NOT EXISTS trg_predictions_no_update BEFORE UPDATE ON predictions
@@ -532,3 +629,20 @@ BEGIN SELECT RAISE(ABORT, 'selection_mode_comparisons silinemez'); END;
 
 CREATE TRIGGER IF NOT EXISTS trg_radar_alerts_no_delete BEFORE DELETE ON radar_alerts
 BEGIN SELECT RAISE(ABORT, 'radar_alerts silinemez'); END;
+
+CREATE TRIGGER IF NOT EXISTS trg_window_alerts_no_delete BEFORE DELETE ON window_radar_alerts
+BEGIN SELECT RAISE(ABORT, 'window_radar_alerts silinemez'); END;
+CREATE TRIGGER IF NOT EXISTS trg_window_alerts_no_update BEFORE UPDATE ON window_radar_alerts
+BEGIN SELECT RAISE(ABORT, 'window_radar_alerts değiştirilemez'); END;
+CREATE TRIGGER IF NOT EXISTS trg_window_evals_no_delete BEFORE DELETE ON window_radar_evaluations
+BEGIN SELECT RAISE(ABORT, 'window_radar_evaluations silinemez'); END;
+-- Değerlendirme yalnızca sonuç alanları bakımından ve yalnızca bir kez güncellenebilir.
+CREATE TRIGGER IF NOT EXISTS trg_window_evals_settle_once BEFORE UPDATE ON window_radar_evaluations
+WHEN OLD.outcome IS NOT NULL
+  OR NEW.model_a_probability IS NOT OLD.model_a_probability
+  OR NEW.model_b_probability IS NOT OLD.model_b_probability
+  OR NEW.market_probability IS NOT OLD.market_probability
+  OR NEW.alarm IS NOT OLD.alarm
+  OR NEW.conditions IS NOT OLD.conditions
+  OR NEW.evaluated_at IS NOT OLD.evaluated_at
+BEGIN SELECT RAISE(ABORT, 'Pencere değerlendirmesi geriye dönük değiştirilemez'); END;

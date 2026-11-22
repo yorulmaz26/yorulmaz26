@@ -2447,5 +2447,293 @@
       {"fixture_id": 5530, "market_id": "OU_2.5", "outcome_id": "UNDER", "odds": 1.95, "entered_at": "2026-11-21T16:40:00Z"},
       {"fixture_id": 5525, "market_id": "1X2", "outcome_id": "1", "odds": 2.6, "entered_at": "2026-11-21T15:12:00Z"}
     ]
+  },
+  "radar_windows": {
+    "name": "Son 15 Dakika Radarı",
+    "windows": [
+      {
+        "code": "H1",
+        "label": "İlk yarının son 15 dakikası (31'–45+')",
+        "target": "İlk yarı bitmeden en az bir gol"
+      },
+      {
+        "code": "H2",
+        "label": "Maçın son 15 dakikası (76'–90+')",
+        "target": "Normal süre bitmeden en az bir gol"
+      }
+    ],
+    "config": {
+      "enabled": true,
+      "threshold": 0.9,
+      "daily_limit": 100,
+      "reserve": 5,
+      "min_reach": 0.01,
+      "min_remaining_minutes": 10
+    },
+    "threshold_range": [
+      0.3,
+      0.99
+    ],
+    "budget": {
+      "day": "2026-11-22",
+      "daily_limit": 100,
+      "reserve": 5,
+      "used": 1,
+      "remaining": 97,
+      "usable": 92,
+      "provider_remaining": 97
+    },
+    "planned_requests": {
+      "live": 0,
+      "note": "Her canlı yoklama 1 istektir; oran isteği yalnızca MODEL A eşiğe ulaşırsa eklenir."
+    },
+    "probability_scale": {
+      "targets": 48,
+      "max_prematch_probability": 0.5946351469645907,
+      "mean_prematch_probability": 0.44684738482926845,
+      "note": "15 dakikalık bir pencerede gol olasılığı genellikle %35–%55 arasındadır; %90 için maçta yaklaşık 10 gol beklentisi gerekir. Bu nedenle %90 eşiğinde istek ve bildirim çok nadirdir."
+    },
+    "threshold_preview": [
+      {
+        "threshold": 0.9,
+        "windows_with_request": 0,
+        "windows": 47
+      },
+      {
+        "threshold": 0.8,
+        "windows_with_request": 0,
+        "windows": 47
+      },
+      {
+        "threshold": 0.7,
+        "windows_with_request": 2,
+        "windows": 47
+      },
+      {
+        "threshold": 0.6,
+        "windows_with_request": 12,
+        "windows": 47
+      },
+      {
+        "threshold": 0.5,
+        "windows_with_request": 33,
+        "windows": 47
+      }
+    ],
+    "targets": [
+      {
+        "fixture_id": 4765,
+        "fixture": {
+          "home": "Kuzey Yıldızı",
+          "away": "Liman Spor",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T11:30:00Z"
+        },
+        "window": "H1",
+        "window_label": "İlk yarının son 15 dakikası (31'–45+')",
+        "due_at": "2026-11-22T12:01:00Z",
+        "prematch_probability": 0.3604968756237117,
+        "reach_probability": 0.0,
+        "status": "gated",
+        "note": "İstek gönderilmeyecek: canlı gol olasılığının %90 eşiğine ulaşma şansı %0,0 (en az %1,0 gerekir)",
+        "will_request": false
+      },
+      {
+        "fixture_id": 4752,
+        "fixture": {
+          "home": "Dağ Kartalları",
+          "away": "Vadi Gençlik",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T10:30:00Z"
+        },
+        "window": "H2",
+        "window_label": "Maçın son 15 dakikası (76'–90+')",
+        "due_at": "2026-11-22T12:03:00Z",
+        "prematch_probability": 0.43591052803446195,
+        "reach_probability": 0.0,
+        "status": "gated",
+        "note": "İstek gönderilmeyecek: canlı gol olasılığının %90 eşiğine ulaşma şansı %0,0 (en az %1,0 gerekir)",
+        "will_request": false
+      },
+      {
+        "fixture_id": 4765,
+        "fixture": {
+          "home": "Kuzey Yıldızı",
+          "away": "Liman Spor",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T11:30:00Z"
+        },
+        "window": "H2",
+        "window_label": "Maçın son 15 dakikası (76'–90+')",
+        "due_at": "2026-11-22T13:03:00Z",
+        "prematch_probability": 0.4272582418576102,
+        "reach_probability": 0.0,
+        "status": "gated",
+        "note": "İstek gönderilmeyecek: canlı gol olasılığının %90 eşiğine ulaşma şansı %0,0 (en az %1,0 gerekir)",
+        "will_request": false
+      },
+      {
+        "fixture_id": 4760,
+        "fixture": {
+          "home": "Bozkır SK",
+          "away": "Irmak Spor",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T13:00:00Z"
+        },
+        "window": "H1",
+        "window_label": "İlk yarının son 15 dakikası (31'–45+')",
+        "due_at": "2026-11-22T13:31:00Z",
+        "prematch_probability": 0.5099323137140643,
+        "reach_probability": 0.0,
+        "status": "gated",
+        "note": "İstek gönderilmeyecek: canlı gol olasılığının %90 eşiğine ulaşma şansı %0,0 (en az %1,0 gerekir)",
+        "will_request": false
+      },
+      {
+        "fixture_id": 4753,
+        "fixture": {
+          "home": "Sahil Birliği",
+          "away": "Yayla Spor",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T13:00:00Z"
+        },
+        "window": "H1",
+        "window_label": "İlk yarının son 15 dakikası (31'–45+')",
+        "due_at": "2026-11-22T13:31:00Z",
+        "prematch_probability": 0.3684776387382549,
+        "reach_probability": 0.0,
+        "status": "gated",
+        "note": "İstek gönderilmeyecek: canlı gol olasılığının %90 eşiğine ulaşma şansı %0,0 (en az %1,0 gerekir)",
+        "will_request": false
+      },
+      {
+        "fixture_id": 4754,
+        "fixture": {
+          "home": "Orman FK",
+          "away": "Kıyı Gençlik",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T13:00:00Z"
+        },
+        "window": "H1",
+        "window_label": "İlk yarının son 15 dakikası (31'–45+')",
+        "due_at": "2026-11-22T13:31:00Z",
+        "prematch_probability": 0.36251536646089144,
+        "reach_probability": 0.0,
+        "status": "gated",
+        "note": "İstek gönderilmeyecek: canlı gol olasılığının %90 eşiğine ulaşma şansı %0,0 (en az %1,0 gerekir)",
+        "will_request": false
+      }
+    ],
+    "evaluations": [
+      {
+        "id": 1,
+        "fixture_id": 4752,
+        "fixture": {
+          "home": "Dağ Kartalları",
+          "away": "Vadi Gençlik",
+          "league": "Kurgu Ligi",
+          "kickoff_at": "2026-11-22T10:30:00Z"
+        },
+        "window": "H1",
+        "window_label": "İlk yarının son 15 dakikası (31'–45+')",
+        "minute": 39,
+        "extra_minute": null,
+        "score": "0-0",
+        "model_a_probability": 0.18696912692028855,
+        "market_probability": null,
+        "model_b_probability": null,
+        "alarm": false,
+        "blocked_reason": "Bildirim gönderilmedi — sağlanmayan koşul: MODEL A ≥ eşik (MODEL A %18,7 (eşik %30 ve üstü))",
+        "conditions": [
+          {
+            "code": "model_a_threshold",
+            "label": "MODEL A ≥ eşik",
+            "passed": false,
+            "detail": "MODEL A %18,7 (eşik %30 ve üstü)"
+          },
+          {
+            "code": "model_b_threshold",
+            "label": "MODEL B ≥ eşik",
+            "passed": false,
+            "detail": "MODEL B henüz eğitilmedi: oranlı sonuçlanmış 0 örnek (en az 300 gerekir)"
+          },
+          {
+            "code": "remaining_time",
+            "label": "Pencerede yeterli süre",
+            "passed": false,
+            "detail": "Pencerede kalan ≈ 8 dk (en az 10 dk)"
+          },
+          {
+            "code": "live_data_fresh",
+            "label": "Canlı veri ≤ 60 sn",
+            "passed": true,
+            "detail": "Canlı durum bu adımda alındı"
+          },
+          {
+            "code": "live_odds_fresh",
+            "label": "Canlı oran ≤ 60 sn ve askıda değil",
+            "passed": null,
+            "detail": "Canlı oran istenmedi: MODEL A eşiğin altında veya başka şart sağlanmıyor (istek harcanmadı)"
+          },
+          {
+            "code": "rare_event_calibration",
+            "label": "Nadir olay kalibrasyonu (iki model)",
+            "passed": false,
+            "detail": "MODEL A: %30 ve üstü bölgede sonuçlanmış geçmiş örnek yok (en az 150 maç gerekir) · MODEL B: %30 ve üstü bölgede sonuçlanmış geçmiş örnek yok (en az 150 maç gerekir)"
+          },
+          {
+            "code": "quality_gate",
+            "label": "Tahmin Kalite Kapısı",
+            "passed": true,
+            "detail": "Maç öncesi MODEL A geçerli, eşleşme güvenilir"
+          },
+          {
+            "code": "notification_permission",
+            "label": "Bildirim izni",
+            "passed": false,
+            "detail": "Bildirim izni verilmedi"
+          },
+          {
+            "code": "duplicate_block",
+            "label": "Mükerrer bildirim engeli",
+            "passed": true,
+            "detail": "Bu maç ve pencere için daha önce bildirim yok"
+          }
+        ],
+        "evaluated_at": "2026-11-22T11:12:00Z",
+        "outcome": null,
+        "remaining_minutes": 8.0
+      }
+    ],
+    "alerts": [],
+    "models": {
+      "settled_evaluations": 0,
+      "with_market": 0,
+      "model_b_ready": false,
+      "model_b_min_samples": 300,
+      "calibration": [
+        "MODEL A: %90 ve üstü bölgede sonuçlanmış geçmiş örnek yok (en az 150 maç gerekir)",
+        "MODEL B: %90 ve üstü bölgede sonuçlanmış geçmiş örnek yok (en az 150 maç gerekir)"
+      ]
+    },
+    "recent_requests": [
+      {
+        "id": 1,
+        "endpoint": "/fixtures",
+        "params": {
+          "live": "39-61-78-135-140-203"
+        },
+        "purpose": "pencere canlı durum",
+        "requested_at": "2026-11-22T11:12:00Z",
+        "status": "ok",
+        "results": 138,
+        "error": null
+      }
+    ],
+    "notes": [
+      "Gol olasılığı eşiğe ulaşamayacak maçlar için API isteği gönderilmez.",
+      "Bildirim yalnızca bu sayfa (veya uygulama sekmesi) açıkken tarayıcı bildirimi olarak gösterilir.",
+      "Tahminler olasılıktır; yüksek olasılık gol garantisi değildir."
+    ]
   }
 }

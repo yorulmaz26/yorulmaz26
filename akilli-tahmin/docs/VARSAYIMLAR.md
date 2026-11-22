@@ -131,6 +131,36 @@ olasılığın küçüğü. Bu, iki modelin de desteklemesini şart koşan bir k
 - **Gerçek piyasa sonucu (Süper Lig, 2024/25–2026/27, 747 maç):** En Güvenilir geriye dönük testte kalibre
   (419 seçim, isabet %91,9 / tahmin %89,8). Piyasa oranları modellerden daha isabetli (log loss: piyasa 0,551,
   MODEL B 0,554, MODEL A 0,572); En Avantajlı ve Dengeli hiç kurulmadı — güvenilir avantaj yok.
-- **İleride:** canlı maç verisi için ücretsiz katmanı olan resmi bir servis (ör. API-Football, günde 100 istek;
-  kullanıcının kendi ücretsiz anahtarı gerekir); İddaa oranları için izinli/lisanslı erişim.
+- **İleride:** İddaa oranları için izinli/lisanslı erişim. (Canlı veri için API-Football bağlandı: §8.)
 5. İstatistiksel politika değerleri (güven düzeyleri, en az örneklemler) varsayılan haliyle kullanılır.
+
+## 8. Son 15 Dakika Radarı — API-Football (kullanıcı talebi, 2026-11-22)
+
+Talep: "ilk yarı son 15 dk ve ikinci yarı son 15 dakika için gol analizi yap canlı radar oluştur. Günlük 100
+istek ile sınırlı olduğu için gol olma ihtimali yüzde 90 ve üstü ise istek gönder bildirim gönder."
+
+- **Anahtar:** kullanıcının API-Football anahtarı koda, veritabanına, kayıtlara veya git geçmişine yazılmaz.
+  Bulut oturumunda ağ vekil sunucusu ekler; kendi bilgisayarınızda `API_FOOTBALL_KEY` ortam değişkeniyle
+  verilir. Anahtar sohbette paylaşıldığı için yenilenmesi önerildi.
+- **Ücretsiz plan doğrulandı (2026-11-22):** `/fixtures?live` ve `/odds/live` erişilebilir; 21 organizasyonun
+  lig kimlikleri `/leagues` ile doğrulandı (`APIF_LEAGUE_IDS`). Sayaç 00:00 UTC'de (03:00 TSİ) sıfırlanır.
+- **Eşik "≥ %90":** kullanıcı "yüzde 90 ve üstü" dediği için bu radar büyük-eşit kullanır (Canlı Gol Radar
+  > %90 kullanır). Eşik Canlı Gol Radar sayfasından %50–%90 arasında (API ile %30–%99) değiştirilebilir; seçim modları
+  değiştiremez.
+- **Gerçekçi beklenti:** 15 dakikalık pencerede gol olasılığı tipik maçta %35–%55'tir; %90 için maçta yaklaşık
+  10 gol beklentisi gerekir. Gerçek veride (6 lig, 4.412 maç değerlendirmesi) maç öncesi pencere olasılığı
+  ortalama %39,8 (H1) / %46,0 (H2), en çok %61,6 / %67,3; hiçbir maç %90'a yaklaşmadı. Bu yüzden %90 eşiğinde radar **pratikte hiç istek göndermez ve
+  bildirim üretmez**. 2026-11-22 planında 47 pencere için istek sayısı: %90 → 0, %80 → 0, %70 → 2, %60 → 12,
+  %50 → 33.
+- **Pencere payları (yaklaşık, literatür):** yarının gollerinin %42'si (H1) ve %41'i (H2) son 15 dakika +
+  uzatmada; ortalama uzatma 2 (H1) ve 4 (H2) dakika. Tempo dağılımı κ = 10 (ihtiyatlı). Radar kendi
+  değerlendirmelerini sonuçlandırdıkça (canlı yanıttaki devre/maç sonu skoru veya football-data.co.uk sonucu)
+  bu değerler yeniden kestirilmelidir.
+- **MODEL B ve nadir olay kalibrasyonu:** yalnızca bu radarın sonuçlanmış geçmişiyle eğitilir/sınanır
+  (MODEL B ≥ 300 oranlı örnek, kalibrasyon ≥ 150 maç). Bu birikene kadar bildirim verilmez; değerlendirmeler
+  yine kaydedilir ve gerekçesiyle gösterilir.
+- **Bildirim teslimi:** tarayıcı bildirimi; uygulama sayfası açıkken çalışır (sekme arka planda olabilir).
+  Telefona uygulama kapalıyken bildirim (web push) yoktur (Aşama 61).
+- **Sunucu açık olmalı:** yoklama `serve` çalışırken arka planda yapılır (`AKILLI_TAHMIN_WINDOW_RADAR=0` kapatır)
+  veya `python -m akilli_tahmin window-radar --db gercek.sqlite3` ile ön planda. Sunucu kapalıyken kaçan
+  pencereler "kaçırıldı" olarak işaretlenir.

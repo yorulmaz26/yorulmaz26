@@ -455,8 +455,8 @@ th.sticky-col { background: var(--surface-2); }
 .switch[aria-checked="true"] .switch-track::after { transform: translateX(20px); }
 .switch[disabled] { opacity: 0.6; cursor: progress; }
 .live-list { display: grid; gap: 12px; list-style: none; }
-.live-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 10px; background: var(--surface); }
-.live-card.alarm-on { border-color: var(--info-ink); box-shadow: inset 4px 0 0 var(--info-ink); }
+.live-card, .window-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; display: grid; gap: 10px; background: var(--surface); }
+.live-card.alarm-on, .window-card.alarm-on { border-color: var(--info-ink); box-shadow: inset 4px 0 0 var(--info-ink); }
 .live-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
 .live-head > :first-child { min-width: 0; flex: 1 1 auto; }
 .live-head > :last-child { flex: none; text-align: right; }
@@ -613,3 +613,13 @@ th.sticky-col { white-space: normal; min-width: 112px; max-width: 170px; }
 .table-compact { font-size: 0.82rem; }
 .table-compact th, .table-compact td { padding: 7px 7px; }
 .table-compact thead th { min-width: 56px; }
+
+/* Son 15 Dakika Radarı */
+.sub-title { font-size: 0.95rem; font-weight: 650; margin-bottom: 6px; }
+.window-form { display: grid; gap: 10px; min-width: 0; }
+.window-form .field { display: grid; gap: 4px; min-width: 0; }
+.window-form label { font-size: 0.85rem; font-weight: 650; color: var(--text-2); }
+.window-form select { width: 100%; max-width: 22rem; min-height: 44px; }
+.window-form .check-inline { display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.window-form .check-inline input { width: 20px; height: 20px; }
+.window-form .btn { justify-self: start; min-height: 40px; }

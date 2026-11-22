@@ -35,6 +35,13 @@ class PermissionBody(BaseModel):
     granted: bool
 
 
+class WindowRadarSettingsBody(BaseModel):
+    enabled: bool | None = None
+    threshold: float | None = None
+    daily_limit: int | None = None
+    reserve: int | None = None
+
+
 class ManualOddsBody(BaseModel):
     fixture_id: int
     market_id: str
@@ -47,6 +54,8 @@ def _minute_now() -> str:
 
 def create_app(db_path: str | None = None, *, auto_refresh_demo: bool = True) -> FastAPI:
     runtime = Runtime(db_path or os.environ.get("AKILLI_TAHMIN_DB", "akilli_tahmin.sqlite3"))
+    if auto_refresh_demo and os.environ.get("AKILLI_TAHMIN_WINDOW_RADAR", "1") != "0":
+        runtime.start_window_radar()  # yalnızca gerçek veri; sentetik veritabanında başlamaz
     app = FastAPI(title="Akıllı Tahmin", version="6.3.0",
                   description="İki tahmin modeli (MODEL A, MODEL B), üç seçim modu, Canlı Gol Radar.")
     app.state.runtime = runtime
@@ -226,6 +235,31 @@ def create_app(db_path: str | None = None, *, auto_refresh_demo: bool = True) ->
         from ..radar.live_goal_radar import set_notification_permission
 
         return set_notification_permission(conn, user(x_user_id), body.granted, to_iso(utcnow()))
+
+    # ───────────── son 15 dakika radarı (API-Football) ─────────────
+    @app.get("/api/v1/radar/windows")
+    @locked
+    def get_window_radar():
+        from ..radar.window_radar import status
+
+        return status(conn, to_iso(utcnow()), runtime.settings)
+
+    @app.put("/api/v1/radar/windows/settings")
+    @locked
+    def put_window_radar_settings(body: WindowRadarSettingsBody):
+        from ..radar.window_radar import update_config
+
+        try:
+            return update_config(conn, body.model_dump(exclude_none=True), to_iso(utcnow()))
+        except (ValueError, TypeError) as exc:
+            raise HTTPException(422, str(exc)) from exc
+
+    @app.get("/api/v1/radar/windows/alerts")
+    @locked
+    def get_window_alerts(after_id: int = Query(0, ge=0, le=MAX_ID), limit: int = Query(20, ge=1, le=200)):
+        from ..radar.window_radar import list_window_alerts
+
+        return {"items": list_window_alerts(conn, after_id, limit)}
 
     # ───────────── oranı elle girme ─────────────
     @app.get("/api/v1/manual-odds/options")

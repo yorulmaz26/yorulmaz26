@@ -137,8 +137,8 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 | 53 | Taban çizgisi ve seçim yanlılığı koruması | Başarı Merkezi ve Doğrulama | Tamamlandı (temel) |
 | 54 | Sezonlar arası dayanıklılık ve model kayması izleme | Başarı Merkezi ve Doğrulama | Kısmen |
 | 55 | Model ve piyasa karşılaştırma raporları | Başarı Merkezi ve Doğrulama | Kısmen |
-| 56 | Canlı maç veri akışı | Canlı | Planlandı |
-| 57 | Canlı oran akışı | Canlı | Planlandı |
+| 56 | Canlı maç veri akışı | Canlı | Kısmen |
+| 57 | Canlı oran akışı | Canlı | Kısmen |
 | 58 | Canlı MODEL A / MODEL B kalan süre gol olasılıkları | Canlı | Tamamlandı (temel) |
 | 59 | Canlı Gol Radar karar kuralları (%90) | Canlı | Tamamlandı (temel) |
 | 60 | Alarm kaydı, mükerrer alarm engeli, bildirim izni ve radar başarı takibi | Canlı | Kısmen |
@@ -159,10 +159,10 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 | 4. Seçim ve Kalite | 32–40 | 7 | 1 | 1 |
 | 5. Arayüz ve API | 41–48 | 3 | 3 | 2 |
 | 6. Başarı Merkezi ve Doğrulama | 49–55 | 5 | 2 | 0 |
-| 7. Canlı | 56–61 | 2 | 1 | 3 |
+| 7. Canlı | 56–61 | 2 | 3 | 1 |
 | 8. Operasyon | 62–65 | 0 | 1 | 3 |
 | 9. v6.3 Entegrasyonu | 66 | 0 | 1 | 0 |
-| **Toplam** | **66** | **40** | **14** | **12** |
+| **Toplam** | **66** | **40** | **16** | **10** |
 
 **v6.3 entegrasyonu içeren aşamalar:** 5 (veritabanı), 16, 20, 32, 33 (Tahmin Kalite Kapısı), 34 (Akıllı Seçim Motoru), 35, 36, 37, 38, 39, 41 (API), 42, 43 (arayüz), 48, 49, 50, 51 (Başarı Merkezi), 52, 53, 54, 59 (radar bağımsızlığı), 62 (testler) ve 66.
 
@@ -1213,9 +1213,15 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 
 | Faz | Durum | Modül |
 |---|---|---|
-| Canlı | Planlandı | `radar/`, `data/` |
+| Canlı | Kısmen | `radar/`, `data/` |
 
 **Amaç:** Canlı skor, dakika ve olay (gol, kırmızı kart) verisini düşük gecikmeyle almak.
+
+**Durum (2026-11-22):** API-Football ücretsiz planı (günde 100 istek) bağlandı: `data/api_football.py`
+(bütçe denetimli istemci, `api_requests` kaydı) ve `radar/window_radar.py` (Son 15 Dakika Radarı). Tek
+`/fixtures?live=<ligler>` isteği o anda oynanan bütün maçları getirir; maçlar takım adı benzerliği, lig ve
+başlama saatiyle yerel maçlara bağlanır (`apif_fixture_links`). Sürekli akış yoktur: istek yalnızca pencere
+başlarında ve olasılık kapısından geçen maçlar için gönderilir. Kalan: kesinti/gecikme izleme, sürekli akış.
 
 **Çıktılar:**
 - Canlı sağlayıcı adaptörü; olay zamanı ve alınma zamanı; veri yaşı ölçümü.
@@ -1230,9 +1236,14 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 
 | Faz | Durum | Modül |
 |---|---|---|
-| Canlı | Planlandı | `odds/`, `radar/` |
+| Canlı | Kısmen | `odds/`, `radar/` |
 
 **Amaç:** Radar için gerekli canlı oranları kaynak ve zaman bilgisiyle almak.
+
+**Durum (2026-11-22):** API-Football `/odds/live` (ücretsiz planda erişilebilir; tek istekte bütün canlı maçlar)
+Son 15 Dakika Radarı'nda kullanılır: "Over/Under (1st Half)" (49) ve "Match Goals" (25) marketlerinin
+(gol + 0,5) çizgisi; güncelleme zamanı ≤ 60 sn ve askıda değilse geçerli. Oran isteği yalnızca MODEL A eşiğe
+ulaştığında gönderilir. İddaa oranı değildir ve İddaa olarak gösterilmez.
 
 **Çıktılar:**
 - Canlı oran adaptörü; askıya alınan market yönetimi.
@@ -1477,6 +1488,7 @@ Mevcut durum: 1–7'nin temel uygulaması sentetik veriyle çalışıyor. Eksik:
 | `domain/markets.py` | 4, 15, 49 |
 | `db/schema.sql`, `db/database.py` | 5, 11, 21, 42, 60, 65, 66 |
 | `data/synthetic.py` | 2, 8 |
+| `data/api_football.py` | 56, 57 |
 | `data/football_data_csv.py` | 7, 66 |
 | `data/point_in_time.py` | 6, 12, 13 |
 | `models/model_a.py` | 14, 15 |
@@ -1487,7 +1499,7 @@ Mevcut durum: 1–7'nin temel uygulaması sentetik veriyle çalışıyor. Eksik:
 | `odds/` | 11, 18, 32, 40 |
 | `selection/` | 31, 34, 35, 36, 37, 38, 39, 66 |
 | `performance/` | 49, 51, 52, 53, 54, 55, 66 |
-| `radar/` | 25, 58, 59, 60 |
+| `radar/` | 25, 56, 57, 58, 59, 60 |
 | `api/` | 41, 42, 44, 45, 66 |
 | `web/static` | 43, 44, 45, 46, 51, 66 |
 | `backtest/` | 13, 50, 55, 66 |

@@ -1990,6 +1990,176 @@
     return h('div', { class: 'tile' }, h('span', { class: 'tile-label' }, label), h('span', { class: 'tile-value' }, value), subText ? h('span', { class: 'tile-sub' }, subText) : null);
   }
 
+  // ================================================================== Son 15 Dakika Radarı
+  const WINDOW_THRESHOLDS = [0.9, 0.85, 0.8, 0.75, 0.7, 0.65, 0.6, 0.55, 0.5];
+  const TARGET_STATUS = {
+    pending: ['info', 'İstek gönderilecek'],
+    gated: ['neutral', 'İstek gönderilmeyecek'],
+    evaluated: ['good', 'Değerlendirildi'],
+    missed: ['warn', 'Kaçırıldı'],
+    no_model: ['neutral', 'Model yok'],
+  };
+
+  function renderWindowRadar(wrap, data, reload) {
+    const d = data && typeof data === 'object' ? data : {};
+    const cfg = d.config || {};
+    const b = d.budget || {};
+    const scale = d.probability_scale || {};
+    const thr = isNum(cfg.threshold) ? cfg.threshold : 0.9;
+    wrap.append(
+      h('p', { class: 'small muted' }, 'İki pencere izlenir: ', h('strong', null, 'ilk yarının son 15 dakikası (31\u2032–45+\u2032)'), ' ve ',
+        h('strong', null, 'maçın son 15 dakikası (76\u2032–90+\u2032)'), '. Gol olasılığı eşiğe ulaşamayacak maçlar için API isteği gönderilmez; canlı oran yalnızca MODEL A eşiğe ulaşınca istenir.'),
+      h('div', { class: 'tiles', style: 'margin-top:10px' },
+        tile('Bildirim eşiği', '≥ ' + fmtPct(thr, 0), cfg.enabled === false ? 'Radar kapalı' : 'Radar açık'),
+        tile('Bugün kullanılan istek', fmtInt(b.used) + ' / ' + fmtInt(b.daily_limit), isNum(b.reserve) ? fmtInt(b.reserve) + ' istek yedekte' : ''),
+        tile('Kullanılabilir istek', fmtInt(b.usable), isNum(b.provider_remaining) ? 'Sağlayıcıya göre kalan: ' + fmtInt(b.provider_remaining) : 'Sayaç 03:00\u2019te (TSİ) sıfırlanır'),
+        tile('Planlanan canlı yoklama', fmtInt((d.planned_requests || {}).live), 'önümüzdeki 36 saat')),
+      notice('warn', '!', 'Gerçekçi beklenti',
+        h('p', null, scale.note || ''),
+        isNum(scale.max_prematch_probability) ? h('p', { class: 'small' }, 'Planlanan ' + fmtInt(scale.targets) + ' pencerede maç öncesi gol olasılığı: en yüksek ' +
+          fmtPct(scale.max_prematch_probability) + ', ortalama ' + fmtPct(scale.mean_prematch_probability) + '.') : null),
+      windowPreview(d.threshold_preview, thr),
+      windowSettingsForm(cfg, reload),
+      windowTargets(d.targets),
+      windowEvaluations(d.evaluations),
+      windowAlertsTable(d.alerts),
+      h('ul', { class: 'small muted', style: 'margin-top:8px;padding-left:18px' }, (d.notes || []).map((n) => h('li', null, n))));
+  }
+
+  function windowPreview(list, thr) {
+    const items = Array.isArray(list) ? list : [];
+    if (!items.length || !items[0].windows) return null;
+    return h('div', { style: 'margin-top:10px' },
+      h('h3', { class: 'sub-title' }, 'Eşiğe göre istek sayısı (önümüzdeki 36 saat)'),
+      h('ul', { class: 'cond-list' }, items.map((p) => h('li', null,
+        h('span', null, '%' + Math.round(p.threshold * 100) + ' ve üstü' + (Math.abs(p.threshold - thr) < 1e-6 ? ' (seçili)' : '')),
+        h('span', { class: 'cond-value' }, fmtInt(p.windows_with_request) + ' / ' + fmtInt(p.windows) + ' pencerede istek')))));
+  }
+
+  function windowSettingsForm(cfg, reload) {
+    const sel = h('select', { id: 'window-threshold', 'aria-describedby': 'window-threshold-help' },
+      WINDOW_THRESHOLDS.map((v) => h('option', { value: String(v), selected: Math.abs(v - (cfg.threshold || 0.9)) < 1e-6 ? '' : null }, '%' + Math.round(v * 100) + ' ve üstü')));
+    const enabled = h('input', { type: 'checkbox', id: 'window-enabled', checked: cfg.enabled === false ? null : '' });
+    const status = h('p', { class: 'form-status', role: 'status', 'aria-live': 'polite' });
+    const btn = h('button', { type: 'submit', class: 'btn btn-small' }, 'Kaydet');
+    const form = h('form', { class: 'window-form', style: 'margin-top:12px' },
+      h('div', { class: 'field' }, h('label', { for: 'window-threshold' }, 'Bildirim ve istek eşiği (MODEL A ve MODEL B)'), sel,
+        h('p', { id: 'window-threshold-help', class: 'small muted' }, 'Eşik düştükçe daha çok maç için istek gönderilir. Günlük sınır ve yedek her durumda korunur.')),
+      h('label', { class: 'check-inline' }, enabled, ' Radar açık'),
+      btn, status);
+    form.addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      btn.disabled = true;
+      status.className = 'form-status';
+      status.textContent = 'Kaydediliyor…';
+      try {
+        await api('/radar/windows/settings', { method: 'PUT', body: { threshold: Number(sel.value), enabled: enabled.checked } });
+        status.className = 'form-status ok';
+        status.textContent = 'Kaydedildi. İstek planı yeni eşiğe göre güncellendi.';
+        window.setTimeout(reload, 600);
+      } catch (e) {
+        status.className = 'form-status err';
+        status.textContent = 'Kaydedilemedi: ' + ((e && e.message) || 'bilinmeyen hata');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+    return form;
+  }
+
+  function windowFixture(x) {
+    const fx = (x && x.fixture) || {};
+    return teamsLabel(fx) + (fx.league ? ' · ' + fx.league : '');
+  }
+
+  function windowTargets(list) {
+    const items = (Array.isArray(list) ? list : []).filter((t) => t && (t.status === 'pending' || t.status === 'gated' || t.status === 'no_model')).slice(0, 30);
+    const head = h('h3', { class: 'sub-title', style: 'margin-top:14px' }, 'İstek planı');
+    if (!items.length) return h('div', null, head, h('p', { class: 'muted small' }, 'Önümüzdeki 36 saatte izlenecek maç yok (API-Football ligleri ve maç öncesi MODEL A değerlendirmesi gerekir).'));
+    return h('div', null, head, h('div', { class: 'table-wrap', tabindex: '0', role: 'region', 'aria-label': 'İstek planı tablosu' }, h('table', null,
+      h('thead', null, h('tr', null, ['Yoklama', 'Maç', 'Pencere', 'Maç öncesi olasılık', 'Eşiğe ulaşma şansı', 'Durum'].map((t) => h('th', { scope: 'col', class: t === 'Maç' ? 'text-left' : null }, t)))),
+      h('tbody', null, items.map((t) => {
+        const st = TARGET_STATUS[t.status] || ['neutral', t.status];
+        return h('tr', null,
+          h('td', null, fmtDateTime(t.due_at)),
+          h('td', { class: 'text-left' }, windowFixture(t)),
+          h('td', null, t.window === 'H1' ? '31\u2032–45+\u2032' : '76\u2032–90+\u2032'),
+          h('td', null, fmtPct(t.prematch_probability)),
+          h('td', null, fmtPct(t.reach_probability)),
+          h('td', { title: t.note || '' }, badge(st[0], st[1])));
+      })))));
+  }
+
+  function windowEvaluations(list) {
+    const items = Array.isArray(list) ? list.slice(0, 12) : [];
+    const head = h('h3', { class: 'sub-title', style: 'margin-top:14px' }, 'Son değerlendirmeler');
+    if (!items.length) return h('div', null, head, h('p', { class: 'muted small' }, 'Henüz canlı değerlendirme yok.'));
+    return h('div', null, head, h('ul', { class: 'live-list' }, items.map((e) => {
+      const conds = Array.isArray(e.conditions) ? e.conditions : [];
+      return h('li', null, h('article', { class: 'window-card' + (e.alarm ? ' alarm-on' : '') },
+        h('div', { class: 'live-head' },
+          h('div', null, h('h3', null, windowFixture(e)), h('p', { class: 'small muted' }, e.window_label || '')),
+          h('div', null, h('div', { class: 'live-score' }, e.score || '—'),
+            h('div', { class: 'live-minute' }, (isNum(e.minute) ? e.minute + (e.extra_minute ? '+' + e.extra_minute : '') + '. dk' : '—') +
+              (isNum(e.remaining_minutes) ? ' · ≈' + Math.round(e.remaining_minutes) + ' dk kaldı' : '')))),
+        h('div', { class: 'live-probs' },
+          h('span', null, 'MODEL A ', h('strong', null, fmtPct(e.model_a_probability))),
+          h('span', null, 'Piyasa ', h('strong', null, fmtPct(e.market_probability))),
+          h('span', null, 'MODEL B ', h('strong', null, fmtPct(e.model_b_probability)))),
+        h('div', { class: 'fact-line' }, e.alarm ? badge('info', 'Bildirim gönderildi', 'alarm-badge') : badge('neutral', 'Bildirim yok', 'alarm-badge'),
+          e.outcome === 1 ? badge('good', 'Pencerede gol oldu') : e.outcome === 0 ? badge('bad', 'Pencerede gol olmadı') : null),
+        e.blocked_reason ? h('p', { class: 'small', style: 'color:var(--warn-ink)' }, e.blocked_reason) : null,
+        h('details', null, h('summary', { class: 'small' }, 'Neden? (koşul ayrıntıları)'), h('div', { class: 'details-body' }, checkList(conds)))));
+    })));
+  }
+
+  function windowAlertsTable(list) {
+    const items = Array.isArray(list) ? list : [];
+    const head = h('h3', { class: 'sub-title', style: 'margin-top:14px' }, 'Gönderilen bildirimler');
+    if (!items.length) return h('div', null, head, h('p', { class: 'muted small' }, 'Henüz bildirim yok.'));
+    return h('div', null, head, h('div', { class: 'table-wrap', tabindex: '0', role: 'region', 'aria-label': 'Pencere bildirimleri' }, h('table', null,
+      h('thead', null, h('tr', null, ['Zaman', 'Maç', 'Pencere', 'Dakika', 'MODEL A', 'MODEL B'].map((t) => h('th', { scope: 'col', class: t === 'Maç' ? 'text-left' : null }, t)))),
+      h('tbody', null, items.map((a) => h('tr', null,
+        h('td', null, fmtDateTime(a.created_at)), h('td', { class: 'text-left' }, windowFixture(a)),
+        h('td', null, a.window === 'H1' ? '31\u2032–45+\u2032' : '76\u2032–90+\u2032'),
+        h('td', null, isNum(a.minute) ? a.minute + '. dk' : '—'),
+        h('td', null, fmtPct(a.model_a_probability)), h('td', null, fmtPct(a.model_b_probability))))))));
+  }
+
+  /** Yeni pencere bildirimlerini tarayıcı bildirimi olarak gösterir (yalnızca izin varsa; yerel istek, API kotası harcamaz). */
+  let windowPollBusy = false;
+  async function pollWindowAlerts() {
+    if (windowPollBusy || store.get('radarNotifications', false) !== true) return;
+    windowPollBusy = true;
+    try {
+      const seen = store.get('windowAlertSeen', null);
+      const res = await api('/radar/windows/alerts?after_id=' + encodeURIComponent(String(seen == null ? 0 : seen)) + '&limit=50');
+      const items = Array.isArray(res && res.items) ? res.items : [];
+      if (!items.length) {
+        if (seen == null) store.set('windowAlertSeen', 0);
+        return;
+      }
+      const maxId = Math.max(...items.map((a) => Number(a.id) || 0));
+      store.set('windowAlertSeen', maxId);
+      if (seen == null) return; // ilk açılışta eski bildirimler yeniden gösterilmez
+      if (!('Notification' in window) || window.Notification.permission !== 'granted') return;
+      for (const a of items.slice(-3)) {
+        try {
+          new window.Notification('Gol radarı: ' + windowFixture(a), {
+            body: (a.target || 'Gol') + ' · ' + (isNum(a.minute) ? a.minute + '. dk · ' : '') + 'MODEL A ' + fmtPct(a.model_a_probability) + ', MODEL B ' + fmtPct(a.model_b_probability),
+            tag: 'window-' + a.id,
+          });
+        } catch (e) {
+          /* bazı mobil tarayıcılar sayfa içinden bildirim kurucusunu desteklemez */
+        }
+      }
+    } catch (e) {
+      /* sessiz: bir sonraki yoklamada yeniden denenir */
+    } finally {
+      windowPollBusy = false;
+    }
+  }
+
   // ================================================================== SAYFA: Canlı Gol Radar
   function RadarPage(root) {
     const configWrap = h('div');
@@ -2001,9 +2171,13 @@
     let lastRefresh = 0;
     let granted = store.get('radarNotifications', false) === true;
 
+    const windowWrap = h('div');
     root.append(h('section', { class: 'page' },
       h('div', { class: 'page-head' }, h('h1', null, 'Canlı Gol Radar'),
-        h('p', null, 'Canlı maçlarda kalan normal sürede gol olasılığını izler. Radar, seçim modlarından tamamen bağımsızdır.')),
+        h('p', null, 'Canlı maçlarda gol olasılığını izler. Radar, seçim modlarından tamamen bağımsızdır.')),
+      h('section', { class: 'panel', 'aria-labelledby': 'window-radar-title' },
+        h('div', { class: 'panel-title' }, h('h2', { class: 'section-title', id: 'window-radar-title' }, 'Son 15 Dakika Radarı (API-Football canlı veri)')),
+        windowWrap),
       h('div', { class: 'radar-grid' },
         h('section', { class: 'panel', 'aria-labelledby': 'radar-cond-title' }, h('h2', { class: 'section-title', id: 'radar-cond-title' }, 'Zorunlu çalışma koşulları'), configWrap),
         h('section', { class: 'panel', 'aria-labelledby': 'radar-notify-title' }, h('h2', { class: 'section-title', id: 'radar-notify-title' }, 'Bildirimler'), notifyWrap)),
@@ -2024,14 +2198,18 @@
       if (live) setLiveNames(live);
       return alerts;
     });
+    const reloadWindow = loadInto(windowWrap, () => api('/radar/windows'), (d) => renderWindowRadar(windowWrap, d, () => reloadWindow()),
+      { keepFrame: true, loadingText: 'Son 15 dakika radarı yükleniyor…' });
     const reloadLive = loadInto(liveWrap, loadLive, renderLive, { keepFrame: true, loadingText: 'Canlı maçlar değerlendiriliyor…' });
     const reloadAlerts = loadInto(alertsWrap, loadAlerts, renderAlerts, { keepFrame: true, loadingText: 'Alarmlar yükleniyor…' });
     lastRefresh = Date.now();
 
     function refresh() {
       lastRefresh = Date.now();
+      reloadWindow();
       reloadLive();
       reloadAlerts();
+      pollWindowAlerts();
     }
     const timer = window.setInterval(() => {
       if (document.visibilityState === 'visible') refresh();
@@ -2831,6 +3009,8 @@
     });
     window.addEventListener('scroll', () => tip.hide(), { passive: true });
     route(false);
+    pollWindowAlerts();
+    window.setInterval(pollWindowAlerts, 60000);
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

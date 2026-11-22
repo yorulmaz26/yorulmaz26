@@ -583,6 +583,11 @@ async function runViewport(browser, vp) {
   for (const label of ['MODEL A olasılığı', 'MODEL B olasılığı', '%90', 'Normal sürede kalan süre', 'Güncel canlı veri', 'Gerekli güncel oran', 'nadir olay kalibrasyonu', 'Tahmin Kalite Kapısı', 'Bildirim izni', 'Mükerrer alarm engeli', 'Seçim modları radar eşiklerini değiştiremez']) {
     check(radarText.includes(label), `Radar: "${label}" görünmeli`);
   }
+  const win = await getJson(page, 'api/v1/radar/windows');
+  for (const label of ['Son 15 Dakika Radarı', 'Bildirim eşiği', 'Bugün kullanılan istek', 'Eşiğe göre istek sayısı', 'İstek planı']) {
+    check(radarText.includes(label), `Radar: "${label}" görünmeli`);
+  }
+  if (win && win.config) check(radarText.includes('≥ %' + Math.round(win.config.threshold * 100)), 'Radar: pencere eşiği görünmeli');
   const live = await getJson(page, 'api/v1/radar/live');
   check((await page.locator('.live-card').count()) === (live.items || []).length, 'Radar: canlı maç kartı sayısı');
   if ((live.items || []).length) {
@@ -601,12 +606,12 @@ async function runViewport(browser, vp) {
     const ctype = (resp.request().headers()['content-type'] || '').split(';')[0].trim();
     check(ctype === 'application/json', `Radar (${label}): POST Content-Type application/json olmalı (bulunan "${ctype}")`);
     await page.waitForFunction(() => {
-      const st = document.querySelector('#main .form-status');
+      const st = document.querySelector('#main [aria-labelledby="radar-notify-title"] .form-status');
       return st && st.textContent.trim() && st.textContent.trim() !== 'Kaydediliyor…';
     }, null, { timeout: 10000 }).catch(() => {});
     check((await sw.getAttribute('aria-checked')) !== before, `Radar (${label}): bildirim anahtarı durum değiştirmeli`);
-    const stClass = (await page.getAttribute('#main .form-status', 'class')) || '';
-    const stText = (await page.innerText('#main .form-status').catch(() => '')).trim();
+    const stClass = (await page.getAttribute('#main [aria-labelledby="radar-notify-title"] .form-status', 'class')) || '';
+    const stText = (await page.innerText('#main [aria-labelledby="radar-notify-title"] .form-status').catch(() => '')).trim();
     check(/\bok\b/.test(stClass), `Radar (${label}): durum metni başarı (.form-status.ok) göstermeli; bulunan "${stClass}" "${stText}"`);
     check(!/kaydedilemedi/i.test(stText), `Radar (${label}): başarılı kayıttan sonra "kaydedilemedi" yazmamalı ("${stText}")`);
     await waitIdle(page);

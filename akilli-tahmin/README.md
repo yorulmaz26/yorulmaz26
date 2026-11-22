@@ -32,7 +32,7 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 ```
 
 Kaynak: [football-data.co.uk](https://www.football-data.co.uk) ücretsiz dosyaları (21 organizasyonun 16'sı).
-İddaa oranı ve canlı maç verisi içermez; oranların zamanı yaklaşık olduğu için güncel öneride yalnızca En
+İddaa oranı ve canlı maç verisi içermez (canlı veri: API-Football, aşağıda); oranların zamanı yaklaşık olduğu için güncel öneride yalnızca En
 Güvenilir modu seçim yapabilir. Ayrıntılar ve Nesine/Maçkolik'in neden kullanılmadığı: `docs/VARSAYIMLAR.md` §7.
 
 Demo **kurgusal takımlar ve sentetik oranlar** kullanır (`--market biased` varsayılan: favori–sürpriz
@@ -57,6 +57,7 @@ eğilimli piyasa; `--market efficient`: verimli piyasa, oranlı modlar seçim ü
 | Bağımsız denetim | `akilli_tahmin/selection/audit.py` |
 | Başarı Merkezi | `akilli_tahmin/performance/tracker.py` |
 | Canlı Gol Radar | `akilli_tahmin/radar/live_goal_radar.py` |
+| Son 15 Dakika Radarı, API-Football | `akilli_tahmin/radar/window_radar.py`, `data/api_football.py` |
 | API ve arayüz | `akilli_tahmin/api/`, `akilli_tahmin/web/static/` |
 | Geriye dönük test | `akilli_tahmin/backtest/walk_forward.py` |
 
@@ -92,3 +93,28 @@ MODEL A'yı etkilemez. API: `GET /api/v1/manual-odds/options`, `POST /api/v1/man
 Hedef: kalan normal sürede en az bir gol. Alarm şartları: MODEL A > %90, MODEL B > %90 (kullanıcı talebiyle
 %99'dan indirildi), en az 15 dk normal süre, ≤ 60 sn canlı veri ve oran, yeterli nadir olay kalibrasyonu,
 Kalite Kapısı, bildirim izni, mükerrer alarm engeli. Seçim modları bu şartları değiştiremez.
+
+## Son 15 Dakika Radarı (API-Football canlı veri)
+
+İki pencere: **ilk yarının son 15 dakikası (31'–45+')** ve **maçın son 15 dakikası (76'–90+')**. Ücretsiz
+API-Football planı günde 100 istekle sınırlı olduğundan istekler kapılıdır:
+
+1. Maç öncesi MODEL A, canlı gol olasılığının eşiğe (**varsayılan ≥ %90**) ulaşma şansını hesaplar; şans %1'in
+   altındaysa o maç için **istek gönderilmez**.
+2. Pencere başında tek istek (`/fixtures?live=…`) o anda oynanan bütün maçları getirir; MODEL A pencere
+   olasılığı canlı skor, dakika ve kırmızı kartla hesaplanır.
+3. Canlı oran (`/odds/live`) **yalnızca MODEL A eşiğe ulaşırsa** istenir; MODEL B hesaplanır.
+4. Bildirim, Canlı Gol Radar'daki bütün şartlar (iki model ≥ eşik, kalibrasyon, Kalite Kapısı, izin, mükerrer
+   engeli) sağlanınca verilir.
+
+**Gerçekçi beklenti:** 15 dakikada gol olasılığı tipik maçta %35–%55'tir; %90 için ~10 gol beklentisi gerekir.
+Bu yüzden %90 eşiğinde radar pratikte hiç istek göndermez ve bildirim üretmez. Eşik, Canlı Gol Radar
+sayfasından değiştirilebilir; sayfa her eşikte kaç maç için istek gönderileceğini gösterir.
+
+```bash
+export API_FOOTBALL_KEY=...            # kendi bilgisayarınızda (anahtar hiçbir dosyaya yazılmaz)
+.venv/bin/python -m akilli_tahmin serve --db gercek.sqlite3               # radar arka planda çalışır
+.venv/bin/python -m akilli_tahmin window-radar --db gercek.sqlite3 --plan # yalnızca istek planı (istek yok)
+```
+
+Ayrıntılar: `docs/VARSAYIMLAR.md` §8, API: `docs/API.md` ("Son 15 Dakika Radarı").

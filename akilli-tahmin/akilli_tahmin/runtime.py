@@ -23,6 +23,7 @@ class Runtime:
     _refreshing: bool = False
     _last_refresh_attempt: str | None = None
     last_refresh_report: dict | None = None
+    last_window_tick: dict | None = None
 
     def __post_init__(self) -> None:
         self.conn = connect(self.db_path)
@@ -134,6 +135,35 @@ class Runtime:
             log.warning("Gerçek veri güncellemesi başarısız: %s", exc)
         finally:
             self._refreshing = False
+
+    def start_window_radar(self, interval_seconds: float = 30.0, client=None) -> bool:
+        """Son 15 Dakika Radarı'nı arka planda çalıştırır (yalnızca gerçek veri). İstekler bütçe ve olasılık
+        kapılarından geçer; ağ çağrıları veritabanı kilidi dışında yapılır."""
+        if self.is_synthetic() or getattr(self, "_window_thread", None) is not None:
+            return False
+        from .data.api_football import Client
+        from .radar import window_radar
+
+        client = client or Client()
+        stop = self._window_stop = threading.Event()
+
+        def loop() -> None:
+            while not stop.wait(interval_seconds):
+                try:
+                    self.last_window_tick = window_radar.tick(self.conn, client, lock=self.lock,
+                                                              settings=self.settings)
+                except Exception as exc:  # radar hatası sunucuyu durdurmaz
+                    self.last_window_tick = {"error": f"{type(exc).__name__}: {exc}"}
+                    log.warning("Son 15 dakika radarı adımı başarısız: %s", exc)
+
+        self._window_thread = threading.Thread(target=loop, name="window-radar", daemon=True)
+        self._window_thread.start()
+        return True
+
+    def stop_window_radar(self) -> None:
+        if getattr(self, "_window_stop", None) is not None:
+            self._window_stop.set()
+            self._window_thread = None
 
     def live_tick(self, now: str | None = None) -> int:
         now = now or to_iso(utcnow())
