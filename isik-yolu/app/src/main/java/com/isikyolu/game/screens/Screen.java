@@ -24,4 +24,7 @@ public abstract class Screen extends FrameLayout {
     public void onAppPause() {}
 
     public void onAppResume() {}
+
+    /** Ekranın altında banner reklam gösterilsin mi (oyun akışını bozmayan ekranlar). */
+    public boolean wantsBanner() { return false; }
 }

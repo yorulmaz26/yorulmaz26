@@ -57,15 +57,19 @@ public final class SettingsScreen extends Screen {
                 Ui.lpMargins(c, -1, -2, 0, 16, 0, 0));
         col.addView(Ui.button(c, "İlerlemeyi Sıfırla", Ui.SECONDARY, Icon.RESET, v -> confirmReset(a)),
                 Ui.lpMargins(c, -1, -2, 0, 10, 0, 0));
+        if (com.isikyolu.game.ads.Ads.get().privacyOptionsRequired()) // AB/İngiltere: reklam izni değiştirilebilir
+            col.addView(Ui.button(c, "Reklam Gizlilik Seçenekleri", Ui.SECONDARY, Icon.HELP, v -> com.isikyolu.game.ads.Ads.get().showPrivacyOptions(a)),
+                    Ui.lpMargins(c, -1, -2, 0, 10, 0, 0));
 
         LinearLayout about = Ui.vertical(c);
         about.setBackground(Ui.card(c));
         about.setGravity(Gravity.CENTER_HORIZONTAL);
         about.setPadding(Ui.dp(c, 18), Ui.dp(c, 18), Ui.dp(c, 18), Ui.dp(c, 18));
         about.addView(Ui.text(c, "Işık Yolu", 20, Palette.WHITE, Ui.BOLD));
-        about.addView(Ui.text(c, "Sürüm 1.6.0", 13, Palette.TURQUOISE, Ui.MEDIUM));
+        about.addView(Ui.text(c, "Sürüm 1.7.0", 13, Palette.TURQUOISE, Ui.MEDIUM));
         TextView info = Ui.text(c, Progress.LEVEL_COUNT + " bölüm · 5 dünya · " + Achievements.ALL.size() + " başarı · günlük bulmaca\n"
-                + "Tamamen çevrimdışı çalışır. Reklam yok, veri toplanmaz.\nİlerlemen cihazına otomatik kaydedilir.", 13, Palette.TEXT_DIM, Ui.REGULAR);
+                + "Oyun çevrimdışı oynanır. İnternet varken reklamlar Google AdMob ile gösterilir; video izlemek isteğe bağlıdır.\n"
+                + "İlerlemen yalnızca cihazına kaydedilir.", 13, Palette.TEXT_DIM, Ui.REGULAR);
         info.setGravity(Gravity.CENTER);
         info.setLineSpacing(0, 1.2f);
         about.addView(info, Ui.lpMargins(c, -2, -2, 0, 10, 0, 0));

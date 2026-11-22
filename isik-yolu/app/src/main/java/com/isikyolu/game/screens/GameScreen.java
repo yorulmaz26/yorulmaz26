@@ -7,6 +7,7 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.isikyolu.engine.AdPolicy;
 import com.isikyolu.engine.Achievements;
 import com.isikyolu.engine.Chapters;
 import com.isikyolu.engine.DailyPuzzle;
@@ -207,6 +208,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
         return true;
     }
 
+    @Override public boolean wantsBanner() { return true; }
+
     @Override public void onAppPause() {
         if (!finished && !act.hasOverlay()) showPause();
     }
@@ -369,6 +372,17 @@ public final class GameScreen extends Screen implements BoardView.Host {
                 + (p.shields > 0 ? "\nCan Kalkanı: " + p.shields + " (canını korur)" : ""));
         String contLabel = p.tickets > 0 ? "Bilet kullan · +" + extra + " hak (" + p.tickets + ")"
                 : "+" + extra + " hak · " + price + " kristal";
+        if (!daily && act.videoAvailable(AdPolicy.Reward.MOVES)) {
+            o.button("Video izle · +" + extra + " hak (bugün " + act.videosLeft(AdPolicy.Reward.MOVES) + ")", Ui.PRIMARY, Icon.PLAY, v ->
+                    act.watchVideo(AdPolicy.Reward.MOVES, () -> {
+                        o.dismiss();
+                        session.grantBudget(extra);
+                        finished = false;
+                        board.setInputEnabled(true);
+                        Game.save();
+                        updateHud();
+                    }));
+        }
         o.button(contLabel, Ui.GOLD, p.tickets > 0 ? Icon.TICKET : Icon.CRYSTAL, v -> {
             if (!Economy.payContinue(Game.progress(), session.continues())) {
                 Game.audio().play(Audio.LOCKED);
@@ -434,6 +448,14 @@ public final class GameScreen extends Screen implements BoardView.Host {
             o.body("İpucun kalmadı.\nHer 10 bölüm tamamladığında +1 ipucu kazanırsın.\nSonraki ipucuna " + p.levelsUntilNextHint() + " bölüm kaldı.");
             Economy.Item hi = Economy.item("hint1");
             int hp = Economy.price(p, hi, Game.shopDay());
+            if (act.videoAvailable(AdPolicy.Reward.HINT)) {
+                o.button("Video izle · +1 ipucu (bugün " + act.videosLeft(AdPolicy.Reward.HINT) + ")", Ui.PRIMARY, Icon.PLAY, v ->
+                        act.watchVideo(AdPolicy.Reward.HINT, () -> {
+                            o.dismiss();
+                            updateHud();
+                            useHint();
+                        }));
+            }
             o.button("1 ipucu al · " + hp + " kristal", Ui.GOLD, Icon.CRYSTAL, v -> {
                 String why = Economy.blockReason(Game.progress(), hi, Game.shopDay());
                 if (why != null) { Game.audio().play(Audio.LOCKED); act.toast(why); return; }
@@ -534,6 +556,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
             reward = Economy.onLevelComplete(p, level.id, oldStars, p.stars[level.id]);
         }
         boolean rewarded = p.hints > hintsBefore;
+        AdPolicy.onLevelCompleted(p, daily ? 0 : level.id);
         Game.save();
         checkAchievements(); // hemen: pencere gelmeden çıkılsa da başarı ve ödülü kaybolmaz
         final boolean firstF = first;
@@ -596,17 +619,19 @@ public final class GameScreen extends Screen implements BoardView.Host {
             TextView r = Ui.text(c, "Sonraki ipucuna " + Game.progress().levelsUntilNextHint() + " bölüm kaldı", 13, Palette.TEXT_DIM, Ui.MEDIUM);
             o.cardView().addView(r, Ui.lpMargins(c, -2, -2, 0, 0, 0, 4));
         }
+        // sonraki ekrana geçerken, zamanı geldiyse geçiş reklamı (bkz. AdPolicy)
+        int adId = daily ? 0 : level.id;
         if (daily) {
-            o.button("Ana Menü", Ui.PRIMARY, Icon.HOME, v -> { o.dismiss(); act.goMenu(); });
-            o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.goDailyGame(level, epochDay); });
+            o.button("Ana Menü", Ui.PRIMARY, Icon.HOME, v -> { o.dismiss(); act.afterLevel(adId, act::goMenu); });
+            o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.afterLevel(adId, () -> act.goDailyGame(level, epochDay)); });
         } else if (level.id < Progress.LEVEL_COUNT) {
-            o.button("Sonraki Bölüm", Ui.PRIMARY, Icon.NEXT, v -> { o.dismiss(); act.goLevel(level.id + 1); });
-            o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.goLevel(level.id); });
-            o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); act.goLevels(); });
+            o.button("Sonraki Bölüm", Ui.PRIMARY, Icon.NEXT, v -> { o.dismiss(); act.afterLevel(adId, () -> act.goLevel(level.id + 1)); });
+            o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.afterLevel(adId, () -> act.goLevel(level.id)); });
+            o.button("Bölümler", Ui.SECONDARY, Icon.GRID, v -> { o.dismiss(); act.afterLevel(adId, act::goLevels); });
         } else {
             o.body("Tebrikler! " + Progress.LEVEL_COUNT + " bölümün hepsini bitirdin. Sen gerçek bir Işık Ustasısın!");
-            o.button("Bölümler", Ui.PRIMARY, Icon.GRID, v -> { o.dismiss(); act.goLevels(); });
-            o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.goLevel(level.id); });
+            o.button("Bölümler", Ui.PRIMARY, Icon.GRID, v -> { o.dismiss(); act.afterLevel(adId, act::goLevels); });
+            o.button("Tekrar Oyna", Ui.SECONDARY, Icon.RESET, v -> { o.dismiss(); act.afterLevel(adId, () -> act.goLevel(level.id)); });
         }
         o.show(act.overlayLayer());
     }

@@ -76,13 +76,16 @@ public final class MenuScreen extends Screen {
         col.addView(Ui.button(a, "Nasıl Oynanır?", Ui.GHOST, Icon.HELP, v -> TutorialOverlay.full(a).show(a.overlayLayer())),
                 Ui.lpMargins(a, -1, -2, 0, 0, 0, 0));
         col.addView(Ui.space(a, 18));
-        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.6.0", 12, Palette.TEXT_FAINT, Ui.REGULAR);
+        TextView foot = Ui.text(a, "Çevrimdışı oynanır · v1.7.0", 12, Palette.TEXT_FAINT, Ui.REGULAR);
         col.addView(foot);
         sv.addView(col, new ScrollView.LayoutParams(-1, -2));
         addView(sv, new LayoutParams(-1, -1));
     }
 
+    @Override public boolean wantsBanner() { return true; }
+
     @Override public void onShow() {
+        act.startAds(); // ilk ana menüde (açılış animasyonu bölünmez); izin formu gerekirse burada açılır
         if (Game.takeAbandonedNotice())
             act.toast(Game.abandonedShieldUsed() ? "Yarım bırakılan bölümde Can Kalkanı canını korudu" : "Yarım bırakılan bölüm için 1 can harcandı");
     }

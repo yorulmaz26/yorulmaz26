@@ -177,7 +177,7 @@ public final class Economy {
         }
     }
 
-    private static void addLives(Progress p, int n, Lives.Clock clock) {
+    static void addLives(Progress p, int n, Lives.Clock clock) {
         if (clock != null) Lives.update(p, clock);
         p.lives = Math.min(Lives.MAX, p.lives + n);
         if (clock != null) Lives.update(p, clock); // dolduysa sayaç sıfırlanır

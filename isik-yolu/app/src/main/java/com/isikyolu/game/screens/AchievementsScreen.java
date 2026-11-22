@@ -72,4 +72,6 @@ public final class AchievementsScreen extends Screen {
         row.addView(col, new LinearLayout.LayoutParams(0, -2, 1f));
         return row;
     }
+
+    @Override public boolean wantsBanner() { return true; }
 }

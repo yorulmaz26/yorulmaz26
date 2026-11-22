@@ -25,8 +25,10 @@ import com.isikyolu.game.ui.Ui;
 
 /** Tek etkinlik: ekranlar arasında animasyonlu geçiş yapar. */
 public final class MainActivity extends Activity {
-    private FrameLayout root, stage;
+    private FrameLayout root, stage, bannerHost;
     private Screen current;
+    private View banner;
+    private boolean bannerLoaded, adsStarted;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -35,6 +37,16 @@ public final class MainActivity extends Activity {
         root.addView(new BackgroundView(this), new FrameLayout.LayoutParams(-1, -1));
         stage = new FrameLayout(this);
         root.addView(stage, new FrameLayout.LayoutParams(-1, -1));
+        // banner yuvası: ekranın en altında, oyun düğmelerinden ince bir ayraçla ayrı; pencereler üstünü örter
+        bannerHost = new FrameLayout(this);
+        bannerHost.setBackgroundColor(0xFF1A2547);
+        bannerHost.setPadding(0, Ui.dp(this, 6), 0, 0);
+        View divider = new View(this);
+        divider.setBackgroundColor(0x334A5C87);
+        bannerHost.addView(divider, new FrameLayout.LayoutParams(-1, Ui.dp(this, 1), Gravity.TOP));
+        bannerHost.setVisibility(View.GONE);
+        bannerHost.addOnLayoutChangeListener((v, l, t, r, btm, ol, ot, or, ob) -> fitStage());
+        root.addView(bannerHost, new FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM));
         setContentView(root);
         show(new com.isikyolu.game.screens.StudioIntroScreen(this), true);
     }
@@ -42,6 +54,80 @@ public final class MainActivity extends Activity {
     public FrameLayout overlayLayer() { return root; }
 
     public Screen currentScreen() { return current; }
+
+    // ---------- reklamlar ----------
+
+    /** Reklamları başlatır (ilk ana menüde: açılış animasyonu bölünmesin). İzin formu gerekiyorsa burada açılır. */
+    public void startAds() {
+        if (adsStarted) return;
+        adsStarted = true;
+        com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
+        ads.start(this);
+        int widthDp = (int) (getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density);
+        banner = ads.createBanner(this, widthDp, () -> { bannerLoaded = true; updateBanner(); }, () -> { bannerLoaded = false; updateBanner(); });
+        if (banner != null) bannerHost.addView(banner, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+    }
+
+    /** Banner yalnızca yüklendiyse ve ekran istiyorsa görünür (açılış, market, ayarlar ve öğreticide yok). */
+    private void updateBanner() {
+        boolean show = banner != null && bannerLoaded && current != null && current.wantsBanner()
+                && com.isikyolu.engine.AdPolicy.bannersAllowed(Game.progress());
+        bannerHost.setVisibility(show ? View.VISIBLE : View.GONE);
+        fitStage();
+    }
+
+    /** Ekran banner'ın altında kalmasın: sahnenin alt boşluğu banner yüksekliği kadar. */
+    private void fitStage() {
+        int h = bannerHost.getVisibility() == View.VISIBLE ? bannerHost.getHeight() : 0;
+        FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) stage.getLayoutParams();
+        if (lp.bottomMargin != h) { lp.bottomMargin = h; stage.setLayoutParams(lp); }
+    }
+
+    /** Görünür banner yüksekliği (testler ve yerleşim için). */
+    public int bannerHeight() { return bannerHost.getVisibility() == View.VISIBLE ? bannerHost.getHeight() : 0; }
+
+    /**
+     * Bölüm bitince sonraki ekrana geçiş: zamanı geldiyse önce geçiş (resim) reklamı, kapanınca devam.
+     * Sıklık AdPolicy'dedir (öğreticide yok, en az 3 bölüm / 4 dk arayla).
+     */
+    public void afterLevel(int levelId, Runnable next) {
+        com.isikyolu.engine.Progress p = Game.progress();
+        long now = Game.trustedNow();
+        com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
+        if (com.isikyolu.engine.AdPolicy.interstitialDue(p, levelId, now) && ads.interstitialReady()) {
+            com.isikyolu.engine.AdPolicy.onInterstitialShown(p, now);
+            Game.save();
+            ads.showInterstitial(this, next);
+        } else next.run();
+    }
+
+    /** Ödüllü video düğmesi gösterilebilir mi (sınır dolmadı ve video yüklü)? */
+    public boolean videoAvailable(com.isikyolu.engine.AdPolicy.Reward r) {
+        return com.isikyolu.engine.AdPolicy.canOffer(Game.progress(), r, Game.shopDay()) && com.isikyolu.game.ads.Ads.get().rewardedReady();
+    }
+
+    /** Kalan günlük video ödülü. */
+    public int videosLeft(com.isikyolu.engine.AdPolicy.Reward r) {
+        return com.isikyolu.engine.AdPolicy.rewardsLeft(Game.progress(), r, Game.shopDay());
+    }
+
+    /**
+     * İsteğe bağlı ödüllü video. Ödül yalnızca video sonuna kadar izlenince verilir; {@code onGranted}
+     * video kapandıktan sonra çalışır (arayüz güncellemesi).
+     */
+    public void watchVideo(com.isikyolu.engine.AdPolicy.Reward r, Runnable onGranted) {
+        if (!com.isikyolu.engine.AdPolicy.canOffer(Game.progress(), r, Game.shopDay())) { toast("Bugünlük video ödülü sınırı doldu"); return; }
+        com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
+        if (!ads.rewardedReady()) { toast("Video şu an hazır değil. Bağlantını kontrol edip biraz sonra dene."); return; }
+        boolean[] granted = {false};
+        ads.showRewarded(this, () -> {
+            granted[0] = com.isikyolu.engine.AdPolicy.grant(Game.progress(), r, Game.shopDay(), Game.trustedNow(), Game.clock());
+            Game.save();
+        }, earned -> {
+            if (granted[0]) { Game.audio().play(Audio.HINT); onGranted.run(); }
+            else toast("Ödül için videoyu sonuna kadar izlemelisin");
+        });
+    }
 
     public void show(Screen next, boolean forward) {
         final Screen old = current;
@@ -55,6 +141,7 @@ public final class MainActivity extends Activity {
             old.onHide();
             old.animate().alpha(0f).translationX(-dx).setDuration(200).withEndAction(() -> stage.removeView(old)).start();
         }
+        updateBanner();
         next.onShow();
     }
 
@@ -98,6 +185,14 @@ public final class MainActivity extends Activity {
         tick[0].run();
         com.isikyolu.engine.Economy.Item life = com.isikyolu.engine.Economy.item("life1");
         int lp = com.isikyolu.engine.Economy.price(Game.progress(), life, Game.shopDay());
+        if (videoAvailable(com.isikyolu.engine.AdPolicy.Reward.LIFE)) {
+            o.button("Video izle · +1 can (bugün " + videosLeft(com.isikyolu.engine.AdPolicy.Reward.LIFE) + ")", Ui.PRIMARY, com.isikyolu.game.ui.Icon.PLAY, v ->
+                    watchVideo(com.isikyolu.engine.AdPolicy.Reward.LIFE, () -> {
+                        o.dismiss();
+                        toast("+1 can kazandın");
+                        if (retryLevel > 0) goLevel(retryLevel);
+                    }));
+        }
         o.button("+1 can al · " + lp + " kristal", Ui.GOLD, com.isikyolu.game.ui.Icon.CRYSTAL, v -> {
             String why = com.isikyolu.engine.Economy.blockReason(Game.progress(), life, Game.shopDay());
             if (why != null) { Game.audio().play(Audio.LOCKED); toast(why); return; }
@@ -200,6 +295,7 @@ public final class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         Game.audio().onResume();
+        com.isikyolu.game.ads.Ads.get().resume(banner);
         if (current != null) current.onAppResume();
     }
 
@@ -207,13 +303,16 @@ public final class MainActivity extends Activity {
         super.onPause();
         Game.save();
         Game.audio().onPause();
-        if (current != null) current.onAppPause();
+        com.isikyolu.game.ads.Ads.get().pause(banner);
+        // tam ekran reklam açıldı: oyun duraklatma penceresi açılmasın
+        if (current != null && !com.isikyolu.game.ads.Ads.get().fullscreenShowing()) current.onAppPause();
     }
 
     @Override protected void onDestroy() {
         // etkinlik kapanıyor ya da yeniden oluşturuluyor: yarım deneme bırakılmış sayılır
         if (current != null) current.onHide();
         Game.save();
+        com.isikyolu.game.ads.Ads.get().destroyBanner(banner);
         super.onDestroy();
         if (isFinishing()) Game.audio().release();
     }

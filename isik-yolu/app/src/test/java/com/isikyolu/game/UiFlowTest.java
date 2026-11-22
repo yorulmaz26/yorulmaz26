@@ -736,6 +736,202 @@ public class UiFlowTest {
         assertTrue("blok bırakıldığı yerden geri kaymalı (" + off / cell + " hücre)", off > 0.4f * cell);
     }
 
+    // ---------- reklamlar (1.7.0) ----------
+
+    @org.junit.After public void resetAds() { com.isikyolu.game.ads.Ads.resetForTests(); }
+
+    private FakeAds fakeAds() {
+        FakeAds f = new FakeAds();
+        com.isikyolu.game.ads.Ads.setForTests(f);
+        return f;
+    }
+
+    private static void complete(com.isikyolu.engine.Progress p, int upTo) {
+        for (int i = 1; i <= upTo; i++) { p.stars[i] = 3; p.bestMoves[i] = Game.levels().get(i).optimal; }
+    }
+
+    private View topButton(String prefix) {
+        Overlay o = topOverlay();
+        return o == null ? null : findText(o, prefix) == null ? null : (View) findText(o, prefix).getParent();
+    }
+
+    /** Banner: ilk 3 bölüm bitmeden yok; menü, bölümler ve oyun ekranında var; market ve ayarlarda yok; ekranla çakışmaz. */
+    @Test public void bannerPlacement() throws Exception {
+        FakeAds ads = fakeAds();
+        start();
+        assertEquals(1, ads.starts);
+        assertEquals("ilk 3 bölüm reklamsız", 0, act.bannerHeight());
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        complete(p, 3);
+        act.goLevels();
+        idle(600);
+        assertTrue("bölümler ekranında banner", act.bannerHeight() > 0);
+        View stage = (View) act.currentScreen().getParent();
+        int[] ls = new int[2]; stage.getLocationInWindow(ls);
+        View host = (View) findByDescription(act.overlayLayer(), "test-banner").getParent();
+        int[] lb = new int[2]; host.getLocationInWindow(lb);
+        assertTrue("ekran banner'ın üstünde biter", ls[1] + stage.getHeight() <= lb[1]);
+        float dens = act.getResources().getDisplayMetrics().density;
+        assertTrue("banner ince bir şerit (" + act.bannerHeight() / dens + " dp)", act.bannerHeight() < 80 * dens);
+        assertTrue("ekranın büyük kısmı oyuna kalır", stage.getHeight() > act.overlayLayer().getHeight() * 0.85f);
+        shot("20_reklam_banner_bolumler");
+        GameScreen gs = openLevel(4);
+        idle(400);
+        assertTrue("oyun ekranında banner", act.bannerHeight() > 0);
+        shot("20b_reklam_banner_oyun");
+        act.goMarket(0);
+        idle(600);
+        assertEquals("markette banner yok", 0, act.bannerHeight());
+        act.goSettings();
+        idle(600);
+        assertEquals("ayarlarda banner yok", 0, act.bannerHeight());
+        assertNotNull("gizlilik seçenekleri düğmesi", findText(act.currentScreen(), "Reklam Gizlilik"));
+    }
+
+    /** Geçiş (resim) reklamı: öğreticide yok, bölüm bitince ve en az 3 bölüm / 4 dk arayla, sonraki ekrana geçerken. */
+    @Test public void interstitialBetweenLevelsWithFrequencyCap() throws Exception {
+        FakeAds ads = fakeAds();
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        // öğretici bölümleri arayüzden oyna: reklam yok
+        for (int id = 1; id <= 10; id++) {
+            GameScreen gs = openLevel(id);
+            solveThroughUi(gs, Game.levels().get(id));
+            waitFor("tamamlandı " + id, () -> findText(act.overlayLayer(), "Sonraki Bölüm") != null);
+            topButton("Sonraki Bölüm").performClick();
+            idle(600);
+        }
+        assertEquals("öğreticide geçiş reklamı yok", 0, ads.interstitials);
+        int[] counts = new int[6];
+        for (int k = 0; k < 6; k++) {
+            int id = 11 + k;
+            closeOverlays();
+            GameScreen gs = (GameScreen) act.currentScreen();
+            solveThroughUi(gs, Game.levels().get(id));
+            waitFor("tamamlandı " + id, () -> findText(act.overlayLayer(), "Sonraki Bölüm") != null);
+            topButton("Sonraki Bölüm").performClick();
+            idle(600);
+            counts[k] = ads.interstitials;
+            assertTrue("reklamdan sonra sonraki bölüm açılır", act.currentScreen() instanceof GameScreen);
+        }
+        // 11, 12: yok; 13 (3. bölüm): var; 14–16: 4 dakika dolmadı
+        assertArrayEquals(new int[]{0, 0, 1, 1, 1, 1}, counts);
+        p.trustWall += 5 * 60_000L; // güvenilir saat 5 dk ilerledi
+        closeOverlays();
+        GameScreen gs = (GameScreen) act.currentScreen();
+        solveThroughUi(gs, Game.levels().get(17));
+        waitFor("tamamlandı 17", () -> findText(act.overlayLayer(), "Bölümler") != null);
+        topButton("Bölümler").performClick();
+        idle(600);
+        assertEquals("3 bölüm ve 4 dk sonra yeniden", 2, ads.interstitials);
+        assertTrue(act.currentScreen() instanceof LevelSelectScreen);
+    }
+
+    /** Ödüllü video: can bitince +1 can ve bölüm açılır; günlük sınır dolunca düğme kalkar. */
+    @Test public void rewardedVideoGivesLife() throws Exception {
+        FakeAds ads = fakeAds();
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        complete(p, 11);
+        for (int k = 0; k < 3; k++) {
+            p.lives = 0;
+            act.goLevel(12);
+            idle(500);
+            View v = topButton("Video izle · +1 can");
+            assertNotNull("can videosu " + k, v);
+            v.performClick();
+            idle(600);
+            assertEquals(k + 1, ads.rewardedShown);
+            assertTrue(act.currentScreen() instanceof GameScreen);
+            closeOverlays();
+            act.goLevels();
+            idle(400);
+        }
+        p.lives = 0;
+        act.goLevel(12);
+        idle(500);
+        assertNull("günde 3 can videosu", topButton("Video izle · +1 can"));
+        assertNotNull(topButton("+1 can al"));
+    }
+
+    /** Ödüllü video: hak bitince ek hak (kristalli devam fiyatını artırmaz); video yarıda kalırsa ödül yok. */
+    @Test public void rewardedVideoGivesMoves() throws Exception {
+        FakeAds ads = fakeAds();
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        complete(p, 11);
+        GameScreen gs = openLevel(12);
+        com.isikyolu.engine.GameSession ses = (com.isikyolu.engine.GameSession) field(gs, "session");
+        burnBudget(gs, 12);
+        waitFor("hak bitti penceresi", () -> topButton("Video izle · +") != null);
+        ads.completeVideo = false;
+        topButton("Video izle · +").performClick();
+        idle(500); // çift tıklama korumasından uzun
+        assertEquals("yarım video ödül vermez", 0, ses.budgetLeft());
+        ads.completeVideo = true;
+        topButton("Video izle · +").performClick();
+        idle(400);
+        assertTrue("ek hak verildi", ses.budgetLeft() >= 5);
+        assertEquals("devam fiyatı artmadı", 0, ses.continues());
+        int[] pm = probeMirror(12);
+        assertTrue("hamle yapılabilir", gs.onRotate(pm[0], pm[1]));
+    }
+
+    /** Ödüllü video: ipucu bitince +1 ipucu ve ipucu hemen kullanılır; markette +25 kristal (günde 3). */
+    @Test public void rewardedVideoGivesHintAndCrystals() throws Exception {
+        fakeAds();
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        complete(p, 11);
+        p.hints = 0;
+        GameScreen gs = openLevel(12);
+        Method req = GameScreen.class.getDeclaredMethod("requestHint");
+        req.setAccessible(true);
+        req.invoke(gs);
+        idle(400);
+        topButton("Video izle · +1 ipucu").performClick();
+        waitPlan(gs);
+        idle(100);
+        assertEquals("kazanılan ipucu kullanıldı", 0, p.hints);
+        assertTrue("ipucu tahtada", boardOf(gs).hasHint());
+        act.goMarket(0);
+        idle(600);
+        int kr = p.crystals;
+        for (int k = 0; k < 3; k++) {
+            View v = findText(act.currentScreen(), "Video izle · +25 kristal");
+            assertNotNull(v);
+            ((View) v.getParent()).performClick();
+            idle(500);
+        }
+        assertEquals(kr + 75, p.crystals);
+        assertNull("günde 3", findText(act.currentScreen(), "Video izle · +25 kristal"));
+    }
+
+    /** Tam ekran reklam açılınca oyun "Duraklatıldı" penceresi açmaz. */
+    @Test public void fullscreenAdDoesNotPauseGame() throws Exception {
+        FakeAds ads = fakeAds();
+        org.robolectric.android.controller.ActivityController<MainActivity> ctl = Robolectric.buildActivity(MainActivity.class).setup();
+        act = ctl.get();
+        idle(100);
+        waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
+        Game.progress().tutorialSeen = true;
+        openLevel(4);
+        ads.fullscreen = true;
+        ctl.pause();
+        idle(200);
+        assertNull("reklam sırasında duraklatma penceresi yok", topOverlay());
+        ads.fullscreen = false;
+        ctl.resume();
+        ctl.pause();
+        idle(200);
+        assertNotNull("normal arka plana geçişte duraklatılır", topOverlay());
+    }
+
     @Test public void splashScreenRenders() throws Exception {
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         assertTrue("önce stüdyo açılışı", act.currentScreen() instanceof com.isikyolu.game.screens.StudioIntroScreen);

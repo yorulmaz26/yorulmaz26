@@ -120,4 +120,6 @@ public final class DailyScreen extends Screen {
         l.addView(Ui.text(c, label, 12, Palette.TEXT_DIM, Ui.MEDIUM));
         return l;
     }
+
+    @Override public boolean wantsBanner() { return true; }
 }

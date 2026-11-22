@@ -42,6 +42,9 @@ public final class GameSession {
     /** Marketten/biletle ek hak (bu denemede kaçıncı devam olduğu da sayılır). */
     public void addBudget(int n) { bonusBudget += n; continues++; }
 
+    /** Ödüllü videoyla ek hak: kristalli devam fiyatını artırmaz. */
+    public void grantBudget(int n) { bonusBudget += n; }
+
     public int continues() { return continues; }
     public int actions() { return actions; }
     /** Hak bitti ve çözülmedi mi? */

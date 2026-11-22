@@ -48,6 +48,13 @@ public final class Progress {
     public final Map<String, Integer> shopBuys = new LinkedHashMap<>();
     public final Set<Integer> perfectChapters = new LinkedHashSet<>();
 
+    // reklamlar (bkz. AdPolicy)
+    /** Son geçiş reklamından beri biten bölüm; son geçiş reklamı ve son ödüllü video zamanı (güvenilir). */
+    public int adLevelsSince;
+    public long adLastWall, adLastReward;
+    public int adRewardDay = -1, adVideos;
+    public final Map<String, Integer> adRewards = new LinkedHashMap<>();
+
     public boolean isUnlocked(int level) {
         return level == 1 || (level >= 2 && level <= LEVEL_COUNT && stars[level - 1] > 0);
     }
@@ -125,6 +132,7 @@ public final class Progress {
         lives = Lives.MAX; attemptLevel = 0; lifeBaseElapsed = Long.MIN_VALUE;
         crystals = Economy.START_CRYSTALS; gems = 0; tickets = 0; shields = 0; purchases = 0; crystalsEarned = 0;
         owned.clear(); perfectChapters.clear(); shopBuys.clear(); shopDay = -1; maxDay = -1;
+        adLevelsSince = 0; adLastWall = 0; adLastReward = 0; adRewardDay = -1; adVideos = 0; adRewards.clear();
         mirrorSkin = Economy.DEFAULT_MIRROR; boardSkin = Economy.DEFAULT_BOARD; beamSkin = Economy.DEFAULT_BEAM;
     }
 
@@ -170,6 +178,12 @@ public final class Progress {
         m.put("md", maxDay);
         m.put("shopBuys", new LinkedHashMap<String, Object>(shopBuys));
         m.put("perf", new ArrayList<Object>(perfectChapters));
+        m.put("adN", adLevelsSince);
+        m.put("adT", adLastWall);
+        m.put("adV", adLastReward);
+        m.put("adD", adRewardDay);
+        m.put("adC", adVideos);
+        m.put("adR", new LinkedHashMap<String, Object>(adRewards));
         return Json.write(m);
     }
 
@@ -226,6 +240,14 @@ public final class Progress {
                 if (e.getValue() instanceof Number) p.shopBuys.put(e.getKey(), ((Number) e.getValue()).intValue());
             Object pf = m.get("perf");
             if (pf instanceof List) for (Object o : (List<Object>) pf) if (o instanceof Number) p.perfectChapters.add(((Number) o).intValue());
+            p.adLevelsSince = Json.getInt(m, "adN", 0);
+            p.adLastWall = Json.getLong(m, "adT", 0);
+            p.adLastReward = Json.getLong(m, "adV", 0);
+            p.adRewardDay = Json.getInt(m, "adD", -1);
+            p.adVideos = Json.getInt(m, "adC", 0);
+            Object ar = m.get("adR");
+            if (ar instanceof Map) for (Map.Entry<String, Object> e : ((Map<String, Object>) ar).entrySet())
+                if (e.getValue() instanceof Number) p.adRewards.put(e.getKey(), ((Number) e.getValue()).intValue());
             return p;
         } catch (RuntimeException e) {
             return new Progress();

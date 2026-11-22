@@ -195,4 +195,6 @@ public final class LevelSelectScreen extends Screen {
         f.setContentDescription("Bölüm " + id + (open ? ", " + stars + " yıldız" : ", kilitli"));
         return f;
     }
+
+    @Override public boolean wantsBanner() { return true; }
 }

@@ -118,6 +118,15 @@ public final class MarketScreen extends Screen {
         head.addView(countdown);
         list.addView(head, Ui.lpMargins(c, -1, -2, 4, 4, 4, 2));
         list.addView(note("Her gün 3 indirimli ürün, her biri tek adet. Teklifte günlük ürün sınırı uygulanmaz."));
+        if (act.videoAvailable(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS)) {
+            View video = Ui.button(c, "Video izle · +" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal (bugün "
+                    + act.videosLeft(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS) + ")", Ui.PRIMARY, Icon.PLAY,
+                    v -> act.watchVideo(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS, () -> {
+                        act.toast("+" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal kazandın");
+                        render(false);
+                    }));
+            list.addView(video, Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
+        }
         Progress p = Game.progress();
         int d = day();
         List<Economy.Deal> deals = Economy.deals(d);
@@ -181,6 +190,7 @@ public final class MarketScreen extends Screen {
                 {"Her başarı", "30 kristal"},
                 {"Dünya başarıları, 900 yıldız, 100 kusursuz bölüm, 30 günlük bulmaca", "+1 Prizma Taşı"},
                 {"Işık Yolu Efsanesi, Kusursuz Işık", "+3 Prizma Taşı"},
+                {"Ödüllü video (isteğe bağlı, internet gerekir)", "Teklifler'de +25 kristal (günde 3) · can bitince +1 can (günde 3) · ipucu bitince +1 ipucu (günde 3) · hak bitince ek hak (günde 5)"},
                 {"Aynı bölümü tekrar oynamak", "kazandırmaz"},
         };
         list.addView(Ui.text(c, "Kazanç rehberi", 18, Palette.WHITE, Ui.BOLD), Ui.lpMargins(c, -2, -2, 4, 4, 0, 6));
