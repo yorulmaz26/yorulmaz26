@@ -9,7 +9,10 @@ import java.util.function.Consumer;
 
 /** Testler için sahte reklam sağlayıcısı: her şey anında "yüklü", gösterimler sayılır. */
 public class FakeAds implements AdProvider {
-    public int interstitials, rewardedShown, bannersCreated, starts;
+    public int interstitials, rewardedShown, bannersCreated, starts, pauses, resumes, lastWidthDp;
+    /** AdView gibi: oluşturulunca çalışır durumdadır. */
+    public boolean bannerRunning;
+    public final java.util.List<Integer> widthsRequested = new java.util.ArrayList<>();
     public boolean interstitialLoaded = true, rewardedLoaded = true, completeVideo = true, failToShow, fullscreen;
     /** Gerçek SDK gibi: gösterilen reklam tükenir, yenisi biraz sonra yüklenir. */
     public long reloadMs = 1000;
@@ -21,6 +24,9 @@ public class FakeAds implements AdProvider {
 
     @Override public View createBanner(Activity a, int widthDp, Runnable onReady, Runnable onGone) {
         bannersCreated++;
+        lastWidthDp = widthDp;
+        widthsRequested.add(widthDp);
+        bannerRunning = true;
         float d = a.getResources().getDisplayMetrics().density;
         // gerçek AdView gibi kendi reklam boyutunu ölçer (320×50 dp)
         View v = new View(a) {
@@ -41,8 +47,8 @@ public class FakeAds implements AdProvider {
     }
 
     @Override public void destroyBanner(View banner) {}
-    @Override public void pause(View banner) {}
-    @Override public void resume(View banner) {}
+    @Override public void pause(View banner) { if (banner != null) { pauses++; bannerRunning = false; } }
+    @Override public void resume(View banner) { if (banner != null) { resumes++; bannerRunning = true; } }
     @Override public boolean interstitialReady() { return interstitialLoaded; }
 
     @Override public void showInterstitial(Activity a, Runnable onShown, Runnable onClosed) {

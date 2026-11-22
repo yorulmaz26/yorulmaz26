@@ -31,6 +31,7 @@ public final class MainActivity extends Activity {
     private Screen current;
     private View banner;
     private boolean bannerLoaded, adsStarted, bannerRunning, resumed;
+    private int bannerWidthDp;
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
@@ -75,7 +76,9 @@ public final class MainActivity extends Activity {
         if (android.os.Build.VERSION.SDK_INT >= 30) w.setDecorFitsSystemWindows(false);
         else w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        if (android.os.Build.VERSION.SDK_INT < 35) { w.setStatusBarColor(0); w.setNavigationBarColor(0); }
+        if (android.os.Build.VERSION.SDK_INT < 35) w.setStatusBarColor(0);
+        w.setNavigationBarColor(0); // 3 düğmeli gezinmede 35+'ta da etkili: çubuğun arkasını barBottom boyar
+        if (android.os.Build.VERSION.SDK_INT >= 29) { w.setNavigationBarContrastEnforced(false); w.setStatusBarContrastEnforced(false); }
         if (android.os.Build.VERSION.SDK_INT >= 28)
             w.getAttributes().layoutInDisplayCutoutMode = android.view.WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
         frame.setOnApplyWindowInsetsListener((v, in) -> {
@@ -113,10 +116,41 @@ public final class MainActivity extends Activity {
         com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
         ads.setOnAvailabilityChanged(() -> { if (current != null) current.onAdsChanged(); });
         ads.start(this);
-        int widthDp = (int) (getResources().getDisplayMetrics().widthPixels / getResources().getDisplayMetrics().density);
-        banner = ads.createBanner(this, widthDp, () -> { bannerLoaded = true; updateBanner(); }, () -> { bannerLoaded = false; updateBanner(); });
-        if (banner != null) bannerHost.addView(banner, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+        createBanner();
+        // döndürme, katlama, bölünmüş ekran: banner yuvanın gerçek genişliğine göre yeniden kurulur
+        root.addOnLayoutChangeListener((v, l, t, r, b, ol, ot, or, ob) -> {
+            if (r - l != or - ol && slotWidthDp() > 0 && Math.abs(slotWidthDp() - bannerWidthDp) >= 8) root.post(this::recreateBanner);
+        });
     }
+
+    /** Banner yuvasının genişliği (dp): sistem çubuklarının iç boşluğu düşülür. */
+    private int slotWidthDp() {
+        int w = root.getWidth() - root.getPaddingLeft() - root.getPaddingRight();
+        if (w <= 0) w = getResources().getDisplayMetrics().widthPixels;
+        return (int) (w / getResources().getDisplayMetrics().density);
+    }
+
+    private void createBanner() {
+        bannerWidthDp = slotWidthDp();
+        bannerLoaded = false;
+        banner = com.isikyolu.game.ads.Ads.get().createBanner(this, bannerWidthDp,
+                () -> { bannerLoaded = true; updateBanner(); }, () -> { bannerLoaded = false; updateBanner(); });
+        if (banner != null) bannerHost.addView(banner, new FrameLayout.LayoutParams(-2, -2, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM));
+        bannerRunning = banner != null; // AdView çalışır başlar; görünmüyorsa updateBanner duraklatır
+        updateBanner();
+    }
+
+    private void recreateBanner() {
+        if (banner == null) return;
+        bannerHost.removeView(banner);
+        com.isikyolu.game.ads.Ads.get().destroyBanner(banner);
+        banner = null;
+        bannerRunning = false;
+        createBanner();
+    }
+
+    /** Testler için: banner'ın istendiği genişlik (dp). */
+    public int bannerWidthDp() { return bannerWidthDp; }
 
     /** İlk menüde başlatılmış reklamlar için: izin isteği başarısız kaldıysa (çevrimdışı açılış) yeniden dene. */
     public void retryAds() { if (adsStarted) com.isikyolu.game.ads.Ads.get().retryConsent(this); }
@@ -392,6 +426,7 @@ public final class MainActivity extends Activity {
         // etkinlik kapanıyor ya da yeniden oluşturuluyor: yarım deneme bırakılmış sayılır
         if (current != null) current.onHide();
         Game.save();
+        com.isikyolu.game.ads.Ads.get().setOnAvailabilityChanged(null); // eski etkinlik tutulmasın
         com.isikyolu.game.ads.Ads.get().destroyBanner(banner);
         super.onDestroy();
         if (isFinishing()) Game.audio().release();

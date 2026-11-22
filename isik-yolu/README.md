@@ -66,7 +66,7 @@ Reklamlar oyun akışını bozmayacak biçimde yerleştirildi:
 |---|---|---|
 | **Banner** (büyük uyarlanabilir) | Ekranın en altı: ana menü, bölümler, günlük bulmaca, başarılar | İlk 3 bölüm bitene kadar hiç yok. **Oyun ekranında yok:** sürekli dokunulan oyun düğmelerine yakın olurdu. Açılışta, markette ve ayarlarda da yok. İçerikten ayraçla ayrı ve ekranla çakışmaz. Bir pencere açıkken gizlenir ve duraklatılır. Hiç yüklenmezse (internet yoksa) yer kaplamaz ve artan aralıklarla yeniden denenir. Yüklendikten sonra yenileme başarısız olursa eski reklam kalır, ekran sıçramaz. |
 | **Geçiş reklamı (resim)** | Yalnızca bölüm bitince, "Sonraki Bölüm / Tekrar Oyna / Bölümler" ile sonraki ekrana geçerken | Oyun sırasında asla çıkmaz. İlk 10 (öğretici) bölümde yok. En az 3 tamamlanan bölüm ve 4 dakika arayla gösterilir; ödüllü videodan sonraki 3 dakikada gösterilmez. |
-| **Ödüllü video** | İsteğe bağlı düğmeler: can bitince "+1 can", ipucu bitince "+1 ipucu", hamle hakkı bitince "+N hak", markette "+25 kristal" | Ödül yalnızca video sonuna kadar izlenince verilir. Günlük sınırlar: can 3, ipucu 3, hak 5, kristal 3. Videoyla alınan ek hak kristalli devamın fiyatını artırmaz. Video izlenince yenisi yüklenene dek düğme kalkar, yüklenince ekran kendini yeniler. Video açılamazsa ya da yarıda kapatılırsa ayrı ayrı uyarı verilir. |
+| **Ödüllü video** | İsteğe bağlı düğmeler: can bitince "+1 can", ipucu bitince "+1 ipucu", hamle hakkı bitince "+N hak", markette "+25 kristal" | Ödül yalnızca video sonuna kadar izlenince verilir. Günlük sınırlar: can 3, ipucu 3, hak 5, kristal 3. Videoyla alınan ek hak kristalli devamın fiyatını artırmaz. Video izlenince yenisi yüklenene dek düğmenin yerinde "Video hazırlanıyor…" yazar. Liste kaymaz. Video açılamazsa ya da yarıda kapatılırsa ayrı ayrı uyarı verilir. |
 
 - **İzin:** Google UMP izin formu ilk ana menüde (açılış animasyonundan sonra) gösterilir. Form yalnızca gereken
   bölgelerde (AB/İngiltere) çıkar. İzin yoksa reklam istenmez. İzin bilgisi alınamazsa (çevrimdışı açılış) uygulamaya
@@ -107,7 +107,8 @@ Play Console'da yapılması gerekenler:
 Uygulama **Android 16 (API 36) hedefler** (Play'in 2026 şartı):
 - Kenardan kenara çizim: içerik durum ve gezinme çubuklarının içinde kalır.
 - Geri hareketi yeni API ile karşılanır.
-- Tablette yatay kullanımda da oynanır (Android 16 büyük ekranda dikey kilidi yok sayar).
+- Uygulama "oyun" kategorisinde bildirildiği için Android 16 büyük ekranda da dikey kilidi korur. Bölünmüş ekranda ve
+  yatay tablette de oynanır; banner yeni genişliğe göre yeniden kurulur.
 
 ## Canlar (bölüm modu)
 

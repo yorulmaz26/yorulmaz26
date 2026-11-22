@@ -44,7 +44,14 @@ public final class AdMobProvider implements AdProvider {
     private boolean initStarted, ready, fullscreen, consentInFlight;
     private long lastConsentRequest;
     private Runnable onAvailability = () -> { };
-    private final java.util.Map<AdView, Runnable> bannerRetry = new java.util.HashMap<>();
+    /** Banner durumu: yüklendi mi, duraklatıldı mı, bekleyen yeniden deneme. */
+    private static final class BannerState {
+        boolean loaded, paused, retryDue;
+        long backoff = RETRY_MIN_MS;
+        Runnable retry;
+    }
+
+    private final java.util.Map<AdView, BannerState> banners = new java.util.HashMap<>();
     private final List<AdView> pending = new ArrayList<>();
 
     private InterstitialAd interstitial;
@@ -101,7 +108,6 @@ public final class AdMobProvider implements AdProvider {
         ready = true;
         for (AdView v : pending) v.loadAd(new AdRequest.Builder().build());
         pending.clear();
-        onAvailability.run();
         loadInterstitial();
         loadRewarded();
     }
@@ -112,20 +118,23 @@ public final class AdMobProvider implements AdProvider {
         AdView v = new AdView(a);
         v.setAdUnitId(BuildConfig.AD_BANNER);
         v.setAdSize(AdSize.getLargeAnchoredAdaptiveBannerAdSize(a, widthDp));
-        boolean[] everLoaded = {false};
-        long[] retry = {RETRY_MIN_MS};
+        BannerState st = new BannerState();
+        banners.put(v, st);
         v.setAdListener(new AdListener() {
-            @Override public void onAdLoaded() { everLoaded[0] = true; retry[0] = RETRY_MIN_MS; onReady.run(); }
+            @Override public void onAdLoaded() { st.loaded = true; st.backoff = RETRY_MIN_MS; onReady.run(); }
 
             @Override public void onAdFailedToLoad(@NonNull LoadAdError e) {
-                // yüklü banner'ın yenilemesi başarısızsa eski reklam görünmeye devam eder: gizleme (tahta sıçramasın)
-                if (everLoaded[0]) return;
+                // yüklü banner'ın yenilemesi başarısızsa eski reklam görünmeye devam eder: gizleme (ekran sıçramasın)
+                if (st.loaded) return;
                 onGone.run();
-                // hiç yüklenemediyse (ör. çevrimdışı) artan aralıklarla yeniden dene
-                Runnable again = () -> { bannerRetry.remove(v); v.loadAd(new AdRequest.Builder().build()); };
-                bannerRetry.put(v, again);
-                main.postDelayed(again, retry[0]);
-                retry[0] = Math.min(RETRY_MAX_MS, retry[0] * 2);
+                // hiç yüklenemediyse (ör. çevrimdışı) artan aralıklarla yeniden dene; duraklatılmışken istek yok
+                st.retry = () -> {
+                    st.retry = null;
+                    if (st.paused) { st.retryDue = true; return; }
+                    v.loadAd(new AdRequest.Builder().build());
+                };
+                main.postDelayed(st.retry, st.backoff);
+                st.backoff = Math.min(RETRY_MAX_MS, st.backoff * 2);
             }
         });
         if (ready) v.loadAd(new AdRequest.Builder().build());
@@ -136,14 +145,26 @@ public final class AdMobProvider implements AdProvider {
     @Override public void destroyBanner(View banner) {
         if (!(banner instanceof AdView)) return;
         pending.remove(banner);
-        Runnable r = bannerRetry.remove(banner);
-        if (r != null) main.removeCallbacks(r);
+        BannerState st = banners.remove(banner);
+        if (st != null && st.retry != null) main.removeCallbacks(st.retry);
         ((AdView) banner).destroy();
     }
 
-    @Override public void pause(View banner) { if (banner instanceof AdView) ((AdView) banner).pause(); }
+    @Override public void pause(View banner) {
+        if (!(banner instanceof AdView)) return;
+        ((AdView) banner).pause();
+        BannerState st = banners.get(banner);
+        if (st != null) st.paused = true;
+    }
 
-    @Override public void resume(View banner) { if (banner instanceof AdView) ((AdView) banner).resume(); }
+    @Override public void resume(View banner) {
+        if (!(banner instanceof AdView)) return;
+        ((AdView) banner).resume();
+        BannerState st = banners.get(banner);
+        if (st == null) return;
+        st.paused = false;
+        if (st.retryDue) { st.retryDue = false; if (ready) ((AdView) banner).loadAd(new AdRequest.Builder().build()); }
+    }
 
     // ---------- geçiş reklamı ----------
 
@@ -155,7 +176,6 @@ public final class AdMobProvider implements AdProvider {
                 loadingInterstitial = false;
                 interstitial = ad;
                 retryInterstitial = RETRY_MIN_MS;
-                onAvailability.run();
             }
 
             @Override public void onAdFailedToLoad(@NonNull LoadAdError e) {

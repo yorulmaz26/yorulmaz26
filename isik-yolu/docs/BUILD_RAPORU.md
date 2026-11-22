@@ -44,12 +44,20 @@ yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/a
     içeride kalır. Stüdyo açılışında çubukların arkası logo rengindedir.
   - **Geri hareketi:** `OnBackInvokedCallback` ile karşılanır.
   - **Başlatma modu:** `singleTop`. `singleTask` simgeden dönüşte açık reklamı kapatıyordu.
-  - **Tablet:** yatay tablette de oynanır.
+  - **Ekran yönü:** uygulama `android:appCategory="game"` ile bildirildi. Android 16 oyunlarda büyük ekranda da dikey
+    kilidi korur. Yine de yatay tablette ve bölünmüş ekranda oynanır, banner yeni genişliğe göre yeniden kurulur.
+  - **Gezinme çubuğu:** pencere rengi saydam, kontrast perdesi kapalı. Çubuğun arkasını uygulama boyar; stüdyo
+    açılışında logo rengindedir.
 - **Gizlilik politikası:** Ayarlar'da uygulama içi metin; web için `docs/GIZLILIK.md` (`privacyPolicyUrl`).
 - **Reklam kimlikleri:** dördü birlikte verilmezse derleme durur.
 - **İzin isteği:** çevrimdışı ilk açılıştan sonra yeniden denenir.
 - **Ödüllü video:** sonuç üç durumludur (kazanıldı / yarıda kapatıldı / açılamadı) ve her biri için doğru uyarı verilir.
 - **Geçiş reklamı:** sayacı yalnızca reklam gerçekten gösterilince ilerler.
+- **Banner:**
+  - Görünmediği her durumda duraklatılır (yeni oyuncu, pencere altı, oyun ekranı, arka plan).
+  - Duraklatılmışken yeniden deneme isteği yapılmaz.
+  - Reklam dinleyicisi kapanan etkinliği tutmaz.
+- **Market video düğmesi:** video yeniden yüklenirken yerinde "hazırlanıyor" yazar, liste kaymaz.
 - **İzinler:** titreşime ek olarak internet ve ağ durumu eklendi. AD_ID izni SDK tarafından eklenir.
 - Kurallar motor tarafında, `engine/AdPolicy.java`. İlerleme kaydına reklam sayaçları eklendi; eski kayıtlar okunur.
 
@@ -179,10 +187,12 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 
 | Dosya | Boyut | SHA-256 |
 |---|---|---|
-| `teslimat/IsikYolu-1.6.0.apk` (release, R8 küçültme + kaynak küçültme) | 1 993 634 bayt | `f960d98e381c85f0ff606ac18f4a5ad3868743be3c400c006a3e191d60251c54` |
-| `teslimat/IsikYolu-1.6.0-debug.apk` | 2 127 820 bayt | `f6bd466954d0dbc9beadd107e89e5b3ff20842eb70c39a0c019c04aff9784600` |
+| `teslimat/IsikYolu-1.7.0.apk` (release, R8 küçültme + kaynak küçültme) | 4 410 279 bayt | `0064821f21864255b9990651d0d6c600715e2c39b02406431bbb809f857b1980` |
+| `teslimat/IsikYolu-1.7.0-debug.apk` | 9 099 161 bayt | `942d6dc9ec850e9e98be1f24993622ebeb3382f388e74f8c72bf9eac99b4f2cc` |
 
-- Paket: `com.isikyolu.game`, sürüm kodu 9, sürüm adı 1.6.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
+APK, reklam SDK'sı ve bağımlılıkları (AndroidX, Kotlin standart kitaplığı) yüzünden 2,0 MB'tan 4,4 MB'a büyüdü.
+
+- Paket: `com.isikyolu.game`, sürüm kodu 10, sürüm adı 1.7.0 (önceki sürümlerin üzerine kurulur, ilerleme korunur), etiket "Işık Yolu".
 - İzinler:
   - Uygulamanın kendisi: `VIBRATE`, `INTERNET`, `ACCESS_NETWORK_STATE`.
   - Reklam SDK'sının eklediği: `AD_ID`, `ACCESS_ADSERVICES_*`, `WAKE_LOCK`, `FOREGROUND_SERVICE`.
@@ -194,7 +204,7 @@ ajanlarıyla oynandı. Bulunan sorunlar düzeltildi; ayrıntı: `docs/TEST_RAPOR
 
 ```
 ./gradlew clean :engine:test :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest
-BUILD SUCCESSFUL in 4m 21s    (98 test, 0 hata)
+BUILD SUCCESSFUL in 6m 3s    (115 test, 0 hata)
 ```
 
 `./gradlew :app:lintDebug` sonucu: **0 hata**, 32 uyarı. Uyarılar şu türden:

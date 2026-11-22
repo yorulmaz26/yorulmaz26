@@ -916,10 +916,19 @@ public class UiFlowTest {
         for (int k = 0; k < 3; k++) {
             View v = findText(act.currentScreen(), "Video izle · +25 kristal");
             assertNotNull("video düğmesi (yeniden yüklenince geri gelir) " + k, v);
+            View slot = (View) v.getParent().getParent();
+            ViewGroup list = (ViewGroup) slot.getParent();
+            View next = list.getChildAt(list.indexOfChild(slot) + 1);
+            int[] before = new int[2]; next.getLocationInWindow(before);
             ((View) v.getParent()).performClick();
             idle(300);
-            if (k < 2) assertNull("video tükendi: düğme yeniden yüklenene kadar yok", findText(act.currentScreen(), "Video izle · +25 kristal"));
+            if (k < 2) {
+                assertNull("video tükendi: düğme yeniden yüklenene kadar yok", findText(act.currentScreen(), "Video izle · +25 kristal"));
+                assertNotNull("yer tutucu", findText(act.currentScreen(), "Video hazırlanıyor"));
+            }
             idle(1200);
+            int[] after = new int[2]; next.getLocationInWindow(after);
+            assertEquals("liste kaymaz", before[1], after[1]);
         }
         assertEquals(kr + 75, p.crystals);
         assertNull("günde 3", findText(act.currentScreen(), "Video izle · +25 kristal"));
@@ -997,6 +1006,61 @@ public class UiFlowTest {
         idle(1500);
         assertNotNull("tamamlandı penceresi", findText(act.overlayLayer(), "Sonraki Bölüm"));
         shot("22_tablet_yatay");
+    }
+
+    /** Banner görünmediği her durumda duraklatılır (yeni oyuncu, pencere altı, oyun ekranı, arka plan). */
+    @Test public void bannerPausedWheneverHidden() throws Exception {
+        FakeAds ads = fakeAds();
+        org.robolectric.android.controller.ActivityController<MainActivity> ctl = Robolectric.buildActivity(MainActivity.class).setup();
+        act = ctl.get();
+        idle(100);
+        waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
+        idle(500);
+        assertEquals(1, ads.bannersCreated);
+        assertFalse("yeni oyuncu: banner görünmez ve duraklatılır", ads.bannerRunning);
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        complete(p, 3);
+        act.goLevels();
+        idle(500);
+        assertTrue("görünür banner çalışır", ads.bannerRunning);
+        p.lives = 0;
+        act.showNoLives(0);
+        idle(300);
+        assertFalse("pencere altında duraklatılır", ads.bannerRunning);
+        closeOverlays();
+        idle(300);
+        assertTrue(ads.bannerRunning);
+        p.lives = 4;
+        openLevel(4);
+        assertFalse("oyun ekranında duraklatılır", ads.bannerRunning);
+        act.goLevels();
+        idle(500);
+        assertTrue(ads.bannerRunning);
+        ctl.pause();
+        assertFalse("arka planda duraklatılır", ads.bannerRunning);
+        ctl.resume();
+        idle(200);
+        assertTrue(ads.bannerRunning);
+    }
+
+    /** Döndürme, katlama ya da bölünmüş ekranda banner yeni genişliğe göre yeniden kurulur. */
+    @Test public void bannerRebuiltWhenWidthChanges() throws Exception {
+        FakeAds ads = fakeAds();
+        org.robolectric.android.controller.ActivityController<MainActivity> ctl = Robolectric.buildActivity(MainActivity.class).setup();
+        act = ctl.get();
+        idle(100);
+        waitFor("ana menü", () -> act.currentScreen() instanceof MenuScreen);
+        idle(500);
+        int w0 = act.bannerWidthDp();
+        assertTrue("dikey genişlik " + w0, w0 > 300 && w0 < 500);
+        // Robolectric pencereyi yeniden boyutlandırmaz: yuvanın genişlik değişimi doğrudan yerleşimle verilir
+        View slot = act.overlayLayer();
+        float d = act.getResources().getDisplayMetrics().density;
+        slot.layout(0, 0, (int) (850 * d), slot.getHeight());
+        idle(50);
+        assertTrue("yeni genişlikte banner istendi: " + ads.widthsRequested, ads.widthsRequested.stream().anyMatch(w -> w > 800));
+        assertTrue(ads.bannersCreated >= 2);
     }
 
     @Test public void splashScreenRenders() throws Exception {

@@ -1,26 +1,29 @@
-# Test Raporu — Işık Yolu 1.6.0
+# Test Raporu — Işık Yolu 1.7.0
 
 Tarih: 22 Kasım 2026 · Komut: `./gradlew clean :engine:test :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest`
 
-**Sonuç: 98 testin 98'i geçti, 0 hata.** 1.6.0'da bölüm denetimi yapıldı; ayrıntısı aşağıda, "Bölüm denetimi" bölümünde.
+**Sonuç: 115 testin 115'i geçti, 0 hata.**
+- 1.7.0: reklamlar ve Android 16 hedefi (aşağıda "Reklamlar ve Android 16").
+- 1.6.0: bölüm denetimi (aşağıda "Bölüm denetimi").
 
 | Test sınıfı | Test | Sonuç | Süre |
 |---|---|---|---|
-| `BeamReflectionTest` | 6 | ✅ | 0,02 sn |
+| `BeamReflectionTest` | 6 | ✅ | 0,01 sn |
 | `ColorFilterTest` | 5 | ✅ | <0,01 sn |
 | `PrismTest` | 3 | ✅ | <0,01 sn |
 | `DoorKeyTest` | 5 | ✅ | <0,01 sn |
-| `GameSessionTest` (akıllı ipucu planı dahil) | 10 | ✅ | 6,0 sn |
-| `LevelPackTest` | 3 | ✅ | 0,1 sn |
-| `AllLevelsSolvableTest` | 2 | ✅ | 4,0 sn |
-| `LevelAuditTest` (500 bölümün bütün durumları) | 1 | ✅ | 35,7 sn |
-| `ShortcutsTest` (kısayol ve canlı yem) | 3 | ✅ | 1,3 sn |
-| `BeamFollowerTest` (mantık ölçüsü) | 3 | ✅ | 0,13 sn |
+| `GameSessionTest` (akıllı ipucu planı dahil) | 10 | ✅ | 6,5 sn |
+| `LevelPackTest` | 3 | ✅ | 0,06 sn |
+| `AllLevelsSolvableTest` | 2 | ✅ | 4,6 sn |
+| `LevelAuditTest` (500 bölümün bütün durumları) | 1 | ✅ | 39,3 sn |
+| `ShortcutsTest` (kısayol ve canlı yem) | 3 | ✅ | 1,7 sn |
+| `BeamFollowerTest` (mantık ölçüsü) | 3 | ✅ | 0,16 sn |
 | `StarRatingTest` | 2 | ✅ | <0,01 sn |
 | `ProgressTest` | 9 | ✅ | <0,01 sn |
 | `LivesTest` (can sistemi, saat hilesi) | 11 | ✅ | <0,01 sn |
-| `EconomyTest` (market, ekonomi, saat dilimi) | 15 | ✅ | 0,03 sn |
-| `UiFlowTest` (Robolectric, gerçek çizim, denetim geri dönüş testleri) | 20 | ✅ | ~210 sn |
+| `EconomyTest` (market, ekonomi, saat dilimi) | 15 | ✅ | 0,02 sn |
+| `AdPolicyTest` (reklam sıklığı ve video sınırları) | 6 | ✅ | 0,02 sn |
+| `UiFlowTest` (Robolectric, gerçek çizim; denetim ve reklam testleri) | 31 | ✅ | ~300 sn |
 
 ## İstenen 10 kontrol
 
@@ -47,6 +50,70 @@ Tarih: 22 Kasım 2026 · Komut: `./gradlew clean :engine:test :app:assembleDebug
   tamamlandı penceresi → bölüm seçme → 9 farklı mekanikten bölüm → hamle, geri alma, ipucu penceresi, ipucu kullanımı
   (arka plan iş parçacığı) → duraklatma → günlük bulmaca (oynanıp çözülür) → başarılar → ayarlar → "Nasıl Oynanır?".
   Her adımda ekran görüntüsü alındı: [`docs/ekranlar/`](ekranlar).
+
+## Reklamlar ve Android 16 (1.7.0)
+
+### Otomatik testler
+
+`AdPolicyTest` (motor):
+- Öğretici bölümler sayılmaz.
+- İlk 10 bölümde geçiş reklamı yoktur.
+- Geçiş reklamı en az 3 bölüm ve 4 dakika arayla gösterilir: 30 bölüm ve 15 dakikalık örnekte tam 4 reklam.
+- Ödüllü videodan sonraki 3 dakikada geçiş reklamı yoktur.
+- Video ödüllerinin günlük sınırları ve gerçek etkileri (can, ipucu, kristal) doğru çalışır.
+- Ertesi gün sınır yenilenir; geri giden gün yenilemez.
+- Kayıt ve yükleme sonrası reklam durumu korunur.
+
+`UiFlowTest` (Robolectric, sahte reklam sağlayıcısıyla):
+
+| Test | Doğrulanan |
+|---|---|
+| `bannerPlacement` | İlk 3 bölümde banner yok. Bölümler ekranında var; ekran banner'ın üstünde biter ve banner ince bir şerittir. Pencere açılınca gizlenir, kapanınca geri gelir. Oyun ekranında, markette ve ayarlarda yok. Ayarlarda gizlilik seçenekleri düğmesi var. |
+| `bannerPausedWheneverHidden` | Görünmeyen banner her durumda duraklatılır: yeni oyuncu, pencere altı, oyun ekranı, arka plan. Görününce yeniden çalışır. |
+| `bannerRebuiltWhenWidthChanges` | Yuvanın genişliği değişince (döndürme, katlama, bölünmüş ekran) banner yeni genişlikte yeniden istenir. |
+| `interstitialBetweenLevelsWithFrequencyCap` | 1–10. bölümler arayüzden oynanır: reklam çıkmaz. 11–16'da yalnızca 13'ten sonra bir reklam çıkar. Saat 5 dakika ilerletilince 17'den sonra ikinci reklam gelir. Reklamdan sonra istenen ekran açılır. |
+| `rewardedVideoGivesLife` | Can bitince video ile +1 can alınır ve bölüm açılır. Günde 3 kez; sonra düğme kalkar. |
+| `rewardedVideoGivesMoves` | Yarıda kapatılan video ödül vermez. Tam izlenince ek hak verilir; kristalli devam fiyatı artmaz ve oyun sürer. |
+| `rewardedVideoGivesHintAndCrystals` | Video ile ipucu kazanılır ve hemen kullanılır. Markette +25 kristal, günde 3 kez. Video yeniden yüklenene dek yerinde "hazırlanıyor" yazar ve liste kaymaz. |
+| `failedVideoAndPrivacyPolicy` | Açılamayan video ödül vermez ve doğru uyarı çıkar. Ayarlar'da gizlilik politikası okunur. |
+| `fullscreenAdDoesNotPauseGame` | Tam ekran reklam açıkken oyun "Duraklatıldı" penceresi açmaz; normal arka plana geçişte açar. |
+| `contentStaysInsideSystemBars` | Kenardan kenara çizimde içerik durum ve gezinme çubuğunun içinde kalır. |
+| `tabletLandscapeWorks` | 1280×800 yatay tablette bölüm açılır, tahta sığar ve arayüzden çözülür. |
+
+### Bağımsız inceleme (2 tur, her bulgu 2 şüpheciyle)
+
+**1. tur:** ajanlar politika uyumunu, oyun akışını ve SDK kullanımını inceledi. 13 bulgu doğrulandı, 6'sı reddedildi.
+Düzeltmeler:
+- Oyun ekranındaki banner kaldırıldı: sürekli dokunulan düğmelere yakındı.
+- Pencere açıkken banner gizlenir.
+- Gizlilik politikası eklendi.
+- Banner yenileme hatasında gizlenmez; hiç yüklenmezse yeniden dener.
+- Market video düğmesi, video yeniden yüklenince geri gelir.
+- `singleTop` başlatma modu kullanılır.
+- Ödüllü video sonucu üç durumludur; geçiş reklamı sayacı yalnızca gösterimde ilerler.
+- İzin isteği çevrimdışı açılıştan sonra yeniden denenir.
+- **targetSdk 36:** Play 31 Ağustos 2026'dan beri bunu şart koşuyor.
+- Kimlikler dördü birlikte verilmezse derleme durur.
+- Yeni banner boyutu API'si kullanılır.
+
+**2. tur:** ajanlar düzeltmeleri ve Android 16 geçişini inceledi. 6 bulgu doğrulandı, 2'si reddedildi.
+Düzeltmeler:
+- Banner'ın duraklatma durumu doğru başlar; duraklatılmışken yeniden deneme yapılmaz.
+- Genişlik değişince banner yeniden kurulur. Uygulama Android 16'da dikey kilidini korumak için "oyun" kategorisinde
+  bildirildi.
+- Reklam dinleyicisi kapanan etkinliği tutmaz.
+- Market listesi kaymaz.
+- Gezinme çubuğu rengi doğru gösterilir.
+
+Reddedilen başlıca öneriler ve gerekçeleri:
+- "Geçiş reklamı düğmeye basınca çıkıyor." Bölüm sonu geçişi, Google'ın önerdiği doğal geçiş noktasıdır.
+- "Ana menüde geri hareketi uygulamayı kapatıyor." Bu bilinçli bir davranış; önceki sürümle aynı.
+
+### Sınırlar
+
+- Gerçek AdMob reklamı bu ortamda gösterilemez: emülatör yok ve Robolectric reklam SDK'sını çalıştıramaz. Reklam
+  akışları sahte sağlayıcıyla, SDK kullanımı ise kod incelemesi ve SDK bayt koduyla doğrulandı.
+- İlk cihaz denemesi test kimlikleriyle yapılmalıdır ("Test Ad" etiketli reklamlar).
 
 ## Bölüm denetimi (1.6.0)
 
@@ -247,7 +314,7 @@ oynatılarak) yapıldı:
 
 Bilinen sınır: Android 13 öncesinde ağ saati yoksa, saati ileri alıp telefonu yeniden başlatan oyuncu
 geçen süreyi ileri alınan kadar sayılmış bulur. Saati sonra geri alırsa yenilenme gerçek zaman o noktaya
-gelene kadar durur. Sunucusuz bir oyunda bundan ötesi ancak internet saatiyle mümkün; uygulamanın internet izni yok.
+gelene kadar durur. Sunucusuz bir oyunda bundan ötesi ancak internet saatiyle mümkün. Oyun kendi saat sunucusuna bağlanmaz; varsa Android'in ağ saati (API 33+) kullanılır.
 
 ## Mantık bölümleri (1.2.0)
 

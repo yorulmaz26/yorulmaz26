@@ -118,14 +118,12 @@ public final class MarketScreen extends Screen {
         head.addView(countdown);
         list.addView(head, Ui.lpMargins(c, -1, -2, 4, 4, 4, 2));
         list.addView(note("Her gün 3 indirimli ürün, her biri tek adet. Teklifte günlük ürün sınırı uygulanmaz."));
-        if (act.videoAvailable(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS)) {
-            View video = Ui.button(c, "Video izle · +" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal (bugün "
-                    + act.videosLeft(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS) + ")", Ui.PRIMARY, Icon.PLAY,
-                    v -> act.watchVideo(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS, () -> {
-                        act.toast("+" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal kazandın");
-                        render(false);
-                    }));
-            list.addView(video, Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
+        // video yuvası: video yüklenirken yer tutar (liste kaymaz, yanlış dokunuş satın almaya dönmez)
+        videoSlot = null;
+        if (act.videosLeft(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS) > 0) {
+            videoSlot = new FrameLayout(c);
+            list.addView(videoSlot, Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
+            fillVideoSlot();
         }
         Progress p = Game.progress();
         int d = day();
@@ -426,6 +424,33 @@ public final class MarketScreen extends Screen {
 
     @Override public void onHide() { removeCallbacks(tick); }
 
-    /** Ödüllü video yeniden hazır olunca "Video izle" düğmesi Teklifler sekmesinde yeniden görünsün. */
-    @Override public void onAdsChanged() { if (tab == 0) render(false); }
+    private FrameLayout videoSlot;
+
+    /** Yuvayı doldurur: video hazırsa etkin düğme, değilse aynı boyutta "hazırlanıyor" düğmesi. */
+    private void fillVideoSlot() {
+        if (videoSlot == null) return;
+        Context c = getContext();
+        com.isikyolu.engine.AdPolicy.Reward r = com.isikyolu.engine.AdPolicy.Reward.CRYSTALS;
+        videoSlot.removeAllViews();
+        int left = act.videosLeft(r);
+        View b;
+        if (left <= 0) {
+            b = Ui.button(c, "Bugünkü video ödülleri bitti", Ui.SECONDARY, Icon.PLAY, v -> act.toast("Yarın yine izleyebilirsin"));
+            b.setAlpha(0.55f);
+        } else if (act.videoAvailable(r)) {
+            b = Ui.button(c, "Video izle · +" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal (bugün " + left + ")", Ui.PRIMARY, Icon.PLAY,
+                    v -> act.watchVideo(r, () -> {
+                        act.toast("+" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal kazandın");
+                        bar.refresh();
+                        fillVideoSlot();
+                    }));
+        } else {
+            b = Ui.button(c, "Video hazırlanıyor…", Ui.SECONDARY, Icon.PLAY, v -> act.toast("Video yükleniyor. İnternet bağlantısı gerekir."));
+            b.setAlpha(0.55f);
+        }
+        videoSlot.addView(b, new FrameLayout.LayoutParams(-1, -2));
+    }
+
+    /** Ödüllü video yeniden hazır olunca yalnızca video yuvası güncellenir (liste baştan kurulmaz). */
+    @Override public void onAdsChanged() { if (tab == 0) fillVideoSlot(); }
 }
