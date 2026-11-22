@@ -140,10 +140,13 @@ class Engine:
     # ───────────────────────── çalıştırma ─────────────────────────
     def run(self, as_of: str, *, kind: str = "prematch", horizon_hours: float = 192.0,
             fixture_ids: list[int] | None = None, models: CutoffModels | None = None,
-            point_in_time_status: bool = False) -> RunSummary:
+            point_in_time_status: bool = False, lean: bool = False) -> RunSummary:
         """`point_in_time_status`: geçmiş testte fikstür durumu `as_of` anındaki haliyle kullanılır."""
         cutoff = as_of
         self._kind = kind
+        # Yalın kayıt (yalnızca geçmiş testte): uygun olmayan adayların mod satırları ve retleri yazılmaz;
+        # moddan bağımsız değerlendirmeler, uygun adaylar, denetimler ve kararlar her zaman yazılır.
+        self._lean = lean and kind == "backtest"
         if fixture_ids is None:
             fx = self.conn.execute(
                 "SELECT * FROM fixtures WHERE status='scheduled' AND kickoff_at>? AND kickoff_at<=? ORDER BY kickoff_at",
@@ -457,6 +460,8 @@ class Engine:
             rank = {i: r + 1 for r, i in enumerate(chosen)}
             cand_rows = []
             for i, e in enumerate(evals):
+                if self._lean and not e.eligible:
+                    continue
                 checks = list(e.checks)
                 if e.eligible:
                     b = nested_block.get(i)
@@ -486,7 +491,9 @@ class Engine:
             n_sel = 0
             rej_rows = []
             for i, e in enumerate(evals):
-                cid = cand_ids[INDEX.keys[i]]
+                cid = cand_ids.get(INDEX.keys[i])
+                if cid is None:
+                    continue  # yalın kayıt: uygun olmayan aday satırı yazılmadı
                 mt = metrics_list[i]
                 # Oran yalnızca oranlı modlarda zorunludur; En Güvenilir'de ret gerekçesi sayılmaz.
                 failed = list(mt.core_failed) + (list(mt.odds_failed) if mode in USES_ODDS else [])

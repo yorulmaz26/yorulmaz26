@@ -31,7 +31,8 @@ class BacktestReport:
 
 
 def run_backtest(conn: sqlite3.Connection, until: str, *, settings: Settings = SETTINGS,
-                 lead_minutes: int = 30, n_draws: int | None = None, progress=None) -> tuple[BacktestReport, Engine]:
+                 lead_minutes: int = 30, n_draws: int | None = None, progress=None,
+                 lean: bool = False) -> tuple[BacktestReport, Engine]:
     hist = History()
     engine = Engine(conn, settings, hist, n_draws=n_draws)
     rows = conn.execute(
@@ -61,7 +62,7 @@ def run_backtest(conn: sqlite3.Connection, until: str, *, settings: Settings = S
             day_models.clear()
             day_models[day] = engine.prepare(cutoff)
         summary = engine.run(cutoff, kind="backtest", fixture_ids=valid_ids, models=day_models[day],
-                             point_in_time_status=True)
+                             point_in_time_status=True, lean=lean)
         n_runs += 1
         n_fx += summary.fixtures
         for m, v in summary.selected.items():

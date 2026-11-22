@@ -88,7 +88,8 @@ def create_app(db_path: str | None = None, *, auto_refresh_demo: bool = True) ->
 
     def maybe_refresh() -> None:
         if auto_refresh_demo:
-            runtime.refresh_demo_if_stale()
+            if not runtime.refresh_demo_if_stale():
+                runtime.refresh_real_if_stale()
 
     @app.middleware("http")
     async def same_origin_writes(request: Request, call_next):

@@ -106,5 +106,27 @@ olasılığın küçüğü. Bu, iki modelin de desteklemesini şart koşan bir k
    Sistemde `iddaa` kaynağı yalnızca resmi/lisanslı bağlantı kurulup doğrulandığında `verified = 1` olur;
    o zamana kadar hiçbir oran İddaa olarak gösterilmez.
 4. Fikstür, sonuç ve canlı maç verisi (dakika, skor, xG) için oran kaynağından ayrı bir futbol veri sağlayıcısı
-   gerekebilir; seçim, İddaa erişim yöntemi netleşince yapılacaktır.
+   gerekebilir.
+
+## 7. Ücretsiz kaynak kararı (kullanıcı: "ücretsiz olanları kullan")
+
+- **football-data.co.uk — kullanılıyor.** Herkesin indirebileceği ücretsiz CSV dosyaları: 21 organizasyonun
+  16'sı için geçmiş ve güncel sezon sonuçları, ilk yarı skorları ve yaklaşan maçlar; maç öncesi oranlar
+  (Bet365 / piyasa ortalaması / Pinnacle). Kurulum: `python -m akilli_tahmin real-data --db gercek.sqlite3`,
+  güncelleme: `update-data` (sunucu da 6 saatte bir kendisi günceller). Sınırlar:
+  - İddaa oranı değildir; kartta kaynak "football-data.co.uk (Bet365 / piyasa ortalaması)" olarak görünür.
+  - Oranların yakalanma anı bilinmez (`approximate`): geriye dönük testte kullanılır, güncel öneride reddedilir.
+    Bu nedenle gerçek veride En Avantajlı ve Dengeli güncel seçim üretmez; En Güvenilir oran gerektirmez.
+  - Yalnızca Maç Sonucu ve Alt/Üst 2,5 için oran vardır; canlı maç verisi yoktur (radar gerçek veride kapalı kalır).
+  - TFF 1. Lig, Türkiye Kupası, UEFA Şampiyonlar/Avrupa/Konferans Ligi bu kaynakta yoktur.
+  - Dosyalar genellikle haftada iki kez güncellenir; sonuçlar birkaç gün gecikebilir.
+- **Nesine bülten adresi — kullanılmıyor.** Belgelenmemiş, herkese açık olmayan bir adres; bu çalışma ortamının
+  güvenlik denetimi isteği "yetkisiz erişim" olarak engelledi. Atlatılmaya çalışılmadı; ağ izni geri alındı.
+- **Maçkolik — kullanılmıyor.** Kullanım koşulları veritabanına içeriği görüntüleme dışında erişimi açıkça
+  yasaklar; resmi API'si yoktur; araştırmalara göre yalnızca Türkiye IP'lerine yanıt verir.
+- **Gerçek piyasa sonucu (Süper Lig, 2024/25–2026/27, 747 maç):** En Güvenilir geriye dönük testte kalibre
+  (419 seçim, isabet %91,9 / tahmin %89,8). Piyasa oranları modellerden daha isabetli (log loss: piyasa 0,551,
+  MODEL B 0,554, MODEL A 0,572); En Avantajlı ve Dengeli hiç kurulmadı — güvenilir avantaj yok.
+- **İleride:** canlı maç verisi için ücretsiz katmanı olan resmi bir servis (ör. API-Football, günde 100 istek;
+  kullanıcının kendi ücretsiz anahtarı gerekir); İddaa oranları için izinli/lisanslı erişim.
 5. İstatistiksel politika değerleri (güven düzeyleri, en az örneklemler) varsayılan haliyle kullanılır.

@@ -11,6 +11,12 @@ from .selection.engine import Engine, settle_fixture_results
 DEMO_REFRESH_MINUTES = 15
 
 
+def _main_codes() -> dict:
+    from .data.football_data_feed import MAIN_DIVISIONS
+
+    return MAIN_DIVISIONS
+
+
 @dataclass
 class Runtime:
     db_path: str
@@ -67,6 +73,33 @@ class Runtime:
                 generate_goal_events(self.conn, now)
                 self.engine.football.invalidate()
             refresh_prematch_odds(self.conn, now)
+            self.run_prematch(now)
+            return True
+
+    def refresh_real_if_stale(self, now: str | None = None, *, hours: float = 6.0,
+                              codes: tuple[str, ...] | None = None) -> bool:
+        """Gerçek (sentetik olmayan) veritabanında, son çalıştırma `hours` saatten eskiyse ücretsiz kaynaktan
+        (football-data.co.uk) yeni sonuçları ve yaklaşan maçları indirip seçim sürecini yeniden çalıştırır."""
+        now = now or to_iso(utcnow())
+        if self.is_synthetic():
+            return False
+        with self.lock:
+            row = self.conn.execute(
+                "SELECT as_of FROM prediction_runs WHERE kind='prematch' AND status='finished' ORDER BY as_of DESC LIMIT 1"
+            ).fetchone()
+            has_fd = self.conn.execute("SELECT 1 FROM fixtures WHERE source='football-data-csv' LIMIT 1").fetchone()
+            if not has_fd or (row and (from_iso(now) - from_iso(row[0])).total_seconds() < hours * 3600):
+                return False
+            from .data.football_data_feed import DEFAULT_CODES, sync
+
+            leagues = codes or tuple(sorted({c for c, lg in _main_codes().items()
+                                             if self.conn.execute("SELECT 1 FROM fixtures WHERE league_id=? LIMIT 1",
+                                                                  (lg,)).fetchone()})) or DEFAULT_CODES
+            try:
+                sync(self.conn, as_of=now, codes=leagues, seasons=1, cache_dir=self.db_path + ".cache")
+            except Exception:  # ağ yoksa mevcut veriyle devam edilir
+                return False
+            self.engine.football.invalidate()
             self.run_prematch(now)
             return True
 

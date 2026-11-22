@@ -5,6 +5,8 @@
   run         Yaklaşan maçlar için 15 adımlı seçim sürecini çalıştırır (gerçek veri).
   backtest    Veritabanındaki geçmiş maçlar üzerinde kronolojik geriye dönük test çalıştırır.
   import-csv  football-data.co.uk biçimli geçmiş sonuç/oran dosyası içe aktarır.
+  real-data   Ücretsiz gerçek veriyle (football-data.co.uk) kurulum: indir, geriye dönük test, güncel tahmin.
+  update-data Gerçek veriyi günceller (yeni sonuçlar, yaklaşan maçlar) ve seçim sürecini yeniden çalıştırır.
   serve       API ve web arayüzünü başlatır.
 """
 from __future__ import annotations
@@ -91,6 +93,57 @@ def cmd_import(a) -> None:
         sys.exit(str(exc))
 
 
+def _codes(a) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    from .data.football_data_feed import EXTRA_LEAGUES, MAIN_DIVISIONS
+
+    wanted = [c.strip().upper() for c in a.leagues.split(",") if c.strip()]
+    bad = [c for c in wanted if c not in MAIN_DIVISIONS and c not in EXTRA_LEAGUES]
+    if bad:
+        sys.exit(f"Bilinmeyen lig kodu: {', '.join(bad)}. Geçerli: {', '.join(list(MAIN_DIVISIONS) + list(EXTRA_LEAGUES))}")
+    return (tuple(c for c in wanted if c in MAIN_DIVISIONS), tuple(c for c in wanted if c in EXTRA_LEAGUES))
+
+
+def cmd_real_data(a) -> None:
+    from .backtest.walk_forward import run_backtest
+    from .data.football_data_feed import sync
+    from .performance.tracker import snapshot_performance
+    from .selection.engine import settle_fixture_results
+
+    as_of = _now_minute()
+    conn = connect(a.db)
+    init_db(conn, as_of)
+    if conn.execute("SELECT 1 FROM fixtures WHERE is_synthetic=1 LIMIT 1").fetchone():
+        sys.exit("Bu veritabanında sentetik demo verisi var; gerçek veri için yeni bir dosya kullanın (--db).")
+    main_codes, extra = _codes(a)
+    t0 = time.time()
+    rep = sync(conn, as_of=as_of, codes=main_codes, seasons=a.seasons, include_extra=extra,
+               cache_dir=a.db + ".cache")
+    n = conn.execute("SELECT status, COUNT(*) FROM fixtures GROUP BY status").fetchall()
+    print("Veri: " + ", ".join(f"{s}={c}" for s, c in n) + (f"; hatalar: {rep['errors']}" if rep["errors"] else ""))
+    bt, engine = run_backtest(conn, as_of, lean=not a.full_history)
+    print(f"Geriye dönük test: {bt.runs} çalıştırma, {bt.fixtures} maç, seçimler {bt.selected}, {bt.seconds:.0f} sn.")
+    settle_fixture_results(conn, engine.history, as_of)
+    s = engine.run(as_of)
+    print(f"Güncel çalıştırma #{s.run_id}: {s.fixtures} yaklaşan maç, seçimler {s.selected}")
+    snapshot_performance(conn, as_of)
+    conn.execute("VACUUM")
+    print(f"Toplam {time.time() - t0:.0f} sn. Başlatmak için: python -m akilli_tahmin serve --db {a.db}")
+
+
+def cmd_update_data(a) -> None:
+    from .data.football_data_feed import sync
+    from .runtime import Runtime
+
+    as_of = _now_minute()
+    rt = Runtime(a.db)
+    main_codes, extra = _codes(a)
+    with rt.lock:
+        rep = sync(rt.conn, as_of=as_of, codes=main_codes, seasons=a.seasons, include_extra=extra,
+                   cache_dir=a.db + ".cache")
+        rt.engine.football.invalidate()
+    print(json.dumps({"errors": rep["errors"], **rt.run_prematch(as_of)}, ensure_ascii=False))
+
+
 def cmd_serve(a) -> None:
     import uvicorn
 
@@ -125,6 +178,16 @@ def main(argv: list[str] | None = None) -> None:
     sp.add_argument("file")
     sp.add_argument("--league", required=True)
     sp.add_argument("--season", required=True)
+    for name, fn, help_ in (("real-data", cmd_real_data, "Ücretsiz gerçek veriyle kur"),
+                            ("update-data", cmd_update_data, "Gerçek veriyi güncelle")):
+        sp = add(name, fn, help_)
+        sp.add_argument("--leagues", default="T1,E0,SP1,I1,D1,F1",
+                        help="football-data.co.uk kodları (T1=Süper Lig, E0, E1, SP1, I1, D1, F1, N1, P1, B1, SC0, "
+                             "G1, AUT, SWZ, DNK, BRA)")
+        sp.add_argument("--seasons", type=int, default=3, help="Geçmiş + güncel sezon sayısı")
+        if name == "real-data":
+            sp.add_argument("--full-history", action="store_true",
+                            help="Geçmiş testte uygun olmayan adayları ve retleri de kaydet (büyük dosya)")
     sp = add("serve", cmd_serve, "API ve arayüzü başlat")
     sp.add_argument("--host", default="127.0.0.1")
     sp.add_argument("--port", type=int, default=8000)

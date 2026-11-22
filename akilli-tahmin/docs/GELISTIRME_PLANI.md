@@ -90,8 +90,8 @@ Uygun seçim yoksa mesajlar: Dengeli → "Güvenilir ve avantajlı seçim buluna
 | 6 | Geçmiş zaman (point-in-time) veri deposu | Temel ve Veri | Tamamlandı (temel) |
 | 7 | Tarihsel veri içe aktarıcı (CSV) | Temel ve Veri | Tamamlandı (temel) |
 | 8 | Sentetik demo ligler ve oranlar | Temel ve Veri | Tamamlandı (temel) |
-| 9 | Gerçek veri sağlayıcı entegrasyonu ve kimlik eşleştirme | Temel ve Veri | Planlandı |
-| 10 | 21 organizasyon için üretim veri akışları | Temel ve Veri | Planlandı |
+| 9 | Gerçek veri sağlayıcı entegrasyonu ve kimlik eşleştirme | Temel ve Veri | Kısmen |
+| 10 | 21 organizasyon için üretim veri akışları | Temel ve Veri | Kısmen |
 | 11 | Oran anlık görüntüleri: kaynak, zaman ve İddaa ayrımı | Temel ve Veri | Kısmen |
 | 12 | Veri güncelliği ve yeterliliği kontrolleri | Temel ve Veri | Tamamlandı (temel) |
 | 13 | Özellik çıkarımı ve kronolojik eğitim pencereleri | Modeller | Kısmen |
@@ -1448,12 +1448,16 @@ Mevcut durum: 1–7'nin temel uygulaması sentetik veriyle çalışıyor. Eksik:
 
 ## 6. Sonraki adımlar
 
+> Durum (2026-11-22): ücretsiz gerçek veri kaynağı football-data.co.uk bağlandı (16/21 organizasyon). Bu kaynak
+> İddaa oranı ve canlı maç verisi içermez; oranları yaklaşık zamanlıdır. Bu yüzden gerçek veride şu an yalnızca
+> En Güvenilir modu güncel seçim üretebilir; En Avantajlı ve Dengeli için kesin zamanlı güncel oran gerekir.
+
 Öncelik sırasıyla üzerinde çalışılacak 5 somut aşama:
 
 1. **AŞAMA 66 — gerçek tarihsel veriyle bağımsız performans doğrulaması.** Tarihsel CSV içe aktarıcıyla (Aşama 7) en az bir organizasyonun birden çok sezonunu yükle; üç modu walk-forward backtest (Aşama 50) ile aynı havuzda çalıştır; raporu yalnızca veritabanından yeniden üreten bağımsız betiği ekle. Yaklaşık zamanlı tarihsel oranlarla elde edilen sonuçları raporda ayrıca işaretle.
 2. **AŞAMA 62 — v6.3 test eşlemesi ve CI.** Bölüm 10'daki 12 testin adlarıyla eşlemesini test dosyasında belgele; ağ erişimi olmadan çalışan paketi CI'ye bağla; tarayıcıda uçtan uca arayüz testlerini (Dengeli varsayılanı, mod geçişi, kart alanları) ekle.
 3. **AŞAMA 25 — radarın %90 bölgesi için nadir olay kalibrasyonu.** Eşik %90'a indiği için `radar_calibration` yeterlilik kuralını kronolojik olarak belirle ve Clopper–Pearson raporunu MODEL A ve MODEL B için ayrı üret; ardından Aşama 60'taki radar başarı raporunu tamamla.
-4. **AŞAMA 9 — gerçek veri sağlayıcı entegrasyonu.** Lisans koşullarını netleştir, adaptör arayüzünü ve kimlik eşleştirmeyi kur; Aşama 10 (21 organizasyon üretim akışları) için zemini hazırla.
+4. **AŞAMA 9 — gerçek veri sağlayıcı entegrasyonu.** Ücretsiz kaynak (football-data.co.uk) bağlandı: 21 organizasyonun 16'sı için sonuçlar, yaklaşan maçlar ve maç öncesi oranlar (`data/football_data_feed.py`, `real-data` / `update-data` komutları). Kalan: TFF 1. Lig, Türkiye Kupası ve UEFA organizasyonları için kaynak; canlı maç verisi (radar) için kaynak; İddaa oranları için lisanslı/izinli erişim.
 5. **AŞAMA 11 — gerçek oran anlık görüntüleri ve İddaa ayrımı.** Doğrulanmış oran kaynağı/kaynakları bağla, oran yaşı hizmet düzeyi hedeflerini tanımla; En Avantajlı ve Dengeli modlarının gerçek veriyle çalışması ve Aşama 40 (CLV) buna bağlıdır.
 
 ---

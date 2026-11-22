@@ -63,8 +63,9 @@ ODDS_SOURCES = (
     # (code, label, type, is_iddaa, verified, notes)
     ("synthetic-demo", "Sentetik demo bahisçisi", "synthetic", 0, 1,
      "Geliştirme ve test için üretilmiş oranlar; gerçek oran değildir."),
-    ("football-data-csv", "football-data.co.uk geçmiş oranları", "historical_csv", 0, 1,
-     "Zaman damgası yaklaşık; yalnızca geçmiş doğrulama içindir, güncel öneri için kullanılmaz."),
+    ("football-data-csv", "football-data.co.uk (Bet365 / piyasa ortalaması)", "historical_csv", 0, 1,
+     "Ücretsiz dosyalar; yakalanma zamanı yaklaşık: yalnızca geriye dönük testte kullanılır, güncel öneride "
+     "reddedilir. İddaa oranı değildir."),
     ("iddaa", "İddaa (resmi)", "iddaa", 1, 0,
      "Resmi veri bağlantısı kurulmadan doğrulanmış sayılmaz."),
 )

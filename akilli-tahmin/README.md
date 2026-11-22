@@ -22,6 +22,19 @@ python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python -m pytest -q                                # testler
 ```
 
+### Ücretsiz gerçek veri
+
+```bash
+.venv/bin/python -m akilli_tahmin real-data --db gercek.sqlite3      # varsayılan: T1,E0,SP1,I1,D1,F1; 3 sezon
+.venv/bin/python -m akilli_tahmin real-data --db tr.sqlite3 --leagues T1   # yalnızca Süper Lig (~2 dk)
+.venv/bin/python -m akilli_tahmin update-data --db gercek.sqlite3    # yeni sonuçlar ve yaklaşan maçlar
+.venv/bin/python -m akilli_tahmin serve --db gercek.sqlite3          # sunucu 6 saatte bir kendisi günceller
+```
+
+Kaynak: [football-data.co.uk](https://www.football-data.co.uk) ücretsiz dosyaları (21 organizasyonun 16'sı).
+İddaa oranı ve canlı maç verisi içermez; oranların zamanı yaklaşık olduğu için güncel öneride yalnızca En
+Güvenilir modu seçim yapabilir. Ayrıntılar ve Nesine/Maçkolik'in neden kullanılmadığı: `docs/VARSAYIMLAR.md` §7.
+
 Demo **kurgusal takımlar ve sentetik oranlar** kullanır (`--market biased` varsayılan: favori–sürpriz
 eğilimli piyasa; `--market efficient`: verimli piyasa, oranlı modlar seçim üretmez). Gerçek veri için:
 `import-csv` (football-data.co.uk biçimi, yalnızca geçmiş test) ve bir veri sağlayıcı bağlantısı gerekir.
