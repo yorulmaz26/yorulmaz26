@@ -4,20 +4,30 @@ Sabit "%70 olasılık" veya "%10 EV" eşiği yoktur. Her mod için eşik adaylar
 önceki doğrulama penceresindeki aday değerlerinin yüzdeliklerinden üretilir ve her aday eşik
 kümesi, o pencerede *gerçekleşmiş* sonuçlarla puanlanır:
 
-- En Güvenilir: isabet oranının Wilson alt sınırını en büyükler. Olasılık eşiği adayları havuzun
-  üst kuyruğundaki yüzdeliklerden gelir.
+- En Güvenilir: isabet oranının Wilson alt sınırını en büyükler.
+
+En Güvenilir ve Dengeli modlarda olasılık eşiği adayları yalnızca *gerçekleşmesi gerçekleşmemesinden
+daha olası* (ihtiyatlı olasılık > 0,5) adayların yüzdeliklerinden üretilir. Bu bir ayar eşiği değil,
+"yüksek gerçekleşme olasılığı" tanımının kendisidir: %8 olasılıklı bir skor tahmini "en güvenilir"
+veya "yüksek olasılıklı" sayılamaz. Eşiğin kendisi yine doğrulama verisinden seçilir.
 - En Avantajlı: teorik birim ROI'nin alt güven sınırını en büyükler; EV eşiği ≥ 0.
-- Dengeli: ihtiyatlı Kelly payıyla (olasılık alt sınırından) gerçekleşmiş ortalama log büyümenin
-  alt güven sınırını en büyükler. Kelly büyümesi, aynı avantajda daha yüksek olasılığı ödüllendirdiği
-  için olasılık ile değeri matematiksel olarak dengeler. Ek olarak isabet alt sınırı pozitif EV
-  havuzunun isabet oranından düşük olamaz.
+- Dengeli: yalnızca yüksek olasılık alanında (ihtiyatlı olasılık > 0,5 ve kronolojik olasılık eşiği)
+  teorik ROI'nin alt güven sınırını en büyükler; ek olarak isabet alt sınırı pozitif EV havuzunun
+  isabet oranından düşük olamaz. Çalışma anında sıralama ihtiyatlı Kelly oranıyla yapılır (aynı
+  avantajda daha yüksek olasılığı öne alır); Kelly log büyümesi doğrulamada raporlanır.
 
 Bütün modlarda seçilen kümenin ortalama tahmini olasılığı, gözlenen isabet oranının üst güven
 sınırını aşamaz (aşırı güven / "kazananın laneti" engeli).
 
+Bağımsız kronolojik teyit: doğrulama penceresi zamana göre ikiye ayrılır. Eşikler ilk 2/3'lük dilimde
+seçilir; seçilen eşik kümesi son 1/3'lük *teyit* diliminde yeniden ölçülür. Teyit diliminde yeterli
+seçim yoksa, küme aşırı güvenli çıkarsa veya (oranlı modlarda) teorik getiri pozitif değilse mod
+kurulmaz. Bu, çok sayıda eşik denemesinden şans eseri iyi görünen kümenin seçilmesini (seçim aşırı
+uyumu) engeller.
+
 "Güvenilir avantaj" kuralı: oranlı modlar (En Avantajlı, Dengeli) ancak doğrulama penceresinde
-teorik birim ROI'nin tek yönlü %95 alt güven sınırı sıfırın üzerindeyse kurulur (Dengeli için ayrıca
-Kelly log büyümesinin alt sınırı > 0). Aksi halde mod "belirlenmemiş" kalır ve seçim üretmez.
+teorik birim ROI'nin tek yönlü %95 alt güven sınırı sıfırın üzerindeyse ve bağımsız teyit diliminde
+getiri pozitif kalıyorsa kurulur. Aksi halde mod "belirlenmemiş" kalır ve seçim üretmez.
 Verimli bir piyasada bu, çoğu zaman hiç seçim yapılmaması demektir — bu beklenen ve doğru davranıştır.
 """
 from __future__ import annotations
@@ -28,7 +38,7 @@ import numpy as np
 
 from ..config import StatisticalPolicy
 from .history import CONFIDENCE_LEVELS, HistoryView, level_to_q_index
-from .modes import BALANCED, BEST_VALUE, HIGHEST_PROBABILITY, ModeConfig, ModeThresholds
+from .modes import BALANCED, BEST_VALUE, HIGHEST_PROBABILITY, MORE_LIKELY_THAN_NOT, ModeConfig, ModeThresholds
 
 Z95 = 1.959963984540054
 Z_ONE_SIDED_95 = 1.6448536269514722
@@ -81,6 +91,12 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                            "n": n_valid})
 
     idx = np.where(valid)[0]
+    kick = view.kickoffs()[idx]
+    times = np.unique(kick)
+    split_time = times[int(len(times) * 2 / 3)] if len(times) >= 3 else times[-1]
+    tune = (kick < split_time).astype(np.float32)
+    conf = kick >= split_time
+    n_conf_min = max(20, n_min // 3)
     y_v = y[idx]
     won = (y_v == 1).astype(float)
     p_cond = p_est[idx] / np.maximum(1e-9, 1 - p_void[idx])
@@ -102,12 +118,15 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
         p_rob = p_low + down[idx]
         ok_p = np.isfinite(p_rob)
         ev_rob = p_rob * odds[idx] + p_void[idx] - 1.0 if uses_odds else np.full(idx.size, np.nan)
+        likely = ok_p & (p_rob > MORE_LIKELY_THAN_NOT)
         if mode == HIGHEST_PROBABILITY:
-            p_grid = _unique_grid(p_rob[ok_p], (0.80, 0.85, 0.90, 0.925, 0.95, 0.965, 0.975, 0.985, 0.99))
+            p_grid = _unique_grid(p_rob[likely], (0.0, 0.25, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95))
         elif mode == BALANCED:
-            p_grid = _unique_grid(p_rob[ok_p], (0.6, 0.7, 0.8, 0.9, 0.95, 0.975))
+            p_grid = _unique_grid(p_rob[likely], (0.0, 0.2, 0.4, 0.6, 0.8, 0.9))
         else:
             p_grid = [None]
+        if mode != BEST_VALUE and not p_grid:
+            continue
         if uses_odds:
             pos_mask = ok_p & pos_ev & (ev_rob > 0)
             e_grid = [0.0] + [v for v in _unique_grid(ev_rob[pos_mask], (0.25, 0.5, 0.75)) if v > 0]
@@ -130,6 +149,7 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                 if te is not None:
                     mk &= ev_rob > te
                 M[ci] = mk
+            M *= tune[None, :]  # istatistikler yalnızca ayar diliminde
             n = M.sum(axis=1)
             k = M @ won
             if mode == BALANCED:
@@ -163,7 +183,7 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                 else:
                     if baseline_hit is None or lo[ci] < baseline_hit:
                         continue
-                    score = (float(g_lb[ci]), float(n[ci]))
+                    score = (float(roi_lb[ci]), float(n[ci]))
                 if best is None or score > best[0]:
                     best = (score, ModeThresholds(
                         level=level, max_relative_width=float(tw), max_disagreement=float(td),
@@ -179,14 +199,47 @@ def tune_mode(mode: str, view: HistoryView, policy: StatisticalPolicy, *, data_c
                         "log_growth": float(gm[ci]) if mode == BALANCED else None,
                         "log_growth_lower": float(g_lb[ci]) if mode == BALANCED else None,
                         "grid_size": len(combos) * len(w_grid) * len(d_grid) * len(m_grid) * len(CONFIDENCE_LEVELS),
+                        "tuning_until": str(split_time),
                     })
     if best is None:
         return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end,
                           {"reason": "Doğrulama penceresinde koşulları sağlayan eşik kümesi bulunamadı.", "n": n_valid})
     _, th, metrics = best
-    growth_ok = mode != BALANCED or (metrics.get("log_growth_lower") is not None and metrics["log_growth_lower"] > 0)
-    if mode in (BEST_VALUE, BALANCED) and not (metrics["roi_lower"] is not None and metrics["roi_lower"] > 0
-                                               and growth_ok):
+    # ── bağımsız kronolojik teyit ──
+    qi = level_to_q_index(th.level)
+    p_rob = pq[qi, idx] + down[idx]
+    mk = conf & np.isfinite(p_rob) & (width[idx] <= th.max_relative_width + 1e-12) & (dis[idx] <= th.max_disagreement + 1e-12)
+    if th.min_probability_lower is not None:
+        mk &= p_rob >= th.min_probability_lower
+    if uses_odds:
+        ev_rob = p_rob * odds[idx] + p_void[idx] - 1.0
+        mk &= pos_ev & (mdev[idx] <= th.max_market_deviation + 1e-12) & (ev_rob > th.min_ev_lower)
+    n_c = int(mk.sum())
+    metrics["confirm_n"] = n_c
+    if n_c < n_conf_min:
+        metrics["reason"] = f"Bağımsız teyit diliminde yeterli seçim yok ({n_c} < {n_conf_min})."
+        return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end, metrics)
+    k_c = float(won[mk].sum())
+    lo_c, hi_c = _wilson(np.array([k_c]), np.array([float(n_c)]))
+    mean_c = float(p_cond[mk].mean())
+    metrics.update({"confirm_hit_rate": k_c / n_c, "confirm_hit_rate_upper": float(hi_c[0]),
+                    "confirm_mean_probability": mean_c})
+    if hi_c[0] < mean_c:
+        metrics["reason"] = ("Bağımsız teyit diliminde tahmini olasılık gözlenen isabetin üst güven sınırını aştı "
+                             "(aşırı güven).")
+        return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end, metrics)
+    if uses_odds:
+        roi_c = float(ret[mk].mean())
+        metrics["confirm_roi"] = roi_c
+        if mode == BALANCED:
+            f = np.clip((p_rob[mk] * (odds[idx][mk] - 1.0) - (1.0 - p_rob[mk] - p_void[idx][mk]))
+                        / np.maximum(odds[idx][mk] - 1.0, 1e-9), 0.0, 0.99)
+            g = np.where(y_v[mk] == 1, np.log1p(f * (odds[idx][mk] - 1.0)), np.log1p(-f))
+            metrics["confirm_log_growth"] = float(np.mean(g))
+        if roi_c <= 0:
+            metrics["reason"] = "Bağımsız teyit diliminde teorik getiri pozitif değil; güvenilir avantaj belirlenemedi."
+            return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end, metrics)
+    if mode in (BEST_VALUE, BALANCED) and not (metrics["roi_lower"] is not None and metrics["roi_lower"] > 0):
         metrics["reason"] = ("Doğrulama penceresinde teorik getirinin %95 alt güven sınırı pozitif değil; "
                              "güvenilir avantaj belirlenemedi.")
         return ModeConfig(mode, "not_established", None, data_cutoff_at, start, end, metrics)

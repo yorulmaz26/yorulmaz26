@@ -40,7 +40,7 @@ def cmd_demo(a) -> None:
         sys.exit("Veritabanı boş değil; demo için yeni bir dosya kullanın (--db).")
     init_db(conn, as_of)
     t0 = time.time()
-    s = generate_demo(conn, as_of, market=a.market, seed=a.seed)
+    s = generate_demo(conn, as_of, market=a.market, seed=a.seed, leagues=tuple(a.leagues.split(",")))
     print(f"Sentetik veri: {s.fixtures_finished} oynanmış, {s.fixtures_upcoming} yaklaşan, {s.fixtures_live} canlı maç; "
           f"{s.odds_snapshots} oran (piyasa: {a.market}).")
     try:
@@ -112,6 +112,8 @@ def main(argv: list[str] | None = None) -> None:
     sp.add_argument("--market", choices=("biased", "efficient"), default="biased")
     sp.add_argument("--as-of", default=None)
     sp.add_argument("--seed", type=int, default=7)
+    sp.add_argument("--leagues", default="tr-super-lig,en-premier-league,es-la-liga,de-bundesliga",
+                    help="Virgülle ayrılmış organizasyon kodları (sentetik demo)")
     sp = add("run", cmd_run, "Yaklaşan maçları değerlendir")
     sp.add_argument("--as-of", default=None)
     sp = add("backtest", cmd_backtest, "Geriye dönük test")

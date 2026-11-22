@@ -138,7 +138,7 @@ class Engine:
         return cfg
 
     # ───────────────────────── çalıştırma ─────────────────────────
-    def run(self, as_of: str, *, kind: str = "prematch", horizon_hours: float = 96.0,
+    def run(self, as_of: str, *, kind: str = "prematch", horizon_hours: float = 192.0,
             fixture_ids: list[int] | None = None, models: CutoffModels | None = None,
             point_in_time_status: bool = False) -> RunSummary:
         """`point_in_time_status`: geçmiş testte fikstür durumu `as_of` anındaki haliyle kullanılır."""

@@ -21,6 +21,11 @@ class Runtime:
     def __post_init__(self) -> None:
         self.conn = connect(self.db_path)
         init_db(self.conn)
+        if self.is_synthetic():
+            # Eski demo veritabanlarında gol dakikaları yoksa üret (idempotent); radar geçmişi buna dayanır.
+            from .data.synthetic_live import generate_goal_events
+
+            generate_goal_events(self.conn, to_iso(utcnow()))
 
     @property
     def engine(self) -> Engine:
@@ -63,10 +68,11 @@ class Runtime:
         now = now or to_iso(utcnow())
         if not self.is_synthetic():
             return 0
-        from .data.synthetic import simulate_live_tick
+        from .data.synthetic import ensure_live_demo, simulate_live_tick
 
         with self._lock:
-            return simulate_live_tick(self.conn, now)
+            started = ensure_live_demo(self.conn, now)
+            return started + simulate_live_tick(self.conn, now)
 
     def _snapshot(self, now: str) -> None:
         try:

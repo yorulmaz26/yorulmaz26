@@ -407,6 +407,7 @@ CREATE TABLE IF NOT EXISTS radar_calibration (
     mean_predicted  REAL,
     observed_rate   REAL,
     ci_low          REAL,
+    ci_high         REAL,
     adequate        INTEGER NOT NULL,
     data_cutoff_at  TEXT NOT NULL,
     created_at      TEXT NOT NULL
@@ -515,6 +516,19 @@ BEGIN SELECT RAISE(ABORT, 'Geçmiş seçimler geriye dönük değiştirilemez');
 CREATE TRIGGER IF NOT EXISTS trg_decisions_settle_once BEFORE UPDATE ON selection_mode_decisions
 WHEN OLD.settlement_status <> 'pending'
 BEGIN SELECT RAISE(ABORT, 'Sonuçlandırılmış seçim yeniden sonuçlandırılamaz'); END;
+
+CREATE TRIGGER IF NOT EXISTS trg_mode_perf_no_update BEFORE UPDATE ON selection_mode_performance
+BEGIN SELECT RAISE(ABORT, 'selection_mode_performance değiştirilemez (yalnızca eklenir)'); END;
+CREATE TRIGGER IF NOT EXISTS trg_mode_perf_no_delete BEFORE DELETE ON selection_mode_performance
+BEGIN SELECT RAISE(ABORT, 'selection_mode_performance silinemez'); END;
+CREATE TRIGGER IF NOT EXISTS trg_mode_cal_no_update BEFORE UPDATE ON selection_mode_calibration
+BEGIN SELECT RAISE(ABORT, 'selection_mode_calibration değiştirilemez (yalnızca eklenir)'); END;
+CREATE TRIGGER IF NOT EXISTS trg_mode_cal_no_delete BEFORE DELETE ON selection_mode_calibration
+BEGIN SELECT RAISE(ABORT, 'selection_mode_calibration silinemez'); END;
+CREATE TRIGGER IF NOT EXISTS trg_mode_cmp_no_update BEFORE UPDATE ON selection_mode_comparisons
+BEGIN SELECT RAISE(ABORT, 'selection_mode_comparisons değiştirilemez (yalnızca eklenir)'); END;
+CREATE TRIGGER IF NOT EXISTS trg_mode_cmp_no_delete BEFORE DELETE ON selection_mode_comparisons
+BEGIN SELECT RAISE(ABORT, 'selection_mode_comparisons silinemez'); END;
 
 CREATE TRIGGER IF NOT EXISTS trg_radar_alerts_no_delete BEFORE DELETE ON radar_alerts
 BEGIN SELECT RAISE(ABORT, 'radar_alerts silinemez'); END;

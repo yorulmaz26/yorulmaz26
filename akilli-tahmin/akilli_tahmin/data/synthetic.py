@@ -31,6 +31,14 @@ TEAM_NAMES = {
         "Çınar Belediye", "Kızılırmak SK", "Ege Rüzgârı", "Anadolu Ocak", "Karadeniz Fırtına", "Bağlar SK",
         "Göktepe FK", "Saray Kapı",
     ],
+    "es-la-liga": [
+        "Montaña CF", "Puerto Azul", "Real Olivar", "Atlético Sierra", "Costa Dorada", "Villa Roble",
+        "Deportivo Nube", "Unión Brisa", "Racing Faro", "Sporting Lago", "CD Mirador", "Celta Viento",
+    ],
+    "de-bundesliga": [
+        "FC Talburg", "Eintracht Weiden", "Borussia Lindau", "SV Brückenfeld", "TSV Hohenwald", "VfB Seestadt",
+        "Fortuna Bergheim", "Union Altmark", "SC Rheinau", "Kickers Waldstein", "1. FC Mühlbach", "Viktoria Osterau",
+    ],
     "en-premier-league": [
         "Northbridge Town", "Harbour City", "Kingsford United", "Ashby Rovers", "Millbrook Athletic",
         "Westmoor FC", "Calder Vale", "Redhill Albion", "Stonegate", "Fenwick Wanderers", "Lowther Park",
@@ -173,6 +181,7 @@ def _bookmaker_odds(rng: np.random.Generator, lh: float, la: float, noise: float
 
 def generate_demo(conn: sqlite3.Connection, as_of: str, *, seed: int = 7,
                   leagues: tuple[str, ...] = ("tr-super-lig", "en-premier-league"),
+                  upcoming_days: int = 8,
                   history_seasons: int = 2, live_fixtures: bool = True, teams_per_league: int = 12,
                   market: str = "biased", bookmaker_noise: float | None = None) -> DemoSummary:
     """market:
@@ -212,7 +221,7 @@ def generate_demo(conn: sqlite3.Connection, as_of: str, *, seed: int = 7,
                         ko_iso = to_iso(ko)
                         lh, la = world.lambdas(h, a)
                         blh, bla = world.lambdas(h, a, bookmaker=True)
-                        if ko_iso >= as_of and (ko - now) > timedelta(days=4):
+                        if ko_iso >= as_of and (ko - now) > timedelta(days=upcoming_days):
                             continue  # yalnızca yakın fikstürler
                         if ko <= now < ko + timedelta(hours=2, minutes=5):
                             continue  # şu an oynanan lig maçı üretilmez; canlı demo maçları ayrıca kurulur
@@ -397,3 +406,42 @@ def refresh_prematch_odds(conn: sqlite3.Connection, now: str, seed: int = 5) -> 
     with transaction(conn):
         insert_many(conn, "odds_snapshots", out)
     return len(out)
+
+
+def ensure_live_demo(conn: sqlite3.Connection, now: str, seed: int = 21) -> int:
+    """Sentetik canlı demo maçlarını gerçek saate hizalar.
+
+    Bütün sentetik canlı maçlar normal süreyi doldurduysa onları son canlı skorla bitirir ve
+    `now` anına göre 4 yeni sentetik kupa maçı başlatır. Yalnızca demo verisinde çalışır.
+    Dönüş: yeni başlatılan maç sayısı.
+    """
+    nowdt = from_iso(now)
+    live = conn.execute("SELECT id, kickoff_at FROM fixtures WHERE status='live' AND is_synthetic=1").fetchall()
+    running = [r for r in live if (nowdt - from_iso(r[1])).total_seconds() < 88 * 60]
+    if running:
+        return 0
+    teams = conn.execute("SELECT id FROM teams WHERE league_id='tr-super-lig' ORDER BY id").fetchall()
+    if len(teams) < 8:
+        return 0
+    rng = np.random.default_rng(abs(hash((now[:16], seed))) % (2**32))
+    with transaction(conn):
+        for (fid, _ko) in live:
+            last = conn.execute("SELECT home_goals, away_goals FROM live_states WHERE fixture_id=?"
+                                " ORDER BY captured_at DESC LIMIT 1", (fid,)).fetchone()
+            conn.execute("UPDATE fixtures SET status='finished', ft_home=?, ft_away=?, result_recorded_at=?"
+                         " WHERE id=?", (last[0] if last else 0, last[1] if last else 0, now, fid))
+        ids = [t[0] for t in teams]
+        order = rng.permutation(len(ids))
+        for k in range(4):
+            h, a = ids[order[2 * k]], ids[order[2 * k + 1]]
+            ko = nowdt - timedelta(minutes=(12, 31, 55, 77)[k])
+            lh = float(1.45 * math.exp(rng.normal(0, 0.2)))
+            la = float(1.15 * math.exp(rng.normal(0, 0.2)))
+            fid = insert(conn, "fixtures", {
+                "league_id": "tr-kupa", "season": str(nowdt.year if nowdt.month >= 8 else nowdt.year - 1),
+                "round": 1, "home_team_id": h, "away_team_id": a, "kickoff_at": to_iso(ko), "status": "live",
+                "ft_home": None, "ft_away": None, "ht_home": None, "ht_away": None, "result_recorded_at": None,
+                "source": SOURCE, "is_synthetic": 1, "created_at": to_iso(ko - timedelta(days=10)),
+            })
+            _seed_live_state(conn, rng, fid, ko, nowdt, lh, la)
+    return 4

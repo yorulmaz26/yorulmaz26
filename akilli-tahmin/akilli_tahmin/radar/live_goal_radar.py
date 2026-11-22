@@ -32,12 +32,14 @@ MODEL A (canlı) — yalnızca futbol verisi:
         k = (xG_gözlenen + Λ·w0) / (Λ·geçen_pay + Λ·w0),  Λ = λ_ev + λ_dep,  w0 = LIVE_XG_PRIOR_MINUTES / 90
     Kırmızı kart: eksik kalan takımın kalan yoğunluğu × RED_CARD_OWN_FACTOR, rakibinki ×
     RED_CARD_OPPONENT_FACTOR (kart başına).
-    Olasılık: p_A = 1 − (1 + λ_kalan/κ)^(−κ). Bu, maç temposundaki belirsizliğin (takım güçlerinin tahmin
-    hatası, maç içi tempo farkı) gama dağılımıyla temsil edildiği gama–Poisson (negatif binom) öngörü
-    dağılımıdır; κ → ∞ iken tam olarak p_A = 1 − exp(−λ_kalan) olur. Tek parametre κ ("tempo
-    dağılımı"), yalnızca futbol verisinden (geçmiş anlık durumlardaki gol sonuçları) en çok olabilirlikle
-    ve kronolojik olarak kestirilir. Saf Poisson, yüksek olasılık bölgesinde gol olmama ihtimalini
-    sistematik olarak küçümser (aşırı güven); κ bunu düzeltir.
+    Olasılık (gama–Poisson): maçın gerçek temposu bilinmediğinden tempo çarpanı u ~ Gama(κ, κ) önseli
+    alır (ortalama 1; takım güçlerinin tahmin hatası ve maç içi tempo farkı). Şimdiye kadarki goller G,
+    beklenen E = Λ·geçen_pay ile eşlenik güncellenir: u | G ~ Gama(κ + G, κ + E). Buradan
+        p_A = 1 − (1 + λ_kalan / (κ + E))^(−(κ + G))
+    κ → ∞ iken tam olarak p_A = 1 − exp(−λ_kalan) olur. Tek parametre κ ("tempo dağılımı"), yalnızca
+    futbol verisinden (geçmiş anlık durumlardaki gol sonuçları) en çok olabilirlikle ve kronolojik olarak
+    kestirilir. Saf Poisson, yüksek olasılık bölgesinde gol olmama ihtimalini sistematik olarak
+    küçümser (aşırı güven); κ ve gol güncellemesi bunu düzeltir.
     Girdi kayıtları `assert_football_only` ile denetlenir; oran alanı içeren girdi `OddsIsolationError` verir.
 
 MODEL B (canlı) — futbol verisi + out-of-fold MODEL A + tahmin anında bilinen canlı oran:
@@ -61,7 +63,7 @@ from __future__ import annotations
 import math
 import sqlite3
 from collections import OrderedDict
-from dataclasses import dataclass, fields, is_dataclass
+from dataclasses import dataclass, fields
 from typing import Any, Mapping
 
 import numpy as np
@@ -80,7 +82,6 @@ from ..odds.odds import OddsQuote, validate_quote
 RADAR_TARGET = "Kalan normal sürede en az bir gol"
 #: Mükerrer alarm anahtarında kullanılan kararlı hedef kodu.
 RADAR_TARGET_CODE = "goal_in_remaining_regular_time"
-RADAR_VERSION = "radar-live-1.0"
 
 REGULAR_TIME = 90
 HALF_TIME = 45
@@ -197,39 +198,45 @@ def remaining_share(minute: float, ht_share: float = 0.5) -> float:
     return first + second
 
 
-def _remaining_lambda(lam_home: float, lam_away: float, minute: float, home_xg: float | None,
-                      away_xg: float | None, home_red: int, away_red: int, ht_share: float) -> float:
+def _live_intensity(lam_home: float, lam_away: float, minute: float, home_xg: float | None,
+                    away_xg: float | None, home_red: int, away_red: int, ht_share: float) -> tuple[float, float]:
+    """(λ_kalan, E): kalan normal sürenin düzeltilmiş gol yoğunluğu ve maç öncesi beklentiye göre şimdiye
+    kadar beklenen gol sayısı E = Λ·geçen_pay."""
     share_rem = remaining_share(minute, ht_share)
-    if share_rem <= 0.0:
-        return 0.0
     total = lam_home + lam_away
+    expected_elapsed = total * (1.0 - share_rem)
+    if share_rem <= 0.0:
+        return 0.0, expected_elapsed
     k = 1.0
     if home_xg is not None and away_xg is not None and total > 0:
         xg = float(home_xg) + float(away_xg)
         if math.isfinite(xg) and xg >= 0:
             prior = total * LIVE_XG_PRIOR_MINUTES / REGULAR_TIME
-            k = (xg + prior) / (total * (1.0 - share_rem) + prior)
+            k = (xg + prior) / (expected_elapsed + prior)
     hr, ar = int(home_red or 0), int(away_red or 0)
     lh = lam_home * share_rem * k * RED_CARD_OWN_FACTOR ** hr * RED_CARD_OPPONENT_FACTOR ** ar
     la = lam_away * share_rem * k * RED_CARD_OWN_FACTOR ** ar * RED_CARD_OPPONENT_FACTOR ** hr
-    return lh + la
+    return lh + la, expected_elapsed
 
 
-def no_goal_probability(lam_remaining: np.ndarray | float, dispersion: float | None) -> np.ndarray:
-    """Kalan sürede gol olmama olasılığı: gama–Poisson (1 + λ/κ)^(−κ); κ None/∞ → exp(−λ)."""
+def no_goal_probability(lam_remaining: np.ndarray | float, dispersion: float | None,
+                        goals: np.ndarray | float = 0.0, expected_elapsed: np.ndarray | float = 0.0) -> np.ndarray:
+    """Kalan sürede gol olmama olasılığı: (1 + λ/(κ + E))^(−(κ + G)); κ None/∞ → exp(−λ)."""
     lam = np.maximum(np.asarray(lam_remaining, float), 0.0)
     if dispersion is None or not math.isfinite(dispersion):
         return np.exp(-lam)
-    return np.power(1.0 + lam / dispersion, -dispersion)
+    g = np.maximum(np.asarray(goals, float), 0.0)
+    e = np.maximum(np.asarray(expected_elapsed, float), 0.0)
+    return np.power(1.0 + lam / (dispersion + e), -(dispersion + g))
 
 
-def fit_dispersion(lam_remaining: np.ndarray, y: np.ndarray) -> float:
+def fit_dispersion(lam_remaining: np.ndarray, y: np.ndarray, goals: np.ndarray | float = 0.0,
+                   expected_elapsed: np.ndarray | float = 0.0) -> float:
     """MODEL A tempo dağılımı κ'nın en çok olabilirlik kestirimi (ızgara + saf Poisson). Yalnızca futbol verisi."""
-    lam = np.maximum(np.asarray(lam_remaining, float), 0.0)
     y = np.asarray(y, float)
     best_k, best_ll = math.inf, -math.inf
     for k in (*DISPERSION_GRID, math.inf):
-        p0 = np.clip(no_goal_probability(lam, k), 1e-12, 1 - 1e-12)
+        p0 = np.clip(no_goal_probability(lam_remaining, k, goals, expected_elapsed), 1e-12, 1 - 1e-12)
         ll = float(np.sum(y * np.log1p(-p0) + (1 - y) * np.log(p0)))
         if ll > best_ll:
             best_k, best_ll = k, ll
@@ -238,17 +245,18 @@ def fit_dispersion(lam_remaining: np.ndarray, y: np.ndarray) -> float:
 
 def model_a_live_probability(lam_home: float, lam_away: float, state: Any, *, ht_share: float = 0.5,
                              dispersion: float | None = None) -> float:
-    """MODEL A (canlı): kalan normal sürede en az bir gol olasılığı, p_A = 1 − (1 + λ_kalan/κ)^(−κ).
+    """MODEL A (canlı): kalan normal sürede en az bir gol olasılığı, p_A = 1 − (1 + λ_kalan/(κ+E))^(−(κ+G)).
 
     `dispersion` (κ) None ise saf Poisson: p_A = 1 − exp(−λ_kalan). `state`: `LiveFootballState` veya aynı
     alanları taşıyan sözlük. Oranla ilişkili herhangi bir alan (ör. `odds`, `price`, `implied`)
     `OddsIsolationError` ile reddedilir.
     """
     assert_football_only([state], context="MODEL A (canlı)")
-    lam = _remaining_lambda(float(lam_home), float(lam_away), _state_get(state, "minute", 0),
-                            _state_get(state, "home_xg"), _state_get(state, "away_xg"),
-                            _state_get(state, "home_red", 0), _state_get(state, "away_red", 0), ht_share)
-    return float(1.0 - no_goal_probability(lam, dispersion))
+    lam, expected = _live_intensity(float(lam_home), float(lam_away), _state_get(state, "minute", 0),
+                                    _state_get(state, "home_xg"), _state_get(state, "away_xg"),
+                                    _state_get(state, "home_red", 0), _state_get(state, "away_red", 0), ht_share)
+    goals = int(_state_get(state, "home_goals", 0) or 0) + int(_state_get(state, "away_goals", 0) or 0)
+    return float(1.0 - no_goal_probability(lam, dispersion, goals, expected))
 
 
 def _model_a_ready(fit: ModelAFit, home: int, away: int, at: str, settings: Settings) -> tuple[bool, str]:
@@ -345,6 +353,9 @@ class LiveHistory:
 
     data_cutoff_at: str
     n_snapshots: int
+    #: MODEL A canlı tempo dağılımı κ (∞ = saf Poisson) ve kestirimde kullanılan anlık durum sayısı.
+    dispersion: float
+    dispersion_rows: int
     model_b: LogisticFit | None
     model_b_rows: int
     model_b_reason: str | None
@@ -352,7 +363,7 @@ class LiveHistory:
 
 
 def calibration_cutoff(now: str) -> str:
-    """Kalibrasyon ve MODEL B eğitim kesimi: değerlendirme gününün başlangıcı (UTC)."""
+    """Kalibrasyon ve canlı model eğitim kesimi: değerlendirme gününün başlangıcı (UTC)."""
     return now[:10] + "T00:00:00Z"
 
 
@@ -394,14 +405,14 @@ def rare_event_calibration(conn: sqlite3.Connection, cutoff: str, *,
 
 def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) -> LiveHistory:
     rp, dp = settings.radar, settings.data
-    min_b = settings.stats.min_model_b_samples
+    min_rows = settings.stats.min_model_b_samples
     snaps = historical_snapshots(conn, cutoff)
     view = FootballDataView(conn)
     team_league = {int(r[0]): r[1] for r in conn.execute("SELECT id, league_id FROM teams")}
     fits: dict[tuple[str, str], ModelAFit] = {}
     pre: dict[int, tuple[float, float, float] | None] = {}
     states: list[LiveFootballState] = []
-    lam, ys, odds, known, kick, ident = [], [], [], [], [], []
+    lam_pre, ys, odds, known, kick, ident = [], [], [], [], [], []
     for s in snaps:
         fid, home, away = s["fixture_id"], s["home_team_id"], s["away_team_id"]
         if fid not in pre:
@@ -416,53 +427,67 @@ def _build_history(conn: sqlite3.Connection, cutoff: str, settings: Settings) ->
             continue  # canlıda da Kalite Kapısı'ndan geçemeyecek durum: kalibrasyon bölgesine alınmaz
         # MODEL A'ya yalnızca futbol alanları geçer (anlık durumdaki fiyat alanları ayıklanır).
         states.append(LiveFootballState(**{k: s[k] for k in _STATE_FIELDS}))
-        lam.append(pre[fid])
+        lam_pre.append(pre[fid])
         ys.append(s["outcome"])
         odds.append(np.nan if s["over_odds"] is None else float(s["over_odds"]))
         known.append(s["result_recorded_at"])
         kick.append(s["kickoff_at"])
         ident.append(f"{fid}@{s['minute']}")
     assert_football_only(states, context="MODEL A (canlı geçmiş)")
-    pa = np.array([1.0 - math.exp(-_remaining_lambda(lh, la, st.minute, st.home_xg, st.away_xg,
-                                                      st.home_red, st.away_red, ht))
-                   for st, (lh, la, ht) in zip(states, lam)], dtype=float)
+    inten = np.array([_live_intensity(lh, la, st.minute, st.home_xg, st.away_xg, st.home_red, st.away_red, ht)
+                      for st, (lh, la, ht) in zip(states, lam_pre)], dtype=float).reshape(-1, 2)
+    lam_rem, expected = inten[:, 0], inten[:, 1]
+    goals = np.array([st.home_goals + st.away_goals for st in states], dtype=float)
     y = np.array(ys, dtype=float)
     odds_arr = np.array(odds, dtype=float)
     known_arr = np.array(known, dtype=object)
-    kick_arr = np.array(kick, dtype=object)
     ident_arr = np.array(ident, dtype=object)
-
-    cal_a = rare_event_summary("A", pa, y, threshold=rp.model_a_min_probability,
-                               min_samples=rp.min_rare_event_samples, data_cutoff_at=cutoff)
-
-    has = np.isfinite(odds_arr)
-    pm = np.full(y.size, np.nan)
-    if has.any():
-        pm[has] = [live_market_probability(o) for o in odds_arr[has]]
-    # MODEL B kronolojik out-of-fold: her ay, yalnızca o aydan önce sonucu kaydedilmiş maçlarla eğitilir.
-    pb_oof = np.full(y.size, np.nan)
     month = np.array([k[:7] for k in kick], dtype=object)
-    for mon in sorted(set(month[has])):
+    has_odds = np.isfinite(odds_arr)
+    pm = np.full(y.size, np.nan)
+    if has_odds.any():
+        pm[has_odds] = [live_market_probability(o) for o in odds_arr[has_odds]]
+
+    # Kronolojik out-of-fold: her ay için κ (MODEL A) ve MODEL B yalnızca o aydan önce sonucu kaydedilmiş
+    # maçların anlık durumlarıyla kestirilir/eğitilir ve o ayın anlık durumları tahmin edilir.
+    pa_oof = np.full(y.size, np.nan)
+    pb_oof = np.full(y.size, np.nan)
+    for mon in sorted(set(month)):
         start = f"{mon}-01T00:00:00Z"
-        tr = has & (known_arr < start)
-        te = has & (month == mon)
-        if tr.sum() < min_b or not te.any():
+        te = month == mon
+        tr = known_arr < start
+        if tr.sum() < min_rows:
             continue
-        assert_known_before(zip(ident_arr[tr], known_arr[tr]), start, what="MODEL B (canlı) eğitim sonucu")
-        f = train_live_model_b(pa[tr], pm[tr], y[tr], min_samples=min_b)
-        if f is not None:
-            pb_oof[te] = f.predict(model_b_design(pa[te], pm[te]))
+        assert_known_before(zip(ident_arr[tr], known_arr[tr]), start, what="MODEL A (canlı) tempo kestirimi")
+        kappa = fit_dispersion(lam_rem[tr], y[tr], goals[tr], expected[tr])
+        pa_oof[te] = 1.0 - no_goal_probability(lam_rem[te], kappa, goals[te], expected[te])
+        tr_b = tr & has_odds & np.isfinite(pa_oof)
+        te_b = te & has_odds
+        if tr_b.sum() >= min_rows and te_b.any():
+            assert_known_before(zip(ident_arr[tr_b], known_arr[tr_b]), start, what="MODEL B (canlı) eğitim sonucu")
+            f = train_live_model_b(pa_oof[tr_b], pm[tr_b], y[tr_b], min_samples=min_rows)
+            if f is not None:
+                pb_oof[te_b] = f.predict(model_b_design(pa_oof[te_b], pm[te_b]))
+    cal_a = rare_event_summary("A", pa_oof, y, threshold=rp.model_a_min_probability,
+                               min_samples=rp.min_rare_event_samples, data_cutoff_at=cutoff)
     cal_b = rare_event_summary("B", pb_oof, y, threshold=rp.model_b_min_probability,
                                min_samples=rp.min_rare_event_samples, data_cutoff_at=cutoff)
 
-    n_b = int(has.sum())
+    # Canlı değerlendirmede kullanılan son modeller: kesime kadar bilinen bütün geçmiş.
+    if y.size >= min_rows:
+        assert_known_before(zip(ident_arr, known_arr), cutoff, what="MODEL A (canlı) tempo kestirimi")
+        dispersion = fit_dispersion(lam_rem, y, goals, expected)
+    else:
+        dispersion = DEFAULT_DISPERSION
+    use_b = has_odds & np.isfinite(pa_oof)
+    n_b = int(use_b.sum())
     model_b = None
-    reason = f"MODEL B (canlı) eğitim örneklemi yetersiz ({n_b} < {min_b})"
-    if n_b >= min_b:
-        assert_known_before(zip(ident_arr[has], known_arr[has]), cutoff, what="MODEL B (canlı) eğitim sonucu")
-        model_b = train_live_model_b(pa[has], pm[has], y[has], min_samples=min_b)
+    reason = f"MODEL B (canlı) eğitim örneklemi yetersiz ({n_b} < {min_rows} geçmiş anlık durum)"
+    if n_b >= min_rows:
+        assert_known_before(zip(ident_arr[use_b], known_arr[use_b]), cutoff, what="MODEL B (canlı) eğitim sonucu")
+        model_b = train_live_model_b(pa_oof[use_b], pm[use_b], y[use_b], min_samples=min_rows)
         reason = None
-    return LiveHistory(cutoff, len(snaps), model_b, n_b, reason, {"A": cal_a, "B": cal_b})
+    return LiveHistory(cutoff, len(snaps), dispersion, int(y.size), model_b, n_b, reason, {"A": cal_a, "B": cal_b})
 
 
 def _store_calibration(conn: sqlite3.Connection, cals) -> None:
@@ -477,7 +502,8 @@ def _store_calibration(conn: sqlite3.Connection, cals) -> None:
                 continue
             insert(conn, "radar_calibration", {
                 "model": c.model, "region_low": c.region_low, "n": c.n, "mean_predicted": c.mean_predicted,
-                "observed_rate": c.observed_rate, "ci_low": c.ci_low, "adequate": int(c.adequate),
+                "observed_rate": c.observed_rate, "ci_low": c.ci_low,
+                "ci_high": getattr(c, "ci_high", None), "adequate": int(c.adequate),
                 "data_cutoff_at": c.data_cutoff_at, "created_at": now,
             })
 
@@ -553,29 +579,26 @@ def _live_quotes(conn: sqlite3.Connection, fixture_id: int, market_id: str, now:
 
 
 def _pick_quote(quotes: list[tuple[OddsQuote, int | None]], now: str, max_age: float,
-                score_since: int | None) -> tuple[OddsQuote | None, bool, str]:
-    """En yeni geçerli oranı seçer; yoksa en yeni oranı ve geçersizlik gerekçesini döndürür."""
-    first: tuple[OddsQuote, str] | None = None
+                score_since: int | None) -> tuple[OddsQuote | None, bool, str, bool]:
+    """En yeni geçerli oranı seçer; yoksa en yeni oranı ve geçersizlik gerekçesini döndürür.
+
+    Dönüş: (oran, geçerli mi, ayrıntı, skorla uyumlu mu). Skorla uyum: oran dakikası, mevcut skorun ilk
+    gözlendiği dakikadan önce değilse (başka bir skor durumunun fiyatı kullanılmaz).
+    """
+    first: tuple[OddsQuote, str, bool] | None = None
     for q, q_minute in quotes:
+        score_ok = q_minute is None or score_since is None or q_minute >= score_since
         v = validate_quote(q, now, max_age, live=True)
         ok, detail = v.valid, v.detail
-        if ok and q_minute is not None and score_since is not None and q_minute < score_since:
+        if ok and not score_ok:
             ok, detail = False, "Oran son skor değişikliğinden önce fiyatlanmış; güncel skorla uyumsuz."
         if ok:
-            return q, True, detail
+            return q, True, detail, True
         if first is None:
-            first = (q, detail)
+            first = (q, detail, score_ok)
     if first is None:
-        return None, False, ""
-    return first[0], False, first[1]
-
-
-def _quote_matches_score(quotes: list[tuple[OddsQuote, int | None]], q: OddsQuote | None,
-                         score_since: int | None) -> bool:
-    for cand, q_minute in quotes:
-        if q is not None and cand.snapshot_id == q.snapshot_id:
-            return q_minute is None or score_since is None or q_minute >= score_since
-    return False
+        return None, False, "", False
+    return first[0], False, first[1], first[2]
 
 
 def evaluate_live(conn: sqlite3.Connection, now: str, *, user_id: str = "local",
@@ -587,7 +610,6 @@ def evaluate_live(conn: sqlite3.Connection, now: str, *, user_id: str = "local",
     öğe mevcut alarmı (`alert_id`) gösterir; diğer sekiz şart hâlâ sağlanıyorsa `alarm` true kalır
     (alarm geçerli), `blocked_reason` "Mükerrer alarm engeli" olur.
     """
-    rp = settings.radar
     labels = condition_labels(settings)
     fixtures = conn.execute(
         """
@@ -637,20 +659,20 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
         lh, la = fit.expected_goals(home, away)
         live = LiveFootballState(fid, minute, hg, ag, state["home_xg"], state["away_xg"],
                                  int(state["home_red"] or 0), int(state["away_red"] or 0))
-        p_a = model_a_live_probability(lh, la, live, ht_share=fit.ht_share)
+        p_a = model_a_live_probability(lh, la, live, ht_share=fit.ht_share, dispersion=hist.dispersion)
 
     # Gerekli canlı oran: o skorda "kalan sürede gol" = OU_{toplam+0,5} Üst
     market_id = None
     quote: OddsQuote | None = None
+    quote_score_ok = False
     odds_ok, odds_detail = False, "Canlı durum olmadan gerekli market belirlenemiyor."
-    quotes: list = []
     if state is not None:
         line = hg + ag + 0.5
         cand = f"OU_{line}"
         if cand in MARKETS_BY_ID:
             market_id = cand
             quotes = _live_quotes(conn, fid, market_id, now)
-            quote, odds_ok, why = _pick_quote(quotes, now, rp.live_odds_max_age_seconds, score_since)
+            quote, odds_ok, why, quote_score_ok = _pick_quote(quotes, now, rp.live_odds_max_age_seconds, score_since)
             mname = MARKETS_BY_ID[market_id].name
             if quote is None:
                 odds_detail = f"{mname} Üst için canlı oran bulunamadı."
@@ -667,7 +689,7 @@ def _evaluate_fixture(conn: sqlite3.Connection, f: sqlite3.Row, now: str, user_i
 
     # MODEL B — MODEL A + tahmin anında bilinen canlı oran (skorla uyumlu olmalı)
     p_b: float | None = None
-    if quote is not None and _quote_matches_score(quotes, quote, score_since):
+    if quote is not None and quote_score_ok:
         p_b = model_b_live_probability(hist.model_b, p_a, quote.decimal_odds)
 
     # 1–2: eşikler (kesin büyüktür)

@@ -22,6 +22,8 @@ assert DEFAULT_MODE == BALANCED
 assert set(MODE_CODES) == {HIGHEST_PROBABILITY, BEST_VALUE, BALANCED}
 
 USES_PROBABILITY = {HIGHEST_PROBABILITY, BALANCED}
+#: "Yüksek gerçekleşme olasılığı" tanımı: seçenek gerçekleşmemesinden daha olası olmalıdır (ayar eşiği değildir).
+MORE_LIKELY_THAN_NOT = 0.5
 USES_ODDS = {BEST_VALUE, BALANCED}
 
 EMPTY_MESSAGES = {
@@ -129,7 +131,7 @@ def evaluate_mode(mode: str, m: CandidateMetrics, cfg: ModeConfig) -> ModeEvalua
         checks.append(Check("odds_valid", m.odds_valid, m.odds, None,
                             "Bu mod doğrulanmış ve güncel gerçek oran gerektirir."))
     if mode in USES_PROBABILITY:
-        ok = p_low is not None and p_low >= th.min_probability_lower
+        ok = p_low is not None and p_low >= th.min_probability_lower and p_low > MORE_LIKELY_THAN_NOT
         checks.append(Check("prob_lower", ok, p_low, th.min_probability_lower,
                             f"Olasılık alt sınırı ({lvl}) {fmt_num(p_low)} < {fmt_num(th.min_probability_lower)}"))
     if mode in USES_ODDS:

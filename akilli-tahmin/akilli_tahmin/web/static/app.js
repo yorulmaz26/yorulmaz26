@@ -1580,7 +1580,7 @@
       wrap.append(h('div', { class: 'table-wrap', tabindex: '0', role: 'region', 'aria-label': 'Sezon tablosu' }, h('table', null,
         h('thead', null, h('tr', null, ['Sezon', 'Seçim', 'İsabet oranı', 'Teorik ROI', 'Kâr (birim)', 'ECE'].map((t) => h('th', { scope: 'col' }, t)))),
         tbody)),
-      h('p', { class: 'table-caption', style: 'margin-top:8px' }, 'Alt satırlar %95 güven aralığıdır. Tutarlı: sezonlar arasında ROI ve isabet oranı oynaklığı düşük ve ROI yönü aynı. Modların başarısı birbirinden bağımsız kaydedilir.'));
+      h('p', { class: 'table-caption', style: 'margin-top:8px' }, 'Alt satırlar %95 güven aralığıdır. Tutarlı: en az iki sezonda sonuçlanmış seçim var ve her sezonun isabet oranı %95 güven aralığı genel isabet oranını içeriyor. Modların başarısı birbirinden bağımsız kaydedilir.'));
     }
 
     function breakdownTable(title, rows) {
