@@ -49,6 +49,8 @@ penceresine değil, cmd penceresine yazılır.
 ```
 
 Kaynak: [football-data.co.uk](https://www.football-data.co.uk) ücretsiz dosyaları (21 organizasyonun 16'sı).
+Site açılmazsa (ör. Türkiye'deki bazı bağlantılarda) aynı dosyalar `veri/football-data/` klasörünün GitHub
+yansısından, o da olmazsa projedeki yerel kopyadan alınır; yansı her gün güncellenir.
 İddaa oranı ve canlı maç verisi içermez (canlı veri: API-Football, aşağıda); oranların zamanı yaklaşık olduğu için güncel öneride yalnızca En
 Güvenilir modu seçim yapabilir. Ayrıntılar ve Nesine/Maçkolik'in neden kullanılmadığı: `docs/VARSAYIMLAR.md` §7.
 

@@ -124,6 +124,14 @@ olasılığın küçüğü. Bu, iki modelin de desteklemesini şart koşan bir k
   - Yalnızca Maç Sonucu ve Alt/Üst 2,5 için oran vardır; canlı maç verisi yoktur (radar gerçek veride kapalı kalır).
   - TFF 1. Lig, Türkiye Kupası, UEFA Şampiyonlar/Avrupa/Konferans Ligi bu kaynakta yoktur.
   - Dosyalar genellikle haftada iki kez güncellenir; sonuçlar birkaç gün gecikebilir.
+- **Türkiye'de erişim sorunu ve GitHub yansısı (2026-11-22):** kullanıcının bilgisayarında football-data.co.uk
+  "self-signed certificate" ve "erişilemeyen ağ" hatası verdi (internet sağlayıcısı düzeyinde engel olduğu
+  tahmin ediliyor; doğrulanmadı). API-Football ücretsiz planı güncel sezonun maç programını vermediği için yerine
+  geçemez ("Free plans do not have access to this season, try from 2022 to 2024"). Kullanıcı kararıyla dosyalar
+  **değiştirilmeden** `veri/football-data/` klasörüne kopyalanır (12 ana lig × 3 sezon, `fixtures.csv`, 4 ek
+  lig) ve her gün otomatik görevle yenilenir (`scripts/mirror_football_data.py`). Program önce asıl siteyi
+  dener; olmazsa GitHub yansısını (`raw.githubusercontent.com`), o da olmazsa indirilen projedeki yerel kopyayı
+  kullanır. Depo herkese açık olduğu için bu kopyalar da herkese açıktır; hakları kaynağa aittir.
 - **Nesine bülten adresi — kullanılmıyor.** Belgelenmemiş, herkese açık olmayan bir adres; bu çalışma ortamının
   güvenlik denetimi isteği "yetkisiz erişim" olarak engelledi. Atlatılmaya çalışılmadı; ağ izni geri alındı.
 - **Maçkolik — kullanılmıyor.** Kullanım koşulları veritabanına içeriği görüntüleme dışında erişimi açıkça

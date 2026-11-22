@@ -10,6 +10,11 @@ TFF 1. Lig, Türkiye Kupası ve UEFA organizasyonları bu ücretsiz kaynakta yok
 Bu kaynak İddaa oranı içermez (Bet365 / piyasa ortalaması / Pinnacle) ve canlı maç verisi sunmaz; Canlı Gol
 Radar için ayrı bir canlı veri kaynağı gerekir. Dosyalar genellikle haftada iki kez güncellenir.
 
+Yansı (mirror): bazı ağlarda (ör. Türkiye'deki bazı internet sağlayıcıları) football-data.co.uk'a erişilemez
+(sertifika hatası / erişilemeyen ağ). Bu durumda dosyalar, aynı dosyaların değiştirilmeden kopyalandığı GitHub
+yansısından alınır (`MIRROR_URL`; `scripts/mirror_football_data.py` her gün günceller). Ortam değişkeni
+`AKILLI_TAHMIN_DATA_MIRROR` başka bir adres verir; "0" yansıyı kapatır.
+
 İndirme ve içe aktarma ayrıdır: `plan_files` gereken dosyaları, `prefetch` indirmeyi (veritabanı kilidi
 olmadan), `sync` içe aktarmayı yapar. Önbelleğe yalnızca bitmiş (güncel olmayan) sezon dosyaları yazılır.
 """
@@ -29,6 +34,21 @@ from .football_data_csv import import_rows, mark_postponed, read_csv_text
 
 BASE_URL = "https://www.football-data.co.uk"
 USER_AGENT = "akilli-tahmin/6.3 (football-data.co.uk free files)"
+#: football-data.co.uk dosyalarının GitHub yansısı (aynı göreli yollar).
+MIRROR_URL = ("https://raw.githubusercontent.com/yorulmaz26/yorulmaz26/ccr-0bed25e9-5zihfo/"
+              "akilli-tahmin/veri/football-data")
+
+
+#: İndirilen projedeki yerel kopya (GitHub'a da erişilemezse son çare; indirme anındaki veridir).
+LOCAL_COPY = Path(__file__).resolve().parents[2] / "veri" / "football-data"
+
+
+def default_mirrors() -> tuple[str, ...]:
+    env = os.environ.get("AKILLI_TAHMIN_DATA_MIRROR")
+    if env is not None:
+        return () if env.strip() in ("", "0") else (env.strip().rstrip("/"),)
+    local = (LOCAL_COPY.as_uri(),) if (LOCAL_COPY / "fixtures.csv").exists() else ()
+    return (MIRROR_URL, *local)
 
 #: football-data.co.uk bölüm kodu → organizasyon kodu (ana biçim).
 MAIN_DIVISIONS: dict[str, str] = {
@@ -101,37 +121,66 @@ class Fetcher:
     timeout: float = 20.0
     retries: int = 3
     log: list[str] = field(default_factory=list)
+    mirrors: tuple[str, ...] = field(default_factory=default_mirrors)
+    #: Asıl kaynağa bağlanılamadıysa sonraki dosyalar doğrudan yansıdan istenir (her dosyada beklenmez).
+    primary_down: bool = False
 
     def get(self, path: str, *, cache: bool) -> str:
         """`cache=True` yalnızca bitmiş sezon dosyaları içindir: önbellekten okunur ve önbelleğe yazılır.
-        Güncel dosyalar her seferinde indirilir ve önbelleğe yazılmaz (yarım sezon "bitmiş" sanılmaz)."""
+        Güncel dosyalar her seferinde indirilir ve önbelleğe yazılmaz (yarım sezon "bitmiş" sanılmaz).
+        Asıl kaynak başarısız olursa dosya yansıdan alınır; ikisi de başarısızsa ilk hata bildirilir."""
         local = self.cache_dir / path.replace("/", "_") if self.cache_dir else None
         if cache and local is not None and local.exists():
             return local.read_text(encoding="utf-8-sig")
-        url = f"{BASE_URL}/{path}"
+        bases = [*self.mirrors, BASE_URL] if self.primary_down else [BASE_URL, *self.mirrors]
+        first_err: RuntimeError | None = None
+        for base in bases:
+            try:
+                text, size = self._download(f"{base}/{path}", retries=self.retries if base == BASE_URL else 2)
+            except RuntimeError as exc:
+                if base == BASE_URL and self.mirrors:
+                    self.primary_down = True
+                first_err = first_err or exc
+                continue
+            if base != BASE_URL and not _looks_like_csv(text):
+                first_err = first_err or RuntimeError(f"{base}/{path}: yansıdaki dosya geçersiz")
+                continue
+            if cache and local is not None:
+                local.parent.mkdir(parents=True, exist_ok=True)
+                tmp = local.with_suffix(local.suffix + ".tmp")
+                tmp.write_text(text, encoding="utf-8")
+                os.replace(tmp, local)  # yarım yazılmış dosya önbellekte kalmaz
+            via = "" if base == BASE_URL else (" [yerel kopya]" if base.startswith("file:") else " [GitHub yansısı]")
+            self.log.append(f"indirildi: {path} ({size} bayt){via}")
+            return text
+        raise first_err or RuntimeError(f"{path} indirilemedi")
+
+    def get_bytes(self, path: str) -> bytes:
+        """Asıl kaynaktan dosyanın ham baytları (yansı betiği için; önbellek ve yansı kullanılmaz)."""
+        return self._download(f"{BASE_URL}/{path}", retries=self.retries, raw=True)[0]
+
+    def _download(self, url: str, *, retries: int, raw: bool = False) -> tuple:
         last_exc: Exception | None = None
-        for attempt in range(self.retries):
+        for attempt in range(retries):
             try:
                 req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
                 with urllib.request.urlopen(req, timeout=self.timeout) as resp:
-                    raw = resp.read()
-                text = raw.decode("utf-8-sig", errors="replace")
-                if cache and local is not None:
-                    local.parent.mkdir(parents=True, exist_ok=True)
-                    tmp = local.with_suffix(local.suffix + ".tmp")
-                    tmp.write_text(text, encoding="utf-8")
-                    os.replace(tmp, local)  # yarım yazılmış dosya önbellekte kalmaz
-                self.log.append(f"indirildi: {path} ({len(raw)} bayt)")
-                return text
+                    body = resp.read()
+                return (body if raw else body.decode("utf-8-sig", errors="replace")), len(body)
             except urllib.error.HTTPError as exc:
                 if 400 <= exc.code < 500:
                     raise RuntimeError(f"{url} bulunamadı ({exc.code})") from exc  # 4xx yeniden denenmez
                 last_exc = exc
             except Exception as exc:
                 last_exc = exc
-            if attempt < self.retries - 1:
+            if attempt < retries - 1:
                 time.sleep(2 ** attempt)
         raise RuntimeError(f"{url} indirilemedi: {last_exc}")
+
+
+def _looks_like_csv(text: str) -> bool:
+    head = text.lstrip("\ufeff")[:400]
+    return "HomeTeam" in head or ",Home," in head
 
 
 @dataclass
