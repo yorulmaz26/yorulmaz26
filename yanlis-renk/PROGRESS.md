@@ -77,3 +77,4 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 ## 1.3.0 (reklamlar + bölüm denetimi)
 * AdMob: menülerde banner (sahne banner'ın üstüne yerleşir), bölüm sonu molalarında seyrek geçiş reklamı, isteğe bağlı ödüllü video (+1 can, altın ×2). Varsayılan test kimlikleri; gerçek kimlikler gradle özellikleriyle (BUILD_REPORT.md).
 * Bağımsız bölüm denetimi testi ve LEVEL_AUDIT.md; görüş kuralı doğrulayıcı ile ekran arasında birleştirildi, sis/tabela/bilgi çubuğu uyumsuzlukları giderildi; ped yerleşimi ve mekanik listeleri düzeltildi; bölümler yeniden üretildi.
+* 1.3.0 Android 11 emülatöründe (Google Play Hizmetleri ve internet yok) açıldı; reklam SDK'sı bağlanamadığında oyun reklamsız sorunsuz devam etti.
