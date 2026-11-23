@@ -13,3 +13,4 @@ ADIM: bolum 250
 ADIM: bolum 350
 ADIM: bolum 450
 ADIM: bolum 500
+ADIM: reklamlar

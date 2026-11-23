@@ -9,7 +9,7 @@ GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
 GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (2)
-GEÇTİ  | Kayıt: rekor kaydedildi (87)
+GEÇTİ  | Kayıt: rekor kaydedildi (91)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Duraklatma → Ana menü → MenuScreen
@@ -43,5 +43,11 @@ GEÇTİ  | Bölüm 500 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Harita bölümlerinden ana menüye dönüş
 GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
 GEÇTİ  | Kalıcılık: seçili karakter korundu
+KALDI  | Reklam SDK'sı başlatılamadı
+BİLGİ  | Banner yüklenemedi: 
+GEÇTİ  | Oyun ekranına geçildi (banner gizli olmalı)
+BİLGİ  | Geçiş reklamı gösterilemedi: 
+BİLGİ  | Ödüllü video gösterilemedi: 
+GEÇTİ  | Reklamlar sırasında çökme yok
 GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 46 geçti, 0 kaldı
+TOPLAM: 48 geçti, 1 kaldı
