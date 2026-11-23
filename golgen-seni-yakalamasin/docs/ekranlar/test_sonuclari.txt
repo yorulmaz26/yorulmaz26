@@ -7,9 +7,9 @@ GEÇTİ  | Günlük giriş ödülü alındı ve kaydedildi
 GEÇTİ  | OYNA butonu → PlayScreen
 GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
-KALDI  | Hareketsiz kalınca gölge yakalar / oyun sonu → beklenen GameOverScreen, bulunan PlayScreen
+GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
 GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (1)
-GEÇTİ  | Kayıt: rekor kaydedildi (54)
+GEÇTİ  | Kayıt: rekor kaydedildi (70)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Duraklatma → Ana menü → MenuScreen
@@ -25,7 +25,8 @@ GEÇTİ  | Rekorlar geri butonu → MenuScreen
 GEÇTİ  | Ayarlar butonu → SettingsScreen
 GEÇTİ  | Ayarlar: ses ve titreşim kapatıldı ve kaydedildi
 GEÇTİ  | Ayarlar → Öğretici → TutorialScreen
-KALDI  | Öğretici kapat → beklenen MenuScreen, bulunan SettingsScreen
+GEÇTİ  | Öğretici kapat → açıldığı Ayarlar ekranına döner → SettingsScreen
+GEÇTİ  | Ayarlar → geri → Ana menü → MenuScreen
 GEÇTİ  | Bölüm 3 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Bölüm 18 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Bölüm 28 oynanabilir (girdi işlendi, donma yok)
@@ -50,4 +51,4 @@ BİLGİ  | Geçiş (görsel) reklamı gösterildi
 BİLGİ  | Ödüllü video reklamı gösterildi
 GEÇTİ  | Reklamlar sırasında çökme yok
 GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 47 geçti, 2 kaldı
+TOPLAM: 50 geçti, 0 kaldı
