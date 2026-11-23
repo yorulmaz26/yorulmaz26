@@ -96,6 +96,9 @@ class Lives(private val store: Store, private val clock: Clock) {
         if (pendingTrusted >= 0L) pendingCredited += delta
 
         val now = clock.trustedNow()
+        // Bu oturumda internet saati yoksa son doğrulanmış zamanı değiştirilemeyen sayaçla ilerlet;
+        // aksi halde yeniden başlatmadan sonra aynı süre iki kez sayılabiliyordu
+        if (now < 0L && sameBoot && lastTrusted >= 0L && pendingTrusted < 0L) lastTrusted += delta
         if (now >= 0L) {
             if (pendingTrusted >= 0L) {
                 // Gerçek geçen süre - açılıştan beri zaten sayılan süre = telefonun kapalı kaldığı süre

@@ -62,7 +62,7 @@ class MainActivity : Activity() {
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) hideSystemBars()
+        if (hasFocus) hideSystemBars() else gameView.onFocusLost()
     }
 
     /** Durum ve gezinme çubuklarını gizleyip oyunu tam ekran yapar. */

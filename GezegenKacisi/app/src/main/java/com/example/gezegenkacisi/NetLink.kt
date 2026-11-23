@@ -109,6 +109,11 @@ class NetLink(context: Context) {
                     while (alive && !closed) {
                         val line = r.readLine() ?: break
                         if (line == "P" || line.isEmpty()) continue
+                        // Kurucu, oyuncuların konum ve yanma mesajlarını burada hemen diğerlerine aktarır:
+                        // kurucu uygulaması arka plandayken (oyun döngüsü durmuşken) de maç takılmaz
+                        if (isHost && (line.startsWith("S|") || line.startsWith("D|"))) {
+                            for (c in conns.values) if (c.id != id) c.out.offer(line)
+                        }
                         events.add(Event.Message(id, line.split('|')))
                     }
                 } catch (_: Exception) {

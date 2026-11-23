@@ -77,7 +77,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private class Fireball(var x: Float, var y: Float, var vy: Float, var warn: Float, val fromTop: Boolean = false)
 
     /** Yıldırım: önce [warn] süresince kesik çizgiyle uyarır, sonra [life] süresince yukarıdan [len] kadar iner. */
-    private class Bolt(var x: Float, val len: Float, var warn: Float, var life: Float)
+    private class Bolt(var x: Float, var len: Float, var warn: Float, var life: Float)
 
     /** Bir engel kulesi. Asteroit Kuşağı'nda tüm kule [swayAmp] kadar yukarı aşağı salınır. */
     private class Column(var x: Float, val planets: List<Planet>, val swayAmp: Float, val swayPhase: Float) {
@@ -268,6 +268,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var scorePulse = 0f
     private var lastGapY = WORLD_H / 2f
     private var lastSwayPhase = 0f
+    private var physAcc = 0f
 
     private var shake = 0f
     private var flash = 0f
@@ -329,6 +330,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var downX = 0f
     private var downY = 0f
     private var downTime = 0f
+    private var downState = State.SPLASH
 
     private val columns = ArrayList<Column>()
     private val mainArts = ArrayList<PlanetArt>()
@@ -627,11 +629,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     fun pause() {
         if (state == State.PLAYING) paused = true
         // 2 oyuncuda oyun bekletilemez: uygulamadan çıkan oyuncu yanmış sayılır
-        if (state == State.MP_PLAYING && myAlive) mpCrash()
+        if ((state == State.MP_PLAYING || state == State.MP_COUNTDOWN) && myAlive) mpCrash()
         saveCoins()
         running = false
         Choreographer.getInstance().removeFrameCallback(this)
         sound.onPause()
+    }
+
+    /** Pencere odağı gidince (bildirim çubuğu, arama ekranı) tek kişilik oyun duraklar. */
+    fun onFocusLost() {
+        if (state == State.PLAYING) paused = true
     }
 
     fun release() {
@@ -744,6 +751,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val wy = event.y / scale
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                downState = state
                 downX = wx
                 downY = wy
                 downTime = time
@@ -775,7 +783,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_DPAD_UP -> {
                 when (state) {
                     State.MENU -> if (keyCode != KeyEvent.KEYCODE_DPAD_UP) startReady()
-                    State.OVER -> if (stateTimer > 0.6f) startReady()
+                    State.OVER -> if (stateTimer > 0.6f && !adShowing) {
+                        val lv = level
+                        if (levelMode && lv != null) afterBreak { openLevel(lv.number) } else afterBreak { startReady() }
+                    }
+                    State.LEVEL_DONE -> if (stateTimer > 0.6f && !adShowing) {
+                        val lv = level
+                        if (lv != null && lv.number < Levels.COUNT) afterBreak { openLevel(lv.number + 1) } else afterBreak { enterLevels() }
+                    }
+                    State.SPLASH -> if (splashT > 0.6f) finishSplash()
                     else -> onPress()
                 }
                 return true
@@ -823,6 +839,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     /** Parmak kalktığında: menü ve oyun sonu düğmeleri. */
     private fun onRelease(x: Float, y: Float) {
         if (adShowing) return
+        // Dokunuş başka bir ekranda başladıysa (ör. açılış kendiliğinden bitti) bu ekranda düğmeye basılmış sayılmaz
+        if (state != downState) return
         val dx = x - downX
         val dy = y - downY
         val moved = abs(dx) > 28f || abs(dy) > 28f
@@ -961,6 +979,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         speed = cfg.baseSpeed * map.speedMul
         lastGapY = WORLD_H / 2f
         lastSwayPhase = 0f
+        physAcc = 0f
         paused = false
         fireballs.clear()
         bolts.clear()
@@ -1126,15 +1145,23 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 emit(dt, 28f, 0.8f)
             }
             State.PLAYING -> {
-                stepRocket(dt)
-                speed = currentSpeed()
-                updateColumns(dt)
-                // Hedefe ulaşıldıysa bu karede artık çarpışma sayılmaz
-                if (state == State.PLAYING) {
-                    updateFireballs(dt)
-                    emit(dt, 55f, 1f + boost * 0.6f)
-                    if (rocketHits()) crash()
+                // Fizik, kare hızından bağımsız sabit 1/120 sn adımlarla ilerler (yavaş telefonda da aynı oyun)
+                physAcc += dt
+                var steps = 0
+                while (physAcc >= MP_STEP && state == State.PLAYING && steps < 8) {
+                    physAcc -= MP_STEP
+                    steps++
+                    stepRocket(MP_STEP)
+                    speed = currentSpeed()
+                    updateColumns(MP_STEP)
+                    // Hedefe ulaşıldıysa bu adımda artık çarpışma sayılmaz
+                    if (state == State.PLAYING) {
+                        updateFireballs(MP_STEP)
+                        if (rocketHits()) crash()
+                    }
                 }
+                if (steps == 8) physAcc = 0f
+                if (state == State.PLAYING) emit(dt, 55f, 1f + boost * 0.6f)
             }
             State.DYING -> {
                 updateFireballs(dt)
@@ -1163,7 +1190,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                     rocketVy = 0f
                     rocketAngle = 0f
                     for (id in others()) pY[id] = rocketY
-                    flap()
+                    if (myAlive) flap()
                 }
             }
             State.MP_PLAYING -> updateMp(dt)
@@ -1254,6 +1281,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         lastSwayPhase += wr(0.25f, 0.7f)
         val col = Column(x, planets, amp, lastSwayPhase)
         col.gapTop = gapY - gapH / 2f
+        // Bu kuleden önce doğmuş tehlikeleri ona göre ayarla: yıldırım geçidin üstünde biter,
+        // ateş topu kulenin içinden fırlamaz
+        for (b in bolts) {
+            if (b.warn > 0f && abs(b.x - x) < cfg.spacing + 80f) {
+                b.len = min(b.len, col.gapTop - amp - 30f)
+                if (b.len < 120f) { b.warn = 0f; b.life = 0f }
+            }
+        }
+        fireballs.removeAll { !it.fromTop && it.warn > 0f && abs(it.x - x) < 120f }
         if (amp > 0f) col.offset = amp * sin(worldTime * SWAY_SPEED + col.swayPhase)
         // Para: boşluğun içinde, ayrı rastgele sayı üreticisiyle (parkuru değiştirmez)
         if (coinChance > 0f && coinRng.nextFloat() < coinChance) {
@@ -1668,7 +1704,6 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 beginMatch(seed, p[2].split(',').mapNotNull { it.toIntOrNull() })
             }
             "S" -> if (p.size >= 6) {
-                if (host) n.relay(from, p)
                 val id = p[1].toIntOrNull() ?: return
                 if (id == myId || id !in 0 until NetLink.MAX_PLAYERS) return
                 pY[id] = (p[2].toIntOrNull() ?: return) / 10f
@@ -1677,7 +1712,6 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 pScore[id] = p[5].toIntOrNull() ?: pScore[id]
             }
             "D" -> if (p.size >= 4) {
-                if (host) n.relay(from, p)
                 val id = p[1].toIntOrNull() ?: return
                 if (id == myId || id !in 0 until NetLink.MAX_PLAYERS) return
                 if (state == State.MP_PLAYING || state == State.MP_COUNTDOWN) {
@@ -2168,14 +2202,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private fun updateFireballs(dt: Float) {
         val running = worldRunning()
-        val maxX = if (isMpView()) 420f else worldW - 30f
+        // Tehlikeler, ekran genişliğinden bağımsız olarak roketin önünde hep aynı zamanlamayla doğar
+        // (eskiden ekran kenarıyla sınırlanıyordu: hız artınca zararsızlaşıyor, telefona göre değişiyordu).
+        // Ekran dışındayken uyarıları ekran kenarında çizilir.
         if (running && Mech.FIRE in mechs) {
             fireTimer -= dt
             if (fireTimer <= 0f) {
                 fireTimer = wr(2.3f, 3.6f) / hazard()
                 // Topu, roketin hizasına tepeye yakınken varacak şekilde ileriye koy
                 val warn = 0.8f
-                val x = min(maxX, rocketX + speed * (warn + wr(0.35f, 0.85f)))
+                val x = rocketX + speed * (warn + wr(0.35f, 0.85f))
                 val vy = -wr(980f, 1200f)
                 // Kulenin içinden (geçidin içinden) fırlamaz; yalnızca kuleler arasından çıkar
                 if (columns.none { abs(it.x - x) < 120f }) fireballs.add(Fireball(x, WORLD_H + 40f, vy, warn))
@@ -2186,7 +2222,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             if (meteorTimer <= 0f) {
                 meteorTimer = wr(2.0f, 3.2f) / hazard()
                 val warn = 0.8f
-                val x = min(maxX, rocketX + speed * (warn + wr(0.7f, 1.3f)))
+                val x = rocketX + speed * (warn + wr(0.7f, 1.3f))
                 fireballs.add(Fireball(x, -40f, wr(120f, 240f), warn, fromTop = true))
             }
         }
@@ -2195,7 +2231,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             if (boltTimer <= 0f) {
                 boltTimer = wr(2.1f, 3.3f) / hazard()
                 val warn = 0.95f
-                val x = min(maxX, rocketX + speed * (warn + wr(0.1f, 0.5f)))
+                val x = rocketX + speed * (warn + wr(0.1f, 0.5f))
                 val len = safeBoltLen(x, wr(360f, 700f))
                 if (len > 0f) bolts.add(Bolt(x, len, warn, 0.4f))
             }
@@ -2268,10 +2304,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val k = 1f - fb.warn / 0.8f
                 val pulse = 0.6f + 0.4f * sin(time * 30f)
                 paint.color = withAlpha(hex(0xFFFF5A1F), (k * 170 * pulse).toInt())
+                val mx = min(fb.x, worldW - 24f)
                 iconPath.reset()
-                iconPath.moveTo(fb.x - 16f, 8f)
-                iconPath.lineTo(fb.x + 16f, 8f)
-                iconPath.lineTo(fb.x, 34f)
+                iconPath.moveTo(mx - 16f, 8f)
+                iconPath.lineTo(mx + 16f, 8f)
+                iconPath.lineTo(mx, 34f)
                 iconPath.close()
                 cv.drawPath(iconPath, paint)
                 continue
@@ -2281,10 +2318,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val k = 1f - fb.warn / 0.8f
                 val pulse = 0.6f + 0.4f * sin(time * 30f)
                 paint.color = withAlpha(hex(0xFFFF3B1F), (k * 150 * pulse).toInt())
-                tmpRect.set(fb.x - 34f, WORLD_H - 26f, fb.x + 34f, WORLD_H + 26f)
+                val mx = min(fb.x, worldW - 24f)
+                tmpRect.set(mx - 34f, WORLD_H - 26f, mx + 34f, WORLD_H + 26f)
                 cv.drawOval(tmpRect, paint)
                 paint.color = withAlpha(hex(0xFFFFD27A), (k * 220 * pulse).toInt())
-                tmpRect.set(fb.x - 16f, WORLD_H - 10f, fb.x + 16f, WORLD_H + 10f)
+                tmpRect.set(mx - 16f, WORLD_H - 10f, mx + 16f, WORLD_H + 10f)
                 cv.drawOval(tmpRect, paint)
                 continue
             }
@@ -2487,14 +2525,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val k = 1f - b.warn / 0.95f
                 val pulse = 0.55f + 0.45f * sin(time * 26f)
                 paint.color = withAlpha(hex(0xFF9BC8FF), (60 + 150 * k * pulse).toInt())
+                val bx = min(b.x, worldW - 12f)
                 var y = 0f
                 while (y < b.len) {
-                    cv.drawRect(b.x - 2f, y, b.x + 2f, min(b.len, y + 22f), paint)
+                    cv.drawRect(bx - 2f, y, bx + 2f, min(b.len, y + 22f), paint)
                     y += 38f
                 }
                 // Ucunda: yıldırımın ineceği son nokta
                 paint.color = withAlpha(hex(0xFFFFFFFF), (120 + 120 * k).toInt())
-                cv.drawCircle(b.x, b.len, 6f, paint)
+                cv.drawCircle(bx, b.len, 6f, paint)
                 continue
             }
             val a = (b.life / 0.4f).coerceIn(0f, 1f)
@@ -3109,15 +3148,27 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             now - appStartAt >= 90_000L &&
             (lastRewardAt < 0L || now - lastRewardAt >= 60_000L) &&
             a.interstitialReady()
-        if (allowed && a!!.showInterstitial {
+        if (!allowed) {
+            then()
+            return
+        }
+        // Bayrak gösterimden ÖNCE kurulur: reklam gösterilemeyip geri çağrı hemen dönerse kilit kalmasın
+        adShowing = true
+        var finished = false
+        val shown = a!!.showInterstitial {
+            if (!finished) {
+                finished = true
                 adShowing = false
                 lastAdAt = SystemClock.elapsedRealtime()
                 then()
-            }) {
-            adShowing = true
+            }
+        }
+        if (shown) {
             runsSinceAd = 0
             lastAdAt = now
-        } else {
+        } else if (!finished) {
+            finished = true
+            adShowing = false
             then()
         }
     }
@@ -3145,6 +3196,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val kind = currentReward()
         if (kind == Reward.NONE) return
         sound.play(SoundManager.Sfx.CLICK)
+        adShowing = true // gösterimden önce: geri çağrı hemen dönerse kilit kalmasın
         val started = a.showRewarded(
             onReward = {
                 lastRewardAt = SystemClock.elapsedRealtime()
@@ -3172,7 +3224,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             },
             onDone = { adShowing = false }
         )
-        if (started) adShowing = true
+        if (!started) adShowing = false
     }
 
     /** Ödüllü video düğmesi: oynat simgesi + metin, yeşil. */
