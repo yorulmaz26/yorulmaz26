@@ -46,6 +46,7 @@ object Levels {
     const val TARGET_STEP = 2     // her 5'li harita grubunda hedef bu kadar artar
     const val TARGET_MAX = 120
     const val MAX_SPEED = 400f    // bölümlerde ulaşılabilecek en yüksek kaydırma hızı
+    private const val MAIN_PLANET_R = 86f // GameView.MAIN_R: boşluk kenarındaki en büyük gezegen yarıçapı
 
     private val easy = Difficulty.EASY.params
     private val hard = Difficulty.HARD.params
@@ -113,6 +114,10 @@ object Levels {
         if (p.speedPerScore > maxPerScore) p = p.copy(speedPerScore = maxPerScore)
         // Salınım: dar geçitte büyük salınım geçilemez anlar yaratıyordu
         p = p.copy(swayAmp = min(p.swayAmp, if (Mod.NARROW in mods) 45f else 60f))
+        // Kule aralığı: iki büyük gezegen arasında roketin geçebileceği eğri kalsın
+        // (Gaz Devleri'nde gezegenler 1,25 kat büyük; "Sık kuleler" ile kuleler neredeyse birleşiyordu)
+        val minSpacing = 2f * MAIN_PLANET_R * Maps.ALL[mapIndex].planetMul + 70f
+        if (p.spacing < minSpacing) p = p.copy(spacing = minSpacing)
 
         val reward = 10 + block * 2 + (if (step == 4) 15 else 0)
         return LevelInfo(n, mapIndex, round, step, target, mods, p, reward)
