@@ -134,10 +134,14 @@ adbt shell input keyevent KEYCODE_BACK; sleep 0.8
 if log | grep -q "hedef ekran=PlayScreen ad=ANA MENÜ"; then ok "Geri tuşu oyunu duraklatır"; else bad "Geri tuşu duraklatma"; fi
 # Oyun "dokun ve başla" ekranındayken duraklatıldı: devam edince kendiliğinden başlamamalı.
 # Başlasaydı hareketsiz oyuncuyu gölge ~5 sn içinde yakalar ve oyun sonu gelirdi.
+# (clear_log sonrası ekran değişmediği için current_screen boş döner; olaylar doğrudan günlükten okunur)
 tap_target PlayScreen "DEVAM ET"
 sleep 8
-if [ "$(current_screen)" = "PlayScreen" ]; then ok "Hazır ekranında duraklat → devam: oyun dokunuş bekliyor (8 sn)"; else bad "Hazır ekranında devam edince oyun kendiliğinden başladı ($(current_screen))"; fi
+N0=$(log | grep -c "hedef ekran=PlayScreen ad=ANA MENÜ")
 adbt shell input keyevent KEYCODE_BACK; sleep 0.8
+N1=$(log | grep -c "hedef ekran=PlayScreen ad=ANA MENÜ")
+if ! log | grep -q 'ekran=GameOverScreen$' && [ "$N1" -gt "$N0" ]; then ok "Hazır ekranında duraklat → devam: oyun dokunuş bekliyor (8 sn)"
+else bad "Hazır ekranında devam: oyun sonu=$(log | grep -c 'ekran=GameOverScreen$') duraklatma menüsü $N0→$N1"; fi
 tap_target PlayScreen "ANA MENÜ"
 expect_screen MenuScreen "Duraklatma → Ana menü"
 
