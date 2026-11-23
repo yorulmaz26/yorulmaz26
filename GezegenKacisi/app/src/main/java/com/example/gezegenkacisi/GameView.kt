@@ -267,6 +267,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var newBest = false
     private var scorePulse = 0f
     private var lastGapY = WORLD_H / 2f
+    private var lastSwayPhase = 0f
 
     private var shake = 0f
     private var flash = 0f
@@ -959,6 +960,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         applyRunConfig()
         speed = cfg.baseSpeed * map.speedMul
         lastGapY = WORLD_H / 2f
+        lastSwayPhase = 0f
         paused = false
         fireballs.clear()
         bolts.clear()
@@ -1018,9 +1020,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private fun wr(a: Float, b: Float): Float = a + worldRng.nextFloat() * (b - a)
 
     private fun computeWind(): Float = if (Mech.WIND in mechs) {
-        WIND_BASE * hazard() * sin(worldTime * 0.62f + windPhase) *
-            (0.75f + 0.25f * sin(worldTime * 1.7f))
+        windMax() * sin(worldTime * 0.62f + windPhase) * (0.75f + 0.25f * sin(worldTime * 1.7f))
     } else 0f
+
+    /** Rüzgârın en büyük gücü: en fazla yer çekiminin %25'i (daha güçlüsü uç geçitleri geçilmez yapıyordu). */
+    private fun windMax() = min(WIND_BASE * hazard(), GRAVITY * gravMul * 0.25f)
 
     private fun isMpView() =
         state == State.MP_COUNTDOWN || state == State.MP_PLAYING || state == State.MP_OVER
@@ -1033,7 +1037,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val g = GRAVITY * gravMul
         var force = g + wind
         // Kara delik: roket ekranın ortasına doğru çekilir
-        if (Mech.PULL in mechs) force += (WORLD_H * 0.5f - rocketY) * PULL_K * hazard()
+        if (Mech.PULL in mechs) {
+            // Çekim en fazla yer çekiminin %45'i (hafif yer çekiminde çekim baskın gelip geçitleri kapatıyordu)
+            val lim = g * 0.45f
+            force += ((WORLD_H * 0.5f - rocketY) * PULL_K * hazard()).coerceIn(-lim, lim)
+        }
         // Rüzgâr ve çekim ne kadar güçlü olursa olsun roket her zaman inebilmeli (en az %35 yer çekimi)
         // ve aşağı itilirken dokunarak karşı koyabilmeli (en fazla 2 kat). Simülasyonda bu sınır olmadan
         // alçak geçitlere inmek imkânsızlaşıyordu.
@@ -1229,13 +1237,22 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             minY = max(minY, 250f)
             maxY = max(minY, min(maxY, WORLD_H - 250f))
         }
-        val gapY = (lastGapY + wr(-maxGapJump(d), maxGapJump(d))).coerceIn(minY, maxY)
+        // Rüzgâr varken en uç geçitlerde tam ters yönden esen rüzgâra karşı tutunmak imkânsızlaşıyordu
+        if (Mech.WIND in mechs) {
+            minY = max(minY, 200f)
+            maxY = max(minY, min(maxY, WORLD_H - 200f))
+        }
+        // Art arda iki geçit en az 60 birim örtüşsün (dar geçitte ince koridorda roket tutulamıyordu)
+        val j = min(maxGapJump(d), max(40f, gapH - 60f))
+        val gapY = (lastGapY + wr(-j, j)).coerceIn(minY, maxY)
         lastGapY = gapY
 
         val planets = ArrayList<Planet>()
         buildStack(planets, gapY - gapH / 2f, -1f, amp) // üst kule
         buildStack(planets, gapY + gapH / 2f, 1f, amp)  // alt kule
-        val col = Column(x, planets, amp, wr(0f, TWO_PI))
+        // Salınım dalga gibi: komşu kuleler birbirini izler, hiçbir zaman tam zıt yönde değildir
+        lastSwayPhase += wr(0.25f, 0.7f)
+        val col = Column(x, planets, amp, lastSwayPhase)
         col.gapTop = gapY - gapH / 2f
         if (amp > 0f) col.offset = amp * sin(worldTime * SWAY_SPEED + col.swayPhase)
         // Para: boşluğun içinde, ayrı rastgele sayı üreticisiyle (parkuru değiştirmez)
@@ -1257,8 +1274,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val rise = max(40f, v * tap - 0.5f * g * tap * tap) / tap
         // İniş: en kötü yukarı itişe (rüzgâr + kara delik çekimi) karşı kalan aşağı ivmeyle
         var up = 0f
-        if (Mech.WIND in mechs) up += WIND_BASE * hazard()
-        if (Mech.PULL in mechs) up += 250f * PULL_K * hazard()
+        if (Mech.WIND in mechs) up += windMax()
+        if (Mech.PULL in mechs) up += min(250f * PULL_K * hazard(), g * 0.45f)
         val aDown = max(g * 0.35f, g - up)
         val drop = min(0.5f * aDown * tCol * tCol, MAX_FALL * min(1f, gravMul) * tCol)
         return min(d.gapJump, max(70f, min(rise * tCol, drop) * 0.8f))
@@ -4209,7 +4226,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Sol üstte rüzgârın yönünü ve gücünü gösteren ok. */
     private fun drawWindGauge(cv: Canvas, gx: Float = 52f, gy: Float = 74f) {
-        val maxW = WIND_BASE * hazard()
+        val maxW = max(1f, windMax())
         val k = (wind / maxW).coerceIn(-1f, 1f)
         paint.color = withAlpha(colPanel, 190)
         cv.drawCircle(gx, gy, 32f, paint)
