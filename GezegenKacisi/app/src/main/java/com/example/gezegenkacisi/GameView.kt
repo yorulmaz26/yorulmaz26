@@ -1217,9 +1217,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val d = cfg
         val gapH = max(d.minGap, d.startGap - progress * d.gapShrink)
         val amp = if (Mech.SWAY in mechs) d.swayAmp * map.hazardMul.coerceAtLeast(0.8f) else 0f
-        val minY = 110f + gapH / 2f + amp
-        val maxY = WORLD_H - 110f - gapH / 2f - amp
-        val gapY = (lastGapY + wr(-d.gapJump, d.gapJump)).coerceIn(minY, maxY)
+        var minY = 110f + gapH / 2f + amp
+        var maxY = WORLD_H - 110f - gapH / 2f - amp
+        // Kara delik çekimi varken en üst/en alt geçitlere ulaşılamıyordu: geçitler orta bölgede kalır
+        if (Mech.PULL in mechs) {
+            minY = max(minY, 250f)
+            maxY = max(minY, min(maxY, WORLD_H - 250f))
+        }
+        val gapY = (lastGapY + wr(-maxGapJump(d), maxGapJump(d))).coerceIn(minY, maxY)
         lastGapY = gapY
 
         val planets = ArrayList<Planet>()
@@ -1233,6 +1238,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             col.coinY = gapY + (coinRng.nextFloat() - 0.5f) * gapH * 0.45f
         }
         return col
+    }
+
+    /**
+     * İki geçit arasındaki en büyük dikey fark: kuleler arası sürede, saniyede ~8 dokunuşla roketin
+     * çıkabileceği yüksekliğin %80'i (hız arttıkça ve yer çekimi ağırlaştıkça küçülür).
+     */
+    private fun maxGapJump(d: DiffParams): Float {
+        val tCol = d.spacing / max(60f, speed)
+        val tap = 0.125f
+        val v = -FLAP_V * flapMul
+        val g = GRAVITY * gravMul
+        val rise = max(40f, v * tap - 0.5f * g * tap * tap) / tap
+        return min(d.gapJump, max(70f, rise * tCol * 0.8f))
     }
 
     /**

@@ -45,6 +45,7 @@ object Levels {
     const val FIRST_TARGET = 15
     const val TARGET_STEP = 2     // her 5'li harita grubunda hedef bu kadar artar
     const val TARGET_MAX = 120
+    const val MAX_SPEED = 400f    // bölümlerde ulaşılabilecek en yüksek kaydırma hızı
 
     private val easy = Difficulty.EASY.params
     private val hard = Difficulty.HARD.params
@@ -100,8 +101,18 @@ object Levels {
         if (Mod.NARROW in mods) p = p.copy(startGap = p.startGap * 0.88f, minGap = p.minGap * 0.9f)
         if (Mod.DENSE in mods) p = p.copy(spacing = p.spacing * 0.87f)
         if (Mod.FAST in mods) p = p.copy(baseSpeed = p.baseSpeed * 1.15f)
+
+        // --- Oynanabilirlik sınırları (500 bölüm, geleceği bilen bir pilotla simüle edilerek ayarlandı) ---
         // Boşluk hiçbir zaman roketin geçemeyeceği kadar daralmasın
-        p = p.copy(minGap = p.minGap.coerceAtLeast(175f), startGap = p.startGap.coerceAtLeast(200f))
+        p = p.copy(minGap = p.minGap.coerceAtLeast(185f), startGap = p.startGap.coerceAtLeast(210f))
+        // Hız: harita çarpanı ve "Hızlı" dahil en fazla MAX_SPEED (daha hızlısında kuleler arası
+        // dikey farkı dokunarak kapatmak fiziksel olarak imkânsızlaşıyordu)
+        val maxBase = MAX_SPEED / Maps.ALL[mapIndex].speedMul
+        if (p.baseSpeed > maxBase * 0.72f) p = p.copy(baseSpeed = maxBase * 0.72f)
+        val maxPerScore = ((maxBase - p.baseSpeed) / p.speedCapScore).coerceAtLeast(0f)
+        if (p.speedPerScore > maxPerScore) p = p.copy(speedPerScore = maxPerScore)
+        // Salınım: dar geçitte büyük salınım geçilemez anlar yaratıyordu
+        p = p.copy(swayAmp = min(p.swayAmp, if (Mod.NARROW in mods) 45f else 60f))
 
         val reward = 10 + block * 2 + (if (step == 4) 15 else 0)
         return LevelInfo(n, mapIndex, round, step, target, mods, p, reward)
