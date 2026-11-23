@@ -70,6 +70,25 @@ Reklamlar oyunun akışını bozmayacak şekilde yerleştirildi:
 - Kod: [`AdManager.kt`](app/src/main/java/com/example/gezegenkacisi/AdManager.kt) (AdMob + onay),
   [`Ads.kt`](app/src/main/java/com/example/gezegenkacisi/Ads.kt) (oyunun gördüğü arayüz). Sıklık kuralları `GameView.afterBreak`.
 
+### 2.2: Bölüm denetimi (500 bölüm)
+
+Bütün bölümler, oyunun fiziğini birebir taklit eden ve geleceği bilen bir "pilot" ile simüle edildi
+(her bölüm 6 farklı dünyada, hedef puana kadar). Geçilemeyen anlar bulundu ve düzeltildi:
+
+| Sorun | Düzeltme |
+|---|---|
+| Yıldırım geçidin içine kadar iniyordu | Yıldırım boyu yakındaki kulelerin geçidine göre kısalır, sığmıyorsa hiç çıkmaz |
+| İleri turlarda hız 600'ü geçiyordu, iki geçit arası fark kapatılamıyordu | Kaydırma hızı en fazla 400 (`Levels.MAX_SPEED`) |
+| Rüzgâr / kara delik çekimi yer çekimini yeniyordu | Toplam kuvvet sınırlı; rüzgâr en fazla yer çekiminin ¼'ü |
+| Ardışık geçitler arası dikey fark, iniş/çıkış hızından büyüktü | Fark, roketin o sürede gerçekten gidebileceği mesafeyle sınırlı |
+| Dar geçit + büyük salınım; sık kuleler + büyük gezegenler | Salınım ve en küçük kule aralığı sınırlandı; salınım fazı kuleden kuleye yumuşak değişir |
+| Ateş topu / meteor kulelerin dibinde çıkıyordu | Kule yakınında yerden ateş topu çıkmaz |
+| Bölüm zorluğu en zor değerlerde ekranı kapatıyordu | Boşluk en az 185, ilk boşluk en az 210 |
+
+Sonuç: 500 bölümün hepsi, 6 farklı dünyada **3000/3000 geçilebilir**. Mantık hataları da düzeltildi: reklam açıkken
+dokunma, telefon bildirim perdesi açılınca oyunun duraklaması, kare hızından bağımsız fizik, çok oyunculu geri sayımda
+uygulamadan çıkma, kurucunun arka plandayken mesaj aktarması ve can sayacında aynı sürenin iki kez sayılması.
+
 ### 2.1: Açılış animasyonu
 
 Oyun açılırken **Magic Lumos Software** logosu oyuna özel bir animasyonla gösterilir: seçili araç karanlık uzaydan
