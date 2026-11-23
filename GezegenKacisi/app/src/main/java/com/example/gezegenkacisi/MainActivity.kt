@@ -1,6 +1,7 @@
 package com.example.gezegenkacisi
 
 import android.app.Activity
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -45,6 +46,11 @@ class MainActivity : Activity() {
         gameView.pause()
         ads?.onPause()
         super.onPause()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        ads?.onConfigurationChanged()
     }
 
     override fun onDestroy() {

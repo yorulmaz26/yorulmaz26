@@ -125,6 +125,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val SPL_END = 4.6f
         private const val LEVEL_LIST_TOP = 140f  // bölüm listesinin başladığı yer
         private const val LEVEL_ROW_H = 150f     // listede bir harita satırının yüksekliği
+        private const val HUB_BANNER_MAX = 110f  // ana ekran/harita seçiminde gösterilecek en yüksek banner (dünya birimi)
 
         // --- 2 oyuncu ---
         private const val MP_STEP = 1f / 120f     // iki telefonda aynı sabit adımla simülasyon
@@ -173,6 +174,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var worldW = 500f   // oyun dünyasının görünen genişliği (2 oyuncuda yarım ekrana göre)
     private var uiW = 500f      // tam ekran arayüz genişliği
     private var curW = 500f     // drawFit için geçerli genişlik
+    private var viewW = 0f      // çizilen görüntünün dünya genişliği (0: tüm ekran); yarım hücrelerde daha dar
     private var artScale = 0f
     private var artMap = -1
 
@@ -331,6 +333,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var downY = 0f
     private var downTime = 0f
     private var downState = State.SPLASH
+    private var fingerDown = false
 
     private val columns = ArrayList<Column>()
     private val mainArts = ArrayList<PlanetArt>()
@@ -638,6 +641,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Pencere odağı gidince (bildirim çubuğu, arama ekranı) tek kişilik oyun duraklar. */
     fun onFocusLost() {
+        fingerDown = false
         if (state == State.PLAYING) paused = true
     }
 
@@ -751,6 +755,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val wy = event.y / scale
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                fingerDown = true
                 downState = state
                 downX = wx
                 downY = wy
@@ -771,7 +776,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             }
             // İkinci parmakla da itiş yapılabilsin
             MotionEvent.ACTION_POINTER_DOWN -> if (state == State.PLAYING || state == State.MP_PLAYING) onPress()
-            MotionEvent.ACTION_UP -> onRelease(wx, wy)
+            MotionEvent.ACTION_UP -> {
+                fingerDown = false
+                onRelease(wx, wy)
+            }
+            MotionEvent.ACTION_CANCEL -> fingerDown = false
         }
         return true
     }
@@ -781,18 +790,21 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (keyCode) {
             KeyEvent.KEYCODE_SPACE, KeyEvent.KEYCODE_ENTER,
             KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_DPAD_UP -> {
+                // Sonuç ekranlarından yalnızca onay tuşlarıyla çıkılır; itiş tuşları (boşluk, yukarı)
+                // oyunun hemen sonunda basılı tutulurken yanlışlıkla geçiş reklamı açmasın
+                val confirm = keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER
                 when (state) {
                     State.MENU -> if (keyCode != KeyEvent.KEYCODE_DPAD_UP) startReady()
-                    State.OVER -> if (stateTimer > 0.6f && !adShowing) {
+                    State.OVER -> if (confirm && stateTimer > 0.6f && !adShowing) {
                         val lv = level
                         if (levelMode && lv != null) afterBreak { openLevel(lv.number) } else afterBreak { startReady() }
                     }
-                    State.LEVEL_DONE -> if (stateTimer > 0.6f && !adShowing) {
+                    State.LEVEL_DONE -> if (confirm && stateTimer > 0.6f && !adShowing) {
                         val lv = level
                         if (lv != null && lv.number < Levels.COUNT) afterBreak { openLevel(lv.number + 1) } else afterBreak { enterLevels() }
                     }
                     State.SPLASH -> if (splashT > 0.6f) finishSplash()
-                    else -> onPress()
+                    else -> onPress(fromTouch = false)
                 }
                 return true
             }
@@ -802,8 +814,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         return super.onKeyDown(keyCode, event)
     }
 
-    /** Parmak ekrana değdiği an: oyunda gecikmesiz itiş. */
-    private fun onPress() {
+    /**
+     * Parmak ekrana değdiği an: oyunda gecikmesiz itiş. Klavye/kumandadan gelince [fromTouch] false olur;
+     * o zaman eski dokunuş konumuna bakılmaz (ödüllü video yalnızca düğmeye gerçekten dokununca açılır).
+     */
+    private fun onPress(fromTouch: Boolean = true) {
         if (adShowing) return
         if (paused) {
             paused = false
@@ -813,7 +828,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (state) {
             State.READY -> {
                 // Can bittiyse: "video izle +1 can" düğmesi
-                if (currentReward() != Reward.NONE && hit(rewardBtn, downX, downY, 6f)) {
+                if (fromTouch && currentReward() != Reward.NONE && hit(rewardBtn, downX, downY, 6f)) {
                     watchReward()
                     return
                 }
@@ -876,8 +891,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                         sound.play(SoundManager.Sfx.CLICK)
                         afterBreak { leaveRun() }
                     }
-                    levelMode && lv != null -> afterBreak { openLevel(lv.number) }
-                    else -> afterBreak { startReady() } // "Tekrar" ya da ekranın herhangi bir yeri
+                    // Yalnızca TEKRAR düğmesi yeniden başlatır (geçiş reklamı ancak düğmeye basınca gelebilir);
+                    // ekranın başka yerine dokunmak bir şey yapmaz
+                    hit(retryBtn, downX, downY, 6f) -> {
+                        sound.play(SoundManager.Sfx.CLICK)
+                        if (levelMode && lv != null) afterBreak { openLevel(lv.number) } else afterBreak { startReady() }
+                    }
                 }
             }
             else -> Unit
@@ -2296,6 +2315,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         return if (l < 120f) 0f else l
     }
 
+    /** Ekran dışındaki tehlike uyarılarının çizildiği sağ kenar (bölünmüş ekranda hücrenin kenarı). */
+    private fun hazardEdge() = if (viewW > 0f) min(viewW, worldW) else worldW
+
     private fun drawFireballs(cv: Canvas) {
         drawBolts(cv)
         for (fb in fireballs) {
@@ -2304,7 +2326,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val k = 1f - fb.warn / 0.8f
                 val pulse = 0.6f + 0.4f * sin(time * 30f)
                 paint.color = withAlpha(hex(0xFFFF5A1F), (k * 170 * pulse).toInt())
-                val mx = min(fb.x, worldW - 24f)
+                val mx = min(fb.x, hazardEdge() - 24f)
                 iconPath.reset()
                 iconPath.moveTo(mx - 16f, 8f)
                 iconPath.lineTo(mx + 16f, 8f)
@@ -2318,7 +2340,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val k = 1f - fb.warn / 0.8f
                 val pulse = 0.6f + 0.4f * sin(time * 30f)
                 paint.color = withAlpha(hex(0xFFFF3B1F), (k * 150 * pulse).toInt())
-                val mx = min(fb.x, worldW - 24f)
+                val mx = min(fb.x, hazardEdge() - 24f)
                 tmpRect.set(mx - 34f, WORLD_H - 26f, mx + 34f, WORLD_H + 26f)
                 cv.drawOval(tmpRect, paint)
                 paint.color = withAlpha(hex(0xFFFFD27A), (k * 220 * pulse).toInt())
@@ -2525,7 +2547,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val k = 1f - b.warn / 0.95f
                 val pulse = 0.55f + 0.45f * sin(time * 26f)
                 paint.color = withAlpha(hex(0xFF9BC8FF), (60 + 150 * k * pulse).toInt())
-                val bx = min(b.x, worldW - 12f)
+                val bx = min(b.x, hazardEdge() - 12f)
                 var y = 0f
                 while (y < b.len) {
                     cv.drawRect(bx - 2f, y, bx + 2f, min(b.len, y + 22f), paint)
@@ -2974,7 +2996,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val row = i / 2
             val x0 = 16f + col * (cw + 12f)
             // Kartlar banner'ın üstünde kalacak şekilde sığdırılır
-            val pitch = min(166f, (WORLD_H - bannerReserve - 8f - 148f) / 5f)
+            val pitch = min(166f, (WORLD_H - bannerReserve - 24f - 148f) / 5f)
             val y0 = 148f + row * pitch
             marketCards[i].set(x0, y0, x0 + cw, y0 + pitch - 8f)
         }
@@ -2992,6 +3014,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         levelMode = false
         resetGame()
         state = State.LEVELS
+        updateBanner() // kaydırma banner'ın gerçek yüksekliğiyle hesaplansın
         val currentBlock = (levelMax.coerceAtMost(Levels.COUNT - 1)) / Levels.PER_MAP
         levelScroll = (currentBlock * LEVEL_ROW_H - 260f).coerceIn(0f, maxLevelScroll())
         scrollVel = 0f
@@ -3121,8 +3144,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     // =====================================================================
 
     /** Banner'ın görüneceği ekranlar: oyun oynanırken asla. */
-    private fun bannerScreen() =
-        (state == State.HUB || state == State.MENU || state == State.LEVELS || state == State.MARKET) && !adShowing
+    private fun bannerScreen(): Boolean {
+        if (adShowing) return false
+        return when (state) {
+            State.LEVELS, State.MARKET -> true
+            // Ana ekranın ve harita seçiminin altında düğme ve yazı var: banner çok yüksekse
+            // (bölünmüş ekran, küçük pencere) bu ekranlarda hiç gösterilmez
+            State.HUB, State.MENU -> scale <= 0f || (ads?.bannerSlotPx ?: 0) / scale <= HUB_BANNER_MAX
+            else -> false
+        }
+    }
 
     private fun updateBanner() {
         val a = ads ?: return
@@ -3131,8 +3162,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             bannerOn = want
             a.setBannerVisible(want)
         }
-        bannerReserve = if (want && scale > 0f) a.bannerHeightPx / scale else 0f
+        // Parmak ekrandayken yerleşim değişmesin (dokunulan kart/düğme kaymasın)
+        if (fingerDown) return
+        val reserve = if (want && scale > 0f) a.bannerHeightPx / scale else 0f
+        if (reserve != bannerReserve) {
+            val oldMax = maxLevelScroll()
+            val pinned = levelScroll >= oldMax - 1f
+            bannerReserve = reserve
+            // Liste en alttaysa banner gelince de en altta kalsın (son satır banner'ın altında kalmasın)
+            levelScroll = if (pinned) maxLevelScroll() else levelScroll.coerceIn(0f, maxLevelScroll())
+        }
     }
+
+    /** Banner'ın üstünde kalan son dünya birimi (alt kenardaki düğme ve yazılar bunun üstüne yerleşir). */
+    private fun bannerFloor() = WORLD_H - bannerReserve
 
     /**
      * Oyun arası geçişlerde (oyun bitti / bölüm sonu ekranından çıkarken) bazen geçiş reklamı gösterir,
@@ -3222,7 +3265,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 marketMsgT = 2f
                 sound.play(SoundManager.Sfx.RECORD)
             },
-            onDone = { adShowing = false }
+            // Video ödül alınmadan erken kapatılsa da ardından 60 sn geçiş reklamı gelmez
+            onDone = {
+                adShowing = false
+                lastRewardAt = SystemClock.elapsedRealtime()
+            }
         )
         if (!started) adShowing = false
     }
@@ -3368,16 +3415,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawButton(cv, hubMultiBtn, strTwoPlayers, colBlue, colText, false, 255, 20f)
         drawButton(cv, hubMarketBtn, strMarket, colGold, colText, false, 255, 20f)
 
+        // Alt yazılar banner'ın üstünde, aradan rahat bir boşlukla (yanlışlıkla reklama dokunulmasın)
+        val floor = bannerFloor()
         textPaint.textSize = 19f
         textPaint.color = colDim
-        drawFit(cv, strHubHint, cx, 870f, textPaint)
         if (ads?.privacyOptionsRequired() == true) {
+            drawFit(cv, strHubHint, cx, 832f, textPaint)
             labelPaint.textSize = 14f
             labelPaint.color = colDim
             val tw = labelPaint.measureText(strPrivacy)
-            privacyRect.set(cx - tw / 2f - 10f, 886f, cx + tw / 2f + 10f, 916f)
-            cv.drawText(strPrivacy, cx, 906f, labelPaint)
+            val bottom = min(878f, floor - 24f)
+            privacyRect.set(cx - tw / 2f - 12f, bottom - 32f, cx + tw / 2f + 12f, bottom)
+            cv.drawText(strPrivacy, cx, bottom - 11f, labelPaint)
         } else {
+            drawFit(cv, strHubHint, cx, min(870f, floor - 22f), textPaint)
             privacyRect.setEmpty()
         }
     }
@@ -4119,7 +4170,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
         labelPaint.textSize = 19f
         labelPaint.color = colGold
-        drawFit(cv, bestText, cx, multiBtn.centerY() + 8f, labelPaint)
+        drawFit(cv, bestText, cx, min(multiBtn.centerY() + 8f, bannerFloor() - 14f), labelPaint)
     }
 
     /** Lobinin altında: bölünmüş ekran / tam ekran seçimi. */
@@ -4439,8 +4490,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val m = shake / 0.45f * 9f
             canvas.translate(rnd(-m, m), rnd(-m, m))
         }
-        drawWorld(canvas, id)
         val cw = r.width() / cs
+        viewW = cw
+        drawWorld(canvas, id)
+        viewW = 0f
         curW = cw
         drawCellHud(canvas, id, cw)
         canvas.restore()

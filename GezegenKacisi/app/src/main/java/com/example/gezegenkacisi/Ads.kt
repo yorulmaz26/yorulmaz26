@@ -11,6 +11,9 @@ interface AdsBridge {
     /** Banner şu an ekranda kaplıyorsa yüksekliği (piksel), değilse 0. */
     val bannerHeightPx: Int
 
+    /** Yüklü bir banner gösterilse kaplayacağı yükseklik (piksel); banner yoksa 0. */
+    val bannerSlotPx: Int
+
     /** Geçiş (resim) reklamı yüklü ve gösterilmeye hazır mı. */
     fun interstitialReady(): Boolean
 

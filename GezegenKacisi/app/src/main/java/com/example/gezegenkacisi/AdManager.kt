@@ -42,6 +42,9 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     private var banner: AdView? = null
     private var bannerLoaded = false
     private var bannerWanted = false
+    private var bannerWidthDp = 0
+    private var bannerRetryMs = 15_000L
+    @Volatile private var destroyed = false
     private var interstitial: InterstitialAd? = null
     private var rewarded: RewardedAd? = null
     private var interstitialLoading = false
@@ -72,7 +75,7 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
         thread(name = "ads-init", isDaemon = true) {
             MobileAds.initialize(activity) {}
             main.post {
-                if (activity.isFinishing || activity.isDestroyed) return@post
+                if (destroyed || activity.isFinishing || activity.isDestroyed) return@post
                 ready = true
                 createBanner()
                 loadInterstitial()
@@ -85,22 +88,35 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     // Banner
     // ---------------------------------------------------------------------
 
-    private fun createBanner() {
+    private fun screenWidthDp(): Int {
         val dm = activity.resources.displayMetrics
-        val widthDp = (dm.widthPixels / dm.density).toInt()
-        val view = AdView(activity).apply {
-            adUnitId = activity.getString(R.string.ad_banner_id)
-            setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp))
-            visibility = View.GONE
-            adListener = object : AdListener() {
-                override fun onAdLoaded() {
-                    bannerLoaded = true
-                    applyBannerVisibility()
-                }
+        return (dm.widthPixels / dm.density).toInt()
+    }
 
-                override fun onAdFailedToLoad(error: LoadAdError) {
-                    bannerLoaded = false
-                    applyBannerVisibility()
+    private fun createBanner() {
+        if (destroyed || banner != null) return
+        val widthDp = screenWidthDp()
+        bannerWidthDp = widthDp
+        bannerLoaded = false
+        val view = AdView(activity)
+        view.adUnitId = activity.getString(R.string.ad_banner_id)
+        view.setAdSize(AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp))
+        view.visibility = View.GONE
+        view.adListener = object : AdListener() {
+            override fun onAdLoaded() {
+                if (banner !== view) return
+                bannerLoaded = true
+                bannerRetryMs = 15_000L
+                applyBannerVisibility()
+            }
+
+            override fun onAdFailedToLoad(error: LoadAdError) {
+                if (banner !== view || destroyed) return
+                // Yenileme başarısız olsa da önceki reklam ekranda geçerli kalır; banner gizlenmez.
+                // Hiç yüklenememişse (çevrimdışı açılış, reklam yok) artan aralıklarla yeniden denenir.
+                if (!bannerLoaded) {
+                    main.postDelayed({ if (banner === view && !bannerLoaded) view.loadAd(AdRequest.Builder().build()) }, bannerRetryMs)
+                    bannerRetryMs = (bannerRetryMs * 2).coerceAtMost(300_000L)
                 }
             }
         }
@@ -126,24 +142,44 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     }
 
     override val bannerHeightPx: Int
+        get() = if (bannerWanted) bannerSlotPx else 0
+
+    override val bannerSlotPx: Int
         get() {
             val b = banner ?: return 0
-            if (!bannerWanted || !bannerLoaded) return 0
+            if (!bannerLoaded) return 0
             return b.adSize?.getHeightInPixels(activity) ?: 0
         }
+
+    /**
+     * Ekran boyutu ya da yoğunluğu değişince (katlanabilir telefon, ekran boyutu ayarı) etkinlik yeniden
+     * başlatılmaz; uyarlanabilir banner yeni genişliğe göre baştan kurulur.
+     */
+    fun onConfigurationChanged() {
+        if (destroyed || !ready) return
+        val old = banner ?: return
+        if (screenWidthDp() == bannerWidthDp) return
+        container.removeView(old)
+        old.destroy()
+        banner = null
+        bannerLoaded = false
+        bannerRetryMs = 15_000L
+        createBanner()
+    }
 
     // ---------------------------------------------------------------------
     // Geçiş (resim) reklamı
     // ---------------------------------------------------------------------
 
     private fun loadInterstitial() {
-        if (!ready || interstitial != null || interstitialLoading) return
+        if (destroyed || !ready || interstitial != null || interstitialLoading) return
         interstitialLoading = true
         InterstitialAd.load(
             activity, activity.getString(R.string.ad_interstitial_id), AdRequest.Builder().build(),
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(ad: InterstitialAd) {
                     interstitialLoading = false
+                    if (destroyed) return
                     interstitial = ad
                     interstitialRetryMs = 15_000L
                 }
@@ -151,6 +187,7 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     interstitialLoading = false
                     interstitial = null
+                    if (destroyed) return
                     main.postDelayed({ loadInterstitial() }, interstitialRetryMs)
                     interstitialRetryMs = (interstitialRetryMs * 2).coerceAtMost(300_000L)
                 }
@@ -183,13 +220,14 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     // ---------------------------------------------------------------------
 
     private fun loadRewarded() {
-        if (!ready || rewarded != null || rewardedLoading) return
+        if (destroyed || !ready || rewarded != null || rewardedLoading) return
         rewardedLoading = true
         RewardedAd.load(
             activity, activity.getString(R.string.ad_rewarded_id), AdRequest.Builder().build(),
             object : RewardedAdLoadCallback() {
                 override fun onAdLoaded(ad: RewardedAd) {
                     rewardedLoading = false
+                    if (destroyed) return
                     rewarded = ad
                     rewardedRetryMs = 15_000L
                 }
@@ -197,6 +235,7 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
                 override fun onAdFailedToLoad(error: LoadAdError) {
                     rewardedLoading = false
                     rewarded = null
+                    if (destroyed) return
                     main.postDelayed({ loadRewarded() }, rewardedRetryMs)
                     rewardedRetryMs = (rewardedRetryMs * 2).coerceAtMost(300_000L)
                 }
@@ -247,8 +286,12 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     }
 
     fun onDestroy() {
+        destroyed = true
+        ready = false
         main.removeCallbacksAndMessages(null)
         banner?.destroy()
         banner = null
+        interstitial = null
+        rewarded = null
     }
 }
