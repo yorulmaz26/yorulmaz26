@@ -290,6 +290,28 @@ class MetaTests {
         assertTrue(avgGap(two) > avgGap(solo))
     }
 
+    @Test fun reklamKurallariAkisiBozmaz() {
+        val a = com.yanlisrenk.logic.ads.AdState()
+        val P = com.yanlisrenk.logic.ads.AdPolicy
+        var now = 1_000_000L
+        // ilk 8 bölüm boyunca hiç geçiş reklamı yok
+        repeat(10) { assertFalse(P.onBreak(a, now, completedLevels = 5)); now += 600_000 }
+        // sonra en az 3 molada bir
+        val b = com.yanlisrenk.logic.ads.AdState()
+        assertFalse(P.onBreak(b, now, 20)); assertFalse(P.onBreak(b, now, 20)); assertTrue(P.onBreak(b, now, 20))
+        P.interstitialShown(b, now)
+        // 3 mola geçse de 2,5 dakika dolmadan gösterilmez
+        repeat(3) { assertFalse(P.onBreak(b, now + 60_000, 20)) }
+        assertTrue(P.onBreak(b, now + 160_000, 20))
+        // ödüllü reklam izlenen molada geçiş reklamı yok
+        val c = com.yanlisrenk.logic.ads.AdState(breaksSinceInterstitial = 10)
+        P.rewardedWatched(c, 5); assertFalse(P.onBreak(c, now, 20)); assertTrue(P.onBreak(c, now, 20))
+        // günlük ödüllü sınır
+        val d = com.yanlisrenk.logic.ads.AdState()
+        repeat(6) { assertTrue(P.rewardedLeft(d, 7) > 0); P.rewardedWatched(d, 7) }
+        assertEquals(0, P.rewardedLeft(d, 7)); assertEquals(6, P.rewardedLeft(d, 8))
+    }
+
     @Test fun sonsuzModKombo() {
         // 30 aynı renk kapı: kombo 30, çarpan 4 olmalı
         val gates = (1..30).map { com.yanlisrenk.logic.model.GateData(10f + it * 6f, com.yanlisrenk.logic.model.RuleType.SAME, listOf(0)) }

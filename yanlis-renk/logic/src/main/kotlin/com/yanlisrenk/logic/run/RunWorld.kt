@@ -115,6 +115,21 @@ class RunWorld(val track: Track, startColor: Int, val endless: Boolean = false) 
     private val collected = HashSet<Int>()
 
     val pickupTaken: Set<Int> get() = collected
+    /** [y] konumundaki nesnenin görünür olduğu mesafe (doğrulayıcıyla aynı kural). */
+    fun visibleDistanceAt(objY: Float, revealDist: Float = 0f): Float =
+        LevelValidator.visibleDistance(track.fogDist, track.zones, objY, revealDist)
+
+    /** Oyuncunun önündeki sis perdeleri: (perdenin başladığı y, bittiği y). Doğrulayıcının sis kuralıyla birebir. */
+    fun fogBanks(out: MutableList<FloatArray>) {
+        out.clear()
+        for (z in track.zones) {
+            if (z.type != ZoneType.FOG || y >= z.y2) continue
+            // bölgenin etkilediği kapılar: [y1 - VIEW, y2) → oyuncu bu aralığa girince perde görünür
+            val from = maxOf(y + z.value, z.y1 - LevelValidator.VIEW_AHEAD)
+            if (from < z.y2) out.add(floatArrayOf(from, z.y2))
+        }
+    }
+
     val activeFog: Float
         get() {
             var d = if (track.fogDist > 0f) track.fogDist else 0f

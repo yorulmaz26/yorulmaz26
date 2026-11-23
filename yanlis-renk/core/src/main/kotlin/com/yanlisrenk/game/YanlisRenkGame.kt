@@ -59,6 +59,42 @@ class YanlisRenkGame(val platform: PlatformServices) : Game() {
         }
     }
 
+    // ---------- reklamlar ----------
+
+    val ads: AdService get() = platform.ads
+
+    /**
+     * Bölüm/koşu sonu molası: kurallar uygunsa geçiş reklamı gösterir, sonra [then] çalışır.
+     * Reklam yoksa ya da sırası değilse [then] hemen çalışır (akış hiç beklemez).
+     */
+    fun adBreak(then: () -> Unit) {
+        val st = session.data.ads
+        val show = com.yanlisrenk.logic.ads.AdPolicy.onBreak(st, session.clock.now(), session.data.completedLevels)
+        if (show && ads.isInterstitialReady()) {
+            audio.pause()
+            com.yanlisrenk.logic.ads.AdPolicy.interstitialShown(st, session.clock.now())
+            session.save()
+            ads.showInterstitial { audio.resume(); then() }
+        } else then()
+    }
+
+    fun rewardedLeftToday(): Int = com.yanlisrenk.logic.ads.AdPolicy.rewardedLeft(session.data.ads, session.dayKey())
+
+    /** İsteğe bağlı ödüllü video. Ödül hak edildiyse [onReward]. Hazır değilse false döner. */
+    fun watchRewarded(onReward: () -> Unit): Boolean {
+        if (rewardedLeftToday() <= 0 || !ads.isRewardedReady()) return false
+        audio.pause()
+        ads.showRewarded { ok ->
+            audio.resume()
+            if (ok) {
+                com.yanlisrenk.logic.ads.AdPolicy.rewardedWatched(session.data.ads, session.dayKey())
+                onReward()
+                session.save()
+            }
+        }
+        return true
+    }
+
     /** Yeni ekrana geç. [remember] → geri tuşu buraya döner. */
     fun go(factory: () -> BaseScreen, remember: Boolean = true) {
         val current = screen as? BaseScreen

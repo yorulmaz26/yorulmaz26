@@ -7,6 +7,7 @@ import com.yanlisrenk.logic.model.Motion
 import com.yanlisrenk.logic.model.PadType
 import com.yanlisrenk.logic.model.PickupType
 import com.yanlisrenk.logic.model.ZoneType
+import com.yanlisrenk.logic.model.ZoneData
 
 /**
  * Bölüm doğrulayıcı. Bir bölümün insan tarafından çözülebilir olduğunu kanıtlar:
@@ -73,11 +74,18 @@ object LevelValidator {
     }
 
     /** Kapının görüş mesafesi: ekran, sis ve gizlilik dikkate alınır. */
-    fun visibleDistance(level: LevelData, gate: GateData): Float {
+    fun visibleDistance(level: LevelData, gate: GateData): Float = visibleDistance(level.fogDist, level.zones, gate.y, gate.revealDist)
+
+    /**
+     * [y] konumundaki bir nesnenin oyuncuya görünür olduğu en büyük mesafe. Oyun ekranı da
+     * ([com.yanlisrenk.logic.run.RunWorld.visibleDistanceAt]) aynı kuralı kullanır:
+     * ekran (VIEW_AHEAD), genel görüş sınırı, sis bölgeleri ve gizli kapının açılma mesafesi.
+     */
+    fun visibleDistance(fogDist: Float, zones: List<ZoneData>, y: Float, revealDist: Float = 0f): Float {
         var d = VIEW_AHEAD
-        if (level.fogDist > 0f) d = minOf(d, level.fogDist)
-        for (z in level.zones) if (z.type == ZoneType.FOG && gate.y >= z.y1 - VIEW_AHEAD && gate.y < z.y2) d = minOf(d, z.value)
-        if (gate.revealDist > 0f) d = minOf(d, gate.revealDist)
+        if (fogDist > 0f) d = minOf(d, fogDist)
+        for (z in zones) if (z.type == ZoneType.FOG && y >= z.y1 - VIEW_AHEAD && y < z.y2) d = minOf(d, z.value)
+        if (revealDist > 0f) d = minOf(d, revealDist)
         return d
     }
 
@@ -86,7 +94,8 @@ object LevelValidator {
         val g = level.gates[gateIndex]
         var know = if (g.chain) {
             val sign = level.signs.firstOrNull { gateIndex in it.gates }
-            if (sign != null) tl.timeAt(maxOf(0f, sign.y - VIEW_AHEAD)) + 0.6f else tl.timeAt(g.y) // tabelasız zincir → çözülemez
+            // tabela da sis içinde kalabilir → tabelanın kendi görünürlüğü kullanılır
+            if (sign != null) tl.timeAt(maxOf(0f, sign.y - visibleDistance(level.fogDist, level.zones, sign.y))) + 0.6f else tl.timeAt(g.y) // tabelasız zincir → çözülemez
         } else {
             tl.timeAt(maxOf(0f, g.y - visibleDistance(level, g)))
         }

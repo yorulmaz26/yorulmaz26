@@ -71,3 +71,14 @@ levels/area_XXX.json ──► LevelRepository ──► LevelData ──► Tra
 ## Gerçek parayla satın alma (hazırlık)
 
 İlk sürümde gerçek para yoktur. `ShopItem.currency` + `GameSession.buy` tek bir satın alma noktasıdır; Google Play Billing eklendiğinde ürün kimlikleri katalogdaki `id` ile eşlenir, satın alma jetonu `server/purchase/verify` ile doğrulanır ve ödül `credit(..., rewardId = purchaseToken)` ile **bir kez** verilir (aynı jeton iki kez işlenemez).
+
+## Reklamlar
+
+* `logic/ads/AdPolicy` reklam sıklığına karar verir (birim testli): geçiş reklamı yalnızca bölüm/koşu sonu molasında, ilk 8 bölüm boyunca hiç, sonra en az 3 molada bir ve en az 2,5 dk arayla; ödüllü reklam izlenen molada geçiş reklamı yok; ödüllü reklam günde en fazla 6.
+* `core/AdService` arayüzü; ekranlar yalnızca `game.adBreak {}` ve `game.watchRewarded {}` kullanır. Reklam hazır değilse akış hiç beklemez.
+* Banner yalnızca menü ekranlarında (`BaseScreen.showBanner`); oyun, iki kişilik mod, açılış ve öğreticide kapalı. Sahne, banner yüksekliği kadar yukarı yerleşir (viewport ekran sınırı), hiçbir arayüz öğesi banner'ın altında kalmaz.
+* `android/AdMobService`: Google Mobile Ads 23.6 + UMP 3.1; uyarlanabilir sabit banner, geçiş ve ödüllü reklamlar; yüklenemezse 60 sn sonra yeniden dener. İçerik derecesi G.
+
+## Görüş kuralı (doğrulayıcı = ekran)
+
+Bir nesnenin oyuncuya görünür olduğu mesafe tek yerde tanımlıdır: `LevelValidator.visibleDistance(fogDist, zones, y, revealDist)`. Doğrulayıcı ve oyun ekranı (`RunWorld.visibleDistanceAt`, `RunWorld.fogBanks`) aynı fonksiyonu kullanır; sis perdesi tam olarak doğrulayıcının sisli saydığı aralığı kapatır. Karakter ekranda 2,9 birim yükseklikte; 9:16 ekranda bile bilgi çubuğunun altında ≥ 11 birim ileri görülür.

@@ -40,6 +40,9 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
     /** Geri tuşuyla bu ekrana dönmek için fabrika (null → geçmişe eklenmez). */
     open val recreate: (() -> BaseScreen)? = null
     open val music: String = "menu"
+    /** Bu ekranda alt banner reklam gösterilsin mi? (oyun içi ekranlarda kapalı) */
+    open val showBanner: Boolean = true
+    private var reservedBannerPx = -1
     private var livesLabel: Label? = null
     private var timerLabel: Label? = null
     private var goldLabel: Label? = null
@@ -62,6 +65,7 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
         extraInput()?.let { mux.addProcessor(it) }
         Gdx.input.inputProcessor = mux
         game.audio.music(music)
+        game.ads.setBannerVisible(showBanner)
         build()
         root.color.a = 0f
         root.addAction(Actions.fadeIn(0.18f))
@@ -135,7 +139,14 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
         bgShapes.end()
     }
 
+    /** Banner yüklenince/gizlenince sahne banner'ın üstüne sığacak şekilde yeniden yerleşir. */
+    protected fun syncBanner() {
+        val px = if (showBanner) game.ads.bannerHeightPx else 0
+        if (px != reservedBannerPx) resize(Gdx.graphics.width, Gdx.graphics.height)
+    }
+
     override fun render(delta: Float) {
+        syncBanner()
         time += delta
         Gdx.gl.glClearColor(0.97f, 0.98f, 1f, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
@@ -145,11 +156,31 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
         stage.draw()
         timerLabel?.let { updateTimer() }
         afterDraw(delta)
+        drawBannerPlaceholder()
     }
 
     open fun afterDraw(delta: Float) {}
 
-    override fun resize(width: Int, height: Int) { stage.viewport.update(width, height, true) }
+    override fun resize(width: Int, height: Int) {
+        val px = if (showBanner) game.ads.bannerHeightPx.coerceIn(0, height / 4) else 0
+        reservedBannerPx = px
+        stage.viewport.update(width, height - px, true)
+        stage.viewport.setScreenY(stage.viewport.screenY + px)
+        stage.viewport.apply(true)
+    }
+
+    /** Masaüstü QA: banner alanını gri yer tutucu olarak gösterir. */
+    private fun drawBannerPlaceholder() {
+        if (!showBanner || !game.ads.drawsPlaceholder || reservedBannerPx <= 0) return
+        val w = Gdx.graphics.backBufferWidth
+        Gdx.gl.glViewport(0, 0, w, reservedBannerPx)
+        bgShapes.projectionMatrix.setToOrtho2D(0f, 0f, w.toFloat(), reservedBannerPx.toFloat())
+        bgShapes.begin(ShapeRenderer.ShapeType.Filled)
+        bgShapes.setColor(0.86f, 0.88f, 0.92f, 1f); bgShapes.rect(0f, 0f, w.toFloat(), reservedBannerPx.toFloat())
+        bgShapes.setColor(0.7f, 0.74f, 0.8f, 1f); bgShapes.rect(0f, reservedBannerPx - 2f, w.toFloat(), 2f)
+        bgShapes.end()
+        stage.viewport.apply()
+    }
 
     override fun dispose() { stage.dispose(); bgShapes.dispose() }
 

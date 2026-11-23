@@ -56,3 +56,14 @@ Komutlar: `./gradlew :logic:test :server:test`, `xvfb-run ./gradlew :desktop:scr
 * Gerçek telefon testi yok; emülatör yazılımsal grafikle ve çok yavaş çalıştığından akıcılık (FPS), titreşim, ses ve arka plana alma emülatörde değerlendirilemedi.
 * Ses dosyaları sayısal olarak doğrulandı (sessiz değil, kırpılma yok, döngü noktası tıklamasız) ancak **dinlenmedi**.
 * Ekran görüntüleri 540×1080 masaüstü penceresindendir; çok uzun (20:9) ve tablet oranları `ExtendViewport` ile desteklenir ama görsel olarak cihazda denenmedi.
+
+## Bölüm denetimi (1.3.0)
+
+`LevelAuditTest`: 500 bölüm + 500 ustalık sürümü gerçek simülasyonda 240 Hz ile oynatıldı; her dokunuş, hedef kapının **ekran kurallarına göre** (sis perdesi, gizli kapı, yanıp sönmenin o andaki fazı, tabela görünürlüğü) okunabildiği anla karşılaştırıldı. Ayrıca görsel çakışma, hareketli kapı varış payı, yanıltıcı kapı, yıldız hedefi ve "YENİ" mekanik kontrolleri yapıldı. Ayrıntılar: [LEVEL_AUDIT.md](LEVEL_AUDIT.md).
+
+* İlk çalıştırmada (eski veri): **0 geçilemeyen bölüm**, 46 ped–kapı görsel çakışması, 33 yanlış mekanik listesi.
+* Kodda bulunan ve düzeltilen görüş uyumsuzlukları: sis perdesi sis bölgesinden sonraki kapıları da gizliyordu; sis geçişi 1,2 birim erken başlıyordu; tabela sis içindeyken görülmüş sayılıyordu; 16:9 ekranda bilgi çubuğu ileri görüşü ~10,7 birime düşürüyordu (doğrulayıcı 11 varsayar).
+* Düzeltme sonrası: **0 hata, 0 uyarı.** En kısa "görünür → varış" süresi 0,67 sn (Bölüm 500), 1 sn'deki en fazla dokunuş 6.
+* Test kalıcıdır; bir bölüm bozulursa derleme testleri başarısız olur.
+
+Toplam test: 36 (logic 35 + server 1), hepsi geçti.

@@ -135,7 +135,10 @@ object LevelGenerator {
         if (!r.ok) return null
         val slackTaps = when { p.id <= 25 -> 3; p.d < 0.5f -> 2; else -> 1 }
         val difficulty = (1 + 80 * p.d + p.mechanics.size * 2 + (if (p.isFinal) 6 else 0) + p.index).toInt().coerceIn(1, 100)
+        // gösterilen mekanik listesi yalnızca bölümde gerçekten bulunanları içersin
+        val real = p.mechanics.filter { it == Mechanic.SAME || isPresent(lvl, it) }
         return lvl.copy(
+            mechanics = real,
             coinTarget = target, tapPar = r.chosenTaps + slackTaps, solution = r.gateColors,
             minTaps = r0.minTaps, maxCoins = maxCoins, difficulty = difficulty,
         )
@@ -496,8 +499,12 @@ object LevelGenerator {
             }
             gates.add(g)
             if (pl.padBefore != null) {
-                val py = (ys.getOrElse(k - 1) { 0f }).let { it + (tl.yAt(pl.padTime) - it).coerceAtLeast(0.6f) }
-                pads.add(pl.padBefore.copy(y = minOf(py, ys[k] - 0.8f)))
+                // ped iki kapıdan da en az 1 birim uzakta olsun (görseller üst üste binmesin)
+                val prevY = ys.getOrElse(k - 1) { 0f }
+                val lo = prevY + 1.0f; val hi = ys[k] - 1.0f
+                val want = tl.yAt(pl.padTime)
+                val py = if (hi >= lo) want.coerceIn(lo, hi) else (prevY + ys[k]) / 2f
+                pads.add(pl.padBefore.copy(y = py))
             }
             if (pl.chainGroup >= 0) chainMembers.getOrPut(pl.chainGroup) { mutableListOf() }.add(k)
             // altınlar
@@ -555,6 +562,34 @@ object LevelGenerator {
             zones = zoneData, pads = pads.sortedBy { it.y }, signs = signs.sortedBy { it.y }, mechanics = p.mechanics,
             fogDist = p.viewDist,
         )
+    }
+
+    /** Mekanik bölümde gerçekten var mı? (bilgi kartları ve denetim için) */
+    fun isPresent(l: LevelData, m: Mechanic): Boolean = when (m) {
+        SAME -> l.gates.any { it.rule == RuleType.SAME }
+        DIFF -> l.gates.any { it.rule == RuleType.DIFF }
+        RAINBOW -> l.gates.any { it.rule == RuleType.ANY && !it.split }
+        MIX -> l.gates.any { it.split }
+        NONE -> l.gates.any { it.rule == RuleType.NONE }
+        NEXT -> l.gates.any { it.rule == RuleType.NEXT }
+        PREV -> l.gates.any { it.rule == RuleType.PREV }
+        REPEAT -> l.gates.any { it.rule == RuleType.REPEAT }
+        DECOY -> l.gates.any { it.rule == RuleType.FREE }
+        ROTATE -> l.gates.any { it.motion == Motion.ROTATE }
+        SLIDE -> l.gates.any { it.motion == Motion.SLIDE }
+        TIMED -> l.gates.any { it.motion == Motion.TIMED }
+        MEMORY -> l.gates.any { it.memoryDist > 0f }
+        HIDDEN -> l.gates.any { it.revealDist > 0f }
+        FLICKER -> l.gates.any { it.flicker }
+        STROOP -> l.gates.any { it.word >= 0 }
+        CHAIN -> l.signs.isNotEmpty()
+        AUTOSHIFT -> l.pads.isNotEmpty()
+        SPEED, WAVE -> l.zones.any { it.type == ZoneType.SPEED }
+        MIRROR -> l.zones.any { it.type == ZoneType.MIRROR }
+        LOCK -> l.zones.any { it.type == ZoneType.LOCK }
+        FOG -> l.zones.any { it.type == ZoneType.FOG }
+        COINS -> l.pickups.count { it.color >= 0 } >= 3
+        DOUBLE, TRIPLE, QUICK, MAZE, EXAM -> true
     }
 
     // ---------- Ustalık modu ----------

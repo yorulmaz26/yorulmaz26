@@ -21,6 +21,8 @@ import java.util.UUID
 import java.util.concurrent.Executors
 
 class AndroidLauncher : AndroidApplication() {
+    private var adService: AdMobService? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installCrashReporter()
@@ -30,8 +32,26 @@ class AndroidLauncher : AndroidApplication() {
         cfg.useAccelerometer = false
         cfg.useCompass = false
         cfg.useGyroscope = false
-        initialize(YanlisRenkGame(AndroidPlatform(this)), cfg)
+        // oyun görünümü + altta reklam banner'ı (oyun, banner yüksekliği kadar yukarıya yerleşir)
+        val bannerView = com.google.android.gms.ads.AdView(this)
+        val ads = AdMobService(this, bannerView)
+        adService = ads
+        val gameView = initializeForView(YanlisRenkGame(AndroidPlatform(this, ads)), cfg)
+        val layout = android.widget.RelativeLayout(this)
+        layout.addView(gameView, android.widget.RelativeLayout.LayoutParams(-1, -1))
+        val lp = android.widget.RelativeLayout.LayoutParams(-1, -2)
+        lp.addRule(android.widget.RelativeLayout.ALIGN_PARENT_BOTTOM)
+        lp.addRule(android.widget.RelativeLayout.CENTER_HORIZONTAL)
+        bannerView.visibility = android.view.View.GONE
+        layout.addView(bannerView, lp)
+        setContentView(layout)
+        runCatching { ads.start() }
         showPreviousCrash()
+    }
+
+    override fun onPause() { adService?.pause(); super.onPause() }
+    override fun onResume() { super.onResume(); adService?.resume() }
+    override fun onDestroy() { adService?.destroy(); super.onDestroy()
     }
 
     private val crashFile get() = File(filesDir, "son_hata.txt")
@@ -43,7 +63,7 @@ class AndroidLauncher : AndroidApplication() {
             runCatching {
                 val sw = java.io.StringWriter()
                 e.printStackTrace(java.io.PrintWriter(sw))
-                crashFile.writeText("Yanlış Renk 1.2.1 · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
+                crashFile.writeText("Yanlış Renk 1.3.0 · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
             }
             prev?.uncaughtException(t, e)
         }
@@ -69,7 +89,7 @@ class AndroidLauncher : AndroidApplication() {
 }
 
 /** Android platform hizmetleri. */
-class AndroidPlatform(private val ctx: Context) : PlatformServices {
+class AndroidPlatform(private val ctx: Context, override val ads: com.yanlisrenk.game.AdService = com.yanlisrenk.game.NoAds) : PlatformServices {
     private val io = Executors.newSingleThreadExecutor()
 
     override val clock = object : PlatformClock {

@@ -2,15 +2,15 @@
 
 | Çıktı | Dosya | Boyut | İmza |
 |---|---|---|---|
-| Release APK | `dist/YanlisRenk-1.2.1.apk` | 11,9 MB | **Android debug anahtarı** (kurulabilir test sürümü) |
-| Debug APK | `dist/YanlisRenk-1.2.1-debug.apk` | ~12,7 MB | Android debug anahtarı |
-| Google Play AAB | `dist/YanlisRenk-1.2.1-release.aab` | ~9 MB | **Android debug anahtarı** |
+| Release APK | `dist/YanlisRenk-1.3.0.apk` | 11,9 MB | **Android debug anahtarı** (kurulabilir test sürümü) |
+| Debug APK | `dist/YanlisRenk-1.3.0-debug.apk` | ~12,7 MB | Android debug anahtarı |
+| Google Play AAB | `dist/YanlisRenk-1.3.0-release.aab` | ~9 MB | **Android debug anahtarı** |
 
 > 1.0.0 sürüm APK, R8 küçültmesi yüzünden açılışta çöküyordu; 1.0.1'de R8 kapalı (ayrıntı TEST_REPORT.md).
 
 SHA-256 özetleri: `dist/SHA256SUMS.txt` (`dist/` git'e eklenmez; komutlarla yeniden üretilir).
 
-* Paket adı: `com.yanlisrenk.oyun` · sürüm 1.2.1 (kod 13) · minSdk 26 (Android 8.0) · targetSdk/compileSdk 35
+* Paket adı: `com.yanlisrenk.oyun` · sürüm 1.3.0 (kod 14) · minSdk 26 (Android 8.0) · targetSdk/compileSdk 35
 * ABI: armeabi-v7a, arm64-v8a, x86, x86_64
 * İzinler: `INTERNET` (yalnızca güvenilir zaman için), `VIBRATE`
 * Yönlendirme: dikey · Kenar yumuşatma: 4× MSAA
@@ -48,3 +48,21 @@ xvfb-run ./gradlew :desktop:screenshots     # görsel QA (Linux)
 ```
 
 Kullanılan sürümler: Kotlin 2.1.0, libGDX 1.13.1, AGP 8.7.3, Gradle 8.14.3, kotlinx.serialization 1.7.3, JDK 21 (hedef bytecode 17).
+
+## Reklamlar (AdMob) — yayından önce yapılması gerekenler
+
+Bu sürüm Google'ın resmî **test** reklam kimlikleriyle derlenir; test reklamları gerçek gelir getirmez.
+Kendi AdMob hesabınızda uygulama ve 3 reklam birimi (Banner, Geçiş/Interstitial, Ödüllü/Rewarded) oluşturup
+kimlikleri `yanlis-renk/gradle.properties` dosyasına (ya da `-P` ile) yazın:
+
+```
+admobAppId=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
+admobBanner=ca-app-pub-XXXXXXXXXXXXXXXX/1111111111
+admobInterstitial=ca-app-pub-XXXXXXXXXXXXXXXX/2222222222
+admobRewarded=ca-app-pub-XXXXXXXXXXXXXXXX/3333333333
+```
+
+* Play Console → Veri güvenliği: "Reklam kimliği" ve reklam amaçlı veri paylaşımı beyan edilmeli; uygulamada reklam olduğu işaretlenmeli.
+* Gizlilik politikası URL'si zorunlu (reklam SDK'sı kullanıldığı için).
+* Uygulama 13 yaş altını hedefliyorsa Aileler politikası ve sertifikalı reklam ayarları gerekir; şu an tüm reklamlar en düşük içerik derecesine (G) sınırlı.
+* AB/BK kullanıcıları için Google UMP izin formu otomatik gösterilir; Ayarlar'da gerektiğinde "Reklam gizlilik seçenekleri" düğmesi çıkar. Formun çıkması için AdMob panelinde GDPR mesajı oluşturulmalıdır.

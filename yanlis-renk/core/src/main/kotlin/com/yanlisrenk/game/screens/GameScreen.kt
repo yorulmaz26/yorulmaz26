@@ -78,6 +78,8 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
     private lateinit var centerLabel: Label
     private var hintCard: Table? = null
 
+    override val showBanner: Boolean = false
+
     override val music: String = when (mode) {
         Mode.ENDLESS, Mode.WEEKLY -> "endless"
         else -> AreaCatalog.world(AreaCatalog.area(level!!.area).world).music
@@ -366,16 +368,17 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         rw.add(ui.chip("coin", "+${reward.gold}")).pad(6f)
         if (reward.diamonds > 0) rw.add(ui.chip("diamond", "+${reward.diamonds}")).pad(6f)
         rw.add(ui.chip("sparkle", "+${reward.xp} XP")).pad(6f)
-        card.add(rw).padBottom(20f).row()
+        card.add(rw).padBottom(14f).row()
+        doubleGoldButton(reward.gold, "lvl${lvl.id}")?.let { card.add(it).padBottom(14f).row() }
         val special = reward.areaCompleted > 0 || reward.levelUps.isNotEmpty() || reward.worldCompleted > 0
         val buttons = Table()
         buttons.add(ui.iconButton("refresh", 110f, Pal.WHITE) {
-            ov.remove(); game.go({ if (session.lives.canPlay) GameScreen(game, mode, lvl.id) else LivesScreen(game) }, remember = false)
+            ov.remove(); adNav({ if (session.lives.canPlay) GameScreen(game, mode, lvl.id) else LivesScreen(game) })
         }).size(110f).padRight(16f)
-        buttons.add(ui.iconButton("map", 110f, Pal.WHITE) { game.go({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }, remember = false) }).size(110f).padRight(16f)
+        buttons.add(ui.iconButton("map", 110f, Pal.WHITE) { adNav({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }) }).size(110f).padRight(16f)
         val nextId = lvl.id + 1
         when {
-            special -> buttons.add(ui.button("Ödüller", Pal.ORANGE, "gift") { game.go({ RewardScreen(game, reward, lvl.id, mode == Mode.MASTERY) }, remember = false) })
+            special -> buttons.add(ui.button("Ödüller", Pal.ORANGE, "gift") { adNav({ RewardScreen(game, reward, lvl.id, mode == Mode.MASTERY) }) })
             mode == Mode.LEVEL && nextId <= 500 -> buttons.add(ui.button("Sonraki", Pal.GREEN, "play") {
                 val nextArea = AreaCatalog.areaOfLevel(nextId)
                 game.go({
@@ -386,11 +389,30 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
                     }
                 }, remember = false)
             })
-            else -> buttons.add(ui.button("Devam", Pal.GREEN, "play") { game.go({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }, remember = false) })
+            else -> buttons.add(ui.button("Devam", Pal.GREEN, "play") { adNav({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }) })
         }
         card.add(buttons)
         ov = ui.overlay(stage, card, 0.3f)
         flushAchievementToasts()
+    }
+
+    /** Sonuç ekranından çıkış: mola reklamı kurallara uygunsa önce o gösterilir. */
+    private fun adNav(f: () -> BaseScreen) = game.adBreak { game.go(f, remember = false) }
+
+    /** "Reklam izle, altını 2 katına çıkar" (isteğe bağlı). */
+    private fun doubleGoldButton(amount: Int, tag: String): com.badlogic.gdx.scenes.scene2d.Actor? {
+        if (amount <= 0 || game.rewardedLeftToday() <= 0 || !game.ads.isRewardedReady()) return null
+        lateinit var b: com.badlogic.gdx.scenes.scene2d.ui.Button
+        b = ui.button("Reklam izle: +$amount altın", Pal.PURPLE, "film", Ui.Size.S) {
+            if (b.isDisabled) return@button
+            val started = game.watchRewarded {
+                session.credit(com.yanlisrenk.logic.shop.Currency.GOLD, amount, "reklam 2x", "ad2x:$tag:${session.clock.now()}")
+                game.audio.play("purchase"); ui.toast(stage, "+$amount altın!", "coin")
+                b.isDisabled = true
+            }
+            if (!started) ui.toast(stage, "Reklam şu an hazır değil", "info")
+        }
+        return b
     }
 
     private fun showLevelFailed() {
@@ -405,12 +427,12 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         val pct = ((world.y / level!!.length) * 100).toInt().coerceIn(0, 99)
         card.add(ui.label("İlerleme: %$pct · Geçilen kapı: ${world.gatesPassed}/${level.gates.size}", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(20f).row()
         if (session.lives.canPlay) {
-            card.add(ui.button("Tekrar Dene", Pal.GREEN, "refresh") { game.go({ GameScreen(game, mode, levelId) }, remember = false) }).width(460f).padBottom(12f).row()
+            card.add(ui.button("Tekrar Dene", Pal.GREEN, "refresh") { adNav({ GameScreen(game, mode, levelId) }) }).width(460f).padBottom(12f).row()
         } else {
-            card.add(ui.button("Canlar", Pal.PINK, "heart_full", textColor = Pal.TEXT) { game.go({ LivesScreen(game) }, remember = false) }).width(460f).padBottom(12f).row()
-            card.add(ui.button("Sonsuz Mod", Pal.TURQ, "infinity") { game.go({ GameScreen(game, Mode.ENDLESS) }, remember = false) }).width(460f).padBottom(12f).row()
+            card.add(ui.button("Canlar", Pal.PINK, "heart_full", textColor = Pal.TEXT) { adNav({ LivesScreen(game) }) }).width(460f).padBottom(12f).row()
+            card.add(ui.button("Sonsuz Mod", Pal.TURQ, "infinity") { adNav({ GameScreen(game, Mode.ENDLESS) }) }).width(460f).padBottom(12f).row()
         }
-        card.add(ui.button("Harita", Pal.BLUE, "map") { game.go({ mapScreen(game, level.id, mode == Mode.MASTERY) }, remember = false) }).width(460f)
+        card.add(ui.button("Harita", Pal.BLUE, "map") { adNav({ mapScreen(game, level.id, mode == Mode.MASTERY) }) }).width(460f)
         ui.overlay(stage, card, 0.3f)
     }
 
@@ -431,9 +453,10 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         s("En iyi skor", (if (mode == Mode.WEEKLY) session.data.weekly.best else session.data.endlessBest).toString())
         card.add(stats).padBottom(12f).row()
         val rw = Table(); rw.add(ui.chip("coin", "+${r.gold}")).pad(6f); rw.add(ui.chip("sparkle", "+${r.xp} XP")).pad(6f)
-        card.add(rw).padBottom(18f).row()
-        card.add(ui.button("Tekrar", Pal.GREEN, "refresh") { game.go({ GameScreen(game, mode) }, remember = false) }).width(440f).padBottom(12f).row()
-        card.add(ui.button("Menü", Pal.BLUE, "home") { game.clearHistory(); game.go({ MainMenuScreen(game) }, remember = false) }).width(440f)
+        card.add(rw).padBottom(14f).row()
+        doubleGoldButton(r.gold, "endless")?.let { card.add(it).padBottom(14f).row() }
+        card.add(ui.button("Tekrar", Pal.GREEN, "refresh") { adNav({ GameScreen(game, mode) }) }).width(440f).padBottom(12f).row()
+        card.add(ui.button("Menü", Pal.BLUE, "home") { game.clearHistory(); adNav({ MainMenuScreen(game) }) }).width(440f)
         ui.overlay(stage, card, 0.3f)
         flushAchievementToasts()
     }

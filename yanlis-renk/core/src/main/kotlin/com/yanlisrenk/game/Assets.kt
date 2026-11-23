@@ -43,7 +43,7 @@ class Assets : Disposable {
         val ICONS = listOf("heart_full", "heart_empty", "coin", "diamond", "star_full", "star_empty", "lock", "play", "pause", "settings",
             "shop", "trophy", "missions", "gift", "profile", "back", "close", "check", "music_on", "music_off", "sound_on", "sound_off",
             "infinity", "map", "calendar", "crown", "shield", "bolt", "puzzle", "sparkle", "refresh", "home", "character", "costume",
-            "info", "clock", "medal", "flag", "palette", "trail", "magic", "box", "plus", "minus")
+            "info", "clock", "medal", "flag", "palette", "trail", "magic", "box", "plus", "minus", "film")
         val UI = listOf("panel", "button", "pill", "circle", "ring", "glow", "particle", "shadow", "shape_circle", "shape_square",
             "shape_triangle", "shape_star", "sym_equal", "sym_notequal", "sym_next", "sym_prev", "sym_repeat", "sym_question",
             "sym_word", "sym_paint", "gradient_v", "white")

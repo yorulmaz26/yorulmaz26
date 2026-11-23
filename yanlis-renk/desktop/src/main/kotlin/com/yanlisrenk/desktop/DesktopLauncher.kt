@@ -13,7 +13,23 @@ import java.util.TimeZone
 import java.util.UUID
 
 /** Masaüstü platformu: geliştirme ve görsel kalite kontrol içindir (Android ile aynı çekirdek). */
+/** Masaüstü QA için sahte reklamlar: banner alanı yer tutucuyla gösterilir, tam ekran reklamlar anında kapanır. */
+class FakeAds(private val bannerPx: Int) : com.yanlisrenk.game.AdService {
+    private var visible = false
+    var interstitials = 0; var rewardeds = 0
+    override val bannerHeightPx: Int get() = if (visible) bannerPx else 0
+    override fun setBannerVisible(visible: Boolean) { this.visible = visible }
+    override fun isInterstitialReady() = true
+    override fun showInterstitial(onClosed: () -> Unit) { interstitials++; onClosed() }
+    override fun isRewardedReady() = true
+    override fun showRewarded(onResult: (Boolean) -> Unit) { rewardeds++; onResult(true) }
+    override val drawsPlaceholder = true
+}
+
 class DesktopPlatform(dir: File) : PlatformServices {
+    /** QA'da banner alanını görmek için ayarlanabilir. */
+    var fakeAds: com.yanlisrenk.game.AdService = com.yanlisrenk.game.NoAds
+    override val ads: com.yanlisrenk.game.AdService get() = fakeAds
     private val start = System.nanoTime()
     override val clock = object : PlatformClock {
         override fun wallMillis() = System.currentTimeMillis()

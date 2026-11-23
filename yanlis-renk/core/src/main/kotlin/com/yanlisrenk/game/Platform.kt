@@ -15,4 +15,6 @@ interface PlatformServices {
     fun newInstallId(): String
     val platformName: String
     val versionName: String
+    /** Reklam hizmeti (varsayılan: reklamsız). */
+    val ads: AdService get() = NoAds
 }

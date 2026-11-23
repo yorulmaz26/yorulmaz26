@@ -73,3 +73,7 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 * Kullanıcı telefonunda harita ekranın sol şeridine sıkışıyordu: harita genişliği yerleşim bitmeden kaydırma alanından okunuyordu. Harita artık `Widget` (kaydırma alanı genişliğine her zaman yayılır); ilk kaydırma yerleşim tamamlandıktan sonra yapılıyor. "Bölümüme dön" geçerli bölüm ekrandayken gizleniyor. Masaüstü QA artık telefon oranında (480×1040).
 * Açılış animasyonundaki "sunar" yazısı kaldırıldı.
 * Android 11 emülatöründe doğrulandı: öğretici → alan girişi → harita akışında harita tam genişlikte (`docs/screenshots/emulator_harita.jpg`).
+
+## 1.3.0 (reklamlar + bölüm denetimi)
+* AdMob: menülerde banner (sahne banner'ın üstüne yerleşir), bölüm sonu molalarında seyrek geçiş reklamı, isteğe bağlı ödüllü video (+1 can, altın ×2). Varsayılan test kimlikleri; gerçek kimlikler gradle özellikleriyle (BUILD_REPORT.md).
+* Bağımsız bölüm denetimi testi ve LEVEL_AUDIT.md; görüş kuralı doğrulayıcı ile ekran arasında birleştirildi, sis/tabela/bilgi çubuğu uyumsuzlukları giderildi; ped yerleşimi ve mekanik listeleri düzeltildi; bölümler yeniden üretildi.

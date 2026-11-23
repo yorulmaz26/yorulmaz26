@@ -179,7 +179,7 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
 fun main(args: Array<String>) {
     val out = File(args.firstOrNull() ?: "build/screenshots")
     val tmp = kotlin.io.path.createTempDirectory("yrqa").toFile()
-    val platform = DesktopPlatform(tmp).also { it.allowNetwork = false }
+    val platform = DesktopPlatform(tmp).also { it.allowNetwork = false; it.fakeAds = FakeAds(bannerPx = 110) }
     val cfg = Lwjgl3ApplicationConfiguration()
     cfg.setTitle("Yanlış Renk QA")
     cfg.setWindowedMode(480, 1040) // telefon oranı (~0,46)

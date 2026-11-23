@@ -240,6 +240,17 @@ class LivesScreen(game: YanlisRenkGame) : BaseScreen(game) {
             row.add(ui.button("Tam Can · ${fullItem.price}", Pal.TURQ, "diamond", Ui.Size.S) { buyAndUse(fullItem.id) })
             card.add(row).padBottom(14f).row()
         }
+        if (!l.isFull && game.rewardedLeftToday() > 0) {
+            card.add(ui.button("Reklam izle: +1 can", Pal.PURPLE, "film", Ui.Size.M) {
+                val started = game.watchRewarded {
+                    session.lives.addLives(1); session.save()
+                    game.audio.play("life_refill"); ui.toast(stage, "+1 can!", "heart_full")
+                    root.clear(); build()
+                }
+                if (!started) ui.toast(stage, "Reklam şu an hazır değil, biraz sonra dene", "info")
+            }).width(520f).padBottom(6f).row()
+            card.add(ui.label("Bugün kalan reklam ödülü: ${game.rewardedLeftToday()}", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(12f).row()
+        }
         card.add(ui.label("Beklerken:", Ui.Size.M)).padTop(6f).padBottom(8f).row()
         card.add(ui.button("Sonsuz Mod (ücretsiz)", Pal.GREEN, "infinity", Ui.Size.M) { game.go({ GameScreen(game, Mode.ENDLESS) }) }).width(520f).padBottom(10f).row()
         card.add(ui.button("Günlük Görevler", Pal.BLUE, "missions", Ui.Size.M) { game.go({ MissionsScreen(game) }) }).width(520f).padBottom(10f).row()

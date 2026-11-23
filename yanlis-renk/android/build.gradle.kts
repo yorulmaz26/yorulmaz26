@@ -15,12 +15,19 @@ val keystoreProps = Properties().also { p ->
 android {
     namespace = "com.yanlisrenk.android"
     compileSdk = 35
+    buildFeatures { buildConfig = true }
     defaultConfig {
         applicationId = "com.yanlisrenk.oyun"
         minSdk = 26
         targetSdk = 35
-        versionCode = 13
-        versionName = "1.2.1"
+        versionCode = 14
+        versionName = "1.3.0"
+        // AdMob kimlikleri: gradle.properties ya da -P ile verin. Varsayılanlar Google'ın resmî TEST kimlikleridir.
+        fun prop(n: String, d: String) = (project.findProperty(n) as String?) ?: d
+        manifestPlaceholders["admobAppId"] = prop("admobAppId", "ca-app-pub-3940256099942544~3347511713")
+        buildConfigField("String", "ADMOB_BANNER", "\"" + prop("admobBanner", "ca-app-pub-3940256099942544/9214589741") + "\"")
+        buildConfigField("String", "ADMOB_INTERSTITIAL", "\"" + prop("admobInterstitial", "ca-app-pub-3940256099942544/1033173712") + "\"")
+        buildConfigField("String", "ADMOB_REWARDED", "\"" + prop("admobRewarded", "ca-app-pub-3940256099942544/5224354917") + "\"")
     }
     sourceSets["main"].apply {
         manifest.srcFile("AndroidManifest.xml")
@@ -60,6 +67,8 @@ android {
 dependencies {
     implementation(project(":core"))
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    implementation("com.google.android.gms:play-services-ads:23.6.0")
+    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")

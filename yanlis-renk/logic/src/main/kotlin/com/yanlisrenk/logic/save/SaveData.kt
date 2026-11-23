@@ -114,6 +114,7 @@ data class SaveData(
     // diğer
     var settings: Settings = Settings(),
     var tutorialsSeen: MutableSet<String> = mutableSetOf(),
+    var ads: com.yanlisrenk.logic.ads.AdState = com.yanlisrenk.logic.ads.AdState(),
     var saveCount: Long = 0,
 ) {
     companion object {

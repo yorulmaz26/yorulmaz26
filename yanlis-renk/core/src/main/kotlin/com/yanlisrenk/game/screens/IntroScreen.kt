@@ -29,6 +29,7 @@ import kotlin.math.sin
  */
 class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
     override val music: String = ""
+    override val showBanner: Boolean = false
     private val logo = Texture(Gdx.files.internal("brand/magic_lumos.jpg")).also {
         it.setFilter(Texture.TextureFilter.Linear, Texture.TextureFilter.Linear)
     }

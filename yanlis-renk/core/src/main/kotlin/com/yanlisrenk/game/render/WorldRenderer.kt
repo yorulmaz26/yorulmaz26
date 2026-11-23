@@ -85,6 +85,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
     val particles = Particles()
     private val layout = GlyphLayout()
     private val tmp = Color()
+    private val fogTmp = ArrayList<FloatArray>()
     private val dark = Pal.hex(0x253858)
 
     companion object {
@@ -93,7 +94,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         const val ROAD_L = 1.35f
         const val ROAD_R = 7.65f
         const val ROAD_W = ROAD_R - ROAD_L
-        const val PLAYER_SCREEN_Y = 3.4f
+        /** Karakterin ekran altına uzaklığı: 9:16 ekranda bile bilgi çubuğu altında ≥ 11 birim ileri görülür. */
+        const val PLAYER_SCREEN_Y = 2.9f
         const val PLAYER_SIZE = 1.15f
         val shapeIcons = arrayOf("shape_circle", "shape_square", "shape_triangle", "shape_star")
     }
@@ -295,6 +297,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         // tabelalar (hafıza zinciri)
         for (s in tr.signs) {
             if (s.y < bottom - 2 || s.y > top + 2) continue
+            if (s.y - py > world.visibleDistanceAt(s.y)) continue
             val n = s.gates.size
             val bw = 1.0f * n + 0.8f
             sr.color = dark; Shapes.roundRect(sr, CX - bw / 2 - 0.08f, s.y - 0.08f, bw + 0.16f, 1.26f, 0.4f)
@@ -334,11 +337,16 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         if (world.shields > 0) { sr.color = tmp.set(0.55f, 0.85f, 1f, 0.28f + 0.08f * sin(time * 6f)); sr.circle(CX, py, 0.95f, 28) }
 
         // sis
-        val fog = world.activeFog
-        if (fog > 0f) {
-            val fy = py + fog - 1.2f
-            sr.rect(left, fy, vw, 1.6f, tmp.set(1f, 1f, 1f, 0f), tmp.set(1f, 1f, 1f, 0f), Color(1f, 1f, 1f, 0.97f), Color(1f, 1f, 1f, 0.97f))
-            sr.color = tmp.set(1f, 1f, 1f, 0.97f); sr.rect(left, fy + 1.6f, vw, top - fy)
+        // sis perdeleri: yalnızca doğrulayıcının sisli saydığı aralığı kapatır; perdeden önce görüş tamamen net
+        world.fogBanks(fogTmp)
+        for (b in fogTmp) {
+            val y1 = b[0]; val y2 = minOf(b[1], top + 1f)
+            if (y2 <= y1) continue
+            val fade = minOf(1.0f, (y2 - y1) / 2f)
+            val solid = Color(1f, 1f, 1f, 0.97f); val clear = Color(1f, 1f, 1f, 0f)
+            sr.rect(left, y1, vw, fade, clear, clear, solid, solid)
+            sr.color = solid; sr.rect(left, y1 + fade, vw, maxOf(0f, y2 - y1 - fade * 2))
+            if (b[1] <= top + 1f) sr.rect(left, y2 - fade, vw, fade, solid, solid, clear, clear)
         }
         particles.draw(sr)
 
@@ -384,8 +392,8 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             val ph = (time / com.yanlisrenk.logic.level.LevelValidator.FLICKER_PERIOD + i * 0.37f) % 1f
             a *= if (ph < 0.6f) 1f else 0.08f
         }
-        val fog = world.activeFog
-        if (fog > 0f && dist > fog) a *= 0f
+        // ekran/sis görüşü: doğrulayıcıyla aynı kural (gizli kapının kendi yumuşak açılışı yukarıda)
+        if (dist > world.visibleDistanceAt(g.y)) a = 0f
         return a
     }
 

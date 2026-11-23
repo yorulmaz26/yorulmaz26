@@ -20,6 +20,7 @@ import com.yanlisrenk.logic.shop.ShopCategory
 
 /** 1. Açılış ekranı */
 class SplashScreen(game: YanlisRenkGame) : BaseScreen(game) {
+    override val showBanner: Boolean = false
     private var t = 0f
     private var done = false
     override fun build() {
@@ -127,6 +128,7 @@ class MainMenuScreen(game: YanlisRenkGame) : BaseScreen(game) {
 
 /** 20. Öğretici ekranlar */
 class TutorialScreen(game: YanlisRenkGame, private val first: Boolean = false) : BaseScreen(game) {
+    override val showBanner: Boolean = false
     private var page = 0
     private val pages = listOf(
         Triple("Dokun, renk değiştir!", "Ekranın herhangi bir yerine dokun. Karakterin sırayla Kırmızı > Mavi > Yeşil > Sarı olur.", Mechanic.SAME),
@@ -231,6 +233,7 @@ class SettingsScreen(game: YanlisRenkGame) : BaseScreen(game) {
         misc.add(ui.button("Nasıl Oynanır", Pal.BLUE, "info", Ui.Size.S) { game.go({ TutorialScreen(game) }) }).pad(8f)
         misc.add(ui.button("Profil", Pal.TURQ, "profile", Ui.Size.S) { game.go({ ProfileScreen(game) }) }).pad(8f)
         list.add(misc).row()
+        if (game.ads.privacyOptionsRequired) list.add(ui.button("Reklam gizlilik seçenekleri", Pal.BLUE, "info", Ui.Size.S) { game.ads.showPrivacyOptions() }).width(520f).row()
         list.add(ui.button("İlerlemeyi Sıfırla", Pal.RED, "refresh", Ui.Size.S) {
             ui.confirm(stage, "Emin misin?", "Tüm bölümler, paralar ve karakterler silinir. Bu işlem geri alınamaz.", "Sıfırla") {
                 session.resetProgress(); game.clearHistory(); game.go({ SplashScreen(game) }, remember = false)

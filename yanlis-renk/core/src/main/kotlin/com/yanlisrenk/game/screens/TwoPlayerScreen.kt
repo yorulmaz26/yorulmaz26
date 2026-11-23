@@ -39,6 +39,7 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
     private enum class State { READY, COUNTDOWN, PLAYING, PAUSED, ENDED }
 
     override val music: String = "endless"
+    override val showBanner: Boolean = false
 
     private inner class Player(val index: Int, val renderer: WorldRenderer, val look: WorldRenderer.Look, startColor: Int) {
         val track = Track(gen.speedFor(0))
