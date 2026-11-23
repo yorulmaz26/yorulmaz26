@@ -639,10 +639,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (state == State.PLAYING) paused = true
         // 2 oyuncuda oyun bekletilemez: uygulamadan çıkan oyuncu yanmış sayılır
         if ((state == State.MP_PLAYING || state == State.MP_COUNTDOWN) && myAlive) mpCrash()
-        // Lobide ya da sonuç ekranındayken arka plana alınan katılımcı: o sırada başlayan maçı sonradan,
-        // kaymış bir zamanla oynamasın (dönünce bekleyen başlatma mesajı yanmış olarak cevaplanır)
+        // Odadayken (lobide, maçta ya da sonuç ekranında) arka plana alınan katılımcı: o sırada başlayan
+        // maçı sonradan, kaymış bir zamanla oynamasın (dönünce bekleyen başlatma mesajı yanmış olarak cevaplanır)
         val n = net
-        if (n != null && !n.isHost && n.connected && (state == State.MP_LOBBY || state == State.MP_OVER)) pausedInRoom = true
+        if (n != null && !n.isHost && (state == State.MP_LOBBY || state == State.MP_COUNTDOWN ||
+                state == State.MP_PLAYING || state == State.MP_OVER)) pausedInRoom = true
         saveCoins()
         running = false
         Choreographer.getInstance().removeFrameCallback(this)
@@ -1742,6 +1743,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             "S" -> if (p.size >= 6) {
                 val id = p[1].toIntOrNull() ?: return
                 if (id == myId || id !in 0 until NetLink.MAX_PLAYERS) return
+                // Yalnızca bu turda hâlâ uçan oyuncunun konumu; yanmış/çıkmış oyuncunun ya da bu cihazın
+                // katılmadığı turun mesajları sonuç tablosunu değiştirmesin
+                if (!pAlive[id]) return
                 pLastNs[id] = System.nanoTime()
                 pY[id] = (p[2].toIntOrNull() ?: return) / 10f
                 pAngle[id] = (p[3].toIntOrNull() ?: return).toFloat()
@@ -3099,7 +3103,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             toHub()
             return
         }
-        if (y < LEVEL_LIST_TOP) return
+        // Listenin görünen kısmı dışında (banner ve altındaki gezinme şeridi) görünmeyen bölüm açılmasın
+        if (y < LEVEL_LIST_TOP || y >= bannerFloor()) return
         val b = ((y - LEVEL_LIST_TOP + levelScroll) / LEVEL_ROW_H).toInt()
         if (b < 0 || b >= Levels.COUNT / Levels.PER_MAP) return
         val y0 = LEVEL_LIST_TOP + b * LEVEL_ROW_H - levelScroll
