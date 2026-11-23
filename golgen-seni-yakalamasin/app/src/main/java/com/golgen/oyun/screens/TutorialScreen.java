@@ -52,6 +52,14 @@ public final class TutorialScreen extends Screen implements GameEvents {
 
     public void setFromSettings(boolean v) {
         fromSettings = v;
+        // Ayarlar'dan/menüden açıldıysa kapatınca o ekrana dönülür
+        returnTo = v ? g.current() : null;
+    }
+
+    private Screen returnTo;
+
+    private void goBack() {
+        if (returnTo != null && returnTo != this) g.go(returnTo); else g.goMenu();
     }
 
     private void complete() {
@@ -63,12 +71,12 @@ public final class TutorialScreen extends Screen implements GameEvents {
 
     private void finish() {
         complete();
-        g.goMenu();
+        goBack();
     }
 
     @Override
     protected void layout() {
-        renderer.s = w / GameWorld.WIDTH;
+        renderer.s = Math.min(w / GameWorld.WIDTH, h / 1200f);
         world.setArenaHeight(h / renderer.s);
         skipBtn.set(w - safeR - 220f * u, safeT + 30f * u, w - safeR - 30f * u, safeT + 130f * u);
         float cx = w / 2f, bw = Math.min(w - 160f * u, 700f * u), bh = 130f * u;

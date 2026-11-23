@@ -45,6 +45,8 @@ public final class PlayScreen extends Screen implements GameEvents {
     private int lastStage = -1, lastMult = -1;
     private String multText = "";
     private boolean dark;
+    private int phaseBeforePause = PLAYING;
+    private float offX;
     private int lastLevelStage = -1;
     private String levelStageText = "";
     private float levelBanner;
@@ -99,7 +101,10 @@ public final class PlayScreen extends Screen implements GameEvents {
 
     @Override
     protected void layout() {
-        renderer.s = w / GameWorld.WIDTH;
+        // Ölçek: genişliğe sığ, ama en az 1200 birim yükseklik görünsün (bölünmüş ekran/küçük pencere);
+        // gerekirse oyun alanı yatayda ortalanır.
+        renderer.s = Math.min(w / GameWorld.WIDTH, h / 1200f);
+        offX = (w - GameWorld.WIDTH * renderer.s) / 2f;
         worldH = h / renderer.s;
         world.setArenaHeight(worldH);
         float s = 112f * u;
@@ -156,6 +161,7 @@ public final class PlayScreen extends Screen implements GameEvents {
 
     private void pause() {
         if (phase != PLAYING && phase != READY) return;
+        phaseBeforePause = phase; // READY'den duraklatılınca devamda yine "dokun ve başla" beklenir
         phase = PAUSED;
         pointerId = -1;
         setPausedUi(true);
@@ -163,7 +169,7 @@ public final class PlayScreen extends Screen implements GameEvents {
     }
 
     private void resume() {
-        phase = PLAYING;
+        phase = phaseBeforePause == READY ? READY : PLAYING;
         setPausedUi(false);
         dumpTargets();
     }
@@ -369,6 +375,7 @@ public final class PlayScreen extends Screen implements GameEvents {
             c.translate((float) Math.sin(time * 90f) * a, (float) Math.cos(time * 75f) * a);
         }
         renderer.drawBackground(c, w, h, world.scrollDistance);
+        c.translate(offX, 0);
         boolean playerVisible = !(phase == ENDING && world.state == GameWorld.DEAD);
         renderer.drawWorld(c, world, g.skin(), playerVisible);
         if (dark) {

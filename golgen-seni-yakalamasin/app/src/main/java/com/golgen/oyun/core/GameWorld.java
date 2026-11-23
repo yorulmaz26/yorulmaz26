@@ -93,7 +93,7 @@ public final class GameWorld {
     public MissionDef mission() { return mission; }
 
     public void setArenaHeight(float h) {
-        height = Math.max(1200f, h);
+        height = Math.max(600f, h); // ekran ölçeği PlayScreen'de en az 1200 birim görünecek şekilde seçilir
     }
 
     public float minPlayerY() { return height * 0.24f; }
@@ -351,7 +351,7 @@ public final class GameWorld {
             }
             case Obstacle.MINE: {
                 o.r = 38f + rng.nextFloat() * 16f;
-                o.x = 80f + rng.nextFloat() * (WIDTH - 160f);
+                o.x = profile.narrow + 80f + rng.nextFloat() * (WIDTH - 2f * profile.narrow - 160f); // dar geçitte lazer şeridine düşmesin
                 o.y = -o.r * 1.3f;
                 o.phase = rng.nextFloat() * 6f;
                 break;
@@ -437,7 +437,8 @@ public final class GameWorld {
         }
         Diamond dm = diamondPool.obtain();
         if (dm == null) return;
-        dm.set(60f + rng.nextFloat() * (WIDTH - 120f), y);
+        float lo = minPlayerX() + 10f, hi = maxPlayerX() - 10f; // yalnızca oyuncunun erişebileceği alan
+        dm.set(lo + rng.nextFloat() * Math.max(0f, hi - lo), y);
     }
 
     private void updateObstacles(float dt) {
@@ -675,7 +676,8 @@ public final class GameWorld {
         if (pu == null) return;
         int type = rng.nextInt(PowerUp.COUNT);
         if (type == PowerUp.SHIELD && shield) type = PowerUp.MAGNET;
-        pu.set(type, 80f + rng.nextFloat() * (WIDTH - 160f), y);
+        float lo = minPlayerX() + 20f, hi = maxPlayerX() - 20f; // yalnızca oyuncunun erişebileceği alan
+        pu.set(type, lo + rng.nextFloat() * Math.max(0f, hi - lo), y);
     }
 
     /** Test ve öğretici için güçlendirme ekleme. */

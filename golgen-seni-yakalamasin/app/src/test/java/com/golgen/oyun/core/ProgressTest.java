@@ -130,6 +130,26 @@ public class ProgressTest {
         for (int i = 0; i < 3; i++) assertTrue("daily " + i, p.dailyDone(i));
     }
 
+    @Test public void upgradeFromVersion1RevokesAchievementsWhoseThresholdGrew() {
+        MemoryStore s = new MemoryStore();
+        s.putInt("levelsDone", 100);
+        StringBuilder crowns = new StringBuilder();
+        for (int i = 0; i < 100; i++) crowns.append('3');
+        s.putString("levelCrowns", crowns.toString());
+        s.putInt("achievements", (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 13));
+        Progress p = new Progress();
+        p.load(s); // version anahtarı yok = 1
+        assertTrue(p.hasAchievement(9));   // 5 bölüm: hâlâ sağlanıyor
+        assertTrue(p.hasAchievement(10));  // 100 bölüm: sağlanıyor
+        assertFalse(p.hasAchievement(11)); // 500 bölüm: sağlanmıyor -> geri alındı
+        assertTrue(p.hasAchievement(12));  // 300 taç: sağlanıyor
+        assertFalse(p.hasAchievement(13)); // 1500 taç: sağlanmıyor -> geri alındı
+        p.save(s);
+        Progress q = new Progress();
+        q.load(s);
+        assertEquals(p.achievements, q.achievements);
+    }
+
     @Test public void resetClearsEverything() {
         Progress p = new Progress();
         p.diamonds = 50; p.bestScore = 10; p.tutorialDone = true; p.unlockedSkins = 0xFF; p.selectedSkin = 3;

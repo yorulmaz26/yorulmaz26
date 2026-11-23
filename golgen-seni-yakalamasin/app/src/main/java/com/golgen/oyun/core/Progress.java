@@ -5,7 +5,7 @@ package com.golgen.oyun.core;
  * Kayıt/okuma KeyValueStore üzerinden yapılır.
  */
 public final class Progress {
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     public static final int TOP_N = 10;
 
     public int diamonds;
@@ -46,6 +46,8 @@ public final class Progress {
     /** Ödüllü video ile alınan günlük can sayacı. */
     public int rewardedLifeDay = -1;
     public int rewardedLivesToday;
+    /** Görülen en büyük (güvenilir) gün: tarih geri alınarak günlük ödüller tekrar alınamaz. */
+    public int maxSeenDay = -1;
 
     public static final int[] LOGIN_REWARDS = {10, 15, 20, 25, 35, 45, 100};
 
@@ -95,6 +97,13 @@ public final class Progress {
         energy.load(s);
         rewardedLifeDay = s.getInt("rwLifeDay", -1);
         rewardedLivesToday = s.getInt("rwLives", 0);
+        maxSeenDay = s.getInt("maxSeenDay", -1);
+        // Sürüm 1 (100 bölüm) -> 2 (500 bölüm): kimliği aynı kalıp eşiği büyüyen başarılar yeni koşulu sağlamıyorsa geri alınır
+        if (s.getInt("version", 1) < 2) {
+            for (int id = 10; id <= 13; id++) {
+                if (hasAchievement(id) && !Achievements.isMet(id, this, null)) achievements &= ~(1 << id);
+            }
+        }
     }
 
     public void save(KeyValueStore s) {
@@ -137,6 +146,7 @@ public final class Progress {
         energy.save(s);
         s.putInt("rwLifeDay", rewardedLifeDay);
         s.putInt("rwLives", rewardedLivesToday);
+        s.putInt("maxSeenDay", maxSeenDay);
         s.apply();
     }
 
@@ -231,6 +241,18 @@ public final class Progress {
         int r = LOGIN_REWARDS[(loginStreak - 1) % LOGIN_REWARDS.length];
         diamonds += r;
         return r;
+    }
+
+    /**
+     * Günlük ödüller için güvenilir gün: telefon saatinden değil, can sistemindeki monoton saatle ilerleyen
+     * güvenilir zamandan hesaplanır (aynı açılışta tarih değiştirmek etkisizdir) ve asla geriye gitmez.
+     */
+    public int trustedDay(TimeSource t, java.time.ZoneId zone) {
+        energy.tick(t);
+        int day = (int) java.time.Instant.ofEpochMilli(energy.lastWall).atZone(zone).toLocalDate().toEpochDay();
+        if (day < maxSeenDay) return maxSeenDay;
+        maxSeenDay = day;
+        return day;
     }
 
     /** Bugün video izleyerek can alınabilir mi? */

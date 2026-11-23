@@ -103,7 +103,7 @@ public class EnergyTest {
         for (int i = 0; i < 4; i++) e.consume(c);
         c.reboot(31 * MIN);          // telefon 31 dk kapalı kaldı
         e.tick(c);
-        assertEquals(2, e.lives);
+        assertEquals("yeniden başlatmada en fazla 1 can kredisi", 1, e.lives);
         // Saati geri alıp yeniden başlatma: yalnızca açılıştan beri geçen süre sayılır
         Energy e2 = fresh(c);
         for (int i = 0; i < 4; i++) e2.consume(c);
@@ -126,6 +126,45 @@ public class EnergyTest {
         c.reboot(20 * MIN);          // 20 dk sonra yeniden başlatıldı
         e.tick(c);
         assertEquals(1, e.lives);
+    }
+
+    @Test public void rebootPlusClockForwardGivesAtMostOneLife() {
+        Clock c = new Clock();
+        Energy e = fresh(c);
+        for (int i = 0; i < 4; i++) e.consume(c);
+        for (int round = 0; round < 3; round++) {
+            int before = e.lives;
+            c.reboot(0);               // gerçek süre ~0
+            c.wall += 60 * MIN;        // açılır açılmaz saat 1 saat ileri
+            e.tick(c);
+            assertTrue("tur " + round, e.lives - before <= 1);
+        }
+        assertTrue(e.lives < 4);
+    }
+
+    @Test public void trustedDayIgnoresDateChangesAndNeverGoesBack() {
+        Clock c = new Clock();
+        Progress p = new Progress();
+        java.time.ZoneId z = java.time.ZoneOffset.UTC;
+        int d0 = p.trustedDay(c, z);
+        assertEquals(d0, p.trustedDay(c, z));
+        // Aynı açılışta tarihi ileri/geri almak gün değiştirmez
+        c.wall += 3L * 24 * 60 * MIN;
+        assertEquals(d0, p.trustedDay(c, z));
+        c.wall -= 10L * 24 * 60 * MIN;
+        assertEquals(d0, p.trustedDay(c, z));
+        // Gerçekten 1 gün geçince gün ilerler
+        c.pass(24 * 60 * MIN);
+        assertEquals(d0 + 1, p.trustedDay(c, z));
+        // Yeniden başlatıp tarihi geri almak günü geri götürmez
+        c.wall -= 5L * 24 * 60 * MIN;
+        c.reboot(0);
+        assertEquals(d0 + 1, p.trustedDay(c, z));
+        // Günlük giriş ödülü aynı güvenilir günde ikinci kez alınamaz
+        int day = p.trustedDay(c, z);
+        assertTrue(p.claimLogin(day) > 0);
+        c.wall -= 2L * 24 * 60 * MIN;
+        assertEquals(0, p.claimLogin(p.trustedDay(c, z)));
     }
 
     @Test public void saveLoadRoundTrip() {

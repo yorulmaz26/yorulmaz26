@@ -133,14 +133,26 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         return Skins.ALL[progress.selectedSkin];
     }
 
+    /** Günlük ödüller için güvenilir gün (tarih değiştirerek hile yapılamaz; bkz. Progress.trustedDay). */
     public int epochDay() {
-        return (int) LocalDate.now().toEpochDay();
+        long now = clock.elapsedMs();
+        if (cachedDay == Integer.MIN_VALUE || now - dayCheckedAt >= 1000L || now < dayCheckedAt) {
+            cachedDay = progress.trustedDay(clock, java.time.ZoneId.systemDefault());
+            dayCheckedAt = now;
+        }
+        return cachedDay;
     }
+
+    private int cachedDay = Integer.MIN_VALUE;
+    private long dayCheckedAt;
 
     /** Gece yarısına kalan süre (dakika). */
     public long minutesToMidnight() {
-        LocalDateTime now = LocalDateTime.now();
-        return now.until(now.toLocalDate().plusDays(1).atStartOfDay(), ChronoUnit.MINUTES);
+        progress.energy.tick(clock);
+        LocalDateTime now = LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(progress.energy.lastWall), java.time.ZoneId.systemDefault());
+        LocalDate day = LocalDate.ofEpochDay(epochDay());
+        long m = now.until(day.plusDays(1).atStartOfDay(), ChronoUnit.MINUTES);
+        return Math.max(0, m);
     }
 
     // ---------------- Ekran geçişleri ----------------
@@ -159,6 +171,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
 
     /** Bölüm başlatır: 1 can harcanır (kazanınca geri verilir). Can yoksa uyarır. */
     public boolean startMission(int index) {
+        if (index < 0 || index >= com.golgen.oyun.core.Missions.ALL.length) return false;
         if (!progress.energy.consume(clock)) {
             toast("Canın kalmadı · sonraki can " + energyTimer(), Icons.HEART);
             if (current != missions) { missions.showTab(MissionsScreen.TAB_LEVELS); go(missions); }
@@ -176,6 +189,13 @@ public final class GameView extends View implements Choreographer.FrameCallback,
     }
 
     // ---------------- Reklamlar ----------------
+    /** Bildirim perdesi/sistem paneli açılınca (onPause gelmeden odak kaybı) oyun duraklatılır. */
+    @Override
+    public void onWindowFocusChanged(boolean hasWindowFocus) {
+        super.onWindowFocusChanged(hasWindowFocus);
+        if (!hasWindowFocus) current.onAppPause();
+    }
+
     @Override
     public void onBannerHeightChanged(int px) {
         if (px == bannerInset) return;

@@ -84,12 +84,7 @@ public final class GameOverScreen extends Screen {
         videoBtn.label = "VİDEO İZLE · +" + videoBonus + " ELMAS";
         videoBtn.visible = false;
         stars = res.mode == RunResult.MODE_MISSION ? res.stars : 0;
-        if (res.mode == RunResult.MODE_MISSION) {
-            int l = g.lives();
-            livesText = won ? "Can korundu · " + l + "/4" : "-1 can · kalan " + l + "/4" + (l < 4 ? " · sonraki " + g.energyTimer() : "");
-        } else {
-            livesText = "";
-        }
+        refreshLives();
         levelUp = rep.levelUps > 0;
         levelText = "Seviye " + g.progress.level;
         xpText = "+" + rep.xpGained + " XP";
@@ -100,13 +95,27 @@ public final class GameOverScreen extends Screen {
         againBtn.label = res.mode == RunResult.MODE_MISSION && won ? "TEKRAR" : "TEKRAR OYNA";
 
         for (int id = 0; id < Achievements.COUNT; id++) {
-            if ((rep.newAchievements & (1 << id)) != 0) g.toast("Başarı: " + Achievements.TITLES[id] + "  +" + Achievements.REWARD, Icons.STAR);
+            if ((rep.newAchievements & (1 << id)) != 0) g.toast("Başarı: " + Achievements.TITLES[id] + "  +" + Achievements.REWARDS[id], Icons.STAR);
         }
         for (int i = 0; i < DailyMissions.PER_DAY; i++) {
             if ((rep.dailyCompleted & (1 << i)) != 0) g.toast("Günlük görev tamamlandı! Ödülünü al", Icons.CALENDAR);
         }
         if (newRecord || won || rep.newAchievements != 0) g.sound.play(Synth.SUCCESS);
         layout();
+    }
+
+    private int lastLivesShown = -1;
+    private String lastTimerShown = "";
+
+    /** Can bilgisi canlı güncellenir (sayaç akar, can yenilenince değişir). */
+    private void refreshLives() {
+        if (r.mode != RunResult.MODE_MISSION) { livesText = ""; return; }
+        int l = g.lives();
+        String tm = l < 4 ? g.energyTimer() : "";
+        if (l == lastLivesShown && tm.equals(lastTimerShown) && !livesText.isEmpty()) return;
+        lastLivesShown = l;
+        lastTimerShown = tm;
+        livesText = won ? "Can korundu · " + l + "/4" : "-1 can · kalan " + l + "/4" + (l < 4 ? " · sonraki " + tm : "");
     }
 
     private void watchVideo() {
@@ -152,6 +161,7 @@ public final class GameOverScreen extends Screen {
         bg.update(dt, 0f);
         boolean v = !videoUsed && videoBonus > 0 && g.ads.isRewardedReady();
         if (v != videoBtn.visible) { videoBtn.visible = v; dumpTargets(); }
+        refreshLives();
         if (shownScore < r.score) shownScore = Math.min(r.score, shownScore + Math.max(1f, r.score * dt * 1.6f));
     }
 

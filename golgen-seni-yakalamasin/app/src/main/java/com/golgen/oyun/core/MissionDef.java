@@ -11,6 +11,7 @@ public final class MissionDef {
     /** Eski arayüz/test uyumluluğu için tür sabiti (tüm bölümler yıldız toplama). */
     public static final int STAR_STAGES = 5;
     public static final int NO_HIT = 3;
+    public static final float MIN_DELAY1 = 1.75f, MIN_DELAY2 = 2.55f, FAST_FACTOR = 0.88f;
 
     public final int index;       // 0..99
     public final int mapIndex;    // 0..19
@@ -86,11 +87,13 @@ public final class MissionDef {
         // Tavan sonrası ek hız da harita ilerledikçe açılır
         p.overdriveMax = Math.min(220f, map.id * 2.2f);
         // Gölgeler bölüm mantığıyla doğar (aşamalar); otomatik takvim kapalı.
-        float shrink = 1f - 0.03f * sub;
-        float d1 = map.shadowDelay1 * shrink, d2 = map.shadowDelay2 * shrink;
-        if (map.has(MapTheme.F_FAST_SHADOWS)) { d1 *= 0.8f; d2 *= 0.8f; }
-        d1 = Math.max(1.7f, d1);
-        d2 = Math.max(2.4f, d2);
+        // Gölge gecikmesi 500 bölüm boyunca tek bir eğriyle azalır (kademe başında zorluk sıfırlanmaz);
+        // haritanın kendi karakteri ±%6 renk katar. "Hızlı Gölgeler" tabandan SONRA uygulanır, her bölümde etkilidir.
+        float g = index / (float) (Missions.MAPS * Missions.PER_MAP - 1);
+        float flavor = Math.max(0.94f, Math.min(1.06f, map.shadowDelay1 / 2.7f));
+        float d1 = Math.max(MIN_DELAY1, (3.0f - 1.25f * g) * flavor);
+        float d2 = Math.max(MIN_DELAY2, (4.4f - 1.7f * g) * flavor);
+        if (map.has(MapTheme.F_FAST_SHADOWS)) { d1 *= FAST_FACTOR; d2 *= FAST_FACTOR; }
         p.shadowDelays = new float[]{d1, d2};
         p.shadowSpawnTimes = new float[]{d1 + 0.4f};
         p.maxShadows = 2;

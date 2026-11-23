@@ -517,10 +517,12 @@ public final class WorldRenderer {
         c.drawBitmap(darkHole, darkSrc, Ui.rf, darkPaint);
         Ui.fill.setShader(null);
         Ui.fill.setColor(DARK_COLOR);
-        if (t0 > 0) c.drawRect(0, 0, width, t0, Ui.fill);
-        if (b < height) c.drawRect(0, b, width, height, Ui.fill);
-        if (l > 0) c.drawRect(0, Math.max(0, t0), l, Math.min(height, b), Ui.fill);
-        if (rr < width) c.drawRect(rr, Math.max(0, t0), width, Math.min(height, b), Ui.fill);
+        // Kaydırılmış (ortalanmış) tuvalde de tüm ekranı kaplasın diye genişçe çizilir
+        float x0 = -width, x1 = width * 2f;
+        if (t0 > 0) c.drawRect(x0, 0, x1, t0, Ui.fill);
+        if (b < height) c.drawRect(x0, b, x1, height, Ui.fill);
+        c.drawRect(x0, Math.max(0, t0), l, Math.min(height, b), Ui.fill);
+        c.drawRect(rr, Math.max(0, t0), x1, Math.min(height, b), Ui.fill);
     }
 
     /** Menü ve önizlemeler için bağımsız karakter çizimi. */

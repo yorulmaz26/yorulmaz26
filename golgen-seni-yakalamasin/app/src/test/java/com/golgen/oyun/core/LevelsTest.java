@@ -32,7 +32,8 @@ public class LevelsTest {
             assertTrue(p.maxDelay() <= 10f);
             assertNotNull(p.weights);
             if (i > 0 && m.mapIndex == Missions.ALL[i - 1].mapIndex && m.timeOffset < 150f) assertTrue(m.timeOffset > Missions.ALL[i - 1].timeOffset);
-            for (float d : p.shadowDelays) assertTrue("gölge gecikmesi " + i, d >= 1.7f);
+            for (float d : p.shadowDelays) assertTrue("gölge gecikmesi " + i, d >= MissionDef.MIN_DELAY1 * MissionDef.FAST_FACTOR - 1e-4f);
+            assertTrue(p.shadowDelays[1] > p.shadowDelays[0]);
         }
     }
 
@@ -204,6 +205,41 @@ public class LevelsTest {
         assertTrue(Missions.ALL[50].timeOffset < 100f);   // ilk 50 bölüm tavana yakın değil
         assertTrue(Missions.ALL[499].timeOffset >= 140f);
         assertTrue(Missions.ALL[499].profile().overdriveMax > Missions.ALL[10].profile().overdriveMax);
+    }
+
+    @Test public void fastShadowsAlwaysEffectiveAndCurveGlobal() {
+        for (int i = 0; i < 500; i++) {
+            MissionDef m = Missions.ALL[i];
+            if (!m.map.has(MapTheme.F_FAST_SHADOWS)) continue;
+            float d = m.profile().shadowDelays[0];
+            float withoutFast = d / MissionDef.FAST_FACTOR;
+            assertTrue("bölüm " + (i + 1), d < withoutFast - 0.05f);
+        }
+        // Kademe başında gölge gecikmesi bir önceki kademenin başındakinden kısa (zorluk sıfırlanmaz)
+        for (int k = 1; k < Maps.TIERS; k++) {
+            float prevStart = Missions.ALL[(k - 1) * 100].profile().shadowDelays[0];
+            float start = Missions.ALL[k * 100].profile().shadowDelays[0];
+            assertTrue("kademe " + (k + 1), start < prevStart);
+        }
+    }
+
+    @Test public void itemsSpawnOnlyInsideReachableAreaOnNarrowMaps() {
+        for (int idx = 0; idx < 500; idx++) {
+            if (!Missions.ALL[idx].map.has(MapTheme.F_NARROW)) continue;
+            GameWorld w = level(idx);
+            w.shadowsHarmless = true;
+            w.obstaclesHarmless = true;
+            float lo = w.minPlayerX(), hi = w.maxPlayerX();
+            for (int f = 0; f < 60 * 40; f++) {
+                w.update(1f / 60f);
+                for (int i = 0; i < w.diamondPool.size(); i++) assertTrue(w.diamondPool.get(i).x >= lo && w.diamondPool.get(i).x <= hi);
+                for (int i = 0; i < w.powerups.size(); i++) assertTrue(w.powerups.get(i).x >= lo && w.powerups.get(i).x <= hi);
+                for (int i = 0; i < w.obstacles.size(); i++) {
+                    Obstacle o = w.obstacles.get(i);
+                    if (o.type == Obstacle.MINE) assertTrue("mayın oynanabilir alanda", o.x + o.r > lo && o.x - o.r < hi);
+                }
+            }
+        }
     }
 
     @Test public void gateOnlyHurtsWhenActive() {

@@ -116,7 +116,8 @@ public final class Maps {
         int deco = (k % 2 == 1) ? (m.deco + k * 2) % 9 : m.deco;
         float shrink = 1f - 0.07f * k;
         String name = m.name + " " + ROMAN[k] + " · " + TIER_NAMES[k];
-        String desc = m.desc + " — " + TIER_NAMES[k].toLowerCase(new java.util.Locale("tr")) + " hâli";
+        String baseDesc = (b == BASE.length - 1) ? "Kademenin son durağı: tehlikeler bir arada" : m.desc;
+        String desc = baseDesc + " — " + TIER_NAMES[k].toLowerCase(new java.util.Locale("tr")) + " hâli";
         return new MapTheme(id, name, desc, bgTop, bgBottom, grid, obstacle, accent, deco, features, signature,
                 m.shadowDelay1 * shrink, m.shadowDelay2 * shrink, w);
     }

@@ -13,8 +13,11 @@ package com.golgen.oyun.core;
 public final class Energy {
     public static final int MAX = 4;
     public static final long REGEN_MS = 15L * 60L * 1000L;
-    /** Yeniden başlatma sonrası duvar saatine göre verilebilecek en fazla süre (tam dolum için yeterli). */
-    public static final long MAX_REBOOT_CREDIT_MS = MAX * REGEN_MS;
+    /**
+     * Yeniden başlatma sonrası duvar saatine göre açılıştan bu yana geçen sürenin üstüne verilebilecek en fazla ek süre.
+     * Bir can kadardır: telefonu yeniden başlatıp saati ileri almak en fazla 1 can kazandırır (tam dolum değil).
+     */
+    public static final long MAX_REBOOT_CREDIT_MS = REGEN_MS;
     /** Bu kadar sapma "saatle oynandı" sayılır. */
     public static final long TAMPER_TOLERANCE_MS = 2L * 60L * 1000L;
 
