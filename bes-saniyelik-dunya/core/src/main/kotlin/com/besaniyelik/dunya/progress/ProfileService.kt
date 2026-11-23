@@ -53,7 +53,19 @@ class ProfileService(private val saves: SaveManager, val clock: GameClock = Syst
     init {
         MissionManager.refresh(data, clock)
         CharacterManager.autoUnlock(data)
+        // önceki oturumda yarım kalan (işlenmeden uygulama kapanan) Sonsuz Dünya koşusu şimdi işlenir
+        data.pendingEndless?.let { p ->
+            onEndlessResult(EndlessResult(p.score, p.seconds, p.distance, p.coinValue, p.stars, p.jumps, p.rulesSurvived, p.powerupsUsed))
+        }
     }
+
+    /** Koşu bitti ama sonucu henüz işlenmedi (reklamla devam sorusu açık): kayıt dosyasında bekletilir. */
+    fun holdEndless(r: EndlessResult) {
+        data.pendingEndless = PendingEndless(r.score, r.seconds, r.distance, r.coinValue, r.stars, r.jumps, r.rulesSurvived, r.powerupsUsed)
+    }
+
+    /** Koşu sürüyor (reklamla devam edildi): bekleyen sonuç bırakılır. */
+    fun releaseEndless() { data.pendingEndless = null }
 
     fun save() = saves.save(data)
 
@@ -111,6 +123,7 @@ class ProfileService(private val saves: SaveManager, val clock: GameClock = Syst
 
     fun onEndlessResult(r: EndlessResult): ResultSummary {
         val d = data
+        d.pendingEndless = null
         MissionManager.refresh(d, clock)
         if (!ScoreCalculator.plausible(r.score, r.seconds, r.distance)) return ResultSummary(rejected = true)
         val st = d.stats

@@ -8,7 +8,7 @@ Her 5 saniyede kuralların değiştiği, renkli bir **yatay** (landscape) Androi
 * Açılışta oyuna özel **Magic Lumos Software** logo animasyonu (önizleme: `docs/intro_animasyon.gif`)
 * Yapay zekâ ile üretilmiş görseller (`art_input/`), otomatik temizleme ve atlas hattı (`tools/art/user_art.py`)
 * Çevrimdışı da oynanır; Türkçe, açık renkli tasarım; grafikler ve sesler programatik üretildi
-* Reklam: Google AdMob ile isteğe bağlı ödüllü reklamlar ve yalnızca bölüm tamamlanınca, seyrek gösterilen geçiş reklamı (afiş yok)
+* Reklam: Google AdMob ile isteğe bağlı ödüllü reklamlar, yalnızca bölüm tamamlanınca seyrek gösterilen geçiş reklamı ve yalnızca liste menülerinin altında afiş (oyun sırasında afiş yok)
 
 ## Hazır dosyalar (`dist/`)
 * `5-saniyelik-dunya-1.0.0.apk` — telefona kurulabilir (release, R8; hata ayıklama anahtarıyla imzalı; **deneme** reklam kimlikleriyle, Android 7.0+)

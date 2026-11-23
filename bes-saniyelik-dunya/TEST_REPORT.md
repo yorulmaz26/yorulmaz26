@@ -28,13 +28,13 @@ Bütün sonuçlar bu ortamda **gerçekten çalıştırılmıştır**.
 | 19 | Menü geçişleri | ✅ | Masaüstü turu: 14 menü ekranı + oyun + sonsuz mod sırayla açıldı, ekran görüntüleri alındı |
 | 20 | Android derleme | ✅ | Debug APK, R8 küçültmeli release APK ve AAB üretildi; APK içeriği (4 ABI için libgdx/box2d/freetype .so, varlıklar) doğrulandı |
 
-**Otomatik birim/entegrasyon testleri: 69/69 geçti** (`./gradlew :core:test`, ~5 dk).
+**Otomatik birim/entegrasyon testleri: 74/74 geçti** (`./gradlew :core:test`, ~5 dk).
 
 | Test sınıfı | Test | Başarısız |
 |---|---|---|
 | SimulationTest | 19 | 0 |
-| LogicFixesTest (denetimde bulunan mantık hatalarının düzeltmeleri) | 15 | 0 |
-| AdsTest (reklam sıklık kuralları, ödüller, günlük sınırlar) | 8 | 0 |
+| LogicFixesTest (denetimde bulunan mantık hatalarının düzeltmeleri) | 16 | 0 |
+| AdsTest (reklam sıklık kuralları, ödüller, günlük sınırlar, yarım kalan Sonsuz Dünya sonucu, kayıt) | 12 | 0 |
 | LevelsTest | 11 | 0 |
 | ProgressTest | 11 | 0 |
 | AuditTest (görsel ↔ mantık, aşama içeriği, kural çizgileri, kontrol noktaları) | 5 | 0 |
@@ -125,21 +125,65 @@ Geri bildirim: "Bölümlerde mantık hataları var, örneğin kapıya gelince te
 
 İstek: "Oyuna reklam ekleyeceğim; kullanıcıyı sıkmayacak şekilde reklam geliri kazanmam için gerekli eklemeleri yap."
 
-**Ne eklendi:** Google AdMob (Google Mobile Ads 25.5.0 + UMP 4.0.0). Beş isteğe bağlı ödüllü reklam yerleşimi ve yalnızca bölüm tamamlanınca, sonuç ekranından önce, seyrek gösterilen tek geçiş reklamı; afiş ve açılış reklamı yok. Ayrıntı: `docs/play_store/REKLAM_REHBERI.md`.
+**Ne eklendi:** Google AdMob (Google Mobile Ads 25.5.0 + UMP 4.0.0). Beş isteğe bağlı ödüllü reklam yerleşimi ve yalnızca bölüm tamamlanınca, sonuç ekranından önce, seyrek gösterilen tek geçiş reklamı; açılış reklamı yok. Afiş sonradan yalnızca beş liste menüsüne eklendi (aşağıdaki "Afiş ve bağımsız inceleme" bölümü). Ayrıntı: `docs/play_store/REKLAM_REHBERI.md`.
 
 **Nasıl doğrulandı:**
 
 | Kontrol | Sonuç |
 |---|---|
 | Reklam kuralları (`AdsTest`, 8 test): geçiş reklamı ilk 10 bölümde, oturumun ilk 2 dakikasında, 3 bölümden ve 3 dakikadan sık, ödüllü reklamdan sonraki 3 dakikada gösterilmez; reklam hazır değilse oyun beklemez; ödül yalnızca reklam tamamlanınca verilir; günlük sınırlar; kayıt | 8/8 |
-| Bütün testler (Kotlin 2.2.21 ile) | 69/69 |
+| Bütün testler (Kotlin 2.2.21 ile) | 69/69 (afiş ve inceleme düzeltmelerinden sonra 74/74) |
 | Masaüstünde sahte reklamla uçtan uca (`-Dads=fake -DtourAds=1`): mağaza +3 elmas, günlük ödül tekrarı, canlar bitince +2 canla devam (ikinci kez sunulmuyor), bölüm sonu geçiş reklamı ve ek altın, Sonsuz Dünya'da diriliş | 6 reklam gösterimi, hepsi beklenen sonucu verdi |
 | Reklamsız çalışma (masaüstü, reklam hizmeti yok): menüler, 3 bölüm, Sonsuz Dünya | reklam düğmesi çıkmıyor, akış aynı |
 | Android paketi: gerçek kitaplıkla derleme ve R8 küçültmesi; `aapt2`: `minSdk 24`, `targetSdk 36`, AdMob uygulama kimliği; `audience=child` iken reklam kimliği izinleri pakette yok; yeni `.so` yok, 16 KB hizası geçerli | geçti |
 
 **Araştırma:** güncel kitaplık kullanımı, Google Play / AdMob reklam politikaları ve AdMob hesap adımları üç araştırma ve bir doğrulamayla tarandı. Tasarımı değiştiren iki sonuç: geçiş reklamı "Sonraki" düğmesine basınca değil sonuç ekranından önce gösteriliyor (AdMob yerleşim önerisi ve Play'in "beklenmedik reklam" örneği); varsayılan kitle modu çocuklara uygun (kişiselleştirme ve reklam kimliği yok).
 
-**Yapılamayanlar:** reklamın gerçek bir telefonda yüklenmesi, gösterilmesi ve ödülün verilmesi denenemedi (cihaz yok). Reklam kodunun bağımsız incelemesi kullanım sınırı nedeniyle çalışmadı; kendi gözden geçirmemde bir hata bulunup düzeltildi (bölüm sonucu reklamdan sonra kaydediliyordu). Paket deneme reklam kimlikleriyle derlenmiştir.
+**Yapılamayanlar:** reklamın gerçek bir telefonda yüklenmesi, gösterilmesi ve ödülün verilmesi denenemedi (cihaz yok). Reklam kodunun bağımsız incelemesi ilk denemede kullanım sınırı nedeniyle çalışmadı; kendi gözden geçirmemde bir hata bulunup düzeltildi (bölüm sonucu reklamdan sonra kaydediliyordu). İnceleme sonradan çalıştı: aşağıdaki bölüm. Paket deneme reklam kimlikleriyle derlenmiştir.
+
+## Afiş reklam ve reklam kodunun bağımsız incelemesi (21–23 Kasım)
+
+Soru: "Banner reklam koymadın mı?" İlk sürümde bilerek konmamıştı: oyun ekranın her yerine dokunularak oynandığı için oyun içi afişe yanlışlıkla basılır. Afiş, yalnızca içeriği kaydırılan beş menü ekranının (Haritalar, Mağaza, Görevler, Başarılar, Koleksiyon) altına eklendi; `ads.properties` içinde `banners=off` ile kapatılır.
+
+**Bağımsız inceleme:** iki inceleyici ve bir doğrulayıcı reklam kodunun tamamını inceledi (ilk deneme kullanım sınırına takılmıştı). 19 bulgu düzeltildi:
+
+| Bulgu | Düzeltme |
+|---|---|
+| Reklam açılmayı beklerken ekrandaki öbür düğmelere basılabiliyordu (ör. "Reklam izle"den sonra "Tekrar Dene") | Reklam istenince ekran kilitleniyor ("Reklam açılıyor..."), geri tuşu da bekliyor |
+| Mağazadaki "Ücretsiz Elmas" kartı her izlemeden sonra kayboluyor, ekrandan çıkıp girmek gerekiyordu | Kart yerinde kalıyor; yeni reklam yüklenene kadar düğme kapalı, "Reklam hazırlanıyor..." yazıyor |
+| Sonsuz Dünya'da "reklam izle: devam et" sorusu açıkken uygulama kapatılırsa koşunun sonucu (skor, altın, görev ilerlemesi) kayboluyordu | Sonuç soru açılmadan önce kayda "bekleyen koşu" olarak yazılıyor, sonraki açılışta işleniyor |
+| Afiş ilk yüklemede başarısız olursa bir daha denenmiyordu | Artan aralıklarla yeniden deneniyor |
+| Afiş geç yüklenince ekran içeriği afişin altında kalabiliyordu (`Table.pad()` yerleşimi yenilemiyor) | Yerleşim açıkça yenileniyor; içeriği afişle birlikte sığmayan ekranda afiş kapanıyor |
+| Karakter ekranındaki sabit yükseklikli panel afişin altında kalıyordu | O ekrandan afiş kaldırıldı |
+| Afiş, oyuncu listeye dokunurken birden belirebiliyordu | Yalnızca ekran açılırken ve o anda yüklüyse gösteriliyor; içerikle arasında boşluk var |
+| Afiş görünümü klavye odağını alıp geri tuşunu oyundan çalabilirdi | Afiş odak alamıyor; geri tuşu için yedek yol eklendi |
+| Çentikli ekranda afiş ortalanmıyordu; ekran genişliği değişince yeniden boyutlanmıyordu | İki yana eşit boşluk; genişlik değişince afiş yeniden kuruluyor |
+| `ads.properties` içine yanlış yazılmış bir reklam kimliği uygulamayı açılışta çökertirdi | Derleme sırasında biçim denetimi ve Türkçe hata iletisi |
+| `banners=OFF`, `interstitials=Kapalı` gibi yazımlar tanınmıyordu | Büyük/küçük harf ayrımı yok; geçersiz değer derlemeyi durdurur |
+| Cihaz saati geri alınarak günlük reklam sınırı sıfırlanabiliyordu | Sayaç yalnızca tarih ileri gidince sıfırlanıyor |
+| Uygulama uzun süre arka planda kalıp dönünce hemen geçiş reklamı çıkabiliyordu | 60 saniyeden uzun aradan sonra oturum baştan sayılıyor (ilk 2 dakika reklam yok) |
+| Ödüllü reklam hiç açılmazsa ya da kapanış bildirimi gelmezse oyun bekleyebilirdi | Zaman aşımı: oyun kendiliğinden devam ediyor, ödül verilmiyor |
+| Ödül bildirimi kapanış bildiriminden sonra gelirse ödül kaçabilirdi | Kapanıştan sonra kısa bir bekleme |
+| Onay (izin) sorgusu çevrimdışıyken bir kez başarısız olunca o oturumda reklam hiç yüklenmiyordu | 30 saniye, 2 dakika sonra ve uygulamaya dönüşte yeniden deneniyor |
+| Mağazadaki elmas kartı, bu oturumda hiç reklam yüklenmemişken de (çevrimdışı) "hazırlanıyor" diye görünüyordu | Kart yalnızca bu oturumda en az bir reklam yüklendiyse görünür |
+| Çok parmakla basılı tutarken reklam açılırsa basılı düğme "takılı" kalabiliyordu | Reklam istenince bütün dokunmalar iptal ediliyor |
+| Belgelerde yanlış ifadeler ("afiş yok", "internet kullanılmaz") | Düzeltildi |
+
+**Doğrulama:**
+
+| Kontrol | Sonuç |
+|---|---|
+| Bütün testler | 74/74 (`AdsTest` 8 → 12, `LogicFixesTest` 15 → 16) |
+| Sahte reklamlı masaüstü turu: mağazada art arda iki izleme (ekrandan çıkmadan), günlük ödül tekrarı, canlar bitince devam, reklam beklerken "Tekrar Dene"ye basma (etkisiz kalmalı), ikinci denemede reklam düğmesinin çıkmaması, bölüm sonu geçiş reklamı ve ek altın, Sonsuz Dünya'da diriliş | 6 ödüllü + 1 geçiş reklamı; hepsi beklenen sonucu verdi |
+| Afiş: mağazada açık, oyun ekranında kapalı; oturumun ilk afişli ekranında (Haritalar) görünmüyor, sonrakilerde görünüyor; içerik afişin üstünde bitiyor | tur günlüğü ve ekran görüntüleri |
+| Reklamsız masaüstü turu: 14 menü ekranı, bölüm 3 / 120 / 500, Sonsuz Dünya | üç bölüm tamamlandı, reklam düğmesi yok |
+| Android paketi: `minSdk 24`, `targetSdk 36`, 12 `.so`, 16 KB hizası, reklam kimliği izni yok, bölüm dosyaları depodakilerle aynı | geçti |
+
+**Yapılamayanlar ve bilinen sınırlar:**
+
+* Afiş ve öbür reklamlar gerçek bir telefonda hiç denenmedi. Masaüstündeki afiş yalnızca yer tutan bir şerittir; gerçek afişin boyutu, çentikli ekrandaki yeri ve geri tuşu davranışı cihazda görülmeli.
+* Ödüllü reklam açıkken oyuncu ana ekrana çıkıp oyuna uygulama simgesinden dönerse reklam ödülsüz kapanır (`launchMode="singleTask"`). Bu ayar açılış yolunu etkilediği için gerçek cihazda denenmeden değiştirilmedi.
+* Paket deneme reklam kimlikleriyle ve hata ayıklama anahtarıyla imzalıdır.
 
 ## Google Play'e hazırlık denetimi (21 Kasım)
 

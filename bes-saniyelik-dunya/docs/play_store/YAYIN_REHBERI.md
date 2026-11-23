@@ -7,11 +7,11 @@ Durum tarihi: 21 Kasım 2026. Kurallar her yıl değişir; yüklemeden önce Pla
 | Gereklilik | Durum | Nasıl doğrulandı |
 |---|---|---|
 | Hedef API: yeni uygulamalar 31 Ağustos 2026'dan beri Android 16 (API 36) hedeflemeli | Tamam: `targetSdk = 36`, `compileSdk = 36` | `aapt2 dump badging` |
-| Android App Bundle (.aab) | Tamam: `dist/5-saniyelik-dunya-1.0.0.aab` (53 MB) | — |
+| Android App Bundle (.aab) | Tamam: `dist/5-saniyelik-dunya-1.0.0.aab` (55 MB) | — |
 | 64-bit kütüphaneler | Tamam: arm64-v8a ve x86_64 var | `aapt2 dump badging` |
 | 16 KB bellek sayfası desteği | Tamam: 64-bit `.so` dosyalarında LOAD hizası 0x4000 | `readelf -lW`, `zipalign -c -P 16` |
 | İzinler | `VIBRATE` ve reklam kitaplığının ekledikleri (`INTERNET`, `ACCESS_NETWORK_STATE`, reklam ölçüm izinleri). `audience=child` iken reklam kimliği izni pakette yok | `aapt2 dump badging` |
-| Reklam | Google AdMob: isteğe bağlı ödüllü reklamlar ve seyrek geçiş reklamı. Ayrıntı ve sizin yapacaklarınız: `REKLAM_REHBERI.md` | birim testleri, masaüstü denemesi; **gerçek cihazda denenmedi** |
+| Reklam | Google AdMob: isteğe bağlı ödüllü reklamlar, seyrek geçiş reklamı ve yalnızca liste menülerinin altında afiş (oyun sırasında afiş yok). Ayrıntı ve sizin yapacaklarınız: `REKLAM_REHBERI.md` | birim testleri, masaüstü denemesi; **gerçek cihazda denenmedi** |
 | Satın alma / analiz | Yok | kaynak taraması |
 | En düşük Android sürümü | 7.0 (API 24): reklam kitaplığı gerektiriyor | `aapt2 dump badging` |
 | Uygulama içinde gizlilik politikası | Tamam: Ayarlar > Gizlilik Politikası | masaüstü ekran görüntüsü |
@@ -75,7 +75,7 @@ Reklam geliri için ayrıca AdMob hesabı, gerçek reklam kimlikleri, `app-ads.t
 
 ## 3. Bilinen riskler
 
-* Reklam kodu gerçek cihazda hiç çalıştırılmadı. Dahili testte deneme reklamlarıyla her reklam düğmesi denenmeli (bkz. `REKLAM_REHBERI.md` bölüm 4).
+* Reklam kodu gerçek cihazda hiç çalıştırılmadı. Dahili testte deneme reklamlarıyla her reklam düğmesi ve afişli beş menü ekranı denenmeli (bkz. `REKLAM_REHBERI.md` bölüm 4).
 
 * Gerçek cihaz testi yapılmadı (bu ortamda cihaz ve emülatör yok). Açılışta çökme, siyah ekran ya da çalışmayan dokunma, incelemede "bozuk işlev" gerekçesiyle ret sebebidir; dahili testte yakalanmalı.
 * libGDX 1.13.1 kullanılıyor. Android 16'da geri hareketi için yeni yol yerine eski tuş yolu açık bırakıldı; Google bu seçeneği "geçici" olarak tanımlıyor. İleride libGDX 1.14.1 ya da sonrasına geçmek gerekecek.

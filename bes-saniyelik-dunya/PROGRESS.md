@@ -37,7 +37,14 @@ Ayrıntılı sonuçlar: `TEST_REPORT.md`. Mimari: `ARCHITECTURE.md`. Kalan işle
 
 ### 21 Kasım — reklam
 
-* Google AdMob eklendi: isteğe bağlı ödüllü reklamlar (canlar bitince +2 can, bölüm sonu ek altın, mağazada elmas, günlük ödül tekrarı, Sonsuz Dünya'da diriliş) ve yalnızca bölüm tamamlanınca, seyrek gösterilen geçiş reklamı. Afiş ve açılış reklamı yok.
+* Google AdMob eklendi: isteğe bağlı ödüllü reklamlar (canlar bitince +2 can, bölüm sonu ek altın, mağazada elmas, günlük ödül tekrarı, Sonsuz Dünya'da diriliş) ve yalnızca bölüm tamamlanınca, seyrek gösterilen geçiş reklamı. Açılış reklamı yok (afiş sonradan, yalnızca liste menülerine eklendi; aşağıya bakın).
 * Güncel politikalar ve kitaplık kullanımı araştırıldı (3 araştırma + doğrulama); geçiş reklamının yeri buna göre "düğmeye basınca" yerine "sonuç ekranından önce" yapıldı; varsayılan kitle modu çocuklara uygun.
 * Kotlin 2.2.21'e, en düşük Android sürümü 7.0'a yükseltildi. Paket deneme reklam kimlikleriyle derleniyor; gerçek kimlikler `ads.properties` dosyasına yazılacak.
 * Gizlilik politikası, mağaza metinleri ve yayın rehberi reklamlı duruma göre güncellendi; `docs/play_store/REKLAM_REHBERI.md` eklendi.
+
+### 21 Kasım — afiş reklam ve reklam kodunun bağımsız incelemesi
+
+* Afiş (banner) eklendi: yalnızca içeriği kaydırılan beş menü ekranının altında (Haritalar, Mağaza, Görevler, Başarılar, Koleksiyon). Oyun sırasında afiş yok: oyun ekranın her yerine dokunularak oynandığı için yanlışlıkla tıklanırdı. `ads.properties` içinde `banners=off` ile kapatılır.
+* Reklam kodu iki bağımsız inceleyici ve bir doğrulayıcıyla incelendi (ilk deneme kullanım sınırına takılmıştı); bulunan 19 sorun düzeltildi: reklam açılırken ekran kilidi, mağaza elmas kartının kaybolması, Sonsuz Dünya sonucunun diriliş sorusu sırasında kaybolması, afişin yeniden yüklenmemesi ve içeriğin üstüne binmesi, geri tuşu odağı, yanlış yazılmış reklam kimliğinin derlemede yakalanması, saat geri alınarak günlük sınırın sıfırlanması ve diğerleri.
+* Değiştirilmeyen bilinen sınır: ödüllü reklam açıkken uygulama simgesinden dönülürse reklam ödülsüz kapanır (`launchMode="singleTask"`; gerçek cihazda denenmeden değiştirilmedi).
+* Afişin ve reklamların gerçek cihazdaki davranışı hâlâ denenmedi.

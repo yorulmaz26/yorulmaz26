@@ -20,16 +20,40 @@ val adsProps = Properties().apply {
     if (f.exists()) f.inputStream().use { load(it) }
 }
 fun adProp(key: String, def: String) = (adsProps.getProperty(key) ?: "").trim().ifEmpty { def }
+
+/** Kimlik biçimi yanlışsa derleme durur: hatalı uygulama kimliği uygulamayı her cihazda AÇILIŞTA çökertir. */
+fun adId(key: String, def: String, unit: Boolean): String {
+    val v = adProp(key, def)
+    val shape = if (unit) Regex("^ca-app-pub-\\d{16}/\\d{10}$") else Regex("^ca-app-pub-\\d{16}~\\d{10}$")
+    if (!shape.matches(v)) throw GradleException(
+        "ads.properties: '$key' değeri geçersiz: \"$v\". Beklenen biçim: " +
+            (if (unit) "ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN (reklam birimi kimliği, '/' ile)" else "ca-app-pub-XXXXXXXXXXXXXXXX~NNNNNNNNNN (uygulama kimliği, '~' ile)") +
+            ". Tırnak, boşluk ya da satır sonu açıklaması eklemeyin.")
+    return v
+}
+
+/** Aç/kapa ayarı: on / off (true, false, 1, 0, açık, kapalı da kabul edilir); başka değer derlemeyi durdurur. */
+fun adSwitch(key: String): Boolean = when (val v = adProp(key, "on").lowercase()) {
+    "on", "true", "1", "açık", "acik" -> true
+    "off", "false", "0", "kapalı", "kapali" -> false
+    else -> throw GradleException("ads.properties: '$key' yalnızca on ya da off olabilir (yazılan: \"$v\").")
+}
+
 val testAppId = "ca-app-pub-3940256099942544~3347511713"
-val admobAppId = adProp("admobAppId", testAppId)
-val rewardedUnitId = adProp("rewardedUnitId", "ca-app-pub-3940256099942544/5224354917")
-val interstitialUnitId = adProp("interstitialUnitId", "ca-app-pub-3940256099942544/1033173712")
+val admobAppId = adId("admobAppId", testAppId, unit = false)
+val rewardedUnitId = adId("rewardedUnitId", "ca-app-pub-3940256099942544/5224354917", unit = true)
+val interstitialUnitId = adId("interstitialUnitId", "ca-app-pub-3940256099942544/1033173712", unit = true)
+val bannerUnitId = adId("bannerUnitId", "ca-app-pub-3940256099942544/9214589741", unit = true)
+/** "off": afiş (banner) reklamlar tümüyle kapalı. */
+val adsBanners = adSwitch("banners")
 /** "child": kitle çocukları da kapsar (varsayılan, güvenli); "general": yalnızca 13 yaş üstü. */
-val adsChildAudience = adProp("audience", "child") != "general"
+val adsAudience = adProp("audience", "child").lowercase()
+if (adsAudience != "child" && adsAudience != "general") throw GradleException("ads.properties: 'audience' yalnızca child ya da general olabilir (yazılan: \"$adsAudience\").")
+val adsChildAudience = adsAudience == "child"
 val adsTestDevices = adProp("testDeviceIds", "")
 /** "off": geçiş reklamları tümüyle kapalı (yalnızca isteğe bağlı ödüllü reklamlar kalır). */
-val adsInterstitials = adProp("interstitials", "on") != "off"
-val usingTestAds = listOf(admobAppId, rewardedUnitId, interstitialUnitId).any { it.startsWith("ca-app-pub-3940256099942544") }
+val adsInterstitials = adSwitch("interstitials")
+val usingTestAds = listOf(admobAppId, rewardedUnitId, interstitialUnitId, bannerUnitId).any { it.startsWith("ca-app-pub-3940256099942544") }
 
 android {
     namespace = "com.besaniyelik.dunya"
@@ -47,6 +71,8 @@ android {
         buildConfigField("boolean", "ADS_CHILD_AUDIENCE", adsChildAudience.toString())
         buildConfigField("String", "ADS_TEST_DEVICES", "\"$adsTestDevices\"")
         buildConfigField("boolean", "ADS_INTERSTITIALS", adsInterstitials.toString())
+        buildConfigField("String", "AD_BANNER_UNIT", "\"$bannerUnitId\"")
+        buildConfigField("boolean", "ADS_BANNERS", adsBanners.toString())
     }
     buildFeatures { buildConfig = true }
 
@@ -127,6 +153,6 @@ tasks.named("preBuild") { dependsOn(copyAndroidNatives) }
 tasks.matching { it.name == "bundleRelease" || it.name == "assembleRelease" }.configureEach {
     doFirst {
         if (usingTestAds) logger.warn("UYARI: ads.properties içinde gerçek AdMob kimlikleri yok; bu paket yalnızca DENEME reklamı gösterir (gelir oluşmaz).")
-        logger.lifecycle("Reklam kitlesi: " + (if (adsChildAudience) "child (çocukları da kapsar; kişiselleştirilmemiş, G içerik)" else "general (13 yaş üstü; içerik sınırı PG)") + "; geçiş reklamları: " + (if (adsInterstitials) "açık" else "kapalı"))
+        logger.lifecycle("Reklam kitlesi: " + (if (adsChildAudience) "child (çocukları da kapsar; kişiselleştirilmemiş, G içerik)" else "general (13 yaş üstü; içerik sınırı PG)") + "; geçiş reklamları: " + (if (adsInterstitials) "açık" else "kapalı") + "; afişler: " + (if (adsBanners) "açık" else "kapalı"))
     }
 }

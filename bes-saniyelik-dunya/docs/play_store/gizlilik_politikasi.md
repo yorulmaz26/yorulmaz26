@@ -37,7 +37,7 @@ Gerçek parayla satın alma yoktur. Altın ve elmaslar oynayarak ya da isteğe b
 
 ## İzinler
 
-Titreşim (Ayarlar ekranından kapatılabilir); reklamlar için internet erişimi ve ağ durumu.
+Titreşim (Ayarlar ekranından kapatılabilir); reklam kitaplığı için internet erişimi, ağ durumu, reklam ölçümü ve arka plan işleri.
 
 ## Çocuklar
 
@@ -84,7 +84,7 @@ This data is not sent to the developer of the game; it is processed by Google fo
 
 **Save file:** Your progress (unlocked levels, stars, settings) is stored only on your device. If Android backup is enabled on your device, this file may be included in the backup of your own Google account; the developer has no access to that backup. You can delete the save with the "İlerlemeyi Sıfırla" (Reset progress) button on the Settings screen or by uninstalling the app.
 
-**Permissions:** Vibration (can be turned off in Settings); internet access and network state for ads.
+**Permissions:** Vibration (can be turned off in Settings); for the ads library: internet access, network state, ad measurement and background work.
 
 **Children:** The game does not knowingly ask children for personal information.
 

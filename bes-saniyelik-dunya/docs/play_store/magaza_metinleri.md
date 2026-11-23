@@ -16,7 +16,7 @@ Sınırlar: başlık en çok 30, kısa açıklama en çok 80, tam açıklama en 
 Her 5 saniyede kurallar değişir! 500 bölümlük renkli koş-zıpla macerası.
 ```
 
-**Tam açıklama** (1256 karakter)
+**Tam açıklama** (1290 karakter)
 
 ```
 5 Saniyelik Dünya, tek dokunuşla oynanan renkli bir koşu ve platform oyunudur. Karakterin kendiliğinden koşar; sen dokunarak zıplarsın. Ama dikkat: dünyanın kuralları her 5 saniyede değişir!
@@ -34,7 +34,7 @@ Bir an yer çekimi ters döner ve tavanda koşarsın. Sonra zaman yavaşlar, zem
 - Kontrol noktaları ve 3 can: hata yapınca bölümün en başına dönmezsin
 
 İNTERNETSİZ DE OYNANIR
-Oyunun tamamı çevrimdışı oynanabilir. Gerçek parayla satın alma yoktur. Reklamlar seni yormaz: ödüllü reklamlar yalnızca sen istersen açılır (ek can, ek altın, elmas), bölüm aralarındaki reklamlar ise seyrek gösterilir.
+Oyunun tamamı çevrimdışı oynanabilir. Gerçek parayla satın alma yoktur. Reklamlar seni yormaz: ödüllü reklamlar yalnızca sen istersen açılır (ek can, ek altın, elmas), bölüm aralarındaki reklamlar seyrek gösterilir, oyun sırasında ekranda reklam durmaz.
 
 NASIL OYNANIR
 Dokun: zıpla. Basılı tut: daha yükseğe zıpla. Dikenlerden ve testerelerden kaç, yıldızları topla, kapıya ulaş.
@@ -48,7 +48,7 @@ Dokun: zıpla. Basılı tut: daha yükseğe zıpla. Dikenlerden ve testerelerden
 The rules change every 5 seconds! A colourful 500-level run-and-jump game.
 ```
 
-**Full description** (1286 characters)
+**Full description** (1323 characters)
 
 ```
 5 Saniyelik Dünya (5-Second World) is a colourful one-touch runner and platformer. Your character runs on its own; you tap to jump. But watch out: the rules of the world change every 5 seconds!
@@ -66,7 +66,7 @@ FEATURES
 - Checkpoints and 3 hearts: a mistake does not send you back to the start of the level
 
 PLAYABLE OFFLINE
-The whole game can be played offline. There are no real-money purchases. Ads stay out of your way: rewarded ads open only when you choose (extra hearts, extra coins, gems), and ads between levels are shown rarely.
+The whole game can be played offline. There are no real-money purchases. Ads stay out of your way: rewarded ads open only when you choose (extra hearts, extra coins, gems), ads between levels are shown rarely, and no ad sits on screen while you play.
 
 HOW TO PLAY
 Tap: jump. Hold: jump higher. Avoid spikes and saws, collect the stars, reach the door.

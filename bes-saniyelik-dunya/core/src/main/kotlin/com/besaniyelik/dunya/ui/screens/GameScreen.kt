@@ -413,7 +413,14 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         }
     }
 
-    override fun pause() { if (started && !paused && !finished) openPauseMenu() }
+    override fun pause() {
+        // "Reklamla devam" sorusu açıkken uygulama arka plana alınırsa (ya da reklam açılırsa) koşu kaybolmasın:
+        // sonuç kayıt dosyasında bekletilir; devam edilirse bırakılır, edilmezse işlenir.
+        if (endless && sim.status == SimStatus.GAME_OVER && !endlessCommitted) game.profile.holdEndless(endlessResult())
+        if (started && !paused && !finished) openPauseMenu()
+    }
+
+    private fun endlessResult() = EndlessResult(score(), sim.tick / 60f, sim.distance, sim.coinValue, sim.starsCollected, jumps, sim.rulesChanged, sim.powerupsUsed)
 
     override fun onBack() {
         // başlangıç kartı açıkken geri tuşu bölüm seçimine döner (duraklatma menüsü henüz açılamaz)
@@ -504,6 +511,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
     private var endlessCommitted = false
 
     private fun resumeAfterGameOver(hearts: Int) {
+        if (endless) game.profile.releaseEndless() // koşu sürüyor: bekletilen sonuç geçersiz
         finished = false; overShown = false
         sim.continueAfterGameOver(hearts); refreshHearts(); readyHold(1.2f)
     }
@@ -558,7 +566,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
         endlessCommitted = true
         run {
             val sc = score()
-            val res = game.profile.onEndlessResult(EndlessResult(sc, sim.tick / 60f, sim.distance, sim.coinValue, sim.starsCollected, jumps, sim.rulesChanged, sim.powerupsUsed))
+            val res = game.profile.onEndlessResult(endlessResult())
             dialog(resultW, resultH) { p, close ->
                 p.top()
                 p.add(kit.label(if (res.newRecord) "YENİ REKOR!" else "Oyun Bitti", a.f48, if (res.newRecord) Palette.ORANGE else Palette.INK)).row()
@@ -585,7 +593,7 @@ class GameScreen(game: BesSaniyelikDunya, private val level: LevelData?, private
     private fun showEndlessResultSilently() {
         if (endlessCommitted) return
         endlessCommitted = true
-        game.profile.onEndlessResult(EndlessResult(score(), sim.tick / 60f, sim.distance, sim.coinValue, sim.starsCollected, jumps, sim.rulesChanged, sim.powerupsUsed))
+        game.profile.onEndlessResult(endlessResult())
     }
 
     private var failCommitted = true

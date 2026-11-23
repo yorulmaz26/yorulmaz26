@@ -18,13 +18,21 @@ Amaç: oyuncu reklamı kendisi istesin; istemediği reklamı çok seyrek görsü
 
 Reklam yüklenmemişse (çevrimdışı, reklam yok) düğmeler hiç görünmez; reklam yarıda kapatılırsa ödül verilmez.
 
-**Geçiş reklamı (oyuncunun istemeden gördüğü tek reklam):**
+**Geçiş reklamı (oyuncunun istemeden gördüğü tek tam ekran reklam):**
 
 * Yalnızca bir bölüm **tamamlanınca**, kutlama bittikten sonra ve sonuç ekranı açılmadan önce.
 * En erken 10 bölüm tamamlandıktan sonra; en çok 3 bölümde bir; iki reklam arasında en az 3 dakika; oturumun ilk 2 dakikasında yok; oyuncu ödüllü reklam izlediyse 3 dakika boyunca yok.
 * Oyun sırasında, açılışta, çıkışta, başarısız denemeden sonra, bir düğmeye basılınca ve Sonsuz Dünya'da **asla** gösterilmez.
 
-Afiş (banner) ve açılış reklamı yoktur. Sınırlar `core/.../ads/Ads.kt` içindeki sabitlerdir (`AdDirector`); değiştirmek tek satırdır. Geçiş reklamlarını tümüyle kapatmak için `ads.properties` içinde `interstitials=off` yazmanız yeterlidir; ödüllü reklamlar etkilenmez.
+**Afiş (banner) reklam:**
+
+* Yalnızca içeriği kaydırılan beş menü ekranının alt kenarında: Haritalar, Mağaza, Görevler, Başarılar, Koleksiyon. Afiş görünürken ekranın içeriği afişin üstünde biter ve arada küçük bir boşluk kalır. İçeriği afişle birlikte sığmayan bir ekranda afiş kendiliğinden kapanır.
+* Afiş bir ekranın ortasında birden belirmez: yalnızca ekran açılırken, o anda yüklüyse gösterilir (oyuncu listeye dokunurken altına reklam gelmesin). Bu yüzden oturumun ilk afişli ekranında çoğu zaman görünmez, sonrakilerde görünür.
+* **Oyun sırasında hiç gösterilmez.** Oyun ekranın her yerine dokunularak oynandığı için oyun içi afişe yanlışlıkla basılır; bu hem oyuncuyu rahatsız eder hem de AdMob'un "yanlışlıkla tıklama" kuralını çiğner. Ana menü, bölüm seçimi, ayarlar gibi altı düğmelerle dolu ekranlarda da yoktur.
+* Bu ekranlarda oyuncu az vakit geçirdiği için afişten beklenen gelir düşüktür; asıl gelir ödüllü reklamlardan gelir.
+* Kapatmak için `ads.properties` içinde `banners=off` yazın.
+
+Açılış reklamı yoktur. Sınırlar `core/.../ads/Ads.kt` içindeki sabitlerdir (`AdDirector`); değiştirmek tek satırdır. Geçiş reklamlarını tümüyle kapatmak için `ads.properties` içinde `interstitials=off` yazmanız yeterlidir; ödüllü reklamlar etkilenmez.
 
 Bölüm sonucu (yıldızlar, altın, açılan bölüm) reklamdan önce kaydedilir; reklam sırasında uygulama kapansa da ilerleme kaybolmaz.
 
@@ -34,13 +42,14 @@ Bölüm sonucu (yıldızlar, altın, açılan bölüm) reklamdan önce kaydedili
 
 1. admob.google.com üzerinden hesap açın (18 yaş, kendi adınız ve posta adresiniz kimlikteki gibi). AdMob bir ödeme (AdSense) hesabına bağlanır.
 2. Uygulamalar > Uygulama ekle > Android > "henüz mağazada değil" > ad: 5 Saniyelik Dünya.
-3. Reklam birimleri: bir **Ödüllü** ve bir **Geçiş** birimi oluşturun.
+3. Reklam birimleri: bir **Ödüllü**, bir **Geçiş** ve bir **Banner** birimi oluşturun.
 4. Proje kökündeki `ads.properties` dosyasına yazın:
 
 ```properties
 admobAppId=ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
 rewardedUnitId=ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
 interstitialUnitId=ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+bannerUnitId=ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
 audience=child
 ```
 
@@ -104,8 +113,9 @@ Türkiye'deki oyunculara Google bir onay formu göstermez. KVKK açısından aç
 
 ## 4. Doğrulananlar ve doğrulanamayanlar
 
-* Doğrulandı: reklam kuralları (8 birim testi), masaüstünde sahte reklamla bütün akışlar (5 ödüllü yerleşim ve bölüm sonu geçiş reklamı), Android paketinin gerçek kitaplıkla derlenmesi (R8 küçültmesi dahil), paketteki izinler, 16 KB hizası.
-* **Bağımsız kod incelemesi yapılamadı:** reklam kodunu inceleyecek iki inceleyici kullanım sınırına takılıp sonuç veremedi. Kodu kendim satır satır gözden geçirdim; bir hata buldum ve düzelttim (bölüm sonucu reklamdan sonra kaydediliyordu).
-* **Doğrulanamadı: gerçek bir telefonda reklamın yüklenmesi, gösterilmesi, kapanması ve ödülün verilmesi.** Bu ortamda cihaz yok. İlk denemeyi deneme kimlikleriyle, dahili test kanalında yapın: her ödüllü düğme, reklamı yarıda kapatma, reklam sırasında ana ekrana çıkıp dönme, uçak modu.
+* Doğrulandı: reklam kuralları (12 birim testi), masaüstünde sahte reklamla bütün akışlar (5 ödüllü yerleşim, bölüm sonu geçiş reklamı, afişin menüde açılıp oyun ekranında kapanması), Android paketinin gerçek kitaplıkla derlenmesi (R8 küçültmesi dahil), paketteki izinler, 16 KB hizası.
+* **Bağımsız kod incelemesi yapıldı:** ilk deneme kullanım sınırına takılmıştı; ikinci denemede iki inceleyici ve bir doğrulayıcı reklam kodunun tamamını inceledi. Bulunan 19 sorunun hepsi düzeltildi. Başlıcaları: reklam açılırken ekrandaki öbür düğmelere basılabiliyordu (artık ekran kilitleniyor); mağazadaki elmas kartı her izlemeden sonra kayboluyordu; Sonsuz Dünya'da "reklam izle" sorusu açıkken uygulama kapanırsa koşunun sonucu kayboluyordu; afiş bir kez yüklenemezse bir daha denenmiyordu; afiş geç yüklenince ekran içeriği altında kalabilirdi; afiş geri tuşunu oyundan çalabilirdi; `ads.properties` içine yanlış yazılmış bir kimlik uygulamayı açılışta çökertirdi (artık derleme sırasında Türkçe hata verir); cihaz saatini geri alarak günlük reklam sınırı sıfırlanabiliyordu.
+* **Bilinen sınır:** ödüllü reklam açıkken oyuncu ana ekrana çıkıp oyuna uygulama simgesinden dönerse reklam kapanır ve ödül verilmez (son uygulamalar listesinden dönerse sorun olmaz). Düzeltmesi uygulamanın açılış ayarını değiştirmeyi gerektiriyor; bu ayar gerçek cihazda denenmeden değiştirilmedi.
+* **Doğrulanamadı: gerçek bir telefonda reklamın yüklenmesi, gösterilmesi, kapanması ve ödülün verilmesi.** Bu ortamda cihaz yok. İlk denemeyi deneme kimlikleriyle, dahili test kanalında yapın: her ödüllü düğme, reklamı yarıda kapatma, reklam sırasında ana ekrana çıkıp dönme, uçak modu; afişin beş menü ekranında içeriğin üstüne binmediği, çentikli ekranda ortalandığı ve afiş görünürken geri tuşunun çalıştığı.
 * Politika bilgileri Google'ın yardım sayfalarının arama sonuçlarındaki alıntılarına dayanır; sayfaların kendisi bu ortamdan açılamadı. Reklam kitaplığının arayüzü ise indirilen kitaplıktan ve Google'ın resmi örnek kodundan doğrudan okundu.
 * Gelir tahmini verilemez: Google bir rakam yayımlamıyor; ülkeye, mevsime ve oyuncu sayısına göre değişir. İlk haftalarda gelir düşük ve dalgalı olur.

@@ -163,6 +163,88 @@ class AdsTest {
         var skipped = 0; d.showRewarded(onEarned = { fail("reklam yokken ödül verilemez") }, onSkipped = { skipped++ }); assertEquals(1, skipped)
     }
 
+    @DisplayName("Cihaz tarihi geri alınınca günlük sınır sıfırlanmaz; uzun süre arka planda kalınca yeni oturum başlar")
+    @Test fun clockAndSession() {
+        val e = Env()
+        repeat(AdDirector.GEM_ADS_PER_DAY) { e.director.grantGemAd() }
+        e.clock.day--                                   // tarih bir gün geri alındı
+        assertEquals(0, e.director.gemAdsLeft(), "tarihi geri almak hak kazandırmaz")
+        e.clock.day++                                   // yeniden bugüne
+        assertEquals(0, e.director.gemAdsLeft(), "aynı güne dönmek de sıfırlamaz")
+        e.clock.day++                                   // gerçekten yeni gün
+        assertEquals(AdDirector.GEM_ADS_PER_DAY, e.director.gemAdsLeft())
+        // oturum: 3 bölüm tamamlanmış, uygulama uzun süre arka planda kalmış
+        e.completeLevels(12); e.minutes(10.0)
+        repeat(3) { e.director.onBreakEarned() }
+        e.director.onAppPaused(); e.minutes(30.0); e.director.onAppResumed()
+        assertFalse(e.breakShowsAd(), "uzun aradan dönünce ilk 2 dakika geçiş reklamı gösterilmez")
+        e.minutes(2.5)
+        assertTrue(e.breakShowsAd())
+        // kısa süreli arka plan (ör. bildirime bakmak) oturumu yenilemez
+        repeat(3) { e.director.onBreakEarned() }; e.minutes(4.0)
+        e.director.onAppPaused(); e.minutes(0.2); e.director.onAppResumed()
+        assertTrue(e.breakShowsAd())
+    }
+
+    @DisplayName("Bölüm sonu ek altını ve mağaza kartı: reklamsız platformda kart yok, reklam yüklenirken kart durur")
+    @Test fun bonusCoinsAndGemCard() {
+        val e = Env()
+        val coins = e.profile.data.coins
+        e.director.grantBonusCoins(31); e.director.grantBonusCoins(0); e.director.grantBonusCoins(-5)
+        assertEquals(coins + 31, e.profile.data.coins)
+        assertTrue(e.director.rewardedReady)            // bu oturumda bir reklam yüklendi
+        e.ads.rewarded = false                          // izlendi; yenisi yükleniyor
+        assertTrue(e.director.gemCardVisible(), "reklam yüklenirken kart görünür kalır (düğme kapalı)")
+        assertFalse(e.director.gemAdAvailable())
+        // hiç reklam yüklenemeyen oturum (ör. çevrimdışı): kart hiç gösterilmez
+        val offline = AdDirector(TestAds(rewarded = false), e.profile)
+        assertFalse(offline.gemCardVisible(), "reklam hiç yüklenmediyse boş vaat gösterilmez")
+        val none = AdDirector(AdService.NONE, e.profile)
+        assertFalse(none.supported); assertFalse(none.gemCardVisible())
+        assertEquals(0, none.bannerHeightPx, "reklamsız platformda afiş yer kaplamaz")
+    }
+
+    @DisplayName("Sonsuz Dünya: işlenmeden kalan koşu kayıtta bekler, sonraki açılışta işlenir; devam edilirse bırakılır")
+    @Test fun pendingEndlessRun() {
+        val dir = Files.createTempDirectory("bekleyen").toFile()
+        val clock = FixedClock(20000)
+        val p1 = ProfileService(SaveManager(FileSaveStorage(dir)), clock)
+        val run = EndlessResult(600, 60f, 300f, 40, 2, 55, 9, 0)
+        p1.holdEndless(run); p1.save()                  // uygulama arka plana alındı, sonra süreç öldü
+        assertEquals(0, p1.data.stats.endlessRuns)
+        val p2 = ProfileService(SaveManager(FileSaveStorage(dir)), clock)
+        assertEquals(1, p2.data.stats.endlessRuns, "yarım kalan koşu açılışta işlenmeli")
+        assertEquals(600, p2.data.stats.endlessBestScore); assertNull(p2.data.pendingEndless)
+        val p3 = ProfileService(SaveManager(FileSaveStorage(dir)), clock)
+        assertEquals(1, p3.data.stats.endlessRuns, "ikinci kez işlenmemeli")
+        // reklamla devam edilirse bekleyen sonuç bırakılır
+        p3.holdEndless(run); p3.releaseEndless(); p3.save()
+        assertEquals(1, ProfileService(SaveManager(FileSaveStorage(dir)), clock).data.stats.endlessRuns)
+        // normal bitiş: sonuç işlenince bekleyen kayıt temizlenir
+        p3.holdEndless(run); p3.onEndlessResult(run)
+        assertNull(p3.data.pendingEndless); assertEquals(2, p3.data.stats.endlessRuns)
+    }
+
+    @DisplayName("Reklam alanları olmayan eski kayıt dosyası sorunsuz açılır")
+    @Test fun oldSaveWithoutAdFields() {
+        val dir = Files.createTempDirectory("eskikayit").toFile()
+        val clock = FixedClock(20000)
+        val p1 = ProfileService(SaveManager(FileSaveStorage(dir)), clock)
+        p1.data.coins = 777; p1.save()
+        // kayıt dosyasından reklamla ilgili alanları çıkar (eski sürümün yazdığı dosya gibi) ve sağlama toplamını yenile
+        val file = java.io.File(dir, SaveManager.MAIN)
+        val env = kotlinx.serialization.json.Json.parseToJsonElement(file.readText()) as kotlinx.serialization.json.JsonObject
+        val body = kotlinx.serialization.json.Json.parseToJsonElement((env["data"] as kotlinx.serialization.json.JsonPrimitive).content) as kotlinx.serialization.json.JsonObject
+        assertTrue("ads" in body && "pendingEndless" in body)
+        val old = kotlinx.serialization.json.JsonObject(body.filterKeys { it != "ads" && it != "pendingEndless" }).toString()
+        val rebuilt = kotlinx.serialization.json.JsonObject(mapOf(
+            "v" to env["v"]!!, "crc" to kotlinx.serialization.json.JsonPrimitive(SaveManager.checksum(old)), "data" to kotlinx.serialization.json.JsonPrimitive(old)))
+        file.writeText(rebuilt.toString()); java.io.File(dir, SaveManager.BACKUP).delete()
+        val p2 = ProfileService(SaveManager(FileSaveStorage(dir)), clock)
+        assertEquals(777, p2.data.coins, "eski kayıt yüklenmeli (yedeğe ya da sıfır kayda düşmemeli)")
+        assertEquals(-1, p2.data.ads.day); assertEquals(0, p2.data.ads.gemAdsToday); assertNull(p2.data.pendingEndless)
+    }
+
     @DisplayName("Kayıt: reklam sayaçları kalıcıdır; reklamsız sürümün kaydı sorunsuz açılır")
     @Test fun adStatePersists() {
         val dir = Files.createTempDirectory("reklamkayit").toFile()

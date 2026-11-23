@@ -75,8 +75,8 @@ class BesSaniyelikDunya(val platform: Platform = Platform.NONE) : Game() {
 
     fun vibrate(ms: Int) { if (profile.data.settings.vibration) platform.vibrate(ms) }
 
-    override fun pause() { super.pause(); profile.save(); audio.pause() }
-    override fun resume() { super.resume(); audio.resume() }
+    override fun pause() { super.pause(); ads.onAppPaused(); profile.save(); audio.pause() }
+    override fun resume() { super.resume(); ads.onAppResumed(); audio.resume() }
 
     override fun dispose() {
         screen?.dispose()

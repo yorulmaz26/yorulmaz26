@@ -106,22 +106,40 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
 }
 
 class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
+    override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
+    override val watchesAdReadiness get() = true
+    private var gemButton: com.besaniyelik.dunya.ui.UiButton? = null
+    private var gemStatus: Label? = null
+    /** Reklam yüklenince düğme açılır (liste yeniden kurulmaz: kaydırma konumu bozulmaz). */
+    override fun onAdReadyChanged(ready: Boolean) {
+        if (gemButton == null) { if (ready && game.ads.gemCardVisible()) rebuild(); return } // kart ilk kez beliriyor
+        gemButton?.enabled = ready
+        gemStatus?.setText(if (ready) "" else "Reklam hazırlanıyor...")
+    }
     override fun build() {
         val d = game.profile.data
         root.add(header("Mağaza")).growX().padTop(20f).row()
         val list = Table()
-        // İsteğe bağlı ödüllü reklam: günde sınırlı sayıda ücretsiz elmas (reklam hazır değilse kart gösterilmez)
-        if (game.ads.gemAdAvailable()) {
+        // İsteğe bağlı ödüllü reklam: günde sınırlı sayıda ücretsiz elmas. Kart, günlük hak bitene kadar durur; düğme
+        // yalnızca reklam yüklüyken açıktır (reklam tek kullanımlıktır, izlendikten sonra yenisi birkaç saniyede yüklenir).
+        gemButton = null; gemStatus = null
+        if (game.ads.gemCardVisible()) {
+            val ready = adReadyNow()
             val free = Table().apply { background = kit.patch("panel_yellow"); pad(14f, 22f, 18f, 22f) }
             free.add(Image(a.ui("b_gem"))).size(72f).padRight(16f)
             val txt = Table()
             txt.add(kit.label("Ücretsiz Elmas", a.f28, Palette.INK, Align.left)).left().row()
-            txt.add(kit.label("Kısa bir reklam izle, ${AdDirector.GEMS_PER_AD} elmas kazan. Bugün kalan: ${game.ads.gemAdsLeft()}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(430f).left()
+            txt.add(kit.label("Kısa bir reklam izle, ${AdDirector.GEMS_PER_AD} elmas kazan. Bugün kalan: ${game.ads.gemAdsLeft()}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(400f).left().row()
+            val status = kit.label(if (ready) "" else "Reklam hazırlanıyor...", a.f22, Palette.INK_SOFT, Align.left)
+            txt.add(status).left()
             free.add(txt).padRight(16f)
-            free.add(kit.button("Reklam izle: +${AdDirector.GEMS_PER_AD} elmas", "turq", "g_play", a.f28) {
+            val btn = kit.button("Reklam izle: +${AdDirector.GEMS_PER_AD} elmas", "turq", "g_play", a.f28) {
                 watchAd { val g = game.ads.grantGemAd(); if (g > 0) { game.audio.play(Sfx.REWARD); toast("+$g elmas", "b_gem") }; rebuild() }
-            }).width(330f).height(92f)
+            }
+            btn.enabled = ready
+            free.add(btn).width(380f).height(92f)
             list.add(free).padTop(6f).padBottom(10f).row()
+            gemButton = btn; gemStatus = status
         }
         list.add(kit.label("Güçlendirmeler", a.f36, Palette.INK)).padTop(6f).row()
         list.add(kit.label("Bölüm başında en fazla 2 tane seçebilirsin. Hepsi oynayarak kazanılır; hiçbir bölüm güçlendirme gerektirmez.", a.f22, Palette.INK_SOFT, wrap = true)).width(620f).row()
@@ -158,6 +176,7 @@ class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
 }
 
 class MissionsScreen(game: BesSaniyelikDunya, private var weekly: Boolean) : BaseScreen(game) {
+    override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
     override fun build() {
         game.profile.refreshDaily()
         val d = game.profile.data
@@ -195,6 +214,7 @@ class MissionsScreen(game: BesSaniyelikDunya, private var weekly: Boolean) : Bas
 }
 
 class AchievementsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
+    override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
     override fun build() {
         val d = game.profile.data
         root.add(header("Başarılar")).growX().padTop(20f).row()
@@ -224,6 +244,7 @@ class AchievementsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
 }
 
 class CollectionScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
+    override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
     override fun build() {
         val d = game.profile.data
         root.add(header("Koleksiyon")).growX().padTop(20f).row()
@@ -322,7 +343,7 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         side.add(kit.button("Gizlilik Politikası", "white", "g_info", a.f28, Palette.INK) { showPrivacy() }).width(420f).height(88f).padTop(14f).row()
         // Reklam onayı gereken bölgelerde (ör. AB) oyuncu tercihini buradan değiştirebilir
         if (game.ads.privacyOptionsRequired) side.add(kit.button("Reklam Tercihleri", "white", "g_info", a.f28, Palette.INK) { game.ads.showPrivacyOptions() }).width(420f).height(88f).padTop(10f).row()
-        side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternet gerekmez, ilerlemen cihazında güvenle saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(14f)
+        side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternetsiz de oynanır (reklamlar internet kullanır); ilerlemen cihazında saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(14f)
         val body = Table()
         body.add(p).width(640f).padRight(24f)
         body.add(side).top()
@@ -359,7 +380,7 @@ SATIN ALMA: Gerçek parayla satın alma yoktur. Altın ve elmaslar oynayarak ya 
 
 KAYIT DOSYASI: İlerlemeniz (açılan bölümler, yıldızlar, ayarlar) yalnızca cihazınızda saklanır. Cihazınızda Android yedeklemesi açıksa bu dosya kendi Google hesabınızın yedeğine dahil edilebilir; geliştirici bu yedeğe erişemez. Kaydı Ayarlar ekranındaki İlerlemeyi Sıfırla düğmesiyle ya da uygulamayı kaldırarak silebilirsiniz.
 
-İZİNLER: Titreşim (Ayarlar ekranından kapatılabilir); reklamlar için internet erişimi ve ağ durumu.
+İZİNLER: Titreşim (Ayarlar ekranından kapatılabilir); reklam kitaplığı için internet erişimi, ağ durumu, reklam ölçümü ve arka plan işleri.
 
 ÇOCUKLAR: Oyun çocuklardan bilerek kişisel bilgi istemez.
 
@@ -370,6 +391,9 @@ DEĞİŞİKLİKLER: Bu politika değişirse güncel metin bu ekranda ve mağaza 
 Son güncelleme: 21 Kasım 2026"""
 
 class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean = false) : BaseScreen(game) {
+    override val watchesAdReadiness get() = true
+    /** Ödül alındıktan sonra reklam hazır olursa "ödülü tekrar al" düğmesi belirir. */
+    override fun onAdReadyChanged(ready: Boolean) { if (!game.profile.loginAvailable()) rebuild() }
     override fun build() {
         val d = game.profile.data
         root.add(header("Günlük Ödül", back = { onBack() })).growX().padTop(20f).row()
@@ -399,7 +423,7 @@ class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean
             root.add(kit.label("Bugünkü ödülünü aldın. Yarın yine gel!", a.f28, Palette.INK)).padTop(8f).row()
             val row = Table()
             // İsteğe bağlı ödüllü reklam: bugünkü ödülü bir kez daha verir (günde bir kez); ödül düğmenin üstünde açıkça yazar
-            val canDouble = game.ads.loginDoubleAvailable()
+            val canDouble = adReadyNow() && game.ads.loginDoubleAvailable()
             if (canDouble) {
                 root.add(kit.label("Reklamı izlersen bugünkü ödülü bir kez daha alırsın: ${game.ads.todaysLoginReward().describe()}", a.f22, Palette.INK)).padTop(2f).row()
                 row.add(kit.button("Reklam izle: ödülü tekrar al", "turq", "g_play", a.f28) {

@@ -47,4 +47,25 @@ class AndroidLauncher : AndroidApplication() {
         super.onResume()
         androidAds?.onHostResumed()
     }
+
+    override fun onPause() {
+        androidAds?.onHostPaused()
+        super.onPause()
+    }
+
+    /**
+     * Güvenlik ağı: geri tuşu libGDX'e ulaşmazsa (ör. odak afiş reklamdayken) uygulamadan çıkmak yerine oyuna
+     * iletilir; oyun kendi geri davranışını uygular (menüye dön, duraklat).
+     */
+    @Deprecated("Android 13+ için yeni geri API'si var; manifestte eski davranış açık bırakıldı")
+    override fun onBackPressed() {
+        val app = com.badlogic.gdx.Gdx.app
+        if (app == null) { @Suppress("DEPRECATION") super.onBackPressed(); return }
+        app.postRunnable { com.badlogic.gdx.Gdx.input?.inputProcessor?.keyDown(com.badlogic.gdx.Input.Keys.BACK) }
+    }
+
+    override fun onDestroy() {
+        androidAds?.onHostDestroyed()
+        super.onDestroy()
+    }
 }

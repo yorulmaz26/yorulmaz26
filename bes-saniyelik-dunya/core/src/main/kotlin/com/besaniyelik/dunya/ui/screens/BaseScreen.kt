@@ -109,7 +109,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         input.addProcessor(stage)
         input.addProcessor(object : InputAdapter() {
             override fun keyDown(keycode: Int): Boolean {
-                if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) { onBack(); return true }
+                if (keycode == Input.Keys.BACK || keycode == Input.Keys.ESCAPE) { if (!adBusy) onBack(); return true }
                 return false
             }
         })
@@ -120,6 +120,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     open fun onBack() { game.go(MainMenuScreen(game)) }
 
     override fun show() {
+        game.ads.setBanner(bannerAllowed)
         Gdx.input.inputProcessor = input
         build()
         stage.addActor(fadeImg)
@@ -134,8 +135,29 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
 
     fun fadeOut(done: () -> Unit) { fadeDir = 1f; fadeDone = done; Gdx.input.inputProcessor = null }
 
+    /** Ödüllü reklam düğmesi olan menü ekranları true döndürür: reklamın hazır olma durumu değişince haber verilir. */
+    open val watchesAdReadiness: Boolean = false
+    private var adReadyKnown: Boolean? = null
+    private var adPoll = 0f
+
+    /** Ödüllü reklam hazır oldu / hazır olmaktan çıktı (saniyede iki kez yoklanır). */
+    open fun onAdReadyChanged(ready: Boolean) {}
+
+    /** build() içinde kullanılır: ekrana çizilen "hazır" durumu, yoklamanın karşılaştırdığı değer olur. */
+    protected fun adReadyNow(): Boolean { val r = game.ads.rewardedReady; adReadyKnown = r; return r }
+
     override fun render(delta: Float) {
         val dt = delta.coerceAtMost(1 / 20f)
+        syncBanner()
+        if (watchesAdReadiness && !adBusy) {
+            adPoll -= dt
+            if (adPoll <= 0f) {
+                adPoll = 0.5f
+                val ready = game.ads.rewardedReady
+                if (adReadyKnown != null && ready != adReadyKnown) onAdReadyChanged(ready)
+                adReadyKnown = ready
+            }
+        }
         Gdx.gl.glClearColor(Palette.BG.r, Palette.BG.g, Palette.BG.b, 1f)
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT)
         renderWorld(dt)
@@ -171,7 +193,44 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         val r = d?.get(2) ?: g.safeInsetRight; val b = d?.get(3) ?: g.safeInsetBottom
         val sx = stage.viewport.worldWidth / g.width
         val sy = stage.viewport.worldHeight / g.height
-        root.pad(t * sy, l * sx, b * sy, r * sx)
+        // afiş reklam görünüyorsa içerik onun üstünde biter (afiş hiçbir düğmenin üstüne binmez)
+        root.pad(t * sy, l * sx, (b + bannerPx) * sy, r * sx)
+        root.invalidate() // pad() tek başına yerleşimi yenilemez; afiş yüksekliği ekran açıldıktan sonra da gelebilir
+        // İçerik afişin üstüne sığmıyorsa (kaydırılmayan, yüksek ekran) bu ekranda afiş hiç gösterilmez
+        if (bannerPx > 0) {
+            root.validate()
+            if (root.minHeight > stage.height + 0.5f) {
+                bannerBlocked = true
+                game.ads.setBanner(false)
+                bannerPx = 0
+                root.pad(t * sy, l * sx, b * sy, r * sx); root.invalidate()
+            }
+        }
+        if (debugBannerOverlay) {
+            debugBanner?.remove(); debugBanner = null
+            if (bannerPx > 0) {
+                val box = Table().apply { background = kit.patch("white").tint(Color(0.2f, 0.2f, 0.25f, 0.85f)); touchable = Touchable.disabled }
+                box.add(kit.label("REKLAM ALANI (afiş)", a.f22, Color.WHITE))
+                box.setBounds(0f, 0f, stage.width, bannerPx * sy)
+                stage.addActor(box); debugBanner = box
+            }
+        }
+    }
+
+    /**
+     * Bu ekranın altında afiş (banner) reklam gösterilebilir mi? Yalnızca içeriği kaydırılabilen liste ekranlarında
+     * açılır; oyun ekranında ve altı düğmelerle dolu ekranlarda kapalıdır.
+     */
+    open val bannerAllowed: Boolean = false
+    private var bannerPx = 0
+    /** Bu ekranın içeriği afişle birlikte sığmadı: ekran kapanana kadar afiş istenmez. */
+    private var bannerBlocked = false
+    private var debugBanner: Table? = null
+
+    /** Afişin yüksekliği reklam yüklendiğinde belli olur; değişince yerleşim yeniden hesaplanır. */
+    private fun syncBanner() {
+        val bp = if (bannerAllowed && !bannerBlocked) game.ads.bannerHeightPx else 0
+        if (bp != bannerPx) { bannerPx = bp; applySafeArea() }
     }
 
     private var adBusy = false
@@ -183,15 +242,27 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     fun watchAd(onEarned: () -> Unit) {
         if (adBusy) return
         adBusy = true
+        // Reklam açılana kadar (ve açılamazsa sonuç gelene kadar) ekrandaki diğer düğmeler kilitlenir: aynı anda
+        // "elmasla devam" ya da "bitir" gibi ikinci bir seçim yapılamaz, ödül iki kez ya da hiç verilmez.
+        val shield = Table().apply {
+            setFillParent(true); touchable = Touchable.enabled
+            background = kit.patch("white").tint(Color(0.97f, 0.98f, 1f, 0.7f))
+            add(kit.label("Reklam açılıyor...", a.f36, Palette.INK))
+        }
+        stage.addActor(shield)
+        stage.cancelTouchFocus() // o anda başka bir düğmede duran ikinci parmağın dokunuşu da iptal edilir
+        val done = { adBusy = false; shield.remove() }
         game.ads.showRewarded(
-            onEarned = { adBusy = false; if (game.screen === this) onEarned() },
-            onSkipped = { adBusy = false; if (game.screen === this) toast("Reklam tamamlanmadı ya da gösterilemedi; ödül verilmedi.") },
+            onEarned = { done(); if (game.screen === this) onEarned() },
+            onSkipped = { done(); if (game.screen === this) toast("Reklam tamamlanmadı ya da gösterilemedi; ödül verilmedi.") },
         )
     }
 
     companion object {
         /** Yalnızca masaüstü denemesi için: [sol, üst, sağ, alt] ekran kesiği (piksel). */
         var debugInsets: IntArray? = null
+        /** Yalnızca masaüstü denemesi için: afişin kaplayacağı alanı koyu bir şeritle gösterir. */
+        var debugBannerOverlay = false
     }
 
     override fun dispose() { stage.dispose() }

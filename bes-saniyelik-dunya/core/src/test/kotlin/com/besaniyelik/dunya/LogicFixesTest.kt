@@ -253,6 +253,39 @@ class LogicFixesTest {
         sim.dispose()
     }
 
+    @DisplayName("canlar bitince devam: bölümde son kontrol noktasından, Sonsuz Dünya'da koşu geri sarılmadan sürer")
+    @Test fun continueAfterGameOver() {
+        // bölüm modu: 1 can, boşluğa düşüş -> oyun bitti -> 2 canla devam
+        val lvl = flatLevel(floorGaps = listOf(30f to 60f))
+        val sim = Simulation(lvl, SimConfig(hearts = 1))
+        var guard = 0
+        while (sim.status != SimStatus.GAME_OVER && guard++ < 4000) sim.step(false)
+        assertEquals(SimStatus.GAME_OVER, sim.status)
+        sim.continueAfterGameOver(2)
+        assertEquals(SimStatus.RUNNING, sim.status); assertEquals(2, sim.hearts)
+        assertTrue(sim.player.x < 30f, "boşluğun gerisinden devam etmeli: ${sim.player.x}")
+        sim.continueAfterGameOver(5)
+        assertEquals(2, sim.hearts, "oyun sürerken ikinci çağrı etkisiz olmalı")
+        sim.dispose()
+        // Sonsuz Dünya: ölüm -> oyun bitti -> devam: mesafe ve süre geri sarılmaz
+        val endless = Simulation(null, SimConfig(hearts = 1), EndlessGenerator(7L))
+        guard = 0
+        while (endless.player.x < 12f && guard++ < 2000) endless.step(false)
+        endless.kill(DeathCause.STUCK)
+        guard = 0
+        while (endless.status != SimStatus.GAME_OVER && guard++ < 600) endless.step(false)
+        assertEquals(SimStatus.GAME_OVER, endless.status)
+        val tick = endless.tick; val dist = endless.distance; val x = endless.player.x
+        endless.continueAfterGameOver(1)
+        assertEquals(SimStatus.RUNNING, endless.status); assertEquals(1, endless.hearts)
+        assertTrue(endless.tick >= tick && endless.distance >= dist - 0.01f, "süre ve mesafe geri sarılmamalı")
+        assertTrue(endless.player.x > x - 8f, "oyuncu dünyanın başına atılmamalı: ${endless.player.x} (ölüm x=$x)")
+        var alive = 0
+        while (alive < 60 && endless.status == SimStatus.RUNNING) { endless.step(false); alive++ }
+        assertEquals(60, alive, "devam ettikten sonra en az 1 sn yaşamalı")
+        endless.dispose()
+    }
+
     @DisplayName("hedef zorluk eğrisi: harita içinde artar, yeni harita öncekinin sonundan kolay başlar, 1..10 aralığındadır")
     @Test fun targetCurveIsSawtooth() {
         for (id in 1..500) { val t = GameContent.targetDifficulty(id); assertTrue(t in 1f..10f, "bölüm $id hedef $t") }

@@ -33,16 +33,37 @@ fun main(args: Array<String>) {
     Lwjgl3Application(game, config)
 }
 
-/** Masaüstü denemesi için sahte reklam: her zaman "hazır", yarım saniye sonra "izlendi" sonucunu verir ve olayları kaydeder. */
+/**
+ * Masaüstü denemesi için sahte reklam. Gerçek cihazdaki gecikmeleri taklit eder: gösterilen reklam yarım saniye sonra
+ * "izlendi" sonucunu verir, yeni ödüllü reklam bir saniye sonra hazır olur, afişin yüksekliği istendikten bir saniye
+ * sonra belli olur (ekran çoktan yerleşmişken).
+ */
 class FakeAds : AdService {
     val events = ArrayList<String>()
-    private fun later(f: () -> Unit) { com.badlogic.gdx.utils.Timer.schedule(object : com.badlogic.gdx.utils.Timer.Task() { override fun run() = f() }, 0.5f) }
-    override fun rewardedReady() = true
-    override fun showRewarded(onResult: (Boolean) -> Unit) { events += "ödüllü reklam gösterildi"; later { onResult(true) } }
+    private fun later(sec: Float, f: () -> Unit) { com.badlogic.gdx.utils.Timer.schedule(object : com.badlogic.gdx.utils.Timer.Task() { override fun run() = f() }, sec) }
+    private var rewardedLoaded = true
+    override fun supported() = true
+    override fun rewardedReady() = rewardedLoaded
+    override fun showRewarded(onResult: (Boolean) -> Unit) {
+        events += "ödüllü reklam gösterildi"
+        rewardedLoaded = false // reklam tek kullanımlıktır; yenisi biraz sonra yüklenir
+        later(0.5f) { onResult(true); later(1f) { rewardedLoaded = true } }
+    }
     override fun interstitialReady() = true
-    override fun showInterstitial(onClosed: () -> Unit) { events += "geçiş reklamı gösterildi"; later(onClosed) }
+    override fun showInterstitial(onClosed: () -> Unit) { events += "geçiş reklamı gösterildi"; later(0.5f, onClosed) }
     override fun privacyOptionsRequired() = true
     override fun showPrivacyOptions() { events += "gizlilik tercihleri açıldı" }
+    /** Afiş: gerçek cihazdaki gibi ekran yüksekliğinin yaklaşık %14'ü; yüksekliği gecikmeyle gelir. */
+    private var bannerWanted = false
+    private var bannerLoaded = false
+    val bannerLog = ArrayList<String>()
+    val bannerOn get() = bannerWanted
+    override fun setBannerVisible(visible: Boolean) {
+        if (visible == bannerWanted) return
+        bannerWanted = visible; bannerLog += if (visible) "açık" else "kapalı"
+        if (visible && !bannerLoaded) later(1f) { bannerLoaded = true }
+    }
+    override fun bannerHeightPx() = if (bannerWanted && bannerLoaded) (com.badlogic.gdx.Gdx.graphics.height * 0.14f).toInt() else 0
 }
 
 /** Ekranları sırayla açıp görüntü alır; bölümleri kayıtlı çözümle gerçek oyun ekranında baştan sona oynatır. */
@@ -101,9 +122,10 @@ class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = nu
             screen("40_endless") { g -> g.go(GameScreen(g, null, 42L, emptyList())) }
             steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(150)); steps.add(Step.Shot("41_endless_run"))
         }
+        if (fakeAds != null) BaseScreen.debugBannerOverlay = true
         if (System.getProperty("tourAds") == "1") adScenario()
         steps.add(Step.Run {
-            fakeAds?.let { log.append("Reklam olayları: ${it.events}\n") }
+            fakeAds?.let { log.append("Reklam olayları: ${it.events}\n"); log.append("Afiş geçişleri: ${it.bannerLog}\n") }
             java.io.File("$dir/tour_log.txt").writeText(log.toString()); Gdx.app.exit()
         })
     }
@@ -130,11 +152,15 @@ class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = nu
         fun screen(name: String, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(45)); steps.add(Step.Shot(name)) }
         fun sim(g: BesSaniyelikDunya) = (g.screen as? GameScreen)?.simulation
         fun note(g: BesSaniyelikDunya, what: String) { val d = g.profile.data; log.append("$what -> altın ${d.coins}, elmas ${d.gems}, can ${sim(g)?.hearts ?: "-"}, durum ${sim(g)?.status ?: "-"}\n") }
+        fun bannerCheck(g: BesSaniyelikDunya, where: String) { fakeAds?.let { log.append("afiş $where: ${if (it.bannerOn) "AÇIK" else "kapalı"}\n") } }
         fun killAll(n: Int) { repeat(n) { steps.add(Step.Run { g -> sim(g)?.kill(com.besaniyelik.dunya.sim.DeathCause.STUCK) }); steps.add(Step.Wait(170)) } }
         // mağaza: ücretsiz elmas
         screen("60_reklam_magaza") { it.go(ShopScreen(it)) }
         steps.add(Step.Run { g -> note(g, "mağaza önce"); click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
         steps.add(Step.Run { g -> note(g, "mağaza sonra") }); steps.add(Step.Shot("61_reklam_magaza_sonra"))
+        // ikinci izleme: reklam yeniden yüklenince düğme kendiliğinden açılmalı (ekrandan çıkmadan)
+        steps.add(Step.Wait(100)); steps.add(Step.Run { g -> click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> note(g, "mağaza ikinci izleme sonrası"); bannerCheck(g, "mağazada (açık olmalı)") }); steps.add(Step.Wait(60)); steps.add(Step.Shot("61b_magaza_afis"))
         // günlük ödül: al, sonra ikiye katla
         screen("62_gunluk") { it.go(DailyRewardScreen(it)) }
         steps.add(Step.Run { g -> click(g, "Ödülü Al") }); steps.add(Step.Wait(40)); steps.add(Step.Shot("63_gunluk_katla"))
@@ -144,7 +170,10 @@ class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = nu
         steps.add(Step.Run { g -> g.go(GameScreen(g, LevelRepository.level(12), null, emptyList())) }); steps.add(Step.Wait(60))
         steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(30))
         killAll(3); steps.add(Step.Wait(60)); steps.add(Step.Shot("65_canlar_bitti"))
-        steps.add(Step.Run { g -> note(g, "devam önce"); click(g, "Reklam izle: +2 can") }); steps.add(Step.Wait(120))
+        steps.add(Step.Run { g -> bannerCheck(g, "oyun ekranında (kapalı olmalı)"); note(g, "devam önce"); click(g, "Reklam izle: +2 can") })
+        // reklam açılırken ikinci bir düğmeye basmak (elmasla devam / tekrar dene) etkisiz olmalı
+        steps.add(Step.Wait(5)); steps.add(Step.Run { g -> click(g, "Tekrar Dene"); log.append("  reklam beklerken 'Tekrar Dene' denendi -> ekran hâlâ oyun mu: ${g.screen is GameScreen}\n") })
+        steps.add(Step.Wait(120))
         steps.add(Step.Run { g -> note(g, "devam sonra") }); steps.add(Step.Shot("66_devam_edildi"))
         killAll(2); steps.add(Step.Wait(60)); steps.add(Step.Shot("67_canlar_bitti_ikinci"))
         steps.add(Step.Run { g -> note(g, "ikinci kez (reklam düğmesi olmamalı)"); if (click(g, "Reklam izle: +2 can")) log.append("  HATA: reklamla devam ikinci kez sunuldu\n") })

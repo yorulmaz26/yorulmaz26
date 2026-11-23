@@ -12,6 +12,9 @@ import com.besaniyelik.dunya.progress.ProfileService
  * gösterilemezse de çağrılır (oyun hiçbir zaman reklam yüzünden askıda kalmaz).
  */
 interface AdService {
+    /** Bu platformda reklam altyapısı var mı (masaüstünde yok)? Yoksa reklamla ilgili hiçbir arayüz gösterilmez. */
+    fun supported(): Boolean = true
+
     /** Ödüllü reklam şu anda gösterilebilir mi (yüklenmiş ve onay koşulları sağlanmış). */
     fun rewardedReady(): Boolean
 
@@ -29,6 +32,15 @@ interface AdService {
     /** Oyuncu oyunun sesini tamamen kapattıysa reklamlar da sessiz başlar. */
     fun setAppMuted(muted: Boolean) {}
 
+    /**
+     * Afiş (banner) reklamı gösterir ya da gizler. Yalnızca içeriği kaydırılabilen menü ekranlarında açılır; oyun
+     * sırasında asla (tek dokunuşla oynanan oyunda afişe yanlışlıkla basılır).
+     */
+    fun setBannerVisible(visible: Boolean) {}
+
+    /** Görünen afişin ekranın altında kapladığı yükseklik (piksel); afiş yoksa ya da henüz yüklenmediyse 0. */
+    fun bannerHeightPx(): Int = 0
+
     /** Reklamlar çocuklara uygun modda mı isteniyor (kişiselleştirme ve reklam kimliği yok)? Gizlilik metni buna göre yazılır. */
     fun childDirected(): Boolean = true
 
@@ -40,6 +52,7 @@ interface AdService {
     companion object {
         /** Reklamsız platform: hiçbir reklam hazır değildir, bütün reklam düğmeleri gizli kalır. */
         val NONE = object : AdService {
+            override fun supported() = false
             override fun rewardedReady() = false
             override fun showRewarded(onResult: (Boolean) -> Unit) = onResult(false)
             override fun interstitialReady() = false
@@ -63,7 +76,8 @@ interface AdService {
 class AdDirector(
     private val service: AdService,
     private val profile: ProfileService,
-    private val now: () -> Long = { System.currentTimeMillis() },
+    /** Tekdüze (geri gitmeyen) saat: cihaz saatinin değişmesi reklam aralıklarını etkilemez. */
+    private val now: () -> Long = { System.nanoTime() / 1_000_000L },
 ) {
     companion object {
         /** Mağazadaki "reklam izle, elmas kazan" ödülü ve günlük sınırı. */
@@ -77,18 +91,35 @@ class AdDirector(
         /** Oturumun ilk dakikalarında geçiş reklamı gösterilmez; izlenen her ödüllü reklam bekleme süresini yeniden başlatır. */
         const val SESSION_GRACE_MS = 120_000L
         const val AFTER_REWARDED_GAP_MS = 180_000L
+        /** Uygulama bu kadar süre arka planda kaldıysa dönüş yeni oturum sayılır. */
+        const val NEW_SESSION_AFTER_BACKGROUND_MS = 60_000L
     }
 
-    private val sessionStart = now()
+    private var sessionStart = now()
+    private var pausedAt = -1L
     private var lastInterstitialAt = Long.MIN_VALUE / 2
     private var lastRewardedAt = Long.MIN_VALUE / 2
     private var breaksSinceInterstitial = 0
 
     private val data get() = profile.data
 
+    /** Reklam altyapısı olan bir platformda mıyız (reklamla ilgili arayüz yalnızca o zaman gösterilir)? */
+    val supported: Boolean get() = service.supported()
+
+    fun onAppPaused() { pausedAt = now() }
+
+    /** Uzun süre arka planda kalıp dönülürse yeni oturum başlar: ilk dakikalarda geçiş reklamı gösterilmez. */
+    fun onAppResumed() {
+        val p = pausedAt; pausedAt = -1L
+        if (p >= 0 && now() - p >= NEW_SESSION_AFTER_BACKGROUND_MS) sessionStart = now()
+    }
+
     // ------------------------------------------------------------------ ödüllü reklam
 
-    val rewardedReady: Boolean get() = service.rewardedReady()
+    /** Bu oturumda en az bir ödüllü reklam yüklendi mi (hiç yüklenemiyorsa, ör. çevrimdışı, reklam kartları gösterilmez). */
+    private var rewardedSeen = false
+
+    val rewardedReady: Boolean get() = service.rewardedReady().also { if (it) rewardedSeen = true }
 
     /** Ödüllü reklamı gösterir; ödül hak edildiyse [onEarned], edilmediyse (kapatıldı / gösterilemedi) [onSkipped]. */
     fun showRewarded(onEarned: () -> Unit, onSkipped: () -> Unit = {}) {
@@ -139,15 +170,19 @@ class AdDirector(
 
     // ------------------------------------------------------------------ günlük sınırlar
 
+    /** Günlük sayaç yalnızca YENİ bir güne geçilince sıfırlanır; cihaz tarihini geri almak sınırı sıfırlamaz. */
     private fun rollDay() {
         val today = profile.clock.epochDay()
-        if (data.ads.day != today) { data.ads.day = today; data.ads.gemAdsToday = 0 }
+        if (today > data.ads.day) { data.ads.day = today; data.ads.gemAdsToday = 0 }
     }
 
     /** Bugün "reklam izle, elmas kazan" kaç kez daha kullanılabilir. */
     fun gemAdsLeft(): Int { rollDay(); return (GEM_ADS_PER_DAY - data.ads.gemAdsToday).coerceAtLeast(0) }
 
     fun gemAdAvailable(): Boolean = gemAdsLeft() > 0 && service.rewardedReady()
+
+    /** Mağazadaki ücretsiz elmas kartı gösterilsin mi (reklam o an hazır olmasa da; düğme hazır olunca açılır)? */
+    fun gemCardVisible(): Boolean = service.supported() && gemAdsLeft() > 0 && (rewardedReady || rewardedSeen)
 
     /** Mağazadaki reklam ödülünü verir (reklam tamamlandıktan sonra çağrılır). Verilen elmas; sınır dolduysa 0. */
     fun grantGemAd(): Int {
@@ -187,6 +222,12 @@ class AdDirector(
     }
 
     // ------------------------------------------------------------------ gizlilik
+
+    // ------------------------------------------------------------------ afiş
+
+    /** Afiş yalnızca ekran izin veriyorsa görünür (bkz. BaseScreen.bannerAllowed). */
+    fun setBanner(visible: Boolean) = service.setBannerVisible(visible)
+    val bannerHeightPx: Int get() = service.bannerHeightPx()
 
     val childDirected: Boolean get() = service.childDirected()
     val privacyOptionsRequired: Boolean get() = service.privacyOptionsRequired()

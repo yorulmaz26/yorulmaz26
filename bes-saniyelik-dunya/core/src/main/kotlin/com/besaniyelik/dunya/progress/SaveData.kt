@@ -84,6 +84,13 @@ data class AdState(
     var interstitialTotal: Long = 0,
 )
 
+/** Henüz işlenmemiş Sonsuz Dünya koşusu: "reklamla devam" sorusu açıkken uygulama arka plana alınırsa burada bekler. */
+@Serializable
+data class PendingEndless(
+    val score: Int, val seconds: Float, val distance: Float, val coinValue: Int,
+    val stars: Int, val jumps: Int, val rulesSurvived: Int, val powerupsUsed: Int,
+)
+
 @Serializable
 data class EndlessRecord(
     val score: Int,
@@ -119,6 +126,7 @@ data class SaveData(
     var seenTutorials: MutableSet<String> = mutableSetOf(),
     var levelRewardsClaimed: Int = 1,
     var ads: AdState = AdState(),
+    var pendingEndless: PendingEndless? = null,
 ) {
     val totalStars get() = levels.values.sumOf { it.stars }
     fun stars(id: Int) = levels[id]?.stars ?: 0

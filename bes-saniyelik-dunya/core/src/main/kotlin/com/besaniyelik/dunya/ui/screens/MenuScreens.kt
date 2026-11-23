@@ -211,6 +211,7 @@ object LevelInfo {
 }
 
 class MapSelectScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
+    override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
     override fun build() {
         val d = game.profile.data
         root.add(header("Haritalar")).growX().padTop(20f).row()

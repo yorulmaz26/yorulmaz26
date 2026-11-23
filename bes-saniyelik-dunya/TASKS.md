@@ -10,8 +10,9 @@
 - [x] 8 güçlendirme (kalkan, mıknatıs, çift zıplama, dokunulmazlık, ekstra can, altın çarpanı, yıldız algılayıcı, kontrol noktası koruması)
 - [x] 20 ekran, programatik grafikler ve sesler
 - [x] Güvenilir kayıt (CRC, atomik yazma, yedek, sürüm göçü)
-- [x] Otomatik testler (69 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
-- [x] Reklam: Google AdMob ile isteğe bağlı ödüllü reklamlar ve seyrek geçiş reklamı (deneme kimlikleriyle)
+- [x] Otomatik testler (74 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
+- [x] Reklam: Google AdMob ile isteğe bağlı ödüllü reklamlar, seyrek geçiş reklamı ve yalnızca liste menülerinde afiş (deneme kimlikleriyle)
+- [x] Reklam kodunun bağımsız incelemesi (2 inceleyici + doğrulayıcı); bulunan 19 sorun düzeltildi
 - [x] Debug APK, release APK, release AAB
 
 ## Kullanıcı onayı / erişimi gerektiren
@@ -19,7 +20,7 @@
 - [ ] Play Console: geliştirici hesabı, gizlilik politikası sayfasının yayımlanması, uygulama içeriği formları ve mağaza sayfası. Adım adım: `docs/play_store/YAYIN_REHBERI.md`; metinler `docs/play_store/magaza_metinleri.md`; gizlilik metni `docs/play_store/gizlilik_politikasi.md`; 8 ekran görüntüsü `docs/play_store/ekran_goruntuleri/`; simge `docs/play_icon_512.png`; öne çıkan görsel `docs/play_feature_graphic.png`.
 - [ ] Yeni kişisel hesapta kapalı test: en az 12 kullanıcı, 14 gün kesintisiz; ardından üretim erişimi başvurusu.
 - [ ] Reklam geliri için: AdMob hesabı, gerçek kimliklerin `ads.properties` dosyasına yazılması, hedef kitle kararı (`audience`), `app-ads.txt`, onay mesajları, test cihazı kaydı. Adım adım: `docs/play_store/REKLAM_REHBERI.md`.
-- [ ] Reklam akışlarının gerçek cihazda denenmesi (deneme kimlikleriyle): her ödüllü düğme, reklamı yarıda kapatma, reklam sırasında ana ekrana çıkıp dönme, uçak modu, bölüm sonu geçiş reklamı.
+- [ ] Reklam akışlarının gerçek cihazda denenmesi (deneme kimlikleriyle): her ödüllü düğme, reklamı yarıda kapatma, reklam sırasında ana ekrana çıkıp dönme, uçak modu, bölüm sonu geçiş reklamı, afişli beş menü ekranı (içerik afişin altında kalmamalı, geri tuşu çalışmalı).
 - [ ] Gerçek Android cihazda test (bu ortamda cihaz/emülatör yok): dahili test kanalında açılış, dokunma, geri tuşu (Android 16), çentikli ekranda üst köşe düğmeleri.
 
 ## İyileştirme fikirleri
