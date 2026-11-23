@@ -1,5 +1,5 @@
-11-23 01:53:38.213  7918  7918 I GolgenFPS: fps=26.5 ekran=LogoScreen
-11-23 01:53:43.976  7918  7918 I GolgenFPS: fps=27.5 ekran=MenuScreen
-11-23 01:53:52.416  7918  7918 I GolgenFPS: fps=21.0 ekran=MenuScreen
-11-23 01:54:00.430  7918  7918 I GolgenFPS: fps=20.3 ekran=MenuScreen
-11-23 01:54:14.243  7918  7918 I GolgenFPS: fps=22.3 ekran=MenuScreen
+11-23 02:27:50.964  7972  7972 I GolgenFPS: fps=31.4 ekran=LogoScreen
+11-23 02:27:56.182  7972  7972 I GolgenFPS: fps=31.7 ekran=MenuScreen
+11-23 02:28:03.639  7972  7972 I GolgenFPS: fps=21.2 ekran=MenuScreen
+11-23 02:28:11.979  7972  7972 I GolgenFPS: fps=20.6 ekran=MenuScreen
+11-23 02:28:22.927  7972  7972 I GolgenFPS: fps=23.0 ekran=MenuScreen
