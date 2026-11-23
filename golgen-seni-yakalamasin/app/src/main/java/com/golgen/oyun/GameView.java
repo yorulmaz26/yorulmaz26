@@ -197,6 +197,13 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         }
     }
 
+    /** Yeni reklam katmanı bağlandığında o anki ekranın banner isteğini ve alt boşluğu uygular. */
+    public void attachAds(com.golgen.oyun.platform.Ads a) {
+        ads = a;
+        ads.setBottomMargin((int) safeB);
+        ads.setBannerWanted(current.wantsBanner());
+    }
+
     /** Debug: reklamları testte kapat/aç (kalıcı). */
     public boolean adsDisabledForTest() {
         return debuggable && store.getInt("testReklamsiz", 0) == 1;

@@ -51,7 +51,7 @@ pref_int() { prefs | grep "name=\"$1\"" | sed -E 's/.*value="(-?[0-9]+)".*/\1/';
 
 adb wait-for-device
 # Canlı logcat (takılma olursa son olaylar görülebilsin)
-( adb logcat -v time -s GolgenUI:I GolgenFPS:I GolgenAds:I GolgenAds:W AndroidRuntime:E ActivityManager:W > "$OUT/canli_logcat.txt" 2>/dev/null & )
+( adb logcat -v time -s GolgenUI:I GolgenFPS:I GolgenAds:V AndroidRuntime:E ActivityManager:W > "$OUT/canli_logcat.txt" 2>/dev/null & )
 step() { echo "ADIM: $*" | tee -a "$OUT/adimlar.txt"; }
 adb shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
 # Android'in ilk tam ekran açılışındaki "Viewing full screen" sistem uyarısı dokunuşları yutar; testte önceden onaylanır.
@@ -223,7 +223,7 @@ sleep 1; shot 18_yeniden_acilis
 # 7b) Reklamlar (ağ gerektirir: yükleme adımları BİLGİ olarak raporlanır, çökme/donma ise hata sayılır)
 step reklamlar
 soft() { echo "BİLGİ  | $1" | tee -a "$RESULTS"; }
-adlog() { timeout 20 adb logcat -d -s GolgenAds:I GolgenAds:W 2>/dev/null; }
+adlog() { timeout 20 adb logcat -d -s GolgenAds:V 2>/dev/null; }
 adbt shell am start -n $ACT --ez reklamsiz false >/dev/null
 for i in $(seq 1 30); do adlog | grep -q "SDK hazır" && break; sleep 1; done
 if adlog | grep -q "SDK hazır"; then ok "Reklam SDK'sı başlatıldı (AdMob test kimlikleri)"; else bad "Reklam SDK'sı başlatılamadı"; fi

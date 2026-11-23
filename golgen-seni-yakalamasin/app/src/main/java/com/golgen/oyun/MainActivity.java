@@ -24,14 +24,14 @@ public final class MainActivity extends Activity {
         view.onBannerHeightChanged(0);
         if (enabled) {
             try {
-                view.ads = new com.golgen.oyun.platform.AdMobAds(this, root, view,
-                        BuildConfig.ADMOB_BANNER_ID, BuildConfig.ADMOB_INTERSTITIAL_ID, BuildConfig.ADMOB_REWARDED_ID);
+                view.attachAds(new com.golgen.oyun.platform.AdMobAds(this, root, view,
+                        BuildConfig.ADMOB_BANNER_ID, BuildConfig.ADMOB_INTERSTITIAL_ID, BuildConfig.ADMOB_REWARDED_ID));
             } catch (RuntimeException e) {
                 android.util.Log.w("GolgenAds", "Reklamlar başlatılamadı", e);
-                view.ads = new com.golgen.oyun.platform.NoAds();
+                view.attachAds(new com.golgen.oyun.platform.NoAds());
             }
         } else {
-            view.ads = new com.golgen.oyun.platform.NoAds();
+            view.attachAds(new com.golgen.oyun.platform.NoAds());
         }
     }
 
