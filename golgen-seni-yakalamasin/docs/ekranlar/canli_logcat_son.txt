@@ -1,300 +1,300 @@
-11-23 01:14:21.414 W/ActivityManager(  522): Slow operation: 185ms so far, now at startProcess: starting to update pids map
-11-23 01:14:21.415 W/ActivityManager(  522): Slow operation: 185ms so far, now at startProcess: done updating pids map
-11-23 01:14:21.415 W/ActivityManager(  522): Slow operation: 74ms so far, now at startProcess: asking zygote to start proc
-11-23 01:14:21.533 W/ActivityManager(  522): Slow operation: 192ms so far, now at startProcess: returned from zygote!
-11-23 01:14:21.533 W/ActivityManager(  522): Slow operation: 192ms so far, now at startProcess: done updating battery stats
-11-23 01:14:21.533 W/ActivityManager(  522): Slow operation: 192ms so far, now at startProcess: building log message
-11-23 01:14:21.533 W/ActivityManager(  522): Slow operation: 193ms so far, now at startProcess: starting to update pids map
-11-23 01:14:21.533 W/ActivityManager(  522): Slow operation: 193ms so far, now at startProcess: done updating pids map
-11-23 01:14:25.519 W/ActivityManager(  522): Slow operation: 117ms so far, now at finishAttachApplicationInner: after dispatching broadcasts
-11-23 01:14:25.812 W/ActivityManager(  522): Slow operation: 231ms so far, now at startProcess: returned from zygote!
-11-23 01:14:25.812 W/ActivityManager(  522): Slow operation: 231ms so far, now at startProcess: done updating battery stats
-11-23 01:14:25.812 W/ActivityManager(  522): Slow operation: 231ms so far, now at startProcess: building log message
-11-23 01:14:25.812 W/ActivityManager(  522): Slow operation: 231ms so far, now at startProcess: starting to update pids map
-11-23 01:14:25.814 W/ActivityManager(  522): Slow operation: 234ms so far, now at startProcess: done updating pids map
-11-23 01:14:27.081 W/ActivityManager(  522): Slow operation: 359ms so far, now at startProcess: returned from zygote!
-11-23 01:14:27.082 W/ActivityManager(  522): Slow operation: 359ms so far, now at startProcess: done updating battery stats
-11-23 01:14:27.082 W/ActivityManager(  522): Slow operation: 359ms so far, now at startProcess: building log message
-11-23 01:14:27.082 W/ActivityManager(  522): Slow operation: 359ms so far, now at startProcess: starting to update pids map
-11-23 01:14:27.082 W/ActivityManager(  522): Slow operation: 360ms so far, now at startProcess: done updating pids map
-11-23 01:14:27.770 W/ActivityManager(  522): finishReceiver: no app for android.os.BinderProxy@bc72702
-11-23 01:14:28.178 W/ActivityManager(  522): Slow operation: 62ms so far, now at startProcess: returned from zygote!
-11-23 01:14:28.179 W/ActivityManager(  522): Slow operation: 62ms so far, now at startProcess: done updating battery stats
-11-23 01:14:28.179 W/ActivityManager(  522): Slow operation: 62ms so far, now at startProcess: building log message
-11-23 01:14:28.180 W/ActivityManager(  522): Slow operation: 63ms so far, now at startProcess: starting to update pids map
-11-23 01:14:28.180 W/ActivityManager(  522): Slow operation: 63ms so far, now at startProcess: done updating pids map
-11-23 01:14:28.474 W/ActivityManager(  522): Slow operation: 51ms so far, now at startProcess: returned from zygote!
-11-23 01:14:28.491 W/ActivityManager(  522): Slow operation: 67ms so far, now at startProcess: done updating battery stats
-11-23 01:14:28.491 W/ActivityManager(  522): Slow operation: 68ms so far, now at startProcess: building log message
-11-23 01:14:28.491 W/ActivityManager(  522): Slow operation: 68ms so far, now at startProcess: starting to update pids map
-11-23 01:14:28.491 W/ActivityManager(  522): Slow operation: 68ms so far, now at startProcess: done updating pids map
-11-23 01:14:29.196 W/ActivityManager(  522): finishReceiver: no app for android.os.BinderProxy@deb7630
-11-23 01:14:29.855 W/ActivityManager(  522): Unable to start service Intent { act=com.google.android.gms.home.service.START pkg=com.google.android.gms } U=0: not found
-11-23 01:14:29.856 W/ActivityManager(  522): Unbind failed: could not find connection for android.os.BinderProxy@14abaf7
-11-23 01:14:30.287 E/ActivityManager(  522): Unable to freeze binder for 2200: -11
-11-23 01:14:30.305 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gm/androidx.work.impl.background.systemjob.SystemJobService in 1000ms for connection
-11-23 01:14:30.305 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gm/com.android.email.job.BootCompletedJob$BootCompletedJobService in 11000ms for connection
-11-23 01:14:30.590 W/ActivityManager(  522): finishReceiver: no app for android.os.BinderProxy@2181937
-11-23 01:14:30.719 W/ActivityManager(  522): Service done with onDestroy, but not inDestroying: ServiceRecord{609617b u0 com.google.android.gm/com.android.email.job.UpgradeJob$UpgradeJobService}, app=ProcessRecord{169615b 0:com.google.android.gm/u0a140}
-11-23 01:14:30.723 W/ActivityManager(  522): Service done with onDestroy, but not inDestroying: ServiceRecord{1a8d5b0 u0 com.google.android.gm/com.android.email.job.MigrateDaJob$MigrateDaJobService}, app=ProcessRecord{169615b 0:com.google.android.gm/u0a140}
---------- beginning of main
-11-23 01:14:32.819 E/ActivityManager(  522): Sending non-protected broadcast com.android.settings.battery.action.PERIODIC_JOB_RECHECK from system 1056:com.android.settings/1000 pkg com.android.settings
-11-23 01:14:32.819 E/ActivityManager(  522): java.lang.Throwable
-11-23 01:14:32.819 E/ActivityManager(  522): 	at com.android.server.am.ActivityManagerService.checkBroadcastFromSystem(ActivityManagerService.java:14306)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at com.android.server.am.ActivityManagerService.broadcastIntentLockedTraced(ActivityManagerService.java:15131)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at com.android.server.am.ActivityManagerService.broadcastIntentLocked(ActivityManagerService.java:14370)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at com.android.server.am.ActivityManagerService.broadcastIntentWithFeature(ActivityManagerService.java:15336)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at android.app.IActivityManager$Stub.onTransact(IActivityManager.java:2653)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at com.android.server.am.ActivityManagerService.onTransact(ActivityManagerService.java:2720)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at android.os.Binder.execTransactInternal(Binder.java:1339)
-11-23 01:14:32.819 E/ActivityManager(  522): 	at android.os.Binder.execTransact(Binder.java:1275)
-11-23 01:14:33.005 E/ActivityManager(  522): Unable to freeze binder for 4126: -11
-11-23 01:14:33.063 W/ActivityManager(  522): finishReceiver: no app for android.os.BinderProxy@9da869d
-11-23 01:14:35.238 E/ActivityManager(  522): Cannot find package for uid: 1013
-11-23 01:14:35.797 W/ActivityManager(  522): Unable to start service Intent { cmp=com.google.android.apps.tachyon/.clientapi.ClientApiService } U=0: not found
-11-23 01:14:36.062 W/ActivityManager(  522): Unable to start service Intent { cmp=com.google.android.apps.tachyon/.clientapi.ClientApiService } U=0: not found
-11-23 01:14:54.005 W/ActivityManager(  522): Unable to start service Intent { act=com.google.android.play.core.splitinstall.BIND_SPLIT_INSTALL_SERVICE pkg=com.android.vending } U=0: not found
-11-23 01:14:55.312 W/ActivityManager(  522): Foreground service started from background can not have location/camera/microphone access: service com.google.android.inputmethod.latin/com.google.android.apps.inputmethod.libs.dataservice.superpacks.SuperpacksForegroundTaskService
-11-23 01:14:57.510 W/ActivityManager(  522): Slow operation: 58ms so far, now at startProcess: returned from zygote!
-11-23 01:14:57.512 W/ActivityManager(  522): Slow operation: 60ms so far, now at startProcess: done updating battery stats
-11-23 01:14:57.512 W/ActivityManager(  522): Slow operation: 60ms so far, now at startProcess: building log message
-11-23 01:14:57.513 W/ActivityManager(  522): Slow operation: 60ms so far, now at startProcess: starting to update pids map
-11-23 01:14:57.513 W/ActivityManager(  522): Slow operation: 60ms so far, now at startProcess: done updating pids map
-11-23 01:14:57.552 W/ActivityManager(  522): Slow operation: 82ms so far, now at startProcess: returned from zygote!
-11-23 01:14:57.636 W/ActivityManager(  522): Slow operation: 165ms so far, now at startProcess: done updating battery stats
-11-23 01:14:57.636 W/ActivityManager(  522): Slow operation: 165ms so far, now at startProcess: building log message
-11-23 01:14:57.636 W/ActivityManager(  522): Slow operation: 166ms so far, now at startProcess: starting to update pids map
-11-23 01:14:57.636 W/ActivityManager(  522): Slow operation: 166ms so far, now at startProcess: done updating pids map
-11-23 01:14:57.636 W/ActivityManager(  522): Slow operation: 162ms so far, now at startProcess: asking zygote to start proc
-11-23 01:14:57.658 W/ActivityManager(  522): Slow operation: 184ms so far, now at startProcess: returned from zygote!
-11-23 01:14:57.663 W/ActivityManager(  522): Slow operation: 188ms so far, now at startProcess: done updating battery stats
-11-23 01:14:57.663 W/ActivityManager(  522): Slow operation: 188ms so far, now at startProcess: building log message
-11-23 01:14:57.663 W/ActivityManager(  522): Slow operation: 189ms so far, now at startProcess: starting to update pids map
-11-23 01:14:57.663 W/ActivityManager(  522): Slow operation: 189ms so far, now at startProcess: done updating pids map
-11-23 01:15:00.360 W/ActivityManager(  522): Background start not allowed: service Intent { cmp=com.google.android.apps.messaging/com.google.apps.tiktok.concurrent.AndroidFuturesService (has extras) } to com.google.android.apps.messaging/com.google.apps.tiktok.concurrent.AndroidFuturesService from pid=4945 uid=10130 pkg=com.google.android.apps.messaging startFg?=false
-11-23 01:15:00.423 W/ActivityManager(  522): Slow operation: 92ms so far, now at startProcess: returned from zygote!
-11-23 01:15:00.441 W/ActivityManager(  522): Slow operation: 110ms so far, now at startProcess: done updating battery stats
-11-23 01:15:00.441 W/ActivityManager(  522): Slow operation: 111ms so far, now at startProcess: building log message
-11-23 01:15:00.441 W/ActivityManager(  522): Slow operation: 111ms so far, now at startProcess: starting to update pids map
-11-23 01:15:00.441 W/ActivityManager(  522): Slow operation: 111ms so far, now at startProcess: done updating pids map
-11-23 01:15:01.644 W/ActivityManager(  522): Background start not allowed: service Intent { cmp=com.google.android.apps.messaging/.shared.datamodel.action.execution.ActionExecutorImpl$EmptyService } to com.google.android.apps.messaging/.shared.datamodel.action.execution.ActionExecutorImpl$EmptyService from pid=4945 uid=10130 pkg=com.google.android.apps.messaging startFg?=false
-11-23 01:15:01.742 W/ActivityManager(  522): Background start not allowed: service Intent { cmp=com.google.android.apps.messaging/.shared.datamodel.action.execution.ActionExecutorImpl$EmptyService } to com.google.android.apps.messaging/.shared.datamodel.action.execution.ActionExecutorImpl$EmptyService from pid=4945 uid=10130 pkg=com.google.android.apps.messaging startFg?=false
-11-23 01:15:08.840 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.icing.service.IndexService in 1000ms for connection
-11-23 01:15:08.840 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.GmsIntentOperationService in 10999ms for start-requested
-11-23 01:15:08.840 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.wallet.service.PaymentService in 20999ms for connection
-11-23 01:15:08.840 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.GmsBoundBrokerService in 30999ms for connection
-11-23 01:15:08.840 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.GmsApiService in 40999ms for connection
-11-23 01:15:08.840 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.container.ExternalFileApkService in 50999ms for start-requested
-11-23 01:15:08.841 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.nearby.exposurenotification.WakeUpService in 60999ms for connection
-11-23 01:15:08.944 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.deviceconnection.service.DeviceConnectionWatcherService in 60896ms for start-requested
-11-23 01:15:08.944 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentApiService in 70895ms for connection
-11-23 01:15:08.944 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.nearby.messages.service.NearbyMessagesService in 80895ms for start-requested
-11-23 01:15:08.944 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.nearby.exposurenotification.service.ExposureNotificationInternalService in 90895ms for start-requested
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.location.geocode.GeocodeService in 100895ms for connection
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.fused.FusedLocationService in 110895ms for connection
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.auth.account.authenticator.GoogleAccountAuthenticatorService in 120895ms for connection
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.network.NetworkLocationService in 130895ms for connection
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.auth.setup.devicesignals.LockScreenService in 140895ms for start-requested
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.nearby.sharing.ReceiveSurfaceService in 150895ms for start-requested
-11-23 01:15:08.945 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.internal.server.GoogleLocationService in 160895ms for start-requested
-11-23 01:15:08.946 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.internal.server.HardwareArProviderService in 170893ms for connection
-11-23 01:15:08.948 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/com.google.android.contextmanager.service.ContextManagerService in 180892ms for start-requested
-11-23 01:15:08.950 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.location.persistent.LocationPersistentService in 190890ms for start-requested
-11-23 01:15:08.950 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.thunderbird.EmergencyPersistentService in 200889ms for start-requested
-11-23 01:15:08.953 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/com.google.android.location.internal.GoogleLocationManagerService in 210889ms for start-requested
-11-23 01:15:08.955 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.gcm.nts.SchedulerService in 220885ms for start-requested
-11-23 01:15:08.955 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.common.stats.GmsCoreStatsService in 230885ms for start-requested
-11-23 01:15:08.955 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentBoundBrokerService in 240885ms for connection
-11-23 01:15:08.955 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.gcm.GcmService in 250885ms for start-requested
-11-23 01:15:08.955 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.instantapps.service.InstantAppsService in 260884ms for connection
-11-23 01:15:08.955 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.nearby.exposurenotification.service.ExposureMatchingService in 270884ms for start-requested
-11-23 01:15:08.956 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.clearcut.debug.ClearcutDebugDumpService in 280884ms for start-requested
-11-23 01:15:08.956 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentIntentOperationService in 290884ms for start-requested
-11-23 01:15:08.956 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.geotimezone.GeoTimeZoneService in 300884ms for connection
-11-23 01:15:08.956 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.PersistentDirectBootAwareApiService in 310884ms for connection
-11-23 01:15:09.045 W/ActivityManager(  522): Rescheduling restart of crashed service com.google.android.gms/.icing.service.IndexService in 795ms for other
-11-23 01:15:09.045 W/ActivityManager(  522): Rescheduling restart of crashed service com.google.android.gms/.chimera.GmsIntentOperationService in 10795ms for other
-11-23 01:15:09.045 W/ActivityManager(  522): Rescheduling restart of crashed service com.google.android.gms/.wallet.service.PaymentService in 20795ms for other
-11-23 01:15:09.045 W/ActivityManager(  522): Rescheduling restart of crashed service com.google.android.gms/.chimera.GmsBoundBrokerService in 30795ms for other
-11-23 01:15:09.045 W/ActivityManager(  522): Rescheduling restart of crashed service com.google.android.gms/.chimera.GmsApiService in 40795ms for other
-11-23 01:15:09.045 W/ActivityManager(  522): Rescheduling restart of crashed service com.google.android.gms/.chimera.container.ExternalFileApkService in 50795ms for other
-11-23 01:15:09.824 W/ActivityManager(  522): Scheduling restart of crashed service com.google.android.gms/.chimera.UiIntentOperationService in 1000ms for start-requested
-11-23 01:15:10.782 W/ActivityManager(  522): Unable to start service Intent { act=com.google.android.gms.home.service.START pkg=com.google.android.gms } U=0: not found
-11-23 01:15:10.782 W/ActivityManager(  522): Unbind failed: could not find connection for android.os.BinderProxy@3c03144
-11-23 01:15:36.997 W/ActivityManager(  522): Unable to start service Intent { act=com.google.android.gms.drive.ApiService.RESET_AFTER_BOOT flg=0x4 cmp=com.google.android.gms/.drive.api.ApiService (has extras) } U=0: not found
-11-23 01:18:08.383 W/ActivityManager(  522): Slow operation: 62ms so far, now at startProcess: done updating pids map
-11-23 01:18:09.240 E/AndroidRuntime( 7697): FATAL EXCEPTION: main
-11-23 01:18:09.240 E/AndroidRuntime( 7697): Process: com.golgen.oyun, PID: 7697
-11-23 01:18:09.240 E/AndroidRuntime( 7697): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.golgen.oyun/com.golgen.oyun.MainActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3782)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3922)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:139)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:96)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2443)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.os.Handler.dispatchMessage(Handler.java:106)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.os.Looper.loopOnce(Looper.java:205)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.os.Looper.loop(Looper.java:294)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at java.lang.reflect.Method.invoke(Native Method)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at com.golgen.oyun.GameView.epochDay(GameView.java:138)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at com.golgen.oyun.GameView.<init>(GameView.java:99)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at com.golgen.oyun.MainActivity.onCreate(MainActivity.java:49)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.Activity.performCreate(Activity.java:8595)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.Activity.performCreate(Activity.java:8573)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1456)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3764)
-11-23 01:18:09.240 E/AndroidRuntime( 7697): 	... 12 more
-11-23 01:19:53.527 W/ActivityManager(  522): Slow operation: 132ms so far, now at startProcess: returned from zygote!
-11-23 01:19:53.527 W/ActivityManager(  522): Slow operation: 132ms so far, now at startProcess: done updating battery stats
-11-23 01:19:53.527 W/ActivityManager(  522): Slow operation: 132ms so far, now at startProcess: building log message
-11-23 01:19:53.527 W/ActivityManager(  522): Slow operation: 132ms so far, now at startProcess: starting to update pids map
-11-23 01:19:53.527 W/ActivityManager(  522): Slow operation: 133ms so far, now at startProcess: done updating pids map
-11-23 01:19:53.944 E/AndroidRuntime( 8889): FATAL EXCEPTION: main
-11-23 01:19:53.944 E/AndroidRuntime( 8889): Process: com.golgen.oyun, PID: 8889
-11-23 01:19:53.944 E/AndroidRuntime( 8889): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.golgen.oyun/com.golgen.oyun.MainActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3782)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3922)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:139)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:96)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2443)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.os.Handler.dispatchMessage(Handler.java:106)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.os.Looper.loopOnce(Looper.java:205)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.os.Looper.loop(Looper.java:294)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at java.lang.reflect.Method.invoke(Native Method)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at com.golgen.oyun.GameView.epochDay(GameView.java:138)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at com.golgen.oyun.GameView.<init>(GameView.java:99)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at com.golgen.oyun.MainActivity.onCreate(MainActivity.java:49)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.Activity.performCreate(Activity.java:8595)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.Activity.performCreate(Activity.java:8573)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1456)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3764)
-11-23 01:19:53.944 E/AndroidRuntime( 8889): 	... 12 more
-11-23 01:22:40.157 E/ActivityManager(  522): Unable to freeze binder for 8889: -11
-11-23 01:22:40.232 W/ActivityManager(  522): Ignoring remove of inactive process: ProcessRecord{4bc7e91 0:com.golgen.oyun/u0a192}
-11-23 01:22:41.823 E/AndroidRuntime(10972): FATAL EXCEPTION: main
-11-23 01:22:41.823 E/AndroidRuntime(10972): Process: com.golgen.oyun, PID: 10972
-11-23 01:22:41.823 E/AndroidRuntime(10972): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.golgen.oyun/com.golgen.oyun.MainActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3782)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3922)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:139)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:96)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2443)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.os.Handler.dispatchMessage(Handler.java:106)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.os.Looper.loopOnce(Looper.java:205)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.os.Looper.loop(Looper.java:294)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at java.lang.reflect.Method.invoke(Native Method)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
-11-23 01:22:41.823 E/AndroidRuntime(10972): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at com.golgen.oyun.GameView.epochDay(GameView.java:138)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at com.golgen.oyun.GameView.<init>(GameView.java:99)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at com.golgen.oyun.MainActivity.onCreate(MainActivity.java:49)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.Activity.performCreate(Activity.java:8595)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.Activity.performCreate(Activity.java:8573)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1456)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3764)
-11-23 01:22:41.823 E/AndroidRuntime(10972): 	... 12 more
-11-23 01:23:06.230 W/ActivityManager(  522): Slow operation: 89ms so far, now at startProcess: returned from zygote!
-11-23 01:23:06.231 W/ActivityManager(  522): Slow operation: 90ms so far, now at startProcess: done updating battery stats
-11-23 01:23:06.231 W/ActivityManager(  522): Slow operation: 90ms so far, now at startProcess: building log message
-11-23 01:23:06.231 W/ActivityManager(  522): Slow operation: 90ms so far, now at startProcess: starting to update pids map
-11-23 01:23:06.231 W/ActivityManager(  522): Slow operation: 90ms so far, now at startProcess: done updating pids map
-11-23 01:23:06.472 W/ActivityManager(  522): Slow operation: 105ms so far, now at attachApplicationLocked: immediately before bindApplication
-11-23 01:23:06.477 W/ActivityManager(  522): Slow operation: 110ms so far, now at attachApplicationLocked: immediately after bindApplication
-11-23 01:23:06.477 W/ActivityManager(  522): Slow operation: 110ms so far, now at attachApplicationLocked: after updateLruProcessLocked
-11-23 01:23:06.757 E/AndroidRuntime(11269): FATAL EXCEPTION: main
-11-23 01:23:06.757 E/AndroidRuntime(11269): Process: com.golgen.oyun, PID: 11269
-11-23 01:23:06.757 E/AndroidRuntime(11269): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.golgen.oyun/com.golgen.oyun.MainActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3782)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3922)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:139)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:96)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2443)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.os.Handler.dispatchMessage(Handler.java:106)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.os.Looper.loopOnce(Looper.java:205)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.os.Looper.loop(Looper.java:294)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at java.lang.reflect.Method.invoke(Native Method)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
-11-23 01:23:06.757 E/AndroidRuntime(11269): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at com.golgen.oyun.GameView.epochDay(GameView.java:138)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at com.golgen.oyun.GameView.<init>(GameView.java:99)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at com.golgen.oyun.MainActivity.onCreate(MainActivity.java:49)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.Activity.performCreate(Activity.java:8595)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.Activity.performCreate(Activity.java:8573)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1456)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3764)
-11-23 01:23:06.757 E/AndroidRuntime(11269): 	... 12 more
-11-23 01:23:22.354 W/ActivityManager(  522): Ignoring remove of inactive process: ProcessRecord{4fc76fe 0:com.golgen.oyun/u0a192}
-11-23 01:24:43.823 W/ActivityManager(  522): Slow operation: 96ms so far, now at startProcess: done updating battery stats
-11-23 01:24:43.823 W/ActivityManager(  522): Slow operation: 96ms so far, now at startProcess: building log message
-11-23 01:24:43.823 W/ActivityManager(  522): Slow operation: 96ms so far, now at startProcess: starting to update pids map
-11-23 01:24:43.823 W/ActivityManager(  522): Slow operation: 96ms so far, now at startProcess: done updating pids map
-11-23 01:24:44.327 W/ActivityManager(  522): Scheduling restart of crashed service com.android.chrome/org.chromium.chrome.browser.customtabs.CustomTabsConnectionService in 1000ms for connection
-11-23 01:24:44.369 W/ActivityManager(  522): setHasOverlayUi called on unknown pid: 1056
-11-23 01:24:44.625 E/AndroidRuntime(11779): FATAL EXCEPTION: main
-11-23 01:24:44.625 E/AndroidRuntime(11779): Process: com.golgen.oyun, PID: 11779
-11-23 01:24:44.625 E/AndroidRuntime(11779): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.golgen.oyun/com.golgen.oyun.MainActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3782)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3922)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:139)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:96)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2443)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.os.Handler.dispatchMessage(Handler.java:106)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.os.Looper.loopOnce(Looper.java:205)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.os.Looper.loop(Looper.java:294)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at java.lang.reflect.Method.invoke(Native Method)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
-11-23 01:24:44.625 E/AndroidRuntime(11779): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at com.golgen.oyun.GameView.epochDay(GameView.java:138)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at com.golgen.oyun.GameView.<init>(GameView.java:99)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at com.golgen.oyun.MainActivity.onCreate(MainActivity.java:49)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.Activity.performCreate(Activity.java:8595)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.Activity.performCreate(Activity.java:8573)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1456)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3764)
-11-23 01:24:44.625 E/AndroidRuntime(11779): 	... 12 more
-11-23 01:25:10.554 W/ActivityManager(  522): Slow operation: 78ms so far, now at attachApplicationLocked: immediately before bindApplication
-11-23 01:25:10.554 W/ActivityManager(  522): Slow operation: 78ms so far, now at attachApplicationLocked: immediately after bindApplication
-11-23 01:25:10.554 W/ActivityManager(  522): Slow operation: 78ms so far, now at attachApplicationLocked: after updateLruProcessLocked
-11-23 01:25:10.888 E/AndroidRuntime(11929): FATAL EXCEPTION: main
-11-23 01:25:10.888 E/AndroidRuntime(11929): Process: com.golgen.oyun, PID: 11929
-11-23 01:25:10.888 E/AndroidRuntime(11929): java.lang.RuntimeException: Unable to start activity ComponentInfo{com.golgen.oyun/com.golgen.oyun.MainActivity}: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3782)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.ActivityThread.handleLaunchActivity(ActivityThread.java:3922)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.servertransaction.LaunchActivityItem.execute(LaunchActivityItem.java:103)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.servertransaction.TransactionExecutor.executeCallbacks(TransactionExecutor.java:139)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.servertransaction.TransactionExecutor.execute(TransactionExecutor.java:96)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.ActivityThread$H.handleMessage(ActivityThread.java:2443)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.os.Handler.dispatchMessage(Handler.java:106)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.os.Looper.loopOnce(Looper.java:205)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.os.Looper.loop(Looper.java:294)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.ActivityThread.main(ActivityThread.java:8177)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at java.lang.reflect.Method.invoke(Native Method)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:552)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:971)
-11-23 01:25:10.888 E/AndroidRuntime(11929): Caused by: java.lang.NullPointerException: Attempt to invoke interface method 'long com.golgen.oyun.core.TimeSource.elapsedMs()' on a null object reference
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at com.golgen.oyun.GameView.epochDay(GameView.java:138)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at com.golgen.oyun.GameView.<init>(GameView.java:99)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at com.golgen.oyun.MainActivity.onCreate(MainActivity.java:49)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.Activity.performCreate(Activity.java:8595)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.Activity.performCreate(Activity.java:8573)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.Instrumentation.callActivityOnCreate(Instrumentation.java:1456)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	at android.app.ActivityThread.performLaunchActivity(ActivityThread.java:3764)
-11-23 01:25:10.888 E/AndroidRuntime(11929): 	... 12 more
+11-23 01:39:46.383 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:39:46.383 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:39:46.383 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:39:46.694 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:39:46.700 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:39:46.700 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:39:46.700 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:39:46.700 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:39:46.700 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:39:46.700 I/GolgenUI( 2592): ekran=PlayScreen
+11-23 01:39:46.700 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:39:46.921 I/GolgenFPS( 2592): fps=21.7 ekran=PlayScreen
+11-23 01:39:47.842 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:48.158 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:48.309 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:48.598 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:48.798 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:49.117 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:49.321 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:49.569 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:49.746 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:50.000 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:50.112 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:50.410 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:50.525 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:50.795 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:50.966 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:51.178 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:51.275 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:51.624 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:52.698 I/GolgenFPS( 2592): fps=21.6 ekran=PlayScreen
+11-23 01:39:53.457 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:39:53.457 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:39:53.457 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:39:53.457 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:39:53.457 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:39:53.457 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:39:53.768 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:39:53.771 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:39:53.771 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:39:53.772 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:39:53.772 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:39:53.772 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:39:53.773 I/GolgenUI( 2592): ekran=PlayScreen
+11-23 01:39:53.773 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:39:54.904 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:55.174 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:55.289 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:55.617 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:55.832 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:56.168 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:56.320 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:56.601 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:56.699 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:57.010 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:57.138 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:57.399 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:57.552 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:57.883 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:58.003 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:39:58.349 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:58.477 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:39:58.811 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:39:59.102 I/GolgenFPS( 2592): fps=22.5 ekran=PlayScreen
+11-23 01:40:00.422 I/GolgenUI( 2592): ekran=PlayScreen
+11-23 01:40:00.425 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:40:01.456 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:01.810 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:01.909 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:02.169 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:02.386 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:02.613 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:02.748 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:03.035 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:03.164 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:03.436 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:03.639 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:03.915 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:04.047 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:04.346 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:04.462 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:04.757 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:04.876 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:05.188 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:05.723 I/GolgenFPS( 2592): fps=21.3 ekran=PlayScreen
+11-23 01:40:07.127 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:40:07.127 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:40:07.127 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:40:07.127 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:40:07.127 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:40:07.127 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:40:07.371 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:40:07.372 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:40:07.372 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:40:07.373 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:40:07.373 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:40:07.373 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:40:07.373 I/GolgenUI( 2592): ekran=PlayScreen
+11-23 01:40:07.373 I/GolgenUI( 2592): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:40:08.472 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:08.724 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:08.921 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:09.161 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:09.305 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:09.632 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:09.725 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:10.027 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:10.221 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:10.547 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:10.611 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:10.880 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:11.089 I/GolgenUI( 2592): dokunma a=0 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:11.414 I/GolgenUI( 2592): dokunma a=1 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:11.549 I/GolgenUI( 2592): dokunma a=0 x=800 y=1450 fade=0 ekranAdi=PlayScreen
+11-23 01:40:11.861 I/GolgenUI( 2592): dokunma a=1 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:11.954 I/GolgenUI( 2592): dokunma a=0 x=650 y=1900 fade=0 ekranAdi=PlayScreen
+11-23 01:40:12.312 I/GolgenUI( 2592): dokunma a=1 x=300 y=1600 fade=0 ekranAdi=PlayScreen
+11-23 01:40:12.636 I/GolgenFPS( 2592): fps=20.5 ekran=PlayScreen
+11-23 01:40:14.391 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:40:14.391 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:40:14.391 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:40:14.392 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:40:14.392 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:40:14.392 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:14.394 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:14.394 I/GolgenUI( 2592): ekran=MenuScreen
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:14.395 I/GolgenUI( 2592): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:15.995 W/ActivityManager(  526): setHasOverlayUi called on unknown pid: 2592
+11-23 01:40:16.584 I/GolgenUI( 8382): ekran=LogoScreen
+11-23 01:40:24.224 I/GolgenFPS( 8382): fps=25.4 ekran=LogoScreen
+11-23 01:40:26.816 I/GolgenUI( 8382): ekran=SplashScreen
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:29.589 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:29.592 I/GolgenUI( 8382): ekran=MenuScreen
+11-23 01:40:29.592 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:40:29.592 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:40:29.592 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:40:29.592 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:40:29.593 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:40:29.593 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:29.593 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:29.636 I/GolgenFPS( 8382): fps=26.6 ekran=MenuScreen
+11-23 01:40:32.761 W/ActivityManager(  526): Slow operation: 57ms so far, now at startProcess: returned from zygote!
+11-23 01:40:32.761 W/ActivityManager(  526): Slow operation: 58ms so far, now at startProcess: done updating battery stats
+11-23 01:40:32.761 W/ActivityManager(  526): Slow operation: 58ms so far, now at startProcess: building log message
+11-23 01:40:32.761 W/ActivityManager(  526): Slow operation: 58ms so far, now at startProcess: starting to update pids map
+11-23 01:40:32.761 W/ActivityManager(  526): Slow operation: 58ms so far, now at startProcess: done updating pids map
+11-23 01:40:32.969 W/ActivityManager(  526): Slow operation: 134ms so far, now at startProcess: returned from zygote!
+11-23 01:40:32.974 W/ActivityManager(  526): Slow operation: 140ms so far, now at startProcess: done updating battery stats
+11-23 01:40:32.974 W/ActivityManager(  526): Slow operation: 140ms so far, now at startProcess: building log message
+11-23 01:40:32.974 W/ActivityManager(  526): Slow operation: 140ms so far, now at startProcess: starting to update pids map
+11-23 01:40:32.975 W/ActivityManager(  526): Slow operation: 140ms so far, now at startProcess: done updating pids map
+11-23 01:40:36.652 I/GolgenAds( 8382): SDK hazır
+11-23 01:40:38.406 I/GolgenFPS( 8382): fps=20.5 ekran=MenuScreen
+11-23 01:40:45.810 I/GolgenAds( 8382): geçiş reklamı hazır
+11-23 01:40:46.234 I/GolgenAds( 8382): banner yüklendi
+11-23 01:40:46.236 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:46.236 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:46.236 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:46.237 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:46.237 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:46.237 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:46.237 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:46.255 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:46.255 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:46.256 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:46.256 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:46.256 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:46.256 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:46.256 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:46.358 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:46.362 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:46.362 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:46.363 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:46.364 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:46.365 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:46.367 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:47.499 I/GolgenFPS( 8382): fps=20.3 ekran=MenuScreen
+11-23 01:40:48.782 I/GolgenAds( 8382): ödüllü video hazır
+11-23 01:40:49.720 I/GolgenUI( 8382): dokunma a=0 x=540 y=1595 fade=0 ekranAdi=MenuScreen
+11-23 01:40:49.732 I/GolgenUI( 8382): dokunma a=1 x=540 y=1595 fade=0 ekranAdi=MenuScreen
+11-23 01:40:49.733 I/GolgenUI( 8382): tik ad=OYNA
+11-23 01:40:49.977 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:40:49.980 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:40:49.980 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:40:49.980 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:40:49.980 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:40:49.981 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:40:49.982 I/GolgenUI( 8382): ekran=PlayScreen
+11-23 01:40:49.983 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-23 01:40:52.903 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=DEVAM ET x=540 y=1025
+11-23 01:40:52.903 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=YENİDEN BAŞLAT x=540 y=1185
+11-23 01:40:52.904 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ANA MENÜ x=540 y=1345
+11-23 01:40:52.904 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-23 01:40:52.904 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-23 01:40:52.904 I/GolgenUI( 8382): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-23 01:40:53.831 I/GolgenUI( 8382): dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-23 01:40:53.836 I/GolgenUI( 8382): dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-23 01:40:53.837 I/GolgenUI( 8382): tik ad=ANA MENÜ
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:54.042 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:54.043 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:54.043 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:54.043 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:54.049 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:54.050 I/GolgenUI( 8382): ekran=MenuScreen
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:54.051 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:55.242 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:40:55.242 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:40:55.242 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:40:55.243 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:40:55.269 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:40:55.269 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:55.269 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:55.351 I/GolgenFPS( 8382): fps=22.1 ekran=MenuScreen
+11-23 01:40:55.489 I/GolgenAds( 8382): geçiş reklamı gösterildi
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:55.754 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:40:59.831 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:40:59.831 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:40:59.831 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:40:59.831 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:40:59.831 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:40:59.832 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:40:59.832 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:41:00.183 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:41:00.184 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:41:00.187 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:41:00.189 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:41:00.189 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:41:00.189 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:41:00.189 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:41:02.222 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:41:02.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:41:02.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:41:02.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:41:02.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:41:02.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:41:02.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:41:02.337 I/GolgenAds( 8382): geçiş reklamı hazır
+11-23 01:41:02.453 I/GolgenAds( 8382): ödüllü video gösterildi
+11-23 01:41:04.221 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1763
+11-23 01:41:04.222 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1962
+11-23 01:41:04.222 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=2167
+11-23 01:41:04.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=2167
+11-23 01:41:04.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=2167
+11-23 01:41:04.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:41:04.223 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:41:09.355 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:41:09.356 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:41:09.356 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:41:09.356 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:41:09.356 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:41:09.357 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:41:09.357 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-23 01:41:09.608 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=OYNA x=540 y=1595
+11-23 01:41:09.608 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=HARİTALAR · 500 BÖLÜM x=540 y=1794
+11-23 01:41:09.608 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Karakter x=244 y=1999
+11-23 01:41:09.608 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Görevler x=540 y=1999
+11-23 01:41:09.608 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=Rekorlar x=836 y=1999
+11-23 01:41:09.608 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-23 01:41:09.609 I/GolgenUI( 8382): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216

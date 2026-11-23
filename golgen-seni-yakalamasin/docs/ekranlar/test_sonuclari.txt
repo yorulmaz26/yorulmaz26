@@ -1,84 +1,53 @@
 GEÇTİ  | APK kurulumu
-KALDI  | Logo animasyonu gösterilmedi
-KALDI  | Açılış ekranı gösterilmedi
-KALDI  | İlk açılış öğreticisi → beklenen TutorialScreen, bulunan 
-KALDI  | hedef bulunamadı: TutorialScreen/Atla
-KALDI  | Öğretici → Ana menü → beklenen MenuScreen, bulunan 
-KALDI  | Günlük giriş ödülü penceresi açılmadı
-KALDI  | hedef bulunamadı: MenuScreen/OYNA
-KALDI  | OYNA butonu → beklenen PlayScreen, bulunan 
-KALDI  | hedef bulunamadı: GameOverScreen/TEKRAR OYNA
-KALDI  | hedef bulunamadı: PlayScreen/ikon-1
-KALDI  | hedef bulunamadı: GameOverScreen/TEKRAR OYNA
-KALDI  | hedef bulunamadı: PlayScreen/ikon-1
-KALDI  | hedef bulunamadı: GameOverScreen/TEKRAR OYNA
-KALDI  | hedef bulunamadı: PlayScreen/ikon-1
-KALDI  | Duraklatma menüsü
-KALDI  | Duraklatmada oyun bitti
-KALDI  | hedef bulunamadı: PlayScreen/DEVAM ET
-KALDI  | Hareketsiz kalınca gölge yakalar / oyun sonu → beklenen GameOverScreen, bulunan 
-KALDI  | Kayıt: gamesPlayed=
-KALDI  | Kayıt: bestScore=
-KALDI  | hedef bulunamadı: GameOverScreen/TEKRAR OYNA
-KALDI  | Tekrar oyna → beklenen PlayScreen, bulunan 
-KALDI  | Geri tuşu duraklatma
-KALDI  | hedef bulunamadı: PlayScreen/ANA MENÜ
-KALDI  | Duraklatma → Ana menü → beklenen MenuScreen, bulunan 
-KALDI  | hedef bulunamadı: MenuScreen/Karakter
-KALDI  | Karakter butonu → beklenen SkinsScreen, bulunan 
-KALDI  | hedef bulunamadı: SkinsScreen/kart-2
-KALDI  | hedef bulunamadı: SkinsScreen/SATIN AL  ·  120
-KALDI  | Satın alma: seçili= açık= elmas →
-KALDI  | Geri tuşu → Ana menü → beklenen MenuScreen, bulunan 
-KALDI  | hedef bulunamadı: MenuScreen/Görevler
-KALDI  | Görevler butonu → beklenen MissionsScreen, bulunan 
-KALDI  | hedef bulunamadı: MissionsScreen/Haritalar
-KALDI  | hedef bulunamadı: MissionsScreen/Başarılar
-KALDI  | hedef bulunamadı: MissionsScreen/Haritalar
-KALDI  | hedef bulunamadı: MissionsScreen/bolum-0
-KALDI  | Bölüm 1 başlatma (harita düğümü) → beklenen PlayScreen, bulunan 
-KALDI  | Can harcama: enLives=
-KALDI  | hedef bulunamadı: PlayScreen/ANA MENÜ
-KALDI  | Görev → Ana menü → beklenen MenuScreen, bulunan 
-KALDI  | hedef bulunamadı: MenuScreen/Rekorlar
-KALDI  | Rekorlar butonu → beklenen RecordsScreen, bulunan 
-KALDI  | hedef bulunamadı: RecordsScreen/ikon-3
-KALDI  | Rekorlar geri butonu → beklenen MenuScreen, bulunan 
-KALDI  | hedef bulunamadı: MenuScreen/ikon-2
-KALDI  | Ayarlar butonu → beklenen SettingsScreen, bulunan 
-KALDI  | hedef bulunamadı: SettingsScreen/ayar-ses
-KALDI  | hedef bulunamadı: SettingsScreen/ayar-titresim
-KALDI  | Ayarlar kaydı: ses= titreşim=
-KALDI  | hedef bulunamadı: SettingsScreen/ayar-ses
-KALDI  | hedef bulunamadı: SettingsScreen/İLERLEMEYİ SIFIRLA
-KALDI  | hedef bulunamadı: SettingsScreen/VAZGEÇ
-KALDI  | hedef bulunamadı: SettingsScreen/ÖĞRETİCİYİ OYNA
-KALDI  | Ayarlar → Öğretici → beklenen TutorialScreen, bulunan 
-KALDI  | hedef bulunamadı: TutorialScreen/Kapat
-KALDI  | Öğretici kapat → beklenen MenuScreen, bulunan 
-KALDI  | Bölüm 3 açılamadı
-KALDI  | Bölüm 18 açılamadı
-KALDI  | Bölüm 28 açılamadı
-KALDI  | Bölüm 38 açılamadı
-KALDI  | Bölüm 58 açılamadı
-KALDI  | Bölüm 73 açılamadı
-KALDI  | Bölüm 78 açılamadı
-KALDI  | Bölüm 93 açılamadı
-KALDI  | Bölüm 100 açılamadı
-KALDI  | Bölüm 150 açılamadı
-KALDI  | Bölüm 250 açılamadı
-KALDI  | Bölüm 350 açılamadı
-KALDI  | Bölüm 450 açılamadı
-KALDI  | Bölüm 500 açılamadı
-KALDI  | Harita bölümlerinden menüye dönüş
-KALDI  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → beklenen MenuScreen, bulunan 
-KALDI  | Kalıcılık: selectedSkin=
-KALDI  | Reklam SDK'sı başlatılamadı
-BİLGİ  | Banner yüklenemedi: 
-KALDI  | hedef bulunamadı: MenuScreen/OYNA
-KALDI  | hedef bulunamadı: PlayScreen/ANA MENÜ
-BİLGİ  | Geçiş reklamı gösterilemedi: 
-BİLGİ  | Ödüllü video gösterilemedi: 
-KALDI  | Reklamlar sırasında çökme
-KALDI  | Çökme/ANR bulundu
-TOPLAM: 1 geçti, 79 kaldı
+GEÇTİ  | Magic Lumos logo animasyonu gösterildi
+GEÇTİ  | Uygulama açılışı → SplashScreen gösterildi
+GEÇTİ  | İlk açılış öğreticisi → TutorialScreen
+GEÇTİ  | Öğretici → Ana menü → MenuScreen
+GEÇTİ  | Günlük giriş ödülü alındı ve kaydedildi
+GEÇTİ  | OYNA butonu → PlayScreen
+GEÇTİ  | Duraklatma menüsü açıldı
+GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
+KALDI  | Hareketsiz kalınca gölge yakalar / oyun sonu → beklenen GameOverScreen, bulunan PlayScreen
+GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (1)
+GEÇTİ  | Kayıt: rekor kaydedildi (54)
+GEÇTİ  | Tekrar oyna → PlayScreen
+GEÇTİ  | Geri tuşu oyunu duraklatır
+GEÇTİ  | Duraklatma → Ana menü → MenuScreen
+GEÇTİ  | Karakter butonu → SkinsScreen
+GEÇTİ  | Karakter satın alındı ve seçildi (elmas 530 → 410)
+GEÇTİ  | Geri tuşu → Ana menü → MenuScreen
+GEÇTİ  | Görevler butonu → MissionsScreen
+GEÇTİ  | Bölüm 1 başlatma (harita düğümü) → PlayScreen
+GEÇTİ  | Bölüm başlatınca 1 can harcandı (4 → 3)
+GEÇTİ  | Görev → Ana menü → MenuScreen
+GEÇTİ  | Rekorlar butonu → RecordsScreen
+GEÇTİ  | Rekorlar geri butonu → MenuScreen
+GEÇTİ  | Ayarlar butonu → SettingsScreen
+GEÇTİ  | Ayarlar: ses ve titreşim kapatıldı ve kaydedildi
+GEÇTİ  | Ayarlar → Öğretici → TutorialScreen
+KALDI  | Öğretici kapat → beklenen MenuScreen, bulunan SettingsScreen
+GEÇTİ  | Bölüm 3 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 18 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 28 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 38 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 58 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 73 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 78 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 93 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 100 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 150 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 250 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 350 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 450 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Bölüm 500 oynanabilir (girdi işlendi, donma yok)
+GEÇTİ  | Harita bölümlerinden ana menüye dönüş
+GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
+GEÇTİ  | Kalıcılık: seçili karakter korundu
+GEÇTİ  | Reklam SDK'sı başlatıldı (AdMob test kimlikleri)
+BİLGİ  | Banner yüklendi (yalnızca menülerde)
+GEÇTİ  | Oyun ekranına geçildi (banner gizli olmalı)
+BİLGİ  | Geçiş (görsel) reklamı gösterildi
+BİLGİ  | Ödüllü video reklamı gösterildi
+GEÇTİ  | Reklamlar sırasında çökme yok
+GEÇTİ  | Çökme veya ANR yok
+TOPLAM: 47 geçti, 2 kaldı
