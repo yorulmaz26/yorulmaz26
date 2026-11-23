@@ -167,6 +167,28 @@ public class EnergyTest {
         assertEquals(0, p.claimLogin(p.trustedDay(c, z)));
     }
 
+    /**
+     * Sunucusuz engellenemeyen tek durum belgelendiği gibi sınırlı: kapat-aç + tarihi ileri almak
+     * yalnızca BİR yeni ödül günü açar; aynı açılışta tarihle oynamak ya da geri almak başka gün açmaz.
+     */
+    @Test public void rebootWithDateForwardOpensOneRewardDayAndNothingMore() {
+        Clock c = new Clock();
+        Progress p = new Progress();
+        java.time.ZoneId z = java.time.ZoneOffset.UTC;
+        int d0 = p.trustedDay(c, z);
+        assertTrue(p.claimLogin(d0) > 0);
+        c.reboot(0);
+        c.wall += 3L * 24 * 60 * MIN;
+        int d1 = p.trustedDay(c, z);
+        assertEquals(d0 + 3, d1);
+        assertTrue(p.claimLogin(d1) > 0);
+        c.wall += 5L * 24 * 60 * MIN;
+        assertEquals(0, p.claimLogin(p.trustedDay(c, z)));
+        c.wall -= 9L * 24 * 60 * MIN;
+        assertEquals(0, p.claimLogin(p.trustedDay(c, z)));
+        assertEquals(d1, p.trustedDay(c, z));
+    }
+
     @Test public void saveLoadRoundTrip() {
         Clock c = new Clock();
         Energy e = fresh(c);

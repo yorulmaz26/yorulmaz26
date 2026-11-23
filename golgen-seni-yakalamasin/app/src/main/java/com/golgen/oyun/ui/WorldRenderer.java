@@ -561,6 +561,9 @@ public final class WorldRenderer {
     private static final android.graphics.Paint darkPaint = new android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG);
     private static final android.graphics.Rect darkSrc = new android.graphics.Rect();
     private static final int DARK_COLOR = 0xF70A101C; // NAVY_DEEP, %97
+    // Kenar yumuşatmasız boya: dikdörtgenler ile delik dokusu tam piksellerde birleşir, aradan ışık sızmaz.
+    private static final android.graphics.Paint darkRectPaint = new android.graphics.Paint();
+    static { darkRectPaint.setColor(DARK_COLOR); darkRectPaint.setStyle(android.graphics.Paint.Style.FILL); }
 
     private static void ensureDarkHole() {
         if (darkHole != null) return;
@@ -590,17 +593,18 @@ public final class WorldRenderer {
         ensureDarkHole();
         float r = w.lightRadius() * s;
         float cx = w.px * s, cy = w.lightCenterY() * s;
-        float l = cx - r, t0 = cy - r, rr = cx + r, b = cy + r;
+        // Kenarlar tam piksele yuvarlanır (tuval yatayda tam piksel kaydırılır, bkz. PlayScreen)
+        float l = (float) Math.floor(cx - r), t0 = (float) Math.floor(cy - r);
+        float rr = (float) Math.ceil(cx + r), b = (float) Math.ceil(cy + r);
         Ui.rf.set(l, t0, rr, b);
         c.drawBitmap(darkHole, darkSrc, Ui.rf, darkPaint);
-        Ui.fill.setShader(null);
-        Ui.fill.setColor(DARK_COLOR);
         // Kaydırılmış (ortalanmış) tuvalde de tüm ekranı kaplasın diye genişçe çizilir
         float x0 = -width, x1 = width * 2f;
-        if (t0 > 0) c.drawRect(x0, 0, x1, t0, Ui.fill);
-        if (b < height) c.drawRect(x0, b, x1, height, Ui.fill);
-        c.drawRect(x0, Math.max(0, t0), l, Math.min(height, b), Ui.fill);
-        c.drawRect(rr, Math.max(0, t0), x1, Math.min(height, b), Ui.fill);
+        // (ekran sarsıntısında da kenar açılmasın diye dikeyde de taşırılır)
+        c.drawRect(x0, -height, x1, t0, darkRectPaint);
+        c.drawRect(x0, b, x1, height * 2f, darkRectPaint);
+        c.drawRect(x0, t0, l, b, darkRectPaint);
+        c.drawRect(rr, t0, x1, b, darkRectPaint);
     }
 
     /** Menü ve önizlemeler için bağımsız karakter çizimi. */

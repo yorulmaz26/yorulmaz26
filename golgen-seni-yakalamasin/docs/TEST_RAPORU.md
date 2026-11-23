@@ -2,7 +2,7 @@
 
 Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalıştırma çıktılarıdır.
 
-## 1. Birim testleri (JUnit, 78 test) — ✅ 78/78 geçti
+## 1. Birim testleri (JUnit, 79 test) — ✅ 79/79 geçti
 Çalıştırıldığı yerler: geliştirme konteynerinde (`javac` + JUnit 4.13.2) ve GitHub Actions'ta `./gradlew testDebugUnitTest`.
 
 | Sınıf | Test | Doğrulanan |
@@ -13,8 +13,8 @@ Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalı�
 | ProgressTest | 9 | Kayıt/okuma gidiş-dönüş, kilitli karakter seçiminin reddi, rekor ve ilk 10, satın alma, bölüm açılması ve tek seferlik ödül, günlük görevler, sıfırlama, **eski kayıttan (sürüm 1) yükseltmede eşiği büyüyen başarıların geri alınması** |
 | SynthTest | 3 | 8 ses efekti, müzik döngüsü, WAV başlığı |
 | AllocationTest | 1 | Isınmadan sonra oyun döngüsünde bellek tahsisi < 8 bayt/kare (GC takılması yok) |
-| EnergyTest | 12 | İlk kurulumda 4 can, ölünce can gitmesi / kazanınca iadesi, 15 dk'da 1 can (en fazla 4), saati ileri/geri almanın işe yaramaması, ileri-geri döngüsü, yeniden başlatma senaryoları, **yeniden başlatma + saati ileri alma ile en fazla 1 can**, **günlük ödül gününün tarih değişikliğinden etkilenmemesi ve geri gitmemesi**, kayıt/yükleme, elmasla doldurma |
-| LevelsTest | 18 | 500 bölüm/100 harita yapısı, kademeler, zorluğun **500 bölüm boyunca kesintisiz** artması, haritaların ayırt edilebilirliği, 2 aşama / 1→2 gölge / 40 yıldız kuralı, yıldızların erişilebilir alanda doğması, yıldız toplayan botun bölüm bitirmesi, rüzgâr, buz, dar geçit, meteor, tüm engel türleri, lazer kapı, **hızlı gölgelerin her bölümde etkili olması**, **dar geçitte tüm engel/elmas/güçlendirmelerin koridor içinde kalması (85 dar bölüm)**, **dar geçit ile hızlı gölgelerin hiçbir haritada birleşmemesi**, **karanlıkta her akış hızında ≥ 0,6 sn ileriyi görme** |
+| EnergyTest | 13 | İlk kurulumda 4 can, ölünce can gitmesi / kazanınca iadesi, 15 dk'da 1 can (en fazla 4), saati ileri/geri almanın işe yaramaması, ileri-geri döngüsü, yeniden başlatma senaryoları, **yeniden başlatma + saati ileri alma ile en fazla 1 can**, **günlük ödül gününün tarih değişikliğinden etkilenmemesi ve geri gitmemesi**, **kapat-aç + tarihi ileri almanın en fazla bir ödül günü açması**, kayıt/yükleme, elmasla doldurma |
+| LevelsTest | 18 | 500 bölüm/100 harita yapısı, kademeler, zorluğun **500 bölüm boyunca kesintisiz** artması, haritaların ayırt edilebilirliği, 2 aşama / 1→2 gölge / 40 yıldız kuralı, yıldızların erişilebilir alanda doğması, yıldız toplayan botun bölüm bitirmesi, rüzgâr, buz, dar geçit, meteor, tüm engel türleri, lazer kapı, **hızlı gölgelerin her bölümde etkili olması**, **dar geçitte 9 engel türünün, yıldız, elmas ve güçlendirmelerin koridor içinde kalması, kapının yanında geçiş payı (85 dar bölüm)**, **dar geçit ile hızlı gölgelerin hiçbir haritada birleşmemesi**, **karanlıkta her akış hızında ≥ 0,6 sn ileriyi görme** |
 | LongevityTest | 12 | Kalkan, Yavaş Zaman, Mıknatıs, kombo, aşamalar, yıldız kuralları, XP/seviye, 7 günlük giriş serisi, günlük görev türleri, başarılar ve karakterler |
 | MissionsAndSkinsTest | 2 | Karakter fiyatları, başarı tabloları |
 | AdPolicyTest | 4 | İlk 3 oyunda geçiş reklamı olmaması, en fazla 3 oyunda bir + 150 sn arayla gösterim, 12 sn'den kısa oyunların sayılmaması, ödüllü video ile günde en fazla 3 can |
@@ -23,7 +23,7 @@ Tüm testler otomatik çalıştırıldı. Aşağıdaki sonuçlar gerçek çalı�
 - Android 15 API'sine (android-all) karşı tüm kaynakların yerel `javac` derlemesi: hatasız.
 - GitHub Actions: `testDebugUnitTest lintDebug assembleDebug assembleRelease` → **BUILD SUCCESSFUL**.
 
-## 3. Emülatörde uçtan uca UI testi — ✅ 50/50 geçti
+## 3. Emülatörde uçtan uca UI testi — ✅ 51/51 geçti
 Ortam: GitHub Actions, Android 14 (API 34) emülatörü, Pixel 6 profili (1080×2400), betik: `tools/smoke_test.sh`.
 Butonlara gerçek dokunma olaylarıyla (`adb input tap/swipe`) basılır; ekran geçişleri uygulama günlüğünden doğrulanır.
 
@@ -49,17 +49,18 @@ incelendi, her bulgu ayrı doğrulayıcılarla çürütülmeye çalışıldı. D
 | # | Bulgu | Düzeltme |
 |---|---|---|
 | 1 | Dar geçitli haritalarda elmas, güçlendirme ve mayınlar ulaşılamayan kenar şeritlerinde doğabiliyordu; salınan blok, dönen lazer ve çift top koridoru hesaba katmıyordu | Tümü koridor içinde üretiliyor; dönen lazer koridorun en fazla %80'i |
-| 2 | Dar geçit + hızlı gölgeler birlikte olan 65 bölüm komşularından 5–10 kat zordu | İkili aynı haritada birleşmiyor; dar geçitte gölgeler %12 daha geriden gelir |
+| 2 | Dar geçit + hızlı gölgeler birlikte olan 70 bölüm (14 harita) komşularından 5–10 kat zordu | İkili aynı haritada birleşmiyor; dar geçitte gölgeler %12 daha geriden gelir |
 | 3 | Hızlı gölgeler özelliği gecikme alt sınırı yüzünden geç bölümlerde etkisizdi; kademe sınırlarında zorluk testere dişi gibi düşüyordu | Gölge gecikmesi 500 bölüm boyunca tek eğri; hızlı gölgeler her zaman %12 daha yakın |
 | 4 | Karanlıkta görüş yarıçapı sabitti; hızlı kademelerde duvar boşluğu görüldüğünde kaçacak zaman kalmıyordu (iyimser bot bile %74) | Aydınlık alan akış hızıyla büyür ve ileri kayar; boşluk kenarları ve tehlike çerçeveleri karanlığın üstünde çizilir |
 | 5 | Meteor uyarısı karanlığın altında kalıyordu (karanlık + meteor olan 105 bölüm) | Uyarı karanlığın üstünde çiziliyor |
-| 6 | Tarihi ileri almak günlük ödülleri (giriş serisi, günlük görevler) yeniden açıyordu | Gün, monoton saatle doğrulanan güvenilir saatten hesaplanır, geri gitmez |
+| 6 | Tarihi ileri almak günlük ödülleri (giriş serisi, günlük görevler) yeniden açıyordu | Gün, monoton saatle doğrulanan güvenilir saatten hesaplanır, geri gitmez. Sunucusuz kapatılamayan tek yol: telefonu yeniden başlatıp tarihi ileri almak — her yeniden başlatma en fazla bir yeni ödül günü açar |
 | 7 | Telefonu yeniden başlatıp saati ileri almak 4 canı birden dolduruyordu | Yeniden başlatma başına en fazla 1 can |
 | 8 | Hazır ekranındayken duraklatıp devam edince oyun kendiliğinden başlıyordu | Hazır ekranına döner |
 | 9 | Uygulama arka plana geçip odak kaybedince oyun duraklamıyordu | Odak kaybında duraklar |
 | 10 | Başarı bildirimi yanlış ödül miktarını gösteriyordu; can sayacı oyun sonu ekranında donuyordu | Düzeltildi |
 | 11 | Kısa/geniş ekranlarda oyun alanı çok küçülebiliyordu | En az 1200 birim yükseklik görünecek şekilde ölçeklenir, yatayda ortalanır |
 | 12 | Öğretici Ayarlar'dan açılınca ana menüye dönüyordu; eski kayıttaki başarılar yeni eşiklerle tutarsızdı | Ayarlar'a döner; yükseltmede tutarsız başarılar geri alınır |
+| 13 | (Son kontrol) Karanlık bölümde dokunup başlarken ışık dairesi bir karede %28'e kadar büyüyüp kayıyordu; karanlık katmanının kenarlarında ince ışık sızıntısı vardı | Akış hızı ilk adımın değeriyle başlar; karanlık katmanı tam piksellere hizalı, kenar yumuşatmasız çizilir |
 
 ### Oynanabilirlik ölçümü (botlar)
 Her bölüm 2222 birim yüksekliğinde arenada, 1/60 sn adımla, gerçek oyun kodu (`core`) ile oynatıldı.

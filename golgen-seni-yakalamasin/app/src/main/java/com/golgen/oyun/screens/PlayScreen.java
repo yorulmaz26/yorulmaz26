@@ -104,7 +104,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         // Ölçek: genişliğe sığ, ama en az 1200 birim yükseklik görünsün (bölünmüş ekran/küçük pencere);
         // gerekirse oyun alanı yatayda ortalanır.
         renderer.s = Math.min(w / GameWorld.WIDTH, h / 1200f);
-        offX = (w - GameWorld.WIDTH * renderer.s) / 2f;
+        offX = (float) Math.floor((w - GameWorld.WIDTH * renderer.s) / 2f); // tam piksel: karanlık katmanında dikiş olmasın
         worldH = h / renderer.s;
         world.setArenaHeight(worldH);
         float s = 112f * u;
@@ -372,7 +372,7 @@ public final class PlayScreen extends Screen implements GameEvents {
         c.save();
         if (shake > 0f) {
             float a = shake * 14f * u;
-            c.translate((float) Math.sin(time * 90f) * a, (float) Math.cos(time * 75f) * a);
+            c.translate(Math.round(Math.sin(time * 90f) * a), Math.round(Math.cos(time * 75f) * a));
         }
         renderer.drawBackground(c, w, h, world.scrollDistance);
         c.translate(offX, 0);

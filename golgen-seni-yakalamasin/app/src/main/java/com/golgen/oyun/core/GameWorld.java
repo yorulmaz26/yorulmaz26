@@ -146,7 +146,9 @@ public final class GameWorld {
         nextDiamondAt = 2.0f;
         lastGapX = WIDTH / 2f;
         nextShadow = 0;
-        scroll = p.scroll(0f);
+        // İlk adımın kullanacağı hızla başla (bölümün zorluk ofseti dahil): karanlıktaki ışık
+        // dairesi "dokun ve başla" anında sıçramasın.
+        scroll = p.scroll(p.level(0f)) + p.overdrive(0f);
     }
 
     /** Parmak hareketi (dünya birimi cinsinden göreli). */

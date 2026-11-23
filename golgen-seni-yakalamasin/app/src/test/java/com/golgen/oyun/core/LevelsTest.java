@@ -234,10 +234,31 @@ public class LevelsTest {
                 w.update(1f / 60f);
                 for (int i = 0; i < w.diamondPool.size(); i++) assertTrue(w.diamondPool.get(i).x >= lo && w.diamondPool.get(i).x <= hi);
                 for (int i = 0; i < w.powerups.size(); i++) assertTrue(w.powerups.get(i).x >= lo && w.powerups.get(i).x <= hi);
+                for (int i = 0; i < w.starPool.size(); i++) assertTrue("yıldız erişilebilir", w.starPool.get(i).x >= lo && w.starPool.get(i).x <= hi);
                 for (int i = 0; i < w.obstacles.size(); i++) {
                     Obstacle o = w.obstacles.get(i);
-                    if (o.type == Obstacle.MINE) assertTrue("mayın oynanabilir alanda", o.x + o.r > lo && o.x - o.r < hi);
-                    float n = w.profile().narrow, corridor = GameWorld.WIDTH - 2f * n;
+                    float n = w.profile().narrow, corridor = GameWorld.WIDTH - 2f * n, W = GameWorld.WIDTH;
+                    switch (o.type) {
+                        case Obstacle.MINE:
+                            assertTrue("mayın koridorda", o.x - o.mineRadius() >= n && o.x + o.mineRadius() <= W - n);
+                            break;
+                        case Obstacle.METEOR:
+                            assertTrue("meteor koridorda", o.x - o.r >= n && o.x + o.r <= W - n);
+                            break;
+                        case Obstacle.GATE:
+                            assertTrue("kapı koridorda", o.x - o.w / 2f >= n - 0.01f && o.x + o.w / 2f <= W - n + 0.01f);
+                            assertTrue("kapının yanında geçiş payı", corridor - o.w >= 2.5f * GameWorld.PLAYER_R * 2f);
+                            break;
+                        case Obstacle.BOUNCER:
+                            if (o.y > 0f) assertTrue("seken top koridorda", o.x - o.r >= n - 0.01f && o.x + o.r <= W - n + 0.01f);
+                            break;
+                        case Obstacle.WALL:
+                        case Obstacle.ZIGZAG:
+                            assertTrue("boşluk koridorda", o.gapX - o.gapW / 2f >= n && o.gapX + o.gapW / 2f <= W - n);
+                            break;
+                        default:
+                            break;
+                    }
                     if (o.type == Obstacle.SWEEPER)
                         assertTrue("süpürücü koridor içinde salınır", o.x - o.w / 2f >= n - 1f && o.x + o.w / 2f <= GameWorld.WIDTH - n + 1f);
                     if (o.type == Obstacle.ROTOR) {

@@ -73,10 +73,11 @@ Hazır APK: GitHub Actions her push'ta APK'yı derler, emülatörde test eder ve
   **Saat hilesine karşı:** süre telefon saatinden değil, Android'in kullanıcı tarafından değiştirilemeyen monoton sayacından
   (`SystemClock.elapsedRealtime`, uyku dahil) ölçülür. Saati ileri almak can kazandırmaz, geri almak kaybettirmez; aynı açılışta
   saatle oynandığı tespit edilip kaydedilir. Telefon yeniden başlatılırsa (`BOOT_COUNT`) duvar saati kullanılır; saat geri
-  alınmışsa yalnızca açılıştan beri geçen süre sayılır. Sunucu olmadığı için tamamen engellenemeyen tek durum: kapalıyken saati
-  ileri alıp telefonu yeniden başlatmak — bu yolla en fazla **1 can** kazanılabilir (yeniden başlatma başına üst sınır).
-  Günlük ödüller (giriş serisi, günlük görevler, ödüllü video hakkı) de aynı güvenilir saatle hesaplanır; tarihi ileri/geri
-  almak yeni gün açmaz, görülen en ileri gün asla geri gitmez.
+  alınmışsa yalnızca açılıştan beri geçen süre sayılır. Günlük ödüller (giriş serisi, günlük görevler, ödüllü video hakkı) de
+  aynı güvenilir saatle hesaplanır: aynı açılışta tarihi ileri/geri almak yeni gün açmaz, görülen en ileri gün asla geri gitmez.
+  Sunucu olmadığı için tamamen engellenemeyen tek durum: saati/tarihi ileri alıp telefonu **yeniden başlatmak**. Bu yolla her
+  yeniden başlatmada en fazla **1 can** ve en fazla **bir yeni ödül günü** elde edilebilir (sonrasında saatle oynamak bir şey
+  kazandırmaz).
   Bölüm içindeki 3 darbe hakkı ayrı bir şeydir (kalkan simgeleriyle gösterilir).
 - **Taçlar (1500 adet):** her bölümde ♛ tamamla · ♛ hiç çarpmadan bitir · ♛ kombo hedefine ulaş.
 
@@ -188,7 +189,7 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 78 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 79 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
   kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı, 500 bölümün yapı/erişilebilirlik
   kuralları, can ve günlük ödül saat hilesi senaryoları, reklam sıklık kuralları.

@@ -132,6 +132,12 @@ expect_screen PlayScreen "Tekrar oyna"
 clear_log
 adbt shell input keyevent KEYCODE_BACK; sleep 0.8
 if log | grep -q "hedef ekran=PlayScreen ad=ANA MENÜ"; then ok "Geri tuşu oyunu duraklatır"; else bad "Geri tuşu duraklatma"; fi
+# Oyun "dokun ve başla" ekranındayken duraklatıldı: devam edince kendiliğinden başlamamalı.
+# Başlasaydı hareketsiz oyuncuyu gölge ~5 sn içinde yakalar ve oyun sonu gelirdi.
+tap_target PlayScreen "DEVAM ET"
+sleep 8
+if [ "$(current_screen)" = "PlayScreen" ]; then ok "Hazır ekranında duraklat → devam: oyun dokunuş bekliyor (8 sn)"; else bad "Hazır ekranında devam edince oyun kendiliğinden başladı ($(current_screen))"; fi
+adbt shell input keyevent KEYCODE_BACK; sleep 0.8
 tap_target PlayScreen "ANA MENÜ"
 expect_screen MenuScreen "Duraklatma → Ana menü"
 
