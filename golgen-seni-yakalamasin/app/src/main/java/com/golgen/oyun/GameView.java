@@ -96,9 +96,10 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         setFocusable(true);
         store = new PrefsStore(activity);
         progress.load(store);
-        progress.ensureDaily(epochDay());
+        // Saat kaynağı, güvenilir güne (epochDay) ve canlara erişen her şeyden ÖNCE kurulmalı
         clock = new com.golgen.oyun.platform.SystemTime(activity.getContentResolver());
         progress.energy.tick(clock); // ilk kurulumda 4 can
+        progress.ensureDaily(epochDay());
         save();
         sound = new SoundSystem(activity);
         haptics = new Haptics(activity);
