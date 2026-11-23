@@ -7,10 +7,12 @@ import android.view.View
 import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
+import android.widget.FrameLayout
 
 class MainActivity : Activity() {
 
     private lateinit var gameView: GameView
+    private var ads: AdManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,22 +24,32 @@ class MainActivity : Activity() {
             }
         }
         gameView = GameView(this)
-        setContentView(gameView)
+        // Oyun tüm ekranı kaplar; banner reklam yalnızca menülerde, altta üstüne biner
+        val root = FrameLayout(this)
+        root.addView(gameView, FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT))
+        setContentView(root)
         hideSystemBars()
+        ads = runCatching { AdManager(this, root) }.getOrNull()?.also {
+            gameView.ads = it
+            it.start()
+        }
     }
 
     override fun onResume() {
         super.onResume()
+        ads?.onResume()
         gameView.resume()
     }
 
     override fun onPause() {
         gameView.pause()
+        ads?.onPause()
         super.onPause()
     }
 
     override fun onDestroy() {
         gameView.release()
+        ads?.onDestroy()
         super.onDestroy()
     }
 

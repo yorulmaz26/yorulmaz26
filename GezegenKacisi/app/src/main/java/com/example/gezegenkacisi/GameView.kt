@@ -85,6 +85,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         var offset = 0f
         var coinY = Float.NaN   // boşluktaki para (yoksa NaN)
         var coinTaken = false
+        var gapTop = 0f         // geçidin üst kenarı (salınım hariç), yıldırımın güvenli boyu için
         val halfWidth: Float = planets.maxOf { abs(it.dx) + it.art.padX * it.r / it.art.baseR }
     }
 
@@ -235,6 +236,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     )
     private var livesTick = 0f
     private var lifeSpent = false               // bu bölüm denemesi için can harcandı mı
+
+    // --- Reklamlar (MainActivity verir; testlerde yoktur) ---
+    var ads: AdsBridge? = null
+    private enum class Reward { NONE, LIFE, DOUBLE_LEVEL, DOUBLE_RUN }
+    private var bannerOn = false
+    private var bannerReserve = 0f              // banner'ın kapladığı alt alan (dünya birimi)
+    private var runsSinceAd = 0                 // son geçiş reklamından beri biten oyun sayısı
+    private var lastAdAt = 0L
+    private var lastRewardAt = -1L
+    private val appStartAt = SystemClock.elapsedRealtime()
+    private var adShowing = false               // reklam açıkken dokunuşlar yok sayılır
+    private var rewardUsed = false              // bu ekrandaki ödüllü video kullanıldı mı
+    private val rewardBtn = RectF()
+    private val privacyRect = RectF()
 
     private val bolts = ArrayList<Bolt>()
     private var boltTimer = 0f
@@ -408,6 +423,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val strLevelLocked = context.getString(R.string.level_locked)
     private val strNoLives = context.getString(R.string.lives_empty)
     private val strTapToSkip = context.getString(R.string.splash_skip)
+    private val strRewardLife = context.getString(R.string.ad_reward_life)
+    private val strRewardDouble = context.getString(R.string.ad_reward_double)
+    private val strRewardCoins = context.getString(R.string.ad_reward_coins)
+    private val strGotLife = context.getString(R.string.ad_got_life)
+    private val strGotCoins = context.getString(R.string.ad_got_coins)
+    private val strPrivacy = context.getString(R.string.ad_privacy)
     private val strLifeRule = context.getString(R.string.lives_rule)
     private val modNames = Mod.entries.map { context.getString(it.nameRes) }
     private val skinNames = Skin.entries.map { context.getString(it.nameRes) }
@@ -766,6 +787,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Parmak ekrana değdiği an: oyunda gecikmesiz itiş. */
     private fun onPress() {
+        if (adShowing) return
         if (paused) {
             paused = false
             if (state == State.PLAYING) flap()
@@ -773,6 +795,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
         when (state) {
             State.READY -> {
+                // Can bittiyse: "video izle +1 can" düğmesi
+                if (currentReward() != Reward.NONE && hit(rewardBtn, downX, downY, 6f)) {
+                    watchReward()
+                    return
+                }
                 if (levelMode && !lifeSpent) {
                     if (!lives.spend()) {
                         marketMsg = String.format(strNoLives, lives.nextText())
@@ -794,6 +821,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     /** Parmak kalktığında: menü ve oyun sonu düğmeleri. */
     private fun onRelease(x: Float, y: Float) {
+        if (adShowing) return
         val dx = x - downX
         val dy = y - downY
         val moved = abs(dx) > 28f || abs(dy) > 28f
@@ -823,10 +851,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             State.OVER -> if (!moved && stateTimer > 0.6f) {
                 val lv = level
                 when {
+                    currentReward() != Reward.NONE && hit(rewardBtn, downX, downY, 4f) -> watchReward()
                     hit(soundBtn, downX, downY) -> toggleSound()
-                    hit(menuBtn, downX, downY) -> { sound.play(SoundManager.Sfx.CLICK); leaveRun() }
-                    levelMode && lv != null -> openLevel(lv.number)
-                    else -> startReady() // "Tekrar" ya da ekranın herhangi bir yeri
+                    hit(menuBtn, downX, downY) -> {
+                        sound.play(SoundManager.Sfx.CLICK)
+                        afterBreak { leaveRun() }
+                    }
+                    levelMode && lv != null -> afterBreak { openLevel(lv.number) }
+                    else -> afterBreak { startReady() } // "Tekrar" ya da ekranın herhangi bir yeri
                 }
             }
             else -> Unit
@@ -935,6 +967,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         boltTimer = 2.4f
         windPhase = wr(0f, TWO_PI)
         runCoins = 0
+        rewardUsed = false
         coinRng = Random(seed xor 0x5EED)
     }
 
@@ -1032,6 +1065,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
         val base = cfg.baseSpeed * map.speedMul
         if (marketMsgT > 0f) marketMsgT -= dt
+        updateBanner()
         livesTick -= dt
         if (livesTick <= 0f) {
             livesTick = 1f
@@ -1192,6 +1226,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         buildStack(planets, gapY - gapH / 2f, -1f, amp) // üst kule
         buildStack(planets, gapY + gapH / 2f, 1f, amp)  // alt kule
         val col = Column(x, planets, amp, wr(0f, TWO_PI))
+        col.gapTop = gapY - gapH / 2f
         if (amp > 0f) col.offset = amp * sin(worldTime * SWAY_SPEED + col.swayPhase)
         // Para: boşluğun içinde, ayrı rastgele sayı üreticisiyle (parkuru değiştirmez)
         if (coinChance > 0f && coinRng.nextFloat() < coinChance) {
@@ -1294,6 +1329,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         performHapticFeedback(HapticFeedbackConstants.LONG_PRESS)
         sound.play(SoundManager.Sfx.CRASH)
         saveCoins()
+        runsSinceAd++
         if (!levelMode && score > best) {
             best = score
             newBest = true
@@ -1316,6 +1352,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             lives.refund()
             lifeSpent = false
         }
+        runsSinceAd++
+        rewardUsed = false
         val first = lv.number > levelMax
         levelBonus = if (first) lv.reward else 3
         coins += levelBonus
@@ -2110,7 +2148,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 boltTimer = wr(2.1f, 3.3f) / hazard()
                 val warn = 0.95f
                 val x = min(maxX, rocketX + speed * (warn + wr(0.1f, 0.5f)))
-                bolts.add(Bolt(x, wr(360f, 700f), warn, 0.4f))
+                val len = safeBoltLen(x, wr(360f, 700f))
+                if (len > 0f) bolts.add(Bolt(x, len, warn, 0.4f))
             }
         }
 
@@ -2158,6 +2197,19 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 if (b.life <= 0f) bi.remove()
             }
         }
+    }
+
+    /**
+     * Yıldırım, iki yanındaki kulelerin geçitlerinin üstünde biter; böylece roket geçitlerin
+     * yüksekliğinde kalarak her zaman altından geçebilir. Yer kalmıyorsa (0) yıldırım düşmez.
+     * (Simülasyonla doğrulandı: bu kural olmadan bazı anlarda hiçbir hamle kurtarmıyordu.)
+     */
+    private fun safeBoltLen(x: Float, len: Float): Float {
+        var l = len
+        for (col in columns) {
+            if (abs(col.x - x) < cfg.spacing + 80f) l = min(l, col.gapTop - col.swayAmp - 30f)
+        }
+        return if (l < 120f) 0f else l
     }
 
     private fun drawFireballs(cv: Canvas) {
@@ -2834,8 +2886,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val col = i % 2
             val row = i / 2
             val x0 = 16f + col * (cw + 12f)
-            val y0 = 148f + row * 166f
-            marketCards[i].set(x0, y0, x0 + cw, y0 + 158f)
+            // Kartlar banner'ın üstünde kalacak şekilde sığdırılır
+            val pitch = min(166f, (WORLD_H - bannerReserve - 8f - 148f) / 5f)
+            val y0 = 148f + row * pitch
+            marketCards[i].set(x0, y0, x0 + cw, y0 + pitch - 8f)
         }
     }
 
@@ -2857,7 +2911,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     private fun maxLevelScroll() =
-        max(0f, (Levels.COUNT / Levels.PER_MAP) * LEVEL_ROW_H - (WORLD_H - LEVEL_LIST_TOP) + 30f)
+        max(0f, (Levels.COUNT / Levels.PER_MAP) * LEVEL_ROW_H - (WORLD_H - bannerReserve - LEVEL_LIST_TOP) + 30f)
 
     /** Haritayı değiştirir (görseller ve müzik dahil). [save] ise menüdeki seçim olarak da hatırlanır. */
     private fun setMap(index: Int, save: Boolean) {
@@ -2888,6 +2942,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
     private fun hubTap(x: Float, y: Float) {
         when {
+            !privacyRect.isEmpty && hit(privacyRect, x, y, 4f) -> ads?.showPrivacyOptions()
             hit(soundBtn, x, y) -> toggleSound()
             hit(coinPillRect, x, y) || hit(hubMarketBtn, x, y) -> { sound.play(SoundManager.Sfx.CLICK); state = State.MARKET }
             hit(hubLevelsBtn, x, y) -> enterLevels()
@@ -2968,9 +3023,139 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private fun levelDoneTap(x: Float, y: Float) {
         val lv = level ?: return
         when {
-            hit(retryBtn, x, y) && lv.number < Levels.COUNT -> openLevel(lv.number + 1)
-            hit(menuBtn, x, y) -> enterLevels()
+            currentReward() != Reward.NONE && hit(rewardBtn, x, y, 4f) -> watchReward()
+            hit(retryBtn, x, y) && lv.number < Levels.COUNT -> afterBreak { openLevel(lv.number + 1) }
+            hit(menuBtn, x, y) -> afterBreak { enterLevels() }
         }
+    }
+
+    // =====================================================================
+    // Reklamlar: banner yalnızca menülerde, geçiş reklamı yalnızca oyun aralarında, ödüllü video isteğe bağlı
+    // =====================================================================
+
+    /** Banner'ın görüneceği ekranlar: oyun oynanırken asla. */
+    private fun bannerScreen() =
+        (state == State.HUB || state == State.MENU || state == State.LEVELS || state == State.MARKET) && !adShowing
+
+    private fun updateBanner() {
+        val a = ads ?: return
+        val want = bannerScreen()
+        if (want != bannerOn) {
+            bannerOn = want
+            a.setBannerVisible(want)
+        }
+        bannerReserve = if (want && scale > 0f) a.bannerHeightPx / scale else 0f
+    }
+
+    /**
+     * Oyun arası geçişlerde (oyun bitti / bölüm sonu ekranından çıkarken) bazen geçiş reklamı gösterir,
+     * sonra [then] ile devam eder. Sıklık sınırları: en az 3 oyunda bir, araya en az 150 sn,
+     * uygulama açıldıktan sonraki ilk 90 sn ve ödüllü videodan sonraki 60 sn hiç yok.
+     */
+    private fun afterBreak(then: () -> Unit) {
+        val a = ads
+        val now = SystemClock.elapsedRealtime()
+        val allowed = a != null && !isMpView() &&
+            runsSinceAd >= 3 &&
+            now - lastAdAt >= 150_000L &&
+            now - appStartAt >= 90_000L &&
+            (lastRewardAt < 0L || now - lastRewardAt >= 60_000L) &&
+            a.interstitialReady()
+        if (allowed && a!!.showInterstitial {
+                adShowing = false
+                lastAdAt = SystemClock.elapsedRealtime()
+                then()
+            }) {
+            adShowing = true
+            runsSinceAd = 0
+            lastAdAt = now
+        } else {
+            then()
+        }
+    }
+
+    /** Bu ekranda sunulabilecek ödüllü video (video hazır değilse NONE). */
+    private fun currentReward(): Reward {
+        val a = ads ?: return Reward.NONE
+        if (adShowing || isMpView()) return Reward.NONE
+        val r = when (state) {
+            State.READY -> if (levelMode && !lifeSpent && lives.count == 0) Reward.LIFE else Reward.NONE
+            State.OVER -> when {
+                rewardUsed -> Reward.NONE
+                levelMode && lives.count < Lives.MAX -> Reward.LIFE
+                !levelMode && runCoins > 0 -> Reward.DOUBLE_RUN
+                else -> Reward.NONE
+            }
+            State.LEVEL_DONE -> if (!rewardUsed && levelBonus + runCoins > 0) Reward.DOUBLE_LEVEL else Reward.NONE
+            else -> Reward.NONE
+        }
+        return if (r != Reward.NONE && a.rewardedReady()) r else Reward.NONE
+    }
+
+    private fun watchReward() {
+        val a = ads ?: return
+        val kind = currentReward()
+        if (kind == Reward.NONE) return
+        sound.play(SoundManager.Sfx.CLICK)
+        val started = a.showRewarded(
+            onReward = {
+                lastRewardAt = SystemClock.elapsedRealtime()
+                when (kind) {
+                    Reward.LIFE -> {
+                        lives.refund()
+                        marketMsg = strGotLife
+                    }
+                    Reward.DOUBLE_LEVEL -> {
+                        val extra = levelBonus + runCoins
+                        coins += extra
+                        saveCoins()
+                        marketMsg = String.format(strGotCoins, extra)
+                    }
+                    Reward.DOUBLE_RUN -> {
+                        coins += runCoins
+                        saveCoins()
+                        marketMsg = String.format(strGotCoins, runCoins)
+                    }
+                    Reward.NONE -> Unit
+                }
+                if (kind != Reward.LIFE || state == State.OVER) rewardUsed = true
+                marketMsgT = 2f
+                sound.play(SoundManager.Sfx.RECORD)
+            },
+            onDone = { adShowing = false }
+        )
+        if (started) adShowing = true
+    }
+
+    /** Ödüllü video düğmesi: oynat simgesi + metin, yeşil. */
+    private fun drawRewardButton(cv: Canvas, cx: Float, top: Float, alpha: Int) {
+        val kind = currentReward()
+        if (kind == Reward.NONE) {
+            rewardBtn.setEmpty()
+            return
+        }
+        val text = when (kind) {
+            Reward.LIFE -> strRewardLife
+            Reward.DOUBLE_LEVEL -> strRewardDouble
+            else -> strRewardCoins
+        }
+        val w = min(uiW - 60f, 340f)
+        rewardBtn.set(cx - w / 2f, top, cx + w / 2f, top + 56f)
+        val pulse = 1f + 0.03f * sin(time * 5f)
+        cv.save()
+        cv.scale(pulse, pulse, rewardBtn.centerX(), rewardBtn.centerY())
+        drawButton(cv, rewardBtn, "     $text", colGreen, colDarkText, true, alpha, 17f)
+        // Oynat üçgeni
+        val tx = rewardBtn.left + 30f
+        val ty = rewardBtn.centerY()
+        paint.color = withAlpha(colDarkText, alpha)
+        iconPath.reset()
+        iconPath.moveTo(tx - 7f, ty - 10f)
+        iconPath.lineTo(tx + 10f, ty)
+        iconPath.lineTo(tx - 7f, ty + 10f)
+        iconPath.close()
+        cv.drawPath(iconPath, paint)
+        cv.restore()
     }
 
     // --- Çizim ---
@@ -3086,6 +3271,15 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         textPaint.textSize = 19f
         textPaint.color = colDim
         drawFit(cv, strHubHint, cx, 870f, textPaint)
+        if (ads?.privacyOptionsRequired() == true) {
+            labelPaint.textSize = 14f
+            labelPaint.color = colDim
+            val tw = labelPaint.measureText(strPrivacy)
+            privacyRect.set(cx - tw / 2f - 10f, 886f, cx + tw / 2f + 10f, 916f)
+            cv.drawText(strPrivacy, cx, 906f, labelPaint)
+        } else {
+            privacyRect.setEmpty()
+        }
     }
 
     private fun drawScreenHeader(cv: Canvas, cx: Float, title: String) {
@@ -3105,7 +3299,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val r = min(28f, sp * 0.38f)
         val blocks = Levels.COUNT / Levels.PER_MAP
         cv.save()
-        cv.clipRect(0f, LEVEL_LIST_TOP, uiW, WORLD_H)
+        cv.clipRect(0f, LEVEL_LIST_TOP, uiW, WORLD_H - bannerReserve)
         val first = (levelScroll / LEVEL_ROW_H).toInt().coerceAtLeast(0)
         val last = ((levelScroll + WORLD_H) / LEVEL_ROW_H).toInt().coerceAtMost(blocks - 1)
         for (b in first..last) {
@@ -3216,31 +3410,32 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             val boostV = (0.5f + 0.5f * sin(time * 3f + i)).pow(3)
             cv.save()
             cv.clipRect(r)
-            drawSkinPreview(cv, sk, r.centerX() + 6f, r.top + 62f + sin(time * 2f + i) * 3f, 1.75f, boostV)
+            val ck = (r.height() / 158f).coerceAtMost(1f)
+            drawSkinPreview(cv, sk, r.centerX() + 6f, r.top + 62f * ck + sin(time * 2f + i) * 3f, 1.75f * ck, boostV)
             cv.restore()
 
             labelPaint.textSize = 15f
             labelPaint.color = colText
-            drawFitW(cv, skinNames[i], r.centerX(), r.top + 116f, labelPaint, r.width() - 16f)
+            drawFitW(cv, skinNames[i], r.centerX(), r.top + 116f * ck, labelPaint, r.width() - 16f)
             when {
                 selected -> {
                     labelPaint.textSize = 15f
                     labelPaint.color = colGreen
-                    cv.drawText(strSelected, r.centerX(), r.top + 144f, labelPaint)
+                    cv.drawText(strSelected, r.centerX(), r.top + 144f * ck, labelPaint)
                 }
                 owned -> {
                     labelPaint.textSize = 15f
                     labelPaint.color = colDim
-                    cv.drawText(strSelect, r.centerX(), r.top + 144f, labelPaint)
+                    cv.drawText(strSelect, r.centerX(), r.top + 144f * ck, labelPaint)
                 }
                 else -> {
                     rightPaint.textSize = 19f
                     val txt = sk.price.toString()
                     val tw = rightPaint.measureText(txt) + 26f
                     val x0 = r.centerX() - tw / 2f
-                    drawCoinIcon(cv, x0 + 9f, r.top + 138f, 9f)
+                    drawCoinIcon(cv, x0 + 9f, r.top + 138f * ck, 9f)
                     rightPaint.color = if (coins >= sk.price) colGold else colDim
-                    cv.drawText(txt, x0 + tw, r.top + 145f, rightPaint)
+                    cv.drawText(txt, x0 + tw, r.top + 145f * ck, rightPaint)
                 }
             }
         }
@@ -3317,6 +3512,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         labelPaint.color = colDim
         drawFit(cv, strLifeRule, cx, 836f, labelPaint)
         drawLivesPill(cv, uiW - 16f, 24f, 1)
+        drawRewardButton(cv, cx, 596f, 255)
         if (Mech.WIND in mechs) drawWindGauge(cv)
         drawToast(cv, cx)
     }
@@ -3409,7 +3605,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 textPaint.color = withAlpha(colGold, ba)
                 drawFit(cv, strAllDoneDesc, cx, top + panelH + 40f, textPaint)
             }
+            drawRewardButton(cv, cx, retryBtn.bottom + 26f, ba)
         }
+        drawToast(cv, cx)
     }
 
     // =====================================================================
@@ -4082,7 +4280,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 rightPaint.color = withAlpha(colGold, ba)
                 cv.drawText(txt, cx + tw / 2f, retryBtn.bottom + 100f, rightPaint)
             }
+            drawRewardButton(cv, cx, retryBtn.bottom + 172f, ba)
         }
+        drawToast(cv, cx)
     }
 
     private fun drawPaused(cv: Canvas, cx: Float) {

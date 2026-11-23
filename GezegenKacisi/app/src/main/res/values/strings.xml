@@ -174,4 +174,12 @@
 
     <!-- Açılış -->
     <string name="splash_skip">Geçmek için dokun</string>
+
+    <!-- Reklamlar -->
+    <string name="ad_reward_life">VİDEO İZLE: +1 CAN</string>
+    <string name="ad_reward_double">VİDEO İZLE: ÖDÜLÜ 2 KAT AL</string>
+    <string name="ad_reward_coins">VİDEO İZLE: PARAYI 2 KAT AL</string>
+    <string name="ad_got_life">+1 can kazandın!</string>
+    <string name="ad_got_coins">+%1$d para kazandın!</string>
+    <string name="ad_privacy">Reklam gizlilik ayarları</string>
 </resources>

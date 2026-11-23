@@ -50,6 +50,26 @@ Oyundaki **2-4 OYUNCU** ekranının sağ üstündeki **?** düğmesi de bu adım
 Notlar: Maç sırasında uygulamadan çıkan oyuncu yanmış sayılır. Bazı misafir/okul Wi-Fi ağları cihazların birbirini
 görmesini engeller; öyle bir ağda hotspot kullanın. Ağ kodu [`NetLink.kt`](app/src/main/java/com/example/gezegenkacisi/NetLink.kt) içinde.
 
+### 2.2: Reklamlar (AdMob)
+
+Reklamlar oyunun akışını bozmayacak şekilde yerleştirildi:
+
+| Reklam | Nerede | Kural |
+|---|---|---|
+| **Banner** | Ana ekran, Sonsuz Mod ayarı, Bölümler, Market (altta) | Oyun oynanırken, geri sayımda ve çok oyunculuda **hiç görünmez**. Ekranlar banner'a yer bırakır. |
+| **Geçiş (resim) reklamı** | Oyun bitince TEKRAR / MENÜ / SONRAKİ'ye basıldığında | En az 3 oyunda bir, araya en az 2,5 dk; uygulama açıldıktan sonraki ilk 1,5 dk ve ödüllü videodan sonraki 1 dk hiç yok. Ölüm anında aniden açılmaz. |
+| **Ödüllü video** | Can bitince, bölüm başarısız/geçildi ekranında, sonsuz mod sonunda | Tamamen isteğe bağlı: **+1 can**, **bölüm ödülünü 2 kat al**, **parayı 2 kat al**. Düğme yalnızca video hazırsa görünür. |
+
+- AB/İngiltere kullanıcılarına Google'ın reklam izni penceresi (UMP) reklamlardan önce gösterilir; izin yoksa reklam istenmez.
+  Gerekli bölgelerde ana ekranın altında "Reklam gizlilik ayarları" bağlantısı çıkar.
+- Reklam yüklenemezse oyun etkilenmez: düğmeler gizli kalır, geçiş reklamı atlanır.
+- **Yayından önce:** `app/build.gradle.kts` başındaki `admobAppId`, `adBannerId`, `adInterstitialId`, `adRewardedId`
+  değerlerini AdMob hesabınızdaki kendi kimliklerinizle değiştirin. Şu an Google'ın herkese açık **test** kimlikleri var
+  (reklamlarda "Test Ad" yazar, gelir getirmez). Play Console'da "Veri güvenliği" formunda reklam kimliği ve reklam
+  verilerini beyan edin; web sitenizde `app-ads.txt` yayınlayın.
+- Kod: [`AdManager.kt`](app/src/main/java/com/example/gezegenkacisi/AdManager.kt) (AdMob + onay),
+  [`Ads.kt`](app/src/main/java/com/example/gezegenkacisi/Ads.kt) (oyunun gördüğü arayüz). Sıklık kuralları `GameView.afterBreak`.
+
 ### 2.1: Açılış animasyonu
 
 Oyun açılırken **Magic Lumos Software** logosu oyuna özel bir animasyonla gösterilir: seçili araç karanlık uzaydan
@@ -115,6 +135,8 @@ app/src/main/
 │   ├── GameConfig.kt     haritalar, mekanikler ve seviyeler
 │   ├── Progress.kt       500 bölüm, bölüm özellikleri ve marketteki araçlar
 │   ├── Lives.kt          canlar ve saat hilesine karşı süre ölçümü
+│   ├── AdManager.kt      AdMob reklamları (banner, geçiş, ödüllü video) ve reklam izni
+│   ├── Ads.kt            oyunun reklamlarla konuştuğu arayüz
 │   ├── SoundManager.kt   kodla üretilen ses efektleri ve müzik
 │   └── NetLink.kt        2-4 oyuncu: yerel ağda oda kurma, bulma ve mesajlaşma
 └── res/
@@ -123,7 +145,7 @@ app/src/main/
     └── values/            metinler, renkler, tema
 ```
 
-Harici kütüphane kullanılmadı. Her şey Android'in `Canvas` API'siyle çiziliyor. En düşük Android sürümü 8.0.
+Oyun tamamen Android'in `Canvas` API'siyle çiziliyor; tek dış kütüphaneler reklam (Google AdMob) ve reklam izni (UMP). En düşük Android sürümü 8.0.
 
 ## Sorun giderme
 
