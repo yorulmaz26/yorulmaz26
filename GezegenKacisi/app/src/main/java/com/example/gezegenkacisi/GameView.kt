@@ -1255,7 +1255,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val v = -FLAP_V * flapMul
         val g = GRAVITY * gravMul
         val rise = max(40f, v * tap - 0.5f * g * tap * tap) / tap
-        return min(d.gapJump, max(70f, rise * tCol * 0.8f))
+        // İniş: en kötü yukarı itişe (rüzgâr + kara delik çekimi) karşı kalan aşağı ivmeyle
+        var up = 0f
+        if (Mech.WIND in mechs) up += WIND_BASE * hazard()
+        if (Mech.PULL in mechs) up += 250f * PULL_K * hazard()
+        val aDown = max(g * 0.35f, g - up)
+        val drop = min(0.5f * aDown * tCol * tCol, MAX_FALL * min(1f, gravMul) * tCol)
+        return min(d.gapJump, max(70f, min(rise * tCol, drop) * 0.8f))
     }
 
     /**
