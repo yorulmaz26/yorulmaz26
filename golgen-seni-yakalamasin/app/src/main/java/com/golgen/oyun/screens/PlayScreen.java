@@ -249,6 +249,7 @@ public final class PlayScreen extends Screen implements GameEvents {
     private void finishRun() {
         phase = PAUSED; // tekrar çağrılmasın
         world.toResult(mode, missionIndex, result);
+        g.adPolicy.onRunFinished(result.time);
         if (mode == RunResult.MODE_MISSION && result.won) g.progress.energy.refund(g.clock);
         g.progress.applyRun(result, g.epochDay(), report);
         g.save();

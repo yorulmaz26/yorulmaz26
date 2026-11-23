@@ -40,7 +40,7 @@ import java.time.temporal.ChronoUnit;
  * Oyunun tek görünümü: Choreographer ile ekran yenilemesine senkron (60 FPS hedefli) döngü,
  * ekran yönetimi, geçiş animasyonları, bildirimler ve paylaşılan servisler.
  */
-public final class GameView extends View implements Choreographer.FrameCallback {
+public final class GameView extends View implements Choreographer.FrameCallback, com.golgen.oyun.platform.Ads.Listener {
     public final Activity activity;
     public final boolean debuggable;
     public final Progress progress = new Progress();
@@ -48,6 +48,10 @@ public final class GameView extends View implements Choreographer.FrameCallback 
     public final SoundSystem sound;
     public final Haptics haptics;
     public final com.golgen.oyun.core.TimeSource clock;
+    /** Reklam katmanı (MainActivity kurar; test/çevrimdışı durumda reklamsız). */
+    public com.golgen.oyun.platform.Ads ads = new com.golgen.oyun.platform.NoAds();
+    public final com.golgen.oyun.core.AdPolicy adPolicy = new com.golgen.oyun.core.AdPolicy();
+    private int bannerInset;
     private int lastEnergySec = -1;
     private String energyText = "";
 
@@ -171,6 +175,33 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         return progress.energy.lives;
     }
 
+    // ---------------- Reklamlar ----------------
+    @Override
+    public void onBannerHeightChanged(int px) {
+        if (px == bannerInset) return;
+        bannerInset = px;
+        layoutScreen(current);
+    }
+
+    /**
+     * Oyun sonu ekranından çıkarken (doğal mola) gerekirse geçiş reklamı gösterir, sonra işlemi yapar.
+     * Sıklık AdPolicy ile sınırlıdır; reklam hazır değilse işlem hemen yapılır.
+     */
+    public void afterRunBreak(Runnable action) {
+        long now = clock.elapsedMs();
+        if (adPolicy.shouldShowInterstitial(progress.gamesPlayed, now) && ads.isInterstitialReady()) {
+            adPolicy.onInterstitialShown(now);
+            ads.showInterstitial(action);
+        } else {
+            action.run();
+        }
+    }
+
+    /** Debug: reklamları testte kapat/aç (kalıcı). */
+    public boolean adsDisabledForTest() {
+        return debuggable && store.getInt("testReklamsiz", 0) == 1;
+    }
+
     /** Sonraki cana kalan süre "dd:ss" (saniyede bir yeniden üretilir). */
     public String energyTimer() {
         long ms = progress.energy.msToNext(clock);
@@ -187,6 +218,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
     private void switchNow(Screen next) {
         current.exit();
         current = next;
+        ads.setBannerWanted(current.wantsBanner());
         layoutScreen(current);
         current.enter();
         android.util.Log.i("GolgenUI", "ekran=" + current.getClass().getSimpleName());
@@ -204,6 +236,15 @@ public final class GameView extends View implements Choreographer.FrameCallback 
      */
     public void handleDebugIntent(android.content.Intent intent) {
         if (!debuggable || intent == null) return;
+        if (intent.hasExtra("reklamsiz")) {
+            boolean off = intent.getBooleanExtra("reklamsiz", false);
+            store.putInt("testReklamsiz", off ? 1 : 0);
+            store.apply();
+            if (activity instanceof MainActivity) ((MainActivity) activity).setupAds(!off);
+        }
+        String reklam = intent.getStringExtra("reklam");
+        if ("gecis".equals(reklam)) ads.showInterstitial(null);
+        else if ("video".equals(reklam)) ads.showRewarded(() -> android.util.Log.i("GolgenAds", "test ödülü verildi"), null);
         int extraDiamonds = intent.getIntExtra("elmas", 0);
         if (extraDiamonds > 0) {
             progress.diamonds += extraDiamonds;
@@ -233,7 +274,8 @@ public final class GameView extends View implements Choreographer.FrameCallback 
 
     private void layoutScreen(Screen s) {
         if (getWidth() > 0) {
-            s.resize(getWidth(), getHeight(), u, safeL, safeT, safeR, safeB);
+            int inset = s.wantsBanner() ? bannerInset : 0; // banner yalnızca menülerde; altındaki butonlar yukarı kayar
+            s.resize(getWidth(), getHeight(), u, safeL, safeT, safeR, safeB + inset);
             s.dumpTargets();
         }
     }
@@ -277,6 +319,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
     // ---------------- Yaşam döngüsü ----------------
     public void onResume() {
         progress.energy.tick(clock);
+        ads.onResume();
         running = true;
         lastNanos = 0;
         sound.onResume();
@@ -288,11 +331,13 @@ public final class GameView extends View implements Choreographer.FrameCallback 
         running = false;
         Choreographer.getInstance().removeFrameCallback(this);
         current.onAppPause();
+        ads.onPause();
         sound.onPause();
         save();
     }
 
     public void release() {
+        ads.destroy();
         sound.release();
     }
 
@@ -392,6 +437,7 @@ public final class GameView extends View implements Choreographer.FrameCallback 
             }
         }
         safeL = l; safeT = t; safeR = r; safeB = b;
+        ads.setBottomMargin(b);
         layoutScreen(current);
         return super.onApplyWindowInsets(in);
     }

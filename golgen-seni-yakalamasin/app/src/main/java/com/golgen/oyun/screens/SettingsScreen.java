@@ -94,6 +94,9 @@ public final class SettingsScreen extends Screen {
     }
 
     @Override
+    public boolean wantsBanner() { return true; }
+
+    @Override
     public boolean onBack() {
         if (confirming) setConfirm(false); else g.goMenu();
         return true;

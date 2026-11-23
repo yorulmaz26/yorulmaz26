@@ -51,7 +51,7 @@ pref_int() { prefs | grep "name=\"$1\"" | sed -E 's/.*value="(-?[0-9]+)".*/\1/';
 
 adb wait-for-device
 # Canlı logcat (takılma olursa son olaylar görülebilsin)
-( adb logcat -v time -s GolgenUI:I GolgenFPS:I AndroidRuntime:E ActivityManager:W > "$OUT/canli_logcat.txt" 2>/dev/null & )
+( adb logcat -v time -s GolgenUI:I GolgenFPS:I GolgenAds:I GolgenAds:W AndroidRuntime:E ActivityManager:W > "$OUT/canli_logcat.txt" 2>/dev/null & )
 step() { echo "ADIM: $*" | tee -a "$OUT/adimlar.txt"; }
 adb shell settings put global window_animation_scale 0 >/dev/null 2>&1 || true
 # Android'in ilk tam ekran açılışındaki "Viewing full screen" sistem uyarısı dokunuşları yutar; testte önceden onaylanır.
@@ -63,7 +63,7 @@ adb shell getprop ro.build.version.release | sed 's/^/Android /' | tee -a "$OUT/
 adb uninstall $PKG >/dev/null 2>&1 || true
 if adb install -r "$APK" >/dev/null; then ok "APK kurulumu"; else bad "APK kurulumu"; fi
 clear_log
-adb shell am start -W -n $ACT >/dev/null
+adb shell am start -W -n $ACT --ez reklamsiz true >/dev/null
 sleep 1.6; shot 00_logo_a
 sleep 3.4; shot 00_logo_b
 if log | grep -q "ekran=LogoScreen"; then ok "Magic Lumos logo animasyonu gösterildi"; else bad "Logo animasyonu gösterilmedi"; fi
@@ -219,6 +219,30 @@ adb shell am start -W -n $ACT >/dev/null
 expect_screen MenuScreen "Yeniden açılış (öğretici atlanır, kayıt yüklenir)" 20
 if [ "$(pref_int selectedSkin)" = "2" ]; then ok "Kalıcılık: seçili karakter korundu"; else bad "Kalıcılık: selectedSkin=$(pref_int selectedSkin)"; fi
 sleep 1; shot 18_yeniden_acilis
+
+# 7b) Reklamlar (ağ gerektirir: yükleme adımları BİLGİ olarak raporlanır, çökme/donma ise hata sayılır)
+step reklamlar
+soft() { echo "BİLGİ  | $1" | tee -a "$RESULTS"; }
+adlog() { timeout 20 adb logcat -d -s GolgenAds:I GolgenAds:W 2>/dev/null; }
+adbt shell am start -n $ACT --ez reklamsiz false >/dev/null
+for i in $(seq 1 30); do adlog | grep -q "SDK hazır" && break; sleep 1; done
+if adlog | grep -q "SDK hazır"; then ok "Reklam SDK'sı başlatıldı (AdMob test kimlikleri)"; else bad "Reklam SDK'sı başlatılamadı"; fi
+for i in $(seq 1 25); do adlog | grep -q "banner yüklendi" && break; sleep 1; done
+if adlog | grep -q "banner yüklendi"; then soft "Banner yüklendi (yalnızca menülerde)"; else soft "Banner yüklenemedi: $(adlog | grep banner | tail -1)"; fi
+sleep 1; shot 20_reklam_banner_menu
+tap_target MenuScreen OYNA
+if wait_screen PlayScreen 8; then sleep 1; shot 21_reklam_oyunda_banner_yok; ok "Oyun ekranına geçildi (banner gizli olmalı)"; fi
+adbt shell input keyevent KEYCODE_BACK; sleep 0.6; tap_target PlayScreen "ANA MENÜ"; wait_screen MenuScreen 8
+for i in $(seq 1 20); do adlog | grep -q "geçiş reklamı hazır" && break; sleep 1; done
+adbt shell am start -n $ACT --es reklam gecis >/dev/null; sleep 4
+if adlog | grep -q "geçiş reklamı gösterildi"; then soft "Geçiş (görsel) reklamı gösterildi"; shot 22_reklam_gecis; else soft "Geçiş reklamı gösterilemedi: $(adlog | grep -i 'geçiş' | tail -1)"; fi
+adbt shell input keyevent KEYCODE_BACK; sleep 2
+for i in $(seq 1 20); do adlog | grep -q "ödüllü video hazır" && break; sleep 1; done
+adbt shell am start -n $ACT --es reklam video >/dev/null; sleep 5
+if adlog | grep -q "ödüllü video gösterildi"; then soft "Ödüllü video reklamı gösterildi"; shot 23_reklam_video; else soft "Ödüllü video gösterilemedi: $(adlog | grep -i 'video' | tail -1)"; fi
+adbt shell input keyevent KEYCODE_BACK; sleep 2
+adb logcat -d >> "$OUT/logcat.txt"
+if grep -q "FATAL EXCEPTION" "$OUT/logcat.txt"; then bad "Reklamlar sırasında çökme"; else ok "Reklamlar sırasında çökme yok"; fi
 
 # 8) Çökme / ANR kontrolü
 adb logcat -d >> "$OUT/logcat.txt"

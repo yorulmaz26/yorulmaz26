@@ -13,6 +13,27 @@ import android.window.OnBackInvokedDispatcher;
 /** Tek aktivite: tam ekran, dikey, kesik (notch) alanına uyumlu. */
 public final class MainActivity extends Activity {
     private GameView view;
+    private android.widget.FrameLayout root;
+
+    /** Reklamları kurar veya kaldırır (test modu). Reklam kimlikleri derleme ayarından gelir. */
+    public void setupAds(boolean enabled) {
+        if (view == null || root == null) return;
+        boolean active = !(view.ads instanceof com.golgen.oyun.platform.NoAds);
+        if (enabled == active) return;
+        view.ads.destroy();
+        view.onBannerHeightChanged(0);
+        if (enabled) {
+            try {
+                view.ads = new com.golgen.oyun.platform.AdMobAds(this, root, view,
+                        BuildConfig.ADMOB_BANNER_ID, BuildConfig.ADMOB_INTERSTITIAL_ID, BuildConfig.ADMOB_REWARDED_ID);
+            } catch (RuntimeException e) {
+                android.util.Log.w("GolgenAds", "Reklamlar başlatılamadı", e);
+                view.ads = new com.golgen.oyun.platform.NoAds();
+            }
+        } else {
+            view.ads = new com.golgen.oyun.platform.NoAds();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +47,13 @@ public final class MainActivity extends Activity {
         }
         if (Build.VERSION.SDK_INT >= 30) win.setDecorFitsSystemWindows(false);
         view = new GameView(this);
-        setContentView(view);
+        root = new android.widget.FrameLayout(this);
+        root.addView(view, new android.widget.FrameLayout.LayoutParams(
+                android.widget.FrameLayout.LayoutParams.MATCH_PARENT, android.widget.FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(root);
         hideSystemBars();
         view.handleDebugIntent(getIntent());
+        setupAds(!view.adsDisabledForTest());
         if (Build.VERSION.SDK_INT >= 33) {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     OnBackInvokedDispatcher.PRIORITY_DEFAULT, () -> view.handleBack());

@@ -26,6 +26,10 @@ public final class GameOverScreen extends Screen {
     private String title = "", subtitle = "", scoreText = "", bestText = "";
     private String[] statLabels = new String[0], statValues = new String[0];
     private String rewardText = "";
+    private final Button videoBtn;
+    private int videoBonus;
+    private boolean videoUsed;
+    private int shownTotal;
     private boolean newRecord, won;
     private int titleColor = Theme.WHITE;
     private final Button againBtn, nextBtn, menuBtn;
@@ -38,11 +42,16 @@ public final class GameOverScreen extends Screen {
 
     public GameOverScreen(GameView g) {
         super(g);
-        againBtn = add(new Button("TEKRAR OYNA", Icons.RESTART, Button.PRIMARY, () -> {
+        // Oyun sonundan çıkış = doğal mola: gerekirse (sıklık sınırıyla) geçiş reklamı burada gösterilir.
+        againBtn = add(new Button("TEKRAR OYNA", Icons.RESTART, Button.PRIMARY, () -> g.afterRunBreak(() -> {
             if (r.mode == RunResult.MODE_MISSION) g.startMission(r.missionIndex); else g.startEndless();
-        }));
-        nextBtn = add(new Button("SONRAKİ BÖLÜM", Icons.NEXT, Button.GOLD, () -> g.startMission(r.missionIndex + 1)));
-        menuBtn = add(new Button("ANA MENÜ", Icons.HOME, Button.SECONDARY, g::goMenu));
+        })));
+        nextBtn = add(new Button("SONRAKİ BÖLÜM", Icons.NEXT, Button.GOLD, () -> g.afterRunBreak(() -> g.startMission(r.missionIndex + 1))));
+        menuBtn = add(new Button("ANA MENÜ", Icons.HOME, Button.SECONDARY, () -> g.afterRunBreak(g::goMenu)));
+        // İsteğe bağlı ödüllü video: bu oyunda kazanılan elmasları ikiye katlar
+        videoBtn = add(new Button("", Icons.PLAY, Button.SECONDARY, this::watchVideo));
+        videoBtn.id = "video-elmas";
+        videoBtn.visible = false;
     }
 
     public void show(RunResult res, Progress.Report rep) {
@@ -69,6 +78,11 @@ public final class GameOverScreen extends Screen {
         int total = rep.diamondsEarned + rep.missionReward + rep.achievementReward;
         total += rep.levelReward;
         rewardText = "+" + total + " elmas kazandın";
+        shownTotal = total;
+        videoBonus = rep.diamondsEarned + rep.missionReward;
+        videoUsed = false;
+        videoBtn.label = "VİDEO İZLE · +" + videoBonus + " ELMAS";
+        videoBtn.visible = false;
         stars = res.mode == RunResult.MODE_MISSION ? res.stars : 0;
         if (res.mode == RunResult.MODE_MISSION) {
             int l = g.lives();
@@ -95,6 +109,20 @@ public final class GameOverScreen extends Screen {
         layout();
     }
 
+    private void watchVideo() {
+        if (videoUsed || videoBonus <= 0) return;
+        videoUsed = true;
+        videoBtn.visible = false;
+        g.ads.showRewarded(() -> {
+            g.progress.diamonds += videoBonus;
+            g.save();
+            shownTotal += videoBonus;
+            rewardText = "+" + shownTotal + " elmas kazandın";
+            g.sound.play(Synth.PURCHASE);
+            g.toast("Video ödülü: +" + videoBonus + " elmas", Icons.PLAY);
+        }, () -> dumpTargets());
+    }
+
     @Override
     protected void layout() {
         float cx = w / 2f, bw = Math.min(w - 140f * u, 800f * u), bh = 140f * u;
@@ -107,6 +135,8 @@ public final class GameOverScreen extends Screen {
         } else {
             againBtn.set(cx - bw / 2f, menuBtn.rect.top - 30f * u - bh, cx + bw / 2f, menuBtn.rect.top - 30f * u);
         }
+        float vh = 104f * u;
+        videoBtn.set(cx - bw / 2f, againBtn.rect.top - 26f * u - vh, cx + bw / 2f, againBtn.rect.top - 26f * u);
         bg.s = w / 1000f;
     }
 
@@ -120,8 +150,13 @@ public final class GameOverScreen extends Screen {
     public void update(float dt) {
         super.update(dt);
         bg.update(dt, 0f);
+        boolean v = !videoUsed && videoBonus > 0 && g.ads.isRewardedReady();
+        if (v != videoBtn.visible) { videoBtn.visible = v; dumpTargets(); }
         if (shownScore < r.score) shownScore = Math.min(r.score, shownScore + Math.max(1f, r.score * dt * 1.6f));
     }
+
+    @Override
+    public boolean wantsBanner() { return true; }
 
     @Override
     public boolean onBack() {
@@ -190,8 +225,9 @@ public final class GameOverScreen extends Screen {
         if (xk > 0f) Ui.panel(c, cx - bw3 / 2f, ly + 18f * u, cx - bw3 / 2f + bw3 * xk, ly + 34f * u, 8f * u, Theme.TEAL, 0, 0);
         ry = ly + 40f * u;
         // Karakter + gölge süsü
-        float dy = (againBtn.rect.top + ry + 46f * u) / 2f;
-        if (againBtn.rect.top - (ry + 46f * u) > 160f * u) {
+        float limitTop = videoBtn.visible ? videoBtn.rect.top : againBtn.rect.top;
+        float dy = (limitTop + ry + 46f * u) / 2f;
+        if (limitTop - (ry + 46f * u) > 160f * u) {
             WorldRenderer.drawSkinPreview(c, g.skin(), cx - 70f * u, dy + 10f * u, 40f * u, 0f, 1f, true);
             WorldRenderer.drawSkinPreview(c, g.skin(), cx + 70f * u, dy - 10f * u, 40f * u, (float) Math.sin(time * 2f) * 0.3f, 1f, false);
         }

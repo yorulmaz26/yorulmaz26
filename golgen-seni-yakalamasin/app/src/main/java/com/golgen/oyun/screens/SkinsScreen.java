@@ -112,6 +112,9 @@ public final class SkinsScreen extends Screen {
     }
 
     @Override
+    public boolean wantsBanner() { return true; }
+
+    @Override
     public boolean onBack() {
         g.goMenu();
         return true;

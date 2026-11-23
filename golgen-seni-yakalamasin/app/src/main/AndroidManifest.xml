@@ -18,6 +18,11 @@
         android:isGame="true"
         android:supportsRtl="false">
 
+        <!-- AdMob uygulama kimliği (varsayılan: Google test kimliği; build.gradle'dan değiştirilir) -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="${admobAppId}" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

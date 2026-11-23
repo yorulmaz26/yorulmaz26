@@ -151,6 +151,9 @@ public final class MenuScreen extends Screen {
     }
 
     @Override
+    public boolean wantsBanner() { return true; }
+
+    @Override
     public boolean onBack() {
         if (loginModal) {
             setModal(false);

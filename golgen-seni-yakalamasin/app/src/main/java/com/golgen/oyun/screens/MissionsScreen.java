@@ -27,6 +27,7 @@ public final class MissionsScreen extends Screen {
     private final Button[] claim = new Button[DailyMissions.PER_DAY];
     private int tab;
     private final Button refillBtn;
+    private final Button videoLifeBtn;
     private float livesY;
     static final int HEART = 0xFFFF6B8B;
     private float scroll;
@@ -85,6 +86,21 @@ public final class MissionsScreen extends Screen {
             dumpTargets();
         }));
         refillBtn.id = "can-doldur";
+        videoLifeBtn = add(new Button("VİDEO · +1 CAN", Icons.PLAY, Button.PRIMARY, () -> {
+            if (!g.progress.canWatchForLife(g.epochDay(), g.clock)) {
+                g.toast("Bugünlük video hakkın bitti", Icons.LOCK);
+                return;
+            }
+            g.ads.showRewarded(() -> {
+                if (g.progress.onWatchedForLife(g.epochDay(), g.clock)) {
+                    g.sound.play(Synth.SUCCESS);
+                    g.toast("+1 can! (bugün " + g.progress.rewardedLivesLeft(g.epochDay()) + " hak kaldı)", Icons.HEART);
+                    g.save();
+                }
+            }, this::dumpTargets);
+        }));
+        videoLifeBtn.id = "video-can";
+        videoLifeBtn.visible = false;
         for (int c = 0; c < Missions.MAPS; c++) {
             chapterTitle[c] = "HARİTA " + (c + 1) + "  ·  " + Maps.ALL[c].name.toUpperCase(new java.util.Locale("tr"));
             mapDesc[c] = Maps.ALL[c].desc + "  ·  " + Maps.ALL[c].featuresText();
@@ -149,8 +165,9 @@ public final class MissionsScreen extends Screen {
         colR = colL + cw;
         float tt = headerBottom() + 10f * u, th = 96f * u, tw = cw / 3f;
         for (int i = 0; i < 3; i++) tabs[i].set(colL + tw * i + 6f * u, tt, colL + tw * (i + 1) - 6f * u, tt + th);
-        livesY = tt + th + 60f * u;
-        refillBtn.set(colR - 330f * u, livesY - 42f * u, colR, livesY + 42f * u);
+        livesY = tt + th + 62f * u;
+        refillBtn.set(colR - 250f * u, livesY - 42f * u, colR, livesY + 42f * u);
+        videoLifeBtn.set(colR - 520f * u, livesY - 42f * u, colR - 266f * u, livesY + 42f * u);
         listTop = tt + th + 130f * u;
         listBottom = h - safeB - 30f * u;
         rowH = 180f * u;
@@ -223,6 +240,9 @@ public final class MissionsScreen extends Screen {
     }
 
     @Override
+    public boolean wantsBanner() { return true; }
+
+    @Override
     public boolean onBack() {
         g.goMenu();
         return true;
@@ -233,6 +253,8 @@ public final class MissionsScreen extends Screen {
         super.update(dt);
         bg.update(dt, 0f);
         refillBtn.visible = tab == TAB_LEVELS && g.lives() < com.golgen.oyun.core.Energy.MAX;
+        boolean vl = refillBtn.visible && g.ads.isRewardedReady() && g.progress.canWatchForLife(g.epochDay(), g.clock);
+        if (vl != videoLifeBtn.visible) { videoLifeBtn.visible = vl; dumpTargets(); }
         if (!isDragging() && Math.abs(scrollVel) > 5f) {
             scroll = clampScroll(scroll - scrollVel * dt, contentHeight(), listBottom - listTop);
             scrollVel *= (float) Math.pow(0.05, dt);
@@ -258,10 +280,10 @@ public final class MissionsScreen extends Screen {
     private void drawLives(Canvas c) {
         int lives = g.lives();
         for (int i = 0; i < com.golgen.oyun.core.Energy.MAX; i++) {
-            Icons.draw(c, Icons.HEART, colL + 40f * u + i * 70f * u, livesY, 26f * u, i < lives ? HEART : Theme.alpha(Theme.LINE, 0.9f));
+            Icons.draw(c, Icons.HEART, colL + 34f * u + i * 58f * u, livesY - 16f * u, 22f * u, i < lives ? HEART : Theme.alpha(Theme.LINE, 0.9f));
         }
         String t = lives >= com.golgen.oyun.core.Energy.MAX ? "Canlar dolu" : "Sonraki can " + g.energyTimer();
-        Ui.text(c, t, colL + 320f * u, Ui.centerY(livesY, 32f * u), 32f * u, lives > 0 ? Theme.WHITE : HEART, Paint.Align.LEFT, Ui.BOLD);
+        Ui.text(c, t, colL + 10f * u, livesY + 40f * u, 28f * u, lives > 0 ? Theme.WHITE : HEART, Paint.Align.LEFT, Ui.BOLD);
     }
 
     private void drawLevels(Canvas c) {

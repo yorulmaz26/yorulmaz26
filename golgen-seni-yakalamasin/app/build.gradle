@@ -12,6 +12,19 @@ android {
         targetSdk 35
         versionCode 1
         versionName '1.0.0'
+
+        // ---- Reklam kimlikleri ----
+        // Varsayılanlar Google'ın resmî TEST kimlikleridir (gerçek gelir getirmez, hesap riski yoktur).
+        // Yayın için gradle.properties veya komut satırından verin, örn:
+        //   ./gradlew assembleRelease -PadmobAppId=ca-app-pub-XXX~YYY -PadmobBannerId=ca-app-pub-XXX/ZZZ ...
+        manifestPlaceholders = [admobAppId: (project.findProperty('admobAppId') ?: 'ca-app-pub-3940256099942544~3347511713')]
+        buildConfigField 'String', 'ADMOB_BANNER_ID', "\"${project.findProperty('admobBannerId') ?: 'ca-app-pub-3940256099942544/9214589741'}\""
+        buildConfigField 'String', 'ADMOB_INTERSTITIAL_ID', "\"${project.findProperty('admobInterstitialId') ?: 'ca-app-pub-3940256099942544/1033173712'}\""
+        buildConfigField 'String', 'ADMOB_REWARDED_ID', "\"${project.findProperty('admobRewardedId') ?: 'ca-app-pub-3940256099942544/5224354917'}\""
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     buildTypes {
@@ -48,5 +61,8 @@ android {
 }
 
 dependencies {
+    // Google AdMob (banner, geçiş, ödüllü video) ve AB/İngiltere için gizlilik onayı (UMP)
+    implementation 'com.google.android.gms:play-services-ads:23.6.0'
+    implementation 'com.google.android.ump:user-messaging-platform:3.1.0'
     testImplementation 'junit:junit:4.13.2'
 }

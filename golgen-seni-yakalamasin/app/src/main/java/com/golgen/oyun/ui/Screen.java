@@ -59,6 +59,9 @@ public abstract class Screen {
 
     public void onAppPause() {}
 
+    /** Bu ekranda banner reklam gösterilebilir mi? (Oyun, öğretici ve açılışta asla.) */
+    public boolean wantsBanner() { return false; }
+
     protected Button add(Button b) {
         buttons.add(b);
         return b;

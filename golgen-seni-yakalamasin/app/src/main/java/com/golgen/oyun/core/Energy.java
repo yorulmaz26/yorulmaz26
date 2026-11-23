@@ -102,6 +102,15 @@ public final class Energy {
         if (lives >= MAX) progressMs = 0;
     }
 
+    /** Ödüllü video: +1 can (en fazla MAX). */
+    public boolean addLife(TimeSource t) {
+        tick(t);
+        if (lives >= MAX) return false;
+        lives++;
+        if (lives >= MAX) progressMs = 0;
+        return true;
+    }
+
     /** Elmasla tam dolum. */
     public void refill(TimeSource t) {
         tick(t);

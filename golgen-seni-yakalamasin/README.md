@@ -5,8 +5,8 @@ beyaz geometrik karakterini sürükle; **gölgen birkaç saniye önceki hareketl
 Hem neon engellerden hem de kendi geçmişinden kaçmalısın.
 
 - **Platform:** Android 8.0+ (API 26–35). Çekirdek mantık platformdan bağımsız saf Java olduğu için iOS'a taşınabilir.
-- **Teknoloji:** Android Studio projesi, **saf Java**, harici kütüphane yok. Kendi 2D motoru (Canvas + Choreographer, donanım hızlandırmalı).
-- **İnternet gerekmez**, sunucu yok. Tüm görseller ve sesler kodla üretilir (lisans gerektiren üçüncü taraf varlık yok).
+- **Teknoloji:** Android Studio projesi, **saf Java**; oyun motoru kendi yazımımız, tek harici kütüphane reklam için Google AdMob (+UMP). Kendi 2D motoru (Canvas + Choreographer, donanım hızlandırmalı).
+- **İnternet gerekmez** (yalnızca reklamlar için kullanılır), sunucu yok. Tüm görseller ve sesler kodla üretilir (lisans gerektiren üçüncü taraf varlık yok).
 
 > Not: İstekte Unity 2D belirtilmişti; talimatın sonunda "Android Studio Java olarak" istendiği ve bu ortamda
 > Unity bulunmadığı için proje Android Studio + Java ile geliştirildi. Unity'deki ScriptableObject, prefab ve
@@ -127,6 +127,25 @@ Oyun, yapımcı **Magic Lumos Software** logosuyla açılır (`app/src/main/asse
 kullanır: karanlıkta karakter devre yolunda neon iz bırakarak ilerler, mor gölgesi geçmiş hareketlerini gecikmeli tekrar ederek
 onu kovalar; karakter merkeze varınca "Lumos" ışığı patlar, gölge dağılır, genişleyen ışık halkası logoyu karanlıktan açığa
 çıkarır ve yazının üzerinden ışık süzülür (≈7 sn, dokunarak geçilebilir).
+
+## Reklamlar (Google AdMob)
+Akışı bozmamak için reklamlar yalnızca doğal molalarda ve sınırlı sıklıkta gösterilir:
+
+| Tür | Nerede | Kural |
+|---|---|---|
+| **Banner** | Yalnızca menüler: ana menü, görevler, karakterler, rekorlar, ayarlar, oyun sonu | Oyun, öğretici ve açılışta **asla**. Banner görünürken ekranın alt butonları banner'ın üstüne kayar (üst üste binmez). |
+| **Geçiş reklamı (görsel/video)** | Oyun sonu ekranından çıkarken (Tekrar / Sonraki bölüm / Ana menü) | İlk 3 oyunda yok; en fazla **3 oyunda bir** ve iki reklam arası en az **150 sn**; 12 sn'den kısa oyunlar sayılmaz. Süre monoton saatle ölçülür. |
+| **Ödüllü video** (isteğe bağlı) | Oyun sonu: *Video izle → bu oyundaki elmaslar ×2* · Görevler: *Video → +1 can* | Yalnızca oyuncu isterse; +1 can günde en fazla 3. Ödül video kapandıktan sonra verilir. |
+
+- İnternet yoksa veya reklam yüklenemezse oyun reklamsız devam eder (yüklemeler artan aralıklarla yeniden denenir).
+- AB/İngiltere kullanıcıları için Google **UMP** ile gizlilik onayı alınır; onay yoksa reklam istenmez. İçerik derecesi: PG.
+- Varsayılan kimlikler Google'ın **test** kimlikleridir. Yayın için kendi AdMob kimliklerinizi verin:
+  ```bash
+  ./gradlew assembleRelease -PadmobAppId=ca-app-pub-XXXX~YYYY -PadmobBannerId=ca-app-pub-XXXX/1111 \
+      -PadmobInterstitialId=ca-app-pub-XXXX/2222 -PadmobRewardedId=ca-app-pub-XXXX/3333
+  ```
+  (veya aynı anahtarları `gradle.properties` dosyasına yazın). Play Console'da "Reklam içerir" ve veri güvenliği formunda
+  reklam kimliği kullanımını beyan edin.
 
 ## Ekranlar
 Logo animasyonu · Açılış · Ana menü · Oynanış (HUD) · Duraklatma · Oyun sonu · Karakter seçimi · Görevler (Görev Modu / Günlük / Başarılar) · Rekorlar · Ayarlar · Öğretici.

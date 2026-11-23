@@ -43,6 +43,9 @@ public final class Progress {
     /** Bölüm modu canları (4 can, 15 dk'da bir yenilenir; saat hilesine dayanıklı). */
     public final Energy energy = new Energy();
     public static final int REFILL_COST = 60;
+    /** Ödüllü video ile alınan günlük can sayacı. */
+    public int rewardedLifeDay = -1;
+    public int rewardedLivesToday;
 
     public static final int[] LOGIN_REWARDS = {10, 15, 20, 25, 35, 45, 100};
 
@@ -90,6 +93,8 @@ public final class Progress {
         loginStreak = s.getInt("loginStreak", 0);
         lastLoginClaimDay = s.getInt("lastLoginClaimDay", -1);
         energy.load(s);
+        rewardedLifeDay = s.getInt("rwLifeDay", -1);
+        rewardedLivesToday = s.getInt("rwLives", 0);
     }
 
     public void save(KeyValueStore s) {
@@ -130,6 +135,8 @@ public final class Progress {
         s.putInt("loginStreak", loginStreak);
         s.putInt("lastLoginClaimDay", lastLoginClaimDay);
         energy.save(s);
+        s.putInt("rwLifeDay", rewardedLifeDay);
+        s.putInt("rwLives", rewardedLivesToday);
         s.apply();
     }
 
@@ -224,6 +231,26 @@ public final class Progress {
         int r = LOGIN_REWARDS[(loginStreak - 1) % LOGIN_REWARDS.length];
         diamonds += r;
         return r;
+    }
+
+    /** Bugün video izleyerek can alınabilir mi? */
+    public boolean canWatchForLife(int epochDay, TimeSource t) {
+        energy.tick(t);
+        int used = rewardedLifeDay == epochDay ? rewardedLivesToday : 0;
+        return energy.lives < Energy.MAX && used < AdPolicy.REWARDED_LIVES_PER_DAY;
+    }
+
+    public int rewardedLivesLeft(int epochDay) {
+        int used = rewardedLifeDay == epochDay ? rewardedLivesToday : 0;
+        return Math.max(0, AdPolicy.REWARDED_LIVES_PER_DAY - used);
+    }
+
+    /** Video izlendi: +1 can ve günlük sayaç. */
+    public boolean onWatchedForLife(int epochDay, TimeSource t) {
+        if (!canWatchForLife(epochDay, t)) return false;
+        if (rewardedLifeDay != epochDay) { rewardedLifeDay = epochDay; rewardedLivesToday = 0; }
+        rewardedLivesToday++;
+        return energy.addLife(t);
     }
 
     /** Elmasla canları doldurur. */
