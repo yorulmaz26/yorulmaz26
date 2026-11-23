@@ -118,6 +118,8 @@ if [ "$PAUSED" = "1" ]; then ok "Duraklatma menüsü açıldı"; else bad "Durak
 sleep 6
 if [ "$(current_screen)" = "PlayScreen" ]; then ok "Duraklatmada oyun ilerlemiyor (6 sn)"; else bad "Duraklatmada oyun bitti"; fi
 tap_target PlayScreen "DEVAM ET"
+# Başlamadan önce duraklatıldıysa oyun yine "dokun ve başla" bekler: tek dokunuşla başlat, sonra hareketsiz kal
+adbt shell input tap 540 1500
 # Hareketsiz kal → gölge yakalamalı
 expect_screen GameOverScreen "Hareketsiz kalınca gölge yakalar / oyun sonu" 25
 sleep 1.5; shot 07_oyun_sonu
@@ -186,7 +188,9 @@ tap_target SettingsScreen "ÖĞRETİCİYİ OYNA"
 expect_screen TutorialScreen "Ayarlar → Öğretici"
 sleep 0.6; shot 17_ogretici
 tap_target TutorialScreen Kapat
-expect_screen MenuScreen "Öğretici kapat"
+expect_screen SettingsScreen "Öğretici kapat → açıldığı Ayarlar ekranına döner"
+adbt shell input keyevent KEYCODE_BACK
+expect_screen MenuScreen "Ayarlar → geri → Ana menü"
 
 step harita-goruntuleri
 # 6b) Farklı haritalardan oynanış görüntüleri (debug ekstrasıyla bölüm aç)
