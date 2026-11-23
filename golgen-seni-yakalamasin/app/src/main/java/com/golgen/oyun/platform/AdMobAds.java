@@ -112,7 +112,7 @@ public final class AdMobAds implements Ads {
         banner.setAdUnitId(bannerId);
         DisplayMetrics dm = activity.getResources().getDisplayMetrics();
         int widthDp = (int) (dm.widthPixels / dm.density);
-        AdSize size = AdSize.getCurrentOrientationAnchoredAdaptiveBannerSize(activity, widthDp);
+        AdSize size = AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(activity, widthDp);
         banner.setAdSize(size);
         bannerHeightPx = size.getHeightInPixels(activity);
         FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
