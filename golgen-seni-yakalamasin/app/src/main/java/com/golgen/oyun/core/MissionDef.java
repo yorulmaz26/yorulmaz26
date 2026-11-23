@@ -11,7 +11,7 @@ public final class MissionDef {
     /** Eski arayüz/test uyumluluğu için tür sabiti (tüm bölümler yıldız toplama). */
     public static final int STAR_STAGES = 5;
     public static final int NO_HIT = 3;
-    public static final float MIN_DELAY1 = 1.75f, MIN_DELAY2 = 2.55f, FAST_FACTOR = 0.88f;
+    public static final float MIN_DELAY1 = 1.75f, MIN_DELAY2 = 2.55f, FAST_FACTOR = 0.88f, NARROW_FACTOR = 1.12f;
 
     public final int index;       // 0..99
     public final int mapIndex;    // 0..19
@@ -94,6 +94,8 @@ public final class MissionDef {
         float d1 = Math.max(MIN_DELAY1, (3.0f - 1.25f * g) * flavor);
         float d2 = Math.max(MIN_DELAY2, (4.4f - 1.7f * g) * flavor);
         if (map.has(MapTheme.F_FAST_SHADOWS)) { d1 *= FAST_FACTOR; d2 *= FAST_FACTOR; }
+        // Dar koridorda kaçış alanı az: gölgeler biraz daha geriden gelir
+        if (map.has(MapTheme.F_NARROW)) { d1 *= NARROW_FACTOR; d2 *= NARROW_FACTOR; }
         p.shadowDelays = new float[]{d1, d2};
         p.shadowSpawnTimes = new float[]{d1 + 0.4f};
         p.maxShadows = 2;

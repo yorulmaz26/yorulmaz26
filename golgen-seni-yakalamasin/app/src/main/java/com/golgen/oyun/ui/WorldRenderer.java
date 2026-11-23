@@ -314,20 +314,8 @@ public final class WorldRenderer {
                 case Obstacle.METEOR: {
                     float x = o.x * s, y = o.y * s, r = o.r * s;
                     if (o.y < 0f) {
-                        // Uyarı: ekranın üstünde yanıp sönen işaret
-                        float bl = 0.4f + 0.6f * (float) Math.abs(Math.sin(t * 10f));
-                        Ui.path.reset();
-                        float ty = 40f * s;
-                        Ui.path.moveTo(x, ty + 30f * s);
-                        Ui.path.lineTo(x - 22f * s, ty);
-                        Ui.path.lineTo(x + 22f * s, ty);
-                        Ui.path.close();
-                        Ui.fill.setShader(null);
-                        Ui.fill.setColor(Theme.alpha(accentColor, bl));
-                        c.drawPath(Ui.path, Ui.fill);
-                        Ui.stroke.setColor(Theme.alpha(accentColor, 0.15f * bl));
-                        Ui.stroke.setStrokeWidth(8f * s);
-                        c.drawLine(x, ty + 40f * s, x, ty + 400f * s, Ui.stroke);
+                        // Uyarı: ekranın üstünde yanıp sönen işaret (karanlıkta drawShadowHints yeniden çizer)
+                        drawMeteorWarning(c, o);
                     } else {
                         // Alev izi
                         for (int k = 4; k >= 1; k--) {
@@ -463,7 +451,12 @@ public final class WorldRenderer {
         }
     }
 
-    /** Karanlıkta gölgelerin gözleri görünmeye devam eder (adil uyarı). */
+    /**
+     * Karanlığın ÜSTÜNE çizilen adil uyarılar: gölgelerin gözleri, duvar/zikzak boşluklarının
+     * kenar işaretleri, süpürücünün çerçevesi, kapının uç direkleri ile durumu, meteor uyarı üçgenleri
+     * ve nokta engellerin soluk çerçeveleri. Karanlık yıldızları, elmasları ve engellerin ayrıntısını
+     * gizler; ama tehlikenin yerini ve nereden geçileceğini asla gizlemez.
+     */
     public void drawShadowHints(Canvas c, GameWorld w) {
         float pr = GameWorld.PLAYER_R * s;
         Ui.fill.setShader(null);
@@ -474,6 +467,91 @@ public final class WorldRenderer {
             c.drawCircle(sh.x * s - pr * 0.3f, sh.y * s - pr * 0.1f, pr * 0.14f, Ui.fill);
             c.drawCircle(sh.x * s + pr * 0.3f, sh.y * s - pr * 0.1f, pr * 0.14f, Ui.fill);
         }
+        for (int i = 0; i < w.obstacles.size(); i++) {
+            Obstacle o = w.obstacles.get(i);
+            switch (o.type) {
+                case Obstacle.WALL:
+                case Obstacle.ZIGZAG: {
+                    float y = o.y * s, hh = o.h / 2f * s;
+                    float gl = (o.gapX - o.gapW / 2f) * s, gr = (o.gapX + o.gapW / 2f) * s;
+                    Ui.fill.setColor(Theme.alpha(accentColor, 0.85f));
+                    c.drawRect(gl - 6f * s, y - hh, gl, y + hh, Ui.fill);
+                    c.drawRect(gr, y - hh, gr + 6f * s, y + hh, Ui.fill);
+                    Ui.stroke.setColor(Theme.alpha(obstacleColor, 0.35f));
+                    Ui.stroke.setStrokeWidth(3f * s);
+                    c.drawLine(gl - 90f * s, y, gl - 8f * s, y, Ui.stroke);
+                    c.drawLine(gr + 8f * s, y, gr + 90f * s, y, Ui.stroke);
+                    break;
+                }
+                case Obstacle.GATE: {
+                    float l = (o.x - o.w / 2f) * s, r = (o.x + o.w / 2f) * s, y = o.y * s;
+                    Ui.fill.setColor(Theme.alpha(accentColor, 0.85f));
+                    c.drawCircle(l, y, 10f * s, Ui.fill);
+                    c.drawCircle(r, y, 10f * s, Ui.fill);
+                    float a = o.gateActive() ? 0.55f : (o.gateWarning() ? 0.2f + 0.35f * (float) Math.abs(Math.sin(o.phase * 18f)) : 0.1f);
+                    Ui.stroke.setColor(Theme.alpha(obstacleLight, a));
+                    Ui.stroke.setStrokeWidth(3f * s);
+                    c.drawLine(l, y, r, y, Ui.stroke);
+                    break;
+                }
+                case Obstacle.SWEEPER: {
+                    float l = (o.x - o.w / 2f) * s, r = (o.x + o.w / 2f) * s, y = o.y * s, hh = o.h / 2f * s;
+                    Ui.stroke.setColor(Theme.alpha(obstacleLight, 0.45f));
+                    Ui.stroke.setStrokeWidth(3f * s);
+                    c.drawRect(l, y - hh, r, y + hh, Ui.stroke);
+                    break;
+                }
+                case Obstacle.METEOR:
+                    if (o.y < 0f) drawMeteorWarning(c, o);
+                    else silhouette(c, o.x, o.y, o.r);
+                    break;
+                case Obstacle.MINE:
+                    silhouette(c, o.x, o.y, o.mineRadius());
+                    break;
+                case Obstacle.BOUNCER:
+                    silhouette(c, o.x, o.y, o.r);
+                    break;
+                case Obstacle.ORBITER: {
+                    float cx = (float) Math.cos(o.angle) * Obstacle.ORBIT_R, cy = (float) Math.sin(o.angle) * Obstacle.ORBIT_R;
+                    silhouette(c, o.x + cx, o.y + cy, Obstacle.ORBIT_BALL);
+                    silhouette(c, o.x - cx, o.y - cy, Obstacle.ORBIT_BALL);
+                    break;
+                }
+                case Obstacle.ROTOR: {
+                    float hx = (float) Math.cos(o.angle) * o.w / 2f, hy = (float) Math.sin(o.angle) * o.w / 2f;
+                    Ui.stroke.setColor(Theme.alpha(obstacleLight, 0.4f));
+                    Ui.stroke.setStrokeWidth(Math.max(3f, o.h * 0.35f) * s);
+                    c.drawLine((o.x - hx) * s, (o.y - hy) * s, (o.x + hx) * s, (o.y + hy) * s, Ui.stroke);
+                    break;
+                }
+                default:
+                    break;
+            }
+        }
+    }
+
+    /** Karanlıkta nokta engellerin soluk çerçevesi: yeri ve boyu seçilir, ayrıntısı gizli kalır. */
+    private void silhouette(Canvas c, float x, float y, float r) {
+        Ui.stroke.setColor(Theme.alpha(obstacleLight, 0.4f));
+        Ui.stroke.setStrokeWidth(3f * s);
+        c.drawCircle(x * s, y * s, r * s, Ui.stroke);
+    }
+
+    private void drawMeteorWarning(Canvas c, Obstacle o) {
+        float x = o.x * s;
+        float bl = 0.4f + 0.6f * (float) Math.abs(Math.sin(t * 10f));
+        Ui.path.reset();
+        float ty = 40f * s;
+        Ui.path.moveTo(x, ty + 30f * s);
+        Ui.path.lineTo(x - 22f * s, ty);
+        Ui.path.lineTo(x + 22f * s, ty);
+        Ui.path.close();
+        Ui.fill.setShader(null);
+        Ui.fill.setColor(Theme.alpha(accentColor, bl));
+        c.drawPath(Ui.path, Ui.fill);
+        Ui.stroke.setColor(Theme.alpha(accentColor, 0.15f * bl));
+        Ui.stroke.setStrokeWidth(8f * s);
+        c.drawLine(x, ty + 40f * s, x, ty + 400f * s, Ui.stroke);
     }
 
     // ---------------- Karanlık özelliği ----------------
@@ -510,8 +588,8 @@ public final class WorldRenderer {
     /** Oyuncu çevresi dışını karartır (yalnızca çizim; oyun mantığını değiştirmez). */
     public void drawDarkness(Canvas c, GameWorld w, float width, float height) {
         ensureDarkHole();
-        float r = 330f * s;
-        float cx = w.px * s, cy = w.py * s;
+        float r = w.lightRadius() * s;
+        float cx = w.px * s, cy = w.lightCenterY() * s;
         float l = cx - r, t0 = cy - r, rr = cx + r, b = cy + r;
         Ui.rf.set(l, t0, rr, b);
         c.drawBitmap(darkHole, darkSrc, Ui.rf, darkPaint);

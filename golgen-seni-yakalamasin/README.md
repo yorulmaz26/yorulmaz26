@@ -73,8 +73,10 @@ Hazır APK: GitHub Actions her push'ta APK'yı derler, emülatörde test eder ve
   **Saat hilesine karşı:** süre telefon saatinden değil, Android'in kullanıcı tarafından değiştirilemeyen monoton sayacından
   (`SystemClock.elapsedRealtime`, uyku dahil) ölçülür. Saati ileri almak can kazandırmaz, geri almak kaybettirmez; aynı açılışta
   saatle oynandığı tespit edilip kaydedilir. Telefon yeniden başlatılırsa (`BOOT_COUNT`) duvar saati kullanılır; saat geri
-  alınmışsa yalnızca açılıştan beri geçen süre sayılır. Sunucu olmadığı için yapılamayan tek şey: kapalıyken saati ileri alıp
-  yeniden başlatarak en fazla bir tam dolum (4 can) elde etmek — bu da bekleyerek alınabilecek miktarla sınırlıdır.
+  alınmışsa yalnızca açılıştan beri geçen süre sayılır. Sunucu olmadığı için tamamen engellenemeyen tek durum: kapalıyken saati
+  ileri alıp telefonu yeniden başlatmak — bu yolla en fazla **1 can** kazanılabilir (yeniden başlatma başına üst sınır).
+  Günlük ödüller (giriş serisi, günlük görevler, ödüllü video hakkı) de aynı güvenilir saatle hesaplanır; tarihi ileri/geri
+  almak yeni gün açmaz, görülen en ileri gün asla geri gitmez.
   Bölüm içindeki 3 darbe hakkı ayrı bir şeydir (kalkan simgeleriyle gösterilir).
 - **Taçlar (1500 adet):** her bölümde ♛ tamamla · ♛ hiç çarpmadan bitir · ♛ kombo hedefine ulaş.
 
@@ -105,6 +107,14 @@ Klasik kademedeki 20 temel harita:
 
 Engel türleri (9): boşluklu duvar, mayın, salınan blok, dönen lazer, **yanıp sönen lazer kapı** (önce uyarır),
 **seken top**, **meteor** (ekranın üstünde uyarı işareti), **dönen çift top**, **kayan boşluklu duvar**.
+
+Harita özellikleri: **rüzgâr** (sürekli itme), **buz** (atalet), **karanlık**, **meteor yağmuru**, **dar geçit** (kenarlar kapanır;
+tüm engeller, yıldızlar ve elmaslar koridorun içinde doğar, gölgeler biraz daha geriden gelir), **hızlı akış**, **hızlı gölgeler**.
+Dar geçit ile hızlı gölgeler aynı haritada birleşmez (denetimde bu ikilinin komşu bölümlerden 5–10 kat zor olduğu ölçüldü).
+**Karanlık:** aydınlık alan akış hızıyla büyür ve hareket yönüne kayar (her hızda en az ~0,6 sn ileriyi gösterir).
+Karanlık yıldızları, elmasları ve engellerin ayrıntısını gizler; ama tehlikenin yeri asla gizlenmez: gölge gözleri,
+duvar/zikzak boşluk kenarları, kapı direkleri, süpürücü çerçevesi, nokta engellerin soluk çerçeveleri ve meteor uyarıları
+karanlığın üstünde çizilir.
 
 ### Uzun süreli oynanış
 - **Güçlendirmeler:** Kalkan (bir engel veya gölge temasını emer), Yavaş Zaman (dünya %55 hızda akar; gölge geçmişi bozulmaz),
@@ -178,9 +188,13 @@ HUD metinleri, dokuya önceden işlenmiş ışıma), donanım hızlandırmalı C
 1080×1920 tasarım birimine göre ölçeklenir; sistem çubukları ve kamera çentiği (safe area) hesaba katılır.
 
 ## Testler
-- `app/src/test/...` — 67 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
+- `app/src/test/...` — 78 JUnit testi (oyun döngüsünde bellek tahsisi olmadığını ölçen test dahil): gölge gecikme doğruluğu, duraklatmada zamanın donması, hareketsiz kalınca yakalanma,
   determinizm, çarpışmalar, elmas toplama, gölge sınırı, adil engel üretimi (botla 20 tohum), görev kazanma/kaybetme,
-  kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı.
+  kayıt sistemi gidiş-dönüş, satın alma, günlük görevler, ses sentezi ve WAV başlığı, 500 bölümün yapı/erişilebilirlik
+  kuralları, can ve günlük ödül saat hilesi senaryoları, reklam sıklık kuralları.
+- **Oynanabilirlik denetimi:** 500 bölümün her biri iki farklı bot (güçlü planlayıcı ve insan benzeri, kısa ufuklu) ile
+  3'er tohumla oynatıldı: ikisi de **1500/1500** kazandı; karanlık bölümler ayrıca "yalnızca görüneni bilen" botla
+  oynatıldı (450/450). Ayrıntı: test raporu.
 - `tools/smoke_test.sh` — emülatörde uçtan uca test (CI): kurulum, öğretici, tüm menü butonları ve ekran geçişleri,
   oynanış, duraklatma, gölge yakalaması, satın alma, ayarların kaydı, uygulama yeniden açıldığında kalıcılık, çökme/ANR kontrolü
   ve ekran görüntüleri. Debug derlemede ekranlar dokunma hedeflerini `GolgenUI` etiketiyle loglar.

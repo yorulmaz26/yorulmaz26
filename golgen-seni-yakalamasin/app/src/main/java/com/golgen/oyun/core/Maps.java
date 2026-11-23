@@ -90,6 +90,9 @@ public final class Maps {
             if ((features & f) != 0) continue;
             if (f == MapTheme.F_NARROW && (features & MapTheme.F_ICE) != 0) continue;
             if (f == MapTheme.F_ICE && (features & MapTheme.F_NARROW) != 0) continue;
+            // Dar geçit + hızlı gölgeler birlikte aşırı zor (denetim: komşu bölümlerden 5-10 kat); aynı haritaya düşmesin
+            if (f == MapTheme.F_NARROW && (features & MapTheme.F_FAST_SHADOWS) != 0) continue;
+            if (f == MapTheme.F_FAST_SHADOWS && (features & MapTheme.F_NARROW) != 0) continue;
             return features | f;
         }
         return features;

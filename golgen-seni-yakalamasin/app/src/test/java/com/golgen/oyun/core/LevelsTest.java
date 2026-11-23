@@ -237,8 +237,41 @@ public class LevelsTest {
                 for (int i = 0; i < w.obstacles.size(); i++) {
                     Obstacle o = w.obstacles.get(i);
                     if (o.type == Obstacle.MINE) assertTrue("mayın oynanabilir alanda", o.x + o.r > lo && o.x - o.r < hi);
+                    float n = w.profile().narrow, corridor = GameWorld.WIDTH - 2f * n;
+                    if (o.type == Obstacle.SWEEPER)
+                        assertTrue("süpürücü koridor içinde salınır", o.x - o.w / 2f >= n - 1f && o.x + o.w / 2f <= GameWorld.WIDTH - n + 1f);
+                    if (o.type == Obstacle.ROTOR) {
+                        assertTrue("rotor koridordan kısa", o.w <= corridor * 0.8f + 0.01f);
+                        assertTrue("rotor merkezi koridorda", o.x - o.w / 2f >= n && o.x + o.w / 2f <= GameWorld.WIDTH - n);
+                    }
+                    if (o.type == Obstacle.ORBITER)
+                        assertTrue("yörünge koridorda", o.x - Obstacle.ORBIT_R >= n && o.x + Obstacle.ORBIT_R <= GameWorld.WIDTH - n);
                 }
             }
+        }
+    }
+
+    @Test public void narrowAndFastShadowsNeverShareAMap() {
+        int narrow = 0;
+        for (int idx = 0; idx < 500; idx++) {
+            MapTheme m = Missions.ALL[idx].map;
+            assertFalse("bölüm " + (idx + 1) + ": dar geçit + hızlı gölgeler",
+                    m.has(MapTheme.F_NARROW) && m.has(MapTheme.F_FAST_SHADOWS));
+            if (m.has(MapTheme.F_NARROW)) narrow++;
+        }
+        assertTrue(narrow > 0);
+    }
+
+    @Test public void darknessLeavesEnoughTimeToSeeIncomingObstacles() {
+        // Aydınlık alanın yarı saydam sınırı (delik dokusunda ~0,725 r) oyuncunun önünde
+        // her akış hızında en az 0,6 sn'lik mesafe bırakmalı.
+        GameWorld w = new GameWorld(1);
+        w.setArenaHeight(2000f);
+        w.start(Missions.ALL[0].profile(), Missions.ALL[0], 1);
+        for (float v = 100f; v <= 1400f; v += 25f) {
+            w.scroll = v;
+            float ahead = (w.py - w.lightCenterY()) + 0.725f * w.lightRadius();
+            assertTrue("hız " + v + " için görüş " + ahead / v + " sn", ahead / v >= 0.6f);
         }
     }
 

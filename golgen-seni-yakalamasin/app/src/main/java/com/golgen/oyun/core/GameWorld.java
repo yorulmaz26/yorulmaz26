@@ -98,6 +98,14 @@ public final class GameWorld {
 
     public float minPlayerY() { return height * 0.24f; }
     public float maxPlayerY() { return height - PLAYER_R - 24f; }
+    // Karanlık özelliği: aydınlık alan akış hızıyla büyür ve hareket yönüne (yukarı) kayar,
+    // böylece hızlı kademelerde de yaklaşan engeli görüp kaçacak zaman kalır (>= ~0,6 sn).
+    public static final float LIGHT_MIN_R = 330f;
+    public static final float LIGHT_PER_SPEED = 0.6f;
+    public static final float LIGHT_FORWARD = 0.3f;
+    public float lightRadius() { return Math.max(LIGHT_MIN_R, scroll * LIGHT_PER_SPEED); }
+    public float lightCenterY() { return py - lightRadius() * LIGHT_FORWARD; }
+
     public float minPlayerX() { return PLAYER_R + 14f + profile.narrow; }
     public float maxPlayerX() { return WIDTH - PLAYER_R - 14f - profile.narrow; }
 
@@ -359,7 +367,7 @@ public final class GameWorld {
             case Obstacle.SWEEPER: {
                 o.w = 250f + rng.nextFloat() * 50f;
                 o.h = 30f;
-                o.amp = (WIDTH - o.w) / 2f - 30f;
+                o.amp = Math.max(0f, (WIDTH - 2f * profile.narrow - o.w) / 2f - 30f); // dar geçitte koridor içinde salınır
                 o.baseX = WIDTH / 2f;
                 o.speed = 1.3f + 1.2f * d;
                 o.phase = rng.nextFloat() * 6.28f;
@@ -368,9 +376,9 @@ public final class GameWorld {
                 break;
             }
             case Obstacle.ROTOR: {
-                o.w = 420f + 140f * d;
+                o.w = Math.min(420f + 140f * d, (WIDTH - 2f * profile.narrow) * 0.8f); // koridordan uzun olmasın
                 o.h = 22f;
-                o.x = o.w / 2f + 10f + rng.nextFloat() * (WIDTH - o.w - 20f);
+                o.x = profile.narrow + o.w / 2f + 10f + rng.nextFloat() * Math.max(0f, WIDTH - 2f * profile.narrow - o.w - 20f);
                 o.speed = (rng.nextBoolean() ? 1f : -1f) * (1.1f + 0.9f * d);
                 o.angle = rng.nextFloat() * 3.14f;
                 o.y = -o.w / 2f - o.h;
@@ -399,7 +407,8 @@ public final class GameWorld {
                 break;
             }
             case Obstacle.ORBITER: {
-                o.x = Obstacle.ORBIT_R + 60f + rng.nextFloat() * (WIDTH - 2f * Obstacle.ORBIT_R - 120f);
+                float span = WIDTH - 2f * profile.narrow - 2f * Obstacle.ORBIT_R - 120f;
+                o.x = span > 0f ? profile.narrow + Obstacle.ORBIT_R + 60f + rng.nextFloat() * span : WIDTH / 2f;
                 o.speed = (rng.nextBoolean() ? 1f : -1f) * (1.4f + 0.8f * d);
                 o.angle = rng.nextFloat() * 6.28f;
                 o.y = -Obstacle.ORBIT_R - Obstacle.ORBIT_BALL;
