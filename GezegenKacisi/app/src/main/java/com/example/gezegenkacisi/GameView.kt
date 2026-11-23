@@ -1030,9 +1030,14 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     /** Roketin bir adımlık fiziği: yer çekimi, rüzgâr, tavan ve eğim. */
     private fun stepRocket(dt: Float) {
         val maxFall = MAX_FALL * min(1f, gravMul)
-        var force = GRAVITY * gravMul + wind
+        val g = GRAVITY * gravMul
+        var force = g + wind
         // Kara delik: roket ekranın ortasına doğru çekilir
         if (Mech.PULL in mechs) force += (WORLD_H * 0.5f - rocketY) * PULL_K * hazard()
+        // Rüzgâr ve çekim ne kadar güçlü olursa olsun roket her zaman inebilmeli (en az %35 yer çekimi)
+        // ve aşağı itilirken dokunarak karşı koyabilmeli (en fazla 2 kat). Simülasyonda bu sınır olmadan
+        // alçak geçitlere inmek imkânsızlaşıyordu.
+        force = force.coerceIn(g * 0.35f, g * 2f)
         rocketVy = min(rocketVy + force * dt, maxFall)
         rocketY += rocketVy * dt
         if (rocketY < 22f) {
@@ -2148,7 +2153,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 // Topu, roketin hizasına tepeye yakınken varacak şekilde ileriye koy
                 val warn = 0.8f
                 val x = min(maxX, rocketX + speed * (warn + wr(0.35f, 0.85f)))
-                fireballs.add(Fireball(x, WORLD_H + 40f, -wr(980f, 1200f), warn))
+                val vy = -wr(980f, 1200f)
+                // Kulenin içinden (geçidin içinden) fırlamaz; yalnızca kuleler arasından çıkar
+                if (columns.none { abs(it.x - x) < 120f }) fireballs.add(Fireball(x, WORLD_H + 40f, vy, warn))
             }
         }
         if (running && Mech.METEOR in mechs) {
