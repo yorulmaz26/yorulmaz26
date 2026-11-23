@@ -125,7 +125,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val SPL_END = 4.6f
         private const val LEVEL_LIST_TOP = 140f  // bölüm listesinin başladığı yer
         private const val LEVEL_ROW_H = 150f     // listede bir harita satırının yüksekliği
-        private const val HUB_BANNER_MAX = 110f  // ana ekran/harita seçiminde gösterilecek en yüksek banner (dünya birimi)
+        private const val FIRE_RETRY = 0.12f     // ateş topu kuleye denk gelince yeniden deneme süresi
+        // Ana ekranda / harita seçiminde gösterilecek en yüksek banner (dünya birimi); daha yüksekse
+        // alttaki düğme ve yazılara çok yaklaşacağından o ekranlarda banner hiç gösterilmez
+        private const val HUB_BANNER_MAX = 135f
+        private const val MENU_BANNER_MAX = 112f
 
         // --- 2 oyuncu ---
         private const val MP_STEP = 1f / 120f     // iki telefonda aynı sabit adımla simülasyon
@@ -133,6 +137,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val MP_FIRST_X = 900f       // ilk kulenin konumu
         private const val MP_SPAWN_X = 2100f      // yeni kulelerin üretildiği uzaklık
         private const val MP_COUNTDOWN_NS = 3_000_000_000L
+        private const val MP_SILENT_NS = 4_000_000_000L // bu kadar mesaj göndermeyen oyuncu oyundan çıkmış sayılır
 
         // Oyuncu renkleri: 1 kırmızı, 2 mavi, 3 yeşil, 4 sarı (roket gövdesi ve kanatçık)
         private val PLAYER_COLORS = intArrayOf(0xFFFF5B4A.toInt(), 0xFF4F8BFF.toInt(), 0xFF4CD98A.toInt(), 0xFFFFC14D.toInt())
@@ -270,7 +275,6 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var scorePulse = 0f
     private var lastGapY = WORLD_H / 2f
     private var lastSwayPhase = 0f
-    private var physAcc = 0f
 
     private var shake = 0f
     private var flash = 0f
@@ -314,6 +318,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private val pBoost = FloatArray(4)
     private val pScore = IntArray(4)
     private val pAlive = BooleanArray(4)
+    private val pLastNs = LongArray(4)          // oyuncudan son konum mesajının geldiği an
+    private var pausedInRoom = false            // odadayken uygulama arka plana alındı (bekleyen "G" eskidir)
     private val pGone = BooleanArray(4)          // bağlantısı koptu
     private var watchId = -1                     // tam ekranda yanınca izlenen oyuncu
     private var sendTimer = 0f
@@ -633,6 +639,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         if (state == State.PLAYING) paused = true
         // 2 oyuncuda oyun bekletilemez: uygulamadan çıkan oyuncu yanmış sayılır
         if ((state == State.MP_PLAYING || state == State.MP_COUNTDOWN) && myAlive) mpCrash()
+        // Lobide ya da sonuç ekranındayken arka plana alınan katılımcı: o sırada başlayan maçı sonradan,
+        // kaymış bir zamanla oynamasın (dönünce bekleyen başlatma mesajı yanmış olarak cevaplanır)
+        val n = net
+        if (n != null && !n.isHost && n.connected && (state == State.MP_LOBBY || state == State.MP_OVER)) pausedInRoom = true
         saveCoins()
         running = false
         Choreographer.getInstance().removeFrameCallback(this)
@@ -998,7 +1008,6 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         speed = cfg.baseSpeed * map.speedMul
         lastGapY = WORLD_H / 2f
         lastSwayPhase = 0f
-        physAcc = 0f
         paused = false
         fireballs.clear()
         bolts.clear()
@@ -1164,22 +1173,23 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 emit(dt, 28f, 0.8f)
             }
             State.PLAYING -> {
-                // Fizik, kare hızından bağımsız sabit 1/120 sn adımlarla ilerler (yavaş telefonda da aynı oyun)
-                physAcc += dt
-                var steps = 0
-                while (physAcc >= MP_STEP && state == State.PLAYING && steps < 8) {
-                    physAcc -= MP_STEP
-                    steps++
-                    stepRocket(MP_STEP)
-                    speed = currentSpeed()
-                    updateColumns(MP_STEP)
-                    // Hedefe ulaşıldıysa bu adımda artık çarpışma sayılmaz
-                    if (state == State.PLAYING) {
-                        updateFireballs(MP_STEP)
-                        if (rocketHits()) crash()
+                // Fizik, kare süresini en fazla 1/120 sn'lik eşit alt adımlara bölerek ilerler: yavaş telefonda
+                // da aynı oyun, 90/120/144 Hz ekranlarda da her kare tam kendi süresi kadar akar (takılma yok)
+                val n = ceil(dt / MP_STEP).toInt()
+                if (n > 0) {
+                    val h = dt / n
+                    for (i in 0 until n) {
+                        if (state != State.PLAYING) break
+                        stepRocket(h)
+                        speed = currentSpeed()
+                        updateColumns(h)
+                        // Hedefe ulaşıldıysa bu adımda artık çarpışma sayılmaz
+                        if (state == State.PLAYING) {
+                            updateFireballs(h)
+                            if (rocketHits()) crash()
+                        }
                     }
                 }
-                if (steps == 8) physAcc = 0f
                 if (state == State.PLAYING) emit(dt, 55f, 1f + boost * 0.6f)
             }
             State.DYING -> {
@@ -1308,7 +1318,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 if (b.len < 120f) { b.warn = 0f; b.life = 0f }
             }
         }
-        fireballs.removeAll { !it.fromTop && it.warn > 0f && abs(it.x - x) < 120f }
+        if (fireballs.removeAll { !it.fromTop && it.warn > 0f && abs(it.x - x) < 120f }) fireTimer = min(fireTimer, FIRE_RETRY)
         if (amp > 0f) col.offset = amp * sin(worldTime * SWAY_SPEED + col.swayPhase)
         // Para: boşluğun içinde, ayrı rastgele sayı üreticisiyle (parkuru değiştirmez)
         if (coinChance > 0f && coinRng.nextFloat() < coinChance) {
@@ -1695,6 +1705,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 is NetLink.Event.Message -> handleMessage(e.from, e.parts)
             }
         }
+        // Arka plandayken biriken mesajlar işlendi; bundan sonra gelen başlatma mesajları geçerlidir
+        pausedInRoom = false
     }
 
     private fun handleMessage(from: Int, p: List<String>) {
@@ -1720,11 +1732,17 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             }
             "G" -> if (!host && p.size >= 3) {
                 val seed = p[1].toLongOrNull() ?: return
+                if (pausedInRoom) {
+                    // Maç biz arka plandayken başladı: bu turu kaçırdık, diğerleri beklemesin
+                    n.send("D", myId, 0, (WORLD_H * 4.5f).toInt())
+                    return
+                }
                 beginMatch(seed, p[2].split(',').mapNotNull { it.toIntOrNull() })
             }
             "S" -> if (p.size >= 6) {
                 val id = p[1].toIntOrNull() ?: return
                 if (id == myId || id !in 0 until NetLink.MAX_PLAYERS) return
+                pLastNs[id] = System.nanoTime()
                 pY[id] = (p[2].toIntOrNull() ?: return) / 10f
                 pAngle[id] = (p[3].toIntOrNull() ?: return).toFloat()
                 pBoost[id] = max(pBoost[id], (p[4].toIntOrNull() ?: 0) / 100f)
@@ -1737,7 +1755,9 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                     playerDead(id, p[2].toIntOrNull() ?: pScore[id], (p[3].toIntOrNull() ?: 0) / 10f)
                 }
             }
-            "X" -> if (!host && p.size >= 2) playerOut(p[1].toIntOrNull() ?: return)
+            "X" -> if (!host && p.size >= 2 && (state == State.MP_COUNTDOWN || state == State.MP_PLAYING)) {
+                playerOut(p[1].toIntOrNull() ?: return)
+            }
             "BYE" -> if (!host) onHostLost()
         }
     }
@@ -1829,6 +1849,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         sendTimer = 0f
         simTime = 0f
         mpStartNs = System.nanoTime() + MP_COUNTDOWN_NS
+        pLastNs.fill(mpStartNs)
         stateTimer = 0f
         sound.play(SoundManager.Sfx.START)
     }
@@ -1857,6 +1878,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             n.send("S", myId, (rocketY * 10f).toInt(), rocketAngle.toInt(), (boost * 100f).toInt(), score)
         }
         if (myAlive) emit(dt, 55f, 1f + boost * 0.6f) else myDeadTime += dt
+
+        // Yaşayan oyuncular saniyede 20 konum gönderir. Uzun süre sessiz kalan (uygulaması arka planda,
+        // bağlantısı kopmuş) oyuncu çıkmış sayılır; yoksa diğerlerinin maçı hiç bitmiyordu
+        val nowNs = System.nanoTime()
+        for (id in others()) if (pAlive[id] && nowNs - pLastNs[id] > MP_SILENT_NS) playerOut(id)
 
         if (players.none { isAlive(it) }) {
             endTimer += dt
@@ -2232,8 +2258,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val warn = 0.8f
                 val x = rocketX + speed * (warn + wr(0.35f, 0.85f))
                 val vy = -wr(980f, 1200f)
-                // Kulenin içinden (geçidin içinden) fırlamaz; yalnızca kuleler arasından çıkar
+                // Kulenin içinden (geçidin içinden) fırlamaz; yalnızca kuleler arasından çıkar.
+                // Yer uygun değilse kısa süre sonra yeniden denenir (yoksa sık kulelerde ateş topu neredeyse hiç çıkmıyordu)
                 if (columns.none { abs(it.x - x) < 120f }) fireballs.add(Fireball(x, WORLD_H + 40f, vy, warn))
+                else fireTimer = min(fireTimer, FIRE_RETRY)
             }
         }
         if (running && Mech.METEOR in mechs) {
@@ -3150,10 +3178,13 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             State.LEVELS, State.MARKET -> true
             // Ana ekranın ve harita seçiminin altında düğme ve yazı var: banner çok yüksekse
             // (bölünmüş ekran, küçük pencere) bu ekranlarda hiç gösterilmez
-            State.HUB, State.MENU -> scale <= 0f || (ads?.bannerSlotPx ?: 0) / scale <= HUB_BANNER_MAX
+            State.HUB -> bannerFits(HUB_BANNER_MAX)
+            State.MENU -> bannerFits(MENU_BANNER_MAX)
             else -> false
         }
     }
+
+    private fun bannerFits(maxWorld: Float) = scale <= 0f || (ads?.bannerSlotPx ?: 0) / scale <= maxWorld
 
     private fun updateBanner() {
         val a = ads ?: return
@@ -3419,16 +3450,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val floor = bannerFloor()
         textPaint.textSize = 19f
         textPaint.color = colDim
+        // Banner yüksekse ipucu yazısı (önemsiz) çıkarılır; gizlilik bağlantısı her zaman kalır
         if (ads?.privacyOptionsRequired() == true) {
-            drawFit(cv, strHubHint, cx, 832f, textPaint)
             labelPaint.textSize = 14f
             labelPaint.color = colDim
             val tw = labelPaint.measureText(strPrivacy)
-            val bottom = min(878f, floor - 24f)
-            privacyRect.set(cx - tw / 2f - 12f, bottom - 32f, cx + tw / 2f + 12f, bottom)
+            val bottom = min(878f, floor - 22f)
+            val top = bottom - 32f
+            val hintY = min(832f, top - 12f)
+            if (hintY >= 819f) drawFit(cv, strHubHint, cx, hintY, textPaint)
+            privacyRect.set(cx - tw / 2f - 12f, top, cx + tw / 2f + 12f, bottom)
             cv.drawText(strPrivacy, cx, bottom - 11f, labelPaint)
         } else {
-            drawFit(cv, strHubHint, cx, min(870f, floor - 22f), textPaint)
+            val hintY = min(870f, floor - 22f)
+            if (hintY >= 819f) drawFit(cv, strHubHint, cx, hintY, textPaint)
             privacyRect.setEmpty()
         }
     }

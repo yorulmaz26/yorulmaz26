@@ -270,6 +270,9 @@ class NetLink(context: Context) {
             c.close()
             if (closed) return
             if (isHost) {
+                // Diğerlerine hemen bildir: kurucu uygulaması arka plandayken (oyun döngüsü dururken) de
+                // ayrılan oyuncu maçta "çıktı" sayılsın
+                for (o in conns.values) o.out.offer("X|${c.id}")
                 events.add(Event.Left(c.id))
             } else {
                 connected = false

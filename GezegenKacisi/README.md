@@ -56,13 +56,14 @@ Reklamlar oyunun akışını bozmayacak şekilde yerleştirildi:
 
 | Reklam | Nerede | Kural |
 |---|---|---|
-| **Banner** | Ana ekran, Sonsuz Mod ayarı, Bölümler, Market (altta) | Oyun oynanırken, geri sayımda ve çok oyunculuda **hiç görünmez**. Ekranlar banner'a yer bırakır. |
-| **Geçiş (resim) reklamı** | Oyun bitince TEKRAR / MENÜ / SONRAKİ'ye basıldığında | En az 3 oyunda bir, araya en az 2,5 dk; uygulama açıldıktan sonraki ilk 1,5 dk ve ödüllü videodan sonraki 1 dk hiç yok. Ölüm anında aniden açılmaz. |
+| **Banner** | Ana ekran, Sonsuz Mod ayarı, Bölümler, Market (altta) | Oyun oynanırken, geri sayımda ve çok oyunculuda **hiç görünmez**. Ekranlar banner'a yer bırakır; banner, 3 düğmeli gezinmede geri/ana ekran düğmelerinin üstünde durur. Küçük pencerede (bölünmüş ekran) ana ekranda gösterilmez. |
+| **Geçiş (resim) reklamı** | Oyun bitince yalnızca TEKRAR / MENÜ / SONRAKİ / BÖLÜMLER düğmesine basıldığında (ekranın başka yerine dokunmak bir şey yapmaz) | En az 3 oyunda bir, araya en az 2,5 dk; uygulama açıldıktan sonraki ilk 1,5 dk ve ödüllü videodan sonraki 1 dk hiç yok. Ölüm anında aniden açılmaz. |
 | **Ödüllü video** | Can bitince, bölüm başarısız/geçildi ekranında, sonsuz mod sonunda | Tamamen isteğe bağlı: **+1 can**, **bölüm ödülünü 2 kat al**, **parayı 2 kat al**. Düğme yalnızca video hazırsa görünür. |
 
 - AB/İngiltere kullanıcılarına Google'ın reklam izni penceresi (UMP) reklamlardan önce gösterilir; izin yoksa reklam istenmez.
   Gerekli bölgelerde ana ekranın altında "Reklam gizlilik ayarları" bağlantısı çıkar.
-- Reklam yüklenemezse oyun etkilenmez: düğmeler gizli kalır, geçiş reklamı atlanır.
+- Reklam yüklenemezse oyun etkilenmez: düğmeler gizli kalır, geçiş reklamı atlanır; banner artan aralıklarla yeniden denenir.
+- Ödüllü video yalnızca düğmesine dokununca açılır (klavye/kumanda tuşu açmaz); erken kapatılsa da ardından 1 dk geçiş reklamı gelmez.
 - **Yayından önce:** `app/build.gradle.kts` başındaki `admobAppId`, `adBannerId`, `adInterstitialId`, `adRewardedId`
   değerlerini AdMob hesabınızdaki kendi kimliklerinizle değiştirin. Şu an Google'ın herkese açık **test** kimlikleri var
   (reklamlarda "Test Ad" yazar, gelir getirmez). Play Console'da "Veri güvenliği" formunda reklam kimliği ve reklam

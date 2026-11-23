@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.Gravity
 import android.view.View
+import android.view.WindowInsets
 import android.widget.FrameLayout
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -43,6 +44,7 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     private var bannerLoaded = false
     private var bannerWanted = false
     private var bannerWidthDp = 0
+    private var navInsetPx = 0              // altta dokunulabilir gezinme düğmeleri varsa yükseklikleri
     private var bannerRetryMs = 15_000L
     @Volatile private var destroyed = false
     private var interstitial: InterstitialAd? = null
@@ -57,6 +59,17 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
 
     fun start() {
         if (disabled) return
+        // Banner, gizli de olsa açılabilen gezinme düğmelerinin (geri/ana ekran) üstünde durur:
+        // kaydırınca beliren çubuğa basmak isterken reklama dokunulmasın. Hareketle gezinmede bu yükseklik 0'dır.
+        container.setOnApplyWindowInsetsListener { v, insets ->
+            val bottom = tappableBottom(insets)
+            if (bottom != navInsetPx) {
+                navInsetPx = bottom
+                banner?.let { applyBannerMargin(it) }
+            }
+            v.onApplyWindowInsets(insets)
+        }
+        container.requestApplyInsets()
         val params = ConsentRequestParameters.Builder().build()
         consent.requestConsentInfoUpdate(
             activity, params,
@@ -87,6 +100,21 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
     // ---------------------------------------------------------------------
     // Banner
     // ---------------------------------------------------------------------
+
+    private fun tappableBottom(insets: WindowInsets): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            insets.getInsetsIgnoringVisibility(WindowInsets.Type.tappableElement()).bottom
+        } else {
+            @Suppress("DEPRECATION")
+            insets.stableInsetBottom
+        }
+
+    private fun applyBannerMargin(view: AdView) {
+        val lp = view.layoutParams as? FrameLayout.LayoutParams ?: return
+        if (lp.bottomMargin == navInsetPx) return
+        lp.bottomMargin = navInsetPx
+        view.layoutParams = lp
+    }
 
     private fun screenWidthDp(): Int {
         val dm = activity.resources.displayMetrics
@@ -125,7 +153,7 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
                 Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
-            )
+            ).apply { bottomMargin = navInsetPx }
         )
         banner = view
         view.loadAd(AdRequest.Builder().build())
@@ -148,7 +176,8 @@ class AdManager(private val activity: Activity, private val container: FrameLayo
         get() {
             val b = banner ?: return 0
             if (!bannerLoaded) return 0
-            return b.adSize?.getHeightInPixels(activity) ?: 0
+            // Banner'ın altındaki gezinme düğmesi şeridi de ayrılır (oyunun yazıları ikisinin de üstünde kalır)
+            return (b.adSize?.getHeightInPixels(activity) ?: 0) + navInsetPx
         }
 
     /**

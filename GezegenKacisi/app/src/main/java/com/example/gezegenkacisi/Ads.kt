@@ -8,10 +8,10 @@ interface AdsBridge {
     /** Alttaki banner'ı göster/gizle (yalnızca menü ekranlarında açılır). */
     fun setBannerVisible(visible: Boolean)
 
-    /** Banner şu an ekranda kaplıyorsa yüksekliği (piksel), değilse 0. */
+    /** Banner şu an ekranda kaplıyorsa ayrılması gereken alt yükseklik (piksel), değilse 0. */
     val bannerHeightPx: Int
 
-    /** Yüklü bir banner gösterilse kaplayacağı yükseklik (piksel); banner yoksa 0. */
+    /** Yüklü bir banner gösterilse kaplayacağı yükseklik (piksel, altındaki gezinme şeridi dahil); banner yoksa 0. */
     val bannerSlotPx: Int
 
     /** Geçiş (resim) reklamı yüklü ve gösterilmeye hazır mı. */
