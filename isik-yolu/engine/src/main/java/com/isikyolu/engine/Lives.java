@@ -1,7 +1,9 @@
 package com.isikyolu.engine;
 
 /**
- * Bölüm modu can sistemi: en fazla 4 can, 15 dakikada bir yenilenir.
+ * Bölüm modu can sistemi. En fazla {@link GameConfig#LIVES_MAX} can; her {@link GameConfig#LIFE_REGEN_SECONDS} saniyede
+ * (20 dakika) bir can yenilenir. Canlar doluyken sayaç durur; can azalınca başlar ve sonraki kayıplarda sıfırlanmaz.
+ * Süre oyun kapalıyken de, internetsiz ve yeniden başlatmadan sonra da sayılır; saat dilimi etkilemez (UTC/monoton).
  *
  * Saat hilesine karşı süre şu sırayla ölçülür:
  * 1. Aynı açılış (boot) içinde: {@code elapsedRealtime} — telefon açıldığından beri işleyen, kullanıcının
@@ -12,9 +14,9 @@ package com.isikyolu.engine;
  * Aynı açılışta duvar saati monoton saatten 2 dakikadan fazla saparsa saat değişikliği algılanır.
  */
 public final class Lives {
-    public static final int MAX = 4;
-    public static final long REGEN_MS = 15 * 60_000L;
-    static final long TOLERANCE_MS = 2 * 60_000L;
+    public static final int MAX = GameConfig.LIVES_MAX;
+    public static final long REGEN_MS = GameConfig.LIFE_REGEN_SECONDS * 1000L;
+    static final long TOLERANCE_MS = GameConfig.CLOCK_TOLERANCE_SECONDS * 1000L;
 
     /** Platformdan okunan saatler. */
     public static final class Clock {
@@ -30,7 +32,7 @@ public final class Lives {
     private Lives() {}
 
     /** Hamle hakkı: bölümün en az hamlesinin iki katı + 5. Geri almak hakkı iade etmez. */
-    public static int moveBudget(int optimal) { return optimal * 2 + 5; }
+    public static int moveBudget(int optimal) { return optimal * GameConfig.MOVE_BUDGET_FACTOR + GameConfig.MOVE_BUDGET_EXTRA; }
 
     private static boolean sameBoot(Progress p, Clock c) {
         if (p.lifeBaseBoot < 0 || c.boot < 0) {
@@ -70,18 +72,24 @@ public final class Lives {
             }
         }
         if (!tamper && c.wall >= p.lifeMaxWall - TOLERANCE_MS) p.lifeMaxWall = Math.max(p.lifeMaxWall, c.wall);
+        if (p.lives < 0) p.lives = 0; // asla negatif değil
         if (p.lives >= MAX) { p.lives = MAX; rebase(p, c, 0); return tamper; }
         long el = trustedElapsed(p, c);
         if (el < 0) { tamper = true; rebase(p, c, 0); return tamper; }
         int gain = (int) Math.min(MAX, el / REGEN_MS);
         if (gain > 0) {
+            int before = p.lives;
             p.lives = Math.min(MAX, p.lives + gain);
+            p.regenGained += p.lives - before;
             rebase(p, c, p.lives >= MAX ? 0 : el % REGEN_MS);
         } else if (!sameBoot(p, c)) {
             rebase(p, c, el); // yeni açılışta tabanı monoton saate taşı, ilerlemeyi koru
         }
         return tamper;
     }
+
+    /** Yenilenme süresi (dakika), metinlerde gösterilir. */
+    public static int regenMinutes() { return GameConfig.LIFE_REGEN_SECONDS / 60; }
 
     /** Bir sonraki cana kalan süre (can doluysa 0). */
     public static long msUntilNext(Progress p, Clock c) {
@@ -133,9 +141,9 @@ public final class Lives {
         return t;
     }
 
-    /** "12:34" biçiminde süre. */
+    /** "dd:ss" biçiminde süre (ör. "19:42", "04:05"). */
     public static String format(long ms) {
-        long s = (ms + 999) / 1000;
-        return String.format(java.util.Locale.ROOT, "%d:%02d", s / 60, s % 60);
+        long s = Math.max(0, (ms + 999) / 1000);
+        return String.format(java.util.Locale.ROOT, "%02d:%02d", s / 60, s % 60);
     }
 }

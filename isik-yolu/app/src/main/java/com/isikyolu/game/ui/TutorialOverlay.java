@@ -102,7 +102,7 @@ public final class TutorialOverlay extends Overlay {
         l.add(new Page("ÖĞRETİCİ · 2/4", "Aynaları döndür", "Turkuaz halkalı aynalara dokun: her dokunuş aynayı 90° çevirir. Cıvatalı koyu yuvadaki aynalar sabittir, dönmez.", Demos.chapter(1)));
         l.add(new Page("ÖĞRETİCİ · 3/4", "Yıldızları topla", "En az hamleyle bitirirsen 3 yıldız kazanırsın. Takılırsan İpucu bir sonraki doğru hamleyi (gerekirse önce Geri Al'ı) gösterir.", Demos.chapter(2)));
         l.add(new Page("ÖĞRETİCİ · 4/4", "Hamle hakkı ve canlar", "Her bölümde sınırlı hamle hakkın var (sağ üstte HAK). Geri Al hakkı geri vermez. "
-                + "İlk hamlede 1 can düşer, bölümü bitirince geri gelir; hak bitince, yeniden başlayınca ya da çıkınca can gider. Canlar 15 dakikada bir yenilenir.", Demos.chapter(7)));
+                + "İlk hamlede 1 can düşer, bölümü bitirince geri gelir; hak bitince, yeniden başlayınca ya da çıkınca can gider. Canlar " + com.isikyolu.engine.Lives.regenMinutes() + " dakikada bir yenilenir.", Demos.chapter(7)));
         return l;
     }
 

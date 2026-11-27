@@ -48,6 +48,10 @@ import java.util.function.BooleanSupplier;
 public class UiFlowTest {
     private MainActivity act;
 
+    /** Akış testleri Türkçe arayüzle çalışır (metinle düğme arayan adımlar için); diğer diller I18nTest'te. */
+    @org.junit.Before public void turkish() { com.isikyolu.game.i18n.L.override = "tr"; }
+    @org.junit.After public void resetLanguage() { com.isikyolu.game.i18n.L.override = null; }
+
     private void idle(long ms) { shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(ms)); }
 
     private void waitFor(String what, BooleanSupplier cond) throws InterruptedException {
@@ -228,7 +232,7 @@ public class UiFlowTest {
         again.finish();
     }
 
-    /** Hamle hakkı biter, can gider; can kalmayınca bölüm açılmaz; 15 dk sonra can gelir. */
+    /** Hamle hakkı biter, can gider; can kalmayınca bölüm açılmaz; 20 dk sonra can gelir. */
     @Test public void livesFlow() throws Exception {
         start();
         Game.progress().tutorialSeen = true;
@@ -270,10 +274,30 @@ public class UiFlowTest {
         assertNotNull("can kalmadı penceresi", topOverlay());
         shot("14_can_kalmadi");
         closeOverlays();
-        // 15 dakika geçer (monoton saat)
-        org.robolectric.shadows.ShadowSystemClock.advanceBy(Duration.ofMinutes(15));
+        // rozet "0/4" ve dd:ss geri sayım gösterir
+        idle(1100);
+        assertNotNull("rozet 0/4", findText(act.currentScreen(), "0/4"));
+        assertNotNull("geri sayım dd:ss", findText(act.currentScreen(), "19:") != null ? findText(act.currentScreen(), "19:") : findText(act.currentScreen(), "20:00"));
+        // 19 dakika: henüz can yok; 20. dakikada 1 can (monoton saat)
+        org.robolectric.shadows.ShadowSystemClock.advanceBy(Duration.ofMinutes(19));
+        Game.refreshLives();
+        assertEquals(0, p.lives);
+        org.robolectric.shadows.ShadowSystemClock.advanceBy(Duration.ofMinutes(1));
         Game.refreshLives();
         assertEquals(1, p.lives);
+        idle(1100);
+        assertNotNull("rozet 1/4", findText(act.currentScreen(), "1/4"));
+        // can kaybı yokken 60 dk daha: canlar dolar, "doldu" bildirimi bir kez çıkar
+        org.robolectric.shadows.ShadowSystemClock.advanceBy(Duration.ofMinutes(60));
+        idle(1100);
+        assertEquals(4, p.lives);
+        assertNotNull("canlar doldu bildirimi", findText(act.overlayLayer(), com.isikyolu.game.i18n.L.t("lives.full_title")));
+        idle(4000);
+        assertNull("bildirim bir kez", findText(act.overlayLayer(), com.isikyolu.game.i18n.L.t("lives.full_title")));
+        assertNotNull("dolu rozeti", findText(act.currentScreen(), com.isikyolu.game.i18n.L.t("lives.full")));
+        // bölüm denemesi için yeniden 1 cana indir
+        p.lives = 1;
+        p.regenGained = 0;
         // bölümden yarıda çıkmak canı geri getirmez
         act.goLevel(lvl);
         idle(500);

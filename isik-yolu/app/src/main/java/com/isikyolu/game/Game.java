@@ -36,6 +36,7 @@ public final class Game {
         if (prefs == null) {
             prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
             progress = Progress.deserialize(prefs.getString(KEY, null));
+            saveTamperNotice = progress.saveTampered; // kayıt elle değiştirilmiş: bir kez bildirilir, kayıt yeniden imzalanır
             clockSource = app;
             // uygulama bir bölümün ortasında kapatıldıysa o denemenin canı geri gelmez
             if (progress.attemptLevel != 0) {
@@ -64,7 +65,18 @@ public final class Game {
     }
 
     private static Context clockSource;
-    private static boolean abandonedAttempt, abandonedShield;
+    private static boolean abandonedAttempt, abandonedShield, saveTamperNotice;
+
+    /** Kayıt dosyası değiştirilmiş mi (bir kez bildirilir). */
+    public static boolean takeSaveTamperNotice() { boolean b = saveTamperNotice; saveTamperNotice = false; return b; }
+
+    /** Son sorgudan beri canlar zamanla yenilenip dolduysa true (bildirim için; ödül ve satın almalar sayılmaz). */
+    public static boolean takeLivesRefilled() {
+        Lives.update(progress, clock());
+        boolean full = progress.regenGained > 0 && progress.lives >= Lives.MAX;
+        progress.regenGained = 0;
+        return full;
+    }
 
     /** Yarım kalan denemede can harcandı mı (bir kez bildirilir). */
     public static boolean takeAbandonedNotice() { boolean b = abandonedAttempt; abandonedAttempt = false; return b; }

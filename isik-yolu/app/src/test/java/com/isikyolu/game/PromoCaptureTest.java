@@ -213,6 +213,7 @@ public class PromoCaptureTest {
         String dir = System.getProperty("promo.dir");
         Assume.assumeTrue("yalnızca -PpromoDir ile", dir != null && !dir.isEmpty());
         out = new File(dir);
+        com.isikyolu.game.i18n.L.override = System.getProperty("promo.lang", "tr"); // kayıt dili: -PpromoLang=en …
         act = Robolectric.buildActivity(MainActivity.class).setup().get();
         idle(100);
         for (int i = 0; i < 600 && !(act.currentScreen() instanceof MenuScreen); i++) { Thread.sleep(10); idle(30); }

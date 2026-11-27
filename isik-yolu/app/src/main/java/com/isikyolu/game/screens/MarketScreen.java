@@ -156,7 +156,7 @@ public final class MarketScreen extends Screen {
         row.setGravity(Gravity.CENTER);
         row.addView(new LivesBadge(c));
         list.addView(row, Ui.lpMargins(c, -1, -2, 0, 4, 0, 6));
-        list.addView(note("Canlar 15 dakikada bir kendiliğinden yenilenir. Beklemek istemezsen buradan alabilirsin."));
+        list.addView(note("Canlar " + com.isikyolu.engine.Lives.regenMinutes() + " dakikada bir kendiliğinden yenilenir. Beklemek istemezsen buradan alabilirsin."));
         for (Economy.Item it : Economy.ITEMS) if (it.category == Economy.CAT_LIVES) list.addView(itemCard(p, it), Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
     }
 

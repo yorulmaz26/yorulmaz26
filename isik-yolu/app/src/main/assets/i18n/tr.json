@@ -1,0 +1,49 @@
+{
+  "common.ok": "Tamam",
+  "common.cancel": "Vazgeç",
+  "common.close": "Kapat",
+  "common.back": "Geri",
+  "common.continue": "Devam et",
+  "common.yes": "Evet",
+  "common.no": "Hayır",
+  "common.retry": "Tekrar dene",
+  "common.menu": "Ana menü",
+  "common.levels": "Bölümler",
+  "common.level_n": "Bölüm {0}",
+  "common.crystals": {
+    "one": "{0} kristal",
+    "other": "{0} kristal"
+  },
+  "common.gems": {
+    "one": "{0} Prizma Taşı",
+    "other": "{0} Prizma Taşı"
+  },
+  "common.lives": {
+    "one": "{0} can",
+    "other": "{0} can"
+  },
+  "common.hints": {
+    "one": "{0} ipucu",
+    "other": "{0} ipucu"
+  },
+  "common.stars": {
+    "one": "{0} yıldız",
+    "other": "{0} yıldız"
+  },
+  "common.moves": {
+    "one": "{0} hamle",
+    "other": "{0} hamle"
+  },
+  "common.minutes": {
+    "one": "{0} dakika",
+    "other": "{0} dakika"
+  },
+  "lives.full": "Dolu",
+  "lives.next": "Sonraki can: {0}",
+  "lives.cd": "{0}/{1} can, sonraki can {2}",
+  "lives.cd_full": "{0}/{1} can, canlar dolu",
+  "lives.full_title": "Canların doldu!",
+  "lives.full_body": "{0} canın da hazır. İyi oyunlar!",
+  "lives.tamper_title": "Kayıt dosyası değiştirilmiş",
+  "lives.tamper_body": "İlerlemen ve satın aldıkların korundu. Canlar baştan, normal hızda yenilenecek."
+}

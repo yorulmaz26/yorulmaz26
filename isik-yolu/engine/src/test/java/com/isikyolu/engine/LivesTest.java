@@ -54,21 +54,28 @@ public class LivesTest {
         }
         assertEquals(0, p.lives);
         assertFalse(Lives.startAttempt(p, ph.clock(), 9));
-        assertEquals(15 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+        assertEquals(20 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
     }
 
-    @Test public void regeneratesEveryFifteenMinutesKeepingRemainder() {
+    @Test public void configIsTwentyMinutes() {
+        assertEquals(1200, GameConfig.LIFE_REGEN_SECONDS);
+        assertEquals(20 * MIN, Lives.REGEN_MS);
+        assertEquals(4, Lives.MAX);
+        assertEquals(20, Lives.regenMinutes());
+    }
+
+    @Test public void regeneratesEveryTwentyMinutesKeepingRemainder() {
         Phone ph = new Phone();
         Progress p = fresh(ph);
         for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
-        ph.pass(14 * MIN);
+        ph.pass(19 * MIN);
         Lives.update(p, ph.clock());
         assertEquals(0, p.lives);
         assertEquals(MIN, Lives.msUntilNext(p, ph.clock()), 1000);
-        ph.pass(6 * MIN); // toplam 20 dk: 1 can, 5 dk ilerleme korunur
+        ph.pass(6 * MIN); // toplam 25 dk: 1 can, 5 dk ilerleme korunur
         Lives.update(p, ph.clock());
         assertEquals(1, p.lives);
-        assertEquals(10 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+        assertEquals(15 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
         ph.pass(3 * 60 * MIN); // saatler sonra: en fazla 4
         Lives.update(p, ph.clock());
         assertEquals(4, p.lives);
@@ -81,7 +88,7 @@ public class LivesTest {
         ph.wall += 5 * 60 * MIN; // kullanıcı saati 5 saat ileri aldı
         assertTrue("saat değişikliği algılanmalı", Lives.update(p, ph.clock()));
         assertEquals(0, p.lives);
-        ph.pass(15 * MIN); // gerçek 15 dk geçince yine 1 can
+        ph.pass(20 * MIN); // gerçek 20 dk geçince yine 1 can
         assertFalse(Lives.update(p, ph.clock()));
         assertEquals(1, p.lives);
     }
@@ -92,7 +99,7 @@ public class LivesTest {
         for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
         ph.wall -= 3 * 60 * MIN;
         assertTrue(Lives.update(p, ph.clock()));
-        ph.pass(10 * MIN);
+        ph.pass(15 * MIN);
         Lives.update(p, ph.clock());
         assertEquals(0, p.lives);
         ph.pass(5 * MIN);
@@ -104,14 +111,14 @@ public class LivesTest {
         Phone ph = new Phone();
         Progress p = fresh(ph);
         for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
-        ph.reboot(32 * MIN); // telefon 32 dk kapalı kaldı
+        ph.reboot(42 * MIN); // telefon 42 dk kapalı kaldı
         Lives.update(p, ph.clock());
         assertEquals(2, p.lives);
         // saati geri alıp yeniden başlatmak süre kazandırmaz
         ph.reboot(-120 * MIN);
         assertTrue(Lives.update(p, ph.clock()));
         assertEquals(2, p.lives);
-        ph.pass(15 * MIN);
+        ph.pass(20 * MIN);
         Lives.update(p, ph.clock());
         assertEquals(3, p.lives);
     }
@@ -136,9 +143,163 @@ public class LivesTest {
         Progress q = Progress.deserialize(p.serialize());
         assertEquals(3, q.lives);
         assertEquals(3, q.attemptLevel);
-        ph.pass(14 * MIN);
+        ph.pass(19 * MIN);
         Lives.update(q, ph.clock());
         assertEquals(4, q.lives);
+    }
+
+    // ---------- 1.8.0: 20 dakikalık yenilenme, sayaç sürekliliği, kayıt koruması ----------
+
+    @Test public void zeroToFullTakesEightyMinutes() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
+        for (int k = 1; k <= 4; k++) {
+            ph.pass(20 * MIN - 1000);
+            Lives.update(p, ph.clock());
+            assertEquals("20 dk dolmadan can gelmez", k - 1, p.lives);
+            ph.pass(1000);
+            Lives.update(p, ph.clock());
+            assertEquals(k, p.lives);
+        }
+        assertEquals("doluyken sayaç durur", 0, Lives.msUntilNext(p, ph.clock()));
+        ph.pass(5 * 60 * MIN);
+        Lives.update(p, ph.clock());
+        assertEquals("en fazla 4", 4, p.lives);
+    }
+
+    @Test public void furtherLossDoesNotResetRunningTimer() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); // 3/4: sayaç başladı
+        ph.pass(12 * MIN);
+        assertEquals(8 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+        Lives.startAttempt(p, ph.clock(), 2); Lives.loseAttempt(p); // 2/4: sayaç sıfırlanmaz
+        assertEquals(2, p.lives);
+        assertEquals(8 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+        ph.pass(8 * MIN);
+        Lives.update(p, ph.clock());
+        assertEquals(3, p.lives);
+        assertEquals("sonraki can için yeni 20 dk", 20 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+    }
+
+    @Test public void winningOrRewardKeepsTimerProgress() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        for (int i = 0; i < 2; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
+        ph.pass(5 * MIN);
+        // reklam/market ödülü: +1 can, yarım kalan sayaç korunur
+        Economy.addLives(p, 1, ph.clock());
+        assertEquals(3, p.lives);
+        assertEquals(15 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+        // ödül canı dolu sayıyı aşmaz
+        Economy.addLives(p, 9, ph.clock());
+        assertEquals(4, p.lives);
+        assertEquals(0, Lives.msUntilNext(p, ph.clock()));
+    }
+
+    @Test public void timePassesWhileAppClosedAndRestarted() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
+        String saved = p.serialize();
+        // uygulama kapatıldı (zorla durdurma dahil); 47 dk sonra aynı açılışta yeniden açıldı
+        ph.pass(47 * MIN);
+        Progress q = Progress.deserialize(saved);
+        assertFalse(q.saveTampered);
+        Lives.update(q, ph.clock());
+        assertEquals(2, q.lives);
+        assertEquals(13 * MIN, Lives.msUntilNext(q, ph.clock()), 1000);
+        // art arda aç/kapat: süre ne kazandırır ne kaybettirir
+        for (int i = 0; i < 30; i++) {
+            q = Progress.deserialize(q.serialize());
+            Lives.update(q, ph.clock());
+            ph.pass(1000);
+        }
+        assertEquals(2, q.lives);
+        assertEquals(13 * MIN - 30_000, Lives.msUntilNext(q, ph.clock()), 1500);
+    }
+
+    @Test public void rebootWithoutNetworkCountsOffTime() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
+        ph.pass(10 * MIN);
+        Progress q = Progress.deserialize(p.serialize());
+        ph.reboot(30 * MIN); // internetsiz, telefon kapalı 30 dk: toplam 40 dk
+        Lives.update(q, ph.clock());
+        assertEquals(2, q.lives);
+        assertEquals(20 * MIN, Lives.msUntilNext(q, ph.clock()), 1000);
+    }
+
+    @Test public void timeZoneChangeHasNoEffect() {
+        // saat dilimi duvar saatini (UTC milisaniye) değiştirmez; yalnızca gösterim değişir
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p);
+        ph.pass(10 * MIN);
+        assertFalse(Lives.update(p, ph.clock()));
+        assertEquals(10 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+        // tarih değişikliği (saat 1 gün ileri) aynı açılışta algılanır, can vermez
+        ph.wall += 24 * 60 * MIN;
+        assertTrue(Lives.update(p, ph.clock()));
+        assertEquals(3, p.lives);
+        assertEquals(10 * MIN, Lives.msUntilNext(p, ph.clock()), 1000);
+    }
+
+    @Test public void livesNeverNegativeOrAboveMax() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        p.lives = -3;
+        Lives.update(p, ph.clock());
+        assertEquals(0, p.lives);
+        p.lives = 99;
+        Lives.update(p, ph.clock());
+        assertEquals(4, p.lives);
+        assertEquals(0, Progress.deserialize("{\"lives\":-5}").lives);
+        assertEquals(4, Progress.deserialize("{\"lives\":50}").lives);
+    }
+
+    @Test public void editedSaveIsDetectedButProgressKept() {
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        p.stars[1] = 3; p.stars[2] = 2; p.gems = 120;
+        for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
+        String saved = p.serialize();
+        assertTrue(saved.contains("#sig:"));
+        // kayıt dosyasında can sayısı elle 4 yapıldı
+        String hacked = saved.replace("\"lives\":0", "\"lives\":4");
+        assertNotEquals(saved, hacked);
+        Progress q = Progress.deserialize(hacked);
+        assertTrue(q.saveTampered);
+        assertEquals(0, q.lives);
+        assertEquals(3, q.stars[1]);
+        assertEquals(2, q.stars[2]);
+        assertEquals(120, q.gems);
+        // can normal hızla yeniden dolar
+        Lives.update(q, ph.clock());
+        ph.pass(20 * MIN);
+        Lives.update(q, ph.clock());
+        assertEquals(1, q.lives);
+        // imzayı silmek de işe yaramaz (yeni sürüm kaydı imzasız olamaz)
+        String stripped = hacked.substring(0, hacked.lastIndexOf("\n#sig:"));
+        assertTrue(Progress.deserialize(stripped).saveTampered);
+        // sağlam kayıt sorunsuz yüklenir
+        assertFalse(Progress.deserialize(saved).saveTampered);
+    }
+
+    @Test public void oldUnsignedSaveMigratesWithoutPenalty() {
+        // 1.7.1 kaydı: imza ve "sv" alanı yok
+        String old = "{\"stars\":[3,2,1],\"gem\":40,\"lives\":2}";
+        Progress q = Progress.deserialize(old);
+        assertFalse(q.saveTampered);
+        assertEquals(2, q.lives);
+        assertEquals(40, q.gems);
+        assertEquals(3, q.stars[1]);
+        // sonraki kayıt imzalı yazılır ve yeniden yüklenince temizdir
+        Progress r = Progress.deserialize(q.serialize());
+        assertFalse(r.saveTampered);
+        assertEquals(2, r.lives);
     }
 
     @Test public void moveBudgetLimitsSession() throws Exception {

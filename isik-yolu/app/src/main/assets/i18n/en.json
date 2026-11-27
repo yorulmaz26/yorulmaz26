@@ -1,0 +1,49 @@
+{
+  "common.ok": "OK",
+  "common.cancel": "Cancel",
+  "common.close": "Close",
+  "common.back": "Back",
+  "common.continue": "Continue",
+  "common.yes": "Yes",
+  "common.no": "No",
+  "common.retry": "Try again",
+  "common.menu": "Main menu",
+  "common.levels": "Levels",
+  "common.level_n": "Level {0}",
+  "common.crystals": {
+    "one": "{0} crystal",
+    "other": "{0} crystals"
+  },
+  "common.gems": {
+    "one": "{0} Prism Gem",
+    "other": "{0} Prism Gems"
+  },
+  "common.lives": {
+    "one": "{0} life",
+    "other": "{0} lives"
+  },
+  "common.hints": {
+    "one": "{0} hint",
+    "other": "{0} hints"
+  },
+  "common.stars": {
+    "one": "{0} star",
+    "other": "{0} stars"
+  },
+  "common.moves": {
+    "one": "{0} move",
+    "other": "{0} moves"
+  },
+  "common.minutes": {
+    "one": "{0} minute",
+    "other": "{0} minutes"
+  },
+  "lives.full": "Full",
+  "lives.next": "Next life: {0}",
+  "lives.cd": "{0}/{1} lives, next life in {2}",
+  "lives.cd_full": "{0}/{1} lives, lives full",
+  "lives.full_title": "Lives refilled!",
+  "lives.full_body": "All {0} lives are ready. Have fun!",
+  "lives.tamper_title": "Save file was modified",
+  "lives.tamper_body": "Your progress and purchases are safe. Lives will refill from zero at the normal pace."
+}

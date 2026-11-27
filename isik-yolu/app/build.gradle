@@ -27,8 +27,8 @@ android {
         applicationId 'com.isikyolu.game'
         minSdk 26
         targetSdk 36
-        versionCode 11
-        versionName '1.7.1'
+        versionCode 12
+        versionName '1.8.0'
     }
 
     buildFeatures { buildConfig true }
@@ -77,6 +77,7 @@ android {
                 maxHeapSize = '2g'
                 systemProperty 'screens.dir', rootProject.file('docs/ekranlar').absolutePath
                 if (project.hasProperty('promoDir')) systemProperty 'promo.dir', project.property('promoDir').toString()
+                if (project.hasProperty('promoLang')) systemProperty 'promo.lang', project.property('promoLang').toString()
                 testLogging { events 'passed', 'failed'; exceptionFormat 'full'; showStandardStreams = true }
             }
         }

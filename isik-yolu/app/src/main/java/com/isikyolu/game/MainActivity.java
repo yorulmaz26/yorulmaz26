@@ -35,6 +35,8 @@ public final class MainActivity extends Activity {
 
     @Override protected void onCreate(Bundle b) {
         super.onCreate(b);
+        com.isikyolu.game.i18n.L.init(this);
+        com.isikyolu.game.i18n.L.addListener(languageListener);
         Game.init(this);
         // kenardan kenara çizim (Android 15+ zorunlu): içerik sistem çubuklarının iç boşluğu kadar içeride
         frame = new FrameLayout(this);
@@ -68,6 +70,55 @@ public final class MainActivity extends Activity {
     }
 
     public FrameLayout overlayLayer() { return root; }
+
+    // ---------- dil ----------
+    private final Runnable languageListener = this::onLanguageChanged;
+
+    /** Dil değişti: açık ekran yeni dilde yeniden kurulur (oyun yeniden başlatılmaz, ilerleme etkilenmez). */
+    private void onLanguageChanged() {
+        if (current instanceof SettingsScreen) replaceCurrent(new SettingsScreen(this));
+        else if (current instanceof MenuScreen) replaceCurrent(new MenuScreen(this));
+        else if (current instanceof LevelSelectScreen) replaceCurrent(new LevelSelectScreen(this));
+        // diğer ekranlar bir sonraki açılışta yeni dille kurulur
+    }
+
+    // ---------- can bildirimleri ----------
+    private final Runnable livesTick = this::livesTick;
+
+    /** Her saniye: canlar zamanla dolduysa üstten bildirim; kayıt dosyası değiştirilmişse bir kez uyarı. */
+    private void livesTick() {
+        root.removeCallbacks(livesTick);
+        if (!resumed) return;
+        boolean ready = current != null && !(current instanceof SplashScreen)
+                && !(current instanceof com.isikyolu.game.screens.StudioIntroScreen) && Game.levels() != null;
+        if (ready) {
+            if (Game.takeSaveTamperNotice())
+                banner(com.isikyolu.game.ui.Icon.HEART, com.isikyolu.game.i18n.L.t("lives.tamper_title"), com.isikyolu.game.i18n.L.t("lives.tamper_body"));
+            else if (Game.takeLivesRefilled()) {
+                Game.save();
+                Game.audio().play(Audio.STAR, 1.25f);
+                banner(com.isikyolu.game.ui.Icon.HEART, com.isikyolu.game.i18n.L.t("lives.full_title"),
+                        com.isikyolu.game.i18n.L.n("lives.full_body", com.isikyolu.engine.Lives.MAX));
+            }
+        }
+        root.postDelayed(livesTick, 1000);
+    }
+
+    /** Geçiş animasyonu olmadan açık ekranı değiştirir. */
+    private void replaceCurrent(Screen next) {
+        Screen old = current;
+        current = next;
+        stage.addView(next, new FrameLayout.LayoutParams(-1, -1));
+        if (old != null) { old.onHide(); stage.removeView(old); }
+        updateBanner();
+        next.onShow();
+    }
+
+    @Override public void onConfigurationChanged(android.content.res.Configuration c) {
+        super.onConfigurationChanged(c);
+        // sistem dili ya da (Android 13+) sistem ayarlarındaki uygulama dili değişti
+        if (com.isikyolu.game.i18n.L.refresh(this)) onLanguageChanged();
+    }
 
     /** Pencere sistem çubuklarının altına çizilir; içerik onların iç boşluğu kadar içeri alınır (tüm sürümlerde aynı). */
     @SuppressWarnings("deprecation")
@@ -285,7 +336,7 @@ public final class MainActivity extends Activity {
         tick[0] = () -> {
             com.isikyolu.engine.Lives.update(Game.progress(), Game.clock());
             if (Game.progress().lives > 0) { body.setText("Yeni bir can geldi! Bölümlere dönebilirsin."); return; }
-            body.setText("Her 15 dakikada 1 can yenilenir (en fazla " + com.isikyolu.engine.Lives.MAX + ").\nSonraki can: "
+            body.setText("Her " + com.isikyolu.engine.Lives.regenMinutes() + " dakikada 1 can yenilenir (en fazla " + com.isikyolu.engine.Lives.MAX + ").\nSonraki can: "
                     + com.isikyolu.engine.Lives.format(com.isikyolu.engine.Lives.msUntilNext(Game.progress(), Game.clock()))
                     + "\n\nGünlük bulmaca can harcamaz.");
             body.postDelayed(tick[0], 1000);
@@ -406,6 +457,7 @@ public final class MainActivity extends Activity {
     @Override protected void onResume() {
         super.onResume();
         resumed = true;
+        livesTick();
         Game.audio().onResume();
         updateBanner();
         retryAds();
@@ -417,6 +469,7 @@ public final class MainActivity extends Activity {
         Game.save();
         Game.audio().onPause();
         resumed = false;
+        root.removeCallbacks(livesTick);
         setBannerRunning(false);
         // tam ekran reklam açıldı: oyun duraklatma penceresi açılmasın
         if (current != null && !com.isikyolu.game.ads.Ads.get().fullscreenShowing()) current.onAppPause();
@@ -426,6 +479,7 @@ public final class MainActivity extends Activity {
         // etkinlik kapanıyor ya da yeniden oluşturuluyor: yarım deneme bırakılmış sayılır
         if (current != null) current.onHide();
         Game.save();
+        com.isikyolu.game.i18n.L.removeListener(languageListener);
         com.isikyolu.game.ads.Ads.get().setOnAvailabilityChanged(null); // eski etkinlik tutulmasın
         com.isikyolu.game.ads.Ads.get().destroyBanner(banner);
         super.onDestroy();

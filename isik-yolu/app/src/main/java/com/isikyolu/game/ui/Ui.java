@@ -42,6 +42,7 @@ public final class Ui {
         t.setTextColor(color);
         t.setTypeface(tf);
         t.setIncludeFontPadding(true);
+        t.setTextLocale(com.isikyolu.game.i18n.L.locale()); // satır kırma/heceleme seçili dile göre
         return t;
     }
 
@@ -129,7 +130,12 @@ public final class Ui {
             b.addView(iv, lp);
         }
         TextView t = text(c, label, 17, tc, BOLD);
-        b.addView(t);
+        // uzun çeviriler (ör. Almanca) taşmaz: en fazla iki satır, ortalı, heceleme açık
+        t.setMaxLines(2);
+        t.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        t.setGravity(Gravity.CENTER);
+        t.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NORMAL);
+        b.addView(t, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0f));
         clickable(b, l);
         b.setContentDescription(label);
         return b;

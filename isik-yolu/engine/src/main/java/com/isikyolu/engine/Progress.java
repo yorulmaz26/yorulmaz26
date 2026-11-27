@@ -141,7 +141,7 @@ public final class Progress {
         mirrorSkin = Economy.DEFAULT_MIRROR; boardSkin = Economy.DEFAULT_BOARD; beamSkin = Economy.DEFAULT_BEAM;
     }
 
-    public String serialize() {
+    private String serializeJson() {
         Map<String, Object> m = new LinkedHashMap<>();
         m.put("v", 1);
         List<Object> s = new ArrayList<>(), b = new ArrayList<>();
@@ -189,12 +189,67 @@ public final class Progress {
         m.put("adD", adRewardDay);
         m.put("adC", adVideos);
         m.put("adR", new LinkedHashMap<String, Object>(adRewards));
+        m.put("sv", SAVE_VERSION);
         return Json.write(m);
     }
+
+    /** Kayıt imzası: kayıt dosyası elle değiştirilirse fark edilir (çevrimdışı oyunda caydırıcı koruma). */
+    private static final String SIG_MARK = "\n#sig:";
+    /** 2: imzalı kayıt (1.8.0+). Bu sürümle yazılmış ama imzası olmayan kayıt da değiştirilmiş sayılır. */
+    static final int SAVE_VERSION = 2;
+    private transient int loadedVersion;
+    private static final String SIG_SALT = "IsikYolu|MagicLumos|kayit|v1";
+
+    static String signature(String json) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
+            byte[] h = md.digest((SIG_SALT + json).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (int k = 0; k < 16; k++) sb.append(String.format(java.util.Locale.ROOT, "%02x", h[k]));
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            return "";
+        }
+    }
+
+    public String serialize() {
+        String json = serializeJson();
+        return json + SIG_MARK + signature(json);
+    }
+
+    /** Son yüklemede kayıt imzası tutmadı mı (kayıt elle değiştirilmiş). Bir kez bildirilir. */
+    public transient boolean saveTampered;
+
+    /** Zamanla yenilenen (ödül/satın alma dışı) can sayısı; arayüz "canların doldu" bildirimi için okur ve sıfırlar. */
+    public transient int regenGained;
 
     /** Bozuk veya boş kayıtta varsayılan ilerleme döner. */
     @SuppressWarnings("unchecked")
     public static Progress deserialize(String text) {
+        boolean tampered = false, signed = false;
+        if (text != null) {
+            int at = text.lastIndexOf(SIG_MARK);
+            if (at >= 0) {
+                signed = true;
+                String json = text.substring(0, at), sig = text.substring(at + SIG_MARK.length()).trim();
+                tampered = !sig.equals(signature(json));
+                text = json;
+            } // imzasız eski kayıt (önceki sürüm): olduğu gibi kabul edilir, sonraki kayıtta imzalanır
+        }
+        Progress p = deserializeJson(text);
+        if (!signed && p.loadedVersion >= SAVE_VERSION) tampered = true; // imza silinmiş
+        if (tampered) {
+            // İlerleme, yıldızlar ve satın alımlar korunur; yalnızca can durumu güvenli değere döner:
+            // canlar 0'dan normal hızla yeniden dolar (değiştirilmiş can/süre değerleri işe yaramaz).
+            p.lives = 0;
+            p.lifeBaseElapsed = Long.MIN_VALUE;
+            p.attemptLevel = 0;
+            p.saveTampered = true;
+        }
+        return p;
+    }
+
+    private static Progress deserializeJson(String text) {
         Progress p = new Progress();
         if (text == null || text.isEmpty()) return p;
         try {
@@ -224,6 +279,7 @@ public final class Progress {
             p.lifeBaseNet = Json.getLong(m, "lbn", -1);
             p.lifeMaxWall = Json.getLong(m, "lmw", 0);
             p.attemptLevel = Json.getInt(m, "att", 0);
+            p.loadedVersion = Json.getInt(m, "sv", 1);
             p.trustWall = Json.getLong(m, "tw", 0);
             p.trustElapsed = Json.getLong(m, "te", 0);
             p.trustBoot = Json.getInt(m, "tb", -1);
