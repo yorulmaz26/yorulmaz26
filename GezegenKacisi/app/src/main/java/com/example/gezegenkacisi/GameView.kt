@@ -3,6 +3,8 @@ package com.example.gezegenkacisi
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.BlurMaskFilter
@@ -25,6 +27,7 @@ import android.view.HapticFeedbackConstants
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import java.util.Locale
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.ceil
@@ -51,7 +54,13 @@ import kotlin.concurrent.thread
  */
 class GameView(context: Context) : View(context), Choreographer.FrameCallback {
 
-    private enum class State { SPLASH, HUB, MENU, LEVELS, MARKET, READY, PLAYING, DYING, OVER, LEVEL_DONE, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
+    private enum class State { SPLASH, HUB, SETTINGS, MENU, LEVELS, MARKET, READY, PLAYING, DYING, OVER, LEVEL_DONE, MP_LOBBY, MP_COUNTDOWN, MP_PLAYING, MP_OVER }
+
+    /** Desteklenen diller; ayarlarda her biri kendi dilindeki adıyla gösterilir. Yeni dil: buraya + values-xx. */
+    private enum class Lang(val code: String, val nativeName: String) {
+        TR("tr", "Türkçe"), EN("en", "English"), DE("de", "Deutsch"),
+        IT("it", "Italiano"), FR("fr", "Français"), ES("es", "Español")
+    }
 
     /** 2 oyuncu lobisinin aşamaları. */
     private enum class Lobby { CHOOSE, HOSTING, JOINING, CONNECTED }
@@ -148,6 +157,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         private const val KEY_MAP = "map"
         private const val KEY_DIFF = "difficulty"
         private const val KEY_SOUND = "sound"
+        private const val KEY_MUSIC = "music"
+        private const val REGEN_MIN = GameRules.LIFE_REGEN_SECONDS / 60
+        private const val BRAND = "Magic Lumos Software"
+        private const val KEY_LANG = "language"         // "" = telefonun dili
         private const val KEY_MP_HELP_SEEN = "mp_help_seen"
         private const val KEY_MP_FULL = "mp_full"
         private const val KEY_COINS = "coins"
@@ -222,14 +235,20 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
     private var skin: Skin = Skin.entries.firstOrNull { it.name == prefs.getString(KEY_SKIN, "") }
         ?.takeIf { it in ownedSkins } ?: Skin.CLASSIC
-    // --- Canlar (bölüm modu): 4 can, her biri 15 dakikada dolar, saat hilesine karşı korumalı ---
+    // --- Canlar (bölüm modu): GameRules.MAX_LIVES can, her biri 20 dakikada dolar, saat hilesine karşı korumalı ---
     @Volatile private var netBaseMs = -1L       // internetten alınan gerçek saat
     @Volatile private var netBaseElapsed = 0L   // o andaki değiştirilemeyen sayaç
     private var netRetry = 0f
     private val lives = Lives(
         object : Lives.Store {
             override fun getLong(key: String, def: Long) = prefs.getLong(key, def)
-            override fun putLong(key: String, value: Long) { prefs.edit().putLong(key, value).apply() }
+            override fun contains(key: String) = prefs.contains(key)
+            override fun putAll(values: Map<String, Long>) {
+                // Tek seferde yazılır: kayıt hiçbir zaman yarım kalmaz (imza tutarlı kalır)
+                val ed = prefs.edit()
+                for ((k, v) in values) ed.putLong(k, v)
+                ed.apply()
+            }
         },
         object : Lives.Clock {
             override fun elapsed() = SystemClock.elapsedRealtime()
@@ -239,9 +258,22 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                 val b = netBaseMs
                 return if (b < 0L) -1L else b + (SystemClock.elapsedRealtime() - netBaseElapsed)
             }
+            override fun wallNow() = System.currentTimeMillis()
         }
     )
     private var livesTick = 0f
+    private var livesDialog = false             // "canın kalmadı" penceresi açık mı
+    private val dlgVideoBtn = RectF()
+    private val dlgBuyBtn = RectF()
+    private val dlgWaitBtn = RectF()
+    private var heartPulse = 0f                 // can dolunca kalp atışı (1 → 0)
+
+    // --- Ayarlar ekranı ---
+    private val gearBtn = RectF()
+    private val langBtns = Array(Lang.entries.size + 1) { RectF() } // 0: telefonun dili
+    private val setSoundBtn = RectF()
+    private val setMusicBtn = RectF()
+    private val setPrivacyBtn = RectF()
     private var lifeSpent = false               // bu bölüm denemesi için can harcandı mı
 
     // --- Reklamlar (MainActivity verir; testlerde yoktur) ---
@@ -350,116 +382,276 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     private var bgBitmap: Bitmap? = null
 
     // --- Metinler ---
-    private val strTitle1 = context.getString(R.string.title_line1)
-    private val strTitle2 = context.getString(R.string.title_line2)
-    private val strTapToStart = context.getString(R.string.tap_to_start)
-    private val strHint = context.getString(R.string.hint)
-    private val strGameOver = context.getString(R.string.game_over)
-    private val strScoreLabel = context.getString(R.string.score_label)
-    private val strBestLabel = context.getString(R.string.best_label)
-    private val strNewRecord = context.getString(R.string.new_record)
-    private val strPaused = context.getString(R.string.paused)
-    private val strTapToContinue = context.getString(R.string.tap_to_continue)
-    private val strMapLabel = context.getString(R.string.label_map)
-    private val strLevelLabel = context.getString(R.string.label_level)
-    private val strStart = context.getString(R.string.start)
-    private val strRetry = context.getString(R.string.retry)
-    private val strMenu = context.getString(R.string.menu)
-    private val strWind = context.getString(R.string.wind)
-    private val mapTips = Maps.ALL.map { context.getString(it.tipRes) }
-    private val strTwoPlayers = context.getString(R.string.two_players)
-    private val strMpInfo1 = context.getString(R.string.mp_info1)
-    private val strMpInfo2 = context.getString(R.string.mp_info2)
-    private val strHost = context.getString(R.string.mp_host)
-    private val strJoin = context.getString(R.string.mp_join)
-    private val strBack = context.getString(R.string.back)
-    private val strLeave = context.getString(R.string.mp_leave)
-    private val strRoomOpen = context.getString(R.string.mp_room_open)
-    private val strWaiting = context.getString(R.string.mp_waiting)
-    private val strSearching = context.getString(R.string.mp_searching)
-    private val strJoinHint = context.getString(R.string.mp_join_hint)
-    private val strConnected = context.getString(R.string.mp_connected)
-    private val strMpStart = context.getString(R.string.mp_start)
-    private val strWaitHost = context.getString(R.string.mp_wait_host)
-    private val strYou = context.getString(R.string.mp_you)
-    private val strOpponent = context.getString(R.string.mp_opponent)
-    private val strYouCrashed = context.getString(R.string.mp_you_crashed)
-    private val strWatching = context.getString(R.string.mp_watching)
-    private val strOppCrashed = context.getString(R.string.mp_opp_crashed)
-    private val strWin = context.getString(R.string.mp_win)
-    private val strLose = context.getString(R.string.mp_lose)
-    private val strDraw = context.getString(R.string.mp_draw)
-    private val strDisconnected = context.getString(R.string.mp_disconnected)
-    private val strRetryWait = context.getString(R.string.mp_retry_wait)
-    private val strNoNetwork = context.getString(R.string.mp_failed)
-    private val strMpPick = context.getString(R.string.mp_pick)
-    private val strViewSplit = context.getString(R.string.mp_view_split)
-    private val strViewFull = context.getString(R.string.mp_view_full)
-    private val strViewLabel = context.getString(R.string.mp_view_label)
-    private val strPlaying = context.getString(R.string.mp_playing)
-    private val strCrashedShort = context.getString(R.string.mp_crashed_short)
-    private val strSpectating = context.getString(R.string.mp_spectating)
-    private val strPlayerFormat = context.getString(R.string.mp_player_format)
-    private val strLeftGame = context.getString(R.string.mp_left)
-    private val strPlaceFormat = context.getString(R.string.mp_place_format)
-    private val strWatchFormat = context.getString(R.string.mp_watch_format)
-    private val strTapToSwitch = context.getString(R.string.mp_tap_switch)
-    private val strNobodyLeft = context.getString(R.string.mp_nobody_left)
-    private val strPlayersCount = context.getString(R.string.mp_players_count)
-    private val strWatchingMany = context.getString(R.string.mp_watching_many)
-    private val strLevels = context.getString(R.string.hub_levels)
-    private val strEndless = context.getString(R.string.hub_endless)
-    private val strMarket = context.getString(R.string.hub_market)
-    private val strHubHint = context.getString(R.string.hub_hint)
-    private val strLevelProgress = context.getString(R.string.level_progress)
-    private val strLevelTitle = context.getString(R.string.level_title)
-    private val strRound = context.getString(R.string.level_round)
-    private val strTarget = context.getString(R.string.level_target)
-    private val strPractice = context.getString(R.string.level_practice)
-    private val strMapFinal = context.getString(R.string.level_final)
-    private val strReward = context.getString(R.string.level_reward)
-    private val strReplay = context.getString(R.string.level_replay)
-    private val strLevelFailed = context.getString(R.string.level_failed)
-    private val strLevelDone = context.getString(R.string.level_done)
-    private val strAllDone = context.getString(R.string.level_all_done)
-    private val strAllDoneDesc = context.getString(R.string.level_all_done_desc)
-    private val strNext = context.getString(R.string.next)
-    private val strLevelsPassed = context.getString(R.string.levels_passed)
-    private val strTargetLabel = context.getString(R.string.target_label)
-    private val strRewardLabel = context.getString(R.string.reward_label)
-    private val strCoinsCollected = context.getString(R.string.coins_collected)
-    private val strSelected = context.getString(R.string.market_selected)
-    private val strSelect = context.getString(R.string.market_select)
-    private val strNoMoney = context.getString(R.string.market_no_money)
-    private val strBought = context.getString(R.string.market_bought)
-    private val strLevelLocked = context.getString(R.string.level_locked)
-    private val strNoLives = context.getString(R.string.lives_empty)
-    private val strTapToSkip = context.getString(R.string.splash_skip)
-    private val strRewardLife = context.getString(R.string.ad_reward_life)
-    private val strRewardDouble = context.getString(R.string.ad_reward_double)
-    private val strRewardCoins = context.getString(R.string.ad_reward_coins)
-    private val strGotLife = context.getString(R.string.ad_got_life)
-    private val strGotCoins = context.getString(R.string.ad_got_coins)
-    private val strPrivacy = context.getString(R.string.ad_privacy)
-    private val strLifeRule = context.getString(R.string.lives_rule)
-    private val modNames = Mod.entries.map { context.getString(it.nameRes) }
-    private val skinNames = Skin.entries.map { context.getString(it.nameRes) }
-    private val strBothCanPick = context.getString(R.string.mp_both_pick)
-    private val strHelpTitle = context.getString(R.string.mp_help_title)
-    private val strHelpClose = context.getString(R.string.mp_help_close)
-    private val strHelpTip = context.getString(R.string.mp_help_tip)
-    private val helpSteps = listOf(
-        context.getString(R.string.mp_help_1),
-        context.getString(R.string.mp_help_2),
-        context.getString(R.string.mp_help_3),
-        context.getString(R.string.mp_help_4),
-        context.getString(R.string.mp_help_5),
-        context.getString(R.string.mp_help_6),
-        context.getString(R.string.mp_help_7)
-    )
-    private val mapNames = Maps.ALL.map { context.getString(it.nameRes) }
-    private val mapDescs = Maps.ALL.map { context.getString(it.descRes) }
-    private val diffNames = Difficulty.entries.map { context.getString(it.nameRes) }
+    private var strTitle1 = ""
+    private var strLivesRegenInfo = ""
+    private var strCoinsHave = ""
+    private var strLangCode = ""
+    private var strTitleSecondary = ""
+    private var strSettings = ""
+    private var strSetLanguage = ""
+    private var strSetLangAuto = ""
+    private var strSetSound = ""
+    private var strSetMusic = ""
+    private var strOn = ""
+    private var strOff = ""
+    private var strVersion = ""
+    private var strLivesFull = ""
+    private var strLivesCount = ""
+    private var strLivesNext = ""
+    private var strLifeRefilled = ""
+    private var strLivesAllFull = ""
+    private var strLivesDlgTitle = ""
+    private var strBuyLife = ""
+    private var strLifeBought = ""
+    private var strWait = ""
+    private var strRank = ""
+    private var strTitle2 = ""
+    private var strTapToStart = ""
+    private var strHint = ""
+    private var strGameOver = ""
+    private var strScoreLabel = ""
+    private var strBestLabel = ""
+    private var strNewRecord = ""
+    private var strPaused = ""
+    private var strTapToContinue = ""
+    private var strMapLabel = ""
+    private var strLevelLabel = ""
+    private var strStart = ""
+    private var strRetry = ""
+    private var strMenu = ""
+    private var strWind = ""
+    private var mapTips = emptyList<String>()
+    private var strTwoPlayers = ""
+    private var strMpInfo1 = ""
+    private var strMpInfo2 = ""
+    private var strHost = ""
+    private var strJoin = ""
+    private var strBack = ""
+    private var strLeave = ""
+    private var strRoomOpen = ""
+    private var strWaiting = ""
+    private var strSearching = ""
+    private var strJoinHint = ""
+    private var strMpStart = ""
+    private var strWaitHost = ""
+    private var strYou = ""
+    private var strYouCrashed = ""
+    private var strWatching = ""
+    private var strWin = ""
+    private var strLose = ""
+    private var strDraw = ""
+    private var strDisconnected = ""
+    private var strRetryWait = ""
+    private var strNoNetwork = ""
+    private var strMpPick = ""
+    private var strViewSplit = ""
+    private var strViewFull = ""
+    private var strViewLabel = ""
+    private var strPlaying = ""
+    private var strCrashedShort = ""
+    private var strPlayerFormat = ""
+    private var strLeftGame = ""
+    private var strPlaceFormat = ""
+    private var strWatchFormat = ""
+    private var strTapToSwitch = ""
+    private var strNobodyLeft = ""
+    private var strPlayersCount = ""
+    private var strWatchingMany = ""
+    private var strLevels = ""
+    private var strEndless = ""
+    private var strMarket = ""
+    private var strHubHint = ""
+    private var strLevelProgress = ""
+    private var strLevelTitle = ""
+    private var strRound = ""
+    private var strTarget = ""
+    private var strPractice = ""
+    private var strMapFinal = ""
+    private var strReward = ""
+    private var strReplay = ""
+    private var strLevelFailed = ""
+    private var strLevelDone = ""
+    private var strAllDone = ""
+    private var strAllDoneDesc = ""
+    private var strNext = ""
+    private var strTargetLabel = ""
+    private var strRewardLabel = ""
+    private var strCoinsCollected = ""
+    private var strSelected = ""
+    private var strSelect = ""
+    private var strNoMoney = ""
+    private var strBought = ""
+    private var strLevelLocked = ""
+    private var strTapToSkip = ""
+    private var strRewardLife = ""
+    private var strRewardDouble = ""
+    private var strRewardCoins = ""
+    private var strGotLife = ""
+    private var strPrivacy = ""
+    private var strLifeRule = ""
+    private var modNames = emptyList<String>()
+    private var skinNames = emptyList<String>()
+    private var strHelpTitle = ""
+    private var strHelpClose = ""
+    private var strHelpTip = ""
+    private var helpSteps = emptyList<String>()
+    private var mapNames = emptyList<String>()
+    private var mapDescs = emptyList<String>()
+    private var diffNames = emptyList<String>()
+    /** Seçili dildeki metinler (dil değişince [applyLanguage] ile yeniden yüklenir; oyun yeniden başlamaz). */
+    private var res: Resources = context.resources
+
+    private fun loadStrings() {
+        val r = res
+        strLangCode = r.getString(R.string.lang_code)
+        strTitleSecondary = r.getString(R.string.title_secondary)
+        strSettings = r.getString(R.string.settings_title)
+        strSetLanguage = r.getString(R.string.settings_language)
+        strSetLangAuto = r.getString(R.string.settings_lang_auto)
+        strSetSound = r.getString(R.string.settings_sound)
+        strSetMusic = r.getString(R.string.settings_music)
+        strOn = r.getString(R.string.settings_on)
+        strOff = r.getString(R.string.settings_off)
+        strVersion = r.getString(R.string.settings_version)
+        strLivesFull = r.getString(R.string.lives_full)
+        strLivesCount = r.getString(R.string.lives_count)
+        strLivesNext = r.getString(R.string.lives_next)
+        strLifeRefilled = r.getString(R.string.lives_refilled)
+        strLivesAllFull = r.getString(R.string.lives_all_full)
+        strLivesDlgTitle = r.getString(R.string.lives_dialog_title)
+        strBuyLife = r.getString(R.string.lives_buy)
+        strLifeBought = r.getString(R.string.lives_bought)
+        strWait = r.getString(R.string.lives_wait)
+        strRank = r.getString(R.string.mp_rank)
+        strCoinsHave = r.getString(R.string.lives_coins_have)
+        strLivesRegenInfo = r.getQuantityString(R.plurals.lives_regen_info, REGEN_MIN, REGEN_MIN)
+        strTitle1 = r.getString(R.string.title_line1)
+        strTitle2 = r.getString(R.string.title_line2)
+        strTapToStart = r.getString(R.string.tap_to_start)
+        strHint = r.getString(R.string.hint)
+        strGameOver = r.getString(R.string.game_over)
+        strScoreLabel = r.getString(R.string.score_label)
+        strBestLabel = r.getString(R.string.best_label)
+        strNewRecord = r.getString(R.string.new_record)
+        strPaused = r.getString(R.string.paused)
+        strTapToContinue = r.getString(R.string.tap_to_continue)
+        strMapLabel = r.getString(R.string.label_map)
+        strLevelLabel = r.getString(R.string.label_level)
+        strStart = r.getString(R.string.start)
+        strRetry = r.getString(R.string.retry)
+        strMenu = r.getString(R.string.menu)
+        strWind = r.getString(R.string.wind)
+        strTwoPlayers = r.getString(R.string.two_players)
+        strMpInfo1 = r.getString(R.string.mp_info1)
+        strMpInfo2 = r.getString(R.string.mp_info2)
+        strHost = r.getString(R.string.mp_host)
+        strJoin = r.getString(R.string.mp_join)
+        strBack = r.getString(R.string.back)
+        strLeave = r.getString(R.string.mp_leave)
+        strRoomOpen = r.getString(R.string.mp_room_open)
+        strWaiting = r.getString(R.string.mp_waiting)
+        strSearching = r.getString(R.string.mp_searching)
+        strJoinHint = r.getString(R.string.mp_join_hint)
+        strMpStart = r.getString(R.string.mp_start)
+        strWaitHost = r.getString(R.string.mp_wait_host)
+        strYou = r.getString(R.string.mp_you)
+        strYouCrashed = r.getString(R.string.mp_you_crashed)
+        strWatching = r.getString(R.string.mp_watching)
+        strWin = r.getString(R.string.mp_win)
+        strLose = r.getString(R.string.mp_lose)
+        strDraw = r.getString(R.string.mp_draw)
+        strDisconnected = r.getString(R.string.mp_disconnected)
+        strRetryWait = r.getString(R.string.mp_retry_wait)
+        strNoNetwork = r.getString(R.string.mp_failed)
+        strMpPick = r.getString(R.string.mp_pick)
+        strViewSplit = r.getString(R.string.mp_view_split)
+        strViewFull = r.getString(R.string.mp_view_full)
+        strViewLabel = r.getString(R.string.mp_view_label)
+        strPlaying = r.getString(R.string.mp_playing)
+        strCrashedShort = r.getString(R.string.mp_crashed_short)
+        strPlayerFormat = r.getString(R.string.mp_player_format)
+        strLeftGame = r.getString(R.string.mp_left)
+        strPlaceFormat = r.getString(R.string.mp_place_format)
+        strWatchFormat = r.getString(R.string.mp_watch_format)
+        strTapToSwitch = r.getString(R.string.mp_tap_switch)
+        strNobodyLeft = r.getString(R.string.mp_nobody_left)
+        strPlayersCount = r.getString(R.string.mp_players_count)
+        strWatchingMany = r.getString(R.string.mp_watching_many)
+        strLevels = r.getString(R.string.hub_levels)
+        strEndless = r.getString(R.string.hub_endless)
+        strMarket = r.getString(R.string.hub_market)
+        strHubHint = r.getString(R.string.hub_hint)
+        strLevelProgress = r.getString(R.string.level_progress)
+        strLevelTitle = r.getString(R.string.level_title)
+        strRound = r.getString(R.string.level_round)
+        strTarget = r.getString(R.string.level_target)
+        strPractice = r.getString(R.string.level_practice)
+        strMapFinal = r.getString(R.string.level_final)
+        strReward = r.getString(R.string.level_reward)
+        strReplay = r.getString(R.string.level_replay)
+        strLevelFailed = r.getString(R.string.level_failed)
+        strLevelDone = r.getString(R.string.level_done)
+        strAllDone = r.getString(R.string.level_all_done)
+        strAllDoneDesc = r.getString(R.string.level_all_done_desc)
+        strNext = r.getString(R.string.next)
+        strTargetLabel = r.getString(R.string.target_label)
+        strRewardLabel = r.getString(R.string.reward_label)
+        strCoinsCollected = r.getString(R.string.coins_collected)
+        strSelected = r.getString(R.string.market_selected)
+        strSelect = r.getString(R.string.market_select)
+        strNoMoney = r.getString(R.string.market_no_money)
+        strBought = r.getString(R.string.market_bought)
+        strLevelLocked = r.getString(R.string.level_locked)
+        strTapToSkip = r.getString(R.string.splash_skip)
+        strRewardLife = r.getString(R.string.ad_reward_life)
+        strRewardDouble = r.getString(R.string.ad_reward_double)
+        strRewardCoins = r.getString(R.string.ad_reward_coins)
+        strGotLife = r.getString(R.string.ad_got_life)
+        strPrivacy = r.getString(R.string.ad_privacy)
+        strLifeRule = r.getString(R.string.lives_rule)
+        strHelpTitle = r.getString(R.string.mp_help_title)
+        strHelpClose = r.getString(R.string.mp_help_close)
+        strHelpTip = r.getString(R.string.mp_help_tip)
+        mapTips = Maps.ALL.map { r.getString(it.tipRes) }
+        modNames = Mod.entries.map { r.getString(it.nameRes) }
+        skinNames = Skin.entries.map { r.getString(it.nameRes) }
+        mapNames = Maps.ALL.map { r.getString(it.nameRes) }
+        mapDescs = Maps.ALL.map { r.getString(it.descRes) }
+        diffNames = Difficulty.entries.map { r.getString(it.nameRes) }
+        helpSteps = listOf(
+            R.string.mp_help_1, R.string.mp_help_2, R.string.mp_help_3, R.string.mp_help_4,
+            R.string.mp_help_5, R.string.mp_help_6, R.string.mp_help_7
+        ).map { r.getString(it) }
+    }
+
+    /** Seçili dilin kaynakları: ayarlarda dil seçildiyse o, yoksa telefonun dili (desteklenmiyorsa İngilizce). */
+    private fun localizedResources(): Resources {
+        val code = prefs.getString(KEY_LANG, "").orEmpty()
+        if (code.isEmpty()) return context.resources
+        val conf = Configuration(context.resources.configuration)
+        conf.setLocale(Locale.forLanguageTag(code))
+        return context.createConfigurationContext(conf).resources
+    }
+
+    /** Dili uygular; tüm metinler yeniden yüklenir, oyun ve kayıtlar etkilenmez. */
+    private fun applyLanguage() {
+        res = localizedResources()
+        loadStrings()
+        refreshBestTexts()
+    }
+
+    private fun setLanguage(code: String) {
+        prefs.edit().putString(KEY_LANG, code).apply()
+        applyLanguage()
+        sound.play(SoundManager.Sfx.CLICK)
+    }
+
+    /** Telefonun dili/ayarları değişti (yalnızca "telefonun dili" seçiliyse görünür etkisi olur). */
+    fun onConfigChanged() = applyLanguage()
+
+    /** Ekranda gösterilen dilin kodu (tr, en, ...). */
+    private fun currentLangCode() = strLangCode
+
     private var scoreText = "0"
     private var bestValueText = "0"
     private var bestText = ""
@@ -618,9 +810,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         isFocusable = true
         isFocusableInTouchMode = true
         sound.enabled = prefs.getBoolean(KEY_SOUND, true)
+        sound.musicEnabled = prefs.getBoolean(KEY_MUSIC, true)
+        applyLanguage()
         fetchNetTime()
         sound.setMusicTheme(map.musicTheme)
-        refreshBestTexts()
     }
 
     // =====================================================================
@@ -667,7 +860,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (state) {
             State.SPLASH -> finishSplash()
             State.HUB -> return false
-            State.MENU, State.LEVELS, State.MARKET -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
+            State.MENU, State.LEVELS, State.MARKET, State.SETTINGS -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
+            State.READY -> if (livesDialog) { livesDialog = false; enterLevels() } else leaveRun()
             State.PLAYING -> if (!paused) paused = true else leaveRun()
             State.MP_LOBBY, State.MP_COUNTDOWN, State.MP_PLAYING, State.MP_OVER -> leaveMp()
             else -> leaveRun()
@@ -838,15 +1032,11 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         }
         when (state) {
             State.READY -> {
-                // Can bittiyse: "video izle +1 can" düğmesi
-                if (fromTouch && currentReward() != Reward.NONE && hit(rewardBtn, downX, downY, 6f)) {
-                    watchReward()
-                    return
-                }
+                // Can penceresi açıkken dokunuş yalnızca penceredeki düğmeler içindir (bırakınca)
+                if (livesDialog) return
                 if (levelMode && !lifeSpent) {
                     if (!lives.spend()) {
-                        marketMsg = String.format(strNoLives, lives.nextText())
-                        marketMsgT = 2f
+                        livesDialog = true
                         sound.play(SoundManager.Sfx.GAME_OVER)
                         return
                     }
@@ -873,6 +1063,8 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (state) {
             State.SPLASH -> if (splashT > 0.6f) finishSplash()
             State.HUB -> if (!moved) hubTap(downX, downY)
+            State.SETTINGS -> if (!moved) settingsTap(downX, downY)
+            State.READY -> if (livesDialog && !moved) livesDialogTap(downX, downY)
             State.LEVELS -> if (!dragging) levelsTap(downX, downY)
             State.MARKET -> if (!moved) marketTap(downX, downY)
             State.LEVEL_DONE -> if (!moved && stateTimer > 0.6f) levelDoneTap(downX, downY)
@@ -1127,17 +1319,29 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val base = cfg.baseSpeed * map.speedMul
         if (marketMsgT > 0f) marketMsgT -= dt
         updateBanner()
+        if (heartPulse > 0f) heartPulse = max(0f, heartPulse - dt * 1.6f)
+        // Can penceresi: video ya da para ile can gelince kapanır
+        if (livesDialog && (state != State.READY || lives.count > 0)) livesDialog = false
         livesTick -= dt
         if (livesTick <= 0f) {
             livesTick = 1f
             lives.update()
+            // Süre dolunca kazanılan can: kalp atar, kısa bilgi gösterilir (oyun sırasında rahatsız etmez)
+            if (state != State.SPLASH && state != State.PLAYING && state != State.DYING && !isMpView()) {
+                if (lives.consumeGained() > 0) {
+                    heartPulse = 1f
+                    marketMsg = if (lives.count >= Lives.MAX) strLivesAllFull else strLifeRefilled
+                    marketMsgT = 2.2f
+                    sound.play(SoundManager.Sfx.COIN)
+                }
+            }
             if (netBaseMs < 0L) {
                 netRetry -= 1f
                 if (netRetry <= 0f) { netRetry = 60f; fetchNetTime() }
             }
         }
         val worldSpeed = when (state) {
-            State.SPLASH, State.HUB, State.LEVELS, State.MARKET -> base * 0.45f
+            State.SPLASH, State.HUB, State.SETTINGS, State.LEVELS, State.MARKET -> base * 0.45f
             State.LEVEL_DONE -> base * 0.25f
             State.MENU -> base * 0.5f
             State.READY -> base * 0.7f
@@ -1157,7 +1361,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         updateMotes(dt, worldSpeed)
 
         when (state) {
-            State.SPLASH, State.MENU, State.HUB, State.MARKET -> Unit
+            State.SPLASH, State.MENU, State.HUB, State.SETTINGS, State.MARKET -> Unit
             State.LEVELS -> if (!dragging && abs(scrollVel) > 1f) {
                 levelScroll = (levelScroll + scrollVel * dt).coerceIn(0f, maxLevelScroll())
                 scrollVel *= exp(-dt * 4f)
@@ -1495,7 +1699,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             best = prefs.getInt(KEY_BEST_LEGACY, 0)
         }
         bestValueText = best.toString()
-        bestText = context.getString(R.string.best_format, best)
+        bestText = res.getString(R.string.best_format, best)
     }
 
     // =====================================================================
@@ -3078,14 +3282,16 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         level = lv
         if (lv.mapIndex != mapIndex) setMap(lv.mapIndex, save = false)
         state = State.READY
+        lives.update()
+        livesDialog = lives.count == 0
         resetGame()
         sound.play(SoundManager.Sfx.START)
     }
 
     private fun hubTap(x: Float, y: Float) {
         when {
-            !privacyRect.isEmpty && hit(privacyRect, x, y, 4f) -> ads?.showPrivacyOptions()
-            hit(soundBtn, x, y) -> toggleSound()
+            hit(soundBtn, x, y, 4f) -> toggleSound()
+            hit(gearBtn, x, y, 4f) -> { sound.play(SoundManager.Sfx.CLICK); state = State.SETTINGS }
             hit(coinPillRect, x, y) || hit(hubMarketBtn, x, y) -> { sound.play(SoundManager.Sfx.CLICK); state = State.MARKET }
             hit(hubLevelsBtn, x, y) -> enterLevels()
             hit(hubEndlessBtn, x, y) -> {
@@ -3288,12 +3494,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
                         val extra = levelBonus + runCoins
                         coins += extra
                         saveCoins()
-                        marketMsg = String.format(strGotCoins, extra)
+                        marketMsg = res.getQuantityString(R.plurals.ad_got_coins, extra, extra)
                     }
                     Reward.DOUBLE_RUN -> {
                         coins += runCoins
                         saveCoins()
-                        marketMsg = String.format(strGotCoins, runCoins)
+                        marketMsg = res.getQuantityString(R.plurals.ad_got_coins, runCoins, runCoins)
                     }
                     Reward.NONE -> Unit
                 }
@@ -3341,6 +3547,24 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         cv.restore()
     }
 
+    /** Ödüllü video düğmesi verilen alanda (oynat simgesi + metin). */
+    private fun drawRewardButtonIn(cv: Canvas, r: RectF, text: String) {
+        val pulse = 1f + 0.03f * sin(time * 5f)
+        cv.save()
+        cv.scale(pulse, pulse, r.centerX(), r.centerY())
+        drawButton(cv, r, "     $text", colGreen, colDarkText, true, 255, 17f)
+        val tx = r.left + 30f
+        val ty = r.centerY()
+        paint.color = colDarkText
+        iconPath.reset()
+        iconPath.moveTo(tx - 7f, ty - 10f)
+        iconPath.lineTo(tx + 10f, ty)
+        iconPath.lineTo(tx - 7f, ty + 10f)
+        iconPath.close()
+        cv.drawPath(iconPath, paint)
+        cv.restore()
+    }
+
     // --- Çizim ---
 
     private val heartPath = Path().apply {
@@ -3373,30 +3597,46 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
     }
 
     /**
-     * Can kutucuğu: 4 kalp, dolmuyorsa sıradaki cana kalan süre.
-     * [anchor] -1 sol kenar, 0 orta, 1 sağ kenar hizası.
+     * Can kutucuğu: kalp + "3/4" + sıradaki cana kalan süre (dd:ss) ya da "DOLU".
+     * Can dolunca kalp kısa bir süre atar ([heartPulse]). [anchor] -1 sol kenar, 0 orta, 1 sağ kenar hizası.
      */
     private fun drawLivesPill(cv: Canvas, x: Float, y: Float, anchor: Int) {
-        val r = 10f
         val full = lives.count >= Lives.MAX
-        rightPaint.textSize = 17f
-        val timer = if (full) "" else lives.nextText()
-        val tw = if (full) 0f else rightPaint.measureText(timer) + 10f
-        val w = 18f + Lives.MAX * 24f + tw + 4f
+        val countTxt = String.format(strLivesCount, lives.count, Lives.MAX)
+        val side = if (full) strLivesFull else lives.nextText()
+        helpPaint.typeface = rightPaint.typeface
+        helpPaint.textSize = 19f
+        val cw = helpPaint.measureText(countTxt)
+        helpPaint.typeface = labelPaint.typeface
+        helpPaint.textSize = 16f
+        helpPaint.letterSpacing = if (full) 0.12f else 0.02f
+        val sw = helpPaint.measureText(side)
+        val w = 44f + cw + 14f + sw + 16f
         val left = when (anchor) { -1 -> x; 0 -> x - w / 2f; else -> x - w }
         tmpRect.set(left, y, left + w, y + 40f)
-        paint.color = withAlpha(colPanel, 220)
+        paint.color = withAlpha(colPanel, 225)
         cv.drawRoundRect(tmpRect, 20f, 20f, paint)
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = 2f
-        paint.color = withAlpha(hex(0xFFFF4D6D), 150)
+        paint.color = withAlpha(hex(0xFFFF4D6D), (150 + 105 * heartPulse).toInt())
         cv.drawRoundRect(tmpRect, 20f, 20f, paint)
         paint.style = Paint.Style.FILL
-        for (i in 0 until Lives.MAX) drawHeart(cv, left + 21f + i * 24f, y + 20f, r, i < lives.count)
-        if (!full) {
-            rightPaint.color = colText
-            cv.drawText(timer, left + w - 12f, y + 26f, rightPaint)
-        }
+        val beat = 1f + 0.35f * heartPulse * sin(heartPulse * 18f).coerceAtLeast(0f)
+        drawHeart(cv, left + 22f, y + 20f, 11f * beat, lives.count > 0)
+        helpPaint.typeface = rightPaint.typeface
+        helpPaint.textSize = 19f
+        helpPaint.letterSpacing = 0f
+        helpPaint.color = colText
+        cv.drawText(countTxt, left + 40f, y + 27f, helpPaint)
+        paint.color = withAlpha(colPanelEdge, 120)
+        cv.drawRect(left + 40f + cw + 6f, y + 10f, left + 40f + cw + 8f, y + 30f, paint)
+        helpPaint.typeface = labelPaint.typeface
+        helpPaint.textSize = 16f
+        helpPaint.letterSpacing = if (full) 0.12f else 0.02f
+        helpPaint.color = if (full) colGreen else colGold
+        cv.drawText(side, left + 40f + cw + 14f, y + 26f, helpPaint)
+        helpPaint.letterSpacing = 0f
+        helpPaint.typeface = textPaint.typeface
     }
 
     private fun drawCoinIcon(cv: Canvas, x: Float, y: Float, r: Float) {
@@ -3433,9 +3673,12 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawCoinPill(cv, 22f, 28f, coins, right = false)
         drawLivesPill(cv, 22f, 84f, -1)
         drawSoundButton(cv, 255)
+        gearBtn.set(soundBtn.left - 64f, soundBtn.top, soundBtn.left - 8f, soundBtn.bottom)
+        drawGearButton(cv, gearBtn)
         titlePaint.textSize = 58f
         drawShadowText(cv, strTitle1, cx, 176f + bob, titlePaint, colText)
         drawShadowText(cv, strTitle2, cx, 234f + bob, titlePaint, colWarm)
+        drawSecondaryTitle(cv, cx, 266f + bob, 1f)
 
         // Seçili araç süzülür
         val boostV = (0.5f + 0.5f * sin(time * 3f)).pow(3)
@@ -3451,26 +3694,232 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawButton(cv, hubMultiBtn, strTwoPlayers, colBlue, colText, false, 255, 20f)
         drawButton(cv, hubMarketBtn, strMarket, colGold, colText, false, 255, 20f)
 
-        // Alt yazılar banner'ın üstünde, aradan rahat bir boşlukla (yanlışlıkla reklama dokunulmasın)
+        // Alt yazı banner'ın üstünde, aradan rahat bir boşlukla; banner yüksekse (önemsiz olduğundan) çizilmez.
+        // Reklam gizlilik ayarları Ayarlar ekranındadır.
         val floor = bannerFloor()
         textPaint.textSize = 19f
         textPaint.color = colDim
-        // Banner yüksekse ipucu yazısı (önemsiz) çıkarılır; gizlilik bağlantısı her zaman kalır
-        if (ads?.privacyOptionsRequired() == true) {
-            labelPaint.textSize = 14f
-            labelPaint.color = colDim
-            val tw = labelPaint.measureText(strPrivacy)
-            val bottom = min(878f, floor - 22f)
-            val top = bottom - 32f
-            val hintY = min(832f, top - 12f)
-            if (hintY >= 819f) drawFit(cv, strHubHint, cx, hintY, textPaint)
-            privacyRect.set(cx - tw / 2f - 12f, top, cx + tw / 2f + 12f, bottom)
-            cv.drawText(strPrivacy, cx, bottom - 11f, labelPaint)
-        } else {
-            val hintY = min(870f, floor - 22f)
-            if (hintY >= 819f) drawFit(cv, strHubHint, cx, hintY, textPaint)
-            privacyRect.setEmpty()
+        val hintY = min(870f, floor - 22f)
+        if (hintY >= 819f) drawFit(cv, strHubHint, cx, hintY, textPaint)
+        privacyRect.setEmpty()
+        drawToast(cv, cx)
+    }
+
+    /** İkinci oyun adı (Türkçede İngilizce ad, diğer dillerde Türkçe ad): ana adın altında küçük. */
+    private fun drawSecondaryTitle(cv: Canvas, cx: Float, y: Float, alpha: Float) {
+        if (strTitleSecondary.isEmpty()) return
+        labelPaint.textSize = 19f
+        labelPaint.letterSpacing = 0.3f
+        labelPaint.color = withAlpha(colGold, (220 * alpha).toInt())
+        drawFit(cv, strTitleSecondary, cx, y, labelPaint)
+        labelPaint.letterSpacing = 0.22f
+    }
+
+    /** Ayarlar düğmesi (dişli simgesi). */
+    private fun drawGearButton(cv: Canvas, r: RectF) {
+        val x = r.centerX()
+        val y = r.centerY()
+        paint.color = withAlpha(colPanel, 205)
+        cv.drawCircle(x, y, 26f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2f
+        paint.color = withAlpha(colPanelEdge, 128)
+        cv.drawCircle(x, y, 26f, paint)
+        paint.style = Paint.Style.FILL
+        paint.color = colText
+        cv.save()
+        cv.translate(x, y)
+        for (i in 0 until 8) {
+            cv.rotate(45f)
+            cv.drawRoundRect(-3.6f, -15.5f, 3.6f, -8f, 1.5f, 1.5f, paint)
         }
+        cv.restore()
+        cv.drawCircle(x, y, 10.5f, paint)
+        paint.color = colPanel
+        cv.drawCircle(x, y, 4.6f, paint)
+    }
+
+    // =====================================================================
+    // Ayarlar: dil, ses, müzik, reklam gizlilik ayarları
+    // =====================================================================
+
+    private fun layoutSettings() {
+        val cx = uiW / 2f
+        val half = min(uiW / 2f - 24f, 210f)
+        langBtns[0].set(cx - half, 214f, cx + half, 266f)
+        val bw = (half * 2f - 12f) / 2f
+        for (i in Lang.entries.indices) {
+            val col = i % 2
+            val row = i / 2
+            val l = cx - half + col * (bw + 12f)
+            val t = 280f + row * 64f
+            langBtns[i + 1].set(l, t, l + bw, t + 52f)
+        }
+        setSoundBtn.set(cx - half, 556f, cx - 6f, 612f)
+        setMusicBtn.set(cx + 6f, 556f, cx + half, 612f)
+        setPrivacyBtn.set(cx - half, 650f, cx + half, 702f)
+    }
+
+    private fun drawSettings(cv: Canvas, cx: Float) {
+        layoutSettings()
+        drawCircleIcon(cv, backCircle, "‹")
+        titlePaint.textSize = 40f
+        titlePaint.color = colWarm
+        drawFitW(cv, strSettings, cx, 68f, titlePaint, uiW - 200f)
+
+        labelPaint.textSize = 17f
+        labelPaint.color = colDim
+        drawFit(cv, strSetLanguage, cx, 190f, labelPaint)
+        val saved = prefs.getString(KEY_LANG, "").orEmpty()
+        drawButton(cv, langBtns[0], strSetLangAuto, colBlue, if (saved.isEmpty()) colDarkText else colText,
+            saved.isEmpty(), 255, 18f)
+        for (l in Lang.entries) {
+            val r = langBtns[l.ordinal + 1]
+            val on = saved == l.code
+            // "Telefonun dili" seçiliyken o an gösterilen dil ince bir çerçeveyle belirtilir
+            val shown = saved.isEmpty() && currentLangCode() == l.code
+            drawButton(cv, r, l.nativeName, if (shown) colGreen else colGold, if (on) colDarkText else colText, on, 255, 19f)
+        }
+
+        labelPaint.textSize = 17f
+        labelPaint.color = colDim
+        drawFit(cv, strSetSound + " · " + strSetMusic, cx, 536f, labelPaint)
+        val sOn = sound.enabled
+        val mOn = sound.musicEnabled
+        drawButton(cv, setSoundBtn, strSetSound + ": " + (if (sOn) strOn else strOff), colGreen,
+            if (sOn) colDarkText else colText, sOn, 255, 17f)
+        drawButton(cv, setMusicBtn, strSetMusic + ": " + (if (mOn) strOn else strOff), colGreen,
+            if (mOn) colDarkText else colText, mOn, 255, 17f)
+
+        if (ads?.privacyOptionsRequired() == true) {
+            drawButton(cv, setPrivacyBtn, strPrivacy, colPanelEdge, colText, false, 255, 17f)
+        } else {
+            setPrivacyBtn.setEmpty()
+        }
+
+        labelPaint.textSize = 15f
+        labelPaint.color = colDim
+        val ver = runCatching { context.packageManager.getPackageInfo(context.packageName, 0).versionName }.getOrNull() ?: ""
+        drawFit(cv, String.format(strVersion, ver), cx, 900f, labelPaint)
+        labelPaint.color = withAlpha(colGold, 200)
+        drawFit(cv, BRAND, cx, 930f, labelPaint)
+        drawToast(cv, cx)
+    }
+
+    private fun settingsTap(x: Float, y: Float) {
+        layoutSettings()
+        when {
+            hit(backCircle, x, y) -> { sound.play(SoundManager.Sfx.CLICK); toHub() }
+            hit(langBtns[0], x, y, 4f) -> setLanguage("")
+            hit(setSoundBtn, x, y, 4f) -> toggleSound()
+            hit(setMusicBtn, x, y, 4f) -> {
+                sound.musicEnabled = !sound.musicEnabled
+                prefs.edit().putBoolean(KEY_MUSIC, sound.musicEnabled).apply()
+                sound.play(SoundManager.Sfx.CLICK)
+            }
+            !setPrivacyBtn.isEmpty && hit(setPrivacyBtn, x, y, 4f) -> ads?.showPrivacyOptions()
+            else -> for (l in Lang.entries) {
+                if (hit(langBtns[l.ordinal + 1], x, y, 4f)) {
+                    setLanguage(l.code)
+                    return
+                }
+            }
+        }
+    }
+
+    // =====================================================================
+    // "Canın kalmadı" penceresi: video izle (+1 can), para ile can al ya da bekle
+    // =====================================================================
+
+    private fun drawLivesDialog(cv: Canvas, cx: Float) {
+        cv.drawColor(withAlpha(hex(0xFF02040F), 170))
+        val pw = min(uiW - 40f, 420f)
+        tmpRect.set(cx - pw / 2f, 250f, cx + pw / 2f, 790f)
+        paint.color = withAlpha(colPanel, 245)
+        cv.drawRoundRect(tmpRect, 30f, 30f, paint)
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = 2.5f
+        paint.color = withAlpha(hex(0xFFFF4D6D), 190)
+        cv.drawRoundRect(tmpRect, 30f, 30f, paint)
+        paint.style = Paint.Style.FILL
+
+        titlePaint.textSize = 34f
+        titlePaint.color = hex(0xFFFF4D6D)
+        drawFitW(cv, strLivesDlgTitle, cx, 306f, titlePaint, pw - 40f)
+        // Boş kalp ve 0/4
+        val beat = 1f + 0.06f * sin(time * 5f)
+        drawHeart(cv, cx, 372f, 34f * beat, false)
+        titlePaint.textSize = 22f
+        titlePaint.color = colText
+        cv.drawText(String.format(strLivesCount, lives.count, Lives.MAX), cx, 380f, titlePaint)
+        textPaint.textSize = 24f
+        textPaint.color = colGold
+        drawFitW(cv, String.format(strLivesNext, lives.nextText()), cx, 448f, textPaint, pw - 40f)
+        textPaint.textSize = 17f
+        textPaint.color = colDim
+        drawFitW(cv, strLivesRegenInfo, cx, 480f, textPaint, pw - 40f)
+
+        val bw = pw - 60f
+        // Video düğmesi yalnızca reklam hazırsa
+        if (currentReward() == Reward.LIFE) {
+            dlgVideoBtn.set(cx - bw / 2f, 510f, cx + bw / 2f, 566f)
+            drawRewardButtonIn(cv, dlgVideoBtn, strRewardLife)
+        } else {
+            dlgVideoBtn.setEmpty()
+        }
+        val canBuy = coins >= GameRules.LIFE_COIN_PRICE
+        dlgBuyBtn.set(cx - bw / 2f, 584f, cx + bw / 2f, 640f)
+        drawButton(cv, dlgBuyBtn, "", colGold, colDarkText, canBuy, if (canBuy) 255 else 150, 18f)
+        // "+1 CAN" ve fiyat (para simgesiyle)
+        val price = GameRules.LIFE_COIN_PRICE.toString()
+        labelPaint.textSize = 18f
+        val lw = labelPaint.measureText(strBuyLife)
+        rightPaint.textSize = 20f
+        val prw = rightPaint.measureText(price)
+        val total = lw + 18f + 24f + prw
+        var x0 = cx - total / 2f
+        labelPaint.color = if (canBuy) colDarkText else colText
+        cv.drawText(strBuyLife, x0 + lw / 2f, dlgBuyBtn.centerY() + 6.5f, labelPaint)
+        x0 += lw + 18f
+        drawCoinIcon(cv, x0 + 10f, dlgBuyBtn.centerY(), 10f)
+        rightPaint.color = if (canBuy) colDarkText else colGold
+        cv.drawText(price, x0 + 24f + prw, dlgBuyBtn.centerY() + 7f, rightPaint)
+        textPaint.textSize = 15f
+        textPaint.color = colDim
+        drawFitW(cv, String.format(strCoinsHave, coins), cx, 662f, textPaint, pw - 40f)
+
+        dlgWaitBtn.set(cx - bw / 2f, 690f, cx + bw / 2f, 746f)
+        drawButton(cv, dlgWaitBtn, strWait, colPanelEdge, colText, false, 255, 18f)
+    }
+
+    private fun livesDialogTap(x: Float, y: Float) {
+        when {
+            !dlgVideoBtn.isEmpty && hit(dlgVideoBtn, x, y, 4f) -> watchReward()
+            hit(dlgBuyBtn, x, y, 4f) -> buyLife()
+            hit(dlgWaitBtn, x, y, 4f) -> {
+                sound.play(SoundManager.Sfx.CLICK)
+                livesDialog = false
+                enterLevels()
+            }
+        }
+    }
+
+    /** Oyun içi para ile 1 can (en fazla [Lives.MAX]). */
+    private fun buyLife() {
+        val price = GameRules.LIFE_COIN_PRICE
+        if (coins < price) {
+            marketMsg = String.format(strNoMoney, price - coins)
+            marketMsgT = 2f
+            sound.play(SoundManager.Sfx.CLICK)
+            return
+        }
+        if (!lives.refund()) return
+        coins -= price
+        saveCoins()
+        heartPulse = 1f
+        marketMsg = strLifeBought
+        marketMsgT = 2f
+        sound.play(SoundManager.Sfx.COIN)
     }
 
     private fun drawScreenHeader(cv: Canvas, cx: Float, title: String) {
@@ -3685,13 +4134,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         val pulse = 0.5f + 0.5f * sin(time * 4f)
         textPaint.textSize = 30f
         textPaint.color = withAlpha(colText, (140 + 115 * pulse).toInt())
-        if (lives.count > 0) {
-            drawFit(cv, strTapToStart, cx, 690f, textPaint)
-        } else {
-            textPaint.textSize = 24f
-            textPaint.color = hex(0xFFFF4D6D)
-            drawFit(cv, String.format(strNoLives, lives.nextText()), cx, 690f, textPaint)
-        }
+        if (lives.count > 0) drawFit(cv, strTapToStart, cx, 690f, textPaint)
         textPaint.textSize = 20f
         textPaint.color = map.accent
         drawFit(cv, mapTips[mapIndex], cx, 732f, textPaint)
@@ -3701,10 +4144,10 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         drawFit(cv, if (first) String.format(strReward, lv.reward) else strReplay, cx, 800f, labelPaint)
         labelPaint.textSize = 15f
         labelPaint.color = colDim
-        drawFit(cv, strLifeRule, cx, 836f, labelPaint)
+        drawFit(cv, String.format(strLifeRule, REGEN_MIN), cx, 836f, labelPaint)
         drawLivesPill(cv, uiW - 16f, 24f, 1)
-        drawRewardButton(cv, cx, 596f, 255)
         if (Mech.WIND in mechs) drawWindGauge(cv)
+        if (livesDialog) drawLivesDialog(cv, cx)
         drawToast(cv, cx)
     }
 
@@ -4069,6 +4512,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 76f + rise, titlePaint)
             titlePaint.color = withAlpha(colWarm, (ta * 255).toInt())
             drawFit(canvas, strTitle1 + " " + strTitle2, cx, logoBottom + 72f + rise, titlePaint)
+            drawSecondaryTitle(canvas, cx, logoBottom + 108f + rise, ta)
         }
         if (splashT > 0.8f && splashT < SPL_FADE_START) {
             textPaint.textSize = 16f
@@ -4091,6 +4535,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
         when (state) {
             State.SPLASH -> Unit
             State.HUB -> drawHub(cv, cx)
+            State.SETTINGS -> drawSettings(cv, cx)
             State.LEVELS -> drawLevels(cv, cx)
             State.MARKET -> drawMarket(cv, cx)
             State.LEVEL_DONE -> drawLevelDone(cv, cx)
@@ -4798,7 +5243,7 @@ class GameView(context: Context) : View(context), Choreographer.FrameCallback {
             }
             titlePaint.textSize = 30f
             titlePaint.color = withAlpha(if (scoreOf(id) == topScore) colGold else colDim, a)
-            cv.drawText("$place.", left + 34f, cy + 11f, titlePaint)
+            cv.drawText(String.format(strRank, place), left + 34f, cy + 11f, titlePaint)
             paint.color = withAlpha(playerColor(id), a)
             cv.drawCircle(left + 70f, cy, 9f, paint)
             helpPaint.textSize = 22f

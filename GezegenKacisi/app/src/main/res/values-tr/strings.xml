@@ -1,0 +1,214 @@
+<resources>
+    <string name="app_name">Gezegen Kaçışı</string>
+    <!-- Bu dosyanın dil kodu (ayarlarda seçili dili göstermek için) -->
+    <string name="lang_code" translatable="false">tr</string>
+    <!-- Oyun adı: ana ad iki satır büyük, ikinci ad (diğer dildeki ad) altında küçük -->
+    <string name="title_secondary">PLANET GAP</string>
+    <string name="title_line1">GEZEGEN</string>
+    <string name="title_line2">KAÇIŞI</string>
+    <string name="tap_to_start">Başlamak için dokun</string>
+    <string name="hint">Roketi gezegenlerin arasından geçir</string>
+    <string name="best_format">EN İYİ: %1$d</string>
+    <string name="game_over">GÖREV BİTTİ</string>
+    <string name="score_label">SKOR</string>
+    <string name="best_label">EN İYİ</string>
+    <string name="new_record">YENİ REKOR!</string>
+    <string name="paused">DURAKLATILDI</string>
+    <string name="tap_to_continue">Devam etmek için dokun</string>
+
+    <!-- Menü -->
+    <string name="label_map">HARİTA</string>
+    <string name="label_level">SEVİYE</string>
+    <string name="start">BAŞLA</string>
+    <string name="retry">TEKRAR</string>
+    <string name="menu">MENÜ</string>
+
+    <!-- Seviyeler -->
+    <string name="diff_easy">KOLAY</string>
+    <string name="diff_normal">ORTA</string>
+    <string name="diff_hard">ZOR</string>
+
+    <!-- Haritalar -->
+    <string name="map_earth">Dünya Yörüngesi</string>
+    <string name="map_earth_desc">Klasik rota · mavi gezegenler</string>
+    <string name="map_earth_tip">Gezegenlerin arasındaki boşluktan geç</string>
+    <string name="map_ice">Buz Kuşağı</string>
+    <string name="map_ice_desc">Çok düşük yer çekimi · buz kristalleri</string>
+    <string name="map_ice_tip">Roket süzülür, hafif dokun!</string>
+    <string name="map_lava">Lav Denizi</string>
+    <string name="map_lava_desc">Fırlayan ateş topları · hızlı akış</string>
+    <string name="map_lava_tip">Kızaran yerden ateş topu fırlar, kaç!</string>
+    <string name="map_gas">Gaz Devleri</string>
+    <string name="map_gas_desc">Değişken rüzgâr · dev halkalı gezegenler</string>
+    <string name="map_gas_tip">Rüzgâr oku nereyi gösteriyorsa oraya iter</string>
+    <string name="map_asteroid">Asteroit Kuşağı</string>
+    <string name="map_asteroid_desc">Dönen ve salınan asteroitler</string>
+    <string name="map_asteroid_tip">Kuleler yukarı aşağı kayar, zamanla!</string>
+    <string name="wind">RÜZGÂR</string>
+
+    <!-- 2 oyuncu -->
+    <string name="two_players">2-4 OYUNCU</string>
+    <string name="mp_info1">İki telefon aynı Wi-Fi ağına bağlı olsun</string>
+    <string name="mp_info2">ya da biri diğerine hotspot açsın</string>
+    <string name="mp_host">ODA KUR</string>
+    <string name="mp_join">ODAYA KATIL</string>
+    <string name="back">GERİ</string>
+    <string name="mp_leave">AYRIL</string>
+    <string name="mp_room_open">Oda kuruldu</string>
+    <string name="mp_waiting">Oyuncular bekleniyor</string>
+    <string name="mp_searching">Oda aranıyor</string>
+    <string name="mp_join_hint">Diğer telefonlarda: 2-4&#160;OYUNCU › ODAYA&#160;KATIL</string>
+    <string name="mp_start">BAŞLAT</string>
+    <string name="mp_wait_host">Oda kurucusu başlatacak</string>
+    <string name="mp_you">SEN</string>
+    <string name="mp_you_crashed">YANDIN</string>
+    <string name="mp_watching">Rakibini izliyorsun</string>
+    <string name="mp_win">KAZANDIN!</string>
+    <string name="mp_lose">KAYBETTİN</string>
+    <string name="mp_draw">BERABERE</string>
+    <string name="mp_disconnected">BAĞLANTI KOPTU</string>
+    <string name="mp_retry_wait">Tekrar için oda kurucusunu bekle</string>
+    <string name="mp_failed">Ağa bağlanılamadı. Wi-Fi açık mı?</string>
+    <string name="mp_pick">Haritayı ve seviyeyi seç, sonra odayı kur</string>
+    <string name="mp_help_title">NASIL KURULUR?</string>
+    <string name="mp_help_1">Oyunu iki telefona da kur.</string>
+    <string name="mp_help_2">İki telefonu aynı Wi-Fi ağına bağla. Wi-Fi yoksa biri hotspot açsın, diğeri ona bağlansın. İnternet gerekmez.</string>
+    <string name="mp_help_3">1. telefon: 2-4&#160;OYUNCU&#160;›&#160;ODA&#160;KUR</string>
+    <string name="mp_help_4">Diğer telefonlar (en fazla 3): 2-4&#160;OYUNCU&#160;›&#160;ODAYA&#160;KATIL. Telefonlar birbirini kendiliğinden bulur.</string>
+    <string name="mp_help_5">Haritayı ve seviyeyi herkes değiştirebilir. Herkes gelince odayı kuran BAŞLAT’a basar.</string>
+    <string name="mp_help_6">Ekranı seç: BÖLÜNMÜŞ&#160;EKRAN’da herkesin oyunu ekranda yan yana görünür. TAM&#160;EKRAN’da kendi oyunun büyük, diğerlerinin puanı sağ üst köşede yazar.</string>
+    <string name="mp_help_7">Yanan, diğerlerini izlemeye devam eder (tam ekranda dokunarak oyuncu değiştirir). En çok puan alan kazanır.</string>
+    <string name="mp_help_tip">Bulamıyorsa: İkisi de aynı ağda mı? Misafir/okul ağları cihazları birbirinden gizleyebilir; o zaman hotspot kullanın.</string>
+    <string name="mp_help_close">Kapatmak için dokun</string>
+    <string name="mp_view_label">EKRAN</string>
+    <string name="mp_view_split">BÖLÜNMÜŞ EKRAN</string>
+    <string name="mp_view_full">TAM EKRAN</string>
+    <string name="mp_playing">oynuyor</string>
+    <string name="mp_crashed_short">YANDI</string>
+    <string name="mp_player_format">OYUNCU %1$d</string>
+    <string name="mp_left">AYRILDI</string>
+    <string name="mp_place_format">%1$d. OLDUN</string>
+    <string name="mp_watch_format">%1$s İZLENİYOR</string>
+    <string name="mp_tap_switch">Başka oyuncuyu izlemek için dokun</string>
+    <string name="mp_nobody_left">Odada başka oyuncu kalmadı</string>
+    <string name="mp_players_count">%1$d/%2$d</string>
+    <string name="mp_watching_many">Diğerlerini izliyorsun</string>
+
+    <!-- Yeni haritalar -->
+    <string name="map_blackhole">Kara Delik</string>
+    <string name="map_blackhole_desc">Roketi ortaya çeken çekim</string>
+    <string name="map_blackhole_tip">Kara delik seni ekranın ortasına çeker</string>
+    <string name="map_storm">Elektrik Fırtınası</string>
+    <string name="map_storm_desc">Yukarıdan inen yıldırımlar</string>
+    <string name="map_storm_tip">Kesik çizginin ucunun altında kal!</string>
+    <string name="map_meteor">Meteor Yağmuru</string>
+    <string name="map_meteor_desc">Gökten düşen meteorlar</string>
+    <string name="map_meteor_tip">Üstte kırmızı işaret: meteor geliyor!</string>
+    <string name="map_toxic">Zehirli Bulutsu</string>
+    <string name="map_toxic_desc">Rüzgâr ve salınan kuleler</string>
+    <string name="map_toxic_tip">Rüzgârı ve kuleleri birlikte izle</string>
+    <string name="map_core">Galaksi Merkezi</string>
+    <string name="map_core_desc">Final: salınım ve ateş bir arada</string>
+    <string name="map_core_tip">Her şey bir arada, dikkatli uç!</string>
+
+    <!-- Ana menü -->
+    <string name="hub_levels">BÖLÜMLER</string>
+    <string name="hub_endless">SONSUZ MOD</string>
+    <string name="hub_market">MARKET</string>
+    <string name="hub_hint">Uçarken para topla, marketten yeni araç al</string>
+
+    <!-- Bölümler -->
+    <string name="level_progress">BÖLÜM %1$d / %2$d</string>
+    <string name="level_title">BÖLÜM %1$d</string>
+    <string name="level_round">Tur %1$d</string>
+    <string name="level_target">HEDEF: %1$d PUAN</string>
+    <string name="level_practice">Alıştırma bölümü: özel kural yok</string>
+    <string name="level_final">HARİTA FİNALİ</string>
+    <string name="level_reward">Ödül: +%1$d para</string>
+    <string name="level_replay">Tekrar oynanıyor: +3 para</string>
+    <string name="level_failed">BÖLÜM BAŞARISIZ</string>
+    <string name="level_done">BÖLÜM GEÇİLDİ!</string>
+    <string name="level_all_done">TEBRİKLER!</string>
+    <string name="level_all_done_desc">500 bölümün hepsini bitirdin!</string>
+    <string name="level_locked">Önce önceki bölümleri geç</string>
+    <string name="next">SONRAKİ</string>
+    <string name="target_label">HEDEF</string>
+    <string name="reward_label">ÖDÜL</string>
+    <string name="coins_collected">Toplanan para: %1$d</string>
+
+    <!-- Bölüm özellikleri -->
+    <string name="mod_fast">⚡ Hızlı akış</string>
+    <string name="mod_narrow">↕ Dar geçitler</string>
+    <string name="mod_dense">▮▮ Sık kuleler</string>
+    <string name="mod_heavy">⬇ Ağır yer çekimi</string>
+    <string name="mod_light">⬆ Hafif yer çekimi</string>
+    <string name="mod_gold">● Altın yağmuru: her geçitte 2 para</string>
+    <string name="mod_wind">≋ Değişken rüzgâr</string>
+    <string name="mod_fire">▲ Yerden ateş topları</string>
+    <string name="mod_meteor">▼ Meteor yağmuru</string>
+    <string name="mod_sway">⇅ Salınan kuleler</string>
+    <string name="mod_pull">◎ Kara delik çekimi</string>
+    <string name="mod_lightning">ϟ Yıldırım</string>
+
+    <!-- Market -->
+    <string name="market_selected">SEÇİLİ</string>
+    <string name="market_select">SEÇ</string>
+    <string name="market_no_money">Yetersiz para! %1$d para daha gerekli</string>
+    <string name="market_bought">Satın alındı ve seçildi!</string>
+    <string name="skin_classic">Klasik Roket</string>
+    <string name="skin_night">Gece Roketi</string>
+    <string name="skin_emerald">Zümrüt Roket</string>
+    <string name="skin_shuttle">Uzay Mekiği</string>
+    <string name="skin_comet">Kuyruklu Yıldız</string>
+    <string name="skin_ufo">UFO</string>
+    <string name="skin_gold">Altın Roket</string>
+    <string name="skin_ring_planet">Halkalı Gezegen</string>
+    <string name="skin_lava_planet">Lav Gezegeni</string>
+    <string name="skin_crystal">Kristal Gemi</string>
+
+    <!-- Canlar -->
+    <string name="lives_rule">Başlarken 1 can gider, geçersen geri gelir · %1$d dk’da 1 can dolar</string>
+
+    <!-- Açılış -->
+    <string name="splash_skip">Geçmek için dokun</string>
+
+    <!-- Reklamlar -->
+    <string name="ad_reward_life">VİDEO İZLE: +1 CAN</string>
+    <string name="ad_reward_double">VİDEO İZLE: ÖDÜLÜ 2 KAT AL</string>
+    <string name="ad_reward_coins">VİDEO İZLE: PARAYI 2 KAT AL</string>
+    <string name="ad_got_life">+1 can kazandın!</string>
+        <string name="ad_privacy">Reklam gizlilik ayarları</string>
+    <plurals name="ad_got_coins">
+        <item quantity="one">+%1$d para kazandın!</item>
+        <item quantity="other">+%1$d para kazandın!</item>
+    </plurals>
+
+    <!-- Ayarlar -->
+    <string name="settings_title">AYARLAR</string>
+    <string name="settings_language">DİL</string>
+    <string name="settings_lang_auto">Telefonun dili</string>
+    <string name="settings_sound">SES</string>
+    <string name="settings_music">MÜZİK</string>
+    <string name="settings_on">AÇIK</string>
+    <string name="settings_off">KAPALI</string>
+    <string name="settings_version">Sürüm %1$s</string>
+
+    <!-- Can göstergesi ve "canın kalmadı" penceresi -->
+    <string name="lives_full">DOLU</string>
+    <string name="lives_count">%1$d/%2$d</string>
+    <string name="lives_next">Sonraki can: %1$s</string>
+    <string name="lives_refilled">Bir can doldu!</string>
+    <string name="lives_all_full">Canların doldu!</string>
+    <string name="lives_dialog_title">CANIN KALMADI</string>
+    <string name="lives_buy">+1 CAN</string>
+    <string name="lives_bought">+1 can aldın!</string>
+    <string name="lives_wait">BEKLE</string>
+    <string name="lives_coins_have">Paran: %1$d</string>
+    <plurals name="lives_regen_info">
+        <item quantity="one">Her dakikada 1 can dolar.</item>
+        <item quantity="other">Her %1$d dakikada 1 can dolar.</item>
+    </plurals>
+
+    <!-- Çok oyunculu sonuç listesinde sıra -->
+    <string name="mp_rank">%1$d.</string>
+</resources>

@@ -67,6 +67,14 @@ class SoundManager(context: Context) {
             updateMusicPlayback()
         }
 
+    /** Müzik ayrıca kapatılabilir (ayarlar); [enabled] kapalıysa müzik de çalmaz. */
+    @Volatile
+    var musicEnabled = true
+        set(value) {
+            field = value
+            updateMusicPlayback()
+        }
+
     init {
         pool.setOnLoadCompleteListener { _, sampleId, status ->
             if (status == 0) loadedIds.add(sampleId)
@@ -127,7 +135,7 @@ class SoundManager(context: Context) {
         synchronized(lock) {
             val track = music ?: return
             runCatching {
-                if (enabled && foreground) {
+                if (enabled && musicEnabled && foreground) {
                     if (track.playState != AudioTrack.PLAYSTATE_PLAYING) track.play()
                 } else if (track.playState == AudioTrack.PLAYSTATE_PLAYING) {
                     track.pause()

@@ -9,6 +9,7 @@ import android.view.WindowInsets
 import android.view.WindowInsetsController
 import android.view.WindowManager
 import android.widget.FrameLayout
+import android.window.OnBackInvokedDispatcher
 
 class MainActivity : Activity() {
 
@@ -34,6 +35,13 @@ class MainActivity : Activity() {
             gameView.ads = it
             it.start()
         }
+        // Android 13+: geri hareketi bu geri çağrıyla gelir (Android 16'yı hedefleyen uygulamalarda
+        // onBackPressed artık çağrılmaz). Oyundayken menüye döner, ana ekrandayken uygulama arka plana gider.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT) {
+                if (!gameView.onBack()) moveTaskToBack(true)
+            }
+        }
     }
 
     override fun onResume() {
@@ -51,6 +59,7 @@ class MainActivity : Activity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         ads?.onConfigurationChanged()
+        gameView.onConfigChanged() // telefonun dili değiştiyse metinler yenilenir
     }
 
     override fun onDestroy() {

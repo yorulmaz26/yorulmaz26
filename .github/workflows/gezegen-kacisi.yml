@@ -26,6 +26,8 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
+      - name: Testler (can sistemi) ve çeviri denetimi
+        run: ./gradlew :app:checkTranslations :app:testDebugUnitTest --stacktrace
       - name: Debug APK
         run: ./gradlew :app:assembleDebug --stacktrace
       - name: APK'yı indirilebilir yap
