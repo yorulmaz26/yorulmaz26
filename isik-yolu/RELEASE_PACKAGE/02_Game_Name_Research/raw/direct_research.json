@@ -1,0 +1,8067 @@
+{
+ "Light Path": {
+  "play_us": {
+   "titles": [
+    "Light Path",
+    "Inrio",
+    "Pathlight",
+    "The CBORD Group, Inc.",
+    "Path Of Light - The Way 101",
+    "SPOEM",
+    "Maze: Path of Light",
+    "LUCKY 22",
+    "Light Path: 3D Laser Puzzle",
+    "MTT Games",
+    "Lumen Path: Light Tile Puzzle",
+    "Lee4Family",
+    "Daily Light on the Daily Path",
+    "Tap Tap Studio",
+    "Light Path - Puzzle & Maze",
+    "Official Brain",
+    "Secure Path ELD",
+    "SP ELD",
+    "RidePATH",
+    "Port Authority of NY & NJ",
+    "Path Prefoundation (PPF)",
+    "Path Career Institute",
+    "Light The Path",
+    "By E&J",
+    "Light Path Quest",
+    "UX Mate",
+    "PurePath: Islamic Recovery",
+    "Ihsan Labs",
+    "PathLightPro",
+    "PathLightPro",
+    "PPFD PAR Meter: Grow Light DLI",
+    "lapnito development studio",
+    "My Path Portal",
+    "Community Council for Mental Health and Mental Ret",
+    "Petro Path",
+    "Petro Path",
+    "Shake Flashlight: Night Light",
+    "Paget96",
+    "Shadow Path: Light & Shadow",
+    "PJ Gaming Labs",
+    "Page Light- Book Light App",
+    "The Basa Studios",
+    "Brightest Flashlight Launcher",
+    "AtomApplications",
+    "m-Path",
+    "m-Path Software",
+    "Tesla Light",
+    "JMBraga",
+    "SunOnTrack: Sun Path & Shadows",
+    "Plan the sun",
+    "Lightpicker: Screen Flashlight",
+    "Alex Tselegidis",
+    "my PATH®",
+    "Pathwater",
+    "Panther Path",
+    "Raftr, Inc.",
+    "Path Flow! - Tap Away Puzzles",
+    "Appindia Technologies Private Limited",
+    "PathCompanion",
+    "RhombusMaximus"
+   ],
+   "ids": [
+    "com.InrioGames.LightPath",
+    "com.alextselegidis.lightpicker",
+    "com.arrows.puzzle.escape.maze.out.free.game",
+    "com.basa.whitelight",
+    "com.brainspace.lightpath",
+    "com.cbord.csg.followme",
+    "com.flashlight.bright.led.light",
+    "com.ihsanlabs.purepath",
+    "com.lee4family.jproject05",
+    "com.lg.ltw2",
+    "com.lucky.maze.lightpath",
+    "com.mttgames.lightpath",
+    "com.paget96.shakeflashlight",
+    "com.path.pathrefillit",
+    "com.path.prefoundation",
+    "com.pathcompanion.app",
+    "com.pathlightpro",
+    "com.petropath.first",
+    "com.raftr.pvamu",
+    "com.shadowpath.game",
+    "com.sunnytapps.sunnytrack",
+    "com.taptapstudio.dailylightlite",
+    "com.tomas.lumenleaf_grow_light",
+    "com.uxmate.lightpathquest",
+    "dev.spoem.path_of_light",
+    "eld.securepath.driver",
+    "gov.panynj.pathuatapp",
+    "io.m_Path.kuleuven",
+    "kinglight.jmbraga.teslaligth",
+    "org.cchss.portal"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Light Path",
+    "Çekirgeler Eğitim",
+    "Light Path",
+    "Inrio",
+    "Pathlight",
+    "The CBORD Group, Inc.",
+    "Maze: Path of Light",
+    "LUCKY 22",
+    "Light Path: 3D Laser Puzzle",
+    "MTT Games",
+    "Path Of Light - The Way 101",
+    "SPOEM",
+    "PPFD ışık ölçer: bitki PAR",
+    "lapnito development studio",
+    "Path Prefoundation (PPF)",
+    "Path Career Institute",
+    "Lumen Path: Light Tile Puzzle",
+    "Lee4Family",
+    "Page Light- Book Light App",
+    "The Basa Studios",
+    "Path Flow! - Tap Away Puzzles",
+    "Appindia Technologies Private Limited",
+    "PurePath: Islamic Recovery",
+    "Ihsan Labs",
+    "Secure Path ELD",
+    "SP ELD",
+    "The Past Within Lite",
+    "Rusty Lake",
+    "Path",
+    "Citera",
+    "%50 indirim",
+    "Light The Path",
+    "By E&J",
+    "Set Light",
+    "ETC, Inc.",
+    "m-Path",
+    "m-Path Software",
+    "Fit Path: Kişisel Fitness Koçu",
+    "Codeway Technologies",
+    "Warrior of Light: Idle RPG",
+    "MGIF",
+    "Google Family Link",
+    "Google LLC",
+    "Path",
+    "Mim Hufford",
+    "₺8,99",
+    "Instagram",
+    "Instagram",
+    "WhatsApp Messenger",
+    "WhatsApp LLC",
+    "Cube Path",
+    "SATORISYS PLAY",
+    "Lost Light: Weapon Skin Treat",
+    "Netease Games Global",
+    "Messenger",
+    "Meta Platforms, Inc.",
+    "TikTok",
+    "TikTok Pte. Ltd.",
+    "Facebook Lite",
+    "Meta Platforms, Inc."
+   ],
+   "ids": [
+    "air.com.RustyLake.ThePastWithinLite",
+    "com.InrioGames.LightPath",
+    "com.arrows.puzzle.escape.maze.out.free.game",
+    "com.basa.whitelight",
+    "com.cbord.csg.followme",
+    "com.cekirgeleregitim.lightpath",
+    "com.cel.path",
+    "com.etcconnect.setlight",
+    "com.facebook.lite",
+    "com.facebook.orca",
+    "com.google.android.apps.kids.familylink",
+    "com.ihsanlabs.purepath",
+    "com.instagram.android",
+    "com.lee4family.jproject05",
+    "com.lg.ltw2",
+    "com.lucky.maze.lightpath",
+    "com.mgif.idle.quest",
+    "com.mttgames.lightpath",
+    "com.netease.h75na",
+    "com.path.prefoundation",
+    "com.pinterest",
+    "com.satorisysplay.cubepath",
+    "com.tomas.lumenleaf_grow_light",
+    "com.visionwizard.wellnessapp",
+    "com.whatsapp",
+    "com.zhiliaoapp.musically",
+    "dev.spoem.path_of_light",
+    "eld.securepath.driver",
+    "io.m_Path.kuleuven",
+    "mim.games.path"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Light Ignite",
+    "Infinity Lightpath",
+    "Amunara Light Path",
+    "LIGHT: Path of the Archmage",
+    "Light Path - Puzzle & Maze",
+    "Archaica: The Path Of Light",
+    "The Path of Light",
+    "Light-Path",
+    "Motion: Live Photo to Video",
+    "LightPath Intranet",
+    "Maze: Puzzle and Relaxing Game",
+    "Phase Loom: Light Path Puzzle",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "light path",
+    "LIGHT: Path of the Archmage",
+    "Maze: Path of Light",
+    "Archaica: The Path of Light",
+    "Maze: Path of Light - Forest Constellations",
+    "Maze: Path of Light - Oasis Constellations",
+    "Maze: Path of Light - Dusk Constellations",
+    "Maze: Path of Light - Wild Constellations",
+    "Path of Light",
+    "Abha \"Light on the Path\"",
+    "Fantasy Grounds - Starfinder RPG - Adventure Path #49: A Light in the Dark (Drift Hackers 1 of 3)",
+    "A Path to Light",
+    "RAX",
+    "Lighting End VR",
+    "Black Hole Simulator",
+    "Parallel Photon Protocol",
+    "LIT: Bend the Light",
+    "Yellow Terminal",
+    "Toto's Journey",
+    "Zombie Graveyard Simulator",
+    "Tiny Glade",
+    "Phantom Blade Zero",
+    "Milki Delivery",
+    "Flick",
+    "任意杂货铺",
+    "Fable Anniversary",
+    "Piece and Quiet: A Stained Glass Restoration",
+    "Dune: Awakening - Filmic Archive DLC",
+    "Hollow Knight",
+    "Eclipsium",
+    "Aeterna Lucis",
+    "The Empty House - A Dementia Interactive Experience",
+    "Well Dweller",
+    "Monster Hunter Stories 3: Twisted Reflection",
+    "FINAL FANTASY VII REBIRTH",
+    "Onde",
+    "Scientific project: Optic",
+    "Hyper Light Drifter",
+    "Slay the Princess — The Pristine Cut",
+    "1 AM MOSCOW TIME"
+   ]
+  },
+  "uspto": {
+   "total": 92,
+   "marks": [
+    {
+     "mark": "LIGHT PATH",
+     "alive": false,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "Rightpathclinic (LIMITED LIABILITY COMPANY; VIRGINIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "GSK Innovative Solutions Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Graham Group LLC, The (CORPORATION; CONNECTICUT, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT PATH",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Optimum Fiberoptics, Inc. (CORPORATION; MARYLAND, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT PRO",
+     "alive": true,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "Path Light Pro, LLC (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT PRO",
+     "alive": true,
+     "classes": [
+      "IC 035"
+     ],
+     "owner": "Path Light Pro, LLC (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT PATH TECHNOLOGIES",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "LightPath Technologies, Inc. (CORPORATION; NEW YORK, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PROGRAMMABLE LIGHT PATH",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Fiber Mountain, Inc. (CORPORATION; NEW YORK, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT PATH OPEN",
+     "alive": false,
+     "classes": [
+      "IC 038",
+      "IC 042"
+     ],
+     "owner": "IPC Technologies, Inc. (CORPORATION; VIRGINIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT PRO",
+     "alive": true,
+     "classes": [
+      "IC 045",
+      "IC 037"
+     ],
+     "owner": "Path Light Pro, LLC (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT PRO",
+     "alive": true,
+     "classes": [
+      "IC 037"
+     ],
+     "owner": "Path Light Pro, LLC (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT PATH AHEAD",
+     "alive": false,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "LightPath Apps, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT PRO",
+     "alive": true,
+     "classes": [
+      "IC 035"
+     ],
+     "owner": "Path Light Pro, LLC (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH OF LIGHT",
+     "alive": false,
+     "classes": [
+      "IC 003"
+     ],
+     "owner": "Andalou Naturals Corporation (CORPORATION; CALIFORNIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT MY PATH",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "GAMASONIC, LTD. (LTD.; Not in List)",
+     "serial": null
+    },
+    {
+     "mark": "DIVINE LIGHT PATH",
+     "alive": true,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "Divine Light Path LLC (LIMITED LIABILITY COMPANY; New Jersey, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT YOUR PATH",
+     "alive": true,
+     "classes": [
+      "IC 035"
+     ],
+     "owner": "InterAct, LLC (LIMITED LIABILITY COMPANY; NEVADA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH LIGHT PRO",
+     "alive": true,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "Path Light Pro, LLC (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHT A PATH",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "Mag Instrument, Inc. (CORPORATION; CALIFORNIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLIGHT",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "The CBORD Group, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLITE",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Corbin Russwin, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": true,
+     "classes": [
+      "IC 038"
+     ],
+     "owner": "Cablevision Lightpath, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLIGHT",
+     "alive": false,
+     "classes": [
+      "IC 041",
+      "IC 045"
+     ],
+     "owner": "PathLight International (SOLE PROPRIETORSHIP; CALIFORNIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLIGHT",
+     "alive": false,
+     "classes": [
+      "IC 016"
+     ],
+     "owner": "CONCORDIA PUBLISHING HOUSE (CORPORATION; MISSOURI, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLITE",
+     "alive": false,
+     "classes": [
+      "IC 006"
+     ],
+     "owner": "Corbin Russwin, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "PERMLIGHT PRODUCTS, INC. (CORPORATION; CALIFORNIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": true,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "VERILY HEALTH INC. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": false,
+     "classes": [
+      "IC 042",
+      "IC 043",
+      "IC 009",
+      "IC 011"
+     ],
+     "owner": "The University Court of the University of St. Andrews (Charity Scotland, United Kingdom; SCOTLAND, UNITED KINGDOM)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLIGHT",
+     "alive": false,
+     "classes": [
+      "IC 016"
+     ],
+     "owner": "United Patients Association for Pulmonary Hypertension, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": true,
+     "classes": [
+      "IC 036"
+     ],
+     "owner": "The Lightpath Company, LLC (LIMITED LIABILITY COMPANY; Texas, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": false,
+     "classes": [
+      "IC 010"
+     ],
+     "owner": "Lightpoint Medical Ltd (LIMITED LIABILITY COMPANY; UNITED KINGDOM)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "VERILY HEALTH INC. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": true,
+     "classes": [
+      "IC 009",
+      "IC 042"
+     ],
+     "owner": "Digital Ambiance Systems Inc. (CORPORATION; Delaware, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLITE",
+     "alive": false,
+     "classes": [
+      "IC 017"
+     ],
+     "owner": "Flex-O-Lite, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "LightPath Technologies, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTPATH",
+     "alive": false,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "LIGHTPATH TECHNOLOGIES, LIMITED PARTNERSHIP (LIMITED PARTNERSHIP; NEW MEXICO, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLIGHT",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Advanced Digital Information Corporation (CORPORATION; WASHINGTON, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLITE",
+     "alive": true,
+     "classes": [
+      "IC 012"
+     ],
+     "owner": "Canyon Bicycles GmbH (LIMITED LIABILITY COMPANY; GERMANY)",
+     "serial": null
+    },
+    {
+     "mark": "PATHLYTE",
+     "alive": false,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "Pathlyte LLC (LIMITED LIABILITY COMPANY; TEXAS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH FINDER WALK LIGHT",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "Alert Stamping & Manufacturing Co., Inc. (CORPORATION; OHIO, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Light Path"
+    ],
+    [
+     "contains",
+     "Light Path: 3D Laser Puzzle"
+    ],
+    [
+     "contains",
+     "Light Path - Puzzle & Maze"
+    ],
+    [
+     "contains",
+     "Light Path Quest"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Light Path"
+    ],
+    [
+     "exact",
+     "Light Path"
+    ],
+    [
+     "contains",
+     "Light Path: 3D Laser Puzzle"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "Infinity Lightpath"
+    ],
+    [
+     "contains",
+     "Amunara Light Path"
+    ],
+    [
+     "contains",
+     "LIGHT: Path of the Archmage"
+    ],
+    [
+     "contains",
+     "Light Path - Puzzle & Maze"
+    ],
+    [
+     "exact",
+     "Light-Path"
+    ],
+    [
+     "contains",
+     "LightPath Intranet"
+    ],
+    [
+     "contains",
+     "Phase Loom: Light Path Puzzle"
+    ]
+   ],
+   "steam": [
+    [
+     "exact",
+     "light path"
+    ],
+    [
+     "contains",
+     "LIGHT: Path of the Archmage"
+    ]
+   ],
+   "uspto": [
+    [
+     "exact",
+     "LIGHT PATH",
+     "dead",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHT PATH",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHT PATH TECHNOLOGIES",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "contains",
+     "PROGRAMMABLE LIGHT PATH",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHT PATH OPEN",
+     "dead",
+     [
+      "IC 038",
+      "IC 042"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHT PATH AHEAD",
+     "dead",
+     [
+      "IC 042"
+     ]
+    ],
+    [
+     "contains",
+     "DIVINE LIGHT PATH",
+     "LIVE",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "LIVE",
+     [
+      "IC 038"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "LIVE",
+     [
+      "IC 042"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "dead",
+     [
+      "IC 042",
+      "IC 043",
+      "IC 009",
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "LIVE",
+     [
+      "IC 036"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "dead",
+     [
+      "IC 010"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "LIVE",
+     [
+      "IC 009",
+      "IC 042"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTPATH",
+     "dead",
+     [
+      "IC 042"
+     ]
+    ]
+   ]
+  }
+ },
+ "Path of Light": {
+  "play_us": {
+   "titles": [
+    "Maze: Path of Light",
+    "LUCKY 22",
+    "Path Of Light - The Way 101",
+    "SPOEM",
+    "Light Path",
+    "Inrio",
+    "Pathlight",
+    "The CBORD Group, Inc.",
+    "Daily Light on the Daily Path",
+    "Tap Tap Studio",
+    "Light Path: 3D Laser Puzzle",
+    "MTT Games",
+    "Lumen Path: Light Tile Puzzle",
+    "Lee4Family",
+    "Light The Path",
+    "By E&J",
+    "Page Light- Book Light App",
+    "The Basa Studios",
+    "Lantern Path: Light Puzzle",
+    "AURORAWAVE LABS",
+    "Flashlight Lite",
+    "Vladimir Stefanov",
+    "Path of Light Meditation",
+    "Path of Light Institute",
+    "Light Path Quest",
+    "UX Mate",
+    "Brightest Flashlight Launcher",
+    "AtomApplications",
+    "Shadow Path: Light & Shadow",
+    "PJ Gaming Labs",
+    "Lightpicker: Screen Flashlight",
+    "Alex Tselegidis",
+    "Warrior of Light: Idle RPG",
+    "MGIF",
+    "Light Path - Puzzle & Maze",
+    "Official Brain",
+    "Screen Light: Flashlight App",
+    "KayaSoft",
+    "Shake Flashlight: Night Light",
+    "Paget96",
+    "PPFD PAR Meter: Grow Light DLI",
+    "lapnito development studio",
+    "Light Errand",
+    "DarkVille",
+    "Light Of The World",
+    "The Salvation Poem Project",
+    "Flashlight LED Torch Bright",
+    "Byte Bloom Studio",
+    "Flashlight: LED Light & Torch",
+    "TecBLHLab",
+    "Light Notes",
+    "IrynaTsy",
+    "The Past Within Lite",
+    "Rusty Lake",
+    "Lumolight: Screen & Flashlight",
+    "BitMavrick",
+    "Light Master Pro",
+    "Opple Lighting Co.ltd",
+    "Readlight: Book Reading Light",
+    "Asset-Box"
+   ],
+   "ids": [
+    "air.com.RustyLake.ThePastWithinLite",
+    "artline.lightnotes",
+    "com.InrioGames.LightPath",
+    "com.SalvationPoem.LightofTheWorld",
+    "com.alextselegidis.lightpicker",
+    "com.aurorawave.lanternpath",
+    "com.basa.whitelight",
+    "com.bitmavrick.lumolight",
+    "com.brainspace.lightpath",
+    "com.cbord.csg.followme",
+    "com.flash.light.bright.torch.lampe",
+    "com.flashlight.bright.led.light",
+    "com.ledtorchlight.simpleflashlight",
+    "com.lee4family.jproject05",
+    "com.lg.ltw2",
+    "com.lighterrand.app",
+    "com.lucky.maze.lightpath",
+    "com.mgif.idle.quest",
+    "com.mttgames.lightpath",
+    "com.opple.lightmasterpro",
+    "com.paget96.shakeflashlight",
+    "com.pathoflight.meditation",
+    "com.readlight.app",
+    "com.shadowpath.game",
+    "com.stefanov2081.flashlightLite",
+    "com.taptapstudio.dailylightlite",
+    "com.tomas.lumenleaf_grow_light",
+    "com.uxmate.lightpathquest",
+    "dev.spoem.path_of_light",
+    "net.kayasoft.screenlight"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Light Path",
+    "Inrio",
+    "Maze: Path of Light",
+    "LUCKY 22",
+    "Light Path",
+    "Çekirgeler Eğitim",
+    "Path Of Light - The Way 101",
+    "SPOEM",
+    "The Past Within Lite",
+    "Rusty Lake",
+    "Warrior of Light: Idle RPG",
+    "MGIF",
+    "the Light (Remastered Edition)",
+    "AGaming+",
+    "Light Path: 3D Laser Puzzle",
+    "MTT Games",
+    "Light Ignite - Laser Puzzle",
+    "Branching Factor",
+    "LightEarth",
+    "SUNSHINE TECHNOLOGY (CHINA) CO., LIMITED",
+    "PPFD ışık ölçer: bitki PAR",
+    "lapnito development studio",
+    "Page Light- Book Light App",
+    "The Basa Studios",
+    "Light of Chaos: Origin",
+    "LokfungGame",
+    "Light-It Up",
+    "CrazyLabs LTD",
+    "Readlight: Kitap Okuma Işığı",
+    "Asset-Box",
+    "Sparklite",
+    "Playdigious",
+    "LightPlan",
+    "Rivolu LLC",
+    "Shake Flashlight: Night Light",
+    "Paget96",
+    "Lightpicker: Screen Flashlight",
+    "Alex Tselegidis",
+    "Lumolight: Screen & Flashlight",
+    "BitMavrick",
+    "Path of Adventure: Text RPG",
+    "Alinea Games",
+    "Flashlight Lite",
+    "Vladimir Stefanov",
+    "Light Connect",
+    "GOODROID,Inc.",
+    "Işık Kirliliği Haritası",
+    "Dunbar Technology, LLC",
+    "Lux Meter Light Measurement",
+    "Ronraj Tech",
+    "PPFD Meter - Işık Ölçer",
+    "Home Studio Inc.",
+    "WhatsApp Messenger",
+    "WhatsApp LLC",
+    "KS Light",
+    "华芯（东莞）科技有限公司",
+    "Path of Titans",
+    "Alderon Games Pty Ltd",
+    "Set Light",
+    "ETC, Inc."
+   ],
+   "ids": [
+    "air.com.RustyLake.ThePastWithinLite",
+    "com.AlderonGames.PathOfTitansGame",
+    "com.InrioGames.LightPath",
+    "com.agaming.svethd",
+    "com.alextselegidis.lightpicker",
+    "com.basa.whitelight",
+    "com.bitmavrick.lumolight",
+    "com.cekirgeleregitim.lightpath",
+    "com.crazylabs.light.it.up",
+    "com.etcconnect.setlight",
+    "com.homestudio.ppfdmeter",
+    "com.huaxin.smartlight",
+    "com.ifun.google.lco",
+    "com.keeweed.pathofadventure",
+    "com.lucky.maze.lightpath",
+    "com.mgif.idle.quest",
+    "com.mttgames.lightpath",
+    "com.pa.lightpollutionmap",
+    "com.paget96.shakeflashlight",
+    "com.playdigious.sparklite",
+    "com.readlight.app",
+    "com.rivolu.lightplan",
+    "com.ronrajtech.ds.luxmeter",
+    "com.stefanov2081.flashlightLite",
+    "com.tomas.lumenleaf_grow_light",
+    "com.vzcreations.lightignite",
+    "com.whatsapp",
+    "com.yishen.lightearth",
+    "dev.spoem.path_of_light",
+    "jp.co.goodroid.hyper.lightconnect"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "The Path of Light",
+    "Maze: Puzzle and Relaxing Game",
+    "LIGHT: Path of the Archmage",
+    "Path Of Light - The Way 101",
+    "Hudana: Path of Light",
+    "Archaica: The Path Of Light",
+    "Galaxiga: Classic Arcade Game",
+    "Helicopter Escape 3D",
+    "PatronusOfLight",
+    "Route Tracking light",
+    "Universe in Light-Years",
+    "Pinterest",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Path of Light",
+    "Path of Exile",
+    "Path of Exile 2",
+    "Sky: Children of the Light",
+    "Path of Idle: Old Gods Rising",
+    "Light of Atlantis",
+    "Guild Wars 2® Heart of Thorns® and Path of Fire™ Expansions",
+    "Maze: Path of Light",
+    "Archaica: The Path of Light",
+    "Maze: Path of Light - Forest Constellations",
+    "Maze: Path of Light - Oasis Constellations",
+    "Maze: Path of Light - Dusk Constellations",
+    "Maze: Path of Light - Wild Constellations",
+    "Fantasy Grounds - Starfinder RPG - Adventure Path #49: A Light in the Dark (Drift Hackers 1 of 3)",
+    "LIGHT: Path of the Archmage",
+    "Bō: Path of the Teal Lotus",
+    "Path of Achra",
+    "Child of Light",
+    "Eiroku: Path of the Wanderer",
+    "Swords And Magic: Path Of Conquest",
+    "Flashing Lights: Department of Transportation",
+    "Path of the Incremental Cultivator",
+    "Kunitsu-Gami: Path of the Goddess",
+    "The Artisan of Glimmith - Lunar Lights",
+    "Sins of a Solar Empire II - Paths to Power",
+    "Path of Exile 2 - Early Access Supporter Pack",
+    "Path of Kung Fu",
+    "BOOK OF HOURS: HOUSE OF LIGHT",
+    "Lara Croft and the Guardian of Light",
+    "Path of the Yaoguai Demo",
+    "Path of Damned",
+    "Path of the Yaoguai",
+    "Light of Atlantis Demo",
+    "Path of the Midnight Sun",
+    "Path of Idle: Old Gods Rising - Supporter Pack",
+    "Lost Key - The Path of Illumination",
+    "ANDALAS : Realms of Eternal Lights",
+    "Frontier: Path of Shadows",
+    "World of Tanks — HWK 30 pack (VIII German Light Tank)",
+    "Path of the Abyss"
+   ]
+  },
+  "uspto": {
+   "total": 14,
+   "marks": [
+    {
+     "mark": "PATH OF LIGHT",
+     "alive": false,
+     "classes": [
+      "IC 003"
+     ],
+     "owner": "Andalou Naturals Corporation (CORPORATION; CALIFORNIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "PATH-O-LITE",
+     "alive": false,
+     "classes": [
+      "011."
+     ],
+     "owner": "GILBERT J. WILDRIDGE, JR. (UNKNOWN; Not in List)",
+     "serial": null
+    },
+    {
+     "mark": "THE PRIESTESS PATH LINEAGES OF LIGHT",
+     "alive": true,
+     "classes": [
+      "IC 041"
+     ],
+     "owner": "Divine Cosmos, LLC (LIMITED LIABILITY COMPANY; NEVADA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "INNER LIGHT MINISTRIES A PATH OF SOUND AND LIGHT",
+     "alive": true,
+     "classes": [
+      "IC 038",
+      "IC 009"
+     ],
+     "owner": "Inner Light Ministries (non-profit corporation; MICHIGAN, USA)",
+     "serial": null
+    },
+    {
+     "mark": "INNER LIGHT MINISTRIES, A PATH OF SOUND AND LIGHT",
+     "alive": true,
+     "classes": [
+      "IC 045",
+      "IC 009",
+      "IC 016",
+      "IC 041"
+     ],
+     "owner": "Inner Light Ministries (NON-PROFIT CORPORATION; MICHIGAN, USA)",
+     "serial": null
+    },
+    {
+     "mark": null,
+     "alive": false,
+     "classes": [
+      "IC 028",
+      "IC 016"
+     ],
+     "owner": "Businesship International, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "FENOTE-BERHAN",
+     "alive": false,
+     "classes": [
+      "IC 016"
+     ],
+     "owner": "Eritrean Orthodox Tewahdo Diocese of North America, Inc. (CORPORATION; GEORGIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "TAREEG ALNOOR",
+     "alive": false,
+     "classes": [
+      "IC 016",
+      "IC 028"
+     ],
+     "owner": "Businesship International, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "TAREEG AL NOOR",
+     "alive": false,
+     "classes": [
+      "IC 028",
+      "IC 016"
+     ],
+     "owner": "Businesship International, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "JOTHIVITA LIGHTING YOUR PATH TO WELLNESS",
+     "alive": false,
+     "classes": [
+      "IC 005"
+     ],
+     "owner": "Jothivita Ayurvedic Spa & Wellbeing Center (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": null,
+     "alive": false,
+     "classes": [
+      "IC 016",
+      "IC 028"
+     ],
+     "owner": "Businesship International, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "TAREEG AL NOOR",
+     "alive": false,
+     "classes": [
+      "IC 016",
+      "IC 028"
+     ],
+     "owner": "Businesship International, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": null,
+     "alive": false,
+     "classes": [
+      "IC 016",
+      "IC 028"
+     ],
+     "owner": "Businesship International, Inc. (CORPORATION; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "GOD ='S EVERYTHING (COLOSSIANS 1:16), GODEQUALSEVERYTHING, JESUS ='S THE SON OF GOD, JESUS ='S THE SAVIOR: AND FOLLOWING THE TRADEMARK EQUAL SIGN (='S) ALLOWING FOR INFINITE WORD CHANGES, PHRASES AND /OR SYMBOLS AFTER GOD ='S, JESUS ='S; GOD ='S ALL THINGS, LOVE, FAMILY, CREATION, PEACE, JOY, KINDNESS GREATNESS ON DISPLAY, KNOWLEDGE, WISDOM, SAVIOR, LIFE, THE LIGHT, THE RIGHT PATH, POWER, EMMANUEL, KING OF KINGS, LORD OF LORD, THE ROCK,YOUR PATH TO PROSPERITY, JEHOVAH, YAHWEH, HUMANITY, THE ALPHA AND OMEGA, THE BEGINNING AND THE END, VICTORY, MY SHEPHERD, MY HEALER, THE TRUTH IN LOVE AND SOMETIMES THE TRUTH HURTS VS. POLITICAL CORRECTNESS, ORDER, OBEDIENCE, DISCIPLINE, THE RIGHT ANSWER, STABILITY, THE FOUNDATION, MY PROTECTOR, A BEAUTIFUL RAINBOW OR SUNSET, PERPETUITY, YOU, THE TOTAL SUM, THE TREE OF LIFE, THE BIRTH OF CHRIST OUR SAVIOR THE CONCEPTION OF CHRIST MERRY CHRISTMAS, THE UNIVERSE, YOUR PAST PRESENCE AND FUTURE, THE PLUG, THE GREAT I AM, COMPLETENESS, THE SOUL, YOUR HUSBAND OR WIFE, MAJESTY, THE ORIGINAL, THE LION OF JUDAH, MY REFUGE, SERVANT, A JASPER AND SARDINE STONE, ABUNDANCE, WEALTH, MY INHERITANCE, INFINITY, THE FATHER SON & HOLY SPIRIT, FRIENDSHIP, RELATIONSHIP, FELLOWSHIP, PROVIDER, YOUR HELP, THE SUM OF ALL THINGS, THE CONCEPTION OF JESUS CHRIST (DEC 25TH) WHEN JOHN LEAP IN ELIZABETH'S WOMB FOR THE FIRST TIME WHEN MARY SHARED SHE WAS WITH CHILD ='S LIFE BEGINS AT CONCEPTION, BLESSING AND CURSING CHOOSE WISELY, MANKIND, YOUR GOLDMINE WHICH ='S YOUR GOLDMIND, JEWS CHRISTIAN GENTILES, EVERYTHING IN TIME & OUTSIDE OF TIME. MY GOD ='S EVERYTHING TO ME, A GOD OF SECOND CHANCES, KINGS AND QUEEN, MY BEST FRIEND, FRUIT, ETERNITY, EVERLASTING, INFINITY, MY BELIEF, MY FAITH, HOPE, MY SALVATION, DELIVERANCE, HOLINESS, ALL THINGS ARE POSSIBLE (MATT 19:26, AN OPEN DOOR OPPORTUNITY, THE HISTORY OF THE WORLD, THE BEGINNING OF TIME, PURSUING GOD ='S THE GOAL, THE HEART, RIGHTEOUSNESS, FORGIVENESS, THE NARROW PATH ACTION, MY FAITH, THE RESTORER OF MY SOUL, MY LEADER, HEAVEN, MY SWORD, MY SHIELD, LIVING WATER, THE BREAD OF LIFE ETC. GOD ='S EVERYTHING WITH OR WITHOUT THE WORDS/TEXT BEING OUTLINED/ SURROUNDED BY THE CROSS + SHAPE / SYMBOL.",
+     "alive": false,
+     "classes": [
+      "IC 016",
+      "IC 025"
+     ],
+     "owner": "*Moore, Sandi M. (INDIVIDUAL; USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Maze: Path of Light"
+    ],
+    [
+     "contains",
+     "Path Of Light - The Way 101"
+    ],
+    [
+     "contains",
+     "Path of Light Meditation"
+    ],
+    [
+     "contains",
+     "Path of Light Institute"
+    ]
+   ],
+   "play_tr": [
+    [
+     "contains",
+     "Maze: Path of Light"
+    ],
+    [
+     "contains",
+     "Path Of Light - The Way 101"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "The Path of Light"
+    ],
+    [
+     "contains",
+     "Path Of Light - The Way 101"
+    ],
+    [
+     "contains",
+     "Hudana: Path of Light"
+    ],
+    [
+     "contains",
+     "Archaica: The Path Of Light"
+    ]
+   ],
+   "steam": [
+    [
+     "exact",
+     "Path of Light"
+    ],
+    [
+     "contains",
+     "Maze: Path of Light"
+    ],
+    [
+     "contains",
+     "Archaica: The Path of Light"
+    ],
+    [
+     "contains",
+     "Maze: Path of Light - Forest Constellations"
+    ],
+    [
+     "contains",
+     "Maze: Path of Light - Oasis Constellations"
+    ],
+    [
+     "contains",
+     "Maze: Path of Light - Dusk Constellations"
+    ],
+    [
+     "contains",
+     "Maze: Path of Light - Wild Constellations"
+    ]
+   ],
+   "uspto": [
+    [
+     "exact",
+     "PATH OF LIGHT",
+     "dead",
+     [
+      "IC 003"
+     ]
+    ]
+   ]
+  }
+ },
+ "Lightway": {
+  "play_us": {
+   "titles": [
+    "Lightway MFB",
+    "Lightway Finance",
+    "Lightway Remittance",
+    "Lightway Finance",
+    "Lightway",
+    "Medvind Games",
+    "Lightway | طريق النور",
+    "NAS . National Advanced Solution",
+    "Smartway Light",
+    "Smartway.work",
+    "liway",
+    "Liway LLC",
+    "Lifeway On Demand",
+    "Lifeway Christian Resources",
+    "SmartWay",
+    "Smartway System Pty Ltd",
+    "Rightway",
+    "RightwayHealthcare",
+    "LaserAway",
+    "LaserAway Medical Group, INC.",
+    "Lampway: Bible Study + Audio",
+    "Zeno One",
+    "Aiways",
+    "Aiways Automobile",
+    "Leeway: Fuel & Car Expense Log",
+    "Ajay Sivan",
+    "Costway Smarvo: Smart Home",
+    "Costway : More Than Just Furniture",
+    "Flitway",
+    "EvGateway",
+    "LingWay",
+    "LingWay School",
+    "h.way",
+    "Leapfinancial",
+    "Lights-Out Mobile",
+    "AxoNet Software GmbH",
+    "$3.72",
+    "MyWAC Lighting",
+    "WAC Lighting",
+    "Costway - Shop At Home Store",
+    "Costway : More Than Just Furniture",
+    "Calistway",
+    "Nordway Digital",
+    "Lebway - Grocery Delivery",
+    "Lebway",
+    "Wayleadr Home",
+    "Wayleadr",
+    "ExpressVPN: VPN Fast & Secure",
+    "ExpressVPN",
+    "Chartway Mortgage Express",
+    "Chartway Federal Credit Union",
+    "KlickWay Athletics",
+    "Trainerize CBA-ENTERPRISE",
+    "NY Waterway",
+    "Bytemark, Inc.",
+    "the RightWay Burgers",
+    "StarterApp",
+    "Fareway Meat & Grocery",
+    "Fareway Stores, Inc.",
+    "Lake Y"
+   ],
+   "ids": [
+    "co.analogorigins.liway",
+    "co.bytemark.nywaterway",
+    "com.MeeM.LightWay.User",
+    "com.aiways.eu.auto.change",
+    "com.ajaysivan.leeway",
+    "com.au.smartwaysystem.release",
+    "com.bluecompass.farewaymobile.android.ui",
+    "com.expressvpn.vpn",
+    "com.flitway",
+    "com.hooya.costway",
+    "com.hooya.saas",
+    "com.iamleb.lebwayCustomer",
+    "com.innovatise.lakey",
+    "com.laseraway.mobile",
+    "com.leapfinancial.hway.numi.android",
+    "com.lifeway.ondemand",
+    "com.lightfinance",
+    "com.lightway",
+    "com.nordwaydigital.calistway",
+    "com.rightway.roadmap.consumer",
+    "com.simplenexus.loans.client.s__87254",
+    "com.skillzrun.lingway",
+    "com.smartway.smartwayoutsite",
+    "com.trainerize.klickwayathletics",
+    "com.waclighting.location",
+    "com.wayleadr.residential",
+    "com.zenoone.lampway",
+    "de.axonet.lightsoutmobile",
+    "se.localpilots.ljusleden",
+    "starter.kuhnianaraione.client"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Lightway Remittance",
+    "Lightway Finance",
+    "Lightway",
+    "Medvind Games",
+    "Lightway MFB",
+    "Lightway Finance",
+    "Lightway | طريق النور",
+    "NAS . National Advanced Solution",
+    "Smartway Light",
+    "Smartway.work",
+    "Lights-Out Mobile",
+    "AxoNet Software GmbH",
+    "₺9,89",
+    "Sky: Children of the Light",
+    "thatgamecompany inc",
+    "CubeAway - 3DPuzzle",
+    "GOODROID,Inc.",
+    "ExpressVPN: Hızlı ve Güvenli",
+    "ExpressVPN",
+    "Light Of The World",
+    "The Salvation Poem Project",
+    "Lights Out",
+    "Pachaa",
+    "Aiways",
+    "Aiways Automobile",
+    "Always On Edge | Lite LED",
+    "Dubiaz",
+    "Lifeway On Demand",
+    "Lifeway Christian Resources",
+    "Beyaz Denge Kelvin Metre",
+    "Contechity AB",
+    "Calistway",
+    "Nordway Digital",
+    "the RightWay Burgers",
+    "StarterApp",
+    "Lake Y",
+    "Innovatise GmbH",
+    "Işık Ölçer - Lux, Pozlama",
+    "Contechity AB",
+    "Lebway - Grocery Delivery",
+    "Lebway",
+    "Viway",
+    "Strength Of Connection",
+    "Light Connect",
+    "GOODROID,Inc.",
+    "LED Yanıp Sönen Bildirim Işığı",
+    "Mario Ostwald",
+    "iLightShow for Hue & LIFX",
+    "Nicolas Anjoran",
+    "WiZ Connected",
+    "Signify Netherlands B.V.",
+    "Marvelight",
+    "Shenzhen Wanshun Zhilian Technology Co.LTD",
+    "Always On Edge Lighting & AOD",
+    "Dubiaz",
+    "WingsWay-Smart Learn",
+    "Testpress",
+    "Lights Out - The Clean One",
+    "Sven-vh",
+    "Light of Chaos: Origin"
+   ],
+   "ids": [
+    "com.MeeM.LightWay.User",
+    "com.SalvationPoem.LightofTheWorld",
+    "com.aiways.eu.auto.change",
+    "com.contechity.color_temp_meter",
+    "com.contechity.lux_meter",
+    "com.expressvpn.vpn",
+    "com.iamleb.lebwayCustomer",
+    "com.ifun.google.lco",
+    "com.innovatise.lakey",
+    "com.ledblinker.pro",
+    "com.lifeway.ondemand",
+    "com.lightfinance",
+    "com.lightway",
+    "com.nanjoran.ilightshow",
+    "com.nordwaydigital.calistway",
+    "com.puzcc.lightsout",
+    "com.smartway.smartwayoutsite",
+    "com.tgc.sky.android",
+    "com.used.aoe",
+    "com.used.aoelite",
+    "com.vanson.marvelight",
+    "com.viway.socjsc",
+    "com.wizconnected.wiz2",
+    "de.axonet.lightsoutmobile",
+    "in.testpress.wingsway",
+    "jp.co.goodroid.hyper.lightconnect",
+    "jp.co.goodroid.hyper.puzzle.arrows3dcubepuzzle",
+    "nl.svenvh.lights_out",
+    "se.localpilots.ljusleden",
+    "starter.kuhnianaraione.client"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "NordVPN: VPN Fast & Secure",
+    "Lightway Remittance",
+    "Lightway MFB",
+    "ExpressVPN · Secure & Fast VPN",
+    "X-VPN: VPN Fast & Secure",
+    "Lightway Map",
+    "Lightway - AI Trip Planner",
+    "iSharkVPN - Secure & Fast VPN",
+    "Rapid VPN: Secure Tunnel",
+    "JazzWay",
+    "Keepsmile",
+    "Glowfire LLC",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Recruit One"
+   ]
+  },
+  "uspto": {
+   "total": 25,
+   "marks": [
+    {
+     "mark": "LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "SHIMADZU CORPORATION (CORPORATION; JAPAN)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "ALDI Inc. (CORPORATION; ILLINOIS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "(CANCELLED) IC 011",
+      "(CANCELLED) IC 020",
+      "IC 006"
+     ],
+     "owner": "Lightway s.r.o. (spolecnost s rucenim omezenym (spol s.r.o.); CZECH REPUBLIC)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Aquila Space Technologies Pty, Ltd. (JULKINEN OSAKEYHTIÖ; Australia)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 038"
+     ],
+     "owner": "NORTHWESTERN BELL TELEPHONE COMPANY (CORPORATION; IOWA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "ALDI Inc. (CORPORATION; ILLINOIS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "ALDI Inc. (CORPORATION; ILLINOIS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "ALDI Inc. (CORPORATION; ILLINOIS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 038"
+     ],
+     "owner": "NORTHWESTERN BELL TELEPHONE COMPANY (CORPORATION; IOWA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 006",
+      "IC 020"
+     ],
+     "owner": "Lightway s.r.o. (CORPORATION; CZECH REPUBLIC)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "(CANCELLED) IC 010",
+      "IC 011",
+      "(CANCELLED) IC 009"
+     ],
+     "owner": "Aldi GmbH & Co. KG (Limited Partnership; GERMANY)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "ALDI Inc. (CORPORATION; ILLINOIS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "LightWay Home Health Care, LLC (LIMITED LIABILITY COMPANY; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "Toolway Industries Ltd. (CORPORATION; CANADA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY 1",
+     "alive": false,
+     "classes": [
+      "IC 038"
+     ],
+     "owner": "NORTHWESTERN BELL TELEPHONE COMPANY (CORPORATION; IOWA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "ACTROS-LIGHTWAY",
+     "alive": false,
+     "classes": [
+      "IC 018",
+      "IC 025",
+      "IC 006",
+      "IC 014"
+     ],
+     "owner": "DaimlerChrysler AG (CORPORATION; GERMANY)",
+     "serial": null
+    },
+    {
+     "mark": "SENTRY LIGHTWAY",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Aquila Space Technologies Pty, Ltd. (JULKINEN OSAKEYHTIÖ; Australia)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY SENTRY",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Aquila Space Technologies Pty, Ltd. (JULKINEN OSAKEYHTIÖ; Australia)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY PRODUCTS",
+     "alive": false,
+     "classes": [
+      "IC 035"
+     ],
+     "owner": "Jordan, Vedric L. (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY ADVOCACY",
+     "alive": true,
+     "classes": [
+      "IC 045"
+     ],
+     "owner": "Tanacha Gaines (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "STEFANIE LIGHTWAY & ELEMENTS",
+     "alive": false,
+     "classes": [
+      "IC 016",
+      "IC 025",
+      "IC 041"
+     ],
+     "owner": "Stefanie Henry (INDIVIDUAL; GERMANY)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY HOME HEALTH CARE",
+     "alive": false,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "LightWay Home Health Care, LLC (LIMITED LIABILITY COMPANY; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "THE LIGHTWAY TO TRAVEL",
+     "alive": false,
+     "classes": [
+      "018."
+     ],
+     "owner": "RELIABLE LUGGAGE, INC. (CORPORATION; PENNSYLVANIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LITEWAY",
+     "alive": false,
+     "classes": [
+      "IC 012"
+     ],
+     "owner": "The Aluminum Trailer Company (CORPORATION; INDIANA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LIGHTWAY SLS SECURITY LIGHTING SYSTEM PRE-PERIMETER PROTECTION WITH THE POWER OF LIGHT",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Alarm Accessory Limited (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Lightway MFB"
+    ],
+    [
+     "contains",
+     "Lightway Finance"
+    ],
+    [
+     "contains",
+     "Lightway Remittance"
+    ],
+    [
+     "contains",
+     "Lightway Finance"
+    ],
+    [
+     "exact",
+     "Lightway"
+    ],
+    [
+     "exact",
+     "Lightway | طريق النور"
+    ]
+   ],
+   "play_tr": [
+    [
+     "contains",
+     "Lightway Remittance"
+    ],
+    [
+     "contains",
+     "Lightway Finance"
+    ],
+    [
+     "exact",
+     "Lightway"
+    ],
+    [
+     "contains",
+     "Lightway MFB"
+    ],
+    [
+     "contains",
+     "Lightway Finance"
+    ],
+    [
+     "exact",
+     "Lightway | طريق النور"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "Lightway Remittance"
+    ],
+    [
+     "contains",
+     "Lightway MFB"
+    ],
+    [
+     "contains",
+     "Lightway Map"
+    ],
+    [
+     "contains",
+     "Lightway - AI Trip Planner"
+    ]
+   ],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "LIGHTWAY",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "LIVE",
+     [
+      "(CANCELLED) IC 011",
+      "(CANCELLED) IC 020",
+      "IC 006"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 038"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 038"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 006",
+      "IC 020"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "LIVE",
+     [
+      "(CANCELLED) IC 010",
+      "IC 011",
+      "(CANCELLED) IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "dead",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "exact",
+     "LIGHTWAY",
+     "LIVE",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHTWAY 1",
+     "dead",
+     [
+      "IC 038"
+     ]
+    ],
+    [
+     "contains",
+     "ACTROS-LIGHTWAY",
+     "dead",
+     [
+      "IC 018",
+      "IC 025",
+      "IC 006",
+      "IC 014"
+     ]
+    ],
+    [
+     "contains",
+     "SENTRY LIGHTWAY",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHTWAY SENTRY",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHTWAY PRODUCTS",
+     "dead",
+     [
+      "IC 035"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHTWAY ADVOCACY",
+     "LIVE",
+     [
+      "IC 045"
+     ]
+    ],
+    [
+     "contains",
+     "STEFANIE LIGHTWAY & ELEMENTS",
+     "dead",
+     [
+      "IC 016",
+      "IC 025",
+      "IC 041"
+     ]
+    ],
+    [
+     "contains",
+     "LIGHTWAY HOME HEALTH CARE",
+     "dead",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "contains",
+     "THE LIGHTWAY TO TRAVEL",
+     "dead",
+     [
+      "018."
+     ]
+    ],
+    [
+     "contains",
+     "LIGHTWAY SLS SECURITY LIGHTING SYSTEM PRE-PERIMETER PROTECTION WITH THE POWER OF LIGHT",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ]
+   ]
+  }
+ },
+ "Beam Route": {
+  "play_us": {
+   "titles": [
+    "Beam - Escooter sharing",
+    "Ride Beam",
+    "Beam Bolt",
+    "Beam Data Company Limited",
+    "Beam Drive Crashes Original 3D",
+    "CrashTime",
+    "Beam: Powered by Arc",
+    "Ultimate Drill Book",
+    "Beam: One Line Puzzle",
+    "Corvo AI Studio",
+    "Beam Calc: Beam, Frame & Truss",
+    "Nabil's Lab",
+    "BEAM Program",
+    "UofM Mobile",
+    "Beam – P2P File Transfer",
+    "NovoTechX",
+    "Beam",
+    "Jitoma Solutions",
+    "BeamWire",
+    "BeamWire",
+    "Beam Dash",
+    "DWRE Holdings",
+    "Beamies: Beam Home",
+    "Nesim Razon",
+    "Private Net Worth Tracker Beam",
+    "Aventive",
+    "BEAM AND PORTAL FRAME ANALYSIS",
+    "Ahmad Rodzaidi Bin Ahmad Faiz",
+    "$11.99",
+    "beamLive",
+    "BeamLive Inc.",
+    "RouteBeam",
+    "bigMY",
+    "Beam Up: World Tour",
+    "Met The Land Games",
+    "Blackstar BEAM",
+    "Blackstar Amplification",
+    "Beam Class Creator",
+    "Beam Class Creator",
+    "Beam Mobile Car Crash Sim",
+    "Game Vesper",
+    "Mirror Beam Puzzles",
+    "Sari Ananda",
+    "Sunnyvale Beam",
+    "Via Transportation Inc.",
+    "Beam Stream TV",
+    "BEAM Internet",
+    "BeamX: car crash, online city",
+    "Poison Studio LLC",
+    "Beam",
+    "GBC SA.",
+    "Beam Bounce: Light Puzzle",
+    "Zipzoom Studios",
+    "Beam Music",
+    "Ultimate Drill Book",
+    "Beam Space",
+    "Beam Space",
+    "BeamRush: Beam Dodge",
+    "Kullion-Games",
+    "Google Play"
+   ],
+   "ids": [
+    "app.beamhingeu.mirrorbeam",
+    "arc.beam",
+    "beam.live.on",
+    "ca.umanitoba.beam",
+    "ch.aventive.sagefinance",
+    "com.CrashTime.BeamDriveCarCrash",
+    "com.GameVesper.BeamNgCarLegendsMobile",
+    "com.beamcheckout.bolt",
+    "com.beamfitness.app",
+    "com.beamies.nesimapps",
+    "com.beamspace.beamspace",
+    "com.beamstream",
+    "com.beamwallet",
+    "com.car.crash.drive.simulator",
+    "com.escooterapp",
+    "com.idg.beamdash",
+    "com.jitoma.beaco",
+    "com.kulliongames.beamrush",
+    "com.lewes",
+    "com.metthelandgames.beamup",
+    "com.nabil.beam",
+    "com.novotechx.beam",
+    "com.rcudev.vitralbeam",
+    "com.ridewithvia.sunnyvale",
+    "com.rodzaidi.structuralengineering",
+    "com.routebeam.app",
+    "com.sheet.music.app.android",
+    "com.sifrlabs.beamwire",
+    "com.zipzoom.beambounce"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Beam | Paylaşımlı E-scooter",
+    "Ride Beam",
+    "RouteBeam",
+    "bigMY",
+    "Beam Drive Crashes Original 3D",
+    "CrashTime",
+    "Route",
+    "Route Academy",
+    "Beam Bolt",
+    "Beam Data Company Limited",
+    "Route Studio",
+    "Sherpa Map LLC",
+    "Beam Mobile Car Crash Sim",
+    "Game Vesper",
+    "WhatsApp Messenger",
+    "WhatsApp LLC",
+    "Instagram",
+    "Instagram",
+    "Beam Dash",
+    "DWRE Holdings",
+    "RouteLed Navigation",
+    "Route-Led Group Limited",
+    "TikTok",
+    "TikTok Pte. Ltd.",
+    "Route Pro",
+    "Lone wolfe",
+    "Locus Map Outdoor Navigation",
+    "Asamm Software, s. r. o.",
+    "BEAM AND PORTAL FRAME ANALYSIS",
+    "Ahmad Rodzaidi Bin Ahmad Faiz",
+    "₺519,99",
+    "RouTeD: AI Route Optimize",
+    "RouTeD",
+    "Crossy Road",
+    "HIPSTER WHALE",
+    "Mirror Beam: Lazer Bulmaca",
+    "Devtrox",
+    "Beam - Culture",
+    "Zest Lab",
+    "Benim Rota",
+    "Daniel Qin",
+    "TravelBoast™ My Journey Routes",
+    "Urobots GmbH",
+    "MyRoute-app",
+    "MyRoute-app",
+    "Soundstorm for Hue",
+    "Scott Dodson",
+    "₺124,99",
+    "REVER - Motorcycle GPS & Rides",
+    "REVER LLC",
+    "Google Haritalar",
+    "Google LLC",
+    "TZ iBoat - Marine Navigation",
+    "Nobeltec, Inc.",
+    "Beam drive car crash test",
+    "92 Gaming Studio",
+    "Routerra Route Planner",
+    "Routerra",
+    "A Journey to the Light",
+    "STUDIO YEBB GAMES"
+   ],
+   "ids": [
+    "app.beam.prod",
+    "com.CrashTime.BeamDriveCarCrash",
+    "com.GameVesper.BeamNgCarLegendsMobile",
+    "com.beamcheckout.bolt",
+    "com.car.crash.driving.simulator.game",
+    "com.cloudmax.myrouteapp",
+    "com.devtrox.laser.path.mirror.beam.reflection.puzzle",
+    "com.escooterapp",
+    "com.facebook.orca",
+    "com.google.android.apps.maps",
+    "com.idg.beamdash",
+    "com.instagram.android",
+    "com.lonewolfe.Routepro",
+    "com.nobeltec.timezero.app",
+    "com.reverllc.rever",
+    "com.rodzaidi.structuralengineering",
+    "com.route.student",
+    "com.routebeam.app",
+    "com.routedopt.app",
+    "com.routeled.routeledsatnav",
+    "com.sherpamap.routestudio",
+    "com.whatsapp",
+    "com.yebbstudio.journeytothelight",
+    "com.yodo1.crossyroad",
+    "com.zhiliaoapp.musically",
+    "com.zihua.android.mytracks",
+    "io.routerra",
+    "io.scottdodson.soundstorm.hue",
+    "io.urobots.travelboast",
+    "menion.android.locus"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Uber - Rides, Eats, Hotels",
+    "BEAM: Virtual Walking Tours",
+    "European Truck Driving Game",
+    "Moo F Oh",
+    "BeaM30",
+    "WorkWave Route Manager",
+    "Laser Beam 3D - drawing puzzle",
+    "Beam Riddle",
+    "Bike Routes",
+    "Prism: Reflections",
+    "1 Star",
+    "A-Beam+",
+    "1 Star",
+    "Beam Stress Calculator Beamer",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "BeamNG.drive",
+    "Parallel Photon Protocol",
+    "Flux Grid",
+    "GRAVHOUNDS",
+    "Lethal Geometry",
+    "G-Darius HD",
+    "Deadstick - Bush Pilot Simulator",
+    "Last Light Maintenance",
+    "Train Simulator: The Alaska Railroad: Anchorage - Seward Route Add-On",
+    "Stellar Courier",
+    "LUMENKEEP",
+    "Traxion 3000",
+    "Wayfarion",
+    "Train Simulator: Canadian National Peace River Route Add-On",
+    "Fantastical Maze",
+    "ONE LAST BEAM",
+    "Down The Stairs: The Game",
+    "Stellaris: Nomads",
+    "Sweetheart, We're Infested",
+    "Train Simulator: Norfolk Southern Saluda Grade Route Add-On",
+    "Dead Ink",
+    "Train Simulator: CSX Hanover Subdivision: Hanover - Hagerstown Route Add-On",
+    "Derelict Division, LLC",
+    "Stellar Courier Demo",
+    "Those UnderHex",
+    "Prime Prism",
+    "Train Simulator: Western Lines of Scotland Route Add-On",
+    "领航员计划 Navigator Project",
+    "Ballochet",
+    "Voyager 2",
+    "Foundation: Galactic Frontier",
+    "Ocean Cargo Manager",
+    "Undersea Post Office Sim",
+    "Heim",
+    "Moonrise",
+    "Parkour Run Obstacle Adventure",
+    "Exilus Viper",
+    "Incurable",
+    "Super Retro Fighter",
+    "Storm Reavers"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Ray Route": {
+  "play_us": {
+   "titles": [
+    "Routerra Route Planner",
+    "Routerra",
+    "RouTeD: AI Route Optimize",
+    "RouTeD",
+    "Route",
+    "Route Academy",
+    "Route: Package Tracker",
+    "Route App Inc",
+    "Epic Route:Ahead",
+    "Stockpicker Inc",
+    "Route",
+    "I.H.S",
+    "Record My Route",
+    "Jake Moua",
+    "Routestory",
+    "Routestory",
+    "MyRoute-app",
+    "MyRoute-app",
+    "RouteThis Helps (Route This)",
+    "RouteThis",
+    "Route Rush",
+    "Side Apps Ion",
+    "My Route",
+    "AlexVovan Studio",
+    "RouteLed Navigation",
+    "Route-Led Group Limited",
+    "ROUTE",
+    "shifttheroute",
+    "Route Manager",
+    "Delivery Dynamics",
+    "Ray Escape",
+    "Wala Interactive",
+    "My Route Mobile",
+    "H&H Process Inc.",
+    "RouteOne MDC",
+    "RouteOne, LLC",
+    "RouteXK Ultimate Route Planner",
+    "BALANCED ANSWERS, UNIPESSOAL, LDA",
+    "Route One ELD Logbook",
+    "Route One Go",
+    "CamScanner- scanner, PDF maker",
+    "INTSIG PTE",
+    "Ray: Metro Line Puzzle",
+    "Osman Adalı",
+    "Route Recorder - GPS Tracker",
+    "FINECODER",
+    "Route Now",
+    "Via Group",
+    "Arrows – Puzzle Escape",
+    "Lessmore GmbH",
+    "Route Tracker: Run, Bike, Walk",
+    "Accoriate Corporation",
+    "Route Pro",
+    "Lone wolfe",
+    "TravelBoast™ My Journey Routes",
+    "Urobots GmbH",
+    "Rotate Rings",
+    "Nebula  Studio",
+    "Route4Me Route Planner",
+    "Route4Me, Inc"
+   ],
+   "ids": [
+    "app.routestory",
+    "com.WalaInteractive.RayEscape",
+    "com.alexvovan.myrouteapp",
+    "com.cghdcf.gp",
+    "com.cloudmax.myrouteapp",
+    "com.deliverydynamics.routemanager",
+    "com.ecffri.arrows",
+    "com.intsig.camscanner",
+    "com.lonewolfe.Routepro",
+    "com.my.routetracking",
+    "com.myroute.mobile",
+    "com.nebula.rotaterings",
+    "com.osmanadali.ray",
+    "com.route.app",
+    "com.route.student",
+    "com.route4me.routeoptimizer",
+    "com.route_app",
+    "com.routedopt.app",
+    "com.routeled.routeledsatnav",
+    "com.routeone.r1app.mdc",
+    "com.routethis.networkanalyzer",
+    "com.routexl.ai",
+    "com.sideapps.deliveryclick",
+    "com.viagroup_gestor",
+    "dev.eldstar.android",
+    "finecoder.utility.routerecorder",
+    "io.routerra",
+    "io.urobots.travelboast",
+    "tr.com.routeapp",
+    "trackmyroute.gpsrouttracker.recordroutevideo"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "RouTeD: AI Route Optimize",
+    "RouTeD",
+    "Route",
+    "Route Academy",
+    "Routerra Route Planner",
+    "Routerra",
+    "Epic Route:Ahead",
+    "Stockpicker Inc",
+    "Ray: Metro Bulmaca",
+    "Osman Adalı",
+    "Route",
+    "I.H.S",
+    "Record My Route",
+    "Jake Moua",
+    "MyRoute-app",
+    "MyRoute-app",
+    "Z Route: Redemption",
+    "37GAMES GLOBAL",
+    "TravelBoast™ My Journey Routes",
+    "Urobots GmbH",
+    "RAY - Run Against Yourself",
+    "Moula Software",
+    "Route Rush",
+    "Side Apps Ion",
+    "RoutEV - Mapa Inteligente EV",
+    "Luis Eduardo Chacon Rocha",
+    "Route Recorder - GPS Tracker",
+    "FINECODER",
+    "Imou Life",
+    "Huacheng Network (hk) Technology Limited",
+    "RoutEye Pro",
+    "Premium GPS Tracking Software",
+    "Ray Escape",
+    "Wala Interactive",
+    "TravelAnimator・Gezi Notları",
+    "Lascade",
+    "Route 66: Road Scholar",
+    "RouteRunnerStudios",
+    "Rail Rush",
+    "Miniclip.com",
+    "Readict Fiction",
+    "VitalTek, Inc.",
+    "Routeena: Self Care & Routine",
+    "Qounter Studio",
+    "RouteXK Ultimate Route Planner",
+    "BALANCED ANSWERS, UNIPESSOAL, LDA",
+    "Route GPS",
+    "Route GPS",
+    "Route Flow",
+    "Good Mood Games AS",
+    "route.plus",
+    "IQ Solution",
+    "Crossy Road",
+    "HIPSTER WHALE",
+    "MyWay - Akıllı Rotalar",
+    "MyWay Travel App.",
+    "RouteIQ for Zoho CRM",
+    "Zoho Corporation",
+    "iCollect Movies: DVD Tracker",
+    "iCollect Everything, LLC"
+   ],
+   "ids": [
+    "com.WalaInteractive.RayEscape",
+    "com.andrei.route66roadscholar",
+    "com.anilaybakan.sehirkesif",
+    "com.cghdcf.gp",
+    "com.cloudmax.myrouteapp",
+    "com.esoto07.routeena",
+    "com.goodmoodgames.routeflow",
+    "com.icollect.movie",
+    "com.miniclip.railrush",
+    "com.mm.android.smartlifeiot",
+    "com.moulasoftware.ray",
+    "com.my.routetracking",
+    "com.osmanadali.ray",
+    "com.route.gps",
+    "com.route.student",
+    "com.routedopt.app",
+    "com.routexl.ai",
+    "com.routeye",
+    "com.sideapps.deliveryclick",
+    "com.softwarev.routev",
+    "com.travelanimator.routemap",
+    "com.yodo1.crossyroad",
+    "com.zoho.riq",
+    "com.zroute.global",
+    "finecoder.utility.routerecorder",
+    "io.routerra",
+    "io.urobots.travelboast",
+    "pl.iqsolution.route.plus",
+    "pro.novel.fiction.read.story.book",
+    "tr.com.routeapp"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Google Maps",
+    "Street Bike Game: Moto Wheelie",
+    "OneXray",
+    "Flux VPN: Smart Route",
+    "MauAR - Berlin Wall",
+    "Wahoo VPN",
+    "Voxtri: AI Driving Assistant",
+    "Claude by Anthropic",
+    "Clash Plus - Smart Proxy Tool",
+    "ShadowGate VPN Proxy & Routing",
+    "RayNeo AR",
+    "Dash VPN for Outline & VLESS",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Sniper Elite 3",
+    "Baggage Belt Demo",
+    "ReactorX",
+    "Rainswept - Original Soundtrack",
+    "Baggage Belt",
+    "Perikoto",
+    "Sniper Elite V2",
+    "Parcel Inspector Simulator",
+    "Remains on the bus Demo",
+    "Degraman: Act II. Victor",
+    "Coastal Postal",
+    "Idlenaut",
+    "Blood Facsimile",
+    "Specular Stranded",
+    "ARSENAL FORGE",
+    "HEMOHOUND",
+    "Nocto And The Ray Of Light",
+    "Grief the Server",
+    "Before the Fireworks",
+    "Catch Me If You Seoul",
+    "Movie Studio 18 Platinum Steam Edition",
+    "Axial Rift",
+    "Gay It Loud",
+    "Phantom Thief Angels: Twin Angel - Labyrinth of Time and World - Re:birth/Re:light",
+    "ARSENAL FORGE Demo",
+    "MoonCraft",
+    "Gilded Shoals",
+    "Rotten Batch: Bear Inspector",
+    "THE GODDESS TOLD ME: Steal That Loaf of Bread",
+    "My Cuckqueen Girlfriend Soundtrack",
+    "SystemsCritical",
+    "NEON DRIFT ULTRA",
+    "Zoo Peaks : Riders",
+    "Sanguine 3",
+    "7821 Akuji",
+    "Bag Drop",
+    "Sinful Testament",
+    "Stream to 3D",
+    "Gravora",
+    "Seek Lot"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Lumen Path": {
+  "play_us": {
+   "titles": [
+    "Lumen Path",
+    "MOSNEAGU STUDIOS",
+    "Lumen Path",
+    "CoreStackAI",
+    "lumenpath",
+    "LUMENPATH",
+    "Lumen Room Path",
+    "Mahoni Artisan Furniture Tech Labs",
+    "Lumen Path: Light Tile Puzzle",
+    "Lee4Family",
+    "Lumen Trail: Light Path",
+    "TIGames",
+    "Lumen",
+    "UNext Learning Private Limited",
+    "Lumen",
+    "KnowaLabs",
+    "Lumen",
+    "Sergej Pril",
+    "Lumen - Flashcards App",
+    "MTS Studio",
+    "Lumen",
+    "HUUTUANDEV",
+    "Lumen - Metabolic Coach",
+    "Lumen.me",
+    "Lumen 3",
+    "Sergej Pril",
+    "Lumen Cards",
+    "LUMEN",
+    "XTAN LIMITED",
+    "Lumen - Daily Planner",
+    "Respawn realms",
+    "Lumen",
+    "T.creations",
+    "Lumen",
+    "Avaneesh Verma",
+    "Lumen 2",
+    "Sergej Pril",
+    "$0.99",
+    "Lumen by Jonah: Study Planner",
+    "Jonah Howell",
+    "Lumen",
+    "DSI Labs",
+    "Lumen: Bible & Prayers",
+    "DIAMOBYTE SOFTWARE - FZCO",
+    "Lumen 3 Classic",
+    "Sergej Pril",
+    "$1.49",
+    "Lumen",
+    "DC1",
+    "Lumen",
+    "Lumen420",
+    "Lumen Playground",
+    "Santi020k",
+    "Lumen",
+    "OneJobDev",
+    "Lumen",
+    "35MM",
+    "Lumen: Read, Annotate & Notes",
+    "BitLark",
+    "LUMEN LEARNING APP"
+   ],
+   "ids": [
+    "app.lumen.bible",
+    "co.brown.odoxh",
+    "com.LumenMNG.Lumen",
+    "com.avcr.lumen",
+    "com.bajpro.lumen",
+    "com.base6a3ec21a4b8ff741a9ab7db3.app",
+    "com.caulderoninteractive.lumen",
+    "com.coecode.lumen",
+    "com.corestackai.lumenpath",
+    "com.dcwavemeditations.app",
+    "com.dsi.app.auranova",
+    "com.godgpt.fortuneapp",
+    "com.lee4family.jproject05",
+    "com.lumen.app.live",
+    "com.lumen.lumen_money",
+    "com.lumen.mh.app",
+    "com.lumenSoulApp.app",
+    "com.lumenapp.android",
+    "com.lumenathletics307.train.own",
+    "com.lumencare.app",
+    "com.lumenpath.game",
+    "com.lumenpathmobile",
+    "com.lumenplanner.app",
+    "com.metaflow.lumen",
+    "com.mrn110.lumen",
+    "com.onejobdev.lumen",
+    "com.pizzastudio.lumen.camera",
+    "com.santi020k.lumen.playground.compose",
+    "com.sivcor.lumendrop",
+    "com.snowgames.lumenrider",
+    "com.sokolby.lumen",
+    "com.spwatch.lumen",
+    "com.spwatch.lumen2",
+    "com.spwatch.lumen3",
+    "com.spwatch.lumen3classic",
+    "com.spwatch.lumenedge",
+    "com.spwatch.lumensolar",
+    "com.talhaashraf.lumen",
+    "com.ti.lumentrail",
+    "com.tiagoalmeida.photo_wedding.photo_wedding"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Lumen Path",
+    "MOSNEAGU STUDIOS",
+    "Lumen Path",
+    "CoreStackAI",
+    "lumenpath",
+    "LUMENPATH",
+    "Lumen Room Path",
+    "Mahoni Artisan Furniture Tech Labs",
+    "Lumen Path: Light Tile Puzzle",
+    "Lee4Family",
+    "Lumen Trail: Light Path",
+    "TIGames",
+    "Lumen",
+    "UNext Learning Private Limited",
+    "Lumen",
+    "Sergej Pril",
+    "₺24,99",
+    "Lumen 3",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen 3 Classic",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen",
+    "DSI Labs",
+    "Lumen",
+    "T.creations",
+    "Lumen Rider",
+    "Snow_Games",
+    "LumenVPN - Fast & Secure Proxy",
+    "Sanyal",
+    "Lumen",
+    "Lumen420",
+    "Lumen",
+    "Layers Education",
+    "Lumen Playground",
+    "Santi020k",
+    "Lumen",
+    "HUUTUANDEV",
+    "m-Path",
+    "m-Path Software",
+    "Lumen - Spiritual Journey",
+    "Lumen-Noor",
+    "LUMEN",
+    "XTAN LIMITED",
+    "Lumen",
+    "35MM",
+    "TP-Link Tapo",
+    "TP-LINK SYSTEMS INC.",
+    "Lumen.Guru",
+    "GodGPT",
+    "LumenPass - Password Manager",
+    "TranTech Solutions",
+    "Lumen 2",
+    "Sergej Pril",
+    "₺24,99",
+    "LUMEN LEARNING APP",
+    "Education Brown Media",
+    "Lumen - Flashcards App",
+    "MTS Studio"
+   ],
+   "ids": [
+    "br.com.gileade.lumenapp",
+    "co.brown.odoxh",
+    "com.LumenMNG.Lumen",
+    "com.TUAS.LumenAR",
+    "com.avcr.lumen",
+    "com.bajpro.lumen",
+    "com.codemina.apps.lumenta",
+    "com.coecode.lumen",
+    "com.corestackai.lumenpath",
+    "com.dcwavemeditations.app",
+    "com.dsi.app.auranova",
+    "com.godgpt.fortuneapp",
+    "com.lee4family.jproject05",
+    "com.lumen.app.live",
+    "com.lumen.mh.app",
+    "com.lumenSoulApp.app",
+    "com.lumenapp.android",
+    "com.lumenhaus.lumenlink.app",
+    "com.lumenore.insights",
+    "com.lumenpath.game",
+    "com.lumenpathmobile",
+    "com.lumenplanner.app",
+    "com.lumenroot.growthesky",
+    "com.mrn110.lumen",
+    "com.onejobdev.lumen",
+    "com.pizzastudio.lumen.camera",
+    "com.romaio.android",
+    "com.santi020k.lumen.playground.compose",
+    "com.sheheryarahmed.lumenvpn",
+    "com.snowgames.lumenrider",
+    "com.spwatch.lumen",
+    "com.spwatch.lumen2",
+    "com.spwatch.lumen3",
+    "com.spwatch.lumen3classic",
+    "com.spwatch.lumenedge",
+    "com.spwatch.lumensolar",
+    "com.talhaashraf.lumen",
+    "com.ti.lumentrail",
+    "com.tiagoalmeida.photo_wedding.photo_wedding",
+    "com.tplink.iot"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Lumen Path: Relaxing Puzzles",
+    "Lumen Path: Laser Logic Puzzle",
+    "LumenPathMobile",
+    "Jungle Path",
+    "LUMEN Device Control",
+    "Trellis: Word Path",
+    "Lumen Home",
+    "Lumen: Refraction Workshop",
+    "Ride Lumos",
+    "Magic-Lantern",
+    "FlashLight Pro: Path Finder",
+    "Lume Control",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Polaris Sector: Lumens",
+    "Aggelos 2",
+    "Lumencraft",
+    "Lumen Inferius",
+    "Lumen survive the dark",
+    "Azure Striker GUNVOLT 3",
+    "Rush.exe",
+    "The Shores of Stellaluna",
+    "LUMEN BLACK",
+    "Lumen: The Last Hope",
+    "Lumen Veil",
+    "Stones: Second Cut",
+    "Guardians of Lumen",
+    "REKINDLE",
+    "Daisen Demo",
+    "Sherpa's Caravan",
+    "Nakamers: La huida",
+    "Stones",
+    "Judgment Day: Pacific Assault ",
+    "b-Run",
+    "The Last Of Morvein",
+    "Sherpa's Caravan Demo",
+    "Lethal Geometry",
+    "Remothered: Tormented Fathers Remastered",
+    "Echo in the Lightless Deep",
+    "Aatral Origins",
+    "Venatrix",
+    "Starfall Ascendant",
+    "Hackhub: Bug Bounty",
+    "Lumenfall",
+    "GameTechBench",
+    "Kebabstar 🌯⭐",
+    "Skye: The Misty Isle",
+    "Surreal 98",
+    "Unknown Operations : The Habitus",
+    "Legend Battles Solo PvE",
+    "Legend Battles Co-op PvE & PvPvE",
+    "New Citizen - Alpha"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Lumen Path"
+    ],
+    [
+     "exact",
+     "Lumen Path"
+    ],
+    [
+     "exact",
+     "lumenpath"
+    ],
+    [
+     "exact",
+     "LUMENPATH"
+    ],
+    [
+     "contains",
+     "Lumen Path: Light Tile Puzzle"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Lumen Path"
+    ],
+    [
+     "exact",
+     "Lumen Path"
+    ],
+    [
+     "exact",
+     "lumenpath"
+    ],
+    [
+     "exact",
+     "LUMENPATH"
+    ],
+    [
+     "contains",
+     "Lumen Path: Light Tile Puzzle"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "Lumen Path: Relaxing Puzzles"
+    ],
+    [
+     "contains",
+     "Lumen Path: Laser Logic Puzzle"
+    ],
+    [
+     "contains",
+     "LumenPathMobile"
+    ]
+   ],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Lumipath": {
+  "play_us": {
+   "titles": [
+    "LUMISONATA2.0",
+    "LUMISONATA",
+    "Lumi Master",
+    "BILIBILI",
+    "Lumen",
+    "UNext Learning Private Limited",
+    "LumiQ",
+    "LumiQ",
+    "Lume: Focus Timer & Pomodoro",
+    "vp studio",
+    "LumiToM",
+    "Ahmet Selim Bayır",
+    "LUMISONATA3.0",
+    "LUMISONATA",
+    "Ayat Path - Learn the Qur'an",
+    "ictdigital",
+    "Lumi: AI Tarot & Horoscope",
+    "Volodymyr Dudarenko",
+    "Lumi Point of Sale (POS)",
+    "Lumi Developer",
+    "Lumi Steps: Sensory & Sounds",
+    "8stacks8",
+    "Lumi's Reading World",
+    "LumiReading",
+    "Lumi: Lost Spirit",
+    "Game & Magic",
+    "PurePath: Islamic Recovery",
+    "Ihsan Labs",
+    "Luminis Health",
+    "Anne Arundel Health System",
+    "Lumi Wellness Portal",
+    "LUMISOFT",
+    "FuturePath",
+    "Paseka",
+    "Lumi: Learn Languages & Play",
+    "SoloProno",
+    "Empathy - Loss Companion",
+    "Empathy.com",
+    "Lumi - Estudo espírita diário",
+    "EquipeA",
+    "Luminos 2",
+    "BART TEX",
+    "Lumen Cards",
+    "Lumilia Results Tracker",
+    "Lumilia Skin Co",
+    "Lumi IoT",
+    "LUMI VIETNAM",
+    "Lumi: Mindful Scrolling",
+    "Due Falcons",
+    "PsyPathia: Enneagram & MBTI",
+    "Kauku",
+    "Lumio: Kids Learning Games",
+    "lekiam",
+    "Lumosity Mind - Meditation App",
+    "Lumos Labs, Inc.",
+    "Lumi | by WAP",
+    "PT. WAW MEDIA INDONESIA",
+    "ParentPath",
+    "Marcel Witte",
+    "Google Play"
+   ],
+   "ids": [
+    "br.org.fems.promu",
+    "com.aamc.MyChart",
+    "com.ayatpaths.ayatpaths",
+    "com.bilibili.lumi",
+    "com.brightspark.kids",
+    "com.duefalcons.lumi",
+    "com.empathy.companion",
+    "com.facecraft.luminos2.face",
+    "com.futurepathfinder.app",
+    "com.gameandmagic.lumi",
+    "com.ihsanlabs.purepath",
+    "com.londonx.fluorine_flt",
+    "com.lumen.app.live",
+    "com.lumi.thing",
+    "com.lumicashier",
+    "com.lumiliaskinco.resultsTracker",
+    "com.luminari.lumiq",
+    "com.lumireading.app",
+    "com.lumisteps.app",
+    "com.lumoslabs.sense",
+    "com.mywellnessportal.net",
+    "com.qh.fgy",
+    "com.selim.lumitom",
+    "com.soloprono.lumi",
+    "com.unext.lumen",
+    "com.vp.focusapp",
+    "com.wapgroup.wapapp",
+    "com.yobzh.tarot",
+    "de.parentpath.app",
+    "me.kauku.psychological.enneagram.mbti.tests"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "Lumipath 明路 - Knowledge Notes",
+    "LumiPath",
+    "Utah Roadkill Reporter",
+    "WildMap Tracker",
+    "WildlifeWatch.",
+    "RoadkillApp",
+    "1 Star",
+    "Pause for Paws",
+    "Command App",
+    "LNKT: Outdoor Safety & GPS",
+    "SPYPOINT",
+    "HuntPro: AI Hunting App",
+    "TrailBear - Wildlife Safety",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "LUMIPATH",
+     "alive": false,
+     "classes": [
+      "IC 042",
+      "IC 001",
+      "IC 005"
+     ],
+     "owner": "Lumicell, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [
+    [
+     "contains",
+     "Lumipath 明路 - Knowledge Notes"
+    ],
+    [
+     "exact",
+     "LumiPath"
+    ]
+   ],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "LUMIPATH",
+     "dead",
+     [
+      "IC 042",
+      "IC 001",
+      "IC 005"
+     ]
+    ]
+   ]
+  }
+ },
+ "Lumaze": {
+  "play_us": {
+   "titles": [
+    "Lumaze: Maze Game in the Dark",
+    "Stéphane Lam",
+    "Lumaze: Maze Game",
+    "schneider",
+    "Moonlight Phases, Susan Miller",
+    "Astrology Zone",
+    "Lumus: Psychic & Tarot Reading",
+    "Psychics",
+    "LumaGears: Mirror & Gear",
+    "Aydogdu Studios",
+    "Lumluk",
+    "Anurag Karki",
+    "LumaShare Share/Print Station",
+    "Lumasoft",
+    "LumApps",
+    "LumApps",
+    "Alpenglow: Sunset Predictions",
+    "AndyDev - Andrew Yates",
+    "LumenIZE",
+    "ArcadiaReptile",
+    "Fullers360",
+    "Fullers Group Limited",
+    "Florenz",
+    "Singularity Health",
+    "Night Lamp & Timer: Lumentime",
+    "Colored Pixels Studio",
+    "LumaArc: Photo Editor, Filters",
+    "JingSay",
+    "Luma: Events & Invites",
+    "Luma Labs, Inc.",
+    "Luma Brighter Learning",
+    "Luma Brighter Learning",
+    "LUMA Arles",
+    "LUMA Arles",
+    "LumaBounce",
+    "ömer Şahin",
+    "Lumasphere",
+    "Lumasphere",
+    "Lumyros: Aurora App & Social",
+    "Jan Svamberg",
+    "Lumask - Photo Privacy",
+    "SEIZIA Co.",
+    "Luma: AI Photo&Video Generator",
+    "NSI INTERNET SERVIS HIZMETLERI LTD",
+    "Luma Launcher: Flashlight",
+    "AR Applications",
+    "LZ/WA ePaper",
+    "Medienhaus Lüneburg GmbH",
+    "Light Pollution Map - Dark Sky",
+    "Dunbar Technology, LLC",
+    "Fluz",
+    "Fluz",
+    "Lumary",
+    "Shenzhen Lingke Technology Co., Ltd.",
+    "Magnific - AI Video & Image",
+    "Magnific AI",
+    "Nizer: make it happen!",
+    "Afzack",
+    "Light pollution map",
+    "Deneb, Jurij Stare, s.p."
+   ],
+   "ids": [
+    "app.lumaze",
+    "co.lumasoft.lumashare",
+    "com.andydev.alpenglowapp",
+    "com.arapplications.lumalauncher",
+    "com.astrology.psychics",
+    "com.canav.lumagears",
+    "com.fluznyc",
+    "com.freepikcompany.freepik",
+    "com.froiibn.lumask",
+    "com.iapps.landeszeitung",
+    "com.luma.android",
+    "com.luma.generate",
+    "com.luma.mobile",
+    "com.lumapps.android",
+    "com.lumary.smart",
+    "com.lumaze.game",
+    "com.lumluk.movieapp",
+    "com.ofsgames.lumabounce",
+    "com.pa.lightpollutionmap",
+    "com.qh.app.arcadia",
+    "com.skyrr.photo.editor",
+    "com.susanmiller.moonlight.android",
+    "cz.lumyros",
+    "fr.luma",
+    "health.singularity.florenzhealth",
+    "info.lightpollutionmap.mobile",
+    "it.forump.nizer",
+    "lumasphere.world.app",
+    "nz.co.fullers.fullers360",
+    "studio.coloredpixels.lumentime"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Lumaze: Maze Game",
+    "schneider",
+    "Kitap Işığı: Okuma Lambası",
+    "Algorithmic Apps",
+    "Luma Lux — Işık Ölçer",
+    "Indie Apps Lab",
+    "Flashlight + Night Lamp",
+    "Backtracking Technologies",
+    "Gece Lambası & Fener",
+    "Moeez Ahmad",
+    "Lumaze: Maze Game in the Dark",
+    "Stéphane Lam",
+    "Night Lamp & Timer: Lumentime",
+    "Colored Pixels Studio",
+    "El Feneri ve Ekran Lambası",
+    "Paragon Logics",
+    "El Feneri Pure: Mors Kodu, SOS",
+    "Digitale Manufaktur Rudolstadt",
+    "NightGlow - Yatak Odası Lambas",
+    "CloudVya",
+    "Renkli Gece Işığı Lambası",
+    "Tutiki Apps",
+    "Büyüteç + El Feneri",
+    "Beacon Studio",
+    "El feneri",
+    "Flashlight Light",
+    "El feneri",
+    "Light Apps Studio",
+    "Gece Lambası · rahatla ve uyu",
+    "Astonio",
+    "Table Lamp - Night & Reading",
+    "Technify Soft",
+    "Yanıp Sönen El Feneri",
+    "kamesan",
+    "Ekran Işık Masa Lambası",
+    "Apps Wave",
+    "Lamplighter",
+    "Eidolon Cyprus LTD",
+    "En İyi Gece Işığı",
+    "Colorwork Apps",
+    "Light the Lamp: Logic Puzzle",
+    "OceanSoft",
+    "Gece Mumu | Uyku Meditasyonu",
+    "Self Healing",
+    "Gece lambası - Beyaz gürültü",
+    "I.P.Apps",
+    "En Parlak El Feneri",
+    "WEATHER",
+    "El Feneri ve Ekran Işığı",
+    "Vmons",
+    "Lichtspeer",
+    "Noodlecake",
+    "Ekran Işığı: Gece Lambası Uyku",
+    "SmartToolsDev",
+    "Night Light with White Noise",
+    "Sharp Creator 101",
+    "El Feneri - Amazing Flashlight",
+    "Loomatix",
+    "Orijinal El Feneri",
+    "Free Professional Applications"
+   ],
+   "ids": [
+    "app.lumaze",
+    "com.algorithmic.book_light",
+    "com.astonio.nightlight",
+    "com.backtrackingtech.torch",
+    "com.cloudvya.nightglow",
+    "com.colorworkapps.colorscreenlight",
+    "com.display.light.TableLamp",
+    "com.eidoloncorp.lamplighter",
+    "com.flashlightsuper.tung.flashlight",
+    "com.gmail.edelbachmobile.deluxeflashlight",
+    "com.loomatix.flashlight",
+    "com.lumaze.game",
+    "com.moeeza3.neon.flashlight",
+    "com.noodlecake.lichtspeer",
+    "com.ocensoft.lightthelamp",
+    "com.pony.magnifyingglass",
+    "com.pur.taschenlampe",
+    "com.selfhealing.candle11",
+    "com.sfrees.flashlight",
+    "com.sharpcreator101.nightlightwithwhitenoise",
+    "com.smarttoolsdev.screenlightlamp",
+    "com.technifysoft.lamp",
+    "com.tutikiapps.colornightlight",
+    "dav.monirapps.torchlight",
+    "io.github.indieappslab.lumalux",
+    "jp.kamesan.android.flashing_light",
+    "mobi.freeapps.flashlight.free",
+    "studio.coloredpixels.lumentime",
+    "torch.flashlight.light.screen.lamp",
+    "torch.lanterna.flashlight"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "What's Happening Southern Utah",
+    "Strobe Light Party",
+    "Utah Soccer",
+    "ArtTix SLC",
+    "ledsUp",
+    "Fever: Events & Tickets",
+    "Silverton Christmas Market",
+    "REDWEST Fest",
+    "Party Disco Dance Strobe Light",
+    "Tour de Lights",
+    "Fantasy of Lights",
+    "Amsterdam Light Festival",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Lumaze: Maze Game in the Dark"
+    ],
+    [
+     "contains",
+     "Lumaze: Maze Game"
+    ]
+   ],
+   "play_tr": [
+    [
+     "contains",
+     "Lumaze: Maze Game"
+    ],
+    [
+     "contains",
+     "Lumaze: Maze Game in the Dark"
+    ]
+   ],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Lumora": {
+  "play_us": {
+   "titles": [
+    "Lumora",
+    "mxgamecoder",
+    "Lumora",
+    "aegisSoft",
+    "Lumora",
+    "Anup Kushwaha",
+    "lumora",
+    "Turbocharger",
+    "Lumora",
+    "PT TECHNOLOGY KARYA MANDIRI",
+    "Lumora",
+    "Hitachi International(Holland)B.V.",
+    "lumora",
+    "Nova_Pixel",
+    "Lumora",
+    "PolarGames",
+    "Lumora",
+    "lumora Dz",
+    "Lumora: Music & Video Player",
+    "Tech Nest Co.",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "com.aegissoft.lumora",
+    "com.anup.lumora",
+    "com.llumora.app",
+    "com.lumora.hardcore",
+    "com.lumora.photoeditor",
+    "com.lumora.photographers",
+    "com.lzzkjs.lumora",
+    "com.polargames.lumora",
+    "com.technest.lumora.musicplayer",
+    "ng.lumora.app"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Lumora",
+    "aegisSoft",
+    "Lumora",
+    "PT TECHNOLOGY KARYA MANDIRI",
+    "Lumora",
+    "mxgamecoder",
+    "Lumora",
+    "PolarGames",
+    "Lumora",
+    "Anup Kushwaha",
+    "Lumora: Metabolizma Simülatörü",
+    "microiotronic",
+    "lumora",
+    "Turbocharger",
+    "Lumora: Müzik ve Video Çalar",
+    "Tech Nest Co.",
+    "Lumora",
+    "Hitachi International(Holland)B.V.",
+    "Lumora AI: AI Photo Generator",
+    "TheHouseofApps",
+    "Lumora",
+    "lumora Dz",
+    "Lumora: Podcast, Radyo, Dosya",
+    "AlbanM.",
+    "lumora",
+    "Nova_Pixel",
+    "Lumora - FIND YOUR LIGHT",
+    "nextlinecode",
+    "Lumora Expense Tracker",
+    "SABBANI VENKATA SAINATH",
+    "Lumora: AI Wardrobe & Outfits",
+    "Alexandr Alfonso",
+    "Lumora: AI Companion",
+    "刘正和",
+    "Lumora",
+    "Cybertech JSC",
+    "Lumora",
+    "LEN CORP",
+    "Lumora: AI Fotoğraf Editörü",
+    "Rummuscan",
+    "Lumora",
+    "smArt vision",
+    "Lumora",
+    "MEKONG K.K.",
+    "Lumora - AI Photo Editor",
+    "We Design for You",
+    "Lumora: Fotoğraf Editörü",
+    "SUNSHINE SOFTWARE LABS",
+    "Lumora: AI Photo Enhancer HD",
+    "Datrix Labs",
+    "Lumora AI - Metabolic Health",
+    "Dr. Timur",
+    "Lumora.Ai",
+    "Lumora.Ai",
+    "Lumora: 4K & AMOLED Wallpapers",
+    "AB Group Apps",
+    "Lumora",
+    "Egwu Hannah Oluchi",
+    "Lumora: Music & Video Player",
+    "ScanixPro"
+   ],
+   "ids": [
+    "albanm.lumora",
+    "app.lumora.live",
+    "com.aegissoft.lumora",
+    "com.ajtech.lumora",
+    "com.alikaanbashan.lumora",
+    "com.anup.lumora",
+    "com.appvitastudio.neonchess",
+    "com.datrixlabs.lumora",
+    "com.deep.lumoraai",
+    "com.denikagames.lumora",
+    "com.educationapp.education_app",
+    "com.houseoftech.lumora",
+    "com.kyajo.lumorablocks",
+    "com.laurentzi.lumora",
+    "com.llumora.app",
+    "com.lumi.astra.ligh.dark",
+    "com.lumora.amoled.wallpapers.backgrounds.abstracts.ab",
+    "com.lumora.clinic",
+    "com.lumora.hardcore",
+    "com.lumora.imageeditor",
+    "com.lumora.lumora",
+    "com.lumora.photoeditor",
+    "com.lumora.photographers",
+    "com.lumora.risefromthedeep",
+    "com.lzzkjs.lumora",
+    "com.nelvako.lumora",
+    "com.nextlinecode.lumora",
+    "com.oz.photofilter",
+    "com.pdftool.filescan.reader.document",
+    "com.photomanager.galleryalbum.photoedit.photomanager",
+    "com.polargames.lumora",
+    "com.rl.mood",
+    "com.rummuscan.lumora",
+    "com.scanixpro.lumora",
+    "com.scriptapp.lumora",
+    "com.technest.lumora.musicplayer",
+    "com.trivah.lumora",
+    "com.twinkletwinkle.lumina",
+    "com.usnea.lumora",
+    "dev.sametyuksel.lumora"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Lumora - AI Photo & Video",
+    "Lumora: Video Maker",
+    "Lumora: AI Wallpapers",
+    "Lumora: Wallpaper Studio",
+    "Lumora - Couples Sync",
+    "Lumora: Crystal Identifier",
+    "Lumora",
+    "Lumora: Light & Mirror Puzzle",
+    "Lumora - AI Beauty Camera",
+    "Lumora - AI Sleep & Mood",
+    "Lumin - Photo Backup",
+    "Lumora: Mindfulness & Purpose",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "LumoraVR",
+    "Minor Miner"
+   ]
+  },
+  "uspto": {
+   "total": 32,
+   "marks": [
+    {
+     "mark": "LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 003"
+     ],
+     "owner": "DKO Wholesale LLC (LIMITED LIABILITY COMPANY; Wyoming, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 014"
+     ],
+     "owner": "CAMELLIA JEWELRY INC. (CORPORATION; New York, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 014"
+     ],
+     "owner": "LINGLING HE (INDIVIDUAL; China)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "Waterbox USA, LLC (LIMITED LIABILITY COMPANY; Florida, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "Lumora Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "Intex Marketing Ltd. (CORPORATION; Virgin Islands, British)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 005"
+     ],
+     "owner": "Sue Commerce LLC (LIMITED LIABILITY COMPANY; Utah, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 036"
+     ],
+     "owner": "Lumora Wealth Management LLC (LIMITED LIABILITY COMPANY; Massachusetts, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Lumora Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Echospawn Studios (LIMITED LIABILITY COMPANY; FLORIDA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "INFINITY X1 LLC (LIMITED LIABILITY COMPANY; Nevada, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 003"
+     ],
+     "owner": "Furqan Khawar (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 041"
+     ],
+     "owner": "Lumora Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "Rwazi Inc (CORPORATION; Delaware, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 034"
+     ],
+     "owner": "Shenzhen SKE Technology Co., Ltd. (limited company (ltd.); China)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 043",
+      "IC 044",
+      "IC 041",
+      "IC 045"
+     ],
+     "owner": "The Moorings, Inc. (CORPORATION; Florida, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 033"
+     ],
+     "owner": "Rolling Hills Vineyard, LLC (LIMITED LIABILITY COMPANY; Idaho, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA LABS",
+     "alive": false,
+     "classes": [
+      "IC 042",
+      "IC 041"
+     ],
+     "owner": "LeAndra Jordan (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA STONE",
+     "alive": false,
+     "classes": [
+      "IC 027"
+     ],
+     "owner": "Lodgix Networks Corp. (CORPORATION; Wyoming, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA MD",
+     "alive": true,
+     "classes": [
+      "IC 035",
+      "IC 009",
+      "IC 044",
+      "IC 005"
+     ],
+     "owner": "Blue Skies MD LLC (LIMITED LIABILITY COMPANY; Delaware, USA)",
+     "serial": null
+    },
+    {
+     "mark": "MELMEL LUMORA",
+     "alive": true,
+     "classes": [
+      "IC 003"
+     ],
+     "owner": "Yu Liu (INDIVIDUAL; China)",
+     "serial": null
+    },
+    {
+     "mark": "MISTLUMORA",
+     "alive": true,
+     "classes": [
+      "IC 020"
+     ],
+     "owner": "Yun Zheng (INDIVIDUAL; China)",
+     "serial": null
+    },
+    {
+     "mark": "HC LUMORA",
+     "alive": false,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "Health Compass, LLC (LIMITED LIABILITY COMPANY; California, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA HAVEN",
+     "alive": true,
+     "classes": [
+      "IC 004"
+     ],
+     "owner": "KAMREX LLC (LIMITED LIABILITY COMPANY; South Carolina, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA VITALIS",
+     "alive": true,
+     "classes": [
+      "IC 005"
+     ],
+     "owner": "Lumora Psychiatric & Rejuvenation PLLC (LIMITED LIABILITY COMPANY; Virginia, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA KITCHEN",
+     "alive": true,
+     "classes": [
+      "IC 008"
+     ],
+     "owner": "Velora Brands LLC (LIMITED LIABILITY COMPANY; Florida, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LL",
+     "alive": true,
+     "classes": [
+      "IC 003",
+      "IC 035"
+     ],
+     "owner": "Alza Holdings LLC (LIMITED LIABILITY COMPANY; Nevada, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORAPURE",
+     "alive": true,
+     "classes": [
+      "IC 003"
+     ],
+     "owner": "Zhong Qiao (INDIVIDUAL; China)",
+     "serial": null
+    },
+    {
+     "mark": "SEALUMORA",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Guangzhou Shanxu Technology Innovation Co., Ltd. (Limited Company; China)",
+     "serial": null
+    },
+    {
+     "mark": "THE LUMORA EFFECT",
+     "alive": true,
+     "classes": [
+      "IC 044"
+     ],
+     "owner": "PERLA ESMERALDA SANTIAGO (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "M LUMORA MAX",
+     "alive": true,
+     "classes": [
+      "IC 028"
+     ],
+     "owner": "Lumora Max LLC (LIMITED LIABILITY COMPANY; Wyoming, USA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMORA PET EARLY SIGNALS. BETTER CARE.",
+     "alive": true,
+     "classes": [
+      "IC 010"
+     ],
+     "owner": "LumorapetLLC (LIMITED LIABILITY COMPANY; Indiana, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "lumora Dz"
+    ],
+    [
+     "contains",
+     "Lumora: Music & Video Player"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "Lumora: Metabolizma Simülatörü"
+    ],
+    [
+     "exact",
+     "lumora"
+    ],
+    [
+     "contains",
+     "Lumora: Müzik ve Video Çalar"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "Lumora AI: AI Photo Generator"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "lumora Dz"
+    ],
+    [
+     "contains",
+     "Lumora: Podcast, Radyo, Dosya"
+    ],
+    [
+     "exact",
+     "lumora"
+    ],
+    [
+     "contains",
+     "Lumora - FIND YOUR LIGHT"
+    ],
+    [
+     "contains",
+     "Lumora Expense Tracker"
+    ],
+    [
+     "contains",
+     "Lumora: AI Wardrobe & Outfits"
+    ],
+    [
+     "contains",
+     "Lumora: AI Companion"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "Lumora: AI Fotoğraf Editörü"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "Lumora - AI Photo Editor"
+    ],
+    [
+     "contains",
+     "Lumora: Fotoğraf Editörü"
+    ],
+    [
+     "contains",
+     "Lumora: AI Photo Enhancer HD"
+    ],
+    [
+     "contains",
+     "Lumora AI - Metabolic Health"
+    ],
+    [
+     "contains",
+     "Lumora.Ai"
+    ],
+    [
+     "contains",
+     "Lumora.Ai"
+    ],
+    [
+     "contains",
+     "Lumora: 4K & AMOLED Wallpapers"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "Lumora: Music & Video Player"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "Lumora - AI Photo & Video"
+    ],
+    [
+     "contains",
+     "Lumora: Video Maker"
+    ],
+    [
+     "contains",
+     "Lumora: AI Wallpapers"
+    ],
+    [
+     "contains",
+     "Lumora: Wallpaper Studio"
+    ],
+    [
+     "contains",
+     "Lumora - Couples Sync"
+    ],
+    [
+     "contains",
+     "Lumora: Crystal Identifier"
+    ],
+    [
+     "exact",
+     "Lumora"
+    ],
+    [
+     "contains",
+     "Lumora: Light & Mirror Puzzle"
+    ],
+    [
+     "contains",
+     "Lumora - AI Beauty Camera"
+    ],
+    [
+     "contains",
+     "Lumora - AI Sleep & Mood"
+    ],
+    [
+     "contains",
+     "Lumora: Mindfulness & Purpose"
+    ]
+   ],
+   "steam": [
+    [
+     "contains",
+     "LumoraVR"
+    ]
+   ],
+   "uspto": [
+    [
+     "exact",
+     "LUMORA",
+     "dead",
+     [
+      "IC 003"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 014"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "dead",
+     [
+      "IC 014"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "dead",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 005"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 036"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 011"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 003"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "dead",
+     [
+      "IC 041"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 042"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 034"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 043",
+      "IC 044",
+      "IC 041",
+      "IC 045"
+     ]
+    ],
+    [
+     "exact",
+     "LUMORA",
+     "LIVE",
+     [
+      "IC 033"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA LABS",
+     "dead",
+     [
+      "IC 042",
+      "IC 041"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA STONE",
+     "dead",
+     [
+      "IC 027"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA MD",
+     "LIVE",
+     [
+      "IC 035",
+      "IC 009",
+      "IC 044",
+      "IC 005"
+     ]
+    ],
+    [
+     "contains",
+     "MELMEL LUMORA",
+     "LIVE",
+     [
+      "IC 003"
+     ]
+    ],
+    [
+     "contains",
+     "MISTLUMORA",
+     "LIVE",
+     [
+      "IC 020"
+     ]
+    ],
+    [
+     "contains",
+     "HC LUMORA",
+     "dead",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA HAVEN",
+     "LIVE",
+     [
+      "IC 004"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA VITALIS",
+     "LIVE",
+     [
+      "IC 005"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA KITCHEN",
+     "LIVE",
+     [
+      "IC 008"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORAPURE",
+     "LIVE",
+     [
+      "IC 003"
+     ]
+    ],
+    [
+     "contains",
+     "SEALUMORA",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "contains",
+     "THE LUMORA EFFECT",
+     "LIVE",
+     [
+      "IC 044"
+     ]
+    ],
+    [
+     "contains",
+     "M LUMORA MAX",
+     "LIVE",
+     [
+      "IC 028"
+     ]
+    ],
+    [
+     "contains",
+     "LUMORA PET EARLY SIGNALS. BETTER CARE.",
+     "LIVE",
+     [
+      "IC 010"
+     ]
+    ]
+   ]
+  }
+ },
+ "Lumen Lines": {
+  "play_us": {
+   "titles": [
+    "Lumen",
+    "UNext Learning Private Limited",
+    "Lumen Lanes: Connect the Dots",
+    "MandooHai Studio",
+    "Lumen",
+    "Sergej Pril",
+    "Lumen",
+    "HUUTUANDEV",
+    "Lumen",
+    "T.creations",
+    "Lumen - Metabolic Coach",
+    "Lumen.me",
+    "Lumen: Light & Mirrors",
+    "UpFlyDev",
+    "LUMEN",
+    "XTAN LIMITED",
+    "Lumen",
+    "Avaneesh Verma",
+    "Lumen Cards",
+    "Lumen: Read, Annotate & Notes",
+    "BitLark",
+    "Lumen",
+    "DSI Labs",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "com.LumenMNG.Lumen",
+    "com.coecode.lumen",
+    "com.dsi.app.auranova",
+    "com.lumen.app.live",
+    "com.lumen.mh.app",
+    "com.metaflow.lumen",
+    "com.sokolby.lumen",
+    "com.spwatch.lumen",
+    "com.tiagoalmeida.photo_wedding.photo_wedding",
+    "com.unext.lumen",
+    "com.xtan.lumen",
+    "dev.quicklab.lumen_lanes"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Lumen",
+    "UNext Learning Private Limited",
+    "Lumen",
+    "Sergej Pril",
+    "₺24,99",
+    "Lumen",
+    "T.creations",
+    "Lumen",
+    "DSI Labs",
+    "Lumen Rider",
+    "Snow_Games",
+    "Lumen Links",
+    "Nimbus Tap Labs",
+    "Lumen",
+    "HUUTUANDEV",
+    "Lumen 2",
+    "Sergej Pril",
+    "₺24,99",
+    "Lumen 3",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen 3 Classic",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen: Read, Annotate & Notes",
+    "BitLark",
+    "Lumen",
+    "Lumen420",
+    "Lumen Playground",
+    "Santi020k",
+    "LumenAR",
+    "Turku Game Lab",
+    "LUMEN",
+    "XTAN LIMITED",
+    "LUMEN: Neon Yerçekimi Oyunu",
+    "RLD Ranger",
+    "Lumen",
+    "Avaneesh Verma",
+    "Lumen",
+    "35MM",
+    "Lumenwing",
+    "Colisa",
+    "LumenScribe Pro",
+    "Romaio Technology",
+    "Lumen Soul",
+    "Yeni Tahuilan",
+    "Lumen",
+    "OneJobDev",
+    "Lumenen",
+    "Makary Hryshkin",
+    "Lumen Edge",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen Cards",
+    "Lumen",
+    "Valentim Apps",
+    "Lumen",
+    "DC1",
+    "Lumen",
+    "Pizza Studio"
+   ],
+   "ids": [
+    "com.LumenLinks0708Company.LumenLinks",
+    "com.LumenMNG.Lumen",
+    "com.TUAS.LumenAR",
+    "com.coecode.lumen",
+    "com.dcwavemeditations.app",
+    "com.dsi.app.auranova",
+    "com.lumen.app.live",
+    "com.lumen.mh.app",
+    "com.lumenSoulApp.app",
+    "com.mtali.lumenwing",
+    "com.native_lumen_mobile",
+    "com.onejobdev.lumen",
+    "com.pizzastudio.lumen.camera",
+    "com.rldgames.lumen",
+    "com.romaio.android",
+    "com.santi020k.lumen.playground.compose",
+    "com.snowgames.lumenrider",
+    "com.spwatch.lumen",
+    "com.spwatch.lumen2",
+    "com.spwatch.lumen3",
+    "com.spwatch.lumen3classic",
+    "com.spwatch.lumenedge",
+    "com.stafford.vite.capacitor",
+    "com.talhaashraf.lumen",
+    "com.tiagoalmeida.photo_wedding.photo_wedding",
+    "com.torreystudio.lumen",
+    "com.unext.lumen",
+    "com.valentimcanejo.lumen",
+    "com.xtan.lumen",
+    "it.lumentv.mobile"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Telegram Messenger",
+    "Little Lines: Word Search",
+    "Lime - #RideGreen",
+    "LUMEN Device Control",
+    "Lumen Home",
+    "WarpLane VPN - Proxy for Phone",
+    "VPNET — Fast Proxy Client",
+    "Magic-Lantern",
+    "Lumen Burst: Block Puzzle",
+    "DramaBox - Stream Drama Shorts",
+    "Lumen Path: Relaxing Puzzles",
+    "Strong Lumen",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "KARNAL",
+    "Lumen Inferius",
+    "Breath of the Waters: The Angler",
+    "POHMIELISKO",
+    "Dear Reader",
+    "OPUS: Echo of Starsong Official Game Script -Vol.1-",
+    "OPUS: Echo of Starsong Official Game Script -Vol.2-",
+    "Lumen Trace",
+    "Tower Vibes",
+    "BULWARK: Hold the Heart",
+    "The Homecoming Exhibition",
+    "Stones",
+    "Judgment Day: Pacific Assault ",
+    "Luminons: Seeds of Starlight",
+    "Remothered: Tormented Fathers Remastered",
+    "Zombie Recorder: Undead Divas",
+    "Run and Gun 2: Opossum City",
+    "WARRIORS OROCHI 4/無双OROCHI３ - Season Pass",
+    "Lethal Geometry",
+    "Haunted Space Hotel: Vacancy",
+    "Flipper Frenzy",
+    "Venatrix",
+    "Duskwarden",
+    "BuriBoard",
+    "TYGA",
+    "SCP: November 2010",
+    "Red Veil",
+    "Hackhub: Bug Bounty",
+    "Haunted Space Hotel: Vacancy Demo",
+    "Skye: The Misty Isle",
+    "Defcon Zero: Frontlines of Tomorrow",
+    "Heroes of the Void",
+    "WAIDH",
+    "Legend Battles Solo PvE",
+    "Legend Battles Co-op PvE & PvPvE",
+    "Legend Battles",
+    "New Citizen - Alpha"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Prism Path": {
+  "play_us": {
+   "titles": [
+    "Prism Path",
+    "Joshi Legacy",
+    "Prism Path",
+    "MAXIME, LUCIEN, JEAN-CLAUDE CHEVALIER",
+    "Prism Path",
+    "huifumrd",
+    "Prism: AI Quick Path Browser",
+    "James c. Ross",
+    "Prism Path: 3D Memory Puzzle",
+    "ismaildev",
+    "Laser Path: Prism Puzzle",
+    "smallorange",
+    "Prism Path Puzzle",
+    "Mskitchen devs",
+    "Prism: Daily Puzzle",
+    "kssc0112",
+    "Prism Pro",
+    "hemu123",
+    "PRISM - Daily Puzzle",
+    "ssagarwal17",
+    "Prism: Connect & Belong",
+    "Plume Health Inc",
+    "PrismPath: Laser Light Puzzle",
+    "BEEWIST",
+    "PRISM",
+    "ZINWELL RD3",
+    "Prism Finserv",
+    "PRISM FINANCIAL SERVICES",
+    "Prism: Learning Made Visible",
+    "Prism Portfolios",
+    "Prism Route",
+    "FRANCESCO BILANCIA",
+    "Path Prefoundation (PPF)",
+    "Path Career Institute",
+    "Prism Rush: Rhythm Platformer",
+    "Samplify FZCO",
+    "PRISM Instrument LITE",
+    "Prismium GmbH",
+    "PRISM Skills",
+    "PRISM Digital Health",
+    "Prism Paths: Slide Puzzle",
+    "ReppingLabs",
+    "PRISM Live Studio: Games & IRL",
+    "NAVER Corp.",
+    "PRISM Recovery",
+    "Precision Recovery",
+    "Prism By Procural",
+    "Basiq360.com",
+    "Prism Finance: Expense Tracker",
+    "Prism Nexus",
+    "Prism Pods",
+    "BubbleSnap",
+    "Prism - Spectrum Analyzer",
+    "jaehyoo",
+    "Prism",
+    "Soterra Labs Limited",
+    "Prisma Run",
+    "MoonPixel Studios",
+    "Prism Plural",
+    "Prism Plural"
+   ],
+   "ids": [
+    "ai.prism.scan",
+    "ai.think360.pfm",
+    "ch.prismium.prismlite",
+    "co.getplume.community",
+    "co.gildcut.prism",
+    "co.lynde.vtkvj",
+    "com.INSTAR.PRISM",
+    "com.PrismPodsedsaCompany.PrismPods",
+    "com.ProcuralBasiq360.app",
+    "com.advisorlynx.mobileadvisor.prismplan",
+    "com.beewist.prismpath",
+    "com.chromexa.huepath",
+    "com.cynpli.prism",
+    "com.devsonics.prism",
+    "com.globegate.propath",
+    "com.goprisma.residents",
+    "com.ingresosprisma.gestoringresos",
+    "com.ismaildev.brainboost.prismpath",
+    "com.iw.prismfinserv",
+    "com.joshigames.prismpath",
+    "com.noikagames.colorprismpuzzle",
+    "com.path.prefoundation",
+    "com.pocketprism.game",
+    "com.precisionrecovery.supra",
+    "com.primspro.gls.app",
+    "com.prism.bluetooth_app",
+    "com.prism.live",
+    "com.prismbet.app",
+    "com.prismgame.prism",
+    "com.prismjournal.app",
+    "com.prismpath.game",
+    "com.prismplural.prism",
+    "com.prismroute.lightpath",
+    "com.prismsecuritymanager.vaultapp",
+    "com.prismtalentgroup.prism",
+    "com.przlaegsm.browser",
+    "com.rapidstrike.RapidStrike",
+    "com.reppinglabs.prismpaths",
+    "com.sidevesh.prism",
+    "com.smallorange.prismquest"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Prism Path",
+    "MAXIME, LUCIEN, JEAN-CLAUDE CHEVALIER",
+    "Prism Path",
+    "Joshi Legacy",
+    "Prism Path",
+    "huifumrd",
+    "Prism Path: 3D Memory Puzzle",
+    "ismaildev",
+    "Pathrin",
+    "Pathrin",
+    "Prism: Daily Puzzle",
+    "kssc0112",
+    "PRISM Live Studio: Games & IRL",
+    "NAVER Corp.",
+    "Prism Pro",
+    "hemu123",
+    "Path",
+    "Mim Hufford",
+    "₺8,99",
+    "Prism Pods",
+    "BubbleSnap",
+    "Pro Path",
+    "Globe Gate Solutions",
+    "Path",
+    "Citera",
+    "%50 indirim",
+    "Prism Rush: Rhythm Platformer",
+    "Samplify FZCO",
+    "PRISM",
+    "ZINWELL RD3",
+    "Path Prefoundation (PPF)",
+    "Path Career Institute",
+    "PRISM - Daily Puzzle",
+    "ssagarwal17",
+    "Prism: Learning Made Visible",
+    "Prism Portfolios",
+    "PrismPath: Laser Light Puzzle",
+    "BEEWIST",
+    "Prism Launcher",
+    "Shift Logic",
+    "Prism Plural",
+    "Prism Plural",
+    "Prism Finserv",
+    "PRISM FINANCIAL SERVICES",
+    "PRISM LITE Instrument",
+    "Prismium GmbH",
+    "Prism Perfect Match",
+    "KODD Yazilim",
+    "Laser Path: Prism Puzzle",
+    "smallorange",
+    "Pro Path: Radiant",
+    "큐레이트큐브",
+    "Prism: Game of Bending Light",
+    "Cynpli",
+    "Pathlune: Number Path Puzzle",
+    "Mindsnap Games",
+    "Path2Pass",
+    "RizDeveloper",
+    "Prismosaic:Gem Art Puzzle",
+    "Nasreen bibi01"
+   ],
+   "ids": [
+    "ai.prism.scan",
+    "ch.prismium.prismlite",
+    "com.DustProductionsLLC.Prisms",
+    "com.MagzDev.Path",
+    "com.PrismPodsedsaCompany.PrismPods",
+    "com.ProcuralBasiq360.app",
+    "com.appforgedigital.prism",
+    "com.beewist.prismpath",
+    "com.cel.path",
+    "com.chromexa.huepath",
+    "com.cynpli.prism",
+    "com.devsonics.prism",
+    "com.getpaths.paths",
+    "com.globegate.propath",
+    "com.ingresosprisma.gestoringresos",
+    "com.ismaildev.brainboost.prismpath",
+    "com.iw.prismfinserv",
+    "com.joshigames.prismpath",
+    "com.path.prefoundation",
+    "com.pathlune.game",
+    "com.pathrin.app",
+    "com.pksw.colorpathsout",
+    "com.pocketprism.game",
+    "com.primspro.gls.app",
+    "com.prism.bluetooth_app",
+    "com.prism.launcher",
+    "com.prism.live",
+    "com.prismal.prismalpro",
+    "com.prismgame.prism",
+    "com.prismjournal.app",
+    "com.prismpath.game",
+    "com.prismplural.prism",
+    "com.prismstudio.prismblock",
+    "com.propath.pro_path",
+    "com.rapidstrike.RapidStrike",
+    "com.reppinglabs.prismpaths",
+    "com.rizdev.apexqbank",
+    "com.smallorange.prismquest",
+    "com.ssagarwal17.prism",
+    "com.tbegames.and.puzzle.dungeons.spells.rpg"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "PrismPath: LightPuzzle",
+    "Prism Path: Pipe Puzzle",
+    "Prism: Laser Light Puzzle",
+    "Prism – Light & Laser Puzzle",
+    "PrismScroll Pathfinder",
+    "Path Map Studio",
+    "Beam Riddle",
+    "RAYS - 3D Path Tracer",
+    "Path Finding Visualization",
+    "Cube Step: Animal Path",
+    "PrismScroll Sheets",
+    "Lumenfall: Prism Paths",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "OverPeak",
+    "Libe",
+    "HUEMON",
+    "Scientific project: Optic",
+    "Danger Cliff 2",
+    "Which Way Up: Galaxy Games",
+    "Postknight World",
+    "Prism 2033",
+    "Heroines' Chord",
+    "Light Repair Team #4",
+    "RAX",
+    "LUMENKEEP",
+    "PRISM",
+    "Innocence Island",
+    "Tiestru",
+    "GRUEL",
+    "Glowy",
+    "Marfa",
+    "Cyber Haze",
+    "TEMPLE BREAKER",
+    "The Silent Kingdom",
+    "The Great Villainess: Strategy of Lily",
+    "SOLAS 128",
+    "Zombie Day Protocol",
+    "Tower64",
+    "Prisma",
+    "Glowy Demo",
+    "One Mote",
+    "Snoody: One of the Ayrie",
+    "Stoneseeker",
+    "Starbloom Ranch",
+    "Thornroad",
+    "The Silent Kingdom Demo",
+    "The White Witch of White Winter",
+    "Machinery Defense",
+    "Sidebar Starship",
+    "Abyssfall: Seekers Within",
+    "Desert Echo",
+    "PROTON VR",
+    "ECHO Pro"
+   ]
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "PATHWAYPRISM",
+     "alive": false,
+     "classes": [
+      "IC 009",
+      "IC 042"
+     ],
+     "owner": "Physiome Sciences, Inc. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Prism Path"
+    ],
+    [
+     "exact",
+     "Prism Path"
+    ],
+    [
+     "exact",
+     "Prism Path"
+    ],
+    [
+     "contains",
+     "Prism Path: 3D Memory Puzzle"
+    ],
+    [
+     "contains",
+     "Prism Path Puzzle"
+    ],
+    [
+     "contains",
+     "PrismPath: Laser Light Puzzle"
+    ],
+    [
+     "contains",
+     "Prism Paths: Slide Puzzle"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Prism Path"
+    ],
+    [
+     "exact",
+     "Prism Path"
+    ],
+    [
+     "exact",
+     "Prism Path"
+    ],
+    [
+     "contains",
+     "Prism Path: 3D Memory Puzzle"
+    ],
+    [
+     "contains",
+     "PrismPath: Laser Light Puzzle"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "PrismPath: LightPuzzle"
+    ],
+    [
+     "contains",
+     "Prism Path: Pipe Puzzle"
+    ],
+    [
+     "contains",
+     "Lumenfall: Prism Paths"
+    ]
+   ],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Prismway": {
+  "play_us": {
+   "titles": [
+    "Prism: Connect & Belong",
+    "Plume Health Inc",
+    "Prism: Daily Puzzle",
+    "kssc0112",
+    "Prism Pro",
+    "hemu123",
+    "Rightway",
+    "RightwayHealthcare",
+    "Motionscape: Relax with motion",
+    "Reviva Softworks Ltd",
+    "Way Attendant",
+    "way.com",
+    "Prism AI: Daily Self-Care",
+    "Mia Design Studio",
+    "WayaWaya : borderless commerce",
+    "WayaWaya Limited",
+    "Nimway",
+    "Sony Network Communications Europe B.V.",
+    "PRISM Skills",
+    "PRISM Digital Health",
+    "Coachway",
+    "Coachway",
+    "ThePrimeWay",
+    "indrox",
+    "WayWiz - Travel Planner",
+    "WayWiz, SAS",
+    "CubeAway - 3DPuzzle",
+    "GOODROID,Inc.",
+    "PRISM+ Connect - Smart Home",
+    "Prism Tech Private Limited",
+    "Busway",
+    "Busway co.",
+    "Prism: Learning Made Visible",
+    "Prism Portfolios",
+    "Prism Finserv",
+    "PRISM FINANCIAL SERVICES",
+    "Lifeway On Demand",
+    "Lifeway Christian Resources",
+    "Prism - Tenants",
+    "Building Engines",
+    "OnMyWay Safety That Pays",
+    "OnMyWay.com",
+    "Prismatica Pro: Color Grade",
+    "Harwin Popat",
+    "My Way - Viva do seu Jeito",
+    "ProGuest",
+    "Prism Health",
+    "Leuwint Technologies Pvt Ltd",
+    "Prism – Clients",
+    "Prism Planning and Solutions Group, LLC",
+    "Winyway- Spiritual Wellness",
+    "Winy Mind Pvt. Ltd.",
+    "Tenways",
+    "Tenways Technovation Europe B.V.",
+    "Prisms",
+    "Dust Productions, LLC",
+    "Secureway",
+    "FleetManagement",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "app.theprimeway.twa",
+    "br.com.vivermyway",
+    "co.getplume.community",
+    "com.DustProductionsLLC.Prisms",
+    "com.advisorlynx.mobileadvisor.prismplan",
+    "com.app.busway",
+    "com.buildingengines.prismtenant",
+    "com.harwin.prismatica",
+    "com.iw.prismfinserv",
+    "com.lifeway.ondemand",
+    "com.miadesignstudio.prythme",
+    "com.motionscape.app",
+    "com.nimway.smartoffice",
+    "com.onmyway.mobi",
+    "com.primspro.gls.app",
+    "com.prism.health",
+    "com.prism.oasis",
+    "com.prismgame.prism",
+    "com.rightway.roadmap.consumer",
+    "com.secureye.android",
+    "com.way.carwash",
+    "com.wayawaya.wayaa",
+    "com.waywiz.waywiz",
+    "com.winiwayuser",
+    "com.ycy.bluetoothbike",
+    "dk.coachway.app",
+    "edu.harvard.dfci.prism",
+    "guide.prism.android",
+    "jp.co.goodroid.hyper.puzzle.arrows3dcubepuzzle"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "Nadia, by Valence",
+    "Strawberry: 1:1 Coaching",
+    "Wild Success",
+    "Rankup: Self Improvement",
+    "Locked In - Gain Momentum",
+    "Catapult Hub Pro",
+    "iFIT Personal Trainer",
+    "Tony Robbins Arena",
+    "Mastermind.com",
+    "Novos Network",
+    "Solis - Daily Alignment",
+    "Effortless Swimming",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Mirror Beam": {
+  "play_us": {
+   "titles": [
+    "Contains ads",
+    "Mirror Plus - HD Mirror app",
+    "Digitalchemy, LLC",
+    "Beamwright: Mirror Light Game",
+    "SammeekshaGames",
+    "Beam Keeper: Mirror Puzzle",
+    "HDD-DEV",
+    "Miracast Mirror App - MirrorTo",
+    "Shenzhen iMyfone Technology Co., Ltd.",
+    "Meet at the Mirror",
+    "Meet at the Mirror",
+    "Mirror: Copy Pros. Make Money!",
+    "CherryPick Tech",
+    "Mirror Beam",
+    "PROPERTY INVESTMENTS DEV",
+    "Mirror Beam Puzzles",
+    "Sari Ananda",
+    "Mirror - Fullscreen Mirror App",
+    "Studio 360 Apps",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "app.beamhingeu.mirrorbeam",
+    "com.Sahaabiyaat.kisas.alsalihate_book_pro",
+    "com.cherrypick.KalshiPolyMarketTracker",
+    "com.devtrox.laser.path.mirror.beam.reflection.puzzle",
+    "com.imyfone.mirrorto",
+    "com.meetatthemirror",
+    "com.mirrorbeam628.game",
+    "com.sammeekshagames.beamwright",
+    "com.studio360apps.mirror",
+    "mmapps.mirror.free"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Mirror Beam",
+    "PROPERTY INVESTMENTS DEV",
+    "Mirror Beam: Lazer Bulmaca",
+    "Devtrox",
+    "Mirror Beam Puzzles",
+    "Sari Ananda",
+    "Mirror - Fullscreen Mirror App",
+    "Studio 360 Apps",
+    "Ayna",
+    "Digitalchemy, LLC",
+    "Mirror+ : Makeup, Light Mirror",
+    "EXCITING.",
+    "Beamwright: Mirror Light Game",
+    "SammeekshaGames",
+    "Beam Keeper: Mirror Puzzle",
+    "HDD-DEV",
+    "Dance Mirror",
+    "Foxtrot Dynamics, LLC",
+    "Mirror App - Beauty Mirror",
+    "Dairy App & Notes & Audio Editor & Voice Recorder",
+    "Mirror: Pocket Mirror",
+    "MeshDev",
+    "Mükemmel Ayna",
+    "Cards",
+    "Virtual Mirror: Zoom & Light",
+    "SmartToolsDev",
+    "Ekran Yansıtma - MirrorTo App",
+    "Shenzhen iMyfone Technology Co., Ltd.",
+    "Gerçek Ayna - HD Mükemmel",
+    "Bada Labs",
+    "Mirrored Perfect",
+    "Caffeine Monday",
+    "Ayna",
+    "Hottest Lab Inc.",
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": [
+    "app.beamhingeu.mirrorbeam",
+    "com.Sahaabiyaat.kisas.alsalihate_book_pro",
+    "com.badalabs.mirror",
+    "com.dancerecorder.android",
+    "com.devtrox.laser.path.mirror.beam.reflection.puzzle",
+    "com.exciting.mirrorplus.mirror",
+    "com.foxtrotdynamics.dancemirror",
+    "com.hottestlab.mirror",
+    "com.imyfone.mirrorto",
+    "com.mirrorbeam628.game",
+    "com.netigen.bestmirror",
+    "com.sammeekshagames.beamwright",
+    "com.smarttoolsdev.virtualmirror",
+    "com.studio360apps.mirror",
+    "com.vanity_mirror_app",
+    "mirrorapp.lightmirror.beautymirror.makeupmirror",
+    "mmapps.mirror.free"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "MirrorBeam - Screen Mirroring",
+    "Mirror Beam - Laser Puzzle",
+    "BeamRight: Mirror & Cast TV",
+    "Mirror - SLOX",
+    "Mirror: Lock Screen & Makeup",
+    "1 Star",
+    "Halo Mirror: Makeup Ring Light",
+    "Beam It! - Light puzzle",
+    "Mirror ツ",
+    "Mirror with front camera (Ads)",
+    "Mirror, The Simplest Mirror App",
+    "Reflecty - Zoom, Mirror, Light",
+    "My Mirror+",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Beam Eye Tracker",
+    "Lethal Geometry",
+    "Flux Grid",
+    "Beam Splitter",
+    "Enigmo",
+    "Lux Leonarii - A Mechanical Puzzle Adventure",
+    "Pacific Drive: We Have Liftoff Customization Pack",
+    "Lightsaver",
+    "Prism Factory",
+    "Khet 2.0 - Eye of Horus Beam Splitter",
+    "Gwiazdozbiór",
+    "LUMENKEEP",
+    "Mirrors of Epiphany",
+    "One Degree Off",
+    "Lightbender",
+    "BLASK",
+    "Beam Time",
+    "Labyrinth deLux - A Crusoe Quest",
+    "BLASK 2",
+    "REFLEJASTES",
+    "Prism",
+    "Beam Bound",
+    "Laser_Inc",
+    "Mad Experiments: Escape Room - Sanctuary",
+    "Order of the Sinking Star",
+    "Light For Plants",
+    "ZAP: Beam Of Fate",
+    "One Degree Off Demo",
+    "SOLAS 128",
+    "Gizmo",
+    "Laser Connect Demo",
+    "Laser Connect",
+    "Woohoo! - Game \"Laserz\"",
+    "Reflect Laser - Light Reflection Puzzle -",
+    "Jam's Adjustable Mirrors",
+    "Senalux Level Pack 2",
+    "Rayborne",
+    "Lumina",
+    "Lethal Geometry Demo",
+    "Glowy"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Mirror Beam"
+    ],
+    [
+     "contains",
+     "Mirror Beam Puzzles"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Mirror Beam"
+    ],
+    [
+     "contains",
+     "Mirror Beam: Lazer Bulmaca"
+    ],
+    [
+     "contains",
+     "Mirror Beam Puzzles"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "MirrorBeam - Screen Mirroring"
+    ],
+    [
+     "contains",
+     "Mirror Beam - Laser Puzzle"
+    ]
+   ],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Beam Bender": {
+  "play_us": {
+   "titles": [
+    "Beam Bender: Laser Puzzle",
+    "Ultimate Game Play",
+    "Beam Bender",
+    "M I N I M A L",
+    "Beam Bender",
+    "Thinking in Code",
+    "Hand Bender",
+    "eds apps",
+    "Conduit Bender Elite - Calc",
+    "Cyberprodigy LLC",
+    "BendPro: Conduit Bender Calc",
+    "ClearStack Apps",
+    "Beam Bolt",
+    "Beam Data Company Limited",
+    "Beam Calc: Beam, Frame & Truss",
+    "Nabil's Lab",
+    "Easy Bend: Conduit Bending",
+    "MOSAIC MINDS STUDIO LLC",
+    "BeamWire",
+    "BeamWire",
+    "BEAM Program",
+    "UofM Mobile",
+    "Conduit Bending",
+    "McAnswer",
+    "Conduit Bender: Bend Calc",
+    "witty apps",
+    "BEAM AND PORTAL FRAME ANALYSIS",
+    "Ahmad Rodzaidi Bin Ahmad Faiz",
+    "$11.99",
+    "Conduit Bending - Bend Calc",
+    "CoreNexGen",
+    "$4.99",
+    "Beam – P2P File Transfer",
+    "NovoTechX",
+    "Prism: Game of Bending Light",
+    "Cynpli",
+    "Beam Music",
+    "Ultimate Drill Book",
+    "Determinate Beam Solver",
+    "platoxkant",
+    "Beam - Culture",
+    "Zest Lab",
+    "Bending Moment Diagram (pro)",
+    "HD MET",
+    "$0.49",
+    "Conduit Bending Calculator EMT",
+    "BG Apps CH",
+    "Beam Lens",
+    "Beam Dynamics, Inc.",
+    "Beam Operations",
+    "Ride Beam",
+    "Beam Bounce: Light Puzzle",
+    "Zipzoom Studios",
+    "Beam: Signage & Billboard",
+    "Beam by FIVESIX",
+    "Beam: Flashlight & LED",
+    "CloudNineJB",
+    "Beam Deflection Calc: Shear",
+    "Hammer Creative LLC",
+    "25% off"
+   ],
+   "ids": [
+    "app.beam.prod",
+    "ca.umanitoba.beam",
+    "com.beam.flashlight.led.torch",
+    "com.beamcheckout.bolt",
+    "com.beamoperations",
+    "com.beamspace.beamspace",
+    "com.bgappsch.conduitbend",
+    "com.clearstackapps.bendpro",
+    "com.cynpli.prism",
+    "com.danielturcu.beam_bender",
+    "com.eddsappspipebender.pipebender2",
+    "com.hammercreative.beamslate",
+    "com.jitoma.beaco",
+    "com.mcanswer.quickbend",
+    "com.mohanraj.bendingmomentfunctioncalculator",
+    "com.mosaicmindsstudiollc.easybend",
+    "com.nabil.beam",
+    "com.novotechx.beam",
+    "com.prismforge.beambender",
+    "com.rodzaidi.structuralengineering",
+    "com.sheet.music.app.android",
+    "com.sifrlabs.beamwire",
+    "com.ugplay.beambender",
+    "com.vn.edu.best4u.bieudomomenpro",
+    "com.wittyapps.conduitBender",
+    "com.zipzoom.beambounce",
+    "conduit.bending.calc",
+    "cyberprodigy.conduit.bender.elite",
+    "io.beamdynamics.beamlens",
+    "io.fivesix.app"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Beam Bender",
+    "Thinking in Code",
+    "Beam Bender",
+    "M I N I M A L",
+    "Beam Bender: Laser Puzzle",
+    "Ultimate Game Play",
+    "Beam Calc: Beam, Frame & Truss",
+    "Nabil's Lab",
+    "Beam Bolt",
+    "Beam Data Company Limited",
+    "Blackstar BEAM",
+    "Blackstar Amplification",
+    "Bimser BEAM",
+    "Bimser Çözüm",
+    "Beam Operations",
+    "Ride Beam",
+    "Beam - Culture",
+    "Zest Lab",
+    "Beam Bounce: Light Puzzle",
+    "Zipzoom Studios",
+    "Beam: Torch Light with Shake",
+    "Dowble",
+    "₺144,99",
+    "BendPro: Conduit Bender Calc",
+    "ClearStack Apps",
+    "Mirror Beam: Lazer Bulmaca",
+    "Devtrox",
+    "Beam HPC",
+    "Kurt Gramoll",
+    "BeamDesign",
+    "LetsConstruct",
+    "Bender",
+    "Bender Dating Ltd",
+    "Conduit Bender: Bend Calc",
+    "witty apps",
+    "Beam Drive Crashes Original 3D",
+    "CrashTime",
+    "Conduit Bending",
+    "McAnswer",
+    "BEAM AND PORTAL FRAME ANALYSIS",
+    "Ahmad Rodzaidi Bin Ahmad Faiz",
+    "₺519,99",
+    "Prism: Game of Bending Light",
+    "Cynpli",
+    "BEAM BOOST",
+    "EO (Evangelische Omroep)",
+    "Easy Bend: Conduit Bending",
+    "MOSAIC MINDS STUDIO LLC",
+    "Beam Space",
+    "Beam Space",
+    "Single Beam Calc - Calculator",
+    "Yutori Apps",
+    "MetaTrader 4 Forex İşlemleri",
+    "MetaQuotes Software Corp.",
+    "Beams Analysis",
+    "Eng.Alyteem",
+    "StructLab: SFD BMD Beam Calc",
+    "TwisTed Studio",
+    "Flashlight & Magnifier: Torch",
+    "nDroids"
+   ],
+   "ids": [
+    "air.com.gramago.beamHPC",
+    "app.beam.prod",
+    "com.CrashTime.BeamDriveCarCrash",
+    "com.anonymous.bendyFE",
+    "com.beamcheckout.bolt",
+    "com.beamoperations",
+    "com.beamsanalysis.android",
+    "com.beamspace.beamspace",
+    "com.benderdating.app",
+    "com.benoitfreslon.thinkoutsidethebox",
+    "com.bimser.beam",
+    "com.bimser.beamcloud",
+    "com.binaryandbrickspro.construction_calculator",
+    "com.clearstackapps.bendpro",
+    "com.cncpocket.engrave",
+    "com.cocoaent.lightstick.itzy_v2",
+    "com.cynpli.prism",
+    "com.danielturcu.beam_bender",
+    "com.demolition.construction.inc",
+    "com.devtrox.laser.path.mirror.beam.reflection.puzzle",
+    "com.engalyteem.android",
+    "com.headupgames.bridgeconstructorstudio",
+    "com.lewes",
+    "com.littlefieldstudio.MachinikaMuseum",
+    "com.mcanswer.quickbend",
+    "com.mcode.prism",
+    "com.mosaicmindsstudiollc.easybend",
+    "com.mzgames.bimkaminigames",
+    "com.nabil.beam",
+    "com.nettechdevelopers.cnclathecalc",
+    "com.prismforge.beambender",
+    "com.ram.chocolate.torch",
+    "com.rodzaidi.structuralengineering",
+    "com.sheet.music.app.android",
+    "com.smallstepscoding.singlebeamcalc",
+    "com.stephaneginier.nomad",
+    "com.techprojects.flashlightapp",
+    "com.twistedstudio.structlab",
+    "com.ugplay.beambender",
+    "com.webelinx.Rooms.Exits.EscapeRoom.FreeEscapeGames"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Twinkly Pro",
+    "DayBetter",
+    "Lampy DMX Tools",
+    "RUMCU LIFE",
+    "Strobe Light Party",
+    "HELESIN",
+    "InvisiLights",
+    "DeckTok",
+    "XS Light",
+    "LotusLamp X",
+    "Smart echosari",
+    "Galaxy Lamps",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Battle Wizard Attack",
+    "Glissando Demo",
+    "Glissando"
+   ]
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "BEAMBENDER",
+     "alive": false,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "CALIFORNIA AMPLIFIER, INC. (CORPORATION; DELAWARE, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Beam Bender: Laser Puzzle"
+    ],
+    [
+     "exact",
+     "Beam Bender"
+    ],
+    [
+     "exact",
+     "Beam Bender"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Beam Bender"
+    ],
+    [
+     "exact",
+     "Beam Bender"
+    ],
+    [
+     "contains",
+     "Beam Bender: Laser Puzzle"
+    ]
+   ],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "BEAMBENDER",
+     "dead",
+     [
+      "IC 009"
+     ]
+    ]
+   ]
+  }
+ },
+ "Refracto": {
+  "play_us": {
+   "titles": [
+    "Refr Sports",
+    "Refr Sports",
+    "Brix Refractometer",
+    "Max Electronics",
+    "Refo",
+    "Refo App",
+    "Refra",
+    "Yuki S",
+    "ReFra Gallery",
+    "Ionut Iacob",
+    "Refrm",
+    "Spotbee, Inc.",
+    "reoqoo",
+    "Reoqoo IoT Technology Co., Ltd.",
+    "Razer PS Controller",
+    "Razer Inc.",
+    "Refocus: Pomodoro Timer",
+    "Mlem",
+    "Rekoe",
+    "Tsuyoshi Matsunaga",
+    "PractEar – Ear Trainer",
+    "PractEar",
+    "Refoss",
+    "FLEXBEE HK LIMITED",
+    "ReflAct",
+    "Allbit Studio",
+    "RefConnect",
+    "Refconnect B.V.",
+    "Referee Pro REF!",
+    "WAI Social S.A. de C.V.",
+    "Refo",
+    "Believe Agency",
+    "Refractor",
+    "Evolution Optiks",
+    "Refer-Pro",
+    "GetTheReferral.com",
+    "ReflexoCure",
+    "ReflexoCure",
+    "RefAssist",
+    "RefAssist",
+    "RERAC",
+    "株式会社EPARKリラク＆エステ",
+    "Reflora IA",
+    "SnapSystems",
+    "Refloor+",
+    "Refloor LLC.",
+    "myORCHR",
+    "Orchestrate HR, Inc.",
+    "Riffroutr",
+    "RM Technology Services Ltd",
+    "ReFraze™ and ReFraze Craze™",
+    "ReFraze™",
+    "Refugia",
+    "Refugium LLC",
+    "Riffiter: Rate & Log Music",
+    "Pickle Folks",
+    "Rescrito",
+    "Rescrito",
+    "RetaPro: Retatrutide Tracker",
+    "Agora Labs"
+   ],
+   "ids": [
+    "br.com.snapsystems.reflora",
+    "com.ReferPro.referpro",
+    "com.Refloor.refloor",
+    "com.agoralabs.retaTracker",
+    "com.app.reflexocure",
+    "com.betify.app",
+    "com.ceesoop.reflact",
+    "com.citrussoda.rekoe",
+    "com.companyname.ra.mobile",
+    "com.dot.gallery.gplay",
+    "com.gw.reoqoo",
+    "com.newparadigmapps.ReFraze",
+    "com.orchr.MyORCHR",
+    "com.poliziano.notanotherpomodoroapp",
+    "com.practear.app",
+    "com.razerzone.patricia",
+    "com.refconnect.refconnect",
+    "com.refoapp.app",
+    "com.refoss.refoss",
+    "com.refra.app",
+    "com.refractor_3",
+    "com.refrsports.app",
+    "com.rescrito",
+    "com.riffiter.app",
+    "com.riffroutr.app",
+    "com.siine.referee",
+    "com.studioyou.refrmdynamicpilates",
+    "jp.epark.salonappd6i9z8",
+    "kr.co.jjansunyi.scionix_br0101",
+    "me.refugia"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Refocus: Pomodoro Timer",
+    "Mlem",
+    "RetaPro: Retatrutid Takipçisi",
+    "Agora Labs",
+    "ReFra Gallery",
+    "Ionut Iacob",
+    "₺179,00",
+    "Rafy – Self-Tape Acting Reader",
+    "Rafy",
+    "Soner Ardıç Tarih TYT AYT KPSS",
+    "Soner Ardıç",
+    "Referee Pro REF!",
+    "WAI Social S.A. de C.V.",
+    "Tepki Süresi: Refleks Oyunu",
+    "Alab Dev",
+    "Refrm",
+    "Spotbee, Inc.",
+    "Refoss",
+    "FLEXBEE HK LIMITED",
+    "Ref Tools",
+    "Danfoss A/S",
+    "Parroto: Shadowing & Dictation",
+    "PARROTO COMPANY LIMITED",
+    "Otorapor Go",
+    "Otorapor",
+    "Refugia",
+    "Refugium LLC",
+    "Tepki Süresi & Refleks Testi",
+    "Jan Augustyniak",
+    "ReptiCare: Track your reptiles",
+    "Celine Augeberg",
+    "ChordProg Kulak Eğiticisi",
+    "DevDa AS",
+    "QuitSure: Quit Smoking Smartly",
+    "QuitSure",
+    "Perfect Ear: Music & Rhythm",
+    "Crazy Ootka Software AB",
+    "OratoGo: Hitabet Ustası Ol",
+    "Merkulofff",
+    "Odak Timer & Arkadaş: Pogether",
+    "Buor Studio",
+    "Rotation Control: Döndürme",
+    "CloudEx Inc.",
+    "Fiature: Social Crypto App",
+    "FIATURE.COM LTD",
+    "Refer & Share",
+    "LERNA PRIVATE LIMITED",
+    "Retro — Photos with Friends",
+    "Lone Palm Labs",
+    "Relate: Öz Terapi Yolculuğu",
+    "Relate App",
+    "RQ: Reisul Qurra - Hafızlık",
+    "Sarıyer App",
+    "Sleeptot Bebek Beyaz Gürültüsü",
+    "BURLEIGH CREATIVE YAZILIM VE BİLİŞİM LTD. ŞTİ.",
+    "Tepki Süresi ve Refleks Testi",
+    "NVP",
+    "QUIT Sigarayı Bırak SOS Koçu",
+    "ANKO Solutions LLC",
+    "Superead"
+   ],
+   "ids": [
+    "app.therelate.relate",
+    "com.ChordFunc.ChordProg2",
+    "com.agoralabs.retaTracker",
+    "com.danfoss.koolapp",
+    "com.dot.gallery.gplay",
+    "com.evilduck.musiciankit",
+    "com.fiature.wallet",
+    "com.janaug.rtap",
+    "com.merkulofff.oratogo",
+    "com.nusretuzman.pogether",
+    "com.otoraporapp.OtoraporGo",
+    "com.parroto.learnenglish",
+    "com.poliziano.notanotherpomodoroapp",
+    "com.quitapp.quitsmoking",
+    "com.rafy",
+    "com.refoss.refoss",
+    "com.reisulqurra.hifz.quran",
+    "com.repticare.app",
+    "com.siine.referee",
+    "com.sleeptot",
+    "com.sonerardic.tarih",
+    "com.studioyou.refrmdynamicpilates",
+    "com.superead.app",
+    "com.v.nevi.p.sv.android.reaction",
+    "dev.alabdeveloper.reaction",
+    "io.lonepalm.retro",
+    "jp.snowlife01.android.rotationcontrol",
+    "me.refugia",
+    "org.instaquit.app",
+    "sg.lerna.com.marriottvacationclub"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "BrauRefracto",
+    "Toolstoday",
+    "Harbor Freight Tools",
+    "JLCONE - JLCPCB APP",
+    "Probe Setup",
+    "TruTech Tools",
+    "RYOBI",
+    "The Phillips Machinist",
+    "ACMER Studio",
+    "AtomStack Studio",
+    "Lee's Tools for Dewalt",
+    "Lee's Tools for Milwaukee Electric",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "REFRACTO-PAD",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "WIKA ALEXANDER WIEGAND SE & CO. KG (Kommanditgesellschaft (kg); GERMANY)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Brix Refractometer"
+    ],
+    [
+     "contains",
+     "Refractor"
+    ]
+   ],
+   "play_tr": [],
+   "appstore_us": [
+    [
+     "contains",
+     "BrauRefracto"
+    ]
+   ],
+   "steam": [],
+   "uspto": [
+    [
+     "contains",
+     "REFRACTO-PAD",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ]
+   ]
+  }
+ },
+ "Photon Path": {
+  "play_us": {
+   "titles": [
+    "Photon Path",
+    "POLIMERPROMBUD",
+    "PhotonPath",
+    "@krystofhumbert",
+    "Photon - file share (FOSS)",
+    "Abhilash Hegde",
+    "Photon Camera",
+    "Binjia Zhou",
+    "Fotona",
+    "Fotona d.o.o.",
+    "Photon",
+    "Arabiacode.com",
+    "Photon",
+    "DigitalSpark",
+    "Photon Ai Photo Editor",
+    "Crafter Global Ventures",
+    "Фотон-2024",
+    "Команда Навального",
+    "Photon School",
+    "Education Haward Media",
+    "Foton Pro: Zlecenia foto-video",
+    "CamCRM",
+    "Fotons",
+    "BR Advisers LLC",
+    "Photone - Grow Light Meter",
+    "Lightray Innovation GmbH",
+    "FOTN",
+    "Fellowship of the Nations",
+    "PHOTON",
+    "Education Shield Media",
+    "Photon Paths: Light Puzzle",
+    "PATIENT PRIVATE LIMITED",
+    "Photon: Bend the Light",
+    "VebStudio.az",
+    "Photon Loop",
+    "ERGO TUR JAYA",
+    "Photon Siege: Tower Defense",
+    "Meya Studios",
+    "Photon Coding",
+    "Photon Education",
+    "Photon Health",
+    "Photon Medical Communications",
+    "Photon – Lux Light Meter Pro",
+    "Ahsan Manzoor",
+    "Photo2post–Human retouch",
+    "Photo2post",
+    "Photon Control",
+    "RM Software Labs",
+    "PHOTONICS",
+    "Education World Media",
+    "Pathlune: Number Path Puzzle",
+    "Mindsnap Games",
+    "PhotoSpring Digital Frame App",
+    "PhotoSpring",
+    "FotoFun",
+    "Ozone Tecnologia LTDA",
+    "Fotopass",
+    "JoyPictures",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "app.fotons",
+    "care.photon.health",
+    "co.everwatch.photon.watch.app",
+    "co.groot.ksomx",
+    "co.haward.tpirp",
+    "co.shield.cjiii",
+    "com.ahsanrai.photonmeterluxlightmeterpro",
+    "com.arabiacode.noor.app",
+    "com.fotofun",
+    "com.fotona.fotonaapp",
+    "com.fotonpro.app",
+    "com.hinnka.mycamera",
+    "com.joypictures.photopass",
+    "com.meetphoton.PhotonCoding",
+    "com.meyastudios.neoncore",
+    "com.navalny.photon",
+    "com.pathlune.game",
+    "com.photo2post.app",
+    "com.photonaiapp.photonaiapp",
+    "com.photonloop.game",
+    "com.photospring.client",
+    "com.subsplashconsulting.s_CTNB8S",
+    "com.suspension.bumper.rims",
+    "com.vebstudio.photon",
+    "dev.abhi.photon",
+    "fr.astro.photonpath",
+    "io.lightray.photone",
+    "it.rmsoftwarelabs.photoncontrol",
+    "om.photonforge.photonpaths"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Photon Path",
+    "POLIMERPROMBUD",
+    "Fotona",
+    "Fotona d.o.o.",
+    "Photon Camera",
+    "Binjia Zhou",
+    "Photone - Grow Light Meter",
+    "Lightray Innovation GmbH",
+    "Фотон-2024",
+    "Команда Навального",
+    "Path to Nowhere",
+    "AISNO Games",
+    "Instagram",
+    "Instagram",
+    "WhatsApp Messenger",
+    "WhatsApp LLC",
+    "Fotopass",
+    "JoyPictures",
+    "Retro Mode - Icon Pack (Light)",
+    "Moertel Pixel Art",
+    "Inner Light: Azan Qibla Salat",
+    "Orion Space",
+    "Foton Pro: Zlecenia foto-video",
+    "CamCRM",
+    "Sidus Link",
+    "Sidus Link Ltd.",
+    "Path Walker: Roguelike RPG",
+    "EKGAMES",
+    "Overgrid: Çizim Izgarası",
+    "Paintingstack Technologies",
+    "Ente Fotoğraflar",
+    "Ente Technologies, Inc.",
+    "Paths-AI Travel Planner",
+    "gopaths",
+    "Google Fotoğraflar",
+    "Google LLC",
+    "Sachi Bani: All Sikh Paths App",
+    "Delegant Tech",
+    "Photomath",
+    "Google LLC",
+    "PlantNet Plant Identification",
+    "PlantNet",
+    "TikTok",
+    "TikTok Pte. Ltd.",
+    "Photon For Photographers",
+    "Photon Technologies Kft.",
+    "image.canon",
+    "Canon Inc.",
+    "Way of Retribution",
+    "Way of Retribution Game",
+    "SIGMA RIDE",
+    "SIGMA Bike",
+    "Facebook Lite",
+    "Meta Platforms, Inc.",
+    "Dragon Trail 2: Fantasy World",
+    "TTHmobi",
+    "Lara Croft: Guardian of Light",
+    "Feral Interactive",
+    "YouTube",
+    "Google LLC"
+   ],
+   "ids": [
+    "ai.gopaths.pitravel",
+    "app.moertel.retro.iconpack.light",
+    "com.facebook.lite",
+    "com.feralinteractive.laracroftgol_android",
+    "com.fotona.fotonaapp",
+    "com.fotonpro.app",
+    "com.google.android.apps.photos",
+    "com.google.android.youtube",
+    "com.hinnka.mycamera",
+    "com.instagram.android",
+    "com.joypictures.photopass",
+    "com.lib.wrlive",
+    "com.microblink.photomath",
+    "com.navalny.photon",
+    "com.paintingstack.overgrid",
+    "com.salatiholy.android",
+    "com.sigmasport.link2",
+    "com.slsmus.an.watt",
+    "com.suspension.bumper.rims",
+    "com.whatsapp",
+    "com.zhiliaoapp.musically",
+    "com.zy.wqmt.global",
+    "creativity.intelligence.application.sidus.link",
+    "image.canon",
+    "io.ente.photos",
+    "io.lightray.photone",
+    "milestone.creations.sukhmanisahib",
+    "net.ekgames.pathwalker",
+    "org.photontechnologies.photographer",
+    "org.plantnet"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "PhotonPath Mobile",
+    "PhotonPath: Laser Puzzle",
+    "Signalfire2",
+    "DayBetter",
+    "LocalDevVPN",
+    "Precision OT Transceiver Tool",
+    "WiFi Prober",
+    "HELESIN",
+    "BLE Controller – Arduino ESP32",
+    "NetClash-Network's Vital Signs",
+    "Bandly: 4G/5G Router Signal",
+    "BRILLIANT Lights",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "PHOTON CUBE",
+    "Photoelektric",
+    "HAFO: Horse Around, Find Out",
+    "Parallel Photon Protocol",
+    "Black Hole Simulator",
+    "Chunky Orbits",
+    "SoulRoad",
+    "VOIDCRISIS",
+    "Super Robot Survivors",
+    "Ringfall TD",
+    "Eternitubes 3D",
+    "Warhammer 40,000: Gladius - Demolition Pack",
+    "SHOOT-FIGHTERS",
+    "Strata Design 3D SE",
+    "RoboForge"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Photon Path"
+    ],
+    [
+     "exact",
+     "PhotonPath"
+    ],
+    [
+     "contains",
+     "Photon Paths: Light Puzzle"
+    ]
+   ],
+   "play_tr": [
+    [
+     "exact",
+     "Photon Path"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "PhotonPath Mobile"
+    ],
+    [
+     "contains",
+     "PhotonPath: Laser Puzzle"
+    ]
+   ],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Glint Path": {
+  "play_us": {
+   "titles": [
+    "Glint | Buy Gold and Silver",
+    "glintpay app",
+    "Glintpath: Connect Dots Puzzle",
+    "NK Tools",
+    "Glint Reels Max",
+    "JigsawInvest",
+    "GlintLine: Play with reflexes",
+    "AndrCa",
+    "Glint & EMF: Spy Finder",
+    "Sovereign Digital Labs",
+    "Glint: Spot & Collect Planes",
+    "Fan Platform",
+    "Glint",
+    "ogo games",
+    "Glint: AI PDF Reader & Scan",
+    "SAT Soft",
+    "Glint: Subscription Tracker",
+    "Nagarajan Seeni",
+    "Ruby Glint: Gem Price & Value",
+    "Ruby Glint Technologies",
+    "Pandora - Music & Podcasts",
+    "Pandora",
+    "Glint - Your mind. Remembered.",
+    "Glint_App",
+    "Hard Rock Jackpot Planet",
+    "Hard Rock Games",
+    "Glassdoor | Jobs & Careers",
+    "Indeed, Inc.",
+    "Love and Deepspace",
+    "InFold Pte. Ltd.",
+    "DANA Indonesia Digital Wallet",
+    "PT Espay Debit Indonesia Koe",
+    "Path of Giants",
+    "Journey Bound Games Inc.",
+    "Pathrin",
+    "Pathrin",
+    "PENN Play Casino jackpot slots",
+    "Penn Interactive Ventures, LLC",
+    "Chicken Inn",
+    "Simbisa International",
+    "Dragon Fever TD!",
+    "Wonder Game Inc.",
+    "Lightning Link Casino Slots",
+    "Product Madness",
+    "Quick Hit Casino Slots Games",
+    "SciPlay",
+    "Upward Dating: Meet Singles",
+    "Match Group Americas, LLC",
+    "Line Puzzle: String Art",
+    "BitMango",
+    "Timeline Up",
+    "Rollic Games",
+    "Heart of Vegas Casino Slots",
+    "Product Madness",
+    "8 Ball Path Finder: Line Tool",
+    "Wallet Passes Alliance",
+    "Jackpot Nights:Spin Cheers",
+    "Fluxis Games Studio",
+    "88 Fortunes™ Casino Slot Games",
+    "SciPlay"
+   ],
+   "ids": [
+    "app.glintnow.mobile",
+    "com.JourneyBoundGames.PathofGaints",
+    "com.MojoGames.EraEvolution",
+    "com.affinityapps.twozerofour",
+    "com.andrca.glintline",
+    "com.ballytechnologies.f88",
+    "com.ballytechnologies.quickhitslots",
+    "com.bitmango.go.stringart",
+    "com.bored.jejemon.billardpathfinder",
+    "com.chicken.inn",
+    "com.fun.thrill.game",
+    "com.glassdoor.app",
+    "com.glint.spyfinder",
+    "com.glintpay.glintpay",
+    "com.glintreels.shortdrama.max",
+    "com.hollywoodcasino",
+    "com.nagarajanseeni.glint",
+    "com.nktools.glintpath",
+    "com.ogogames.glint",
+    "com.pandora.android",
+    "com.papegames.lysk.en",
+    "com.pathrin.app",
+    "com.productmadness.hovmobile",
+    "com.productmadness.lightninglink",
+    "com.rubyglint.app",
+    "com.satsoft.pdfreader",
+    "com.traverse.zhfx.en.gp",
+    "com.wgames.en.jackpotplanet",
+    "id.dana",
+    "xyz.getglint.app"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "GlintLine: Play with reflexes",
+    "AndrCa",
+    "Glintpath: Connect Dots Puzzle",
+    "NK Tools",
+    "Glint: Gizli Kamera Bulucu",
+    "PSSD Limited",
+    "Glint | Buy Gold and Silver",
+    "glintpay app",
+    "Pocket Glint Ball: Bounce",
+    "Volt Engine",
+    "Glint Core: Idle Planet Miner",
+    "Infinity Games, Lda",
+    "Bubble Shooter: Panda Pop!",
+    "Jam City, Inc.",
+    "LinkedIn: Topluluk ve Ağ",
+    "LinkedIn",
+    "Ruby Glint: Gem Price & Value",
+    "Ruby Glint Technologies",
+    "LINE: Arama ve Mesaj",
+    "LINE (LY Corporation)",
+    "Pathrin",
+    "Pathrin",
+    "Glint & EMF: Casus Bulucu",
+    "Sovereign Digital Labs",
+    "TP-Link Tapo",
+    "TP-LINK SYSTEMS INC.",
+    "Path of Giants",
+    "Journey Bound Games Inc.",
+    "₺25,99",
+    "Glassdoor | Jobs & Careers",
+    "Indeed, Inc.",
+    "Sundar Gutka",
+    "Khalis Foundation",
+    "Spy",
+    "aesthe",
+    "Paths-AI Travel Planner",
+    "gopaths",
+    "VIPraputra path",
+    "Vipraputra Path",
+    "PATHLOCK: Stratejik Masa Oyunu",
+    "BOVASOFT",
+    "One Line",
+    "Gimica GmbH",
+    "Word Crack: Kelime Oyunu",
+    "etermax",
+    "Bitget Wallet: Kripto ve BTC",
+    "Bitget Wallet",
+    "LinkedIn Recruiter",
+    "LinkedIn",
+    "ARK Casino - Vegas Slots Game",
+    "Murka Games Limited",
+    "Path of Evil: Immortal Hunter",
+    "TINYSOFT - slots, slot machines & casino games",
+    "Bubble Shooter Family",
+    "Playful Bytes",
+    "Dragon Era - RPG Card Slots",
+    "Playmage",
+    "Words For Joy",
+    "Songxue World Co., Limited",
+    "Line Dash"
+   ],
+   "ids": [
+    "ai.gopaths.pitravel",
+    "com.JourneyBoundGames.PathofGaints",
+    "com.WahegurooNetwork.SundarGutka",
+    "com.ZimaGames.Spy",
+    "com.andrca.glintline",
+    "com.bitkeep.wallet",
+    "com.bovasoft.pathlock",
+    "com.bubble.shooter.family",
+    "com.etermax.apalabrados.lite",
+    "com.gimica.oneline",
+    "com.glassdoor.app",
+    "com.glint.spyfinder",
+    "com.glintpay.glintpay",
+    "com.infinitygames.glintcore",
+    "com.linkedin.android",
+    "com.linkedin.recruiter",
+    "com.murka.arkslots",
+    "com.nktools.glintpath",
+    "com.pathrin.app",
+    "com.playmage.dragonera",
+    "com.pssd.glint",
+    "com.rubyglint.app",
+    "com.satorisysplay.arrowsdash",
+    "com.sgn.pandapop.gp",
+    "com.spewij.android.llthoy",
+    "com.tinkersignal.pocketglintball",
+    "com.tplink.iot",
+    "com.vipraputra.path",
+    "jp.naver.line.android",
+    "path.of.evil.immortal.hunter.dungeon.rpg"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "LinkedIn: Community & Network",
+    "Little Glint",
+    "Stacking Puzzle – Color Run 3D",
+    "Instagram",
+    "GlintName",
+    "Glintstorm",
+    "Glint Garden",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Springs, Eternal",
+    "Fearwoods",
+    "JUST PRESS SPACE",
+    "Bio Doll",
+    "The Flinch: Unforgiven West",
+    "Springs, Eternal Demo",
+    "Crack of Strike Demo",
+    "Tales of ARISE - Tales of Series Battle BGM Pack",
+    "Bio Doll Demo",
+    "Countless Rooms of Death",
+    "喵德行 Meowdness",
+    "Road to Empress Ⅱ",
+    "Darkzan Arena",
+    "FayFeather",
+    "Glintland",
+    "Rock and Roots",
+    "The Grander",
+    "Rogue Elements",
+    "无量疯之章"
+   ]
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "GLINTPATH",
+     "alive": true,
+     "classes": [
+      "IC 020"
+     ],
+     "owner": "Yueting Xu (INDIVIDUAL; China)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Glintpath: Connect Dots Puzzle"
+    ]
+   ],
+   "play_tr": [
+    [
+     "contains",
+     "Glintpath: Connect Dots Puzzle"
+    ]
+   ],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "GLINTPATH",
+     "LIVE",
+     [
+      "IC 020"
+     ]
+    ]
+   ]
+  }
+ },
+ "Glowline": {
+  "play_us": {
+   "titles": [
+    "Lines Pro - Minimal Icon Pack",
+    "Nate Wren Design",
+    "GetGlowing Skincare",
+    "GetGlowing Skincare",
+    "Glow Spin - Rhythm Reflex Game",
+    "Buhane Information Technologies",
+    "Glow Live",
+    "Biubiubiu limited",
+    "GoGlow",
+    "NGMOB PTE LTD",
+    "Lines Gold Pro - Icon Pack",
+    "Nate Wren Design",
+    "GlowPusher",
+    "ChickWilliam",
+    "Glow: Smart Tanning & UV",
+    "Molly Digital",
+    "Glowly: Skincare AI & Routine",
+    "App Atelier",
+    "Brightline: Mental Health",
+    "Hello Brightline",
+    "Glow Dreaming",
+    "Glow Dreaming",
+    "Glow — Solana Wallet",
+    "Luma Labs, Inc.",
+    "Glow Ritual: Self Care Tracker",
+    "Mercenary Developers",
+    "$1.99",
+    "Click & Glow",
+    "Click & Glow",
+    "Glowing.io",
+    "Glowing.io",
+    "Glowin - Lifestyle Routines",
+    "Ornitorenk Dijital Hizmetler Anonim Sirketi",
+    "GlowPro - Skin Care Routine",
+    "Bigoen Bilişim Teknolojileri Anonim Şirketi",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "com.alphaone.glowline.iconpack",
+    "com.appatelier.glowly",
+    "com.bigoen.glowpro",
+    "com.biubiuclub.biubiuclubchat",
+    "com.clickandglow.mobile",
+    "com.cosmicmeta.games.glowspin",
+    "com.getglowingskincare.getglowingskincare",
+    "com.glowdreaming.app",
+    "com.glowpusherAC.app",
+    "com.hellobrightline.caregiver",
+    "com.kompanion.glowin.android",
+    "com.luma.wallet.prod",
+    "com.mercenarydevs.glow",
+    "com.natewren.lines",
+    "com.natewren.linesgold",
+    "com.ngmob.goglowai",
+    "com.paulaymanu113.gettanfast",
+    "io.glowing.app"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "GlowLine Icon Pack",
+    "AlphaOne",
+    "Glowline: Tek Çizgi Bulmacası",
+    "BlackBlue Studios",
+    "Glowline",
+    "CobraCat Games",
+    "Glowline: Edge Lighting Border",
+    "Sensi Tech",
+    "Glowline: Light Puzzle",
+    "Bairagi Developers",
+    "GlowPro - Cilt Bakım Rutini",
+    "Bigoen Bilişim Teknolojileri Anonim Şirketi",
+    "Skin Glow : Skincare Routine",
+    "Serenity Talks",
+    "Yüz Masajı, Yüz Yogası: ForYou",
+    "forYou Development",
+    "Laline｜頂級天然沐浴香氛保養",
+    "曦月有限公司",
+    "Glow Ai Cilt Bakım Rutini",
+    "Heaox Wellness LLP",
+    "PerfectLine: Putting Simulator",
+    "LineMatics Inc.",
+    "Glow Fashion Idol",
+    "CrazyLabs LTD",
+    "GlowLift - Face Yoga",
+    "Apperture Labs Limited",
+    "Glow: Bronceado Perfecto y UV",
+    "Molly Digital",
+    "Skincare Routine: FeelinMySkin",
+    "FeelinMySkin",
+    "Glowin - Günlük Rutin Planlama",
+    "Ornitorenk Dijital Hizmetler Anonim Sirketi",
+    "Glowline Living Cart",
+    "THE GALLEY WORKSTATION Dev",
+    "AI Renk ve Yüz Analizi",
+    "SL-Solutions",
+    "Luvly: Yüz Yogası",
+    "Gismart",
+    "GlowIN21 Skincare Shop",
+    "Bluevy Cloud Sdn Bhd",
+    "Cilt Bakım Rutini - Glory Skin",
+    "Aytek Studio",
+    "LightLine - Single-painting -",
+    "MoviSoft Co., Ltd.",
+    "Lines Gold Pro - Icon Pack",
+    "Nate Wren Design",
+    "₺78,99",
+    "LINE Camera - Photo editor",
+    "SNOW Corporation",
+    "LooksLab - AI glowup coach",
+    "Adam T, LLC",
+    "Glow Spin - Neon Refleks Oyunu",
+    "Buhane Information Technologies",
+    "ProLine Gym",
+    "Pixel Mind IT Solutions",
+    "Güzellik Salonu Oyunları 2+",
+    "Bimi Boo Kids Learning Games for Toddlers FZ-LLC",
+    "GlowApp: AI Face Scan & Skin",
+    "Mlinjo Creative Labs",
+    "Glow Live"
+   ],
+   "ids": [
+    "ai.endohealth.aivoice",
+    "app.foryou",
+    "app.weglow.v1",
+    "biz.glowapp",
+    "clinkers.glow",
+    "color.analysis.face.beauty.scanner.hair.stylist.fashion.style.best.app.free.ai.slsolutions.colors",
+    "com.adamtllc.lookslab",
+    "com.alphaone.glowline.iconpack",
+    "com.apperturelabs.glowlift",
+    "com.arrow.icons.pastelline",
+    "com.bairagidevelopers.glowline",
+    "com.bigoen.glowpro",
+    "com.bimiboo.kids.games.beauty.salon",
+    "com.biubiuclub.biubiuclubchat",
+    "com.bluevystore.glowin21",
+    "com.clickandglow.mobile",
+    "com.cobracatgames.glowline",
+    "com.cosmicmeta.games.glowspin",
+    "com.crazylabs.fashion.squad",
+    "com.feelinmyskin.app",
+    "com.fuego.laurageller",
+    "com.gloryskin.app",
+    "com.glow.android",
+    "com.glowdreaming.app",
+    "com.glowupdaily.app",
+    "com.h4xhdv.glowlineedgelighting",
+    "com.hautapp.clearrn",
+    "com.hollyshop.app",
+    "com.keremcan534.glowline",
+    "com.kompanion.glowin.android",
+    "com.linematics.perfectline",
+    "com.magicline.mobile",
+    "com.movisoft.lightline",
+    "com.natewren.lines",
+    "com.natewren.linesgold",
+    "com.omytap.glamly",
+    "com.paulaymanu113.gettanfast",
+    "com.paxiegames.glowtales",
+    "com.proline.gym",
+    "com.shoplineapp.sllalinetw182"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Glowline: Draw the Sky",
+    "Glowline AI",
+    "Glow Draw!",
+    "Learn to Draw Glow Cartoon",
+    "Glowline: Light the Lamps",
+    "Magic-Lantern",
+    "Forge of Neon - 3D Art Sandbox",
+    "Glow Hockey 2L",
+    "GlowCam - Glow Cam & Light Cam",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 5,
+   "marks": [
+    {
+     "mark": "GLOWLINE",
+     "alive": false,
+     "classes": [
+      "IC 042"
+     ],
+     "owner": "Glowline (LIMITED LIABILITY COMPANY; TEXAS, USA)",
+     "serial": null
+    },
+    {
+     "mark": "GLOWLINE",
+     "alive": true,
+     "classes": [
+      "IC 033"
+     ],
+     "owner": "Sazerac Brands, LLC (LIMITED LIABILITY COMPANY; Delaware, USA)",
+     "serial": null
+    },
+    {
+     "mark": "GLOWLINE",
+     "alive": false,
+     "classes": [
+      "IC 010"
+     ],
+     "owner": "B. BRAUN MEDICAL INC. (CORPORATION; PENNSYLVANIA, USA)",
+     "serial": null
+    },
+    {
+     "mark": "GLOWLINE",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Michael A. Olszewski (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "GLOWLINE",
+     "alive": true,
+     "classes": [
+      "IC 005"
+     ],
+     "owner": "BEAUTYX CORP (CORPORATION; Florida, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [
+    [
+     "contains",
+     "GlowLine Icon Pack"
+    ],
+    [
+     "contains",
+     "Glowline: Tek Çizgi Bulmacası"
+    ],
+    [
+     "exact",
+     "Glowline"
+    ],
+    [
+     "contains",
+     "Glowline: Edge Lighting Border"
+    ],
+    [
+     "contains",
+     "Glowline: Light Puzzle"
+    ],
+    [
+     "contains",
+     "Glowline Living Cart"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "Glowline: Draw the Sky"
+    ],
+    [
+     "contains",
+     "Glowline AI"
+    ],
+    [
+     "contains",
+     "Glowline: Light the Lamps"
+    ]
+   ],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "GLOWLINE",
+     "dead",
+     [
+      "IC 042"
+     ]
+    ],
+    [
+     "exact",
+     "GLOWLINE",
+     "LIVE",
+     [
+      "IC 033"
+     ]
+    ],
+    [
+     "exact",
+     "GLOWLINE",
+     "dead",
+     [
+      "IC 010"
+     ]
+    ],
+    [
+     "exact",
+     "GLOWLINE",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ],
+    [
+     "exact",
+     "GLOWLINE",
+     "LIVE",
+     [
+      "IC 005"
+     ]
+    ]
+   ]
+  }
+ },
+ "Shinepath": {
+  "play_us": {
+   "titles": [
+    "Path2Pass",
+    "RizDeveloper",
+    "BrightPath Learning",
+    "The Johmacos",
+    "The Hanover SmartPath",
+    "The Hanover Insurance Group, Inc",
+    "Starpath",
+    "Starpath",
+    "MyPath",
+    "Droga Consulting Service",
+    "ShadePath: Comfort Routes",
+    "ShadePath",
+    "Pathrin",
+    "Pathrin",
+    "NLR OpenPATH",
+    "National Laboratory of the Rockies",
+    "MyPath KY",
+    "University of Kentucky",
+    "Fundpath",
+    "Fundpath Limited",
+    "Path of Giants",
+    "Journey Bound Games Inc.",
+    "Yogpath - Yoga & Wellness App",
+    "Ommify Technologies Private Limited",
+    "EnglishPath — Ingliz tili",
+    "EnglishPath",
+    "YorePath",
+    "YorePath",
+    "my PATH®",
+    "Pathwater",
+    "Shine Shine Club",
+    "Shine Shine (M) Sdn Bhd",
+    "ParentPath",
+    "Marcel Witte",
+    "PMPath",
+    "DNTDev",
+    "Secure Path ELD",
+    "SP ELD",
+    "My HealthPath",
+    "HealthMine Services, Inc.",
+    "MyPhantomPath",
+    "devopscoe",
+    "PowerPath",
+    "EPOG Academy",
+    "epath",
+    "Contiem",
+    "lnvestpath",
+    "Excel Net Solutions Pvt. Ltd.",
+    "My Path Portal",
+    "Community Council for Mental Health and Mental Ret",
+    "YGTA Shine On Health & Fitness",
+    "Virtuagym Professional",
+    "healthepath",
+    "U.S. Anesthesia Partners",
+    "SmartPath",
+    "Smart Edge Technologies",
+    "PATHEARN",
+    "VMobile AD",
+    "SHiNE Fitness",
+    "SHiNE Fitness"
+   ],
+   "ids": [
+    "app.powerpath.production",
+    "com.JourneyBoundGames.PathofGaints",
+    "com.droga_consulting.droga_group_pms",
+    "com.fundpath.app",
+    "com.hanover.smartpath",
+    "com.healthepath.app",
+    "com.healthmine.android.pha.bcbstma.ppocsnp",
+    "com.investpathbypfs.mobile.app",
+    "com.path.pathrefillit",
+    "com.pathrin.app",
+    "com.pmpath.mobile",
+    "com.rizdev.apexqbank",
+    "com.shadepath.app",
+    "com.shinefitness.shinefitness",
+    "com.shineshine.user",
+    "com.starpath.starpath",
+    "com.yorepath.app.yorepath_app",
+    "consumer.yogpath.wellness",
+    "de.parentpath.app",
+    "digifit.android.virtuagym.pro.ymcaofgreatertoronto",
+    "edu.uky.ukhc.mypath",
+    "eld.securepath.driver",
+    "eu.vmobile.pathearn",
+    "gov.nrel.cims.openpath",
+    "io.myphantompath.vpn",
+    "io.smartedgetech.smartpathqr",
+    "kr.ahsol.fpcepath",
+    "love.brightpath.app",
+    "org.cchss.portal",
+    "uz.englishpath.app"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "Apteka.ru – онлайн-аптека",
+    "GoodRx: Prescription Savings",
+    "NimbleRx",
+    "Яндекс Аптеки: заказ лекарств",
+    "PlatinumRx: Medicine & Health",
+    "Lazz Pharma",
+    "University Compounding Pharm",
+    "seif pharmacies - صيدلية سيف",
+    "Capsule Pharmacy",
+    "Phluent",
+    "Аптека Максавит–онлайн заказ",
+    "MedEx Plus",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Bright Trail": {
+  "play_us": {
+   "titles": [
+    "Bright Amp Trail",
+    "GRA PSYCHOLOGY LTD",
+    "Fantasy Tennis Manager",
+    "Bright Trail Studio",
+    "Bright GPS",
+    "Bright Office Systems",
+    "Bright Gps",
+    "gpsmart99",
+    "Bright Memory: Infinite",
+    "FYQD-Studio",
+    "Bright Portal",
+    "Bright Renewables",
+    "brightwheel: Childcare App",
+    "brightwheel",
+    "Brightwell Navigator",
+    "Brightwell Payments, Inc.",
+    "BrightOver",
+    "HOTSALES GLOBAL TRADE LLC",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "co.kidcasa.app",
+    "com.FYQD.BMI",
+    "com.andromo.dev894708.app1023640",
+    "com.bright.gps",
+    "com.bright_traccar",
+    "com.brightwellpayments.android",
+    "com.efercro.brightover",
+    "com.tennispassion.app",
+    "www.portalbright.com"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Bright Amp Trail",
+    "GRA PSYCHOLOGY LTD",
+    "Bright Gps",
+    "gpsmart99",
+    "Bright Memory: Infinite",
+    "FYQD-Studio",
+    "Trail Sense",
+    "Trail Sense",
+    "WhatsApp Messenger",
+    "WhatsApp LLC",
+    "Instagram",
+    "Instagram",
+    "Bright GPS",
+    "Bright Office Systems",
+    "Navi: UPI, Payments, Insurance",
+    "Navi",
+    "Oplayer Smart Life",
+    "Synergy Innovations Group Limited",
+    "Wahoo: Ride, Run, Train",
+    "Wahoo Fitness",
+    "ReSound Smart 3D",
+    "GN Resound",
+    "Smart Tales: Matematik ve Zeka",
+    "Marshmallow Games SRL",
+    "Baby Daybook - Newborn Tracker",
+    "Baltapis",
+    "Gorilla Tag",
+    "Game Ware",
+    "TikTok",
+    "TikTok Pte. Ltd.",
+    "BrightLock - Smart Brightness",
+    "AHK Production",
+    "Winix Smart",
+    "Winix inc",
+    "Smart 2 Sync",
+    "Titan Company Limited",
+    "Lollipop - Smart baby monitor",
+    "Masterwork Aoitek Co., Ltd.,",
+    "BTS Official Light Stick Ver.4",
+    "HYBE Co., Ltd.",
+    "DoorVi: Smart Video Doorbell",
+    "Doorvi Technologies Private Limited",
+    "Evrensel TV Uzaktan Kumandası",
+    "SensusTech LLC",
+    "Facebook Lite",
+    "Meta Platforms, Inc.",
+    "Watch Sync App - BT Notifier",
+    "AceTools Team",
+    "Snapchat",
+    "Snap Inc",
+    "Facebook",
+    "Meta Platforms, Inc.",
+    "Photone - Grow Light Meter",
+    "Lightray Innovation GmbH",
+    "YouTube",
+    "Google LLC",
+    "Messenger",
+    "Meta Platforms, Inc.",
+    "Bitalyze",
+    "Bitalyze LLC"
+   ],
+   "ids": [
+    "com.FYQD.BMI",
+    "com.ahkproduction.brightlock",
+    "com.andromo.dev894708.app1023640",
+    "com.aoitek.lollipop",
+    "com.bitalyze.app",
+    "com.bright.gps",
+    "com.bright_traccar",
+    "com.doorvi",
+    "com.drillyapps.babydaybook",
+    "com.facebook.katana",
+    "com.facebook.lite",
+    "com.facebook.orca",
+    "com.google.android.youtube",
+    "com.gw.monkey.tag.jungle.game",
+    "com.hybe.bts",
+    "com.instagram.android",
+    "com.kylecorry.trail_sense",
+    "com.marshmallowgames.smarttales",
+    "com.naviapp",
+    "com.oplayer.orunningplus",
+    "com.snapchat.android",
+    "com.titan.smart2",
+    "com.wahoofitness.fitness",
+    "com.whatsapp",
+    "com.winix.smartiot",
+    "com.zhiliaoapp.musically",
+    "dk.resound.smart3d",
+    "io.lightray.photone",
+    "sensustech.universal.tv.remote.control",
+    "wearos.smart.watch.bt.sync.notifier"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Colorado Trail Explorer",
+    "bright - follow the sunshine",
+    "Pip Parade Pocket",
+    "Trailbot: MTB Trail Conditions",
+    "Nook: Trail & Hike Community",
+    "WTA Trailblazer: Go Hiking",
+    "Tri-Rail",
+    "Spanish Moss Trail Guide",
+    "Trail Run Project",
+    "Pacific Crest Trail Closures",
+    "Sea to Sky Gondola Maps",
+    "SI Trails",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Trails in the Sky 1st Chapter",
+    "Dino running from a FURRY: GAMESFORFARM",
+    "VZX Player - Illuminations",
+    "VZX Creative Visual Pack: Illuminations",
+    "Flux Fall – Abyss Pack",
+    "Random Acts of Madness",
+    "Stunt Legends",
+    "Last Epoch - Fractured Legend Supporter Pack",
+    "Mole & Ore - Supporter Pack",
+    "Axe And Claw",
+    "Positron",
+    "The Legend of Heroes: Trails in the Sky",
+    "Last Epoch - Fractured Vanquisher Supporter Pack",
+    "Flux Fall – Golden Hour",
+    "Ball-Aqua",
+    "Red Panda: The Quiet Path",
+    "Race Maniacs",
+    "Ball-Aqua Demo",
+    "20 Minute Metropolis - The Action City Builder",
+    "Dokimon Quest Soundtrack",
+    "The Hunter's Journals - Wyrmwood",
+    "The Rings of Powder - The weird world of the Elves",
+    "Four Paws",
+    "Burning Branch",
+    "Hold'em Fold'em Poker - Worlds Away",
+    "ZEROED",
+    "Touhou Mystia's Izakaya",
+    "Taskbar",
+    "Run Tank Run",
+    "Paperly 2",
+    "Gate & Grit: Motocross Tycoon",
+    "ΔV: Rings of Saturn - Asteroid Opera",
+    "Last Epoch - Enraged Templar Supporter Pack",
+    "Synergy Strike",
+    "Sly Crow",
+    "Remnants of Dawn",
+    "Spritify",
+    "MPE Keys",
+    "Breath of Fire IV",
+    "Matter MazeBall: Element Trials"
+   ]
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "TRAIL BRITE",
+     "alive": false,
+     "classes": [
+      "IC 011",
+      "IC 012"
+     ],
+     "owner": "R.E. DIETZ COMPANY (CORPORATION; NEW YORK, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Bright Trail Studio"
+    ]
+   ],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Lux Trail": {
+  "play_us": {
+   "titles": [
+    "TrailLink: Bike, Run, Walk",
+    "Rails-to-Trails Conservancy",
+    "The Next Trail",
+    "BlabApps LLC",
+    "Trail Sense",
+    "Trail Sense",
+    "Trailbot: MTB Trail Conditions",
+    "Trailbot Inc.",
+    "Trailintel",
+    "TrailIntel",
+    "Trailforks",
+    "Trailforks",
+    "Trailence",
+    "guillaume.lecousin",
+    "MotoTrail: Ride & Lean Angle",
+    "Vladusic",
+    "TRAIL - Long Exposure Camera",
+    "Hugo Software",
+    "Trail X Trail",
+    "Trail X Trail",
+    "TrailLegs: GPS Thru-Hike Maps",
+    "TrailLegs",
+    "AllTrails: Hike, Bike & Run",
+    "AllTrails, LLC",
+    "TrailX: Discover New Adventure",
+    "Air Microservices LLC.",
+    "Nykaa - Beauty Shopping App",
+    "NYKAA",
+    "Magic Trailz",
+    "Dutch Rose Media",
+    "TrailCollectiv - Family Hikes",
+    "TrailCollectiv",
+    "4x4 Mania",
+    "Dually Games",
+    "Trail Atlas Baltics",
+    "Normunds Neimanis",
+    "X-VPN: Fast VPN & Secure Proxy",
+    "LIGHTNINGLINK NETWORKS PTE. LTD.",
+    "Trail Explorer",
+    "TechontheEdge",
+    "Purplle Online Beauty Shopping",
+    "Purplle.com",
+    "Trailwise: Fell & Peak Bagging",
+    "Adam M Young",
+    "Track N Trail - Hunting & Maps",
+    "Track'n Trail",
+    "YesStyle: K-Beauty Destination",
+    "YESSTYLE.COM LIMITED",
+    "Talking Trail",
+    "Talking Trail, LLC",
+    "Extreme Makeover: Home Edition",
+    "Qiiwi Games AB",
+    "Trail Tracker: Hike, Run, Bike",
+    "Applab Studios",
+    "Tiny Rails - Train Tycoon 2026",
+    "Trophy Games - Tiny Rails Train Cargo Simulator",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "app.teovladusic.mototrail",
+    "app.traillegs",
+    "com.alltrails.alltrails",
+    "com.blabapps.thenexttrail",
+    "com.codename1.trailcollectiv",
+    "com.dutchrosemedia.magictrailz.drm",
+    "com.fsn.nykaa",
+    "com.hugosoftware.trail",
+    "com.kylecorry.trail_sense",
+    "com.manash.purplle",
+    "com.pinkbike.trailforks",
+    "com.qiiwi.extrememakeover",
+    "com.riders.trailxtrail",
+    "com.security.xvpn.z35kb",
+    "com.squaresharp.talkingtrail",
+    "com.tinytitanstudios.TrainChu",
+    "com.trackntrailapp.trackntrail",
+    "com.trailexplorers2.trailexplorers2",
+    "com.trailintel.app",
+    "com.yesstyle.android",
+    "io.trailwise.mobile",
+    "io.trailx.mobile",
+    "lv.gpx.app",
+    "net.limbersoft.offroad3a",
+    "org.railstotrails.traillink",
+    "studios.applab.mygpstrails",
+    "trailence.org",
+    "ventures.crossover.trails"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "TRAIL - Uzun Pozlama Kamera",
+    "Hugo Software",
+    "Magic Trailz",
+    "Dutch Rose Media",
+    "Trailence",
+    "guillaume.lecousin",
+    "TrailLegs: GPS Thru-Hike Maps",
+    "TrailLegs",
+    "Sky Trail",
+    "SayGames Ltd",
+    "Trailwise: Fell & Peak Bagging",
+    "Adam M Young",
+    "Trail Sense",
+    "Trail Sense",
+    "TrailX: Discover New Adventure",
+    "Air Microservices LLC.",
+    "Trail of Light",
+    "Gotzz Labes",
+    "₺66,99",
+    "Traillevel",
+    "traillevel",
+    "Tumblr—Fandom, Sanat, Özgürlük",
+    "Tumblr, Inc",
+    "Trail Explorer",
+    "TechontheEdge",
+    "Whale Trail Classic",
+    "ustwo games",
+    "₺10,99",
+    "AltoTrails: Maps, Bike & Hike",
+    "AltoTrails",
+    "Lux Light Meter Pro",
+    "Doggo Apps",
+    "Trail Control",
+    "1,21 GIGAWATTS",
+    "Color Wood Jam - Blok Bulmaca",
+    "LolTap",
+    "Trail Atlas Baltics",
+    "Normunds Neimanis",
+    "Nike: Sporcular İçin",
+    "Nike, Inc.",
+    "eBay online shopping & selling",
+    "eBay Mobile",
+    "Tiny Trail: Baby Memory Book",
+    "GKnot Studios LLC",
+    "SpeedTop VPN: Fast & Secure",
+    "SOON BODYWERKZ AUTO PTE. LTD.",
+    "Trailo: AI Trip Planner",
+    "Clevr Apps",
+    "TrailSync: Live group location",
+    "Lunkeybolt",
+    "Trailz",
+    "Lootheads",
+    "GPS Yürüyüş İzleyici",
+    "Applab Studios",
+    "Trail Log",
+    "Axon Studio",
+    "TripTrails: Travel Memories",
+    "Shexa Technolabs",
+    "Raidlight Trail Experience",
+    "Yoomigo"
+   ],
+   "ids": [
+    "altitude.alarm.erol.apps",
+    "app.traillegs",
+    "az.lux.rider",
+    "com.Athleticsoft.sayli",
+    "com.Gcenter.WindWings.SpaceShooter.Premium",
+    "com.Splitwise.SplitwiseMobile",
+    "com.axongps.traillog",
+    "com.doggoapps.luxlight",
+    "com.dprietoescandon.traillevel",
+    "com.dutchrosemedia.magictrailz.drm",
+    "com.ebay.mobile",
+    "com.ggamerblock.trailoflight.v2",
+    "com.gknot.cherishedmoments",
+    "com.gmlighting.luxcontrol",
+    "com.gps.trailx",
+    "com.hugosoftware.trail",
+    "com.jakyl.whaletrail",
+    "com.justgoodapps.trailo",
+    "com.kylecorry.trail_sense",
+    "com.linentrail.app",
+    "com.lootheads.trailz",
+    "com.lunkeybolt.trailsync",
+    "com.luxcaddy.androidapp",
+    "com.luxtra.app",
+    "com.miniclip.cricketleague",
+    "com.mytoursapp.android.app8826",
+    "com.nike.omega",
+    "com.ridgelinelabs.solunartrail",
+    "com.ronrajtech.ds.luxmeter",
+    "com.shexa.triptrails",
+    "com.smp.musicspeed",
+    "com.taxsee.taxsee",
+    "com.tinytitanstudios.TrainChu",
+    "com.tracedetrail.raidlight",
+    "com.trail.app",
+    "com.trail.game",
+    "com.trailexplorers2.trailexplorers2",
+    "com.trailrouter",
+    "com.tumblr",
+    "com.ustwo.whaletrailfrenzy"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Spectre Camera",
+    "Tradition - Trail Mobility",
+    "Trailbot: MTB Trail Conditions",
+    "MTB Project",
+    "REI Co-op – Shop Outdoor Gear",
+    "DORBA Trail Status",
+    "NaviMax Maps",
+    "Wandrer",
+    "BikeSpeed – GPS Speedometer",
+    "Nook: Trail & Hike Community",
+    "Happyrunbike",
+    "Yulu - top eBike sharing app",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Dimakerus",
+    "Dimakerus Demo"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Radiant Route": {
+  "play_us": {
+   "titles": [
+    "Radiant Route",
+    "TMIA Holdings",
+    "Radiant",
+    "Early Phantasm",
+    "$4.59",
+    "Radiant",
+    "SoftifyBD",
+    "Radiant",
+    "Manuel Loistl",
+    "Radiant Dash",
+    "hecaiji",
+    "RouteThis Helps (Route This)",
+    "RouteThis",
+    "Radiant Lines",
+    "NICMIT",
+    "RADIANT APP",
+    "Creative_Minds",
+    "RouTeD: AI Route Optimize",
+    "RouTeD",
+    "Radiant: Guardians Of Light",
+    "CHORRUS GAMES",
+    "50% off",
+    "Radiantfs",
+    "RADIANT FINANCIAL SERVICES",
+    "Radiant Frontline",
+    "Cygnux Softtech Pvt. Ltd.",
+    "Radiant: Christian TV",
+    "Dominion Broadcasting Inc.",
+    "RouteSync",
+    "A N Krishna Murthy",
+    "Route X Pro",
+    "Adjuster X LLC",
+    "RouteXK Ultimate Route Planner",
+    "BALANCED ANSWERS, UNIPESSOAL, LDA",
+    "Route",
+    "I.H.S",
+    "Route",
+    "Route Academy",
+    "Route One ELD Logbook",
+    "Route One Go",
+    "ROUTE ELD",
+    "ROUTE ELD",
+    "RadiantWiFi",
+    "Insbudcontrols",
+    "Route Pulse Techs",
+    "Route the Platform",
+    "route.plus",
+    "IQ Solution",
+    "Routerich Connect",
+    "Routerich",
+    "Radiant Planner",
+    "FORAT s.r.o.",
+    "Radiant Academy",
+    "Education Amy Media",
+    "Star Route",
+    "NaucMe.cz",
+    "$2.49",
+    "Radiant Queen",
+    "TagMango, Inc",
+    "Radiant Harvest Journey"
+   ],
+   "ids": [
+    "air.en.star",
+    "co.amy.vivii",
+    "com.Chorrus.Radiant",
+    "com.NICMIT.Dot2Dot",
+    "com.adjusterx.routex",
+    "com.beauty.plannner.schedul",
+    "com.cosmicdrift.game.shaperunner",
+    "com.creativeminds.radiantproject",
+    "com.cygnux.radiant_frontline",
+    "com.prismflow.lightbeam.reflect",
+    "com.radiant.radiantfs",
+    "com.radiantapp.app",
+    "com.radiantjournal.app",
+    "com.route.student",
+    "com.routedopt.app",
+    "com.routeeld.mobile",
+    "com.routeled.routeledsatnav",
+    "com.routepulsetech",
+    "com.routethis.networkanalyzer",
+    "com.routexl.ai",
+    "com.saqgamedev.radiant",
+    "com.softifybd.radiant",
+    "com.stephen.radiant.upgraded",
+    "com.tagmango.coachpriyanka",
+    "dev.eldstar.android",
+    "in.iincube.routesync",
+    "net.routerich.app",
+    "pl.iqsolution.route.plus",
+    "rrg.soutebyte.roal",
+    "tr.com.routeapp"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Radiant",
+    "HEXAGE",
+    "Radiant",
+    "Early Phantasm",
+    "₺254,99",
+    "Radiant",
+    "SoftifyBD",
+    "Radiant: Dijital Kamera & Film",
+    "Ari Pratama",
+    "Radiant",
+    "Manuel Loistl",
+    "Radiant Photo: AI Editor",
+    "Radiant Imaging Labs",
+    "RouTeD: AI Route Optimize",
+    "RouTeD",
+    "Radiant Dash",
+    "hecaiji",
+    "Route",
+    "Route Academy",
+    "Radiant: Guardians Of Light",
+    "CHORRUS GAMES",
+    "%50 indirim",
+    "Radiant Lines",
+    "NICMIT",
+    "route.plus",
+    "IQ Solution",
+    "Route",
+    "I.H.S",
+    "Radiant Defense",
+    "HEXAGE",
+    "RouteXK Ultimate Route Planner",
+    "BALANCED ANSWERS, UNIPESSOAL, LDA",
+    "Epic Route:Ahead",
+    "Stockpicker Inc",
+    "RADIANT APP",
+    "Creative_Minds",
+    "RouteSync",
+    "A N Krishna Murthy",
+    "RouteThis Helps (Route This)",
+    "RouteThis",
+    "Route GPS",
+    "Route GPS",
+    "RouteLed Navigation",
+    "Route-Led Group Limited",
+    "Routerich Connect",
+    "Routerich",
+    "Radiant Frontline",
+    "Cygnux Softtech Pvt. Ltd.",
+    "RadiantWiFi",
+    "Insbudcontrols",
+    "Andronix - Linux on Android",
+    "Andronix Apps",
+    "GSRTC",
+    "GSRTC Official Ticket Booking App.",
+    "RACE THE SUN ®",
+    "Flippfly LLC",
+    "Radiant Radiology Patient",
+    "Zed Technologies",
+    "Landeed: Instant Land Records",
+    "Landeed"
+   ],
+   "ids": [
+    "com.Chorrus.Radiant",
+    "com.NICMIT.Dot2Dot",
+    "com.cghdcf.gp",
+    "com.cosmicdrift.game.shaperunner",
+    "com.creativeminds.radiantproject",
+    "com.cygnux.radiant_frontline",
+    "com.flippfly.racethesun",
+    "com.greytip.ghress",
+    "com.gsrtc.mobileweb",
+    "com.landeed",
+    "com.radiantjournal.app",
+    "com.route.gps",
+    "com.route.student",
+    "com.routedopt.app",
+    "com.routeled.routeledsatnav",
+    "com.routethis.networkanalyzer",
+    "com.routexl.ai",
+    "com.saqgamedev.radiant",
+    "com.softifybd.radiant",
+    "com.stephen.radiant.upgraded",
+    "com.tamastudio.RadiantCamera",
+    "com.zedtechnologies.radiant.patient.droid",
+    "in.iincube.routesync",
+    "io.eyeq.dynamic",
+    "net.hexage.defense",
+    "net.hexage.radiant",
+    "net.routerich.app",
+    "pl.iqsolution.route.plus",
+    "studio.com.techriz.andronix",
+    "tr.com.routeapp"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Radiant Defense",
+    "Pleasant Routes",
+    "Cool Routes",
+    "BrightMaps",
+    "ShadePath: Comfort Routes",
+    "TitanRoute",
+    "Shade Walk: cool routes",
+    "TrackCover",
+    "StayCool: Walk in the Shade",
+    "Invasion Breaker: Idle clicker",
+    "SlopeSmart",
+    "SolMaps: Sun & Shade Routes",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Shipolis",
+    "Radiant Cell",
+    "Radiant Starlets",
+    "Shipolis Demo",
+    "Atlantis Fantasy: Reborn",
+    "The Devil Within: Satgat",
+    "Interstate 35",
+    "Blue Sign",
+    "Gilded Shoals",
+    "Pearlglow Cafe: Sweet Crumb Kisses",
+    "Erannorth Renaissance",
+    "Dawnforge Nightfall",
+    "Radiant Defense",
+    "CrystalLinker:Infinity",
+    "Arcath Tales",
+    "If My Heart Had Wings -Flight Diary-",
+    "Ember Frontier",
+    "暗月法则 Nightlune Rule",
+    "Phantom Cardia: Astral Card Duel",
+    "GodWright",
+    "Abandon All Hope",
+    "Peerless Destiny 绝世天命",
+    "Endless TD",
+    "VALE"
+   ]
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [
+    [
+     "exact",
+     "Radiant Route"
+    ]
+   ],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Lightloom": {
+  "play_us": {
+   "titles": [
+    "In-app purchases",
+    "Presets for Lightroom — FLTR",
+    "Mobile Presets & Filters",
+    "Photoshop Express Photo Editor",
+    "Adobe",
+    "Luminar: Photo Editor&Enhancer",
+    "Skylum Software",
+    "PREQUEL: Photo Editor, Filters",
+    "Prequel Inc.",
+    "Snapseed",
+    "Google LLC",
+    "Photoshop with AI Assistant",
+    "Adobe",
+    "VSCO: Photo Editor",
+    "VSCO",
+    "Picsart AI Photo Editor, Video",
+    "PicsArt, Inc.",
+    "Hypic - Photo Editor & AI Art",
+    "Bytedance Pte. Ltd.",
+    "Adobe Express: AI Photo, Video",
+    "Adobe",
+    "Lightleap by Lightricks",
+    "Lightricks Ltd.",
+    "AI Photo Editor - Lumii",
+    "InShot Video Editor",
+    "LightX AI Photo Editor Retouch",
+    "AndOr Communications Pvt Ltd",
+    "Canva: AI Photo & Video Editor",
+    "Canva",
+    "Remini - AI Photo Enhancer",
+    "Bending Spoons",
+    "Polarr: Photo Filters & Editor",
+    "Polarrcan",
+    "Photo Effects - LD",
+    "Lens Distortions",
+    "Evoto: Photo Editor & Retouch",
+    "TRUESIGHT PTE. LTD.",
+    "GoPro Quik: Video Editor",
+    "GoPro",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "com.adobe.lrmobile",
+    "com.adobe.photoshop.retail",
+    "com.adobe.psmobile",
+    "com.adobe.spark.post",
+    "com.bigwinepot.nwdn.international",
+    "com.canva.editor",
+    "com.feelty",
+    "com.gopro.smarty",
+    "com.lensdistortions.ld",
+    "com.lightricks.quickshot",
+    "com.lightx",
+    "com.niksoftware.snapseed",
+    "com.picsart.studio",
+    "com.prequel.app",
+    "com.skylum.luminar",
+    "com.truesight.evoto",
+    "com.vsco.cam",
+    "com.xt.retouchoversea",
+    "photo.editor.photoeditor.filtersforpictures",
+    "photo.editor.polarr"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Uygulama içi satın alma",
+    "Lightroom Ön Ayarlar — FLTR",
+    "Mobile Presets & Filters",
+    "Photoshop Express - Düzenleme",
+    "Adobe",
+    "PREQUEL: Fotoğraf & Video",
+    "Prequel Inc.",
+    "Adobe Photoshop: Photo Editor",
+    "Adobe",
+    "Picsart Foto ve Video Editörü",
+    "PicsArt, Inc.",
+    "Snapseed",
+    "Google LLC",
+    "Adobe Express: AI Foto, Video",
+    "Adobe",
+    "Luminar: Fotoğraf Editörü",
+    "Skylum Software",
+    "Fotoğraf Düzenleyici - Lumii",
+    "InShot Video Editor",
+    "Canva: AI Video Foto Düzenleme",
+    "Canva",
+    "VSCO: Foto & Video Düzenleyici",
+    "VSCO",
+    "Hypic - Photo Editor & AI Art",
+    "Bytedance Pte. Ltd.",
+    "Meitu: AI Foto & Video Editörü",
+    "Meitu (China) Limited",
+    "Remini - Fotoğraf Netleştirme",
+    "Bending Spoons",
+    "Photoroom: AI Fotoğraf & Video",
+    "Photoroom AI Photo Editor",
+    "Fotoğraf Düzenleyici – Polish",
+    "InShot Inc.",
+    "Lensa: avatar oluşturma, AI",
+    "Prisma Labs, Inc.",
+    "B612 AI Photo&Video Editor",
+    "SNOW Corporation",
+    "Adobe Premiere Video Düzen.",
+    "Adobe",
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": [
+    "com.adobe.lrmobile",
+    "com.adobe.photoshop.retail",
+    "com.adobe.premiere",
+    "com.adobe.psmobile",
+    "com.adobe.spark.post",
+    "com.bigwinepot.nwdn.international",
+    "com.canva.editor",
+    "com.feelty",
+    "com.lensa.app",
+    "com.linecorp.b612.android",
+    "com.mt.mtxx.mtxx",
+    "com.niksoftware.snapseed",
+    "com.photoroom.app",
+    "com.picsart.studio",
+    "com.prequel.app",
+    "com.skylum.luminar",
+    "com.vsco.cam",
+    "com.xt.retouchoversea",
+    "photo.editor.photoeditor.filtersforpictures",
+    "photo.editor.photoeditor.photoeditorpro"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Lightroom Photo Editor & Video",
+    "Presets for Lightroom - FLTR",
+    "VSCO: Photo & Video Editor",
+    "Photoshop Express Photo Editor",
+    "Snapseed: Photo Editor, Camera",
+    "Presets for Lightroom Editor",
+    "Adobe Photoshop: Photo Editor",
+    "Picsart AI Photo Editor, Video",
+    "Tezza: Aesthetic Photo Editor",
+    "Dreamy Room",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "LIGHTLOOM",
+     "alive": true,
+     "classes": [
+      "IC 025"
+     ],
+     "owner": "Zixiang Su (INDIVIDUAL; China)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "LIGHTLOOM",
+     "LIVE",
+     [
+      "IC 025"
+     ]
+    ]
+   ]
+  }
+ },
+ "Beamwise": {
+  "play_us": {
+   "titles": [
+    "Beam Bolt",
+    "Beam Data Company Limited",
+    "BEAM Program",
+    "UofM Mobile",
+    "Beam: Powered by Arc",
+    "Ultimate Drill Book",
+    "Beam - Culture",
+    "Zest Lab",
+    "BeamWire",
+    "BeamWire",
+    "Beam Lens",
+    "Beam Dynamics, Inc.",
+    "Beaming Healthy Marketplace",
+    "Beaming LLC",
+    "Beamer: Save, Pay & Invest",
+    "Redbiller Technologies Limited",
+    "Private Net Worth Tracker Beam",
+    "Aventive",
+    "Beam Calc: Beam, Frame & Truss",
+    "Nabil's Lab",
+    "Beam Space",
+    "Beam Space",
+    "Beam & Bloom: Logic Puzzle",
+    "TUUSIX",
+    "Homebase: Scheduling & Payroll",
+    "Homebase Team Management",
+    "bEAM Cloud",
+    "Bimser Çözüm",
+    "Beam Benefits",
+    "Beam Technologies Inc.",
+    "Beam Operations",
+    "Ride Beam",
+    "Beans View",
+    "Beans View",
+    "Workcloud Shift",
+    "Zebra Technologies Corporation",
+    "Blidz - Shop Deals, Save Money",
+    "Blidz",
+    "Beam Music",
+    "Ultimate Drill Book",
+    "Blackstar BEAM",
+    "Blackstar Amplification",
+    "VeSync",
+    "Vesync",
+    "EigenSpace: Quantum Physics 3D",
+    "Dr Abhishek",
+    "BeambePrep: MDCAT & UCAT Prep",
+    "Beambe",
+    "Workwise",
+    "Workwise GmbH",
+    "EverythingWeather",
+    "corymottice",
+    "BEAM BOOST",
+    "EO (Evangelische Omroep)",
+    "Brilliant: Learn Math & Coding",
+    "Brilliant.org",
+    "Beam: Torch Light with Shake",
+    "Dowble",
+    "BEAM AND PORTAL FRAME ANALYSIS",
+    "Ahmad Rodzaidi Bin Ahmad Faiz"
+   ],
+   "ids": [
+    "app.beam.prod",
+    "arc.beam",
+    "ca.umanitoba.beam",
+    "ch.aventive.sagefinance",
+    "com.beambeprep.app",
+    "com.beamcheckout.bolt",
+    "com.beamoperations",
+    "com.beamspace.beamspace",
+    "com.biddl.biddl",
+    "com.bimser.beamcloud",
+    "com.bvos.videoapp",
+    "com.ce.android.brand.superfoods",
+    "com.corymottice.wiseweather",
+    "com.eigenspace.app",
+    "com.etekcity.vesyncplatform",
+    "com.joinhomebase.homebase.homebase",
+    "com.lewes",
+    "com.nabil.beam",
+    "com.ram.chocolate.torch",
+    "com.redbiller.beamer_bank",
+    "com.rodzaidi.structuralengineering",
+    "com.sheet.music.app.android",
+    "com.sifrlabs.beamwire",
+    "com.tuusix.beamandbloom",
+    "com.zebra.workcloud.shift",
+    "de.campusjaeger.cordova",
+    "dental.beam.beamapp",
+    "io.beamdynamics.beamlens",
+    "nl.eo.beamboost",
+    "org.brilliant.android"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "RayLab",
+    "Optica-App",
+    "Henfolio",
+    "XP Health",
+    "OpenShape3D",
+    "ReFrame Moment",
+    "AppFlowy",
+    "xTool Creative Space Mobile",
+    "JigSpace: 3D & AR Viewer",
+    "BH Installer",
+    "Mockup Generator - Mocksy AI",
+    "3D Designs Handy for Bambu Lab",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "BEAMWISE",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Design Parametrics, Incorporated (CORPORATION; CALIFORNIA, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "BEAMWISE",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ]
+   ]
+  }
+ },
+ "Lumen Quest": {
+  "play_us": {
+   "titles": [
+    "Lumen",
+    "UNext Learning Private Limited",
+    "Lumen",
+    "Sergej Pril",
+    "Lumen - Metabolic Coach",
+    "Lumen.me",
+    "Lumen",
+    "HUUTUANDEV",
+    "Lumen",
+    "Lumen420",
+    "Lumen 3",
+    "Sergej Pril",
+    "Lumen",
+    "Avaneesh Verma",
+    "Lumen",
+    "T.creations",
+    "Lumen",
+    "DSI Labs",
+    "Lumen 3 Classic",
+    "Sergej Pril",
+    "$1.49",
+    "Lumen Cards",
+    "LUMEN",
+    "XTAN LIMITED",
+    "Lumen Edge",
+    "Sergej Pril",
+    "$1.49",
+    "Lumen - Flashcards App",
+    "MTS Studio",
+    "Lumen",
+    "OneJobDev",
+    "LumenIZE",
+    "ArcadiaReptile",
+    "Lumen: Bible, Verse & Prayer",
+    "Anzar Technologies LLC",
+    "Lumen",
+    "35MM",
+    "Lumen",
+    "Valentim Apps",
+    "Lumen",
+    "DC1",
+    "Lumen",
+    "Pizza Studio",
+    "LUMEN LEARNING APP",
+    "Education Brown Media",
+    "Lumen",
+    "Torrey Studio",
+    "Lumen Playground",
+    "Santi020k",
+    "Lumen",
+    "NOKIL SP",
+    "Lumen 2",
+    "Sergej Pril",
+    "$0.99",
+    "LUMEN - Your Guardian Angel",
+    "YEONG LOK KIM",
+    "Lumen CrossMath",
+    "ECOMEVANT",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "co.brown.odoxh",
+    "com.LumenMNG.Lumen",
+    "com.dcwavemeditations.app",
+    "com.dsi.app.auranova",
+    "com.flytodata.lumen",
+    "com.lumen.app.live",
+    "com.lumen.mh.app",
+    "com.lumenapp.android",
+    "com.lumengames.crossmath",
+    "com.lumenplay.lumenplay",
+    "com.metaflow.lumen",
+    "com.onejobdev.lumen",
+    "com.pizzastudio.lumen.camera",
+    "com.qh.app.arcadia",
+    "com.santi020k.lumen.playground.compose",
+    "com.spwatch.lumen",
+    "com.spwatch.lumen2",
+    "com.spwatch.lumen3",
+    "com.spwatch.lumen3classic",
+    "com.spwatch.lumenedge",
+    "com.talhaashraf.lumen",
+    "com.tiagoalmeida.photo_wedding.photo_wedding",
+    "com.torreystudio.lumen",
+    "com.unext.lumen",
+    "com.valentimcanejo.lumen",
+    "com.xtan.lumen",
+    "dev.mtsstudio.lumen",
+    "it.lumentv.mobile"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Lumen",
+    "UNext Learning Private Limited",
+    "Lumen",
+    "Sergej Pril",
+    "₺24,99",
+    "Lumen",
+    "Lumen420",
+    "LumenIZE",
+    "ArcadiaReptile",
+    "Lumen 3",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen",
+    "DSI Labs",
+    "Lumen",
+    "T.creations",
+    "Lumen",
+    "HUUTUANDEV",
+    "Lumen 3 Classic",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumen",
+    "35MM",
+    "Lumen Edge",
+    "Sergej Pril",
+    "₺53,99",
+    "Lumenen",
+    "Makary Hryshkin",
+    "Lumen",
+    "OneJobDev",
+    "LUMEN",
+    "XTAN LIMITED",
+    "Lumen",
+    "Avaneesh Verma",
+    "Lumen",
+    "Layers Education",
+    "Lumen",
+    "Alejandro Vladimir Castillo Ramirez",
+    "Native Lumen",
+    "Softland Corp",
+    "LumenAR",
+    "Turku Game Lab",
+    "Lumen",
+    "Valentim Apps",
+    "Lumen 2",
+    "Sergej Pril",
+    "₺24,99",
+    "LumenVPN - Fast & Secure Proxy",
+    "Sanyal",
+    "Lumen",
+    "Pizza Studio",
+    "LUMEN APP",
+    "Gileade Sistemas",
+    "Lumen",
+    "Torrey Studio",
+    "Lumen Playground",
+    "Santi020k",
+    "Lumen Rider",
+    "Snow_Games",
+    "LUMEN LEARNING APP"
+   ],
+   "ids": [
+    "br.com.gileade.lumenapp",
+    "co.brown.odoxh",
+    "com.LumenMNG.Lumen",
+    "com.TUAS.LumenAR",
+    "com.avcr.lumen",
+    "com.dsi.app.auranova",
+    "com.lumen.app.live",
+    "com.lumen.mh.app",
+    "com.lumenplay.lumenplay",
+    "com.native_lumen_mobile",
+    "com.onejobdev.lumen",
+    "com.pizzastudio.lumen.camera",
+    "com.qh.app.arcadia",
+    "com.santi020k.lumen.playground.compose",
+    "com.sheheryarahmed.lumenvpn",
+    "com.snowgames.lumenrider",
+    "com.spwatch.lumen",
+    "com.spwatch.lumen2",
+    "com.spwatch.lumen3",
+    "com.spwatch.lumen3classic",
+    "com.spwatch.lumenedge",
+    "com.stafford.vite.capacitor",
+    "com.talhaashraf.lumen",
+    "com.tiagoalmeida.photo_wedding.photo_wedding",
+    "com.torreystudio.lumen",
+    "com.unext.lumen",
+    "com.valentimcanejo.lumen",
+    "com.xtan.lumen",
+    "digital.tenda.edu.lumen",
+    "it.lumentv.mobile"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "LUMEN Device Control",
+    "Lumen Home",
+    "The Quest - Hero of Lukomorye5",
+    "Lumen: Make a light",
+    "Lumen: Survive the Darkness",
+    "Arrow Lumen",
+    "The Quest - Hero of Lukomorye4",
+    "Lume Control",
+    "Free Flashlight Glow",
+    "Ride Lumos",
+    "Lumen Breaker: Brick Quest",
+    "VibeFlash - LED Flashlight",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": [
+    "Aggelos",
+    "Lumen",
+    "Gilt",
+    "A Drop of Color",
+    "The Shores of Stellaluna",
+    "Guardians of Lumen",
+    "Exit From: Director's Cut",
+    "Golden Kingdom VR Demo",
+    "CRABS MUST DIE!",
+    "Aatral Origins",
+    "Seed of Nostalgia",
+    "The Last Of Morvein",
+    "Cyberphobia: Prologue - Expansion Pass 43",
+    "Sherpa's Caravan",
+    "Ringborn",
+    "Downfall MMORPG",
+    "Run and Gun 2: Opossum City",
+    "Sherpa's Caravan Demo"
+   ]
+  },
+  "uspto": {
+   "total": 2,
+   "marks": [
+    {
+     "mark": "LUMINQUEST",
+     "alive": true,
+     "classes": [
+      "IC 014"
+     ],
+     "owner": "Liu, Qing (INDIVIDUAL; CHINA)",
+     "serial": null
+    },
+    {
+     "mark": "LUMENQUEST",
+     "alive": true,
+     "classes": [
+      "IC 041"
+     ],
+     "owner": "LightMode Ministries LLC (LIMITED LIABILITY COMPANY; Georgia, USA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "exact",
+     "LUMENQUEST",
+     "LIVE",
+     [
+      "IC 041"
+     ]
+    ]
+   ]
+  }
+ }
+}

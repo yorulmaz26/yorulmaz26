@@ -1,0 +1,1181 @@
+{
+ "Lumiway": {
+  "play_us": {
+   "titles": [
+    "Inter Banking & Money Transfer",
+    "Banco Inter SA",
+    "Lumosity: Brain Training Games",
+    "Lumos Labs, Inc.",
+    "Wellhub (Gympass)",
+    "Gympass",
+    "LumiQ",
+    "LumiQ",
+    "Firefox Focus: No Fuss Browser",
+    "Mozilla",
+    "Lightway Remittance",
+    "Lightway Finance",
+    "Lume: The World of an Album",
+    "Lume Music Limited",
+    "LaserAway",
+    "LaserAway Medical Group, INC.",
+    "Coachway",
+    "Coachway",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "br.com.intermedium",
+    "com.gympass",
+    "com.laseraway.mobile",
+    "com.lightfinance",
+    "com.lumemusic.lume",
+    "com.luminari.lumiq",
+    "com.lumoslabs.lumosity",
+    "dk.coachway.app",
+    "org.mozilla.focus"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Gemini",
+    "Google LLC",
+    "ChatGPT",
+    "OpenAI",
+    "Google Asistan",
+    "Google LLC",
+    "CapCut: Video & Photo Editor",
+    "Bytedance Pte. Ltd.",
+    "Claude by Anthropic",
+    "Anthropic PBC",
+    "Canva: AI Video Foto Düzenleme",
+    "Canva",
+    "Dola: Akıllı AI Asistanı",
+    "SPRING (SG) PTE. LTD.",
+    "Grok",
+    "SpaceX Super Intelligence",
+    "Picsart Foto ve Video Editörü",
+    "PicsArt, Inc.",
+    "Lumi AI: Чат и Roleplay",
+    "Lumi ai",
+    "Perplexity - Ask Anything",
+    "PerplexityAI",
+    "Lumosity - Zihin Jimnastiği",
+    "Lumos Labs, Inc.",
+    "Meta AI",
+    "Meta Platforms, Inc.",
+    "ElevenLabs: AI Voice Generator",
+    "Eleven Labs Inc",
+    "Lumi by Nextcare",
+    "Nextcare",
+    "Manus AI: Video, Slayt",
+    "BUTTERFLY EFFECT PTE. LTD.",
+    "Meitu: AI Foto & Video Editörü",
+    "Meitu (China) Limited",
+    "Remini - Fotoğraf Netleştirme",
+    "Bending Spoons",
+    "Gemini Notebook",
+    "Google LLC",
+    "DeepSeek - AI Asistan",
+    "DeepSeek",
+    "DeepL Translate",
+    "DeepL SE",
+    "Fotoğraf Düzenleyici - Lumii",
+    "InShot Video Editor",
+    "Lumi - AI Video & Chat",
+    "trodo.studio",
+    "Lumi - Super AI App",
+    "LAST ORDER PLATFORM E COMMERCE",
+    "Lumi: vibe coding app",
+    "Lumi Innovation",
+    "Character AI: Chat, Talk, Text",
+    "Character.AI",
+    "Viway",
+    "Strength Of Connection",
+    "Wellhub (Gympass)",
+    "Gympass",
+    "Luzia: AI Assistant & Chat ",
+    "FACTORIA ELCANO SL",
+    "Kling AI: AI Image&Video Maker",
+    "KLING AI"
+   ],
+   "ids": [
+    "ai.character.app",
+    "ai.perplexity.app.android",
+    "ai.x.grok",
+    "co.thewordlab.luzia",
+    "com.anthropic.claude",
+    "com.bigwinepot.nwdn.international",
+    "com.canva.editor",
+    "com.deepl.mobiletranslator",
+    "com.deepseek.chat",
+    "com.facebook.stella",
+    "com.google.android.apps.bard",
+    "com.google.android.apps.googleassistant",
+    "com.google.android.apps.labs.language.tailwind",
+    "com.gympass",
+    "com.larus.wolf",
+    "com.lastorder.app",
+    "com.lemon.lvoverseas",
+    "com.lumi.ai.app",
+    "com.lumiapp.ai",
+    "com.lumoslabs.lumosity",
+    "com.mt.mtxx.mtxx",
+    "com.nextcare.app",
+    "com.openai.chatgpt",
+    "com.picsart.studio",
+    "com.viway.socjsc",
+    "io.elevenlabs.coreapp",
+    "kling.ai.video.chat",
+    "lumi.ai",
+    "photo.editor.photoeditor.filtersforpictures",
+    "tech.butterfly.app"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "iHerb: Vitamins & Supplements",
+    "Hers: Women’s Healthcare",
+    "Probiotic Guide USA",
+    "Fullscript",
+    "Bloume: Period & Cycle Tracker",
+    "The Vitamin Shoppe - VShoppe",
+    "WOMY · Cycle Nutrition Sport",
+    "Viome",
+    "Provin",
+    "Naturitas: Natural Health",
+    "Allara",
+    "Sakara Life",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 2,
+   "marks": [
+    {
+     "mark": "LUMIWAY",
+     "alive": true,
+     "classes": [
+      "IC 005"
+     ],
+     "owner": "Krasilnikov, Yurii (INDIVIDUAL; Ukraine)",
+     "serial": null
+    },
+    {
+     "mark": "LUMIWAY",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "Nanjing Tuda Automotive Products Co., Ltd. (LIMITED LIABILITY COMPANY; CHINA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "LUMIWAY",
+     "LIVE",
+     [
+      "IC 005"
+     ]
+    ],
+    [
+     "LUMIWAY",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ]
+   ]
+  }
+ },
+ "Prismora": {
+  "play_us": {
+   "titles": [
+    "Prismora: Wallpapers & Live",
+    "DU Labs",
+    "Prismora: Cube Puzzle",
+    "KU GAMEs",
+    "Prismora",
+    "SmartBuildHub",
+    "Prismora: Block Puzzle Jewel",
+    "LR Media",
+    "Prismora: Gem Art Puzzle",
+    "Innovation.games.apps.nextsol",
+    "Prismora: Rolling Block Puzzle",
+    "KoBu",
+    "Prismora Blast: Game World",
+    "Yash Bajpai",
+    "Prismora 3D—Live 4K Wallpapers",
+    "Techhub254",
+    "Prismora",
+    "Lutungcode",
+    "Prismora Light & Match",
+    "Hunbowl",
+    "Prismora",
+    "Quynhdev",
+    "Prismora: Crystal Kingdom",
+    "AHMET BAŞYİĞİT",
+    "Prism Pro",
+    "hemu123",
+    "Prisma Art Effect Photo Editor",
+    "Prisma Labs, Inc.",
+    "Prizmora",
+    "BedoGames",
+    "PRISMCORE",
+    "trueinnovations",
+    "Picora: Cartoon Photo Editor",
+    "Gorba Apps",
+    "Prismo: Remember All You Learn",
+    "Prismo Labs",
+    "Prism: Daily Puzzle",
+    "kssc0112",
+    "Prism: Learning Made Visible",
+    "Prism Portfolios",
+    "Runora: Virtual Run & Marathon",
+    "Pixora Technologies",
+    "Fishora",
+    "Frants Guk",
+    "Panora",
+    "nexcode",
+    "LAYORA: Perfume Layering",
+    "Nois7 Ltd",
+    "Ampora - AI for Electricians",
+    "KorvaTech",
+    "PRISMAremote Monitoring",
+    "Canon Inc.",
+    "Prism AI: Daily Self-Care",
+    "Mia Design Studio",
+    "Prisma Browser for Intune",
+    "Palo Alto Networks",
+    "Prism: Connect & Belong",
+    "Plume Health Inc",
+    "Prismo: Lab & Medical Reports",
+    "Criscent LLC"
+   ],
+   "ids": [
+    "ae.apexsports.prism",
+    "app.deenora",
+    "app.picora",
+    "co.getplume.community",
+    "com.app.prismora3d",
+    "com.bpm.theia",
+    "com.criscent.prismo",
+    "com.dentameda.prizmora",
+    "com.dulabs.wallora",
+    "com.easyep.prisma",
+    "com.elial.prismo",
+    "com.frants.fishora",
+    "com.gks.gem.art.puzzle",
+    "com.goprisma.residents",
+    "com.hunbowl.prismoralightmatch",
+    "com.invin.prismora",
+    "com.jrustonapps.myauroraforecastpro",
+    "com.kobugames.prismora",
+    "com.korvatech.ampora",
+    "com.layora.layora",
+    "com.light.prismcore",
+    "com.lrmedia.prismora",
+    "com.lutungcode.prismora",
+    "com.miadesignstudio.prythme",
+    "com.mintora.app",
+    "com.myemg.app",
+    "com.neuralprisma",
+    "com.nexcode.panora",
+    "com.obsidya.kupatlasi",
+    "com.pixora.runora",
+    "com.poweramp.v3.aurora",
+    "com.primspro.gls.app",
+    "com.prism.launcher",
+    "com.prismal.prismalpro",
+    "com.prismgame.prism",
+    "com.prismorablast.game",
+    "com.prismplural.prism",
+    "com.quynhdev.Prismora",
+    "com.rydora.app",
+    "com.smartbuildhub.prismora"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Prismora: Cube Puzzle",
+    "KU GAMEs",
+    "Prismora: Wallpapers & Live",
+    "DU Labs",
+    "Prismora: Gem Art Puzzle",
+    "Innovation.games.apps.nextsol",
+    "Prismora",
+    "SmartBuildHub",
+    "Prismora Blast: Game World",
+    "Yash Bajpai",
+    "Prismora",
+    "Lutungcode",
+    "Prismora: Küp Bulmacası",
+    "KoBu",
+    "Prismora",
+    "Quynhdev",
+    "Prismora Light & Match",
+    "Hunbowl",
+    "Prismora: Block Puzzle Jewel",
+    "LR Media",
+    "Prismora: Kristal Krallık",
+    "AHMET BAŞYİĞİT",
+    "Prisma",
+    "Prisma Labs, Inc.",
+    "Prismora 3D—Live 4K Wallpapers",
+    "Techhub254",
+    "Prisma Browser",
+    "Palo Alto Networks",
+    "Prisma",
+    "Prisma Payments SL",
+    "Prism Pro",
+    "hemu123",
+    "PRISMA",
+    "Primare",
+    "PRISMCORE",
+    "trueinnovations",
+    "Prisma Browser for Intune",
+    "Palo Alto Networks",
+    "PrismalPro",
+    "prismalsat",
+    "Prisma3D: Animasyon, Modelleme",
+    "Prisma3D",
+    "Picora: Cartoon Photo Editor",
+    "Gorba Apps",
+    "PRISMA",
+    "BraveBots",
+    "Prisma Plus",
+    "The Members",
+    "PRISM Live Studio: Games & IRL",
+    "NAVER Corp.",
+    "PRISMAremote Monitoring",
+    "Canon Inc.",
+    "Prizmora",
+    "BedoGames",
+    "Runora: Virtual Run & Marathon",
+    "Pixora Technologies",
+    "Prism: Learning Made Visible",
+    "Prism Portfolios",
+    "LAYORA: Parfüm Katmanlama",
+    "Nois7 Ltd"
+   ],
+   "ids": [
+    "app.deenora",
+    "app.picora",
+    "app.rawflow.app",
+    "com.app.prismora3d",
+    "com.bart.prisma",
+    "com.canelitagames.prismaflow",
+    "com.criscent.prismo",
+    "com.cyberlink.photodirector",
+    "com.dentameda.prizmora",
+    "com.devora.app",
+    "com.dulabs.wallora",
+    "com.easyep.prisma",
+    "com.elial.prismo",
+    "com.frants.fishora",
+    "com.gks.gem.art.puzzle",
+    "com.hansong.primarelinkhd",
+    "com.harwin.prismatica",
+    "com.hunbowl.prismoralightmatch",
+    "com.invin.prismora",
+    "com.jrustonapps.myauroraforecastpro",
+    "com.kobugames.prismora",
+    "com.layora.layora",
+    "com.light.prismcore",
+    "com.lrmedia.prismora",
+    "com.lutungcode.prismora",
+    "com.neuralprisma",
+    "com.nexcode.panora",
+    "com.obsidya.kupatlasi",
+    "com.pixora.runora",
+    "com.primspro.gls.app",
+    "com.prism.live",
+    "com.prisma3D.prisma3D",
+    "com.prismal.prismalpro",
+    "com.prismanovo.mobile",
+    "com.prismmonitor",
+    "com.prismorablast.game",
+    "com.project.aimotech.printmaster",
+    "com.quynhdev.Prismora",
+    "com.rydora.app",
+    "com.sisteplant.prisma"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Prismora: Gem Match Puzzle",
+    "Prism Toy",
+    "Convoochat",
+    "Tilted Prism",
+    "Prismara: Light Puzzle",
+    "Prism Sands",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 2,
+   "marks": [
+    {
+     "mark": "PRISMORA CENTER",
+     "alive": false,
+     "classes": [
+      "IC 035"
+     ],
+     "owner": "Syed Mohsin Jilani (INDIVIDUAL; USA)",
+     "serial": null
+    },
+    {
+     "mark": "PRISMORA",
+     "alive": true,
+     "classes": [
+      "IC 012"
+     ],
+     "owner": "Shouguang Yiwan Electronic Trading Co., Ltd. (limited company (ltd.); CHINA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Prismora: Wallpapers & Live"
+    ],
+    [
+     "contains",
+     "Prismora: Cube Puzzle"
+    ],
+    [
+     "exact",
+     "Prismora"
+    ],
+    [
+     "contains",
+     "Prismora: Block Puzzle Jewel"
+    ],
+    [
+     "contains",
+     "Prismora: Gem Art Puzzle"
+    ],
+    [
+     "contains",
+     "Prismora: Rolling Block Puzzle"
+    ],
+    [
+     "contains",
+     "Prismora Blast: Game World"
+    ],
+    [
+     "contains",
+     "Prismora 3D—Live 4K Wallpapers"
+    ],
+    [
+     "exact",
+     "Prismora"
+    ],
+    [
+     "contains",
+     "Prismora Light & Match"
+    ],
+    [
+     "exact",
+     "Prismora"
+    ],
+    [
+     "contains",
+     "Prismora: Crystal Kingdom"
+    ]
+   ],
+   "play_tr": [
+    [
+     "contains",
+     "Prismora: Cube Puzzle"
+    ],
+    [
+     "contains",
+     "Prismora: Wallpapers & Live"
+    ],
+    [
+     "contains",
+     "Prismora: Gem Art Puzzle"
+    ],
+    [
+     "exact",
+     "Prismora"
+    ],
+    [
+     "contains",
+     "Prismora Blast: Game World"
+    ],
+    [
+     "exact",
+     "Prismora"
+    ],
+    [
+     "contains",
+     "Prismora: Küp Bulmacası"
+    ],
+    [
+     "exact",
+     "Prismora"
+    ],
+    [
+     "contains",
+     "Prismora Light & Match"
+    ],
+    [
+     "contains",
+     "Prismora: Block Puzzle Jewel"
+    ],
+    [
+     "contains",
+     "Prismora: Kristal Krallık"
+    ],
+    [
+     "contains",
+     "Prismora 3D—Live 4K Wallpapers"
+    ]
+   ],
+   "appstore_us": [
+    [
+     "contains",
+     "Prismora: Gem Match Puzzle"
+    ]
+   ],
+   "steam": [],
+   "uspto": [
+    [
+     "PRISMORA CENTER",
+     "dead",
+     [
+      "IC 035"
+     ]
+    ],
+    [
+     "PRISMORA",
+     "LIVE",
+     [
+      "IC 012"
+     ]
+    ]
+   ]
+  }
+ },
+ "Beamora": {
+  "play_us": {
+   "titles": [
+    "Beamora: Screen Mirror & Cast",
+    "NITESH",
+    "Beamora TV: Screen Receiver",
+    "DUVACON",
+    "SurfaBeam - Pro Projection Map",
+    "Secundum Reality",
+    "Screen Mirroring: Cast to TV",
+    "DUVACON",
+    "Beamafilm for Android TV",
+    "Beamafilm Pty Ltd",
+    "beam Home",
+    "Beam Labs",
+    "Beamafilm",
+    "Beamafilm Pty Ltd",
+    "Beam Stream TV",
+    "BEAM Internet",
+    "BEAM Program",
+    "UofM Mobile",
+    "Beam Bolt",
+    "Beam Data Company Limited",
+    "BeamWire",
+    "BeamWire",
+    "Beam: Powered by Arc",
+    "Ultimate Drill Book",
+    "Beam Stream Plus",
+    "BEAM Internet",
+    "A-Beam Pro",
+    "Anan R.",
+    "$4.99",
+    "Beam Lens",
+    "Beam Dynamics, Inc.",
+    "Beamer: Save, Pay & Invest",
+    "Redbiller Technologies Limited",
+    "Beam - Culture",
+    "Zest Lab",
+    "Mirror Beam: Laser Puzzle",
+    "Devtrox",
+    "Beam Operations",
+    "Ride Beam",
+    "deBeam - Secure File Transfer",
+    "Tan Vi",
+    "Rosarium Pro",
+    "Carlo Sacchetti lab",
+    "Beam TV+",
+    "EspialTV",
+    "Rydora",
+    "TRID TECH DOO",
+    "Beam Music",
+    "Ultimate Drill Book",
+    "Beam & Bloom: Logic Puzzle",
+    "TUUSIX",
+    "Filmora: AI Video Editor&Maker",
+    "Wondershare Filmora",
+    "Fishora",
+    "Frants Guk",
+    "Beam: Torch Light with Shake",
+    "Dowble",
+    "Beam Space",
+    "Beam Space",
+    "Aurzen AuroraBeam"
+   ],
+   "ids": [
+    "app.beam.prod",
+    "arc.beam",
+    "ca.umanitoba.beam",
+    "com.ananratana.mg.abeampro",
+    "com.beamafilm",
+    "com.beamafilm.tv",
+    "com.beamcheckout.bolt",
+    "com.beamoperations",
+    "com.beamora.cast",
+    "com.beamora.mirror.cast",
+    "com.beamora.tv",
+    "com.beamspace.beamspace",
+    "com.beamstream",
+    "com.carlosacchetti.rosarium_pro",
+    "com.ctvbeam.ytvn.tv.platform",
+    "com.devitan.debeam",
+    "com.devtrox.laser.path.mirror.beam.reflection.puzzle",
+    "com.espial.elevate.custom.novus",
+    "com.frants.fishora",
+    "com.ram.chocolate.torch",
+    "com.redbiller.beamer_bank",
+    "com.rydora.app",
+    "com.secundumreality.surfabeampro",
+    "com.sheet.music.app.android",
+    "com.sifrlabs.beamwire",
+    "com.smart.zencosmo",
+    "com.tuusix.beamandbloom",
+    "com.wondershare.filmorago",
+    "io.beamdynamics.beamlens",
+    "io.beamlabs.android"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "티머니GO - 택시 고속시외 따릉이 킥보드",
+    "(주)티머니모빌리티",
+    "Beamora TV: Yansıtma Alıcısı",
+    "DUVACON",
+    "Beam: Powered by Arc",
+    "Ultimate Drill Book",
+    "Beamora: Screen Mirror & Cast",
+    "NITESH",
+    "Ekran Yansıtma: TV'ye Bağlan",
+    "DUVACON",
+    "LED Laser Beam Klavye Arkaplan",
+    "Fancy keyboard Themes Studio",
+    "Yeni Havalı Blue Neon Fonts Te",
+    "Fancy keyboard for theme apps",
+    "Ora-X Purple Beam",
+    "Ora-X",
+    "₺11,99",
+    "Prism Link: Renk Bulmaca Oyunu",
+    "Navistella",
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": [
+    "arc.beam",
+    "com.beamora.cast",
+    "com.beamora.mirror.cast",
+    "com.beamora.tv",
+    "com.ikeyboard.theme.blue.neon.tech.beam",
+    "com.ikeyboard.theme.led.laser.beam",
+    "cris.wmwatch.OraXPurpleBeam.analog",
+    "dev.navistella.prism_link",
+    "kr.co.tmoney.tia"
+   ]
+  },
+  "appstore_us": {
+   "titles": [
+    "Temp Mail by Priyo Mail",
+    "ShopAZ",
+    "Efteling",
+    "mojeIKP - log in to health",
+    "Qare - Consultez un médecin",
+    "Proofme",
+    "1 Star",
+    "eAccess Mobile",
+    "NotiaNote",
+    "TUI | Travel, Flights & Hotels",
+    "De Telegraaf",
+    "InboxAI – AI Email Writer",
+    "inbox.la",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 2,
+   "marks": [
+    {
+     "mark": "BEAMORA",
+     "alive": true,
+     "classes": [
+      "IC 026"
+     ],
+     "owner": "Yongliang Xu (INDIVIDUAL; CHINA)",
+     "serial": null
+    },
+    {
+     "mark": "BEAMORA",
+     "alive": true,
+     "classes": [
+      "IC 009"
+     ],
+     "owner": "Shenzhen Huanqiu Tesco E-Commerce Co., Ltd. (limited company (ltd.); CHINA)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [
+    [
+     "contains",
+     "Beamora: Screen Mirror & Cast"
+    ],
+    [
+     "contains",
+     "Beamora TV: Screen Receiver"
+    ]
+   ],
+   "play_tr": [
+    [
+     "contains",
+     "Beamora TV: Yansıtma Alıcısı"
+    ],
+    [
+     "contains",
+     "Beamora: Screen Mirror & Cast"
+    ]
+   ],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "BEAMORA",
+     "LIVE",
+     [
+      "IC 026"
+     ]
+    ],
+    [
+     "BEAMORA",
+     "LIVE",
+     [
+      "IC 009"
+     ]
+    ]
+   ]
+  }
+ },
+ "Raylume": {
+  "play_us": {
+   "titles": [
+    "Artlume",
+    "We3World Ltd",
+    "RAY - Run Against Yourself",
+    "Moula Software",
+    "Pocket FM: Audio Dramas",
+    "PocketFM",
+    "RA Monitor",
+    "RPM Healthcare",
+    "A Soft Murmur",
+    "Sleepy Rabbit LLC",
+    "Illume RGBW",
+    "Dals Lighting",
+    "Relay™ by Luminultra",
+    "LuminUltra Technologies Ltd.",
+    "Room on the Broom: Games",
+    "Magic Light Pictures",
+    "Rymo: AI Music Video Maker",
+    "PROMINENT FORTUNE PTE. LTD.",
+    "Relevant Radio+",
+    "Relevant Radio, Inc.",
+    "Raymote",
+    "Raypak Inc",
+    "Ray Relay",
+    "Pixel Pudding Games",
+    "RENPHO Health",
+    "Joicom corporation",
+    "RAYNOLSE",
+    "raynolse official",
+    "Lumera AI: Food Video Maker",
+    "Zoomerang, Inc.",
+    "Fireplume",
+    "Fireplume",
+    "Lojong: Meditation & Sleep",
+    "Lojong Meditation, Mindfulness and Sleep",
+    "Fy Ring",
+    "MedVigilance Inc.",
+    "Harmony®",
+    "Logitech Europe S.A.",
+    "Lumenate: Explore & Relax",
+    "Lumenate",
+    "Google Arts & Culture",
+    "Google LLC",
+    "ReikiAll - Reiki Timer",
+    "Ricardo V. Del Frari",
+    "Pixlume - AI Couple Generator",
+    "FUTURE GENERATOR PTE. LTD.",
+    "Ray Padula",
+    "Ray Padula Holdings",
+    "Drumplume",
+    "Zzz Animation",
+    "Filmora Lite: AI Video Creator",
+    "Wondershare Filmora",
+    "LumaShare Share/Print Station",
+    "Lumasoft",
+    "Rawly: Photo & Video Challenge",
+    "Rawly",
+    "FLIR ONE",
+    "FLIR Systems Aktiebolag",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "air.com.magiclightpictures.rotb",
+    "br.com.lojong",
+    "cc.blynk.appexport.raypak",
+    "co.lumasoft.lumashare",
+    "co.tapcart.app.id_5xnIzkDCAC",
+    "com.RayRelayCipcCompany.RayRelay",
+    "com.fireplume.app",
+    "com.flir.flirone",
+    "com.gabemart.asoftmurmur",
+    "com.google.android.apps.cultural",
+    "com.healthmonitor.ramonitor",
+    "com.illume.wifi",
+    "com.logitech.harmonyhub",
+    "com.lumenate.lumenateaa",
+    "com.luminultra.relay",
+    "com.moulasoftware.ray",
+    "com.radio.pocketfm",
+    "com.rawly.app",
+    "com.raynolse",
+    "com.renpho.health",
+    "com.rica.reikiall",
+    "com.rymo.musicvideo",
+    "com.wondershare.filmorago.ai",
+    "com.yantech.studiopilot",
+    "com.zzz.drumplume",
+    "io.artlume.mobile",
+    "io.livelog.ring.mv_ring",
+    "net.pixlume.film",
+    "ott.relevantradio"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "Alwaysby: Pet Memorial",
+    "PawFav - Custom Pet Portraits",
+    "soulepets: Pet Journal&Tribute",
+    "My Pet Art: Designs & Gifts",
+    "PokiCandle - Pet Memorial",
+    "Memoriq - Reunion",
+    "AI Pet Studio: AI Video Maker",
+    "PetSmart",
+    "Olive & Fable",
+    "SoulBridge: Pet Loss Memorial",
+    "Veilo: Your Memories",
+    "PetDesk",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 1,
+   "marks": [
+    {
+     "mark": "RAYLUME",
+     "alive": false,
+     "classes": [
+      "IC 011"
+     ],
+     "owner": "NITINOU LIMITED (limited company (ltd.); China)",
+     "serial": null
+    }
+   ]
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": [
+    [
+     "RAYLUME",
+     "dead",
+     [
+      "IC 011"
+     ]
+    ]
+   ]
+  }
+ },
+ "Lumibeam": {
+  "play_us": {
+   "titles": [
+    "deBeam - Secure File Transfer",
+    "Tan Vi",
+    "LightBeam - Quick Flashlight",
+    "SmartToolsDev",
+    "LUMINESS",
+    "Luminess Direct LLC",
+    "StreamingBeam",
+    "Blumonic LLC",
+    "Flashlight - PowerBeam",
+    "shemZa App",
+    "LUMINESS",
+    "Luminess Direct LLC",
+    "Lightbeam Courier",
+    "Lightbeam Courier Ltd.",
+    "AireBeam",
+    "FIF AireBeam LLC",
+    "LumiSync: Jet Lag Planner",
+    "L CUBE YOO",
+    "VeloBeam",
+    "HIGHC LABS LLC",
+    "Lumi: vibe coding app",
+    "Lumi Innovation",
+    "Lumi - AI Video & Chat",
+    "trodo.studio",
+    "Reachbeam: RDP VNC SSH Remote",
+    "DividedBits",
+    "Lumi: Movies, TV & Discovery",
+    "Saurabh Odukle",
+    "LUMISONATA3.0",
+    "LUMISONATA",
+    "SmartBeam",
+    "SAFETY APPDEVTEAM",
+    "Mirror Beam: Laser Puzzle",
+    "Devtrox",
+    "LUMISONATA2.0",
+    "LUMISONATA",
+    "Lumin - Pro Connect",
+    "Lumin Fitness",
+    "Lumie｜AI感情日記・気分記録アプリ",
+    "nano-invitation",
+    "lumini",
+    "lumini lab",
+    "Lumi: AI for NEET, JEE & USMLE",
+    "Aikolumi",
+    "Lumi - Estudo espírita diário",
+    "EquipeA",
+    "Lumi - Super AI App",
+    "LAST ORDER PLATFORM E COMMERCE",
+    "Lumi - Expenses & Savings",
+    "Coast Solutions OÜ",
+    "LumiLink by SEAMAID",
+    "Alphadif",
+    "Lumi",
+    "Lumi Pass",
+    "Lumify",
+    "Apice Dev",
+    "LUMI – Unimedizin Leipzig",
+    "Universitätsklinikum Leipzig AöR",
+    "Lumi Phone",
+    "ZIAMORE LIFESTYLES"
+   ],
+   "ids": [
+    "br.com.lumini",
+    "br.org.fems.promu",
+    "ca.lum.lummobile",
+    "co.smartbeam.app",
+    "co.tapcart.app.id_yi1skKB1mM",
+    "com.aikolumi.neet",
+    "com.airebeam.smarthome",
+    "com.alphadif.seamaid.lumilink",
+    "com.base6a82b139251776aa124417a5.app",
+    "com.blumonicllc.streamingbeam",
+    "com.devitan.debeam",
+    "com.devtrox.laser.path.mirror.beam.reflection.puzzle",
+    "com.dividedbits.app.reachbeam",
+    "com.educabr.dailylight",
+    "com.flashlight.power.beam.shine",
+    "com.getlumi.lumiapp",
+    "com.hhl.lumisketch",
+    "com.i4season.smart_sketcher",
+    "com.lastorder.app",
+    "com.lightbeam.courier",
+    "com.londonx.fluorine_flt",
+    "com.lumi.ai.app",
+    "com.lumiapp.ai",
+    "com.lumiapp.mirror",
+    "com.lumicast.player",
+    "com.lumikit.lumiliterc",
+    "com.luminessair",
+    "com.lumiphone.mobile",
+    "com.lumiplayerpro.app",
+    "com.lumisync.app",
+    "com.luther",
+    "com.mjhoracek.velobeam",
+    "com.mm.android.ka",
+    "com.mywellnessportal.net",
+    "com.nanoinvitation.diaryapp",
+    "com.nms.parent",
+    "com.odukle.cineverse",
+    "com.qh.fgy",
+    "com.simgo",
+    "com.smart.zencosmo"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "Feit Electric",
+    "LUMI Outdoor",
+    "Laser Beam 3D - drawing puzzle",
+    "BookLight - Reading Lamp",
+    "Light - LED Flashlight",
+    "Flashlight - Night Light Clock",
+    "Reading Lamp",
+    "Lumia Stream Link",
+    "Keepsmile",
+    "Devos",
+    "VibeFlash - LED Flashlight",
+    "Flashlight | Night Light",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ },
+ "Glimway": {
+  "play_us": {
+   "titles": [
+    "Logway",
+    "Turki Dabayeh",
+    "Glimsy",
+    "Glimsy",
+    "Glim",
+    "figalo",
+    "glimsy",
+    "AuraText",
+    "Flitway",
+    "EvGateway",
+    "Logiway",
+    "Talgat Sabyrov",
+    "Glimvia",
+    "woodfrog tech pvt ltd",
+    "Trailways",
+    "Trailways",
+    "Mobilityways",
+    "Mobilityways Ltd",
+    "Chargeway",
+    "Chargeway Inc",
+    "TrackerWay",
+    "GPS TrackingApp",
+    "MigWay Driver",
+    "Sonar360",
+    "h.way",
+    "Leapfinancial",
+    "Google Play",
+    "Kids & family"
+   ],
+   "ids": [
+    "com.bettercargo",
+    "com.flitway",
+    "com.glimsy",
+    "com.glimsy.app",
+    "com.leapfinancial.hway.numi.android",
+    "com.mobilityways.app",
+    "com.mycompany.glim",
+    "com.sonar360.driver",
+    "com.trailways.mobile",
+    "com.turkieshop.almaraadrivers.almaraa_drivers",
+    "com.yd.trackerwayapp",
+    "net.chargeway.chargeway",
+    "tech.woodfrog.glimvia"
+   ]
+  },
+  "play_tr": {
+   "titles": [
+    "Google Play",
+    "Çocuklar ve aile"
+   ],
+   "ids": []
+  },
+  "appstore_us": {
+   "titles": [
+    "Porter - Logistics Service App",
+    "Track718 Logistics track query",
+    "1 Star",
+    "AFG Shipping",
+    "LoadNow -Logistics Service App",
+    "Indian Transport & Logistics",
+    "LoadNow Partner",
+    "Pickyload",
+    "Amiable Logistics",
+    "Logistics Manager",
+    "NLDSL LDB",
+    "Pathao Merchant",
+    "ShipGlobal",
+    "Close"
+   ]
+  },
+  "steam": {
+   "titles": []
+  },
+  "uspto": {
+   "total": 0,
+   "marks": []
+  },
+  "flags": {
+   "play_us": [],
+   "play_tr": [],
+   "appstore_us": [],
+   "steam": [],
+   "uspto": []
+  }
+ }
+}

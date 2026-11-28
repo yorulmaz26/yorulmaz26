@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Işık Yolu</string>
+    <!-- Uygulama simgesinin altındaki ad: telefon Türkçeyse "Işık Yolu", diğer dillerde "Prismway" -->
+    <string name="app_name">Prismway</string>
 </resources>

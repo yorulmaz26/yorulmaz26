@@ -169,7 +169,7 @@ public class I18nTest {
         Pattern uiCall = Pattern.compile("\\b(?:Ui\\.text|Ui\\.button|Ui\\.header|toast|title|body|banner|setText|setContentDescription|note|button)\\s*\\((?:[^\"();]|\\([^()]*\\))*\"([^\"]*[A-Za-z][^\"]*)\"");
         List<String> problems = new ArrayList<>();
         for (File f : javaFiles(SRC)) {
-            if (f.getName().equals("L.java")) continue; // dil adları (Türkçe, Français …)
+            if (f.getName().equals("L.java") || f.getName().equals("Brand.java")) continue; // dil adları ve çevrilmeyen oyun adları
             String[] lines = stripComments(new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8)).split("\n", -1);
             for (int i = 0; i < lines.length; i++) {
                 Matcher m = literal.matcher(lines[i]);
