@@ -271,19 +271,19 @@ public final class MainActivity extends Activity {
      * video kapandıktan sonra çalışır (arayüz güncellemesi).
      */
     public void watchVideo(com.isikyolu.engine.AdPolicy.Reward r, Runnable onGranted) {
-        if (!com.isikyolu.engine.AdPolicy.canOffer(Game.progress(), r, Game.shopDay())) { toast("Bugünlük video ödülü sınırı doldu"); return; }
+        if (!com.isikyolu.engine.AdPolicy.canOffer(Game.progress(), r, Game.shopDay())) { toast(com.isikyolu.game.i18n.L.t("ads.limit_reached")); return; }
         com.isikyolu.game.ads.AdProvider ads = com.isikyolu.game.ads.Ads.get();
-        if (!ads.rewardedReady()) { toast("Video şu an hazır değil. Bağlantını kontrol edip biraz sonra dene."); return; }
+        if (!ads.rewardedReady()) { toast(com.isikyolu.game.i18n.L.t("ads.not_ready")); return; }
         boolean[] granted = {false};
         ads.showRewarded(this, () -> {
             granted[0] = com.isikyolu.engine.AdPolicy.grant(Game.progress(), r, Game.shopDay(), Game.trustedNow(), Game.clock());
             Game.save();
         }, result -> {
             if (granted[0]) { Game.audio().play(Audio.HINT); onGranted.run(); }
-            else if (result == com.isikyolu.game.ads.AdProvider.VideoResult.FAILED) toast("Video açılamadı. Biraz sonra tekrar dene.");
-            else if (result == com.isikyolu.game.ads.AdProvider.VideoResult.SKIPPED) toast("Ödül için videoyu sonuna kadar izlemelisin");
+            else if (result == com.isikyolu.game.ads.AdProvider.VideoResult.FAILED) toast(com.isikyolu.game.i18n.L.t("ads.failed"));
+            else if (result == com.isikyolu.game.ads.AdProvider.VideoResult.SKIPPED) toast(com.isikyolu.game.i18n.L.t("ads.skipped"));
             else toast(r == com.isikyolu.engine.AdPolicy.Reward.LIFE && Game.progress().lives >= com.isikyolu.engine.Lives.MAX
-                    ? "Canların zaten doldu" : "Bugünlük video ödülü sınırı doldu");
+                    ? com.isikyolu.game.i18n.L.t("ads.lives_already_full") : com.isikyolu.game.i18n.L.t("ads.limit_reached"));
             if (current != null) current.onAdsChanged();
         });
     }
@@ -329,42 +329,42 @@ public final class MainActivity extends Activity {
         ic.setBackground(Ui.round(0x33FF5C7A, Ui.dp(this, 34)));
         ic.addView(Ui.icon(this, com.isikyolu.game.ui.Icon.HEART, 0xFFFF5C7A, 38), new FrameLayout.LayoutParams(Ui.dp(this, 38), Ui.dp(this, 38), Gravity.CENTER));
         o.cardView().addView(ic, new LinearLayout.LayoutParams(Ui.dp(this, 68), Ui.dp(this, 68)));
-        o.title("Canın kalmadı");
+        o.title(com.isikyolu.game.i18n.L.t("lives.dialog_title"));
         com.isikyolu.engine.Lives.Clock clk = Game.clock();
         TextView body = o.body("");
         Runnable[] tick = new Runnable[1];
         tick[0] = () -> {
             com.isikyolu.engine.Lives.update(Game.progress(), Game.clock());
-            if (Game.progress().lives > 0) { body.setText("Yeni bir can geldi! Bölümlere dönebilirsin."); return; }
-            body.setText("Her " + com.isikyolu.engine.Lives.regenMinutes() + " dakikada 1 can yenilenir (en fazla " + com.isikyolu.engine.Lives.MAX + ").\nSonraki can: "
-                    + com.isikyolu.engine.Lives.format(com.isikyolu.engine.Lives.msUntilNext(Game.progress(), Game.clock()))
-                    + "\n\nGünlük bulmaca can harcamaz.");
+            if (Game.progress().lives > 0) { body.setText(com.isikyolu.game.i18n.L.t("lives.dialog_new_life")); return; }
+            // yenilenme süresi (çoğul), en fazla can ve "Sonraki can: 19:42" geri sayımı
+            String next = com.isikyolu.game.i18n.L.t("lives.next", com.isikyolu.engine.Lives.format(com.isikyolu.engine.Lives.msUntilNext(Game.progress(), Game.clock())));
+            body.setText(com.isikyolu.game.i18n.L.n("lives.dialog_body", com.isikyolu.engine.Lives.regenMinutes(), com.isikyolu.engine.Lives.MAX, next));
             body.postDelayed(tick[0], 1000);
         };
         tick[0].run();
         com.isikyolu.engine.Economy.Item life = com.isikyolu.engine.Economy.item("life1");
         int lp = com.isikyolu.engine.Economy.price(Game.progress(), life, Game.shopDay());
         if (videoAvailable(com.isikyolu.engine.AdPolicy.Reward.LIFE)) {
-            o.button("Video izle · +1 can (bugün " + videosLeft(com.isikyolu.engine.AdPolicy.Reward.LIFE) + ")", Ui.PRIMARY, com.isikyolu.game.ui.Icon.PLAY, v ->
+            o.button(com.isikyolu.game.i18n.L.n("ads.watch_life", videosLeft(com.isikyolu.engine.AdPolicy.Reward.LIFE)), Ui.PRIMARY, com.isikyolu.game.ui.Icon.PLAY, v ->
                     watchVideo(com.isikyolu.engine.AdPolicy.Reward.LIFE, () -> {
                         o.dismiss();
-                        toast("+1 can kazandın");
+                        toast(com.isikyolu.game.i18n.L.t("lives.dialog_life_won"));
                         if (retryLevel > 0) goLevel(retryLevel);
                     }));
         }
-        o.button("+1 can al · " + lp + " kristal", Ui.GOLD, com.isikyolu.game.ui.Icon.CRYSTAL, v -> {
+        o.button(com.isikyolu.game.i18n.L.n("lives.dialog_buy", lp), Ui.GOLD, com.isikyolu.game.ui.Icon.CRYSTAL, v -> {
             String why = com.isikyolu.engine.Economy.blockReason(Game.progress(), life, Game.shopDay());
             if (why != null) { Game.audio().play(Audio.LOCKED); toast(com.isikyolu.game.i18n.EconomyTexts.blockReason(why, life)); return; }
             com.isikyolu.engine.Economy.buy(Game.progress(), life, Game.shopDay(), Game.clock());
             Game.save();
             o.dismiss();
-            toast("+1 can alındı");
+            toast(com.isikyolu.game.i18n.L.t("lives.dialog_bought"));
             checkAchievements();
             if (retryLevel > 0) goLevel(retryLevel);
         });
-        o.button("Market", Ui.PURPLE, com.isikyolu.game.ui.Icon.BAG, v -> { o.dismiss(); goMarket(2); });
-        o.button("Günlük Bulmaca", Ui.SECONDARY, com.isikyolu.game.ui.Icon.CALENDAR, v -> { o.dismiss(); goDaily(); });
-        o.button("Tamam", Ui.SECONDARY, -1, v -> o.dismiss());
+        o.button(com.isikyolu.game.i18n.L.t("lives.dialog_shop"), Ui.PURPLE, com.isikyolu.game.ui.Icon.BAG, v -> { o.dismiss(); goMarket(2); });
+        o.button(com.isikyolu.game.i18n.L.t("lives.dialog_daily"), Ui.SECONDARY, com.isikyolu.game.ui.Icon.CALENDAR, v -> { o.dismiss(); goDaily(); });
+        o.button(com.isikyolu.game.i18n.L.t("common.ok"), Ui.SECONDARY, -1, v -> o.dismiss());
         o.setOnDismiss(() -> body.removeCallbacks(tick[0]));
         o.show(overlayLayer());
         Game.audio().play(Audio.LOCKED);
@@ -382,14 +382,25 @@ public final class MainActivity extends Activity {
         long delay = 300;
         for (com.isikyolu.engine.Achievements.Def d : fresh) {
             com.isikyolu.engine.Economy.Reward r = com.isikyolu.engine.Economy.onAchievement(Game.progress(), d);
-            String gain = "+" + r.crystals + " kristal" + (r.gems > 0 ? " · +" + r.gems + " Prizma Taşı" : "");
             root.postDelayed(() -> {
                 Game.audio().play(Audio.ACHIEVE);
-                banner(com.isikyolu.game.ui.Icon.TROPHY, "Başarı: " + d.title, d.description + "  " + gain);
+                String gain = com.isikyolu.game.i18n.L.n("dialog.plus_crystals", r.crystals);
+                if (r.gems > 0) gain = com.isikyolu.game.i18n.L.t("dialog.reward_pair", gain, com.isikyolu.game.i18n.L.n("dialog.plus_gems", r.gems));
+                banner(com.isikyolu.game.ui.Icon.TROPHY, com.isikyolu.game.i18n.L.t("dialog.ach_title", achText(d, "title", d.title)),
+                        com.isikyolu.game.i18n.L.t("dialog.ach_body", achText(d, "desc", d.description), gain));
             }, delay);
             delay += 3200;
         }
         Game.save();
+    }
+
+    /**
+     * Başarının adı/açıklaması seçili dilde: {@code ach.<id>.title|desc} anahtarları ('world' grubu).
+     * Anahtar hiçbir dilde tanımlı değilse (yalnızca birleştirme öncesi) motorun kaynak metni kullanılır.
+     */
+    private static String achText(com.isikyolu.engine.Achievements.Def d, String part, String source) {
+        String key = "ach." + d.id + "." + part;
+        return com.isikyolu.game.i18n.L.has(key) ? com.isikyolu.game.i18n.L.t(key) : source;
     }
 
     /** Üstten kayan bildirim (başarı kazanıldı vb.). */

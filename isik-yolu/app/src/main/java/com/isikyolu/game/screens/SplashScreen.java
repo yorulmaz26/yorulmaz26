@@ -10,7 +10,6 @@ import android.widget.TextView;
 import com.isikyolu.game.Game;
 import com.isikyolu.game.GameLoader;
 import com.isikyolu.game.MainActivity;
-import com.isikyolu.game.i18n.Brand;
 import com.isikyolu.game.i18n.L;
 import com.isikyolu.game.ui.LogoView;
 import com.isikyolu.game.ui.Palette;
@@ -27,10 +26,7 @@ public final class SplashScreen extends Screen {
         col.setGravity(Gravity.CENTER);
         LogoView logo = new LogoView(a);
         col.addView(logo, new LinearLayout.LayoutParams(Ui.dp(a, 170), Ui.dp(a, 170)));
-        TextView title = Ui.text(a, Brand.NAME_TR, 44, Palette.WHITE, Ui.BOLD);
-        title.setLetterSpacing(0.04f);
-        Ui.gradientText(title, 0xFFFFE08A, 0xFFFFFFFF, 0xFF7DF0E0);
-        title.setShadowLayer(Ui.dp(a, 16), 0, 0, 0x6620B8A6);
+        com.isikyolu.game.ui.BrandTitle title = new com.isikyolu.game.ui.BrandTitle(a, 44); // iki dilli ad (bkz. Brand)
         col.addView(title);
         TextView sub = Ui.text(a, L.t("menu.tagline"), 16, Palette.TURQUOISE, Ui.MEDIUM);
         col.addView(sub);

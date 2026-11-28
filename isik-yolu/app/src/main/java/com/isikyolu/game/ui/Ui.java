@@ -221,7 +221,9 @@ public final class Ui {
     public static LinearLayout header(Context c, String title, View.OnClickListener back, View right) {
         LinearLayout h = horizontal(c);
         h.setPadding(dp(c, 16), dp(c, 14), dp(c, 16), dp(c, 8));
-        h.addView(iconButton(c, Icon.BACK, SECONDARY, 46, back));
+        View backButton = iconButton(c, Icon.BACK, SECONDARY, 46, back);
+        backButton.setContentDescription(com.isikyolu.game.i18n.L.t("common.back")); // ekran okuyucu için
+        h.addView(backButton);
         TextView t = text(c, title, 22, Palette.WHITE, BOLD);
         t.setPadding(dp(c, 14), 0, 0, 0);
         // dar ekranda sağdaki göstergelerle birlikte sığmazsa ikiye bölünmesin: küçülerek tek satırda kalır

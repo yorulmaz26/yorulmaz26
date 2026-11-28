@@ -1001,6 +1001,50 @@ public class UiFlowTest {
         shot("21_gizlilik");
     }
 
+    /** Dil seçici: Ayarlar'dan İngilizceye geçilir, açık ekran yeni dilde kurulur; Türkçeye dönülür; ilerleme değişmez. */
+    @Test public void languageSwitch() throws Exception {
+        start();
+        com.isikyolu.engine.Progress p = Game.progress();
+        p.tutorialSeen = true;
+        complete(p, 5);
+        p.crystals = 345; p.gems = 7;
+        int[] stars = p.stars.clone();
+        int crystals = p.crystals, gems = p.gems, lives = p.lives, hints = p.hints;
+        act.goSettings();
+        idle(800);
+        assertNotNull(findText(act.currentScreen(), "Ayarlar"));
+        assertNotNull("seçili dil görünür", findText(act.currentScreen(), "Türkçe"));
+        ((View) findText(act.currentScreen(), "Dil").getParent()).performClick();
+        idle(500);
+        assertNotNull("dil listesi", topOverlay());
+        for (String name : com.isikyolu.game.i18n.L.NATIVE_NAMES) assertNotNull("listede " + name, topButton(name));
+        assertTrue("seçili dil işaretli", topButton("Türkçe").isSelected());
+        topButton("English").performClick();
+        idle(600);
+        assertEquals("en", com.isikyolu.game.i18n.L.lang());
+        assertTrue(act.currentScreen() instanceof SettingsScreen);
+        assertNotNull("ayarlar İngilizce", findText(act.currentScreen(), "Settings"));
+        assertNotNull(findText(act.currentScreen(), "Sound effects"));
+        assertNotNull(findText(act.currentScreen(), "English"));
+        assertNull("Türkçe başlık kalmadı", findText(act.currentScreen(), "Ayarlar"));
+        assertNull("liste kapandı", topOverlay());
+        // geri: Türkçe
+        ((View) findText(act.currentScreen(), "Language").getParent()).performClick();
+        idle(500);
+        assertTrue(topButton("English").isSelected());
+        topButton("Türkçe").performClick();
+        idle(600);
+        assertEquals("tr", com.isikyolu.game.i18n.L.lang());
+        assertNotNull(findText(act.currentScreen(), "Ayarlar"));
+        assertNotNull(findText(act.currentScreen(), "Ses efektleri"));
+        // dil değişimi ilerlemeye dokunmaz
+        assertArrayEquals(stars, Game.progress().stars);
+        assertEquals(crystals, Game.progress().crystals);
+        assertEquals(gems, Game.progress().gems);
+        assertEquals(lives, Game.progress().lives);
+        assertEquals(hints, Game.progress().hints);
+    }
+
     /** Kenardan kenara çizim: içerik durum ve gezinme çubuğunun altına girmez. */
     @Test public void contentStaysInsideSystemBars() throws Exception {
         start();

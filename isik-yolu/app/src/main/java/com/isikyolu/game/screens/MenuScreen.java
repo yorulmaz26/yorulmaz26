@@ -12,7 +12,6 @@ import com.isikyolu.engine.DailyPuzzle;
 import com.isikyolu.engine.Progress;
 import com.isikyolu.game.Game;
 import com.isikyolu.game.MainActivity;
-import com.isikyolu.game.i18n.Brand;
 import com.isikyolu.game.i18n.L;
 import com.isikyolu.game.ui.Icon;
 import com.isikyolu.game.ui.LogoView;
@@ -34,10 +33,8 @@ public final class MenuScreen extends Screen {
         col.setPadding(pad, Ui.dp(a, 28), pad, pad);
 
         col.addView(new LogoView(a), new LinearLayout.LayoutParams(Ui.dp(a, 130), Ui.dp(a, 130)));
-        TextView title = Ui.text(a, Brand.NAME_TR, 40, Palette.WHITE, Ui.BOLD);
-        Ui.gradientText(title, 0xFFFFE08A, 0xFFFFFFFF, 0xFF7DF0E0);
-        title.setShadowLayer(Ui.dp(a, 14), 0, 0, 0x6620B8A6);
-        col.addView(title);
+        // iki dilli ad: Türkçede "Işık Yolu" büyük + PRISMWAY küçük; diğer dillerde "Prismway" büyük + IŞIK YOLU küçük
+        col.addView(new com.isikyolu.game.ui.BrandTitle(a, 40));
         col.addView(Ui.text(a, L.t("menu.tagline"), 15, Palette.TURQUOISE, Ui.MEDIUM));
 
         // yıldız ve ilerleme göstergesi
