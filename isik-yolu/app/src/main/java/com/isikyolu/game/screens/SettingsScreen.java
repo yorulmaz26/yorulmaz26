@@ -149,9 +149,17 @@ public final class SettingsScreen extends Screen {
         Overlay o = new Overlay(a);
         o.title(L.t("settings.language"));
         String current = L.lang();
+        boolean auto = !L.hasUserChoice(a);
+        // otomatik: telefonun dili (desteklenmiyorsa İngilizce)
+        View ab = o.button(L.t("settings.language_auto", L.nativeName(L.systemLanguage())), auto ? Ui.GOLD : Ui.SECONDARY,
+                auto ? Icon.CHECK : -1, v -> {
+                    o.dismiss();
+                    if (L.hasUserChoice(a)) L.set(getContext(), null);
+                });
+        ab.setSelected(auto);
         for (int i = 0; i < L.SUPPORTED.length; i++) {
             String code = L.SUPPORTED[i];
-            boolean selected = code.equals(current);
+            boolean selected = !auto && code.equals(current);
             View b = o.button(L.NATIVE_NAMES[i], selected ? Ui.GOLD : Ui.SECONDARY, selected ? Icon.CHECK : -1, v -> {
                 o.dismiss();
                 // MainActivity dinleyicisi açık ekranı yeni dilde yeniden kurar (yeniden başlatma yok)

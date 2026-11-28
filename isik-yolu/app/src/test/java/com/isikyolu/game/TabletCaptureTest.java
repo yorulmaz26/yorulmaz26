@@ -63,11 +63,19 @@ public class TabletCaptureTest {
         try (FileOutputStream o = new FileOutputStream(new File(dir, name + ".png"))) { bmp.compress(Bitmap.CompressFormat.PNG, 100, o); }
     }
 
+    /** Önce gecikmeli açılan pencerelerin ("Tamamlandı" 1,1 sn sonra açılır) gelmesini bekler, sonra hepsini kapatır. */
     private void closeOverlays() {
+        idle(1500);
         ViewGroup r = act.overlayLayer();
         for (int i = r.getChildCount() - 1; i >= 0; i--)
             if (r.getChildAt(i) instanceof Overlay) ((Overlay) r.getChildAt(i)).dismiss();
-        idle(400);
+        idle(600);
+    }
+
+    private void assertNoOverlay() {
+        ViewGroup r = act.overlayLayer();
+        for (int i = 0; i < r.getChildCount(); i++)
+            assertTrue("ekran görüntüsünde pencere kalmamalı", !(r.getChildAt(i) instanceof Overlay));
     }
 
     private void prepare() {
@@ -130,11 +138,15 @@ public class TabletCaptureTest {
         closeOverlays();
         act.goLevels();
         idle(700);
+        closeOverlays();
         warm(30);
+        assertNoOverlay();
         shot(out, "04_bolumler");
         act.goDaily();
         idle(700);
+        closeOverlays();
         warm(30);
+        assertNoOverlay();
         shot(out, "05_gunluk");
         com.isikyolu.game.i18n.L.override = null;
     }

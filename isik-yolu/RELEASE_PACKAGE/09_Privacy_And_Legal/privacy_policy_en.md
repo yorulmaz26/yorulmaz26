@@ -9,10 +9,14 @@ This policy applies to the Android game **Prismway (Işık Yolu)** developed by 
 
 - It does not ask you to create an account and does not ask for personal information such as your name, email
   address or phone number.
-- Your progress, stars, settings, language choice, lives, in-game currency and in-game items are stored only on
-  your device. They are never sent to a server of ours; we do not operate any server.
+- Your progress, stars, settings, language choice, lives, in-game currency and in-game items are stored on your
+  device. They are never sent to us; we do not operate any server.
+- If Android backup is turned on on your device, this game data (the save file and language choice) can also be
+  included in the Android backup of your own Google account and restored on a new device. That backup is managed by
+  Google under Google's terms; we have no access to it. You can turn backup off in Android settings.
 - To calculate life refill times, the game reads the device's own clocks (system clock, time since boot and, if
-  available, network time) on the device. This information never leaves the device.
+  available, network time) on the device. This information is not sent to us (it can only be
+  part of the save file in the Android backup described above).
 - The game can be played fully offline.
 - There are no in-app purchases. Items in the shop can only be bought with crystals earned in the game.
 
@@ -36,7 +40,8 @@ This data is encrypted in transit (TLS). How Google uses data: https://policies.
 
 - In regions where it is required, such as the European Economic Area, the UK and Switzerland, Google's consent
   form (User Messaging Platform) is shown before ads.
-- You can change your choice at any time in the game under Settings > **Ad Privacy Options**.
+- In those regions you can change your choice at any time in the game under Settings > **Ad Privacy Options**
+  (the button appears only where consent is required).
 - You can reset or delete your advertising ID in Android Settings > Privacy > Ads.
 - Watching rewarded videos is entirely optional.
 
@@ -46,8 +51,9 @@ The game is intended for a general audience and is not directed at children. Ad 
 
 ## Deleting your data
 
-The game's own data is stored only on your device. Settings > Reset Progress, or uninstalling the app, deletes all
-of it. For Google's advertising data, use the Google link above.
+The game's own data is stored only on your device. Settings > Reset Progress deletes your progress, in-game
+currency and items; uninstalling the app deletes all of the
+game's data from the device; the copy in your Android backup can be deleted in your Google account's backup settings. For Google's advertising data, use the Google link above.
 
 ## Changes
 

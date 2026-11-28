@@ -193,17 +193,22 @@ public final class Progress {
         return Json.write(m);
     }
 
-    /** Kayıt imzası: kayıt dosyası elle değiştirilirse fark edilir (çevrimdışı oyunda caydırıcı koruma). */
-    private static final String SIG_MARK = "\n#sig:";
-    /** 2: imzalı kayıt (1.8.0+). Bu sürümle yazılmış ama imzası olmayan kayıt da değiştirilmiş sayılır. */
-    static final int SAVE_VERSION = 2;
+    /**
+     * Kayıt imzası: kayıt elle değiştirilirse fark edilir (çevrimdışı oyunda caydırıcı koruma).
+     * Kaydın kendisi düz JSON kalır (eski sürümler de okuyabilir; bilinmeyen "sv" alanını yok sayar); imza ayrı bir
+     * anahtarda saklanır (bkz. Game). Eski (1.7.x) imzasız kayıtlar cezasız kabul edilir.
+     */
+    public static final int SAVE_VERSION = 2;
     private transient int loadedVersion;
     private static final String SIG_SALT = "IsikYolu|MagicLumos|kayit|v1";
+    /** Yalnızca 1.8.0 geliştirme sürümünde kullanılan, imzanın JSON'a eklendiği biçim (geriye dönük okunur). */
+    private static final String SIG_MARK = "\n#sig:";
 
-    static String signature(String json) {
+    /** JSON metninin imzası (SHA-256'nın ilk 128 biti, onaltılık). */
+    public static String signature(String json) {
         try {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("SHA-256");
-            byte[] h = md.digest((SIG_SALT + json).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            byte[] h = md.digest((SIG_SALT + (json == null ? "" : json)).getBytes(java.nio.charset.StandardCharsets.UTF_8));
             StringBuilder sb = new StringBuilder();
             for (int k = 0; k < 16; k++) sb.append(String.format(java.util.Locale.ROOT, "%02x", h[k]));
             return sb.toString();
@@ -212,10 +217,8 @@ public final class Progress {
         }
     }
 
-    public String serialize() {
-        String json = serializeJson();
-        return json + SIG_MARK + signature(json);
-    }
+    /** Düz JSON kayıt (imza ayrıca {@link #signature(String)} ile yazılır). */
+    public String serialize() { return serializeJson(); }
 
     /** Son yüklemede kayıt imzası tutmadı mı (kayıt elle değiştirilmiş). Bir kez bildirilir. */
     public transient boolean saveTampered;
@@ -223,32 +226,45 @@ public final class Progress {
     /** Zamanla yenilenen (ödül/satın alma dışı) can sayısı; arayüz "canların doldu" bildirimi için okur ve sıfırlar. */
     public transient int regenGained;
 
-    /** Bozuk veya boş kayıtta varsayılan ilerleme döner. */
-    @SuppressWarnings("unchecked")
+    /** İmza denetimi olmadan yükler (testler ve araçlar için). Bozuk veya boş kayıtta varsayılan ilerleme döner. */
     public static Progress deserialize(String text) {
-        boolean tampered = false, signed = false;
         if (text != null) {
             int at = text.lastIndexOf(SIG_MARK);
-            if (at >= 0) {
-                signed = true;
-                String json = text.substring(0, at), sig = text.substring(at + SIG_MARK.length()).trim();
-                tampered = !sig.equals(signature(json));
-                text = json;
-            } // imzasız eski kayıt (önceki sürüm): olduğu gibi kabul edilir, sonraki kayıtta imzalanır
+            if (at >= 0) return load(text.substring(0, at), text.substring(at + SIG_MARK.length()).trim());
         }
-        Progress p = deserializeJson(text);
-        if (!signed && p.loadedVersion >= SAVE_VERSION) tampered = true; // imza silinmiş
+        return deserializeJson(text); // imza denetimi yok
+    }
+
+    /**
+     * Kaydı imzasıyla yükler.
+     * <ul>
+     *   <li>İmza tutuyor: olduğu gibi.</li>
+     *   <li>İmza yok ve kayıt eski biçimde (sv &lt; 2): 1.7.x'ten güncelleme, cezasız kabul edilir.</li>
+     *   <li>İmza tutmuyor ya da yeni biçimde imza silinmiş: kayıt değiştirilmiş sayılır. Bölüm ilerlemesi, yıldızlar,
+     *       başarılar ve görünümler korunur; elle değiştirilebilecek can, süre ve oyun içi para güvenli başlangıç
+     *       değerlerine döner (normal oyuncu bu duruma düşmez).</li>
+     * </ul>
+     */
+    public static Progress load(String json, String sig) {
+        Progress p = deserializeJson(json);
+        if (json == null || json.isEmpty()) return p;
+        boolean tampered = sig != null ? !sig.equals(signature(json)) : p.loadedVersion >= SAVE_VERSION;
         if (tampered) {
-            // İlerleme, yıldızlar ve satın alımlar korunur; yalnızca can durumu güvenli değere döner:
-            // canlar 0'dan normal hızla yeniden dolar (değiştirilmiş can/süre değerleri işe yaramaz).
             p.lives = 0;
             p.lifeBaseElapsed = Long.MIN_VALUE;
+            p.lifeMaxWall = 0;
             p.attemptLevel = 0;
+            p.crystals = Economy.START_CRYSTALS;
+            p.gems = 0;
+            p.hints = Math.min(p.hints, START_HINTS);
+            p.tickets = 0;
+            p.shields = 0;
             p.saveTampered = true;
         }
         return p;
     }
 
+    @SuppressWarnings("unchecked")
     private static Progress deserializeJson(String text) {
         Progress p = new Progress();
         if (text == null || text.isEmpty()) return p;

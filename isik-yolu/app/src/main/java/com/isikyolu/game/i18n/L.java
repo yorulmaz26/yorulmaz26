@@ -34,6 +34,8 @@ public final class L {
     public static final String[] NATIVE_NAMES = {"Türkçe", "English", "Deutsch", "Italiano", "Français", "Español"};
     public static final String FALLBACK = "en";
     private static final String PREFS = "isik_yolu_dil", KEY = "lang";
+    /** Seçim Android 13+ sistem "Uygulama dili" ayarına da yazıldı mı (sistemde "varsayılan"a dönülürse seçim kalkar). */
+    private static final String KEY_MIRRORED = "lang_mirrored";
 
     /** Testler için sabit dil (null: normal seçim). */
     public static String override;
@@ -66,6 +68,11 @@ public final class L {
         }
         if (sys != null && supported(sys)) return sys; // sistem ayarlarından seçilen uygulama dili
         SharedPreferences p = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        if (android.os.Build.VERSION.SDK_INT >= 33 && sys == null && p.getBoolean(KEY_MIRRORED, false)) {
+            // oyuncu seçimi sisteme de yazılmıştı ama sistem ayarlarında "Sistem varsayılanı"na dönülmüş: telefon dili
+            p.edit().remove(KEY).remove(KEY_MIRRORED).apply();
+            return systemLanguage();
+        }
         String chosen = p.getString(KEY, null);
         if (chosen != null && supported(chosen)) return chosen;
         return systemLanguage();
@@ -92,18 +99,28 @@ public final class L {
         return false;
     }
 
-    /** Dili değiştirir ve kaydeder; ekranlar dinleyicilerle yenilenir. İlerlemeyi etkilemez. */
+    /**
+     * Dili değiştirir ve kaydeder; ekranlar dinleyicilerle yenilenir. İlerlemeyi etkilemez.
+     * {@code code == null}: oyuncu seçimi kaldırılır, telefonun dili kullanılır (otomatik).
+     */
     public static synchronized void set(Context c, String code) {
-        if (!supported(code)) return;
+        if (code != null && !supported(code)) return;
         Context a = c.getApplicationContext();
-        a.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(KEY, code).apply();
+        SharedPreferences.Editor e = a.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit();
+        boolean mirrored = false;
         if (android.os.Build.VERSION.SDK_INT >= 33) {
             try {
                 android.app.LocaleManager lm = a.getSystemService(android.app.LocaleManager.class);
-                if (lm != null) lm.setApplicationLocales(android.os.LocaleList.forLanguageTags(code));
+                if (lm != null) {
+                    lm.setApplicationLocales(code == null ? android.os.LocaleList.getEmptyLocaleList() : android.os.LocaleList.forLanguageTags(code));
+                    mirrored = code != null;
+                }
             } catch (RuntimeException ignored) {}
         }
-        load(code);
+        if (code == null) e.remove(KEY).remove(KEY_MIRRORED);
+        else e.putString(KEY, code).putBoolean(KEY_MIRRORED, mirrored);
+        e.apply();
+        load(code == null ? (override != null && supported(override) ? override : systemLanguage()) : code);
         for (Runnable r : new ArrayList<>(listeners)) r.run();
     }
 
@@ -251,6 +268,9 @@ public final class L {
         }
         return b.toString();
     }
+
+    /** Sayıyı seçili dilin biçiminde yazar (1.500 / 1,500 / 1 500). */
+    public static String num(long v) { return java.text.NumberFormat.getIntegerInstance(locale).format(v); }
 
     private static String format(Object o) {
         if (o instanceof Integer || o instanceof Long) return java.text.NumberFormat.getIntegerInstance(locale).format(((Number) o).longValue());

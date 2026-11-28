@@ -1018,7 +1018,9 @@ public class UiFlowTest {
         idle(500);
         assertNotNull("dil listesi", topOverlay());
         for (String name : com.isikyolu.game.i18n.L.NATIVE_NAMES) assertNotNull("listede " + name, topButton(name));
-        assertTrue("seçili dil işaretli", topButton("Türkçe").isSelected());
+        // henüz seçim yok: "Telefonun dili" (otomatik) işaretli
+        assertTrue("otomatik dil işaretli", topButton("Telefonun dili").isSelected());
+        assertFalse(topButton("Türkçe").isSelected());
         topButton("English").performClick();
         idle(600);
         assertEquals("en", com.isikyolu.game.i18n.L.lang());
@@ -1037,6 +1039,13 @@ public class UiFlowTest {
         assertEquals("tr", com.isikyolu.game.i18n.L.lang());
         assertNotNull(findText(act.currentScreen(), "Ayarlar"));
         assertNotNull(findText(act.currentScreen(), "Ses efektleri"));
+        assertTrue(com.isikyolu.game.i18n.L.hasUserChoice(act));
+        // otomatiğe dön: seçim kalkar, telefonun dili kullanılır (testte sabit Türkçe)
+        ((View) findText(act.currentScreen(), "Dil").getParent()).performClick();
+        idle(500);
+        topButton("Telefonun dili").performClick();
+        idle(600);
+        assertFalse(com.isikyolu.game.i18n.L.hasUserChoice(act));
         // dil değişimi ilerlemeye dokunmaz
         assertArrayEquals(stars, Game.progress().stars);
         assertEquals(crystals, Game.progress().crystals);

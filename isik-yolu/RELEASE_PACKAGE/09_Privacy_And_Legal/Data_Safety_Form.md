@@ -34,7 +34,7 @@ Bu yanıtlar tahmin değildir. İki kaynağa dayanır:
 | **Uygulama etkinliği › Uygulama etkileşimleri** | Evet | Evet | Reklam veya pazarlama, Analiz, Dolandırıcılığı önleme | Hayır | "Collects user product interactions ... including app launch, taps, and video views." |
 | **Uygulama bilgileri ve performansı › Kilitlenme günlükleri** | Evet | Evet | Analiz, Dolandırıcılığı önleme | Hayır | "crash logs" |
 | **Uygulama bilgileri ve performansı › Tanılama** | Evet | Evet | Analiz, Dolandırıcılığı önleme | Hayır | "app launch time, hang rate, and energy usage" |
-| **Cihaz veya diğer kimlikler** | Evet | Evet | Reklam veya pazarlama, Analiz, Dolandırıcılığı önleme | Kullanıcı reklam kimliğini sıfırlayabilir/silebilir | "Collects Android advertising (ad) ID, app set ID ..." |
+| **Cihaz veya diğer kimlikler** | Evet | Evet | Reklam veya pazarlama, Analiz, Dolandırıcılığı önleme | Hayır (zorunlu): SDK uygulama grubu kimliğini her zaman toplar; kullanıcı reklam kimliğini Android ayarlarından sıfırlayabilir/silebilir | "Collects Android advertising (ad) ID, app set ID ..." |
 
 Toplanmayanlar: ad, e-posta, telefon, adres, kesin konum, kişiler, fotoğraf/video, ses, dosyalar, takvim, SMS,
 arama geçmişi, sağlık, finans ve ödeme bilgileri, web tarama geçmişi.
@@ -44,13 +44,19 @@ arama geçmişi, sağlık, finans ve ödeme bilgileri, web tarama geçmişi.
 **Geçici işleme (ephemeral):** Play tanımına göre reklam profili oluşturmak için kullanılan veri geçici sayılamaz.
 Bu nedenle yukarıdaki türler "geçici" olarak işaretlenmemeli.
 
+**Android yedeklemesi:** Kayıt dosyası ve dil seçimi, kullanıcının cihazında Android yedeklemesi açıksa kullanıcının
+kendi Google hesabındaki yedeğe girebilir (`data_extraction_rules.xml`). Play'in SSS'sine göre veri, kullanıcının kendi
+bulut depolamasına o hizmetin koşullarıyla yükleniyor ve uygulama bu veriye erişmiyorsa "toplama" olarak
+bildirilmesi gerekmez. Oyunun bu yedeğe erişimi yoktur. Gizlilik politikasında bu durum ayrıca açıklandı.
+
 **Paylaşım istisnası:** Play'e göre birden çok müşteri için reklam profili oluşturan SDK "hizmet sağlayıcı"
 sayılmaz. Bu yüzden veriler **paylaşılıyor** olarak işaretlenir.
 
 ## 3. Reklam kimliği beyanı (Play Console › Uygulama içeriği › Reklam kimliği)
 
 - Uygulama reklam kimliği kullanıyor mu? **Evet.**
-- Amaç: **Reklam veya pazarlama** ve **Analiz**.
+- Amaç: **Reklam veya pazarlama**, **Analiz** ve **Dolandırıcılığı önleme, güvenlik ve uyumluluk** (Google'ın AdMob
+  açıklamasıyla aynı).
 - Birleşik manifestte `com.google.android.gms.permission.AD_ID` izni var. Bu izin AdMob SDK'dan gelir ve
   `aapt2 dump permissions` ile doğrulandı.
 

@@ -24,6 +24,13 @@ yapılmalı. Hiçbir şey Play Console'a, YouTube'a ya da başka bir platforma y
       `admobAppId`, `admobBanner`, `admobInterstitial`, `admobRewarded`. Verilmezse test kimlikleri kullanılır, gelir
       gelmez.
 - [ ] `privacyPolicyUrl=https://…` özelliğini ver: oyun içindeki "Web'de aç" düğmesi bu adresi açar.
+- [ ] **AdMob › Gizlilik ve mesajlaşma:** bu uygulama için bir **GDPR (AB/İngiltere/İsviçre) izin mesajı** oluştur ve
+      yayımla. İstersen ABD eyaletleri mesajını da ekle.
+  - Mesaj yoksa izin formu (UMP) hiç görünmez ve "Reklam Gizlilik Seçenekleri" düğmesi çıkmaz.
+  - Google, Ocak 2024'ten beri AEA/İngiltere trafiği için sertifikalı bir izin platformu şart koşuyor.
+  - UMP'nin hata ayıklama coğrafyası (EEA) ile dene.
+- [ ] **app-ads.txt:** AdMob'un verdiği satırı Play'de bildirdiğin geliştirici web sitesinin kök dizinine
+      (`https://alanadin/app-ads.txt`) koy.
 
 ## B. Mağaza girişi (Play Console › Store presence)
 - [ ] Varsayılan dil: İngilizce (en-US) ya da Türkçe (tr-TR). Diğer 5 dili "Çeviri ekle" ile ekle.

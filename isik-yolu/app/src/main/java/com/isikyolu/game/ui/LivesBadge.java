@@ -59,7 +59,7 @@ public final class LivesBadge extends LinearLayout {
         String left = Lives.format(Lives.msUntilNext(p, clk));
         if (p.lives >= Lives.MAX) timer.setText(L.t("lives.full"));
         else timer.setText(left);
-        if (lastLives >= 0 && p.lives > lastLives) regenAnimation();
+        if (lastLives >= 0 && p.lives > lastLives) { plus.setText("+" + (p.lives - lastLives)); regenAnimation(); }
         lastLives = p.lives;
         setContentDescription(p.lives >= Lives.MAX ? L.t("lives.cd_full", p.lives, Lives.MAX)
                 : L.t("lives.cd", p.lives, Lives.MAX, left));
@@ -67,7 +67,7 @@ public final class LivesBadge extends LinearLayout {
     }
 
     /**
-     * Yenilenme animasyonu: kalp büyüyüp küçülür, "+1" yukarı süzülerek kaybolur. Kare kare (saat tabanlı) çizilir;
+     * Can artışı animasyonu: kalp büyüyüp küçülür, "+N" (gerçek artış) yukarı süzülerek kaybolur. Kare kare (saat tabanlı) çizilir;
      * ViewPropertyAnimator kullanılmaz (test ortamında saati ileri sarıp kayıtları bozuyordu).
      */
     private void regenAnimation() {

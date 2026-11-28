@@ -11,10 +11,14 @@ sulla privacy.
 - Non ti chiede di creare un account e non ti chiede informazioni personali come il tuo nome, indirizzo email o numero
   di telefono.
 - I tuoi progressi, le stelle, le impostazioni, la lingua scelta, le vite, la valuta di gioco e gli oggetti di gioco
-  vengono memorizzati solo sul tuo dispositivo. Non vengono mai inviati a un nostro server; non gestiamo alcun server.
+  vengono memorizzati sul tuo dispositivo. Non ci vengono mai inviati; non gestiamo alcun server.
+- Se sul tuo dispositivo è attivo il backup di Android, questi dati di gioco (file di salvataggio e lingua scelta)
+  possono essere inclusi anche nel backup Android del tuo account Google e ripristinati su un nuovo dispositivo. Quel
+  backup è gestito da Google secondo i termini di Google; noi non vi abbiamo accesso. Puoi disattivare il backup nelle
+  impostazioni di Android.
 - Per calcolare i tempi di ricarica delle vite, il gioco legge sul dispositivo gli orologi del dispositivo stesso
-  (orologio di sistema, tempo trascorso dall'avvio e, se disponibile, ora di rete). Queste informazioni non lasciano
-  mai il dispositivo.
+  (orologio di sistema, tempo trascorso dall'avvio e, se disponibile, ora di rete). Queste informazioni non ci vengono
+  inviate (possono finire solo nel backup di Android descritto sopra, come parte del file di salvataggio).
 - Il gioco può essere giocato completamente offline.
 - Non ci sono acquisti in-app. Gli oggetti del negozio possono essere acquistati solo con i cristalli guadagnati nel
   gioco.
@@ -41,7 +45,8 @@ https://policies.google.com/technologies/ads
 
 - Nelle regioni in cui è richiesto, come lo Spazio economico europeo, il Regno Unito e la Svizzera, prima degli
   annunci viene mostrato il modulo di consenso di Google (User Messaging Platform).
-- Puoi modificare la tua scelta in qualsiasi momento nel gioco, in Impostazioni > **Opzioni privacy annunci**.
+- In queste regioni puoi modificare la tua scelta in qualsiasi momento nel gioco, in Impostazioni > **Opzioni privacy annunci**
+  (il pulsante compare solo dove il consenso è richiesto).
 - Puoi reimpostare o eliminare il tuo ID pubblicità in Impostazioni di Android > Privacy > Annunci.
 - La visione dei video con premio è del tutto facoltativa.
 
@@ -53,8 +58,9 @@ inferiore ai 13 anni.
 
 ## Eliminazione dei tuoi dati
 
-I dati del gioco sono memorizzati solo sul tuo dispositivo. L'opzione Impostazioni > Azzera progressi, oppure la
-disinstallazione dell'app, li elimina tutti. Per i dati pubblicitari di Google, utilizza il link di Google indicato
+I dati del gioco sono memorizzati solo sul tuo dispositivo. L'opzione Impostazioni > Azzera progressi elimina i tuoi
+progressi, la valuta di gioco e gli oggetti; la disinstallazione dell'app elimina tutti i dati del gioco dal dispositivo;
+la copia nel backup di Android può essere eliminata dalle impostazioni di backup del tuo account Google. Per i dati pubblicitari di Google, utilizza il link di Google indicato
 sopra.
 
 ## Modifiche

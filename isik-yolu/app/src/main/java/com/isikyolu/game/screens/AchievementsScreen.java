@@ -68,7 +68,7 @@ public final class AchievementsScreen extends Screen {
         });
         LinearLayout br = Ui.horizontal(c);
         br.addView(bar, new LinearLayout.LayoutParams(0, Ui.dp(c, 7), 1f));
-        TextView num = Ui.text(c, "  " + cur + "/" + tgt, 12, Palette.TEXT_DIM, Ui.MEDIUM);
+        TextView num = Ui.text(c, "  " + com.isikyolu.game.i18n.L.num(cur) + "/" + com.isikyolu.game.i18n.L.num(tgt), 12, Palette.TEXT_DIM, Ui.MEDIUM);
         br.addView(num);
         col.addView(br, Ui.lpMargins(c, -1, -2, 0, 8, 0, 0));
         row.addView(col, new LinearLayout.LayoutParams(0, -2, 1f));

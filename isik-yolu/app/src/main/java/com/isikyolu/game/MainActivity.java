@@ -79,7 +79,11 @@ public final class MainActivity extends Activity {
         if (current instanceof SettingsScreen) replaceCurrent(new SettingsScreen(this));
         else if (current instanceof MenuScreen) replaceCurrent(new MenuScreen(this));
         else if (current instanceof LevelSelectScreen) replaceCurrent(new LevelSelectScreen(this));
-        // diğer ekranlar bir sonraki açılışta yeni dille kurulur
+        else if (current instanceof com.isikyolu.game.screens.MarketScreen)
+            replaceCurrent(new com.isikyolu.game.screens.MarketScreen(this, ((com.isikyolu.game.screens.MarketScreen) current).currentTab()));
+        else if (current instanceof DailyScreen) replaceCurrent(new DailyScreen(this));
+        else if (current instanceof AchievementsScreen) replaceCurrent(new AchievementsScreen(this));
+        // oyun ekranı (devam eden bölüm durumu korunmalı) bir sonraki açılışta yeni dille kurulur
     }
 
     // ---------- can bildirimleri ----------

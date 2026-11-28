@@ -16,6 +16,8 @@ import java.nio.charset.StandardCharsets;
 public final class Game {
     private static final String PREFS = "isik_yolu";
     private static final String KEY = "progress";
+    /** Kayıt imzası ayrı anahtarda: kayıt düz JSON kalır, eski sürümler de okuyabilir. */
+    private static final String KEY_SIG = "progress_sig";
 
     private static LevelPack levels;
     private static Progress progress = new Progress();
@@ -35,7 +37,9 @@ public final class Game {
         }
         if (prefs == null) {
             prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-            progress = Progress.deserialize(prefs.getString(KEY, null));
+            String json = prefs.getString(KEY, null);
+            progress = json != null && json.contains("\n#sig:") ? Progress.deserialize(json) // geliştirme sürümü biçimi
+                    : Progress.load(json, prefs.getString(KEY_SIG, null));
             saveTamperNotice = progress.saveTampered; // kayıt elle değiştirilmiş: bir kez bildirilir, kayıt yeniden imzalanır
             clockSource = app;
             // uygulama bir bölümün ortasında kapatıldıysa o denemenin canı geri gelmez
@@ -129,6 +133,8 @@ public final class Game {
 
     /** Otomatik kayıt: her değişiklikten sonra çağrılır. */
     public static void save() {
-        if (prefs != null) prefs.edit().putString(KEY, progress.serialize()).apply();
+        if (prefs == null) return;
+        String json = progress.serialize();
+        prefs.edit().putString(KEY, json).putString(KEY_SIG, Progress.signature(json)).apply();
     }
 }

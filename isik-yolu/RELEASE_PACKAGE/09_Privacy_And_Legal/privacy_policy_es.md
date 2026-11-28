@@ -11,10 +11,14 @@ privacidad.
 - No te pide crear una cuenta ni te pide información personal como tu nombre, tu dirección de correo electrónico o tu
   número de teléfono.
 - Tu progreso, tus estrellas, tus ajustes, el idioma elegido, tus vidas, la moneda del juego y los objetos del juego se
-  guardan solo en tu dispositivo. Nunca se envían a ningún servidor nuestro; no gestionamos ningún servidor.
+  guardan en tu dispositivo. Nunca se nos envían; no gestionamos ningún servidor.
+- Si la copia de seguridad de Android está activada en tu dispositivo, estos datos del juego (archivo de guardado e
+  idioma elegido) también pueden incluirse en la copia de seguridad de Android de tu propia cuenta de Google y
+  restaurarse en un dispositivo nuevo. Esa copia la gestiona Google según sus condiciones; nosotros no tenemos acceso a
+  ella. Puedes desactivar la copia de seguridad en los ajustes de Android.
 - Para calcular los tiempos de recarga de las vidas, el juego lee en el dispositivo los relojes del propio dispositivo
-  (reloj del sistema, tiempo transcurrido desde el arranque y, si está disponible, la hora de la red). Esta información
-  nunca sale del dispositivo.
+  (reloj del sistema, tiempo transcurrido desde el arranque y, si está disponible, la hora de la red). Esta información no se nos
+  envía (solo puede formar parte del archivo de guardado en la copia de seguridad de Android descrita arriba).
 - El juego se puede jugar completamente sin conexión.
 - No hay compras dentro de la aplicación. Los artículos de la tienda solo se pueden comprar con cristales ganados en el
   juego.
@@ -40,7 +44,8 @@ Estos datos se cifran en tránsito (TLS). Cómo utiliza Google los datos: https:
 
 - En las regiones donde es obligatorio, como el Espacio Económico Europeo, el Reino Unido y Suiza, se muestra el
   formulario de consentimiento de Google (User Messaging Platform) antes de los anuncios.
-- Puedes cambiar tu elección en cualquier momento en el juego, en Ajustes > **Opciones de privacidad de anuncios**.
+- En esas regiones puedes cambiar tu elección en cualquier momento en el juego, en Ajustes > **Opciones de privacidad de
+  anuncios** (el botón solo aparece donde el consentimiento es obligatorio).
 - Puedes restablecer o eliminar tu ID de publicidad en Ajustes de Android > Privacidad > Anuncios.
 - Ver los vídeos con recompensa es completamente opcional.
 
@@ -52,8 +57,9 @@ años.
 
 ## Eliminación de tus datos
 
-Los datos propios del juego se guardan solo en tu dispositivo. Usar la opción Ajustes > Restablecer progreso o
-desinstalar la aplicación los elimina todos. Para los datos publicitarios de Google, usa el enlace de Google indicado más arriba.
+Los datos propios del juego se guardan solo en tu dispositivo. La opción Ajustes > Restablecer progreso borra tu
+progreso, la moneda del juego y tus objetos; desinstalar la aplicación borra todos los datos del juego del dispositivo;
+la copia de la copia de seguridad de Android se puede eliminar en los ajustes de copia de seguridad de tu cuenta de Google. Para los datos publicitarios de Google, usa el enlace de Google indicado más arriba.
 
 ## Cambios
 

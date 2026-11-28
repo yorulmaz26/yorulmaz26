@@ -4,7 +4,7 @@
   "title_alt_aso": "Prismway : Casse-tête lumineux",
   "short_description": "Tourne les miroirs, guide la lumière vers les cibles ! 500 casse-têtes logiques.",
   "slogan": "Guide la lumière, trouve la voie.",
-  "long_description": "Prismway (Işık Yolu) est un jeu de réflexion relaxant mais astucieux, où tu guides la lumière à l’aide de miroirs.\n\nFais pivoter les miroirs et envoie le rayon sur chaque cible. Décompose la lumière blanche en couleurs grâce aux prismes. Mélange les couleurs pour allumer les cibles jaunes, roses et cyan. Fais glisser les blocs de pierre pour dégager un passage et éclaire les clés pour ouvrir les portes.\n\n★ 500 niveaux répartis dans 5 mondes : des premiers pas tout en douceur aux vrais défis de logique\n★ Des niveaux de logique où tapoter au hasard ne suffit pas : réfléchis d’abord, joue ensuite\n★ Termine chaque niveau en un minimum de coups pour décrocher 3 étoiles\n★ Le puzzle du jour : une nouvelle énigme chaque jour, avec des récompenses de série\n★ Des apparences pour les miroirs, les plateaux et les rayons\n★ Des indices qui te montrent le bon coup à jouer quand tu bloques\n★ Joue hors ligne, sans connexion Internet\n★ 6 langues : Français, English, Türkçe, Deutsch, Italiano, Español\n\nComment jouer ?\nLa lumière part de la source et avance en ligne droite. Touche les miroirs entourés d’un anneau turquoise pour les faire pivoter et guider le rayon vers toutes les cibles. Chaque niveau offre un nombre de coups limité ; lancer un niveau coûte 1 vie, que tu récupères quand tu le termines. Les vies se rechargent toutes seules, à raison d’une toutes les 20 minutes. Le puzzle du jour ne coûte jamais de vie.\n\nLe jeu est gratuit et contient des publicités. Il n’y a aucun achat intégré : tout ce que propose la boutique s’achète avec les cristaux que tu gagnes en jouant.\n\nIdéal pour une petite pause comme pour une longue séance de réflexion. Guide la lumière et résous l’énigme !",
+  "long_description": "Prismway (Işık Yolu) est un jeu de réflexion relaxant mais astucieux, où tu guides la lumière à l’aide de miroirs.\n\nFais pivoter les miroirs et envoie le rayon sur chaque cible. Décompose la lumière blanche en couleurs grâce aux prismes. Mélange les couleurs pour allumer les cibles jaunes, roses et cyan. Fais glisser les blocs de pierre pour dégager un passage et éclaire les clés pour ouvrir les portes.\n\n★ 500 niveaux répartis dans 5 mondes : des premiers pas tout en douceur aux vrais défis de logique\n★ Des niveaux de logique où tapoter au hasard ne suffit pas : réfléchis d’abord, joue ensuite\n★ Termine chaque niveau en un minimum de coups pour décrocher 3 étoiles\n★ Le puzzle du jour : une nouvelle énigme chaque jour, avec des récompenses de série\n★ Des apparences pour les miroirs, les plateaux et les rayons\n★ Des indices qui te montrent le bon coup à jouer quand tu bloques\n★ Joue hors ligne, sans connexion Internet\n★ 6 langues : Français, English, Türkçe, Deutsch, Italiano, Español\n\nComment jouer ?\nLa lumière part de la source et avance en ligne droite. Touche les miroirs entourés d’un anneau turquoise pour les faire pivoter et guider le rayon vers toutes les cibles. Chaque niveau offre un nombre de coups limité ; ton premier coup dans un niveau coûte 1 vie, que tu récupères quand tu le termines. Les vies se rechargent toutes seules, à raison d’une toutes les 20 minutes. Le puzzle du jour ne coûte jamais de vie.\n\nLe jeu est gratuit et contient des publicités. Il n’y a aucun achat intégré : tout ce que propose la boutique s’achète avec les cristaux que tu gagnes en jouant.\n\nIdéal pour une petite pause comme pour une longue séance de réflexion. Guide la lumière et résous l’énigme !",
   "features": [
     "500 niveaux répartis en 5 mondes et 50 chapitres, tous avec une solution vérifiée",
     "Miroirs, prismes, filtres de couleur, blocs de pierre coulissants, clés et portes",
@@ -16,7 +16,7 @@
     "Jouable hors ligne, en 6 langues"
   ],
   "gameplay": "Chaque niveau comporte une ou plusieurs sources lumineuses et des anneaux cibles. Touche les miroirs rotatifs pour changer la direction du rayon, pousse les blocs pour dégager un passage et utilise les prismes et les filtres pour obtenir la bonne couleur. Quand toutes les cibles sont allumées, le niveau est terminé. Moins tu utilises de coups, plus tu gagnes d’étoiles.",
-  "target_audience": "Joueurs de tous âges qui aiment les jeux de logique et les casse-têtes, et toute personne à la recherche d’un jeu calme et hors ligne pour de courtes pauses. Le contenu convient à tous les publics.",
+  "target_audience": "Adolescents et adultes qui aiment les jeux de logique et les casse-têtes, et toute personne à la recherche d’un jeu calme et hors ligne pour de courtes pauses. Le jeu ne contient ni violence ni contenu pour adultes.",
   "keywords": [
     "jeu de réflexion",
     "casse-tête",
@@ -84,7 +84,7 @@
     ]
   ],
   "screenshot_alt_texts": [
-    "Sur le plateau de jeu, un rayon doré se réfléchit sur deux miroirs et atteint les anneaux cibles turquoise.",
+    "Niveau 169 : des rayons rouges et blancs rebondissent sur de nombreux miroirs et allument plusieurs cibles de couleur à la fois.",
     "La lumière blanche traverse un prisme et se divise en rayons rouge, vert et bleu qui allument des cibles colorées.",
     "La fenêtre « Niveau terminé » affiche trois étoiles dorées et le nombre de coups.",
     "Écran de sélection des niveaux : les mondes et les chapitres sont listés avec les étoiles obtenues.",
@@ -99,11 +99,11 @@
     "mechanic": "Tourne les miroirs",
     "mechanic2": "Allume toutes les cibles",
     "experience": "Sépare la lumière au prisme",
-    "experience2": "Chaque niveau, un nouveau défi",
+    "experience2": "Chaque niveau, un défi différent",
     "variety": "5 mondes · 500 niveaux",
     "variety2": "Blocs, clés et portes",
     "success": "Décroche les 3 étoiles",
-    "brand_tagline": "Éclaire la voie.",
+    "brand_tagline": "Guide la lumière, trouve la voie.",
     "cta1": "Joue dès maintenant !",
     "cta2": "Lance-toi dans l’aventure !"
   }

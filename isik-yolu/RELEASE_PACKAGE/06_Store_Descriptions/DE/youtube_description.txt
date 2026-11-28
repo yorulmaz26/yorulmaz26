@@ -1,4 +1,4 @@
-Prismway (Işık Yolu) ist ein Logik-Rätselspiel, in dem du Licht mit Spiegeln lenkst. Drehe Spiegel, zerlege Licht mit Prismen in seine Farben, verschiebe Steine und öffne Türen mit Schlüsseln.
+Prismway (Işık Yolu) ist ein Logik-Rätselspiel, in dem du Licht mit Spiegeln lenkst. Drehe Spiegel, zerlege Licht mit Prismen in seine Farben, verschiebe Blöcke und öffne Türen mit Schlüsseln.
 
 • 500 Level in 5 Welten
 • Jeden Tag ein neues Rätsel

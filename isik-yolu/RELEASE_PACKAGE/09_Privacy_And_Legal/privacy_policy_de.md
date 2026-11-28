@@ -11,11 +11,15 @@ Datenschutzerklärung.
 - Das Spiel verlangt nicht, dass du ein Konto erstellst, und fragt keine persönlichen Informationen wie deinen Namen,
   deine E-Mail-Adresse oder deine Telefonnummer ab.
 - Dein Fortschritt, deine Sterne, Einstellungen und Sprachauswahl, deine Leben, die Spielwährung und deine
-  Gegenstände im Spiel werden ausschließlich auf deinem Gerät gespeichert. Sie werden niemals an einen Server von uns
-  gesendet; wir betreiben keinen Server.
+  Gegenstände im Spiel werden auf deinem Gerät gespeichert. Sie werden niemals an uns gesendet; wir
+  betreiben keinen Server.
+- Wenn auf deinem Gerät die Android-Sicherung aktiviert ist, können diese Spieldaten (Speicherdatei und Sprachauswahl)
+  auch in die Android-Sicherung deines eigenen Google-Kontos aufgenommen und auf einem neuen Gerät wiederhergestellt
+  werden. Diese Sicherung wird von Google nach den Bedingungen von Google verwaltet; wir haben keinen Zugriff darauf.
+  Du kannst die Sicherung in den Android-Einstellungen ausschalten.
 - Um die Zeiten für das Auffüllen der Leben zu berechnen, liest das Spiel auf dem Gerät dessen eigene Uhren aus
-  (Systemuhr, Zeit seit dem Systemstart und, falls verfügbar, Netzwerkzeit). Diese Informationen verlassen das Gerät
-  nie.
+  (Systemuhr, Zeit seit dem Systemstart und, falls verfügbar, Netzwerkzeit). Diese Informationen werden nicht an uns
+  gesendet (sie können nur als Teil der Speicherdatei in die oben beschriebene Android-Sicherung gelangen).
 - Das Spiel kann vollständig offline gespielt werden.
 - Es gibt keine In-App-Käufe. Artikel im Shop können nur mit Kristallen gekauft werden, die im Spiel verdient werden.
 
@@ -40,7 +44,8 @@ https://policies.google.com/technologies/ads
 
 - In Regionen, in denen dies erforderlich ist, etwa im Europäischen Wirtschaftsraum, im Vereinigten Königreich und in
   der Schweiz, wird vor der Werbung das Einwilligungsformular von Google (User Messaging Platform) angezeigt.
-- Du kannst deine Auswahl jederzeit im Spiel unter Einstellungen > **Datenschutzoptionen für Werbung** ändern.
+- In diesen Regionen kannst du deine Auswahl jederzeit im Spiel unter Einstellungen > **Datenschutzoptionen für Werbung**
+  ändern (die Schaltfläche erscheint nur dort, wo eine Einwilligung erforderlich ist).
 - Du kannst deine Werbe-ID in den Android-Einstellungen unter Datenschutz > Anzeigen zurücksetzen oder löschen.
 - Das Ansehen von Videos mit Belohnung ist völlig freiwillig.
 
@@ -52,8 +57,10 @@ Das Spiel richtet sich an ein allgemeines Publikum und nicht gezielt an Kinder. 
 
 ## Löschen deiner Daten
 
-Die Daten des Spiels selbst werden ausschließlich auf deinem Gerät gespeichert. Über Einstellungen > Fortschritt
-zurücksetzen oder durch das Deinstallieren der App werden sie vollständig gelöscht. Für die Werbedaten von Google nutze
+Die Daten des Spiels selbst werden ausschließlich auf deinem Gerät gespeichert. Einstellungen > Fortschritt zurücksetzen
+löscht deinen Fortschritt, deine Spielwährung und deine Gegenstände; beim Deinstallieren der App werden alle Daten des
+Spiels vom Gerät gelöscht; die Kopie in deiner Android-Sicherung kannst du in den Sicherungseinstellungen deines
+Google-Kontos löschen. Für die Werbedaten von Google nutze
 den oben angegebenen Google-Link.
 
 ## Änderungen

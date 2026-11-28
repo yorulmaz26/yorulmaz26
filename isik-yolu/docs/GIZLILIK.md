@@ -8,10 +8,14 @@ Bu politika, Magic Lumos Software tarafından geliştirilen Android oyunu **Iş�
 ## Oyunun kendisi
 
 - Hesap açtırmaz; ad, e-posta, telefon numarası gibi kişisel bilgi istemez.
-- İlerleme, yıldızlar, ayarlar, dil seçimi, canlar, oyun içi para ve oyun içi ürünler yalnızca cihazında saklanır.
-  Hiçbir sunucumuza gönderilmez; bizim bir sunucumuz yoktur.
+- İlerleme, yıldızlar, ayarlar, dil seçimi, canlar, oyun içi para ve oyun içi ürünler cihazında saklanır. Bize
+  gönderilmez; bizim bir sunucumuz yoktur.
+- Cihazında Android yedeklemesi açıksa bu oyun verileri (kayıt dosyası ve dil seçimi) kendi Google hesabındaki Android
+  yedeğine de girebilir ve yeni bir cihaza geri yüklenebilir. Bu yedek Google tarafından, Google'ın koşullarıyla
+  yönetilir; bizim erişimimiz yoktur. Yedeklemeyi Android ayarlarından kapatabilirsin.
 - Can sisteminin süre hesabı için cihazın kendi saatleri (sistem saati, açılıştan beri geçen süre ve varsa ağ
-  saati) cihazda okunur. Bu bilgiler cihazdan çıkmaz.
+  saati) cihazda okunur. Bu bilgiler bize gönderilmez
+  (yalnızca kayıt dosyasının parçası olarak yukarıdaki Android yedeğine girebilir).
 - Oyun internet olmadan da tamamen oynanır.
 - Uygulama içi satın alma yoktur. Marketteki ürünler yalnızca oyunda kazanılan kristallerle alınır.
 
@@ -36,7 +40,8 @@ https://policies.google.com/technologies/ads
 
 - Avrupa Ekonomik Alanı, İngiltere ve İsviçre gibi gereken bölgelerde reklamlardan önce Google'ın izin formu (User
   Messaging Platform) gösterilir.
-- Seçimini istediğin zaman oyundaki Ayarlar > **Reklam Gizlilik Seçenekleri** ile değiştirebilirsin.
+- Bu bölgelerde seçimini istediğin zaman oyundaki Ayarlar > **Reklam Gizlilik Seçenekleri** ile değiştirebilirsin
+  (düğme yalnızca izin gereken bölgelerde görünür).
 - Reklam kimliğini Android Ayarlar > Gizlilik > Reklamlar bölümünden sıfırlayabilir ya da silebilirsin.
 - Ödüllü videoları izlemek tamamen isteğe bağlıdır.
 
@@ -47,7 +52,9 @@ sınırlandırılmıştır. Oyun bilerek 13 yaşından küçük çocuklardan ki�
 
 ## Verilerin silinmesi
 
-Oyunun kendi verileri yalnızca cihazındadır. Ayarlar > İlerlemeyi Sıfırla ya da uygulamayı kaldırmak hepsini siler.
+Oyunun kendi verileri yalnızca cihazındadır. Ayarlar > İlerlemeyi Sıfırla; ilerlemeni, oyun parasını ve
+ürünlerini siler. Uygulamayı kaldırmak oyunun cihazdaki bütün
+verilerini siler; Android yedeğindeki kopya, Google hesabının yedekleme ayarlarından silinebilir.
 Google'ın reklamla ilgili verileri için yukarıdaki Google bağlantısını kullanabilirsin.
 
 ## Değişiklikler

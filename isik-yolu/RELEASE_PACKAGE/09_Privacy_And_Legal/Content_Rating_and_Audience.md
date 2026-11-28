@@ -33,7 +33,7 @@ Bu yanıtlar Play Console'da **senin hesabınla** doldurulmalıdır. Aşağıdak
 | Beyan | Önerilen yanıt |
 |---|---|
 | Reklam içerir | Evet |
-| Reklam kimliği | Evet (reklam, analiz) |
+| Reklam kimliği | Evet (reklam, analiz, dolandırıcılığı önleme) |
 | Uygulama içi satın alma | Hayır |
 | Kamu kurumu / haber / sağlık / finans uygulaması | Hayır |
 | Ön plan hizmeti (FGS) beyanı | Gerekmiyor görünüyor. Birleşik manifestte yalnızca WorkManager'ın türü belirtilmemiş `SystemForegroundService` hizmeti ve `FOREGROUND_SERVICE` izni var (AdMob → WorkManager). Oyun ön plan hizmeti başlatmaz, tür izni (ör. `FOREGROUND_SERVICE_DATA_SYNC`) yok. Play Console yine de sorarsa "kullanılmıyor" de. **Manuel kontrol gerekli.** |

@@ -1,6 +1,6 @@
 Prismway (Işık Yolu) ist ein entspanntes, aber kniffliges Rätselspiel, in dem du Licht mit Spiegeln lenkst.
 
-Drehe Spiegel und schicke den Strahl zu jedem Ziel. Zerlege weißes Licht mit Prismen in seine Farben. Mische Farben und bring Ziele in Gelb, Pink und Cyan zum Leuchten. Verschiebe Steine, um den Weg freizumachen, und beleuchte Schlüssel, um Türen zu öffnen.
+Drehe Spiegel und schicke den Strahl zu jedem Ziel. Zerlege weißes Licht mit Prismen in seine Farben. Mische Farben und bring Ziele in Gelb, Pink und Cyan zum Leuchten. Verschiebe Blöcke, um den Weg freizumachen, und beleuchte Schlüssel, um Türen zu öffnen.
 
 ★ 500 Level in 5 Welten: von leichten ersten Schritten bis zu echten Logik-Herausforderungen
 ★ Logik-Level, die du nicht durch wahlloses Tippen löst: erst denken, dann ziehen
@@ -12,7 +12,7 @@ Drehe Spiegel und schicke den Strahl zu jedem Ziel. Zerlege weißes Licht mit Pr
 ★ 6 Sprachen: Deutsch, English, Türkçe, Italiano, Français, Español
 
 So wird gespielt
-Das Licht tritt aus der Lichtquelle aus und verläuft geradeaus. Tippe auf die Spiegel mit den türkisfarbenen Ringen, um sie zu drehen, und lenke den Strahl zu allen Zielen. Jedes Level hat eine begrenzte Anzahl an Zügen. Ein Level zu starten kostet 1 Leben – schaffst du es, bekommst du das Leben zurück. Alle 20 Minuten füllt sich von selbst 1 Leben wieder auf. Das Tagesrätsel kostet nie ein Leben.
+Das Licht tritt aus der Lichtquelle aus und verläuft geradeaus. Tippe auf die Spiegel mit den türkisfarbenen Ringen, um sie zu drehen, und lenke den Strahl zu allen Zielen. Jedes Level hat eine begrenzte Anzahl an Zügen. Dein erster Zug in einem Level kostet 1 Leben – schaffst du es, bekommst du das Leben zurück. Alle 20 Minuten füllt sich von selbst 1 Leben wieder auf. Das Tagesrätsel kostet nie ein Leben.
 
 Das Spiel ist kostenlos spielbar und enthält Werbung. Es gibt keine In-App-Käufe: Alles im Shop kaufst du mit Kristallen, die du beim Spielen verdienst.
 

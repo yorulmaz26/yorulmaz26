@@ -1,6 +1,6 @@
 Prismway (Işık Yolu) is a calm but clever puzzle game where you guide light with mirrors.
 
-Rotate mirrors and send the beam to every target. Split white light into colors with prisms. Mix colors to light up yellow, pink and cyan targets. Slide stones to clear a path, light up keys to open doors.
+Rotate mirrors and send the beam to every target. Split white light into colors with prisms. Mix colors to light up yellow, pink and cyan targets. Slide blocks to clear a path, light up keys to open doors.
 
 ★ 500 levels across 5 worlds: from easy first steps to true logic challenges
 ★ Logic levels you can't solve by random tapping: think first, then move
@@ -12,7 +12,7 @@ Rotate mirrors and send the beam to every target. Split white light into colors 
 ★ 6 languages: English, Türkçe, Deutsch, Italiano, Français, Español
 
 How to play
-Light leaves the source and travels in a straight line. Tap the mirrors with turquoise rings to rotate them and guide the beam to all targets. Each level has a limited number of moves; starting a level uses 1 life, and you get it back when you finish. Lives refill on their own, 1 every 20 minutes. The daily puzzle never costs a life.
+Light leaves the source and travels in a straight line. Tap the mirrors with turquoise rings to rotate them and guide the beam to all targets. Each level has a limited number of moves; your first move in a level uses 1 life, and you get it back when you finish. Lives refill on their own, 1 every 20 minutes. The daily puzzle never costs a life.
 
 The game is free to play and contains ads. There are no in-app purchases: everything in the shop is bought with crystals you earn by playing.
 

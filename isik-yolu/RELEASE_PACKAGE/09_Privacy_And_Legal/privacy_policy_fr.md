@@ -11,11 +11,16 @@ confidentialité.
 - Il ne te demande pas de créer de compte et ne te demande aucune information personnelle telle que ton nom, ton
   adresse e-mail ou ton numéro de téléphone.
 - Ta progression, tes étoiles, tes paramètres, ton choix de langue, tes vies, ta monnaie virtuelle et tes objets du jeu
-  sont stockés uniquement sur ton appareil. Ils ne sont jamais envoyés à un serveur nous appartenant ; nous
-  n’exploitons aucun serveur.
+  sont stockés sur ton appareil. Ils ne nous sont jamais envoyés ; nous n’exploitons
+  aucun serveur.
+- Si la sauvegarde Android est activée sur ton appareil, ces données de jeu (fichier de sauvegarde et choix de langue)
+  peuvent aussi être incluses dans la sauvegarde Android de ton propre compte Google et restaurées sur un nouvel
+  appareil. Cette sauvegarde est gérée par Google selon les conditions de Google ; nous n’y avons pas accès. Tu peux
+  désactiver la sauvegarde dans les paramètres Android.
 - Pour calculer les délais de recharge des vies, le jeu lit, sur l’appareil, les horloges propres à l’appareil
-  (horloge système, temps écoulé depuis le démarrage et, si elle est disponible, heure du réseau). Ces informations ne
-  quittent jamais l’appareil.
+  (horloge système, temps écoulé depuis le démarrage et, si elle est disponible, heure du réseau). Ces informations ne nous sont
+  pas envoyées (elles peuvent seulement figurer, dans le fichier de sauvegarde, dans la sauvegarde Android décrite
+  plus haut).
 - Le jeu peut se jouer entièrement hors ligne.
 - Il n’y a aucun achat intégré. Les objets de la boutique ne peuvent être achetés qu’avec des cristaux gagnés dans le
   jeu.
@@ -42,7 +47,8 @@ https://policies.google.com/technologies/ads
 
 - Dans les régions où cela est requis, comme l’Espace économique européen, le Royaume-Uni et la Suisse, le
   formulaire de consentement de Google (User Messaging Platform) s’affiche avant les publicités.
-- Tu peux modifier ton choix à tout moment dans le jeu, sous Paramètres > **Options de confidentialité des annonces**.
+- Dans ces régions, tu peux modifier ton choix à tout moment dans le jeu, sous Paramètres > **Options de confidentialité des
+  annonces** (le bouton n’apparaît que là où le consentement est requis).
 - Tu peux réinitialiser ou supprimer ton identifiant publicitaire dans Paramètres Android > Confidentialité > Annonces.
 - Le visionnage des vidéos récompensées est entièrement facultatif.
 
@@ -54,8 +60,9 @@ moins de 13 ans.
 
 ## Suppression de tes données
 
-Les données propres au jeu sont stockées uniquement sur ton appareil. L’option Paramètres > Réinitialiser la progression,
-ou la désinstallation de l’application, les supprime toutes. Pour les données publicitaires de Google,
+Les données propres au jeu sont stockées uniquement sur ton appareil. L’option Paramètres > Réinitialiser la progression efface
+ta progression, ta monnaie de jeu et tes objets ; la désinstallation de l’application efface toutes les données du jeu de
+l’appareil ; la copie de ta sauvegarde Android peut être supprimée dans les paramètres de sauvegarde de ton compte Google. Pour les données publicitaires de Google,
 utilise le lien Google ci-dessus.
 
 ## Modifications

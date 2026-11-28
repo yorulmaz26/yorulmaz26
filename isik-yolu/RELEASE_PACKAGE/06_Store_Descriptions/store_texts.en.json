@@ -4,10 +4,10 @@
   "title_alt_aso": "Prismway: Light Beam Puzzle",
   "short_description": "Rotate mirrors and guide the light to every target! 500 logic puzzles.",
   "slogan": "Guide the light, find the way.",
-  "long_description": "Prismway (Işık Yolu) is a calm but clever puzzle game where you guide light with mirrors.\n\nRotate mirrors and send the beam to every target. Split white light into colors with prisms. Mix colors to light up yellow, pink and cyan targets. Slide stones to clear a path, light up keys to open doors.\n\n★ 500 levels across 5 worlds: from easy first steps to true logic challenges\n★ Logic levels you can't solve by random tapping: think first, then move\n★ Finish in the fewest moves to earn 3 stars\n★ A new daily puzzle every day, with streak rewards\n★ Skins for mirrors, boards and beams\n★ Hints that show you the next right move when you're stuck\n★ Play offline, no internet needed\n★ 6 languages: English, Türkçe, Deutsch, Italiano, Français, Español\n\nHow to play\nLight leaves the source and travels in a straight line. Tap the mirrors with turquoise rings to rotate them and guide the beam to all targets. Each level has a limited number of moves; starting a level uses 1 life, and you get it back when you finish. Lives refill on their own, 1 every 20 minutes. The daily puzzle never costs a life.\n\nThe game is free to play and contains ads. There are no in-app purchases: everything in the shop is bought with crystals you earn by playing.\n\nPerfect for a quick break or a long thinking session. Guide the light and solve the puzzle!",
+  "long_description": "Prismway (Işık Yolu) is a calm but clever puzzle game where you guide light with mirrors.\n\nRotate mirrors and send the beam to every target. Split white light into colors with prisms. Mix colors to light up yellow, pink and cyan targets. Slide blocks to clear a path, light up keys to open doors.\n\n★ 500 levels across 5 worlds: from easy first steps to true logic challenges\n★ Logic levels you can't solve by random tapping: think first, then move\n★ Finish in the fewest moves to earn 3 stars\n★ A new daily puzzle every day, with streak rewards\n★ Skins for mirrors, boards and beams\n★ Hints that show you the next right move when you're stuck\n★ Play offline, no internet needed\n★ 6 languages: English, Türkçe, Deutsch, Italiano, Français, Español\n\nHow to play\nLight leaves the source and travels in a straight line. Tap the mirrors with turquoise rings to rotate them and guide the beam to all targets. Each level has a limited number of moves; your first move in a level uses 1 life, and you get it back when you finish. Lives refill on their own, 1 every 20 minutes. The daily puzzle never costs a life.\n\nThe game is free to play and contains ads. There are no in-app purchases: everything in the shop is bought with crystals you earn by playing.\n\nPerfect for a quick break or a long thinking session. Guide the light and solve the puzzle!",
   "features": [
     "500 levels in 5 worlds and 50 chapters, each one verified as solvable",
-    "Mirrors, prisms, color filters, sliding stones, keys and doors",
+    "Mirrors, prisms, color filters, sliding blocks, keys and doors",
     "3 stars for the fewest moves, with a move counter and undo",
     "A new daily puzzle every day, with streak rewards",
     "Achievements, crystals and Prism Gems",
@@ -15,8 +15,8 @@
     "Hints that show the next right move",
     "Offline play and 6 languages"
   ],
-  "gameplay": "Each level has one or more light sources and target rings. Tap rotatable mirrors to change the beam's direction, push stones to clear a path, and use prisms and filters to get the right color. When every target is lit, the level is complete. The fewer moves you use, the more stars you earn.",
-  "target_audience": "Players of all ages who enjoy logic and puzzle games, and anyone looking for a calm, offline game for short breaks. The content is suitable for a general audience.",
+  "gameplay": "Each level has one or more light sources and target rings. Tap rotatable mirrors to change the beam's direction, push blocks to clear a path, and use prisms and filters to get the right color. When every target is lit, the level is complete. The fewer moves you use, the more stars you earn.",
+  "target_audience": "Teens and adults who enjoy logic and puzzle games, and anyone looking for a calm, offline game for short breaks. The game contains no violence or mature content.",
   "keywords": [
     "light puzzle",
     "mirror puzzle",
@@ -41,7 +41,7 @@
   ],
   "release_notes": "Prismway (Işık Yolu) is here!\n• 500 levels in 5 worlds\n• Daily puzzle and achievements\n• Available in 6 languages\n• Lives refill every 20 minutes",
   "video_title": "Prismway (Işık Yolu) – Gameplay Trailer",
-  "youtube_description": "Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide stones and open doors with keys.\n\n• 500 levels in 5 worlds\n• A new puzzle every day\n• Play offline\n• 6 languages\n\nAll footage in this video is real gameplay.\nMagic Lumos Software",
+  "youtube_description": "Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide blocks and open doors with keys.\n\n• 500 levels in 5 worlds\n• A new puzzle every day\n• Play offline\n• 6 languages\n\nAll footage in this video is real gameplay.\nMagic Lumos Software",
   "social_posts": [
     "Guide the light, find the way. ✨ Prismway (Işık Yolu): mirrors, prisms and 500 logic puzzles. #puzzle #logicgame #mobilegame",
     "Split white light with a prism and send each color to the right target. 🌈 Prismway (Işık Yolu) #Prismway #puzzlegame",
@@ -69,11 +69,11 @@
       "Light up the key to open the door"
     ],
     [
-      "Slide the stones",
+      "Slide the blocks",
       "Push blocks to clear the light's path"
     ],
     [
-      "A new puzzle every day",
+      "One puzzle every day",
       "Keep your streak, collect rewards"
     ],
     [
@@ -82,12 +82,12 @@
     ]
   ],
   "screenshot_alt_texts": [
-    "On the game board, a golden beam reflects off two mirrors and reaches the turquoise target rings.",
+    "Level 169: red and white beams bounce off many mirrors and light up several colored targets at once.",
     "White light passes through a prism and splits into red, green and blue beams that light up colored targets.",
     "The level complete window shows three gold stars and the number of moves.",
     "Level select screen listing worlds and chapters with the stars earned.",
     "The beam lights up a key and a door on the board opens.",
-    "The player pushes a stone to clear a path for the light.",
+    "The player pushes a block to clear a path for the light.",
     "Daily puzzle screen with a calendar, a streak counter and today's puzzle.",
     "A game board decorated with different mirror, board and beam skins."
   ],
@@ -97,9 +97,9 @@
     "mechanic": "Rotate the mirrors",
     "mechanic2": "Light up every target",
     "experience": "Split colors with prisms",
-    "experience2": "Every level, a new puzzle",
+    "experience2": "Every level, a different puzzle",
     "variety": "5 worlds · 500 levels",
-    "variety2": "Stones, keys and doors",
+    "variety2": "Blocks, keys and doors",
     "success": "Collect all 3 stars",
     "brand_tagline": "Guide the light, find the way.",
     "cta1": "Play Now!",

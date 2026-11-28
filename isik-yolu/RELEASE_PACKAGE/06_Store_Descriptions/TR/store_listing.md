@@ -7,7 +7,7 @@ Dil / language: `tr`
 | title | 20 | 30 |
 | title_alt_aso | 25 | 30 |
 | short_description | 69 | 80 |
-| long_description | 1258 | 4000 |
+| long_description | 1263 | 4000 |
 
 ## Title
 Işık Yolu – Prismway
@@ -37,7 +37,7 @@ Aynaları döndür, ışık hüzmesini hedeflere ulaştır. Prizmalarla beyaz ı
 ★ 6 dil: Türkçe, English, Deutsch, Italiano, Français, Español
 
 Nasıl oynanır?
-Işık kaynaktan çıkar ve düz gider. Turkuaz halkalı aynalara dokunarak onları çevir, ışını bütün hedeflere ulaştır. Her bölümde sınırlı hamle hakkın var; bölüme başlamak 1 can harcar, bölümü bitirirsen can geri gelir. Canlar 20 dakikada bir kendiliğinden yenilenir. Günlük bulmaca can harcamaz.
+Işık kaynaktan çıkar ve düz gider. Turkuaz halkalı aynalara dokunarak onları çevir, ışını bütün hedeflere ulaştır. Her bölümde sınırlı hamle hakkın var; bölümdeki ilk hamlen 1 can harcar, bölümü bitirirsen can geri gelir. Canlar 20 dakikada bir kendiliğinden yenilenir. Günlük bulmaca can harcamaz.
 
 Oyun ücretsizdir ve reklam içerir. Uygulama içi satın alma yoktur: marketteki her şey oyunda kazanılan kristallerle alınır.
 
@@ -57,7 +57,7 @@ Kısa molalar için de, uzun düşünme oturumları için de uygun. Işığı y�
 Her bölümde bir ya da daha fazla ışık kaynağı ve hedef halka var. Dönebilen aynalara dokunarak ışığın yönünü değiştirir, taşları iterek yol açar, prizma ve süzgeçlerle doğru rengi elde edersin. Bütün hedefler yandığında bölüm biter. Ne kadar az hamle, o kadar çok yıldız.
 
 ## Target audience
-Mantık ve bulmaca oyunlarını seven her yaştan oyuncu; kısa molalarda oynanacak, internetsiz, sakin bir oyun arayanlar. İçerik genel kitleye uygundur.
+Mantık ve bulmaca oyunlarını seven gençler ve yetişkinler; kısa molalarda oynanacak, internetsiz, sakin bir oyun arayanlar. İçerikte şiddet ya da uygunsuz öğe yoktur.
 
 ## Keywords
 ışık bulmacası, ayna bulmacası, mantık oyunu, lazer bulmaca, prizma, zeka oyunu, beyin oyunu, internetsiz oyun, çevrimdışı bulmaca, renk bulmacası, günlük bulmaca, yansıma
@@ -98,13 +98,13 @@ Magic Lumos Software
 
 | # | Caption | Subline | Alt text |
 |---|---|---|---|
-| 1 | Işığı yönlendir | Aynaları döndür, bütün hedefleri yak | Oyun tahtasında altın renkli ışın iki aynadan yansıyarak turkuaz hedef halkalara ulaşıyor. |
+| 1 | Işığı yönlendir | Aynaları döndür, bütün hedefleri yak | Bölüm 169: kırmızı ve beyaz ışınlar birçok aynadan yansıyarak farklı renkteki hedefleri aynı anda yakıyor. |
 | 2 | Prizmalar ve renkler | Beyaz ışığı renklerine ayır | Beyaz ışık bir prizmadan geçip kırmızı, yeşil ve mavi ışınlara ayrılıyor; renkli hedefler yanıyor. |
 | 3 | Yıldızları topla | En az hamleyle bitir, 3 yıldız kazan | Bölüm tamamlandı penceresinde üç altın yıldız ve hamle sayısı görünüyor. |
 | 4 | 5 dünya, 500 bölüm | Kolaydan ustalığa adım adım | Bölüm seçme ekranı: dünyalar ve bölüm grupları, kazanılan yıldızlarla birlikte listeleniyor. |
 | 5 | Anahtarlar ve kapılar | Anahtarı ışıkla yak, kapı açılsın | Işın bir anahtarı yakıyor, tahtadaki kapı açılıyor. |
 | 6 | Taşları kaydır | Işığa yol açmak için blokları it | Oyuncu bir taşı iterek ışığın geçeceği yolu açıyor. |
-| 7 | Her gün yeni bulmaca | Seriyi sürdür, ödülleri topla | Günlük bulmaca ekranı: takvim, seri sayacı ve günün bulmacası. |
+| 7 | Her gün bir bulmaca | Seriyi sürdür, ödülleri topla | Günlük bulmaca ekranı: takvim, seri sayacı ve günün bulmacası. |
 | 8 | Kendi tarzın | Ayna, tahta ve ışın görünümleri | Farklı ayna, tahta ve ışın görünümleriyle süslenmiş bir oyun tahtası. |
 
 Feature graphic alt text: Işık Yolu (Prismway) logosu ve ışını aynalarla hedefe yönlendirilen oyun tahtası.
@@ -114,6 +114,7 @@ Feature graphic alt text: Işık Yolu (Prismway) logosu ve ışını aynalarla h
 - mechanic: Aynaları döndür
 - mechanic2: Bütün hedefleri yak
 - experience: Prizmalarla renkleri ayır
+- experience2: Her bölüm farklı bir bulmaca
 - variety: 5 dünya · 500 bölüm
 - variety2: Taşlar, anahtarlar, kapılar
 - success: 3 yıldızı topla

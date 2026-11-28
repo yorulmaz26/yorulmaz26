@@ -16,6 +16,11 @@ def realAdKeys = TEST_ADS.keySet().findAll { project.hasProperty(it) && project.
 if (!realAdKeys.isEmpty() && realAdKeys.size() != TEST_ADS.size())
     throw new GradleException("AdMob kimlikleri eksik: ${TEST_ADS.keySet() - realAdKeys} (dördü birlikte verilmeli; hiçbiri verilmezse test kimlikleri kullanılır)")
 def adId = { String key, boolean release -> release && !realAdKeys.isEmpty() ? project.property(key).toString().trim() : TEST_ADS[key] }
+// Yükleme anahtarıyla (Play'e gidecek) imzalanan derlemede test reklam kimlikleri kullanılmasın: sessizce gelirsiz yayın olmasın
+def uploadKeyGiven = project.hasProperty('uploadStoreFile') || System.getenv('UPLOAD_STORE_FILE')
+if (uploadKeyGiven && realAdKeys.isEmpty() && !project.hasProperty('allowTestAds'))
+    throw new GradleException("Yükleme anahtarı verildi ama gerçek AdMob kimlikleri (admobAppId, admobBanner, admobInterstitial, admobRewarded) yok. " +
+            "Play sürümü test reklamlarıyla derlenmesin diye durduruldu. Bilerek test reklamıyla derlemek için: -PallowTestAds")
 // Gizlilik politikası adresi (Play Console'a da girilir): privacyPolicyUrl=https://...
 def privacyUrl = project.hasProperty('privacyPolicyUrl') ? project.property('privacyPolicyUrl').toString().trim() : ''
 

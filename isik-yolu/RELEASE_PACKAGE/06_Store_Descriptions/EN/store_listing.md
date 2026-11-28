@@ -7,7 +7,7 @@ Dil / language: `en`
 | title | 20 | 30 |
 | title_alt_aso | 27 | 30 |
 | short_description | 70 | 80 |
-| long_description | 1331 | 4000 |
+| long_description | 1341 | 4000 |
 
 ## Title
 Prismway – Işık Yolu
@@ -25,7 +25,7 @@ Guide the light, find the way.
 
 Prismway (Işık Yolu) is a calm but clever puzzle game where you guide light with mirrors.
 
-Rotate mirrors and send the beam to every target. Split white light into colors with prisms. Mix colors to light up yellow, pink and cyan targets. Slide stones to clear a path, light up keys to open doors.
+Rotate mirrors and send the beam to every target. Split white light into colors with prisms. Mix colors to light up yellow, pink and cyan targets. Slide blocks to clear a path, light up keys to open doors.
 
 ★ 500 levels across 5 worlds: from easy first steps to true logic challenges
 ★ Logic levels you can't solve by random tapping: think first, then move
@@ -37,7 +37,7 @@ Rotate mirrors and send the beam to every target. Split white light into colors 
 ★ 6 languages: English, Türkçe, Deutsch, Italiano, Français, Español
 
 How to play
-Light leaves the source and travels in a straight line. Tap the mirrors with turquoise rings to rotate them and guide the beam to all targets. Each level has a limited number of moves; starting a level uses 1 life, and you get it back when you finish. Lives refill on their own, 1 every 20 minutes. The daily puzzle never costs a life.
+Light leaves the source and travels in a straight line. Tap the mirrors with turquoise rings to rotate them and guide the beam to all targets. Each level has a limited number of moves; your first move in a level uses 1 life, and you get it back when you finish. Lives refill on their own, 1 every 20 minutes. The daily puzzle never costs a life.
 
 The game is free to play and contains ads. There are no in-app purchases: everything in the shop is bought with crystals you earn by playing.
 
@@ -45,7 +45,7 @@ Perfect for a quick break or a long thinking session. Guide the light and solve 
 
 ## Features
 - 500 levels in 5 worlds and 50 chapters, each one verified as solvable
-- Mirrors, prisms, color filters, sliding stones, keys and doors
+- Mirrors, prisms, color filters, sliding blocks, keys and doors
 - 3 stars for the fewest moves, with a move counter and undo
 - A new daily puzzle every day, with streak rewards
 - Achievements, crystals and Prism Gems
@@ -54,10 +54,10 @@ Perfect for a quick break or a long thinking session. Guide the light and solve 
 - Offline play and 6 languages
 
 ## Gameplay
-Each level has one or more light sources and target rings. Tap rotatable mirrors to change the beam's direction, push stones to clear a path, and use prisms and filters to get the right color. When every target is lit, the level is complete. The fewer moves you use, the more stars you earn.
+Each level has one or more light sources and target rings. Tap rotatable mirrors to change the beam's direction, push blocks to clear a path, and use prisms and filters to get the right color. When every target is lit, the level is complete. The fewer moves you use, the more stars you earn.
 
 ## Target audience
-Players of all ages who enjoy logic and puzzle games, and anyone looking for a calm, offline game for short breaks. The content is suitable for a general audience.
+Teens and adults who enjoy logic and puzzle games, and anyone looking for a calm, offline game for short breaks. The game contains no violence or mature content.
 
 ## Keywords
 light puzzle, mirror puzzle, logic game, laser puzzle, prism, brain teaser, brain game, offline game, offline puzzle, color puzzle, daily puzzle, reflection
@@ -79,7 +79,7 @@ Prismway (Işık Yolu) is here!
 Prismway (Işık Yolu) – Gameplay Trailer
 
 ## YouTube description
-Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide stones and open doors with keys.
+Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide blocks and open doors with keys.
 
 • 500 levels in 5 worlds
 • A new puzzle every day
@@ -98,13 +98,13 @@ Magic Lumos Software
 
 | # | Caption | Subline | Alt text |
 |---|---|---|---|
-| 1 | Guide the light | Rotate mirrors, light up every target | On the game board, a golden beam reflects off two mirrors and reaches the turquoise target rings. |
+| 1 | Guide the light | Rotate mirrors, light up every target | Level 169: red and white beams bounce off many mirrors and light up several colored targets at once. |
 | 2 | Prisms and colors | Split white light into colors | White light passes through a prism and splits into red, green and blue beams that light up colored targets. |
 | 3 | Collect the stars | Finish in the fewest moves for 3 stars | The level complete window shows three gold stars and the number of moves. |
 | 4 | 5 worlds, 500 levels | From easy steps to mastery | Level select screen listing worlds and chapters with the stars earned. |
 | 5 | Keys and doors | Light up the key to open the door | The beam lights up a key and a door on the board opens. |
-| 6 | Slide the stones | Push blocks to clear the light's path | The player pushes a stone to clear a path for the light. |
-| 7 | A new puzzle every day | Keep your streak, collect rewards | Daily puzzle screen with a calendar, a streak counter and today's puzzle. |
+| 6 | Slide the blocks | Push blocks to clear the light's path | The player pushes a block to clear a path for the light. |
+| 7 | One puzzle every day | Keep your streak, collect rewards | Daily puzzle screen with a calendar, a streak counter and today's puzzle. |
 | 8 | Your own style | Mirror, board and beam skins | A game board decorated with different mirror, board and beam skins. |
 
 Feature graphic alt text: Prismway (Işık Yolu) logo and a game board where a beam is guided to its target with mirrors.
@@ -114,8 +114,9 @@ Feature graphic alt text: Prismway (Işık Yolu) logo and a game board where a b
 - mechanic: Rotate the mirrors
 - mechanic2: Light up every target
 - experience: Split colors with prisms
+- experience2: Every level, a different puzzle
 - variety: 5 worlds · 500 levels
-- variety2: Stones, keys and doors
+- variety2: Blocks, keys and doors
 - success: Collect all 3 stars
 - brand_tagline: Guide the light, find the way.
 - cta1: Play Now!

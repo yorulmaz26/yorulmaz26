@@ -1,6 +1,6 @@
 Prismway (Işık Yolu) es un juego de puzles tranquilo pero ingenioso en el que guías la luz con espejos.
 
-Gira los espejos y lleva el rayo hasta cada objetivo. Descompón la luz blanca en colores con prismas. Mezcla colores para iluminar objetivos de color amarillo, rosa y cian. Desliza piedras para despejar el camino e ilumina llaves para abrir puertas.
+Gira los espejos y lleva el rayo hasta cada objetivo. Descompón la luz blanca en colores con prismas. Mezcla colores para iluminar objetivos de color amarillo, rosa y cian. Desliza bloques para despejar el camino e ilumina llaves para abrir puertas.
 
 ★ 500 niveles en 5 mundos: desde los primeros pasos más sencillos hasta auténticos retos de lógica
 ★ Niveles de lógica que no se superan tocando al azar: piensa antes de mover
@@ -12,7 +12,7 @@ Gira los espejos y lleva el rayo hasta cada objetivo. Descompón la luz blanca e
 ★ 6 idiomas: English, Türkçe, Deutsch, Italiano, Français, Español
 
 Cómo jugar
-La luz sale de la fuente y avanza en línea recta. Toca los espejos con anillo turquesa para girarlos y guiar el rayo hasta todos los objetivos. Cada nivel tiene un número limitado de movimientos; empezar un nivel cuesta 1 vida, y la recuperas al completarlo. Las vidas se recargan solas, 1 cada 20 minutos. El puzle diario nunca cuesta vidas.
+La luz sale de la fuente y avanza en línea recta. Toca los espejos con anillo turquesa para girarlos y guiar el rayo hasta todos los objetivos. Cada nivel tiene un número limitado de movimientos; tu primer movimiento en un nivel cuesta 1 vida, y la recuperas al completarlo. Las vidas se recargan solas, 1 cada 20 minutos. El puzle diario nunca cuesta vidas.
 
 El juego es gratuito y contiene anuncios. No hay compras dentro de la aplicación: todo lo que hay en la tienda se compra con cristales que ganas jugando.
 

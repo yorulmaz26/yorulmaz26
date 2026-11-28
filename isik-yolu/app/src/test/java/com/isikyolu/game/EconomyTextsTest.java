@@ -60,7 +60,8 @@ public class EconomyTextsTest {
         use("tr");
         assertNull(EconomyTexts.blockReason(null, 0));
         assertEquals("Sahipsin", EconomyTexts.blockReason(Economy.BLOCK_OWNED, 0));
-        assertEquals("Bölüm 20'u bitir", EconomyTexts.blockReason(Economy.BLOCK_LOCKED, Economy.item("mirror_gold")));
+        // 1.8.0: "Bölüm 20'u bitir" ek hatası düzeltildi (20'yi, 40'ı, 100'ü … sayıya göre değişir): ek kullanılmaz
+        assertEquals("Önce 20. bölümü bitir", EconomyTexts.blockReason(Economy.BLOCK_LOCKED, Economy.item("mirror_gold")));
         assertEquals("Bugünlük sınır doldu", EconomyTexts.blockReason(Economy.BLOCK_DAILY_LIMIT, 0));
         assertEquals("Canların dolu", EconomyTexts.blockReason(Economy.BLOCK_LIVES_FULL, 0));
         assertEquals("Yetersiz Prizma Taşı", EconomyTexts.blockReason(Economy.BLOCK_NOT_ENOUGH_GEMS, 0));

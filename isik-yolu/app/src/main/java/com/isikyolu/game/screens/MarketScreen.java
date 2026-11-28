@@ -39,6 +39,9 @@ public final class MarketScreen extends Screen {
     private final HorizontalScrollView hs;
     private final CurrencyBar bar;
     private int tab;
+
+    /** Açık sekme (dil değişince ekran aynı sekmeyle yeniden kurulur). */
+    public int currentTab() { return tab; }
     private TextView countdown;
     private final Runnable tick = this::tickCountdown;
 

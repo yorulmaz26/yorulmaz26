@@ -1,4 +1,4 @@
-Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide stones and open doors with keys.
+Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide blocks and open doors with keys.
 
 • 500 levels in 5 worlds
 • A new puzzle every day

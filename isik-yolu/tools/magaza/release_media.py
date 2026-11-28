@@ -260,6 +260,7 @@ class Vertical:
                 pd.rounded_rectangle([bx0, by0, self.W - bx0, by0 + 130], radius=65, fill=GOLD + (int(255 * a2),))
                 M.text_center(pd, self.W / 2, by0 + 22, cta, fc, (0x10, 0x18, 0x27, int(255 * a2)))
                 c = Image.alpha_composite(c, pill)
+                d = ImageDraw.Draw(c)  # stüdyo adı birleştirilmiş kareye yazılır
             else:
                 ft = fit_font(self.fonts, "Roboto-Bold.ttf", tagline, 900, 54)
                 M.text_center(d, self.W / 2, 1440, tagline, ft, TURQ + (int(255 * a2),))
@@ -425,7 +426,7 @@ def render(segs, path, sounds, W, H, total=900):
     print(path, f"{count / FPS:.2f} sn")
 
 
-def srt_and_timeline(segs, path_srt, path_json, lang):
+def srt_and_timeline(segs, path_srt, path_json, lang, end_text=""):
     """Altyazı: her bölümün başlığı, gerçek başlangıç/bitiş zamanıyla (geçişler dahil)."""
     def ts(fr):
         ms = int(round(fr * 1000 / FPS))
@@ -441,8 +442,11 @@ def srt_and_timeline(segs, path_srt, path_json, lang):
         items[k]["start"] = mid
     lines, idx, prev = [], 1, None
     for it in items:
-        if it["title"] == "END": continue
-        text = it["title"] + ("\n" + it["sub"] if it["sub"] else "")
+        if it["title"] == "END":
+            if not end_text: continue
+            text = end_text  # marka kapanışı: ekrandaki ad ve slogan
+        else:
+            text = it["title"] + ("\n" + it["sub"] if it["sub"] else "")
         if prev and prev["text"] == text:
             prev["end"] = it["end"]; continue
         prev = {"start": it["start"], "end": it["end"], "text": text}
@@ -462,7 +466,9 @@ def videos(rec, fonts, sounds, tx, lang, out):
     tag = tx["trailer_captions"]["brand_tagline"]
     v = Vertical(fonts)
     segs = build_segments(v, C, plan, lang, tag, None)
-    srt_and_timeline(segs, os.path.join(vd, "Subtitles", f"trailer_{lang}.srt"), os.path.join(vd, "Source_Files", f"timeline_{lang}.json"), lang)
+    main, second = ("Işık Yolu", "Prismway") if lang == "tr" else ("Prismway", "Işık Yolu")
+    srt_and_timeline(segs, os.path.join(vd, "Subtitles", f"trailer_{lang}.srt"), os.path.join(vd, "Source_Files", f"timeline_{lang}.json"), lang,
+                     end_text=f"{main} · {second}\n{tag}")
     render(segs, os.path.join(vd, "Vertical", f"trailer_{lang}_vertical.mp4"), sounds, v.W, v.H)
     for k in (1, 2):
         cta = tx["trailer_captions"][f"cta{k}"]
@@ -485,7 +491,8 @@ def hero_frame(rec, name="y_karma"):
     return c.frame((w if w is not None else c.frames - 1) + 8).convert("RGB")
 
 
-def board_crop(img, top=0.16, bottom=0.80):
+def board_crop(img, top=0.158, bottom=0.845):
+    """Oyun ekranından yalnızca tahta kartı: üstteki yıldız satırının altından alttaki düğmelerin üstüne kadar."""
     w, h = img.size
     return img.crop((0, int(h * top), w, int(h * bottom)))
 
@@ -509,21 +516,21 @@ def compose(W, H, rec, fonts, tx, lang, layout, seed=5, shot="02_prizma", cta=No
     elif layout == "tall":  # 9:16: tam oyun ekranı
         bb = brand_block(fonts, lang, int(W * 0.12))
         paste_center(c, bb, W / 2, H * 0.045)
-        ph = int(H * 0.66); pw = int(ph * 1080 / 1920)
+        ph = int(H * (0.60 if cta else 0.66)); pw = int(ph * 1080 / 1920)  # eylem çağrısı varsa yer açılır
         x, y = (W - pw) // 2, int(H * 0.185)
         c = Image.alpha_composite(c, M.phone_layer((W, H), (x, y, pw, ph), 40))
         c.paste(scr.resize((pw, ph), Image.LANCZOS), (x, y), M.rounded_mask((pw, ph), 38))
         d = ImageDraw.Draw(c)
         t1 = title or tx["slogan"]
         f = fit_font(fonts, "Roboto-Black.ttf", t1, W - 120, int(W * 0.062))
-        M.text_center(d, W / 2, y + ph + int(H * 0.03), t1, f, WHITE)
+        M.text_center(d, W / 2, y + ph + int(H * (0.025 if cta else 0.03)), t1, f, WHITE)
         if sub:
             fs = fit_font(fonts, "Roboto-Medium.ttf", sub, W - 140, int(W * 0.036))
-            M.text_center(d, W / 2, y + ph + int(H * 0.075), sub, fs, DIM)
+            M.text_center(d, W / 2, y + ph + int(H * (0.068 if cta else 0.075)), sub, fs, DIM)
         if cta:
             fc = fit_font(fonts, "Roboto-Black.ttf", cta, W - 300, int(W * 0.055))
             tw = d.textlength(cta, font=fc)
-            by = int(H * 0.905)
+            by = y + ph + int(H * 0.118)  # slogan ve alt satırın altında, üst üste binmez
             d.rounded_rectangle([W / 2 - tw / 2 - 50, by, W / 2 + tw / 2 + 50, by + int(W * 0.1)], radius=int(W * 0.05), fill=GOLD)
             M.text_center(d, W / 2, by + int(W * 0.018), cta, fc, (0x10, 0x18, 0x27))
     else:  # wide: 16:9 ve 1.91:1 — solda ad + slogan, sağda tahta

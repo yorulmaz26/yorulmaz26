@@ -263,44 +263,62 @@ public class LivesTest {
     @Test public void editedSaveIsDetectedButProgressKept() {
         Phone ph = new Phone();
         Progress p = fresh(ph);
-        p.stars[1] = 3; p.stars[2] = 2; p.gems = 120;
+        p.stars[1] = 3; p.stars[2] = 2; p.gems = 120; p.crystals = 300;
+        p.owned.add("mirror_gold");
         for (int i = 0; i < 4; i++) { Lives.startAttempt(p, ph.clock(), 1); Lives.loseAttempt(p); }
         String saved = p.serialize();
-        assertTrue(saved.contains("#sig:"));
-        // kayıt dosyasında can sayısı elle 4 yapıldı
-        String hacked = saved.replace("\"lives\":0", "\"lives\":4");
+        String sig = Progress.signature(saved);
+        assertFalse("kayıt düz JSON (eski sürümler de okur)", saved.contains("#sig"));
+        // kayıt dosyasında can ve kristal elle değiştirildi
+        String hacked = saved.replace("\"lives\":0", "\"lives\":4").replace("\"kr\":300", "\"kr\":99999");
         assertNotEquals(saved, hacked);
-        Progress q = Progress.deserialize(hacked);
+        Progress q = Progress.load(hacked, sig);
         assertTrue(q.saveTampered);
-        assertEquals(0, q.lives);
-        assertEquals(3, q.stars[1]);
+        assertEquals("can güvenli değere döner", 0, q.lives);
+        assertEquals("değiştirilmiş kristal kullanılamaz", Economy.START_CRYSTALS, q.crystals);
+        assertEquals(0, q.gems);
+        assertEquals("bölüm ilerlemesi korunur", 3, q.stars[1]);
         assertEquals(2, q.stars[2]);
-        assertEquals(120, q.gems);
+        assertTrue("görünümler korunur", q.owned.contains("mirror_gold"));
         // can normal hızla yeniden dolar
         Lives.update(q, ph.clock());
         ph.pass(20 * MIN);
         Lives.update(q, ph.clock());
         assertEquals(1, q.lives);
-        // imzayı silmek de işe yaramaz (yeni sürüm kaydı imzasız olamaz)
-        String stripped = hacked.substring(0, hacked.lastIndexOf("\n#sig:"));
-        assertTrue(Progress.deserialize(stripped).saveTampered);
-        // sağlam kayıt sorunsuz yüklenir
-        assertFalse(Progress.deserialize(saved).saveTampered);
+        // imzayı silmek de işe yaramaz (yeni biçimdeki kayıt imzasız olamaz)
+        assertTrue(Progress.load(hacked, null).saveTampered);
+        // sağlam kayıt sorunsuz yüklenir, hiçbir şey değişmez
+        Progress ok = Progress.load(saved, sig);
+        assertFalse(ok.saveTampered);
+        assertEquals(300, ok.crystals);
+        assertEquals(120, ok.gems);
     }
 
     @Test public void oldUnsignedSaveMigratesWithoutPenalty() {
         // 1.7.1 kaydı: imza ve "sv" alanı yok
         String old = "{\"stars\":[3,2,1],\"gem\":40,\"lives\":2}";
-        Progress q = Progress.deserialize(old);
+        Progress q = Progress.load(old, null);
         assertFalse(q.saveTampered);
         assertEquals(2, q.lives);
         assertEquals(40, q.gems);
         assertEquals(3, q.stars[1]);
-        // sonraki kayıt imzalı yazılır ve yeniden yüklenince temizdir
-        Progress r = Progress.deserialize(q.serialize());
+        // sonraki kayıt imzayla yazılır ve yeniden yüklenince temizdir
+        String json = q.serialize();
+        Progress r = Progress.load(json, Progress.signature(json));
         assertFalse(r.saveTampered);
         assertEquals(2, r.lives);
     }
+
+    @Test public void newSaveReadableByOldParser() {
+        // geri dönüş güvenliği: 1.8.0 kaydı düz JSON'dur; eski sürümün ayrıştırıcısı (Json.parse) okuyabilir
+        Phone ph = new Phone();
+        Progress p = fresh(ph);
+        p.stars[1] = 3; p.crystals = 999;
+        Object m = Json.parse(p.serialize());
+        assertTrue(m instanceof java.util.Map);
+        assertEquals(999, ((Number) ((java.util.Map<?, ?>) m).get("kr")).intValue());
+    }
+
 
     @Test public void moveBudgetLimitsSession() throws Exception {
         Level l = TestUtil.pack().get(2);

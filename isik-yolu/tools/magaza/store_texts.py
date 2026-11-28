@@ -27,6 +27,15 @@ def check(d, lang):
         if any(ord(ch) > 0x2600 for ch in d[k]): errs.append(f"{lang}: {k} emoji/simge içeriyor")
     for i, (a, b) in enumerate(d["screenshot_captions"]):
         if len(a) > 26 or len(b) > 44: errs.append(f"{lang}: ekran başlığı {i + 1} uzun ({len(a)}/{len(b)})")
+    # mağaza görsellerinde ve videoda tanıtım ifadeleri olmasın ("yeni", "en iyi", "ücretsiz" …)
+    promo = ["new", "neu", "nuov", "nouv", "nuev", "yeni", "best", "beste", "migliore", "meilleur", "mejor", "en iyi", "free", "gratis",
+             "gratuit", "kostenlos", "ücretsiz", "#1", "top"]
+    visual = [t for pair in d["screenshot_captions"] for t in pair] + list(d["trailer_captions"].values())
+    for t in visual:
+        low = t.lower()
+        for b in promo:
+            if b in low.split() or any(w.startswith(b) for w in low.split()) and len(b) >= 4:
+                errs.append(f"{lang}: görsel/video metninde tanıtım ifadesi: {t!r}")
     if d["title"] not in ("Işık Yolu – Prismway", "Prismway – Işık Yolu"): errs.append(f"{lang}: başlık marka biçiminde değil")
     return errs
 
