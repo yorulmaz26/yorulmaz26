@@ -1,4 +1,8 @@
-# Test Raporu — Işık Yolu 1.7.1
+# Test Raporu — Işık Yolu (Prismway) 1.8.0
+
+> 1.8.0'ın ayrıntılı test raporu: `RELEASE_PACKAGE/08_Test_Reports/Test_Report.md`.
+> 154 test (150 geçti, 0 başarısız, 4 yalnızca kayıt modunda çalışır). Can sistemi (21), 6 dil (I18nTest,
+> LanguageDetectionTest, LocalizedUiTest) ve 33 arayüz akışı dahil. Aşağıdaki bölümler önceki sürümlerden.
 
 Tarih: 22 Kasım 2026 · Komut: `./gradlew clean :engine:test :app:assembleDebug :app:assembleRelease :app:testDebugUnitTest`
 

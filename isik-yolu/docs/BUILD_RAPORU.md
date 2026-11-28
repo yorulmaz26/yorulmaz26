@@ -17,7 +17,23 @@ Tarih: 22 Kasım 2026 · Ortam: Linux bulut kapsayıcısı (4 çekirdek), OpenJD
 Unity bu ortamda kurulu değildi. Talimatın son satırındaki "Android Studio Java" isteğine göre proje
 yerel Android (Java) olarak kuruldu. Android SDK, command-line tools ile `/opt/android-sdk` altına kuruldu.
 
+## 1.8.0 değişiklikleri (küresel yayın hazırlığı)
+
+- **Sürüm:** versionCode 12, versionName 1.8.0. Paket adı ve imza yapılandırması değişmedi; isteğe bağlı yükleme
+  anahtarı desteği eklendi (`uploadStoreFile` …).
+- **Can sistemi:** `GameConfig` (4 can, 1200 sn). İmzalı kayıt. Rozet "3/4 · dd:ss", yenilenme animasyonu, "canlar
+  doldu" bildirimi.
+- **Yerelleştirme:**
+  - `i18n/L.java` + `assets/i18n/{tr,en,de,it,fr,es}.json` (464 anahtar).
+  - Sistem dili algılama, Ayarlar'da dil seçici, Android 13+ `localeConfig`.
+- **Marka:** İngilizce ad Prismway; menü ve açılışta iki dilli başlık (`BrandTitle`); uygulama adı Türkçe telefonda
+  "Işık Yolu", diğerlerinde "Prismway".
+- **Boyut:** müzik OGG Vorbis'e çevrildi, APK'ya yalnızca 6 dil alındı. APK 4,41 MB → 2,86 MB.
+- **Yayın paketi:** `RELEASE_PACKAGE/` (görseller, fragmanlar, mağaza metinleri, gizlilik, test raporları).
+
 ## 1.7.1 değişiklikleri (Play Store malzemesi)
+
+> 1.8.0'da `magaza/` ve `teslimat/` klasörleri yerini `RELEASE_PACKAGE/` klasörüne bıraktı (aşağıdaki yollar 1.7.1 içindir).
 
 - `magaza/`: Play Store görselleri ve tanıtım videoları (ayrıntı: `magaza/MAGAZA.md`). Hiçbirinde reklam yoktur.
   - **Kayıt:** `PromoCaptureTest` oyunu Robolectric'te gerçek çizimle oynatır ve 30 FPS kare kaydeder. Yalnızca

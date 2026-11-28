@@ -1,10 +1,14 @@
-# Işık Yolu
+# Işık Yolu (Prismway)
+
+> **1.8.0 — küresel yayın hazırlığı:** İngilizce ad **Prismway**; 6 dil (tr, en, de, it, fr, es); canlar 20 dakikada bir
+> yenilenir; Google Play paketi, görseller ve fragmanlar `RELEASE_PACKAGE/` klasöründe. Özet rapor:
+> `RELEASE_PACKAGE/11_Final_Report/FINAL_RELEASE_REPORT.md`.
 
 Işık kaynağından çıkan ışını aynalar, prizmalar, renk filtreleri, hareketli bloklar ve
 kapı–anahtar düzenekleriyle hedeflere ulaştırdığın, bölüm geçmeli bir mantık bulmacası.
 **500 bölüm**: 5 dünya × 10 grup × 10 bölüm.
 Android için **Java** ile, **Android Studio / Gradle** projesi olarak geliştirildi; dikey (9:16),
-tamamen çevrimdışı, Türkçe.
+tamamen çevrimdışı; Türkçe, İngilizce, Almanca, İtalyanca, Fransızca ve İspanyolca.
 
 > Talimatta önce Unity 2D istendi, son satırda "Android Studio Java olarak" denildi. Oyun bu son
 > isteğe göre yerel Android (Java) olarak yazıldı. Unity'deki karşılıkları aşağıdaki tabloda var.
@@ -13,7 +17,10 @@ tamamen çevrimdışı, Türkçe.
 
 | İş | Komut (proje klasöründe: `isik-yolu/`) |
 |---|---|
-| Hazır APK'yı telefona kur | `teslimat/IsikYolu-1.7.1.apk` (sürüm, R8 ile küçültülmüş) veya `teslimat/IsikYolu-1.7.1-debug.apk` |
+| Hazır APK'yı telefona kur | `RELEASE_PACKAGE/01_Game_Build/APK/Prismway-IsikYolu-1.8.0-test.apk` (1.8.0, R8 ile küçültülmüş, test imzalı) |
+| Google Play paketi (AAB) | `./gradlew :app:bundleRelease` — yükleme anahtarı için `RELEASE_PACKAGE/01_Game_Build/README.md` |
+| Yayın paketini baştan üret | `tools/magaza/build_release_package.sh <Roboto klasörü>` |
+| Çeviri denetimi | `python3 tools/i18n_check.py` (asıl denetim: `I18nTest`, `LocalizedUiTest`) |
 | Android Studio'da aç | *File › Open* → `isik-yolu` klasörü |
 | Debug APK | `./gradlew :app:assembleDebug` |
 | Sürüm APK | `./gradlew :app:assembleRelease` |
@@ -24,7 +31,7 @@ tamamen çevrimdışı, Türkçe.
 | Bir bölümü komut satırından oyna | `java -cp engine/build/classes/java/main com.isikyolu.engine.tools.Play app/src/main/assets/levels.json 60 r:1,6 …` |
 | Sesleri yeniden üret | `java tools/SoundGen.java app/src/main/res/raw` |
 
-Gereksinimler: JDK 17+, Android SDK 34 (build-tools 34.0.0). `local.properties` içinde `sdk.dir` olmalı
+Gereksinimler: JDK 17+, Android SDK 36 (build-tools 35.0.0). `local.properties` içinde `sdk.dir` olmalı
 (Android Studio bunu kendisi yazar). APK kurulumu için telefonda "Bilinmeyen kaynaklardan yükleme" izni gerekir.
 
 ## Oynanış
@@ -58,17 +65,18 @@ Ekonomi bilerek dar tutuldu:
 Market günü saat hilesine karşı korumalıdır. Hak bitince bilet veya kristalle +5 hak ile devam edilebilir; her
 devam fiyatı ikiye katlar. Ayrıntılar: `engine/Economy.java`, `docs/BUILD_RAPORU.md`.
 
-## Play Store malzemesi
+## Play Store ve yayın paketi
 
-`magaza/` klasöründe:
-- simge (512),
-- öne çıkan görsel (1024×500),
-- 8 adet 1080×1920 ekran görüntüsü (başlıklı ve başlıksız),
-- 30 ve 60 sn'lik 1920×1080 tanıtım videoları,
-- önerilen ad ve açıklamalar.
+`RELEASE_PACKAGE/` klasöründe (ayrıntı: `RELEASE_PACKAGE/README.md`):
+- APK ve AAB,
+- İngilizce ad araştırması,
+- logolar,
+- simge, öne çıkan görsel (TR/EN), 6 dilde 8'er telefon ekran görüntüsü, 7"/10" tablet görüntüleri,
+- 30 sn dikey/yatay fragmanlar (TR/EN), sosyal medya sürümleri, altyazılar, kapaklar,
+- 6 dilde mağaza metinleri ve gizlilik politikası, veri güvenliği formu, test raporları, yayın kontrol listesi.
 
-Görsellerde ve videolarda reklam yok. Ayrıntılar ve Play Console'daki yerleri: `magaza/MAGAZA.md`. Yeniden üretmek için
-`PromoCaptureTest` (oyunu gerçek çizimle oynatıp kare kaydeder) ve `tools/magaza/magaza.py` kullanılır.
+Görsellerde ve videolarda reklam yok; tümü gerçek oyun görüntüsü. Yeniden üretmek için `PromoCaptureTest`,
+`TabletCaptureTest` ve `tools/magaza/` betikleri kullanılır.
 
 ## Reklamlar (Google AdMob)
 
@@ -200,9 +208,10 @@ isik-yolu/
     ui/            BoardView (Canvas çizimi + dokunma), BackgroundView, LogoView, StarsView,
                    Overlay, TutorialOverlay, Demos, Icon (vektör ikonlar), Palette, Ui
     assets/levels.json   500 bölüm (JSON, veri odaklı)
-    res/raw/*.wav        sentezlenmiş sesler ve müzik
+    assets/i18n/*.json   6 dilin metinleri (L yöneticisi)
+    res/raw/             sentezlenmiş sesler (WAV) ve müzik (OGG)
   tools/SoundGen.java    ses ve müzik sentezleyicisi
-  teslimat/              hazır APK'lar
+  RELEASE_PACKAGE/       yayın paketi (APK/AAB, görseller, videolar, metinler, raporlar)
   docs/                  test raporu, build raporu, ekran görüntüleri
 ```
 

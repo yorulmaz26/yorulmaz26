@@ -1,54 +1,64 @@
-# Işık Yolu — Gizlilik Politikası
+# Işık Yolu (Prismway) — Gizlilik Politikası
 
-Son güncelleme: 22 Kasım 2026
+Son güncelleme: 28 Kasım 2026
 
-Bu politika Android oyunu **Işık Yolu** (paket adı `com.isikyolu.game`) için geçerlidir. Oyun içinde Ayarlar >
-Gizlilik Politikası bölümünde de aynı metnin kısa hâli bulunur.
+Bu politika, Magic Lumos Software tarafından geliştirilen Android oyunu **Işık Yolu (Prismway)** için geçerlidir
+(paket adı `com.isikyolu.game`). Oyun içinde Ayarlar > Gizlilik Politikası bölümünde bu metnin kısa hâli bulunur.
 
 ## Oyunun kendisi
 
-- Hesap açtırmaz, ad, e-posta, telefon gibi kişisel bilgi istemez.
-- İlerleme, ayarlar, canlar, oyun içi para ve ürünler yalnızca cihazda saklanır. Hiçbir sunucuya gönderilmez.
+- Hesap açtırmaz; ad, e-posta, telefon numarası gibi kişisel bilgi istemez.
+- İlerleme, yıldızlar, ayarlar, dil seçimi, canlar, oyun içi para ve oyun içi ürünler yalnızca cihazında saklanır.
+  Hiçbir sunucumuza gönderilmez; bizim bir sunucumuz yoktur.
+- Can sisteminin süre hesabı için cihazın kendi saatleri (sistem saati, açılıştan beri geçen süre ve varsa ağ
+  saati) cihazda okunur. Bu bilgiler cihazdan çıkmaz.
 - Oyun internet olmadan da tamamen oynanır.
+- Uygulama içi satın alma yoktur. Marketteki ürünler yalnızca oyunda kazanılan kristallerle alınır.
 
 ## Reklamlar (Google AdMob)
 
 İnternet bağlantısı varken oyun Google AdMob ile reklam gösterir:
-- ekranların altında banner,
-- bölüm aralarında geçiş reklamı,
+- bazı ekranların altında banner,
+- bölüm aralarında, sınırlı sıklıkta geçiş reklamı,
 - isteğe bağlı ödüllü video.
 
-Google ve reklam ortakları şu verileri işleyebilir:
-- reklam kimliği,
-- cihaz ve uygulama bilgileri,
-- IP adresinden yaklaşık konum,
-- reklam etkileşimleri ve tanılama bilgileri.
+Google Mobile Ads SDK, Google'ın yayımladığı bilgiye göre şu verileri reklam, analiz ve kötüye kullanımı önleme
+amacıyla otomatik olarak toplar ve paylaşır:
+- IP adresi (cihazın genel konumunu tahmin etmek için kullanılabilir),
+- ürün etkileşimleri (uygulamanın açılması, dokunmalar, video izlemeleri),
+- tanılama bilgileri (çökme kayıtları, açılış süresi, donma oranı, enerji kullanımı),
+- cihaz kimlikleri (Android reklam kimliği, uygulama grubu kimliği).
 
-Bu veriler reklam sunmak, ölçmek, kişiselleştirmek ve kötüye kullanımı önlemek için kullanılır. Google'ın veri
-kullanımı: https://policies.google.com/technologies/ads
+Bu veriler aktarım sırasında şifrelenir (TLS). Google'ın verileri nasıl kullandığı:
+https://policies.google.com/technologies/ads
 
 ## İzin ve seçimlerin
 
-- Avrupa Ekonomik Alanı ve İngiltere gibi gereken bölgelerde reklamlardan önce Google'ın izin formu (UMP)
-  gösterilir. Seçimini istediğin zaman oyundaki Ayarlar > **Reklam Gizlilik Seçenekleri** ile değiştirebilirsin.
+- Avrupa Ekonomik Alanı, İngiltere ve İsviçre gibi gereken bölgelerde reklamlardan önce Google'ın izin formu (User
+  Messaging Platform) gösterilir.
+- Seçimini istediğin zaman oyundaki Ayarlar > **Reklam Gizlilik Seçenekleri** ile değiştirebilirsin.
 - Reklam kimliğini Android Ayarlar > Gizlilik > Reklamlar bölümünden sıfırlayabilir ya da silebilirsin.
 - Ödüllü videoları izlemek tamamen isteğe bağlıdır.
 
 ## Çocuklar
 
-Oyun genel kitleye yöneliktir. Reklam içeriği "PG" ile sınırlandırılmıştır. Oyun bilerek 13 yaşından küçük
-çocuklardan kişisel veri toplamaz.
+Oyun genel kitleye yöneliktir ve özellikle çocuklara yönelik değildir. Reklam içeriği "PG" (ebeveyn rehberliği; yetişkin içeriği yok) düzeyiyle
+sınırlandırılmıştır. Oyun bilerek 13 yaşından küçük çocuklardan kişisel veri toplamaz.
 
 ## Verilerin silinmesi
 
-Oyundaki tüm veriler cihazındadır. Ayarlar > İlerlemeyi Sıfırla ya da uygulamayı kaldırmak hepsini siler.
+Oyunun kendi verileri yalnızca cihazındadır. Ayarlar > İlerlemeyi Sıfırla ya da uygulamayı kaldırmak hepsini siler.
 Google'ın reklamla ilgili verileri için yukarıdaki Google bağlantısını kullanabilirsin.
+
+## Değişiklikler
+
+Bu politika değişirse güncel hâli bu adreste yayımlanır ve "Son güncelleme" tarihi değişir.
 
 ## İletişim
 
-Sorular için: [geliştirici e-posta adresi buraya]
+Magic Lumos Software — [geliştirici e-posta adresi]
 
 ---
-*Yayıncı notu:* Bu dosyayı herkese açık bir adreste yayımla (örneğin GitHub Pages). Adresi hem Play Console'daki
-"Gizlilik politikası" alanına hem de derlemede `privacyPolicyUrl=https://...` gradle özelliğine yaz. Oyun içinde
-"Web'de Aç" düğmesi bu adresi açar.
+*Yayıncı notu:* Bu dosyayı (ve `RELEASE_PACKAGE/09_Privacy_And_Legal/` altındaki diğer 5 dili) herkese açık bir adreste
+yayımla (örneğin GitHub Pages). Adresi hem Play Console'daki "Gizlilik politikası" alanına hem de derlemede
+`privacyPolicyUrl=https://...` gradle özelliğine yaz. Oyun içinde "Web'de Aç" düğmesi bu adresi açar.
