@@ -51,6 +51,13 @@ public final class Capture {
                 doRun(g, parse(spec));
             } catch (Throwable t) {
                 Log.e("GolgenCekim", "hata: " + spec, t);
+                try {   // betik beklemesin: hata işareti bırak
+                    String ad = parse(spec).get("ad");
+                    File d = new File(g.getContext().getExternalFilesDir(null), "cekim/" + (ad == null ? "sahne" : ad));
+                    //noinspection ResultOfMethodCallIgnored
+                    d.mkdirs();
+                    new FileOutputStream(new File(d, "hata")).close();
+                } catch (Exception ignored) { }
             } finally {
                 busy = false;
                 g.post(() -> g.debugSetCapturing(false));

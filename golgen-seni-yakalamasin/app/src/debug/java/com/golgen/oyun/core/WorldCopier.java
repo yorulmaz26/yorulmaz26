@@ -30,7 +30,9 @@ final class WorldCopier {
             REC_COUNT = acc(MotionRecorder.class, "count");
             POOL_ITEMS = acc(Pool.class, "items");
             POOL_ACTIVE = acc(Pool.class, "active");
-            RAND_SEED = acc(Random.class, "seed");
+            Field seed = null;   // OpenJDK'da var; Android'in Random'ında olmayabilir (o zaman kopyalanmaz)
+            try { seed = acc(Random.class, "seed"); } catch (Exception ignored) { }
+            RAND_SEED = seed;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -52,7 +54,8 @@ final class WorldCopier {
                 else if (t == long.class) f.setLong(d, f.getLong(s));
                 else f.set(d, f.get(s));
             }
-            ((AtomicLong) RAND_SEED.get(RNG.get(d))).set(((AtomicLong) RAND_SEED.get(RNG.get(s))).get());
+            // Bot için: gelecekteki rastgele doğumlar tahmin dışıdır; tohum kopyalanamıyorsa simülasyon kendi rastgeleliğiyle ilerler
+            if (RAND_SEED != null) ((AtomicLong) RAND_SEED.get(RNG.get(d))).set(((AtomicLong) RAND_SEED.get(RNG.get(s))).get());
             MotionRecorder rs = s.recorder, rd = d.recorder;
             int cnt = REC_COUNT.getInt(rs);
             System.arraycopy((float[]) REC_T.get(rs), 0, (float[]) REC_T.get(rd), 0, rs.capacity());

@@ -41,7 +41,7 @@ cek() {
   adbt shell rm -rf "$REMOTE/$ad"
   adbt shell am start -n $ACT --es cekim "\"$spec\"" >/dev/null
   local t=0
-  until adbt shell "[ -f $REMOTE/$ad/bitti ] && echo ok" | grep -q ok; do
+  until adbt shell "[ -f $REMOTE/$ad/bitti ] || [ -f $REMOTE/$ad/hata ] && echo ok" | grep -q ok; do
     sleep 2; t=$((t+2))
     if [ $t -gt 900 ]; then echo "ZAMAN AŞIMI: $spec"; adb logcat -d -s GolgenCekim:V AndroidRuntime:E | tail -20; return 1; fi
   done
