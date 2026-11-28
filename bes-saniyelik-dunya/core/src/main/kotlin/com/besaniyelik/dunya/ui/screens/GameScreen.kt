@@ -513,7 +513,7 @@ class GameScreen(
             }
             btns.add(kit.iconButton("g_retry", "yellow", 120f, 60f) { close(); restart() }).size(112f).pad(8f)
             btns.add(kit.iconButton("g_home", "white", 120f, 60f) { close(); quit() }).size(112f).pad(8f)
-            if (lv.id < 500) btns.add(kit.button(L.t("common.next"), "green", "g_next") { close(); startLevel(LevelRepository.level(lv.id + 1), onCancel = { quit() }) }).width(260f).height(112f).pad(8f)
+            if (lv.id < 500) btns.add(kit.button(L.t("common.next"), "green", "g_next") { close(); startLevel(LevelRepository.level(lv.id + 1), onCancel = { quit() }) }).width(320f).height(112f).pad(8f)
             p.add(btns).colspan(2).padBottom(4f)
         }
     }

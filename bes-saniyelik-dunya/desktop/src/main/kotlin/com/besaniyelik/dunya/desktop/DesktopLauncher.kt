@@ -332,7 +332,7 @@ class MediaTour(private val dir: String, private val mode: Mode) {
             steps.add(Step.Play((System.getProperty("completeLevel") ?: "120").toInt(), afterFrames = 150))
             steps.add(Step.Shot("m_complete"))
             steps.add(Step.Run { g -> val s = GameScreen(g, null, 42L, emptyList()); g.go(s) }); steps.add(Step.Wait(60))
-            steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(330)); steps.add(Step.Shot("m_endless_run"))
+            steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(28)); steps.add(Step.Shot("m_endless_run"))
         } else {
             // kayıt listesi: ad=bölüm,... ve ekran kayıtları
             val lv = (System.getProperty("recLevels") ?: "2,61,160,215,280,330,377,420,470,120").split(",").map { it.trim().toInt() }
@@ -363,6 +363,7 @@ class MediaTour(private val dir: String, private val mode: Mode) {
         d.inventory[com.besaniyelik.dunya.level.PowerupType.SHIELD] = 2; d.inventory[com.besaniyelik.dunya.level.PowerupType.MAGNET] = 1
         d.login.lastClaimDay = g.profile.clock.epochDay() - 1; d.login.cycleDay = 3
         d.seenTutorials.addAll(com.besaniyelik.dunya.sim.Mechanic.entries.map { "m_" + it.name })
+        com.besaniyelik.dunya.progress.AchievementManager.check(d) // vitrin istatistiklerinin başarıları önceden açılmış olsun
         g.profile.save()
         log.append("dil: ${L.lang}\n")
     }

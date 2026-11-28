@@ -1,8 +1,62 @@
 {
- "tr": ["Kurallar her 5 saniyede değişir!", "Dokun ve zıpla, basılı tut daha yükseğe!", "Testerelerden kaç, sıradaki kurala hazırlan!", "10 harita, 500 bölüm", "20 karakter ve iz efektleri", "Her yeni kural bir sürpriz", "Yıldızları topla, ödülleri kazan", "Sonsuz Dünya: ne kadar uzağa gidebilirsin?"],
- "en": ["The rules change every 5 seconds!", "Tap to jump, hold to jump higher!", "Dodge the saws and get ready for the next rule!", "10 maps, 500 levels", "20 characters and trails", "Every new rule is a surprise", "Collect stars, earn rewards", "Endless World: how far can you go?"],
- "de": ["Alle 5 Sekunden ändern sich die Regeln!", "Tippen zum Springen, halten für höhere Sprünge!", "Weiche Sägen aus und mach dich bereit für die nächste Regel!", "10 Karten, 500 Level", "20 Figuren und Spuren", "Jede neue Regel ist eine Überraschung", "Sammle Sterne, hol dir Belohnungen", "Endlose Welt: Wie weit kommst du?"],
- "it": ["Le regole cambiano ogni 5 secondi!", "Tocca per saltare, tieni premuto per saltare più in alto!", "Schiva le lame e preparati alla prossima regola!", "10 mappe, 500 livelli", "20 personaggi e scie", "Ogni nuova regola è una sorpresa", "Raccogli stelle, vinci premi", "Mondo Infinito: fin dove arriverai?"],
- "fr": ["Les règles changent toutes les 5 secondes !", "Touche pour sauter, maintiens pour sauter plus haut !", "Évite les scies et prépare-toi à la règle suivante !", "10 cartes, 500 niveaux", "20 personnages et traînées", "Chaque nouvelle règle est une surprise", "Récolte des étoiles, gagne des récompenses", "Monde infini : jusqu'où iras-tu ?"],
- "es": ["¡Las reglas cambian cada 5 segundos!", "¡Toca para saltar, mantén para saltar más alto!", "¡Esquiva las sierras y prepárate para la siguiente regla!", "10 mapas, 500 niveles", "20 personajes y estelas", "Cada nueva regla es una sorpresa", "Consigue estrellas y gana premios", "Mundo Infinito: ¿hasta dónde llegarás?"]
+ "tr": [
+  "Kurallar her 5 saniyede değişir!",
+  "Tek dokunuşla oyna: dokun ve zıpla!",
+  "Testerelerden kaç, sıradaki kurala hazırlan!",
+  "10 harita, 500 bölüm",
+  "20 karakter ve iz efektleri",
+  "Her yeni kural bir sürpriz",
+  "Yıldızları topla, ödülleri kazan",
+  "Sonsuz Dünya: ne kadar uzağa gidebilirsin?"
+ ],
+ "en": [
+  "The rules change every 5 seconds!",
+  "One-tap play: just tap to jump!",
+  "Dodge the saws and get ready for the next rule!",
+  "10 maps, 500 levels",
+  "20 characters and trails",
+  "Every new rule is a surprise",
+  "Collect stars, earn rewards",
+  "Endless World: how far can you go?"
+ ],
+ "de": [
+  "Alle 5 Sekunden ändern sich die Regeln!",
+  "Spiel mit einem Finger: tippen und springen!",
+  "Weiche Sägen aus und mach dich bereit für die nächste Regel!",
+  "10 Karten, 500 Level",
+  "20 Figuren und Spuren",
+  "Jede neue Regel ist eine Überraschung",
+  "Sammle Sterne, hol dir Belohnungen",
+  "Endlose Welt: Wie weit kommst du?"
+ ],
+ "it": [
+  "Le regole cambiano ogni 5 secondi!",
+  "Si gioca con un tocco: tocca e salta!",
+  "Schiva le lame e preparati alla prossima regola!",
+  "10 mappe, 500 livelli",
+  "20 personaggi e scie",
+  "Ogni nuova regola è una sorpresa",
+  "Raccogli stelle, vinci premi",
+  "Mondo Infinito: fin dove arriverai?"
+ ],
+ "fr": [
+  "Les règles changent toutes les 5 secondes !",
+  "Joue d'une seule touche : touche et saute !",
+  "Évite les scies et prépare-toi à la règle suivante !",
+  "10 cartes, 500 niveaux",
+  "20 personnages et traînées",
+  "Chaque nouvelle règle est une surprise",
+  "Récolte des étoiles, gagne des récompenses",
+  "Monde infini : jusqu'où iras-tu ?"
+ ],
+ "es": [
+  "¡Las reglas cambian cada 5 segundos!",
+  "¡Juega con un toque: toca y salta!",
+  "¡Esquiva las sierras y prepárate para la siguiente regla!",
+  "10 mapas, 500 niveles",
+  "20 personajes y estelas",
+  "Cada nueva regla es una sorpresa",
+  "Consigue estrellas y gana premios",
+  "Mundo Infinito: ¿hasta dónde llegarás?"
+ ]
 }
