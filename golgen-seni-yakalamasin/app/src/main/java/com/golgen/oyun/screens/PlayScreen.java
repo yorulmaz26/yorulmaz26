@@ -543,12 +543,25 @@ public final class PlayScreen extends Screen implements GameEvents {
         Ui.textFit(c, levelBannerSub, w / 2f, cy + 66f * u, 34f * u, w - 100f * u, Theme.alpha(Theme.PURPLE_LIGHT, a), Paint.Align.CENTER, Ui.BOLD);
     }
 
+    private String readySubSrc;
+    private float readySubW;
+    private String[] readySubLines = new String[0];
+    private final float[] readySubSize = {32f};
+
     private void drawReadyHint(Canvas c) {
         float cx = w / 2f, cy = h * 0.58f;
         float pulse = 0.6f + 0.4f * (float) Math.sin(time * 4f);
-        Ui.panel(c, cx - 400f * u, cy - 80f * u, cx + 400f * u, cy + 120f * u, 40f * u, Theme.alpha(Theme.NAVY_DEEP, 0.8f), Theme.alpha(Theme.TEAL, 0.6f), 3f * u);
+        if (readySubSrc != readySub || readySubW != w) {   // uzun harita bilgisi satırlara bölünür (önbellekli)
+            readySubSrc = readySub;
+            readySubW = w;
+            readySubLines = readySub.isEmpty() ? new String[0] : Ui.wrapFit(readySub, 32f * u, 740f * u, 3, Ui.MEDIUM, readySubSize);
+        }
+        float lh = readySubSize[0] * 1.25f, extra = Math.max(0, readySubLines.length - 1) * lh;
+        Ui.panel(c, cx - 400f * u, cy - 80f * u, cx + 400f * u, cy + 120f * u + extra, 40f * u, Theme.alpha(Theme.NAVY_DEEP, 0.8f), Theme.alpha(Theme.TEAL, 0.6f), 3f * u);
         Ui.textFit(c, readyHint, cx, cy, 44f * u, 760f * u, Theme.alpha(Theme.WHITE, pulse), Paint.Align.CENTER, Ui.BOLD);
-        Ui.textFit(c, readySub, cx, cy + 60f * u, 32f * u, 760f * u, Theme.TEAL, Paint.Align.CENTER, Ui.MEDIUM);
+        for (int i = 0; i < readySubLines.length; i++) {
+            Ui.text(c, readySubLines[i], cx, cy + 60f * u + i * lh, readySubSize[0], Theme.TEAL, Paint.Align.CENTER, Ui.MEDIUM);
+        }
     }
 
     private void drawEnding(Canvas c) {

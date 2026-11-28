@@ -101,6 +101,7 @@ public final class LivesDialog extends Screen {
         refill.enabled = g.progress.diamonds >= Progress.REFILL_COST;
         refill.label = L10n.f("lives.dialog.refill", Progress.REFILL_COST);
         refill.sub = L10n.f("lives.dialog.have", g.progress.diamonds);
+        placeButtons();
         if (open) dumpTargets();
     }
 
@@ -117,12 +118,24 @@ public final class LivesDialog extends Screen {
     protected void layout() {
         float pw = Math.min(w - 60f * u, 900f * u), cx = w / 2f;
         float top = h * 0.5f - 470f * u;
-        float bh = 130f * u, bw = pw - 120f * u, y = top + 560f * u;
-        video.set(cx - bw / 2f, y, cx + bw / 2f, y + bh);
-        refill.set(cx - bw / 2f, y + bh + 24f * u, cx + bw / 2f, y + bh * 2f + 24f * u);
-        close.set(cx - bw / 2f, y + bh * 2f + 48f * u, cx + bw / 2f, y + bh * 2f + 48f * u + 110f * u);
+        placeButtons();
         infoLines = Ui.wrapFit(info, 34f * u, pw - 120f * u, 3, Ui.MEDIUM, fit);
         infoSize = fit[0];
+    }
+
+    /** Video butonu yoksa diğerleri yukarı kayar (boşluk kalmaz). */
+    private void placeButtons() {
+        if (w <= 0) return;
+        float pw = Math.min(w - 60f * u, 900f * u), cx = w / 2f;
+        float top = h * 0.5f - 470f * u;
+        float bh = 130f * u, bw = pw - 120f * u, y = top + 560f * u;
+        if (video.visible) {
+            video.set(cx - bw / 2f, y, cx + bw / 2f, y + bh);
+            y += bh + 24f * u;
+        }
+        refill.set(cx - bw / 2f, y, cx + bw / 2f, y + bh);
+        y += bh + 24f * u;
+        close.set(cx - bw / 2f, y, cx + bw / 2f, y + 110f * u);
     }
 
     @Override
