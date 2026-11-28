@@ -480,7 +480,7 @@
   "mechanic.2": "There are several mirrors. Plan the beam's path from the start.",
   "mechanic.3": "Walls stop the light. Mirrors with a dark frame are fixed and don't turn.",
   "mechanic.4": "Colored sources! Each target wants light in the color of its ring. Red + green = yellow.",
-  "mechanic.5": "Color filters only let their own color through. White light comes out of a filter colored.",
+  "mechanic.5": "Color filters only let their own color through. White light that passes through a filter takes on its color.",
   "mechanic.6": "A prism splits light. Relative to the beam's DIRECTION OF TRAVEL, red turns left, green goes straight and blue turns right: on a beam going down, red ends up on the right of the screen.",
   "mechanic.7": "There are several targets. They all have to light up at the same time to finish the level.",
   "mechanic.8": "Gold blocks stop the light. Drag one to slide it by one square.",

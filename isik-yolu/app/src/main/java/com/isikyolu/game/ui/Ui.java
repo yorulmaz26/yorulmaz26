@@ -46,6 +46,31 @@ public final class Ui {
         return t;
     }
 
+    /**
+     * Tek satırlık metin sığmazsa yazıyı orantılı küçültür (en az minSp); ancak o da yetmezse "…" ile kesilir.
+     * Uzun çevirilerde (ör. İtalyanca, Almanca) başlık ve alt başlıklar kesilmeden okunur. Metin değişince yeniden hesaplanır.
+     */
+    public static void shrinkToFit(TextView t, float minSp) {
+        final float base = t.getTextSize();
+        final float min = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, minSp, t.getResources().getDisplayMetrics());
+        final android.text.TextPaint probe = new android.text.TextPaint(t.getPaint());
+        Runnable fit = () -> {
+            int avail = t.getWidth() - t.getTotalPaddingLeft() - t.getTotalPaddingRight();
+            if (avail <= 0) return;
+            probe.set(t.getPaint());
+            probe.setTextSize(base);
+            float need = probe.measureText(t.getText().toString());
+            float size = need <= avail ? base : Math.max(min, base * avail / need * 0.98f);
+            if (Math.abs(size - t.getTextSize()) > 0.5f) t.setTextSize(TypedValue.COMPLEX_UNIT_PX, size);
+        };
+        t.addOnLayoutChangeListener((v, l, tp, r, b, ol, ot, or, ob) -> v.post(fit));
+        t.addTextChangedListener(new android.text.TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void onTextChanged(CharSequence s, int a, int b, int c) {}
+            @Override public void afterTextChanged(android.text.Editable e) { t.post(fit); }
+        });
+    }
+
     public static GradientDrawable round(int color, float radius) {
         GradientDrawable g = new GradientDrawable();
         g.setColor(color);

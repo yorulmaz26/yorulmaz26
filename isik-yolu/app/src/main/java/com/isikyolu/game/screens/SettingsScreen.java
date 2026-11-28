@@ -130,6 +130,7 @@ public final class SettingsScreen extends Screen {
         TextView value = Ui.text(c, L.nativeName(L.lang()), 15, Palette.TURQUOISE, Ui.MEDIUM);
         value.setSingleLine(true);
         value.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        Ui.shrinkToFit(value, 11);
         LinearLayout.LayoutParams vlp = new LinearLayout.LayoutParams(-2, -2);
         vlp.leftMargin = Ui.dp(c, 8);
         r.addView(value, vlp);

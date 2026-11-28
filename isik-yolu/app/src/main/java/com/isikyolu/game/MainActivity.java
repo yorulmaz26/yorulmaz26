@@ -386,21 +386,12 @@ public final class MainActivity extends Activity {
                 Game.audio().play(Audio.ACHIEVE);
                 String gain = com.isikyolu.game.i18n.L.n("dialog.plus_crystals", r.crystals);
                 if (r.gems > 0) gain = com.isikyolu.game.i18n.L.t("dialog.reward_pair", gain, com.isikyolu.game.i18n.L.n("dialog.plus_gems", r.gems));
-                banner(com.isikyolu.game.ui.Icon.TROPHY, com.isikyolu.game.i18n.L.t("dialog.ach_title", achText(d, "title", d.title)),
-                        com.isikyolu.game.i18n.L.t("dialog.ach_body", achText(d, "desc", d.description), gain));
+                banner(com.isikyolu.game.ui.Icon.TROPHY, com.isikyolu.game.i18n.L.t("dialog.ach_title", com.isikyolu.game.i18n.WorldText.achievementTitle(d)),
+                        com.isikyolu.game.i18n.L.t("dialog.ach_body", com.isikyolu.game.i18n.WorldText.achievementDesc(d), gain));
             }, delay);
             delay += 3200;
         }
         Game.save();
-    }
-
-    /**
-     * Başarının adı/açıklaması seçili dilde: {@code ach.<id>.title|desc} anahtarları ('world' grubu).
-     * Anahtar hiçbir dilde tanımlı değilse (yalnızca birleştirme öncesi) motorun kaynak metni kullanılır.
-     */
-    private static String achText(com.isikyolu.engine.Achievements.Def d, String part, String source) {
-        String key = "ach." + d.id + "." + part;
-        return com.isikyolu.game.i18n.L.has(key) ? com.isikyolu.game.i18n.L.t(key) : source;
     }
 
     /** Üstten kayan bildirim (başarı kazanıldı vb.). */

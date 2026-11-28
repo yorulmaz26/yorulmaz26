@@ -44,9 +44,11 @@ public final class MenuScreen extends Screen {
         pill.setBackground(Ui.round(0x22F5C542, Ui.dp(a, 16)));
         pill.setPadding(Ui.dp(a, 14), Ui.dp(a, 6), Ui.dp(a, 16), Ui.dp(a, 6));
         pill.addView(Ui.icon(a, Icon.STAR, Palette.GOLD, 18));
-        // yıldız sayıları binlik ayırıcısız kalır (1500), bu yüzden metin olarak verilir
-        TextView st = Ui.text(a, "  " + L.n("menu.progress", Progress.LEVEL_COUNT, String.valueOf(p.totalStars()),
-                String.valueOf(Progress.LEVEL_COUNT * 3), String.valueOf(p.completedCount())), 14, Palette.GOLD, Ui.MEDIUM);
+        // yıldız sayıları: Türkçede eskisi gibi ayırıcısız (1500), diğer dillerde yerel biçim (1,500 / 1.500 / 1 500)
+        java.util.function.IntFunction<String> num = v -> "tr".equals(L.lang()) ? String.valueOf(v)
+                : java.text.NumberFormat.getIntegerInstance(L.locale()).format(v);
+        TextView st = Ui.text(a, "  " + L.n("menu.progress", Progress.LEVEL_COUNT, num.apply(p.totalStars()),
+                num.apply(Progress.LEVEL_COUNT * 3), num.apply(p.completedCount())), 14, Palette.GOLD, Ui.MEDIUM);
         pill.addView(st);
         col.addView(pill, Ui.lpMargins(a, -2, -2, 0, 18, 0, 10));
         LinearLayout status = Ui.horizontal(a);

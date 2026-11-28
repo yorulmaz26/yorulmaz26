@@ -94,6 +94,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
         TextView st = Ui.text(c, sub, 13, Palette.TEXT_DIM, Ui.REGULAR);
         st.setSingleLine(true);
         st.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        Ui.shrinkToFit(st, 10); // uzun çevirilerde kesilmez, küçülür
         tc.addView(st);
         top.addView(tc, new LinearLayout.LayoutParams(0, -2, 1f));
         LinearLayout movesBox = Ui.vertical(c);
@@ -121,7 +122,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
         goalText.setPadding(Ui.dp(c, 8), 0, 0, 0);
         goalText.setMaxLines(2); // uzun dillerde iki satıra iner
         goalText.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        goal.addView(goalText);
+        // can rozeti önce ölçülür (ağırlıksız): uzun dillerde hedef metni iki satıra iner, rozet sıkışmaz
+        goal.addView(goalText, daily ? new LinearLayout.LayoutParams(-2, -2) : new LinearLayout.LayoutParams(0, -2, 1f));
         if (!daily) {
             LinearLayout.LayoutParams ll = new LinearLayout.LayoutParams(-2, -2);
             ll.leftMargin = Ui.dp(c, 10);

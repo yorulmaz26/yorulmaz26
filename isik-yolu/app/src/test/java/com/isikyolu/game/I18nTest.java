@@ -165,7 +165,8 @@ public class I18nTest {
         Pattern literal = Pattern.compile("\"((?:[^\"\\\\\\n]|\\\\.)*)\"");
         Pattern turkish = Pattern.compile("[çğıöşüÇĞİÖŞÜâÂ]");
         // motorun Türkçe kaynak alanları arayüzde gösterilmez; yerine L anahtarları kullanılır
-        Pattern engineText = Pattern.compile("Chapters\\.(NAMES|TOPICS|MECHANICS|WORLD_NAMES|WORLD_LEVELS|WORLD_INTROS)\\b|LightColor\\.nameTr\\b|\\bnameTr\\(");
+        Pattern engineText = Pattern.compile("Chapters\\.(NAMES|TOPICS|MECHANICS|WORLD_NAMES|WORLD_LEVELS|WORLD_INTROS)\\b|Chapters\\.topic\\("
+                + "|LightColor\\.nameTr\\b|\\bnameTr\\(|\\b(d|def|a|ach)\\.(title|description)\\b|\\b(it|item)\\.(name|description)\\b");
         Pattern uiCall = Pattern.compile("\\b(?:Ui\\.text|Ui\\.button|Ui\\.header|toast|title|body|banner|setText|setContentDescription|note|button)\\s*\\((?:[^\"();]|\\([^()]*\\))*\"([^\"]*[A-Za-z][^\"]*)\"");
         List<String> problems = new ArrayList<>();
         for (File f : javaFiles(SRC)) {
