@@ -1,0 +1,44 @@
+1
+00:00:00,000 --> 00:00:03,000
+Which color is right?
+
+2
+00:00:03,000 --> 00:00:05,500
+Tap to switch colors!
+
+3
+00:00:05,500 --> 00:00:08,000
+Same or different? Decide fast!
+
+4
+00:00:08,000 --> 00:00:11,500
+Mirrors, fog and memory gates
+
+5
+00:00:11,500 --> 00:00:15,000
+A new twist in every level
+
+6
+00:00:15,000 --> 00:00:16,600
+500 levels · 20 worlds
+
+7
+00:00:16,600 --> 00:00:19,000
+Colorful worlds to explore
+
+8
+00:00:19,000 --> 00:00:20,400
+30 cute characters
+
+9
+00:00:20,400 --> 00:00:22,000
+Challenge a friend!
+
+10
+00:00:22,000 --> 00:00:24,500
+Collect all the stars!
+
+11
+00:00:24,500 --> 00:00:27,000
+Beat your best in Endless Mode!
+

@@ -224,7 +224,9 @@ class FitLabel(text: CharSequence, style: LabelStyle) : Label(text, style) {
         if (!wrap && width > 0f) {
             val nat = naturalWidth()
             val s = if (nat > width + 0.5f) maxOf(minScale, width / nat) else 1f
-            if (kotlin.math.abs(fontScaleX - s) > 0.001f) setFontScale(s)
+            // Label.setFontScale yazı tipinin temel ölçeğini (yoğunluğa göre 1/scale) EZER; bu yüzden çarparak veriyoruz.
+            val target = if (s >= 0.999f) 1f else s * style.font.data.scaleX
+            if (kotlin.math.abs(fontScaleX - target) > 0.0001f) setFontScale(target)
         }
         super.layout()
     }

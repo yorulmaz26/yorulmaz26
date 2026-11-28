@@ -10,3 +10,10 @@ keystore.properties
 *.keystore
 dist/
 android/libs/
+# Yayın paketi ikili dosyaları (büyük; yerelde üretilir, depoya eklenmez)
+RELEASE_PACKAGE/**/*.mp4
+RELEASE_PACKAGE/**/*.apk
+RELEASE_PACKAGE/**/*.aab
+RELEASE_PACKAGE/**/*.zip
+RELEASE_PACKAGE/**/*.png
+RELEASE_PACKAGE/**/*.jpg

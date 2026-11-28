@@ -118,7 +118,7 @@ class CollectionScreen(game: YanlisRenkGame) : BaseScreen(game) {
                 val bg = Table(); bg.background = ui.pill(if (got) com.yanlisrenk.game.ui.Pal.hex(a.accent1) else Pal.GREY)
                 bg.add(ui.icon(if (got) "box" else "lock", 60f).also { if (!got) it.color.a = 0.5f }).size(60f).pad(12f)
                 p.add(bg).row()
-                p.add(ui.label(if (got) a.collectible else "???", Ui.Size.S, if (got) Pal.TEXT else Pal.TEXT_SOFT, wrap = true).also { it.setFontScale(0.82f) }).width(118f)
+                p.add(ui.label(if (got) a.collectible else "???", Ui.Size.S, if (got) Pal.TEXT else Pal.TEXT_SOFT, wrap = true).also { it.setFontScale(0.82f * it.style.font.data.scaleX) }).width(118f)
                 c.add(p).width(122f).top().pad(2f)
             }
             list.add(c).width(670f).padBottom(12f).row()

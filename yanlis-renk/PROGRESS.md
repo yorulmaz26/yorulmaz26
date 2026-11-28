@@ -78,3 +78,11 @@ Oturum kesilirse buradan devam edin. Ayrıntılar: TASKS.md, TEST_REPORT.md, BUI
 * AdMob: menülerde banner (sahne banner'ın üstüne yerleşir), bölüm sonu molalarında seyrek geçiş reklamı, isteğe bağlı ödüllü video (+1 can, altın ×2). Varsayılan test kimlikleri; gerçek kimlikler gradle özellikleriyle (BUILD_REPORT.md).
 * Bağımsız bölüm denetimi testi ve LEVEL_AUDIT.md; görüş kuralı doğrulayıcı ile ekran arasında birleştirildi, sis/tabela/bilgi çubuğu uyumsuzlukları giderildi; ped yerleşimi ve mekanik listeleri düzeltildi; bölümler yeniden üretildi.
 * 1.3.0 Android 11 emülatöründe (Google Play Hizmetleri ve internet yok) açıldı; reklam SDK'sı bağlanamadığında oyun reklamsız sorunsuz devam etti.
+
+## 1.4.0 (küresel yayın hazırlığı — Miscolor)
+* Hedef API 36 (Android 16), AGP 8.13.2, Kotlin 2.2.21; Google Mobile Ads 25.5.0 + UMP 4.0.0; 16 KB hizalama doğrulandı.
+* Can sistemi: merkezi `GameConfig` (LIFE_REGEN_SECONDS = 1200 → 20 dk, MAX_LIVES = 4); saat dilimi/gün koruması, imzalı kayıt düzeltmesi, kalp dolma animasyonu, "canların bitti" penceresi (reklam / altın / elmas / sonsuz mod).
+* Yerelleştirme: `L` yöneticisi, `assets/localization/{tr,en,de,it,fr,es}.json` (1006 anahtar), ICU çoğul, cihaz dili algılama (desteklenmeyen → İngilizce), ayarlardan anında dil değişimi, eksik çeviri testi, sığmayan metni küçülten `FitLabel`.
+* Marka: İngilizce ad **Miscolor**; TR'de "Yanlış Renk" ana + "Miscolor" alt, diğer dillerde tersi; uygulama adı values-tr "Yanlış Renk", diğerleri "Miscolor".
+* Hata düzeltmesi: `Label.setFontScale` yoğunluk ölçeğini eziyordu (yüksek DPI cihazda başlık devleşiyordu) — emülatörde bulundu ve düzeltildi.
+* Tanıtım videosu kaydedici (`:desktop:trailer`), mağaza görsel üreticisi (`tools/store`), logo üreticisi (`tools/art/gen_logo.py`). Çıktılar: `RELEASE_PACKAGE/`.

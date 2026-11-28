@@ -1,0 +1,6 @@
+tr: 1006 anahtar, eksik=0, yer tutucu hatası=0, '[' içeren=0, fazla=0
+en: 1006 anahtar, eksik=0, yer tutucu hatası=0, '[' içeren=0, fazla=0
+de: 1006 anahtar, eksik=0, yer tutucu hatası=0, '[' içeren=0, fazla=0
+it: 1006 anahtar, eksik=0, yer tutucu hatası=0, '[' içeren=0, fazla=0
+fr: 1006 anahtar, eksik=0, yer tutucu hatası=0, '[' içeren=0, fazla=0
+es: 1006 anahtar, eksik=0, yer tutucu hatası=0, '[' içeren=0, fazla=0
