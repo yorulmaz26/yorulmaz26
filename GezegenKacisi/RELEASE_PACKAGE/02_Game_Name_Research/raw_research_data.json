@@ -1,0 +1,2499 @@
+{
+ "researched": [
+  {
+   "name": "Planet Escape",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Escape\" site:play.google.com; Planet Escape game android; \"Planet Escape\" on appbrain/apkpure/apkcombo",
+     "accessible": true,
+     "result": "I found no Play app titled exactly \"Planet Escape\" through the search index. Close variants exist: \"Planet Escape Plan\", a one-touch endless arcade game (https://apkpure.com/planet-escape-plan/com.gubugreborn.planetescapeplan), and \"Escape The Planet\" (com.escape.planet). I could not search Play directly because play.google.com is blocked in this session's network."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Escape\" site:apps.apple.com",
+     "accessible": true,
+     "result": "There is no game with this exact name. \"Planet Escape Mobile\" is a travel app made for the Polish travel agency Planet Escape (https://apps.apple.com/us/app/id1551931089). Similar titles include EscapeGame Beautiful Planet and Space Escape."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Escape\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. The closest are \"Escape From This Planet\" (https://store.steampowered.com/app/2189110) and app 3133600, Worlds Explorers, which says 'escape each unique planet'."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Escape\" game",
+     "accessible": true,
+     "result": "The name is very crowded. At least 10 hobby or jam games on itch.io use it (e.g. https://blackthoughtsdev.itch.io/planet-escape, plus GBJAM8, Ludum Dare 41 and Godot Wild Jam 69 entries). Other uses: a Polish travel brand (https://planetescape.pl/en/), a 2022 film and Planet Escape Room venues."
+    },
+    {
+     "platform": "YouTube",
+     "query": "Planet Escape game (youtube.com only)",
+     "accessible": true,
+     "result": "Small videos only: a GBJAM8 'Planet Escape' devlog (https://www.youtube.com/watch?v=Aoc2VJY8_go), a Monkey GO Happy Planet Escape walkthrough and an Alien Planet Escape walkthrough."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planet Escape\" game (instagram.com only)",
+     "accessible": true,
+     "result": "I found no game account with this name, only escape-room businesses (e.g. https://www.instagram.com/theescapegame/)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "Planet Escape game (tiktok.com only)",
+     "accessible": true,
+     "result": "No game found. The only exact use is a 'Planet Escape Room' venue mentioned in a video (https://www.tiktok.com/@celinelinarte/video/7281743574541323566)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int quicksearch brandName=Planet Escape",
+     "accessible": false,
+     "result": "I could not query it: branddb.wipo.int is blocked in this session's network. No results can be claimed."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "EUIPO eSearch / TMview (not reachable); WebSearch \"Planet Escape\" trademark",
+     "accessible": false,
+     "result": "I could not query the database directly. Web search found no EU record, but that is not a database check."
+    },
+    {
+     "platform": "USPTO",
+     "query": "WebSearch \"Planet Escape\" trademark (Justia/TrademarkElite index); tmsearch.uspto.gov not reachable",
+     "accessible": false,
+     "result": "Indexed data shows no exact PLANET ESCAPE mark. It does show PLANESCAPE (serial 74612438, computer game programs, pseudo mark 'PLAN ESCAPE') at https://trademarks.justia.com/746/12/planescape-74612438.html. That is the setting of the famous Planescape: Torment game and sounds almost the same. PLANE SCAPE is also registered (reg. 6222098)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr (not queried, network-restricted); WebSearch trademark",
+     "accessible": false,
+     "result": "I could not query TÜRKPATENT. No web results mention a Turkish PLANET ESCAPE mark."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "I found no exact Play or App Store game and no exact US mark in the indexed data, but the phrase is very generic. Dozens of hobby games use it, a 2019 Play game is called 'Planet Escape Plan', and a Polish travel agency uses 'Planet Escape' as its brand and app name (a travel class, not games). The biggest legal risk is that it sounds almost like PLANESCAPE, an established game and D&D trademark for computer games. Weak to own or defend. Its advantage is that it translates the Turkish title 'Gezegen Kaçışı' exactly.",
+   "negativeMeanings": "I found no slang or negative meaning in EN, DE, FR, IT, ES or TR. 'Escape' may suggest the escape-room puzzle genre, so players may expect the wrong kind of game. It sounds close to 'Planescape'.",
+   "scores": {
+    "originality": 25,
+    "memorability": 60,
+    "pronunciation": 85,
+    "conceptFit": 80,
+    "marketing": 65,
+    "searchVisibility": 20,
+    "lowConflictRisk": 40
+   }
+  },
+  {
+   "name": "Orbit Escape",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Orbit Escape\" site:play.google.com; Orbit Escape game android apk; Orbit Escape on apkcombo/appbrain",
+     "accessible": true,
+     "result": "Exact match: 'Orbit Escape' by Steel Horizon Studio (com.steelhorizon.orbitescape, v1.0.0, Oct 2026), a timing arcade game where you launch between orbital anchors (https://apkcombo.com/orbit-escape/com.steelhorizon.orbitescape). The Play developer page CEVSAA also lists 'Orbit Escape' (https://play.google.com/store/apps/developer?id=CEVSAA). A similar title, 'Orbital Escape: Casual Game' by Limbo Game Studio, also exists."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Orbit Escape\" site:apps.apple.com",
+     "accessible": true,
+     "result": "Exact match: 'Orbit-Escape' by Jack Timothy Armstrong, a one-tap space game about escaping a black hole, with planet packs (https://apps.apple.com/us/app/orbit-escape/id6748784259). This is the same genre as our game. 'Orbito - Singularity Escape' also exists."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Orbit Escape\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Related titles: In Orbit / Orbit HD (https://store.steampowered.com/app/356380), From Orbit, Orbit Express and ORBIT."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Orbit Escape\" game",
+     "accessible": true,
+     "result": "Math Playground hosts an 'Orbit Escape' rocket timing game (https://www.mathplayground.com/pg_orbit_escape.html). There are also several itch.io games with this name (electropenguin, arielb3861, rafgoncan, art-of-one, jburch42)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "Orbit Escape game (youtube.com only)",
+     "accessible": true,
+     "result": "Walkthroughs of a 2016 room-escape game called 'Orbit Escape' (https://www.youtube.com/watch?v=LtdS6b5axaU), and Orbit Exodus by Studio Anastrophe."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Orbit Escape\" game (instagram.com only)",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "TikTok",
+     "query": "Orbit Escape game (tiktok.com only)",
+     "accessible": true,
+     "result": "No exact match. Results are about the Orbito board game, the Geometry Dash 'Orbit' level and the Orbit gravity app (https://www.tiktok.com/discover/orbit-game?lang=en)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "I could not query it: branddb.wipo.int is blocked in this session's network."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "EUIPO eSearch / TMview (not reachable); WebSearch trademark",
+     "accessible": false,
+     "result": "I could not query the database directly. Web search found no EU record."
+    },
+    {
+     "platform": "USPTO",
+     "query": "WebSearch \"Orbit Escape\" OR \"Escape Orbit\" trademark; \"ORBIT ESCAPE\" trademark serial number",
+     "accessible": false,
+     "result": "I could not query the database directly. The indexed data shows no ORBIT ESCAPE mark, but many live ORBIT marks from many owners (e.g. https://trademarks.justia.com/997/15/orbit-99715134.html)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr (not queried, network-restricted)",
+     "accessible": false,
+     "result": "I could not query TÜRKPATENT. No web results found."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "Identical names are already live on both iOS (one-tap black-hole escape, Jack Timothy Armstrong) and Google Play (Steel Horizon Studio, Oct 2026). Both are one-tap or timing space arcade games, the same genre, plus a Math Playground rocket game and several itch.io games. It would be very hard to rank for and would invite store or trademark complaints. It also fits poorly: the game has no orbit mechanic.",
+   "negativeMeanings": "I found no negative meaning in EN, DE, FR, IT, ES or TR. 'Orbit' is also Wrigley's chewing-gum brand (a different class).",
+   "scores": {
+    "originality": 20,
+    "memorability": 60,
+    "pronunciation": 80,
+    "conceptFit": 55,
+    "marketing": 55,
+    "searchVisibility": 15,
+    "lowConflictRisk": 10
+   }
+  },
+  {
+   "name": "Escape Orbit",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Escape Orbit\" site:play.google.com; \"Escape Orbit\" android app",
+     "accessible": true,
+     "result": "No exact 'Escape Orbit' title. Searches bring up the reversed 'Orbit Escape' apps (CEVSAA developer page https://play.google.com/store/apps/developer?id=CEVSAA, and Steel Horizon's com.steelhorizon.orbitescape), plus Orbit Dodge and Orbite."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Escape Orbit\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact title. 'Orbit-Escape' (https://apps.apple.com/us/app/orbit-escape/id6748784259), Orbinity and Orbito - Singularity Escape come up instead."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Escape Orbit\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Related titles: Out of Orbit (https://store.steampowered.com/app/1859990), From Orbit, Orbit Quest and ORBITAL."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Escape Orbit\" game; Escape Orbit game (itch/apk sites)",
+     "accessible": true,
+     "result": "Exact match: an itch.io game 'ESCAPE ORBIT' by Alijaa, made in Godot (https://alijaa.itch.io/escape-orbit). Also 'Escape the Orbit' (GMTK Jam 2025) and 'Escape from Orbit', a one-click space jumper by SandsWorks (https://discussions.unity.com/t/escape-from-orbit-an-amazing-endless-gravity-space-one-click-jumper-sandsworks/598933)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Escape Orbit\" site:youtube.com; Escape Orbit game (youtube.com only)",
+     "accessible": true,
+     "result": "No game channel or video. Results are physics and space videos (e.g. Kurzgesagt) and Orbit Exodus / Orbit Escape walkthroughs (https://www.youtube.com/watch?v=4Xeo-_XYjQs)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Escape Orbit\" (instagram.com only)",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "TikTok",
+     "query": "Escape Orbit game (tiktok.com only)",
+     "accessible": true,
+     "result": "Nothing relevant found. Results are space-station escape rooms and the Geometry Dash Orbit level."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "I could not query it: branddb.wipo.int is blocked in this session's network."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "EUIPO eSearch / TMview (not reachable)",
+     "accessible": false,
+     "result": "I could not query the database directly. Web search found no EU record."
+    },
+    {
+     "platform": "USPTO",
+     "query": "WebSearch \"Orbit Escape\" OR \"Escape Orbit\" trademark",
+     "accessible": false,
+     "result": "I could not query the database directly. The indexed data shows no ESCAPE ORBIT mark, only many ORBIT marks (e.g. https://trademark.justia.com/875/89/orbit-87589465.html)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr (not queried)",
+     "accessible": false,
+     "result": "I could not query TÜRKPATENT. No web results found."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "The exact phrase is used only by a small itch.io game. But it has the same words as 'Orbit Escape', which is live on iOS and Google Play in the same one-tap space genre, and store search ignores word order. It is very likely to be confused with those apps and gives little room to stand out. The verb-first wording is also weaker as a brand.",
+   "negativeMeanings": "I found no negative meaning in EN, DE, FR, IT, ES or TR. It can read as an instruction ('escape orbit') rather than a name.",
+   "scores": {
+    "originality": 25,
+    "memorability": 50,
+    "pronunciation": 80,
+    "conceptFit": 55,
+    "marketing": 50,
+    "searchVisibility": 20,
+    "lowConflictRisk": 20
+   }
+  },
+  {
+   "name": "Planet Dash",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Dash\" site:play.google.com; Planet Dash game android apk; Planet Dash on appbrain/apkpure/apkcombo",
+     "accessible": true,
+     "result": "I found no Play app titled exactly 'Planet Dash' through the search index. Close variants: 'Ninja Planet Dash' on APKPure (v1.0.0.0) and 'Void Dash - Planet Domination' (developer 1Apps, https://play.google.com/store/apps/developer?id=1Apps). I could not search Play directly (blocked)."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Dash\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact title. The closest is 'Galaxy Dash', a game about jumping from planet to planet (https://apps.apple.com/nz/app/galaxy-dash/id1510305535). Planet Orbital X uses the subtitle 'endless planet flying dash'."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Dash\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. The closest is 'Planet Bash' (https://store.steampowered.com/app/700400)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Dash\" game",
+     "accessible": true,
+     "result": "Exact match: a Chrome Web Store game 'Planet Dash' by Creative Spark Studios, a planet-hopping game with about 20 users (https://chromewebstore.google.com/detail/planet-dash/jjndhfjhlfladkphllhojjemajdmbean). Also an itch.io prototype (https://georgev431.itch.io/planet-dash) and 'PlanetsDash' (mridex.itch.io)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "Planet Dash game (youtube.com only)",
+     "accessible": true,
+     "result": "An old Russian browser platformer 'Planet Dash (Планета Дэш)', about 11 years old (https://www.youtube.com/watch?v=V_oviF5goH0), and a 'Dash Planet' video. Geometry Dash planet content is very common."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planet Dash\" game (instagram.com only)",
+     "accessible": true,
+     "result": "I found no Planet Dash account. Results show other 'Dash' or 'Planet' game accounts (e.g. https://www.instagram.com/dashdashracing/)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "Planet Dash game (tiktok.com only)",
+     "accessible": true,
+     "result": "Nothing exact. Results are about Geometry Dash 'Planet Mode' (https://www.tiktok.com/@1wulz/video/7136709941783465221), Planet Merge and Planet Destroyer."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "I could not query it: branddb.wipo.int is blocked in this session's network."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "EUIPO eSearch / TMview (not reachable); WebSearch \"PLANET DASH\" trademark EUIPO OR WIPO class 9",
+     "accessible": false,
+     "result": "I could not query the database directly. Web search found no EU or WIPO record for PLANET DASH."
+    },
+    {
+     "platform": "USPTO",
+     "query": "WebSearch \"Planet Dash\" trademark (Justia index)",
+     "accessible": false,
+     "result": "I could not query the database directly. The indexed data shows no PLANET DASH mark. Nearby game marks: DASH GAMES (https://trademarks.justia.com/793/78/dash-79378130.html), POP DASH and GUNZ DASH."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr (not queried)",
+     "accessible": false,
+     "result": "I could not query TÜRKPATENT. No web results found."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "I found no exact match on Google Play, the App Store or Steam, and no PLANET DASH mark in the indexed data. The exact name is used only by small or inactive projects: a Chrome Web Store planet-hopping game (about 20 users), an itch.io prototype and an old Russian browser game. The Chrome one is the same theme on a Google platform. 'Dash' is crowded in mobile games (Geometry Dash, Galaxy Dash), so search ranking will be shared. Trademark databases were not checked directly, so the risk rating is provisional.",
+   "negativeMeanings": "I found no slang or negative meaning in EN, DE, FR, IT, ES or TR. 'Dash' is a well-known P&G laundry detergent brand in Italy, Germany, France and Spain, which is a mild association. Spanish and Italian speakers may say 'desh', which is harmless.",
+   "scores": {
+    "originality": 40,
+    "memorability": 75,
+    "pronunciation": 85,
+    "conceptFit": 70,
+    "marketing": 75,
+    "searchVisibility": 40,
+    "lowConflictRisk": 55
+   }
+  },
+  {
+   "name": "Orbit Dash",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Orbit Dash\" site:play.google.com; Orbit Dash game android apk; Orbit Dash on appbrain/apkpure/apkcombo",
+     "accessible": true,
+     "result": "Many exact matches. Lewydo's 'Orbit Dash: Rhythm Tap Game' (com.lewydo.orbitdash, 1K-10K installs, 2026, https://apkcombo.com/orbit-dash/com.lewydo.orbitdash). Racotter's 'Orbit Dash: Space Runner', a flappy-style space game (com.racotter.flappyspace, https://www.appbrain.com/app/orbit-dash/com.racotter.flappyspace). Also Pen-Tool, Prerak Games, 'Orbit Dash: Infinity', 'Orbit Dash 3D: Gravity Rush' and 'Orbit Dash Endless Run'."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Orbit Dash\" site:apps.apple.com",
+     "accessible": true,
+     "result": "Exact match: 'Orbit Dash Endless Run' by Imran Hameed, a one-tap game where you swing around planets (https://apps.apple.com/us/app/-/id6756094692)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Orbit Dash\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Many Orbit titles: Orbit Run, Orbits, ORBIT, In Orbit (https://store.steampowered.com/app/719350)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Orbit Dash\" game",
+     "accessible": true,
+     "result": "Kotaku lists a one-tap rhythm game 'Orbit Dash' (https://kotaku.com/games/orbit-dash). Also itch.io games by Pizzaroot (2017) and urafaelgames (Android APK), and many browser-game portals (2games.io, unblocked sites)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "Orbit Dash game (youtube.com only)",
+     "accessible": true,
+     "result": "An 'Orbit Dash Gameplay' video of a tiny ship flying through cosmic obstacles (https://www.youtube.com/watch?v=SphB3QqvsdM). Videos about the Geometry Dash 'ORBIT' level dominate."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Orbit Dash\" game (instagram.com only)",
+     "accessible": true,
+     "result": "No exact account. Results: Orbitals, DarkOrbit and Orbital Games (https://www.instagram.com/orbitals_game/)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "Orbit Dash game (tiktok.com only)",
+     "accessible": true,
+     "result": "Indie developer Lewydo promotes the Orbit Dash rhythm game. The Geometry Dash 'Orbit' level dominates results (https://www.tiktok.com/discover/orbit-geometry-dash)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "I could not query it: branddb.wipo.int is blocked in this session's network."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "EUIPO eSearch / TMview (not reachable); WebSearch \"ORBIT DASH\" trademark EUIPO OR WIPO class 9",
+     "accessible": false,
+     "result": "I could not query the database directly. Web search found no EU record."
+    },
+    {
+     "platform": "USPTO",
+     "query": "WebSearch \"Orbit Dash\" trademark",
+     "accessible": false,
+     "result": "I could not query the database directly. The indexed data shows no ORBIT DASH mark, only many ORBIT marks (e.g. https://trademarks.justia.com/994/03/orbit-99403455.html)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr (not queried)",
+     "accessible": false,
+     "result": "I could not query TÜRKPATENT. No web results found."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "This is the most crowded candidate. At least 6 Android games and 1 iOS game already use 'Orbit Dash' as their exact name. One, Racotter's 'Orbit Dash: Space Runner' (package 'flappyspace'), is a flappy-style space game very close to ours. Searches are also dominated by the viral Geometry Dash 'Orbit' level. It also fits poorly, since the game has no orbit mechanic.",
+   "negativeMeanings": "I found no negative meaning in EN, DE, FR, IT, ES or TR. It suggests both Orbit gum and Dash detergent, two consumer brands.",
+   "scores": {
+    "originality": 10,
+    "memorability": 65,
+    "pronunciation": 85,
+    "conceptFit": 45,
+    "marketing": 50,
+    "searchVisibility": 10,
+    "lowConflictRisk": 5
+   }
+  },
+  {
+   "name": "Planet Slip",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Slip\" site:play.google.com; Planet Slip game android app",
+     "accessible": true,
+     "result": "I found no app with this name through the search index. The closest is 'Slip! – Sliding Logic Puzzles' (https://www.appbrain.com/app/slip-sliding-logic-puzzles/com.bluecrab.iceslide). I could not search Play directly (blocked)."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Slip\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact title. Nearby: Planet Drop (https://apps.apple.com/se/app/planet-drop/id1493451950), Slip: Sliding Logic Puzzles and Orbit Slinger."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Slip\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Nearby: Slip (https://store.steampowered.com/app/291070) and Slip 'n Slime."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Slip\" game; Planet Slip OR \"Planet Slide\" game (itch/apk sites)",
+     "accessible": true,
+     "result": "No game with this exact name. The closest are 'Planet Flip' by Scheming Cat Software (https://toucharcade.com/community/threads/planet-flip-by-scheming-cat-software.303194/) and Slipways (planet trade strategy)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Planet Slip\" site:youtube.com; Planet Slip game (youtube.com only)",
+     "accessible": true,
+     "result": "No exact match. Results: Slipways gameplay videos (https://www.youtube.com/watch?v=kVkzCHBJKT4) and the Planet Slow Mo channel."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planet Slip\" (instagram.com only)",
+     "accessible": true,
+     "result": "Nothing relevant: a Jakarta tyre shop on Jl. Slipi and a slime-products account (https://www.instagram.com/planet_of_slime/)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "Planet Slip game (tiktok.com only)",
+     "accessible": true,
+     "result": "Nothing relevant. Results: the 'Slip It In' party game and slip-and-slide videos (https://www.tiktok.com/discover/slip-and-slide-game?lang=en)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "I could not query it: branddb.wipo.int is blocked in this session's network."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "EUIPO eSearch / TMview (not reachable)",
+     "accessible": false,
+     "result": "I could not query the database directly. Web search found no EU record."
+    },
+    {
+     "platform": "USPTO",
+     "query": "WebSearch \"Planet Slip\" trademark",
+     "accessible": false,
+     "result": "I could not query the database directly. The indexed data shows no PLANET SLIP mark. Nearest marks: PLANET FLIP Inc. (class 25, clothing), PLANET SLEEP (reg. 2204305, https://trademark.justia.com/751/47/planet-75147844.html) and SLIP (reg. 1507765)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr (not queried)",
+     "accessible": false,
+     "result": "I could not query TÜRKPATENT. No web results found."
+    }
+   ],
+   "conflictLevel": "low",
+   "conflictNotes": "I found no game, app or trademark named 'Planet Slip' on any searched platform. The nearest names (Planet Flip, Slip!, Slipways) are different games. The name is nearly free, but its language problem (see negative meanings) is a serious obstacle for the European and Turkish markets. Trademark databases were not checked directly.",
+   "negativeMeanings": "This is a major problem. 'Slip' is the everyday word for underwear (briefs or panties) in French, German, Italian, Spanish and Turkish (e.g. Turkish 'slip külot'), so for a 10+ audience it can read as 'Planet Underpants'. In English, 'slip' also means a mistake or fall (as in 'Freudian slip') and a women's undergarment.",
+   "scores": {
+    "originality": 70,
+    "memorability": 60,
+    "pronunciation": 85,
+    "conceptFit": 60,
+    "marketing": 25,
+    "searchVisibility": 55,
+    "lowConflictRisk": 80
+   }
+  },
+  {
+   "name": "Astro Slip",
+   "findings": [
+    {
+     "platform": "Apple App Store",
+     "query": "\"Astro Slip\" alien adventure game app download (extended) + \"Astro Slip\" site:apps.apple.com",
+     "accessible": true,
+     "result": "EXACT MATCH: 'Astro Slip' by Weird LLC, a free one-tap casual arcade game where you steer a drifting alien past deep-space obstacles. https://apps.apple.com/us/app/astro-slip/id6757115564 (close variant: Astro.Slide by Ra1N Entertainment, https://apps.apple.com/ca/app/astro-slide/id1640228436)"
+    },
+    {
+     "platform": "Google Play",
+     "query": "\"Astro Slip\" site:play.google.com; \"Astro Slip\" Android Google Play alien one-tap",
+     "accessible": true,
+     "result": "No exact Play listing surfaced (via WebSearch only; direct fetch of play.google.com was blocked). Similar: Astro Tap, Astro Tap Orbit (https://play.google.com/store/apps/details?id=com.syn.astrotap)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Astro Slip\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact match. Only unrelated 'Slip' (app 291070) and several games titled 'Astro' (https://store.steampowered.com/app/291070)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Astro Slip\" game; \"Astro Slip\" OR \"AstroSlip\"",
+     "accessible": true,
+     "result": "Apart from the App Store game, a Snapchat page refers to an 'Astro Slip App Launch' video about the same alien game. Also 'Astral Slip' on RAWG (https://rawg.io/games/astral-slip/suggestions)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Astro Slip\" site:youtube.com",
+     "accessible": false,
+     "result": "The search engine ignored the site: filter, so YouTube was not actually searched. No relevant indexed results came up."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Astro Slip\" site:instagram.com",
+     "accessible": false,
+     "result": "site: filter not honored. Results were dominated by the 'slip' silk-sleepwear brand. A Snapchat explore page referenced the Astro Slip game (https://www.snapchat.com/explore/astroseek)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Astro Slip\" site:tiktok.com",
+     "accessible": false,
+     "result": "site: filter not honored. The nearest result was the 'Astro Slide' dance meme (https://knowyourmeme.com/memes/astro-slide)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Astro Slip\" trademark (web search of USPTO mirror sites)",
+     "accessible": false,
+     "result": "tmsearch.uspto.gov was not queried directly because the session network blocks it. The mirror sites show ASTROSLIP, Reg. 2508339 for Class 17 rubber goods, cancelled in 2012 (dead) (https://markinton.com/trademark/astroslip-75435191). Separate ASTROSLIDE filings also exist."
+    },
+    {
+     "platform": "WIPO / EUIPO / TURKPATENT",
+     "query": "Not queried directly",
+     "accessible": false,
+     "result": "These are JavaScript databases and the session network blocks external fetches, so they were not queried. No results can be claimed."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "An identical title, 'Astro Slip' by Weird LLC, is live on the Apple App Store. It is the same genre (one-tap space dodging arcade, Casual, 4+), so store confusion and possible common-law rights are likely. Astro.Slide is a close variant. The only exact USPTO mark found (ASTROSLIP, rubber goods) is dead.",
+   "negativeMeanings": "'Slip' means underpants/briefs in German, French, Italian, Spanish and Turkish ('slip külot'), so the name reads as 'astro underpants' to most of the EU and TR audience. In English, 'slip' also means a mistake, a lingerie slip, or a 'nip slip'. 'Astro' itself is neutral ('star' in IT/ES).",
+   "scores": {
+    "originality": 20,
+    "memorability": 65,
+    "pronunciation": 80,
+    "conceptFit": 55,
+    "marketing": 30,
+    "searchVisibility": 15,
+    "lowConflictRisk": 10
+   }
+  },
+  {
+   "name": "Star Slip",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Star Slip\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact Play listing surfaced (via WebSearch only). Close variant: 'Super Star Slide', a space puzzle (https://appgoblin.info/apps/com.BHabcd.SuperStarSlide)."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Star Slip\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Close variants: 'Star-Flip', a one-touch arcade game weaving between stars (https://apps.apple.com/py/app/star-flip/id6747686111), plus Starry Slide and Slingy Stars."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Star Slip\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact match. Close variant: 'Stars SLIDE' by Sprovieri Games, a puzzle game (https://store.steampowered.com/app/1642590)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Star Slip\" game; \"Star Slip\" mobile game iOS Android arcade (extended)",
+     "accessible": true,
+     "result": "'StarSlip' is a one-tap orbit web game (PWA) on GitHub by Brandon-ECE: a comet slips between planet orbits (https://github.com/Brandon-ECE/starslip). Same name, same genre, but not a store release."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Star Slip\" site:youtube.com",
+     "accessible": false,
+     "result": "site: filter not honored. Only unrelated music results; YouTube was not actually searched."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Star Slip\" site:instagram.com",
+     "accessible": false,
+     "result": "site: filter not honored. Results were flooded by the 'slip' silk-sleepwear brand. Nothing game-related."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Star Slip\" site:tiktok.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Star Slip\" trademark (web search of USPTO mirror sites)",
+     "accessible": false,
+     "result": "Not queried directly. The mirror sites show no STAR SLIP mark, only near-matches such as STAR-SLIT (cancelled) and STAR SLOTS (https://trademarks.justia.com/786/43/star-78643014.html)."
+    },
+    {
+     "platform": "WIPO / EUIPO / TURKPATENT",
+     "query": "Not queried directly",
+     "accessible": false,
+     "result": "Blocked or JavaScript-only; not queried. No results can be claimed."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "No store listing uses the exact name. However, a same-genre one-tap orbit web game called 'StarSlip' exists on GitHub, and Star-Flip, StarSling, Stars SLIDE and Super Star Slide crowd the space. Stars also fit the game less well than planets.",
+   "negativeMeanings": "'Slip' means underpants/briefs in German, French, Italian, Spanish and Turkish. In English, 'star slip' can suggest a celebrity slip-up or wardrobe malfunction, and 'slip' also means a mistake or lingerie.",
+   "scores": {
+    "originality": 40,
+    "memorability": 65,
+    "pronunciation": 80,
+    "conceptFit": 45,
+    "marketing": 30,
+    "searchVisibility": 35,
+    "lowConflictRisk": 45
+   }
+  },
+  {
+   "name": "Gravity Gap",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Gravity Gap\" site:play.google.com; \"GravityGap\" game OR app",
+     "accessible": true,
+     "result": "PROBABLE EXACT MATCH: the search index shows a 'Gravity Gap' title on developer Voryxa's Play page (https://play.google.com/store/apps/developer?id=Voryxa). The page could not be opened to confirm genre or status. Close variant: Gravity Glide, 'tap to flip gravity… glide through endless gaps' (https://play.google.com/store/apps/details?id=com.atiras.GravityGlide)."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Gravity Gap\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. The space is saturated with Gravity Pull, Gravity: Orbital Puzzle, Gravity Invert and others (https://apps.apple.com/cy/app/gravity-pull/id6758897993)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Gravity Gap\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact match. Only many 'Gravity' and 'GRAVIT' titles (https://store.steampowered.com/app/3288390)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Gravity Gap\" game; \"Gravity Gap\" game android; \"Gravity Gap\" one-tap arcade mobile game",
+     "accessible": true,
+     "result": "No other exact game found. Many one-tap gravity-gap clones exist, e.g. Gravity Dash ('weave through the gaps') and Gravimax (https://smartargs.itch.io/gravimax)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Gravity Gap\" site:youtube.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Gravity Gap\" site:instagram.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Gravity Gap\" site:tiktok.com",
+     "accessible": false,
+     "result": "site: filter not honored. Only the 'Center of Gravity' challenge surfaced (https://knowyourmeme.com/memes/center-of-gravity-challenge)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Gravity Gap\" trademark (web search of USPTO mirror sites)",
+     "accessible": false,
+     "result": "Not queried directly. The mirror sites show no GRAVITY GAP mark but many GRAVITY-formative marks, including Gravity Co., Ltd. (Ragnarok publisher) in games (https://trademarks.justia.com/889/07/gravity-88907168.html)."
+    },
+    {
+     "platform": "WIPO / EUIPO / TURKPATENT",
+     "query": "Not queried directly",
+     "accessible": false,
+     "result": "Blocked or JavaScript-only; not queried. No results can be claimed."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "A Google Play title 'Gravity Gap' by Voryxa probably exists (index evidence only, unverified). 'Gravity' is one of the most crowded words in mobile arcade names, and Gravity Co., Ltd. holds GRAVITY marks in games. Search ownership would be very hard.",
+   "negativeMeanings": "None found. 'Gravity' also means seriousness, which is neutral. Cognates help comprehension: gravité (FR), gravità (IT), gravedad (ES), Gravitation (DE), gravite (TR).",
+   "scores": {
+    "originality": 30,
+    "memorability": 75,
+    "pronunciation": 70,
+    "conceptFit": 75,
+    "marketing": 65,
+    "searchVisibility": 20,
+    "lowConflictRisk": 20
+   }
+  },
+  {
+   "name": "Astro Gap",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Astro Gap\" site:play.google.com; \"Astro Gap\" mobile game app (extended)",
+     "accessible": true,
+     "result": "No exact match. Close variants: 'Astro Fit', a deep-space game about fitting through holes in walls (https://play.google.com/store/apps/details?id=com.eshchar.astrofit), plus Astro Tilt and Astro Tap."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Astro Gap\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. The closest is 'Astro-g', a gravity space puzzler (https://apps.apple.com/gh/app/astro-g/id1525090733). The rest are astrology apps."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Astro Gap\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact match. Found Astro (several), Astro-g and ASTRO-NOT (https://store.steampowered.com/app/1260490)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Astro Gap\" game; \"AstroGap\" OR \"OrbitGap\" OR \"PlanetGap\"",
+     "accessible": true,
+     "result": "No exact game or brand found. Loosely related: itch.io jam game 'The Gap' (astronaut in the void) (https://cy-fi.itch.io/the-gap)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Astro Gap\" site:youtube.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Astro Gap\" site:instagram.com",
+     "accessible": false,
+     "result": "site: filter not honored. Only astrophotography content surfaced."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Astro Gap\" site:tiktok.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Astro Gap\" trademark (web search of USPTO mirror sites)",
+     "accessible": false,
+     "result": "Not queried directly. The mirror sites show no ASTRO GAP mark, but many ASTRO-formative marks, including ASTRO GAMING in Class 9 (https://trademarks.justia.com/779/08/astro-77908302.html)."
+    },
+    {
+     "platform": "WIPO / EUIPO / TURKPATENT",
+     "query": "Not queried directly",
+     "accessible": false,
+     "result": "Blocked or JavaScript-only; not queried. No results can be claimed."
+    }
+   ],
+   "conflictLevel": "low",
+   "conflictNotes": "No exact match in any store or on the web. The risk comes from the crowded 'Astro' prefix (Sony's Astro Bot, ASTRO GAMING marks, many 'Astro X' casual games) rather than from the full phrase. Astro Fit has a similar gap mechanic. Trademark databases were not directly checked.",
+   "negativeMeanings": "None found. 'Astro' means star/celestial body in IT/ES. In Turkey, GAP is a well-known neutral acronym (the Southeastern Anatolia Project). In France, Gap is a town.",
+   "scores": {
+    "originality": 60,
+    "memorability": 60,
+    "pronunciation": 85,
+    "conceptFit": 65,
+    "marketing": 60,
+    "searchVisibility": 55,
+    "lowConflictRisk": 65
+   }
+  },
+  {
+   "name": "Planet Gap",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Gap\" site:play.google.com; \"Planet Gap\" mobile game app arcade (extended)",
+     "accessible": true,
+     "result": "No exact match. Close variant: 'Space Gap', an endless runner orbiting around planets (https://m.apkpure.com/space-gap/com.Simplit.SpaceGap). Also Planet Arcade and Planet Hopper."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Gap\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Only Planet Life, Planet Drop, Planet Explorers and similar (https://apps.apple.com/app/id1389159829)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Gap\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact match. Only planet survival and crafting games such as The Planet Crafter (https://store.steampowered.com/app/1284190)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Gap\" game",
+     "accessible": true,
+     "result": "No exact game. Results are astronomy content and the itch.io strategy game 'GAP' (galaxy expansion) (https://itch.io/post/5436026)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Planet Gap\" site:youtube.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planet Gap\" site:instagram.com",
+     "accessible": false,
+     "result": "site: filter not honored. Results were entirely the GAP clothing brand (https://hypeauditor.com/de/instagram/gap/). This shows that 'gap' searches on social media are dominated by the retailer."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Planet Gap\" site:tiktok.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Planet Gap\" trademark (web search of USPTO mirror sites)",
+     "accessible": false,
+     "result": "Not queried directly. The mirror sites show no PLANET GAP mark. Gap (Apparel) LLC owns many GAP-formative marks (https://trademark.justia.com/owners/gap-apparel-llc-2454064)."
+    },
+    {
+     "platform": "WIPO / EUIPO / TURKPATENT",
+     "query": "Not queried directly",
+     "accessible": false,
+     "result": "Blocked or JavaScript-only; not queried. No results can be claimed."
+    }
+   ],
+   "conflictLevel": "low",
+   "conflictNotes": "No exact app, game or mark found. The nearest is 'Space Gap' (Android, planets/orbits). GAP Inc. is a famous mark: probably outside Class 9/41, but a famous-mark dilution argument and social search noise are possible. Trademark databases were not directly checked.",
+   "negativeMeanings": "None found. It may evoke the GAP clothing retailer. In Turkey, GAP is a neutral regional development acronym. 'Planet' is understood everywhere (Planet DE, planète FR, pianeta IT, planeta ES).",
+   "scores": {
+    "originality": 60,
+    "memorability": 65,
+    "pronunciation": 85,
+    "conceptFit": 85,
+    "marketing": 60,
+    "searchVisibility": 45,
+    "lowConflictRisk": 65
+   }
+  },
+  {
+   "name": "Orbit Gap",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Orbit Gap\" site:play.google.com; \"Orbit Gap\" mobile game app arcade (extended)",
+     "accessible": true,
+     "result": "No exact match. Very similar concepts: 'Orbiter', where rings close in with a single narrow gap (https://play.google.com/store/apps/details?id=com.kervan.orbiter), plus Orbit Escape, Orbit Dodge and Orbit: 1-Tap Space Arcade."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Orbit Gap\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Close variant: 'OrbitSplit', 'tap to launch the core through gaps in spinning neon rings' (https://apps.apple.com/az/app/orbitsplit/id6774967568), plus Orbit Tap, Orbit Jump and Orbit-Escape."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Orbit Gap\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact match. Several 'Orbit' and 'ORBIT' games (https://store.steampowered.com/app/356380)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Orbit Gap\" game",
+     "accessible": true,
+     "result": "No exact game. Many 'Orbit' one-button games, e.g. Orbit - Playing with Gravity (https://apps.apple.com/app/id991457817)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Orbit Gap\" site:youtube.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Orbit Gap\" site:instagram.com",
+     "accessible": false,
+     "result": "site: filter not honored. Only the Orbit Instagram-automation tool and Orbitkey surfaced."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Orbit Gap\" site:tiktok.com",
+     "accessible": false,
+     "result": "site: filter not honored. Nothing relevant surfaced."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Orbit Gap\" trademark (web search of USPTO mirror sites)",
+     "accessible": false,
+     "result": "Not queried directly. The mirror sites show no ORBIT GAP mark, but many live ORBIT marks, including software (Class 9) filings (https://trademarks.justia.com/997/15/orbit-99715134.html)."
+    },
+    {
+     "platform": "WIPO / EUIPO / TURKPATENT",
+     "query": "Not queried directly",
+     "accessible": false,
+     "result": "Blocked or JavaScript-only; not queried. No results can be claimed."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "No exact match. However, 'Orbit' is heavily used in one-tap space games, and OrbitSplit and Orbiter use the same 'tap through the gap' idea. Many ORBIT trademarks exist, including software classes. The gameplay is not about orbiting, which weakens the fit.",
+   "negativeMeanings": "None found. It may evoke Wrigley's Orbit chewing gum. Cognates exist in DE/FR/IT/ES (Orbit, orbite, orbita); Turkish uses 'yörünge', but 'orbit' is widely understood.",
+   "scores": {
+    "originality": 45,
+    "memorability": 60,
+    "pronunciation": 80,
+    "conceptFit": 55,
+    "marketing": 55,
+    "searchVisibility": 30,
+    "lowConflictRisk": 50
+   }
+  },
+  {
+   "name": "Rocket Rift",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Rocket Rift\" site:play.google.com; \"Rocket Rift\" android game",
+     "accessible": true,
+     "result": "Through WebSearch: no Google Play listing named Rocket Rift was indexed. A direct fetch of play.google.com search failed because the host is blocked in this session. The only exact hits were the iOS RocketRift pages."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Rocket Rift\" site:apps.apple.com",
+     "accessible": true,
+     "result": "EXACT (one word): 'RocketRift' by Zijian He (2024, v1.3), a free one-tap space game where you tap through obstacles and dodge asteroids. The concept is almost the same as ours. https://apps.apple.com/ca/app/rocketrift/id6475633629"
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Rocket Rift\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact Steam title found. Near names: Rocket! (app 2382450), Rocket Riot (460190), Rocket Rumble (1661650). A direct Steam search fetch was blocked in this session."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Rocket Rift\" game",
+     "accessible": true,
+     "result": "EXACT: itch.io 'Rocket Rift' by brallex, a free Jetpack Joyride clone made in Godot (tap or click to fly). https://brallex.itch.io/rocket-rift. The iOS RocketRift also ranks."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Rocket Rift\" site:youtube.com",
+     "accessible": true,
+     "result": "No youtube.com results were returned. The itch.io Rocket Rift page links to the developer's YouTube, and comments mention a video. https://brallex.itch.io/rocket-rift"
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Rocket Rift\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found (only unrelated Rocket/Rift accounts)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Rocket Rift\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Rocket Rift\" trademark (WebSearch fallback; tmsearch.uspto.gov not queried directly)",
+     "accessible": false,
+     "result": "The database was not queried directly. The fallback web search (Justia mirrors of USPTO data) found no exact ROCKET RIFT mark. It did find SPACE RIFT (registered, computer games, bitComposer), ZERORIFT (video games), several RIFT marks and ROCKET RIOT (games). https://trademarks.justia.com/792/06/space-79206452.html"
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "Not queried: this is a JavaScript database and direct fetch is unavailable in this session. No result can be claimed."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "euipo eSearch / TMview",
+     "accessible": false,
+     "result": "Not queried: this is a JavaScript database and direct fetch is unavailable in this session. No result can be claimed."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr",
+     "accessible": false,
+     "result": "Not queried: this is a JavaScript database and direct fetch is unavailable in this session. No result can be claimed."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "Two exact-name games already exist. On iOS, 'RocketRift' (Zijian He) is a one-tap space obstacle game, the same genre and pitch. On itch.io, 'Rocket Rift' is a tap-to-fly Jetpack Joyride clone. 'Rift' is also crowded in class 9/41: Meta's Oculus Rift, League of Legends: Wild Rift on mobile, the registered SPACE RIFT for computer games, and The Riftbreaker. Store users and reviewers would probably confuse the titles.",
+   "negativeMeanings": "None found. EN 'rift' means crack or split, which is neutral. DE 'Rift' is a geology term. The word has no meaning in FR, IT, ES or TR. No slang issues known.",
+   "scores": {
+    "originality": 40,
+    "memorability": 78,
+    "pronunciation": 80,
+    "conceptFit": 72,
+    "marketing": 70,
+    "searchVisibility": 30,
+    "lowConflictRisk": 20
+   }
+  },
+  {
+   "name": "Planet Rift",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Rift\" site:play.google.com",
+     "accessible": true,
+     "result": "Through WebSearch: no exact listing. Near names: RiftCore (NERDNCO), Rift Serpent (Fazal01), Planet Destroyer, Planet Breaker. A direct Play fetch was blocked."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Rift\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact listing. Near names: RocketRift (id6475633629), RiftCraft: Roguelike Strategy, and Planet Rush: Cosmic Drift (a one-touch planet-hopping arcade game). https://apps.apple.com/us/app/riftcraft-roguelike-strategy/id6744392381"
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Rift\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Near names: Star Rift Saga, a planet platformer about rifts in space (https://store.steampowered.com/app/2158690/Star_Rift_Saga), The Riftbreaker and The Rift Rebels."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Rift\" game",
+     "accessible": true,
+     "result": "EXACT: 'Planet Rift' is a voxel MMORPG in The Sandbox metaverse, funded by the Game Maker Fund (creators Sythicentt and Sarynade). https://sandboxgame.gitbook.io/the-sandbox/funds-programs-creators/game-maker-fund-projects/planet-rift. 'OrbitRift' is also listed on RAWG."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Planet Rift\" site:youtube.com",
+     "accessible": true,
+     "result": "No youtube.com pages were returned. The Sandbox wiki page mentions a Planet Rift teaser trailer."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planet Rift\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Planet Rift\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Planet Rift\" trademark (WebSearch fallback; tmsearch.uspto.gov not queried directly)",
+     "accessible": false,
+     "result": "The database was not queried directly. The fallback search (Justia and Markinton) found no exact PLANET RIFT. Similar marks: SPACE RIFT (registered 2018, computer games, bitComposer), COSMIC RIFT, DARK RIFT, LOST RIFT, ZERORIFT, and many RIFT marks. https://trademarks.justia.com/792/06/space-79206452.html"
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "euipo eSearch / TMview",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "The exact name is used by a Sandbox metaverse MMORPG project. It is a different platform and genre, but it is a game. No mobile store listing with this exact name was found. The structure closely mirrors the registered SPACE RIFT (bitComposer, computer games) and the crowded RIFT, COSMIC RIFT and DARK RIFT marks, so a legal check in class 9/41 is advisable.",
+   "negativeMeanings": "None found in EN, DE, FR, IT, ES or TR. 'Planet' is understood everywhere (TR 'planet' and 'gezegen', DE 'Planet', FR 'planète', IT 'pianeta', ES 'planeta').",
+   "scores": {
+    "originality": 50,
+    "memorability": 70,
+    "pronunciation": 78,
+    "conceptFit": 80,
+    "marketing": 68,
+    "searchVisibility": 45,
+    "lowConflictRisk": 45
+   }
+  },
+  {
+   "name": "Nova Dash",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Nova Dash\" site:play.google.com; \"Nova Dash\" android game space",
+     "accessible": true,
+     "result": "Through WebSearch: no Play listing indexed, only unrelated 'Nova' developer pages. Near names: Nova Drift (Android port) and deep NOVA. A direct Play fetch was blocked."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Nova Dash\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No current App Store hit. However, TouchArcade lists an iOS game 'Nova Dash' by Play This! Studios (2015, v1.06, updated 2019): a space-themed action puzzle platformer. https://toucharcade.com/games/nova-dash"
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Nova Dash\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Near names: Nova Drift (858210), Nova Slash, Nova Strider (4701320), Nova Strike (2320280), Nova Fighter."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Nova Dash\" game; \"NovaDash\" app OR game",
+     "accessible": true,
+     "result": "EXACT: Nova Dash by Play This! Studios (https://toucharcade.com/games/nova-dash). Also HyperDash, whose hero is named Nova (itch.io), and Nova Star, which uses a 'Nova dash' mechanic."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Nova Dash\" site:youtube.com",
+     "accessible": true,
+     "result": "Nothing relevant found. Results were dominated by unrelated 'Nova' content (music, Chevy Nova, Amazon Nova)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Nova Dash\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found. Noise came from Fashion Nova and Dash Social."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Nova Dash\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Nova Dash\" OR \"NovaDash\" trademark (WebSearch fallback; tmsearch.uspto.gov not queried directly)",
+     "accessible": false,
+     "result": "The database was not queried directly. The fallback found NOVADASH (Serial 85577378, Reg 4330572, class 9, NovaRad Corp.), now cancelled (dead since 2023). Many live NOVA marks exist. https://markinton.com/trademark/novadash-85577378"
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "euipo eSearch / TMview",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "There is an exact prior iOS game, Nova Dash (Play This! Studios, 2015, last updated 2019, possibly delisted), and a dead class-9 NOVADASH registration. 'Nova' is very crowded in games (Gameloft's N.O.V.A., Nova Drift, Nova Strike) and in tech (Amazon Nova). 'Dash' strongly suggests Geometry Dash.",
+   "negativeMeanings": "ES: 'no va' means 'doesn't go'. This is the well-known Chevy Nova anecdote, mostly an urban legend but sometimes cited. PT: 'nova' means 'new' (neutral). No slang issues in EN, DE, FR, IT or TR. 'Dash' is neutral but evokes DoorDash and the Dash cryptocurrency.",
+   "scores": {
+    "originality": 38,
+    "memorability": 76,
+    "pronunciation": 86,
+    "conceptFit": 52,
+    "marketing": 74,
+    "searchVisibility": 28,
+    "lowConflictRisk": 38
+   }
+  },
+  {
+   "name": "Cosmo Escape",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Cosmo Escape\" site:play.google.com; \"Cosmo Escape\" android game",
+     "accessible": true,
+     "result": "No exact Play listing found through WebSearch. Close variants: 'Cosmic Escape' (D'Agoeng Game Studio, a spaceship endless runner, 2025) at https://appgoblin.info/apps/com.dagoenggs.CosmicEscape, plus 'AstroFlip: Cosmic Escape' and 'Cosmo Jump: Meteor Escape'."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Cosmo Escape\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact listing. Close variants: 'Space Elf: Cosmic Escape' (FireCat, a space dodging game) at https://apps.apple.com/us/app/id6474036855, plus Cosmo Run, Cosmo Jump, Cosmo Race and Cosmo Explorer."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Cosmo Escape\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Close variant: 'Cosmos: Escape From Freedom', a bullet-hell game (https://store.steampowered.com/app/1209570). Cosmo's Cosmic Adventure (358250) is also on Steam."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Cosmo Escape\" game; \"Cosmo Escape\" itch.io",
+     "accessible": true,
+     "result": "EXACT: an itch.io game titled 'Cosmo Escape' (developer F0xers; comments page at https://itch.io/post/9075691). There are many 'Cosmic Escape' itch.io games and Cosmo-themed escape rooms."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Cosmo Escape\" site:youtube.com",
+     "accessible": true,
+     "result": "Nothing relevant found on youtube.com."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Cosmo Escape\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found (only unrelated 'Cosmo' creators)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Cosmo Escape\" site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Cosmo Escape\" OR \"Cosmic Escape\" trademark games (WebSearch fallback; tmsearch.uspto.gov not queried directly)",
+     "accessible": false,
+     "result": "The database was not queried directly. The fallback found no exact mark. Related game marks: COSMO CHAMPIONS (R2 Games), COSMIC ROYALE (Eden Games), COSMIC MARBLE and COSMIC GAMES. https://trademarks.justia.com/owners/r2-games-usa-co-ltd-3320855"
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "euipo eSearch / TMview",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "An exact-name itch.io game exists (F0xers). The near-identical 'Cosmic Escape' is a live Android space runner, and several 'Cosmic Escape' titles are on iOS and itch. The phrase is generic, so it is weak as a trademark and hard to own in search. 'Escape' also pulls in escape-room games and venues.",
+   "negativeMeanings": "No slang issues in EN, DE, FR, IT, ES or TR. 'Cosmo' also brings to mind Cosmopolitan magazine and the cocktail. In IT, 'cosmo' means cosmos (positive). 'Escape' may suggest the escape-room genre, which is not this game.",
+   "scores": {
+    "originality": 30,
+    "memorability": 55,
+    "pronunciation": 82,
+    "conceptFit": 74,
+    "marketing": 55,
+    "searchVisibility": 25,
+    "lowConflictRisk": 45
+   }
+  },
+  {
+   "name": "Starlane Escape",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Starlane Escape\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact listing through WebSearch. Near name: 'Stellar Escape' (Orange Agenda, an Android space endless runner) at https://www.pocketgamer.com/stellar-escape/"
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Starlane Escape\" site:apps.apple.com OR site:store.steampowered.com; \"Starlane\" site:apps.apple.com game",
+     "accessible": true,
+     "result": "No exact listing. Near names: 'Starlife Escape' (a 2-player spaceship escape room, https://apps.apple.com/ae/app/starlife-escape/id1671958739), 'Stellar Escape - The Spaceship', and 'StarLanes', a classic trading strategy game (id1631952327)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Starlane Escape\" site:store.steampowered.com; \"Starlane\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title and no 'Starlane' title. Near names: Starlair (3126380), Starlorn, Interstellar Escape, Escape Space (2131020)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Starlane Escape\" game; \"Starlane\" game android OR mobile",
+     "accessible": true,
+     "result": "No exact match. Near names: 'Starscape Escape' (an itch.io jam game), Starlance (Android itch), 'Starlane Studios' (an itch.io developer, https://starlane-studios.itch.io), and Starbucks 'Starland'."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Starlane Escape\" site:youtube.com OR site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Starlane Escape\" site:youtube.com OR site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Starlane Escape\" site:youtube.com OR site:instagram.com OR site:tiktok.com",
+     "accessible": true,
+     "result": "Nothing relevant found."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Starlane\" trademark software OR games (WebSearch fallback; tmsearch.uspto.gov not queried directly)",
+     "accessible": false,
+     "result": "The database was not queried directly. The fallback found no STARLANE mark. Near marks: STARLANCER (dead, Digital Anvil) and STARLITE (space game software). https://trademarks.justia.com/751/31/starlancer-75131992.html"
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "euipo eSearch / TMview",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    }
+   ],
+   "conflictLevel": "low",
+   "conflictNotes": "No exact match on any store or the web. Similar names exist: 'Starlane Studios' (an itch.io developer name), 'StarLanes' (an iOS trading strategy game), 'Starlife Escape' (an iOS escape room) and 'Stellar Escape' (an Android runner). These are not confusingly identical, but registry databases were not checked directly.",
+   "negativeMeanings": "None found in EN, DE, FR, IT, ES or TR. Risk: non-native speakers (DE, IT, ES, TR) may read 'lane' as 'lah-neh' instead of /leɪn/. 'Escape' can suggest escape-room games.",
+   "scores": {
+    "originality": 62,
+    "memorability": 58,
+    "pronunciation": 65,
+    "conceptFit": 64,
+    "marketing": 60,
+    "searchVisibility": 62,
+    "lowConflictRisk": 68
+   }
+  },
+  {
+   "name": "Planetgate",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planetgate\" OR \"Planet Gate\" site:play.google.com",
+     "accessible": true,
+     "result": "No listing named Planetgate or Planet Gate was found through WebSearch. Only unrelated Planet* and *Gate developer pages (e.g. 'Traveler Gate' by Luxota, 'Gate 0'). A direct Play fetch was blocked."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planetgate\" OR \"Planet Gate\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact listing. Near names: 'Plantgate', a productivity app by Climaset Srl (https://apps.apple.com/bb/app/plantgate/id6470648978), and 'Space Gate: AR Solar System' (an astronomy app)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planetgate\" OR \"Planet Gate\" site:store.steampowered.com",
+     "accessible": true,
+     "result": "No exact title. Only loosely related titles: Planet's Edge (1367170), The Gate (3253070), One More Planet."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planetgate\" game",
+     "accessible": true,
+     "result": "No game called Planetgate found. Near names: the board games Space Gate Odyssey and Jump Gate (https://gamingtrend.com/reviews/planetary-colonization-race-space-gate-odyssey-review/)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Planetgate\" site:youtube.com OR site:instagram.com OR site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried: the shared web-search budget ran out before this query ran. No result can be claimed."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planetgate\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried: web-search budget exhausted."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Planetgate\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried: web-search budget exhausted."
+    },
+    {
+     "platform": "USPTO",
+     "query": "\"Planetgate\" trademark",
+     "accessible": false,
+     "result": "Not queried: neither the database nor the fallback web search was run, because the web-search budget was exhausted."
+    },
+    {
+     "platform": "WIPO",
+     "query": "branddb.wipo.int",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "euipo eSearch / TMview",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "turkpatent.gov.tr",
+     "accessible": false,
+     "result": "Not queried (JavaScript database, no direct fetch in this session)."
+    }
+   ],
+   "conflictLevel": "low",
+   "conflictNotes": "No exact game or app was found on Google Play, the App Store, Steam or the web. The only near miss is 'Plantgate', an iOS productivity app. Social media and trademark checks were NOT done (search budget exhausted), so the low rating is provisional. The name also echoes MGM's STARGATE franchise, a heavily protected brand that includes games, which a trademark examiner or MGM could raise.",
+   "negativeMeanings": "EN, and also DE, FR, IT and ES media: the '-gate' suffix signals a scandal (Watergate, Dieselgate), so 'Planetgate' can sound like the name of a planetary scandal. TR, IT, ES and DE speakers may read 'gate' as 'ga-te'. No vulgar slang found. Note the echo of 'Stargate'.",
+   "scores": {
+    "originality": 66,
+    "memorability": 68,
+    "pronunciation": 66,
+    "conceptFit": 78,
+    "marketing": 60,
+    "searchVisibility": 72,
+    "lowConflictRisk": 60
+   }
+  },
+  {
+   "name": "Lumos Orbit",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Lumos Orbit\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact match. Only unrelated Lumi/Luminus/Orbit developer pages came up, e.g. 'Orbit - The Game' (https://play.google.com/store/apps/developer?id=Awen28). The separate '<name> game android' query was not run."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Lumos Orbit\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Near names: 'Lumos: Sun and Moon Tracker' (https://apps.apple.com/app/id725106192) and the astronomy app 'Luminos Pro', which has an orbit feature (https://apps.apple.com/app/id1458648031)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Lumos Orbit\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried. The shared web-search budget for this run (200 calls) ran out before this query could execute."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Lumos Orbit\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube / Instagram / TikTok",
+     "query": "\"Lumos Orbit\" site:youtube.com / instagram.com / tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO / EUIPO / USPTO / TURKPATENT",
+     "query": "LUMOS ORBIT",
+     "accessible": false,
+     "result": "Not queried. Search budget exhausted, and WebFetch cannot resolve external hosts in this session's network (apps.apple.com and other hosts failed DNS). No trademark status is known."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "No exact app found on Google Play or the App Store. 'Lumos' is a crowded term: the Harry Potter light spell (Warner Bros. IP), J.K. Rowling's 'Lumos' charity, plus Lumos Sleep, Ride Lumos, Lumos AI and Lumosity on the App Store. A Turkish game publisher, 'Lumos Games Teknoloji Yazilim ve Pazarlama A.S.', publishes 'Rocket Men' on iOS (https://apps.apple.com/us/app/id1570588093), which seen from Turkey could suggest a link to the studio name. Many one-tap 'Orbit' games exist. Steam, social media and trademark databases were not checked.",
+   "negativeMeanings": "None known in EN/DE/FR/IT/ES/TR. 'Lumos' reads as Latin-ish 'light' (Italian 'lume'). Its strongest association is the Harry Potter spell, which helps recall but adds IP-adjacency risk.",
+   "scores": {
+    "originality": 60,
+    "memorability": 65,
+    "pronunciation": 85,
+    "conceptFit": 50,
+    "marketing": 60,
+    "searchVisibility": 55,
+    "lowConflictRisk": 55
+   }
+  },
+  {
+   "name": "Rocket Lumos",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Rocket Lumos\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact match. The nearest rocket title is 'Rocket Foundry' on the XDLABS developer page (https://play.google.com/store/apps/developer?id=XDLABS). The '<name> game android' query was not run."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Rocket Lumos\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Close conflict: the game 'Rocket Men' by Lumos Games Teknoloji Yazilim ve Pazarlama A.S., a Turkish studio (https://apps.apple.com/us/app/id1570588093). Also the 'Ride Lumos' helmet app (https://apps.apple.com/app/id1129158829)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Rocket Lumos\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Rocket Lumos\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube / Instagram / TikTok",
+     "query": "\"Rocket Lumos\" site:youtube.com / instagram.com / tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO / EUIPO / USPTO / TURKPATENT",
+     "query": "ROCKET LUMOS",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, and outbound fetch is blocked in this session). No trademark status is known."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "No exact listing found. The main risk is 'Lumos Games', an existing Turkish game publisher whose iOS game 'Rocket Men' puts 'Rocket' and 'Lumos' together in the same category and the same home market. The Harry Potter 'Lumos' association and many unrelated Lumos apps also apply. Steam, social media and trademark databases were not checked.",
+   "negativeMeanings": "None known in EN/DE/FR/IT/ES/TR. The English word order (noun + noun, 'Rocket Lumos') sounds slightly unnatural, and 'Lumos' again recalls the Harry Potter spell.",
+   "scores": {
+    "originality": 55,
+    "memorability": 60,
+    "pronunciation": 85,
+    "conceptFit": 60,
+    "marketing": 50,
+    "searchVisibility": 55,
+    "lowConflictRisk": 40
+   }
+  },
+  {
+   "name": "Orbit Breaker",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Orbit Breaker\" site:play.google.com",
+     "accessible": true,
+     "result": "Near-exact match: 'OrbitBreaker: Neon Reflex' (package tr.com.yazilimk.orbitbreaker, apparently a Turkish developer, updated Feb 2026 according to tracker https://appgoblin.info/apps/tr.com.yazilimk.orbitbreaker). The search also surfaced a browser game, 'Orbit Breaker' by Bedolagi Production Studio (https://playgama.com/game/orbit-breaker)."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Orbit Breaker\" site:apps.apple.com",
+     "accessible": true,
+     "result": "Exact match: 'Orbit Breaker: Watch Arcade', a $2.99 Apple Watch brick-breaker by Dmitrii Samoilenko (https://apps.apple.com/app/id6821956842). Similar: 'Orbit Buster' (https://apps.apple.com/ca/app/orbit-buster/id1364385050) and 'Orbit Destroyer'."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Orbit Breaker\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Orbit Breaker\" game",
+     "accessible": false,
+     "result": "Not queried directly (search budget exhausted). The Playgama browser game above appeared incidentally in the Play search."
+    },
+    {
+     "platform": "YouTube / Instagram / TikTok",
+     "query": "\"Orbit Breaker\" site:youtube.com / instagram.com / tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO / EUIPO / USPTO / TURKPATENT",
+     "query": "ORBIT BREAKER",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, and outbound fetch is blocked in this session). No trademark status is known."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "At least three existing games already use the name: an Android 'OrbitBreaker: Neon Reflex' (Turkish package), an iOS/watchOS 'Orbit Breaker: Watch Arcade', and a 'Orbit Breaker' browser game on Playgama. All are in the same class 9/41 games space. 'Orbit' is also a Wrigley/Mars chewing-gum brand. Strongly not recommended.",
+   "negativeMeanings": "None in EN/DE/FR/IT/ES/TR. 'Breaker' suggests smashing or brick-breaking, which misrepresents a fly-through-gaps game.",
+   "scores": {
+    "originality": 30,
+    "memorability": 65,
+    "pronunciation": 75,
+    "conceptFit": 45,
+    "marketing": 60,
+    "searchVisibility": 20,
+    "lowConflictRisk": 10
+   }
+  },
+  {
+   "name": "Planet Pass",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Pass\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact match. Results were dominated by Google's own 'Play Pass' subscription text, plus unrelated pages such as Planet Finder (https://play.google.com/store/apps/developer?id=JtApps). The '<name> game android' query was not run."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Pass\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Near names: the 'Planet 13 Passport' loyalty app (https://apps.apple.com/us/app/id1626048176) and 'Planet Escape Mobile' (https://apps.apple.com/us/app/id1551931089), which shares the Turkish name's English meaning."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Pass\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Pass\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube / Instagram / TikTok",
+     "query": "\"Planet Pass\" site:youtube.com / instagram.com / tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO / EUIPO / USPTO / TURKPATENT",
+     "query": "PLANET PASS",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, and outbound fetch is blocked in this session). No trademark status is known."
+    }
+   ],
+   "conflictLevel": "low",
+   "conflictNotes": "No exact game or app found on either store. The main issue is generic search noise: 'pass' collides with Google 'Play Pass' on Google Play and with travel and loyalty passes, so the name will be hard to own in search. Visually it is close to 'Play Pass'. Coverage was limited (Steam, social media and trademarks unchecked), so 'low' reflects only what was searched.",
+   "negativeMeanings": "Mostly clean. German 'Pass' = passport (neutral), Turkish 'pas' = rust or a sports pass (neutral). French 'une passe' is slang for a prostitute's trick, a mild risk mostly in the feminine noun form.",
+   "scores": {
+    "originality": 50,
+    "memorability": 60,
+    "pronunciation": 90,
+    "conceptFit": 75,
+    "marketing": 55,
+    "searchVisibility": 30,
+    "lowConflictRisk": 65
+   }
+  },
+  {
+   "name": "Galaxy Slip",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Galaxy Slip\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact match. Nearest: 'Slip! - Sliding Logic Puzzles' (https://www.appbrain.com/app/slip-sliding-logic-puzzles/com.bluecrab.iceslide) and 'Galaxy GO!' on the hiqi developer page (https://play.google.com/store/apps/developer?id=hiqi). The '<name> game android' query was not run."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Galaxy Slip\" site:apps.apple.com",
+     "accessible": true,
+     "result": "No exact match. Nearest: the space tap game 'Galaxy Jump' (https://apps.apple.com/us/app/id1247747130) and 'Slip: Sliding Logic Puzzles' (https://apps.apple.com/us/app/-/id6743483785)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Galaxy Slip\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Galaxy Slip\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube / Instagram / TikTok",
+     "query": "\"Galaxy Slip\" site:youtube.com / instagram.com / tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO / EUIPO / USPTO / TURKPATENT",
+     "query": "GALAXY SLIP",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, and outbound fetch is blocked in this session). No trademark status is known."
+    }
+   ],
+   "conflictLevel": "medium",
+   "conflictNotes": "No exact app found. 'Galaxy' is Samsung's major class 9 brand (Galaxy phones, Galaxy Store), and Samsung dominates Galaxy search results. There are many 'Galaxy X' games. Steam, social media and trademarks were not checked.",
+   "negativeMeanings": "Serious problem: 'slip' means underpants or briefs in French, German ('Slip'), Italian, Spanish and Turkish ('slip külot'), so locally it reads as 'Galaxy Briefs'. In English 'slip' also means a mistake or fall (Freudian slip, slip-up).",
+   "scores": {
+    "originality": 55,
+    "memorability": 55,
+    "pronunciation": 80,
+    "conceptFit": 55,
+    "marketing": 25,
+    "searchVisibility": 30,
+    "lowConflictRisk": 60
+   }
+  },
+  {
+   "name": "Orbit Flip",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Orbit Flip\" site:play.google.com",
+     "accessible": true,
+     "result": "No exact listing, but many similar one-tap Orbit games: 'Orbit Flux: Space Dodge' (https://play.google.com/store/apps/developer?id=pixzza), plus Orbit Drop, Orbit Dodge and Orbit Tap. The '<name> game android' query was not run."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Orbit Flip\" site:apps.apple.com",
+     "accessible": true,
+     "result": "Near-exact match: 'Orbit Flip Nova' by Gokhan Alp Atar, a one-tap arcade game with ring flipping (https://appadvice.com/app/orbit-flip-nova/6752806546). A tracker lists App Store ID 6752806546 as 'OrbitFlip' / 'Orbit Quick Flip' (https://chrome-stats.com/d/id6752806546). Also similar: Orbit Rush and Orbit Split."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Orbit Flip\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Orbit Flip\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube / Instagram / TikTok",
+     "query": "\"Orbit Flip\" site:youtube.com / instagram.com / tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO / EUIPO / USPTO / TURKPATENT",
+     "query": "ORBIT FLIP",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, and outbound fetch is blocked in this session). No trademark status is known."
+    }
+   ],
+   "conflictLevel": "high",
+   "conflictNotes": "'Orbit Flip Nova' (also listed as OrbitFlip / Orbit Quick Flip) is an existing one-tap arcade game on iOS containing the exact phrase, apparently also from a Turkish developer. The 'Orbit + verb' one-tap space game name is crowded on both stores. 'Orbit' is also a Wrigley gum brand.",
+   "negativeMeanings": "None serious. French slang 'flipper' = to freak out or be scared, Spanish 'flipar' = to be amazed (positive). 'Flip' suggests reversing gravity or direction, which does not match a tap-to-thrust mechanic.",
+   "scores": {
+    "originality": 30,
+    "memorability": 70,
+    "pronunciation": 85,
+    "conceptFit": 40,
+    "marketing": 60,
+    "searchVisibility": 25,
+    "lowConflictRisk": 25
+   }
+  },
+  {
+   "name": "Planetrip",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planetrip\" site:play.google.com; Planetrip game android",
+     "accessible": false,
+     "result": "Not queried. The WebSearch budget for this run (200 calls, shared by all agents) was already used up before my first query, so I have no result."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planetrip\" site:apps.apple.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planetrip\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planetrip\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Planetrip\" site:youtube.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planetrip\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Planetrip\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "Planetrip (branddb.wipo.int)",
+     "accessible": false,
+     "result": "Not queried. I did no fetch or fallback trademark search, so I cannot say whether any marks exist."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "Planetrip (eSearch / TMview)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "Planetrip (tmsearch.uspto.gov)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "Planetrip (turkpatent.gov.tr)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    }
+   ],
+   "conflictLevel": "unknown",
+   "conflictNotes": "No live research was possible: the shared WebSearch budget was gone before this agent's first query, and I did not try other ways around the limit. Everything here is unverified analysis, not research results. The name reads most easily as 'plane trip' (an airplane journey), so it probably sits close to travel and airline brands and booking apps. The combination looks likely to be used by travel businesses in class 39 and possibly class 9 apps. Re-run the full checks before shortlisting.",
+   "negativeMeanings": "EN: 'trip' is also slang for a drug trip (mild), and the word is commonly misread as 'plane trip' or 'planet RIP'. DE/FR/IT/ES: 'trip' is a known loanword with the same mild drug-trip sense. TR: no negative meaning known. Not verified against slang sources.",
+   "scores": {
+    "originality": 55,
+    "memorability": 65,
+    "pronunciation": 70,
+    "conceptFit": 50,
+    "marketing": 55,
+    "searchVisibility": 40,
+    "lowConflictRisk": 45
+   }
+  },
+  {
+   "name": "Orbiteer",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Orbiteer\" site:play.google.com; Orbiteer game android",
+     "accessible": false,
+     "result": "Not queried. The WebSearch budget for this run (200 calls, shared) was already used up before my first query."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Orbiteer\" site:apps.apple.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Orbiteer\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Orbiteer\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Orbiteer\" site:youtube.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Orbiteer\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Orbiteer\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "Orbiteer (branddb.wipo.int)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "Orbiteer (eSearch / TMview)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "Orbiteer (tmsearch.uspto.gov)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "Orbiteer (turkpatent.gov.tr)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    }
+   ],
+   "conflictLevel": "unknown",
+   "conflictNotes": "No live research was possible (shared search budget exhausted). This is unverified analysis from general knowledge only. Orbiteer is one letter-pair away from 'Orbiter', which is the name of a long-running, well-known space flight simulator (Orbiter by Martin Schweiger) and of many apps and products. Search engines and store search are likely to autocorrect it to 'Orbiter'. 'Orbit' is also a crowded prefix in apps and games. Expect a medium to high similarity risk once checked.",
+   "negativeMeanings": "No negative or slang meaning known in EN/DE/FR/IT/ES/TR. The main problem is mispronunciation as 'orbiter' (losing the -EER stress) by TR/DE/IT/ES speakers. Not verified against slang sources.",
+   "scores": {
+    "originality": 60,
+    "memorability": 60,
+    "pronunciation": 60,
+    "conceptFit": 60,
+    "marketing": 60,
+    "searchVisibility": 45,
+    "lowConflictRisk": 35
+   }
+  },
+  {
+   "name": "Slipstar",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Slipstar\" site:play.google.com; Slipstar game android",
+     "accessible": false,
+     "result": "Not queried. The WebSearch budget for this run (200 calls, shared) was already used up before my first query."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Slipstar\" site:apps.apple.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Slipstar\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Slipstar\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Slipstar\" site:youtube.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Slipstar\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Slipstar\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "Slipstar (branddb.wipo.int)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "Slipstar (eSearch / TMview)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "Slipstar (tmsearch.uspto.gov)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "Slipstar (turkpatent.gov.tr)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    }
+   ],
+   "conflictLevel": "unknown",
+   "conflictNotes": "No live research was possible (shared search budget exhausted). This is unverified analysis only. It is short, compound and easy to say, but 'slipstream' and 'slip' names are common in racing and space games, so close variants are likely. The bigger issue is linguistic: in several of the target markets the first syllable means underwear (see negativeMeanings), which hurts marketing whatever the trademark results show.",
+   "negativeMeanings": "DE, FR, IT, ES and TR: 'slip' is the everyday word for briefs or underpants, so 'Slipstar' can read as 'underwear star' and may draw jokes from kids aged 10+. EN: 'slip' also means a mistake or fall, and a woman's undergarment (slip dress). This is a significant drawback for the target markets.",
+   "scores": {
+    "originality": 65,
+    "memorability": 75,
+    "pronunciation": 80,
+    "conceptFit": 70,
+    "marketing": 40,
+    "searchVisibility": 55,
+    "lowConflictRisk": 45
+   }
+  },
+  {
+   "name": "Planet Weave",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Planet Weave\" site:play.google.com; Planet Weave game android",
+     "accessible": false,
+     "result": "Not queried. The WebSearch budget for this run (200 calls, shared) was already used up before my first query."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Planet Weave\" site:apps.apple.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Planet Weave\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Planet Weave\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Planet Weave\" site:youtube.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Planet Weave\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Planet Weave\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "Planet Weave (branddb.wipo.int)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "Planet Weave (eSearch / TMview)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "Planet Weave (tmsearch.uspto.gov)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "Planet Weave (turkpatent.gov.tr)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    }
+   ],
+   "conflictLevel": "unknown",
+   "conflictNotes": "No live research was possible (shared search budget exhausted). This is unverified analysis only. 'Weave' describes the core action (weaving between towers of planets) and is less common in game titles than Dash/Rush/Escape. 'Planet' plus a verb is a familiar pattern, though, and textile or hair brands may use 'Weave' names outside class 9/41. The two-word name is harder to own in search than a coined single word.",
+   "negativeMeanings": "EN: 'weave' is also used for hair extensions (mild and neutral). Non-native speakers may confuse 'weave' with 'wave'. No known negative meaning in DE/FR/IT/ES/TR. Not verified against slang sources.",
+   "scores": {
+    "originality": 65,
+    "memorability": 60,
+    "pronunciation": 65,
+    "conceptFit": 80,
+    "marketing": 65,
+    "searchVisibility": 55,
+    "lowConflictRisk": 55
+   }
+  },
+  {
+   "name": "Rocket Weave",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Rocket Weave\" site:play.google.com; Rocket Weave game android",
+     "accessible": false,
+     "result": "Not queried. The WebSearch budget for this run (200 calls, shared) was already used up before my first query."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Rocket Weave\" site:apps.apple.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Rocket Weave\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Rocket Weave\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Rocket Weave\" site:youtube.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Rocket Weave\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Rocket Weave\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "Rocket Weave (branddb.wipo.int)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "Rocket Weave (eSearch / TMview)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "Rocket Weave (tmsearch.uspto.gov)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "Rocket Weave (turkpatent.gov.tr)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    }
+   ],
+   "conflictLevel": "unknown",
+   "conflictNotes": "No live research was possible (shared search budget exhausted). This is unverified analysis only. 'Rocket' is one of the most crowded words in mobile game titles (Rocket League and many 'Rocket X' casual games), so the name will compete with a lot of similar titles in store search. It also does not mention planets, which are the game's distinctive visual hook.",
+   "negativeMeanings": "EN: 'weave' is also used for hair extensions (mild). Possible confusion of 'weave' and 'wave' for non-native speakers. No known negative meaning in DE/FR/IT/ES/TR. Not verified against slang sources.",
+   "scores": {
+    "originality": 55,
+    "memorability": 60,
+    "pronunciation": 70,
+    "conceptFit": 70,
+    "marketing": 60,
+    "searchVisibility": 45,
+    "lowConflictRisk": 50
+   }
+  },
+  {
+   "name": "Starweave Escape",
+   "findings": [
+    {
+     "platform": "Google Play",
+     "query": "\"Starweave Escape\" / \"Starweave\" site:play.google.com",
+     "accessible": false,
+     "result": "Not queried. The WebSearch budget for this run (200 calls, shared) was already used up before my first query."
+    },
+    {
+     "platform": "Apple App Store",
+     "query": "\"Starweave\" site:apps.apple.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Steam",
+     "query": "\"Starweave\" site:store.steampowered.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Google/Bing web",
+     "query": "\"Starweave Escape\" game; \"Starweave\" game",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "YouTube",
+     "query": "\"Starweave\" site:youtube.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "Instagram",
+     "query": "\"Starweave\" site:instagram.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "TikTok",
+     "query": "\"Starweave\" site:tiktok.com",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted)."
+    },
+    {
+     "platform": "WIPO",
+     "query": "Starweave (branddb.wipo.int)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "EUIPO",
+     "query": "Starweave (eSearch / TMview)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "USPTO",
+     "query": "Starweave (tmsearch.uspto.gov)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    },
+    {
+     "platform": "TURKPATENT",
+     "query": "Starweave (turkpatent.gov.tr)",
+     "accessible": false,
+     "result": "Not queried (search budget exhausted, no fallback search possible)."
+    }
+   ],
+   "conflictLevel": "unknown",
+   "conflictNotes": "No live research was possible (shared search budget exhausted). This is unverified analysis only. 'Starweave' and 'Starweaver' are fantasy-sounding coinages that are fairly likely to exist already in fiction, games, or company names (for example, 'Starweaver' as a company or brand name, unverified). 'Escape' is one of the most generic words in store titles. At 16 characters it still leaves room for a subtitle within 30, but the name feels more like fantasy or puzzle than an arcade flyer.",
+   "negativeMeanings": "EN: none known, apart from the mild hair-extension sense of 'weave'. Non-native speakers may find the 'ea' in 'weave' and 'esc' in 'escape' a little harder to say. No known negative meaning in DE/FR/IT/ES/TR. Not verified against slang sources.",
+   "scores": {
+    "originality": 55,
+    "memorability": 55,
+    "pronunciation": 60,
+    "conceptFit": 65,
+    "marketing": 55,
+    "searchVisibility": 50,
+    "lowConflictRisk": 45
+   }
+  }
+ ],
+ "extraIdeas": [
+  "Planet Threader",
+  "Planetgap Flyer",
+  "Starstack Escape",
+  "Planet Slalom",
+  "Gapstronaut",
+  "Thrustar",
+  "Planetslip",
+  "Gapstar Escape",
+  "Orbinaut Escape",
+  "Gapnaut",
+  "Planet Threader",
+  "Lumonaut",
+  "Orbitap (orbit + tap; one-tap flying, not researched)",
+  "Gravigap (gravity + gap; flying through planet gaps, not researched)",
+  "Nebulift (nebula + lift; thrust-to-rise mechanic, not researched)"
+ ],
+ "ranking": {
+  "ranking": [
+   {
+    "name": "Planet Gap",
+    "total": 66.5,
+    "rationale": "Raw weighted score 66.5, no adjustment. The research found no exact game, app or trademark on Google Play, the App Store, Steam or the web. The nearest is 'Space Gap', a different game. It has the best concept fit of all candidates (85): the player flies through gaps in towers of planets, which is what the name says. The weaknesses are moderate: the GAP clothing brand adds noise to social search and is a famous mark outside classes 9/41, and the trademark databases were not checked directly."
+   },
+   {
+    "name": "Astro Gap",
+    "total": 63.75,
+    "rationale": "Raw score 63.75, no adjustment. No exact match in any store or on the web. The risk comes from the crowded 'Astro' prefix (Sony's Astro Bot, ASTRO GAMING in class 9, many 'Astro X' casual games), and Astro Fit uses a similar fit-through-the-hole idea. It fits the planet theme less well than Planet Gap and does not echo 'Gezegen'."
+   },
+   {
+    "name": "Planetgate",
+    "total": 63.6,
+    "rationale": "Raw score 66.6, minus 3: 1 for partial coverage (social and trademark checks were not run) and 2 for the echo of MGM's heavily protected STARGATE franchise. It is a strong single coined word and the easiest to find in search (72). However, the '-gate' suffix suggests a scandal in EN, DE, FR, IT and ES, and TR, DE, IT and ES speakers may say 'ga-te'."
+   },
+   {
+    "name": "Starlane Escape",
+    "total": 61.9,
+    "rationale": "Raw score 62.9, minus 1 for nearby names: 'StarLanes' (an iOS strategy game) and 'Starlane Studios' (an itch.io developer). It is not identical to any title and conflict risk is low. It loses points because non-native speakers may misread 'lane', 'Escape' suggests an escape room, and it is too long to sit comfortably next to 'Gezegen Kaçışı' within 30 characters."
+   },
+   {
+    "name": "Planet Weave",
+    "total": 59.5,
+    "rationale": "Raw score 63.5, minus 4 because nothing was researched: the search budget ran out, so the conflict level is unknown. The concept fit is good (80), since the player weaves between planet towers. Some TR speakers may confuse 'weave' with 'wave', and the name is not verified. It can only stay in the top 5 if a full check comes back clean."
+   },
+   {
+    "name": "Planet Pass",
+    "total": 59,
+    "rationale": "Raw score 61.0, minus 2 for limited coverage (Steam, social media and trademarks were not checked). No exact app on either store. On Google Play it collides badly with Google's own 'Play Pass' and with travel and loyalty passes, so it would be hard to own in search."
+   },
+   {
+    "name": "Lumos Orbit",
+    "total": 56.25,
+    "rationale": "Raw score 60.25, minus 4: 2 for partial coverage and 2 because the Turkish publisher 'Lumos Games' (maker of Rocket Men) could be confused with it in the home market. The Harry Potter spell also brings IP-adjacency risk. Its concept fit is poor, because the game has no orbit mechanic."
+   },
+   {
+    "name": "Planet Slip",
+    "total": 56.25,
+    "rationale": "Raw score 62.25, minus 6 for language: 'slip' means underpants in Turkish ('slip külot'), French, German, Italian and Spanish. For a 10+ audience, and next to 'Gezegen Kaçışı' in the home market, it reads as 'Planet Underpants'. It is otherwise free of conflicts."
+   },
+   {
+    "name": "Rocket Weave",
+    "total": 54.25,
+    "rationale": "Raw score 58.25, minus 4 because nothing was researched. 'Rocket' is one of the most crowded words in mobile game titles, and the name drops the distinctive planet hook."
+   },
+   {
+    "name": "Planet Rift",
+    "total": 53.5,
+    "rationale": "Raw score 61.5, minus 8. The exact name belongs to a voxel MMORPG funded by The Sandbox Game Maker Fund, which already has a teaser trailer. Its structure is also close to the registered SPACE RIFT mark for computer games (bitComposer), and RIFT marks are crowded. A game already uses the name, so it is kept out of the top 5."
+   },
+   {
+    "name": "Orbit Gap",
+    "total": 53.25,
+    "rationale": "Raw score 53.25, no adjustment. No exact match, but OrbitSplit and Orbiter use the same 'tap through the gap' idea, and there are many ORBIT marks in software classes. Its concept fit is weak because the game has no orbiting."
+   },
+   {
+    "name": "Planet Dash",
+    "total": 52.5,
+    "rationale": "Raw score 62.5, minus 10. A published Chrome Web Store game called 'Planet Dash' (planet-hopping, by Creative Spark Studios) already exists on a Google platform, along with an itch.io prototype and an old Russian browser game. 'Dash' is also dominated by Geometry Dash. A published game uses the name, so it is excluded from the top 5."
+   },
+   {
+    "name": "Starweave Escape",
+    "total": 50.5,
+    "rationale": "Raw score 54.5, minus 4 because nothing was researched. It feels more like fantasy or puzzle than an arcade flyer, 'Escape' is generic, and 'Starweaver'-type names probably exist already."
+   },
+   {
+    "name": "Rocket Lumos",
+    "total": 50.75,
+    "rationale": "Raw score 55.75, minus 5: 2 for partial coverage and 3 because the Turkish publisher Lumos Games has a game called 'Rocket Men', which is the same pairing of words in the same home market. The word order is also awkward in English."
+   },
+   {
+    "name": "Slipstar",
+    "total": 50,
+    "rationale": "Raw score 60.0, minus 10: 4 because nothing was researched and 6 because 'slip' means underwear in TR, DE, FR, IT and ES. That is a significant drawback for kids and the home market."
+   },
+   {
+    "name": "Planetrip",
+    "total": 49.75,
+    "rationale": "Raw score 53.75, minus 4 because nothing was researched. It is easily misread as 'plane trip', which puts it next to travel and airline brands, and 'trip' has a mild drug-slang sense."
+   },
+   {
+    "name": "Orbiteer",
+    "total": 46.5,
+    "rationale": "Raw score 53.5, minus 7: 4 because nothing was researched and 3 because it is one letter-pair from 'Orbiter', a long-running space simulator. Store search is likely to autocorrect it, and the stress is easy to mispronounce."
+   },
+   {
+    "name": "Planet Escape",
+    "total": 45,
+    "rationale": "Raw score 53.0, minus 8. More than 10 published itch.io games already carry the exact name. 'Planet Escape Plan' is an existing one-touch arcade game on Play, a Polish travel brand has an app with the name, and it sounds almost like PLANESCAPE, an established computer-game trademark. It translates the Turkish title exactly, but it is weak to own or defend."
+   },
+   {
+    "name": "Galaxy Slip",
+    "total": 43.5,
+    "rationale": "Raw score 51.5, minus 8: 2 for partial coverage and 6 for the underwear meaning of 'slip'. Samsung's Galaxy brand also dominates class 9 and search results."
+   },
+   {
+    "name": "Cosmo Escape",
+    "total": 43.8,
+    "rationale": "Raw score 51.8, minus 8. An exact-name itch.io game exists (F0xers), and 'Cosmic Escape' is a live Android space runner with several more on iOS and itch. The name is generic."
+   },
+   {
+    "name": "Nova Dash",
+    "total": 43,
+    "rationale": "Raw score 55.0, minus 12. An exact prior iOS game exists: Nova Dash by Play This! Studios (2015, updated 2019). There is also a dead class-9 NOVADASH registration, 'Nova' is crowded (N.O.V.A., Nova Drift), and 'Dash' suggests Geometry Dash."
+   },
+   {
+    "name": "Star Slip",
+    "total": 41.5,
+    "rationale": "Raw score 47.5, minus 6: 'StarSlip' is a same-genre one-tap web game on GitHub, there are many Star-Flip and Star Slide variants, and 'slip' means underwear."
+   },
+   {
+    "name": "Rocket Rift",
+    "total": 39,
+    "rationale": "Raw score 54.0, minus 15. 'RocketRift' is live on iOS (Zijian He) as a one-tap space obstacle game, the same pitch as ours, and there is an exact itch.io tap-to-fly 'Rocket Rift'. RIFT marks are also crowded in classes 9/41."
+   },
+   {
+    "name": "Gravity Gap",
+    "total": 37.75,
+    "rationale": "Raw score 49.75, minus 12. The search index probably shows an exact Play title 'Gravity Gap' by Voryxa. 'Gravity' is among the most crowded arcade words, and Gravity Co., Ltd. holds GRAVITY marks for games."
+   },
+   {
+    "name": "Orbit Flip",
+    "total": 36,
+    "rationale": "Raw score 46.0, minus 10. 'Orbit Flip Nova' (also listed as OrbitFlip) is an existing one-tap iOS arcade game. 'Orbit + verb' names are crowded, and the name does not match the thrust mechanic."
+   },
+   {
+    "name": "Escape Orbit",
+    "total": 29,
+    "rationale": "Raw score 41.0, minus 12. An exact itch.io game exists, and it uses the same words as the live same-genre 'Orbit Escape' on iOS and Play. Store search ignores word order."
+   },
+   {
+    "name": "Orbit Breaker",
+    "total": 26.5,
+    "rationale": "Raw score 41.5, minus 15. Three games already use the name: an Android 'OrbitBreaker: Neon Reflex', an iOS/watchOS 'Orbit Breaker: Watch Arcade', and a browser game on Playgama. 'Breaker' also suggests brick-breaking."
+   },
+   {
+    "name": "Orbit Escape",
+    "total": 22,
+    "rationale": "Raw score 40.0, minus 18. Identical, live, same-genre games exist on both iOS (Jack Timothy Armstrong) and Google Play (Steel Horizon Studio), plus a Math Playground rocket game and several itch.io games."
+   },
+   {
+    "name": "Astro Slip",
+    "total": 19,
+    "rationale": "Raw score 37.0, minus 18. An identical title by Weird LLC is live on the App Store as a one-tap deep-space dodging game, the same genre. It also has the underwear problem."
+   },
+   {
+    "name": "Orbit Dash",
+    "total": 16,
+    "rationale": "Raw score 36.0, minus 20. This is the most crowded name: at least 6 Android games and 1 iOS game use it, including Racotter's flappy-style 'Orbit Dash: Space Runner', which is almost the same game. Geometry Dash 'Orbit' content also dominates search."
+   }
+  ],
+  "top5": [
+   "Planet Gap",
+   "Astro Gap",
+   "Planetgate",
+   "Starlane Escape",
+   "Planet Weave"
+  ],
+  "chosen": "Planet Gap",
+  "chosenRationale": "How the scores were worked out: each total uses the given weights (originality 15%, memorability 15%, pronunciation 10%, conceptFit 15%, marketing 15%, searchVisibility 10%, lowConflictRisk 20%). Totals were then lowered by 8 to 20 points where a game with the same or nearly the same name already exists. A name used by a published game was not allowed into the top 5, which removed Planet Dash (Chrome Web Store game), Planet Rift (Sandbox MMORPG), Nova Dash, Rocket Rift, Planet Escape, Orbit Escape and others. Names with incomplete research lost 1 to 4 points for that uncertainty. 'Slip' names lost 6 points because 'slip' means underwear in TR, DE, FR, IT and ES.\n\nWhy Planet Gap: it has the highest adjusted total (66.5) and the research found no exact game, app or trademark on Google Play, the App Store, Steam or the web, so its conflict risk is low. It also fits the game best (85). The game is about flying through the gaps in towers of planets, so the name says what you do on the first screenshot. 'Planet' is understood in every target language and also renders the 'Gezegen' half of the Turkish title, so the two names belong together. It is two short, easy words that a 10+ player in any of the target markets can say and remember.\n\nWhy not the others in the top 5:\n- Planetgate (63.6) has a scandal sound ('-gate') and echoes MGM's STARGATE.\n- Astro Gap (63.75) competes with crowded ASTRO marks (Astro Bot, ASTRO GAMING) and loses the planet link.\n- Starlane Escape (61.9) is long, easy to mispronounce and 'Escape' is generic.\n- Planet Weave (59.5) has not been researched at all.\n\nStore title: 'Planet Gap – Gezegen Kaçışı' is 27 characters, within Google Play's 30. An English listing could use 'Planet Gap: Tap & Fly' (21) or 'Planet Gap: Space Flyer' (23). Using 'PlanetGap' as one word for the package name, domain and social handles would help it be found despite the GAP clothing brand.\n\nWhat still needs checking: no candidate's trademark databases could actually be queried. Before launch, search TURKPATENT, EUIPO, USPTO and WIPO for 'PLANET GAP' in classes 9 and 41. Also confirm that GAP Inc.'s famous-mark rights do not reach games. If that check turns something up, Astro Gap is the next safest choice."
+ },
+ "verification": [
+  {
+   "name": "Planet Gap",
+   "conflictsFound": [],
+   "sourcesChecked": [],
+   "sourcesInaccessible": [
+    "General web search: no search ran. The shared WebSearch budget for this turn (200 calls across all agents) was already used up, and the queries '\"Planet Gap\" game', '\"Planet Gap\" app Google Play' and '\"PlanetGap\"' all came back unsearched",
+    "Google Play Store (play.google.com)",
+    "Apple App Store (apps.apple.com)",
+    "Steam (store.steampowered.com)",
+    "itch.io",
+    "YouTube",
+    "Instagram",
+    "TikTok",
+    "WIPO Global Brand Database (branddb.wipo.int)",
+    "EUIPO / TMview (tmdn.org/tmview)",
+    "USPTO trademark search (tmsearch.uspto.gov)",
+    "TÜRKPATENT (turkpatent.gov.tr)",
+    "Spelling variants not checked: 'PlanetGap', 'Planet-Gap', 'Planet Gaps', 'The Planet Gap', 'Planets Gap', 'Planet Gap trademark'"
+   ],
+   "verdict": "risky",
+   "notes": "THIS IS NOT A CLEARANCE. Nothing was actually checked. The workflow's shared limit of 200 WebSearch calls was already spent before this check began, so all three of my searches returned nothing. I did not get around the limit by fetching store search pages, search engines or trademark databases some other way, because the harness forbids that. With no evidence either way, I cannot return 'usable'. The verdict is 'risky' only because the name is unverified, not because I found a conflict.\n\nFrom memory alone, and unconfirmed: I don't know of a prominent published game, app or trademark called 'Planet Gap'. My training data does not cover small Google Play or itch.io releases or recent trademark filings, so this means little.\n\nTwo reasons for extra care once searching is possible:\n(1) Tap-to-fly-through-gaps games (Flappy Bird clones) are very common on Google Play. Many have names that pair 'Gap' with a space word, such as 'Space Gap', 'Galaxy Gap' or 'Planet Jump/Gap', so a same-name or near-identical listing is plausible.\n(2) 'GAP' is a famous, registered clothing brand (Gap Inc.). It is unlikely to block a game title, but it can make trademark searches noisy and is worth noting.\n\nTo finish this check, run a follow-up after the budget resets, or with CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION raised. The follow-up should search exact phrases ('\"Planet Gap\"', 'PlanetGap', 'Planet-Gap', 'Planet Gaps', '\"The Planet Gap\"') on:\n- Google Play, App Store, Steam and itch.io\n- YouTube, Instagram and TikTok\n- WIPO Brand DB, TMview, USPTO and TÜRKPATENT, in Nice classes 9, 28 and 41"
+  },
+  {
+   "name": "Astro Gap",
+   "conflictsFound": [],
+   "sourcesChecked": [],
+   "sourcesInaccessible": [
+    "WebSearch (general web): the 200-search budget shared by every agent in this turn was already used up, so none of the searches ran. Queries tried: '\"Astro Gap\" game', '\"AstroGap\" app', '\"Astro Gap\" Google Play'",
+    "Google Play Store: not searched (no search budget left)",
+    "Apple App Store: not searched (no search budget left)",
+    "Steam: not searched (no search budget left)",
+    "itch.io: not searched (no search budget left)",
+    "YouTube: not searched (no search budget left)",
+    "Instagram: not searched (no search budget left)",
+    "TikTok: not searched (no search budget left)",
+    "WIPO Global Brand Database: not queried (no search budget left, and the DB needs an interactive query)",
+    "EUIPO / TMview: not queried",
+    "USPTO trademark search: not queried",
+    "TURKPATENT trademark search: not queried",
+    "https://astrogap.com: WebFetch got ENOTFOUND. The domain may not exist, or it may be blocked by this session's network allowlist, so it has to be allowed in the network settings before anyone can tell which",
+    "https://www.astrogap.com: WebFetch got ENOTFOUND, same as above"
+   ],
+   "verdict": "risky",
+   "notes": "THE CHECK DID NOT RUN. I found no conflicts only because I could not search, not because I looked and found nothing. Every WebSearch call was refused: the 200-search budget shared by all agents in this turn was already spent. I did not try to get around the limit by fetching store or search pages directly. I tried two direct fetches of candidate domains (astrogap.com, www.astrogap.com) and both failed DNS resolution in this sandbox. That could mean the domain is unregistered or that the network allowlist blocks it, so it proves nothing. Per the sandbox guidance I stopped trying further hosts after two failures.\n\nVerdict is 'risky' as a cautious default because nothing was verified. Do not read it as a confirmed conflict or as clearance. From prior knowledge only (unverified): I know of no specific published game called 'Astro Gap'. But one-tap flappy-style space games with 'Gap', 'Astro', 'Space' or 'Galaxy' in the name are very common on Google Play and the App Store, so a same-name or near-identical-name listing is plausible.\n\nTo finish the check, send a follow-up so search can run again, or raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION. The search should cover:\n(1) 'Astro Gap', 'AstroGap', 'Astro-Gap', 'Astro Gaps', 'The Astro Gap' on Google Play, the App Store, Steam and itch.io;\n(2) YouTube, Instagram and TikTok;\n(3) WIPO Brand DB, TMview, USPTO and TURKPATENT in Nice classes 9, 28 and 41, plus a web search for 'Astro Gap trademark';\n(4) look-alikes such as 'AstroGap: Space Flyer', 'Astro Gaps', 'Space Gap', 'Galaxy Gap' and 'Planet Gap', which could be confusingly similar for a one-tap space flyer."
+  },
+  {
+   "name": "Planetgate",
+   "conflictsFound": [
+    {
+     "what": "UNVERIFIED, from background knowledge only, no live check: \"Stargate\" is a long-running space sci-fi franchise owned by MGM/Amazon, with many licensed video games and mobile apps and registered trademarks in game and software classes. \"Planetgate\" uses the same \"[celestial noun] + gate\" pattern in the same deep-space setting, so a rights holder could argue it is confusingly similar. Whether this would actually cause trouble needs a check in USPTO, EUIPO or WIPO for STARGATE marks in Nice class 9/41 and for any \"-GATE\" space-game marks.",
+     "url": "https://en.wikipedia.org/wiki/Stargate",
+     "severity": "notable"
+    }
+   ],
+   "sourcesChecked": [],
+   "sourcesInaccessible": [
+    "WebSearch (all queries): this turn's shared limit of 200 web searches was already used up before this check started, so none of the planned queries ran (\"Planetgate\" game, \"Planet Gate\" game app, \"Planetgate\" Google Play, and the planned spelling variants Planet-Gate, Planetgates, The Planetgate, PlanetGate)",
+    "https://planetgate.com (direct fetch failed: ENOTFOUND, either the domain does not exist or it is blocked by the session network allowlist)",
+    "https://planetgate.io (direct fetch failed: ENOTFOUND, same reason; after two failures I stopped direct fetches as the environment told me to)",
+    "Google Play Store (not checked)",
+    "Apple App Store (not checked)",
+    "Steam (not checked)",
+    "itch.io (not checked)",
+    "YouTube (not checked)",
+    "Instagram (not checked)",
+    "TikTok (not checked)",
+    "WIPO Global Brand Database (not checked)",
+    "EUIPO eSearch / TMview (not checked)",
+    "USPTO trademark search (not checked)",
+    "TURKPATENT trademark search (not checked)",
+    "General web search for \"Planetgate trademark\" (not checked)"
+   ],
+   "verdict": "risky",
+   "notes": "THIS CHECK DID NOT RUN, so it is NOT a clearance. I loaded WebSearch, but every search call was refused at once: this turn's shared limit of 200 searches across all agents was already spent. As instructed, I did not get around the limit with curl, a browser or proxy services. Direct fetches of planetgate.com and planetgate.io also failed with ENOTFOUND. That means either the domains are unregistered (a mildly good sign) or the session network blocks them, and I cannot tell which. The environment says those hosts would have to be allowed in the session's network settings before they can be fetched. No store, social or trademark source was checked. \"Risky\" here means \"unverified\", not that a conflict was found. The only possible conflict listed comes from background knowledge: the similarity to MGM's Stargate franchise and its trademarks, a pattern-level resemblance in the same space theme, not an identical name. To finish this check, send a follow-up message in a new turn so the search budget resets (or raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION), then re-run these queries: \"Planetgate\", \"Planet Gate\", \"Planet-Gate\", \"PlanetGate\", \"Planetgates\", \"The Planetgate\", each combined with game/app/apk/steam/itch.io/youtube/tiktok/instagram; \"Planetgate trademark\"; and searches in WIPO Brand DB, TMview, USPTO and TURKPATENT for PLANETGATE and STARGATE in Nice classes 9, 28 and 41. Until then, do not treat Planetgate as clear to use."
+  }
+ ]
+}

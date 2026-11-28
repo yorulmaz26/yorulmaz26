@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -38,10 +40,33 @@ android {
         }
     }
 
+    // Yayın imzası: anahtar depoya konmaz. GezegenKacisi/keystore.properties (git'e eklenmez) varsa onunla imzalanır:
+    //   storeFile=/yol/upload-keystore.jks  storePassword=...  keyAlias=upload  keyPassword=...
+    val ksFile = rootProject.file("keystore.properties")
+    if (ksFile.exists()) {
+        val ks = Properties().apply { ksFile.inputStream().use { load(it) } }
+        signingConfigs.create("release") {
+            storeFile = file(ks.getProperty("storeFile"))
+            storePassword = ks.getProperty("storePassword")
+            keyAlias = ks.getProperty("keyAlias")
+            keyPassword = ks.getProperty("keyPassword")
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (ksFile.exists()) signingConfig = signingConfigs.getByName("release")
         }
+    }
+
+    // Oyun içinden dil değiştirilebildiği için tüm diller her cihaza gelmeli (App Bundle dil bölmesi kapalı)
+    bundle {
+        language { enableSplit = false }
+    }
+    // Yalnızca desteklenen 6 dil (kütüphanelerin başka dillerdeki kaynakları alınmaz)
+    androidResources {
+        localeFilters += listOf("en", "tr", "de", "it", "fr", "es")
     }
 
     compileOptions {

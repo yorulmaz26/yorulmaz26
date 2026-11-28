@@ -7,3 +7,10 @@ local.properties
 .DS_Store
 captures/
 .cxx/
+
+# Yayın imzası (gizli)
+keystore.properties
+*.jks
+
+# Teslim ZIP arşivleri (RELEASE_PACKAGE ile aynı içerik)
+RELEASE_PACKAGE_ZIPS/

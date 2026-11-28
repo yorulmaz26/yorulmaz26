@@ -71,6 +71,18 @@ Reklamlar oyunun akışını bozmayacak şekilde yerleştirildi:
 - Kod: [`AdManager.kt`](app/src/main/java/com/example/gezegenkacisi/AdManager.kt) (AdMob + onay),
   [`Ads.kt`](app/src/main/java/com/example/gezegenkacisi/Ads.kt) (oyunun gördüğü arayüz). Sıklık kuralları `GameView.afterBreak`.
 
+### 3.0: Planet Gap – global yayın hazırlığı
+
+- **İki dilli ad:** Gezegen Kaçışı / Planet Gap. Türkçe telefonda "Gezegen Kaçışı", diğer dillerde "Planet Gap".
+- **6 dil:** Türkçe, İngilizce (varsayılan), Almanca, İtalyanca, Fransızca, İspanyolca. Telefon diline göre otomatik;
+  Ayarlar'dan (dişli simgesi) oyunu yeniden başlatmadan değiştirilir. Eksik çeviri her derlemede denetlenir
+  (`./gradlew :app:checkTranslations`). Yeni dil: `res/values-xx/strings.xml` + `GameView.Lang` + `res/xml/locales_config.xml`.
+- **Canlar:** en fazla 4, her biri **20 dakikada** dolar (`GameRules.kt`: `LIFE_REGEN_SECONDS = 1200`). Can yoksa pencere:
+  video izle (+1), 60 para ile +1 ya da bekle. Saat hilesine ve kayıt değiştirmeye karşı korumalı; testler `app/src/test`.
+- **Android 16 (API 36)**, AGP 8.13.2, Gradle 8.14.3. Yayın imzası için `keystore.properties` (depoya eklenmez).
+- **Yayın paketi:** `RELEASE_PACKAGE/` (APK, AAB, logolar, mağaza görselleri, fragmanlar, mağaza metinleri, raporlar).
+  Önce `RELEASE_PACKAGE/FINAL_RELEASE_REPORT.md` dosyasını okuyun (paket adı ve imza gibi yayından önce yapılması gerekenler).
+
 ### 2.2: Bölüm denetimi (500 bölüm)
 
 Bütün bölümler, oyunun fiziğini birebir taklit eden ve geleceği bilen bir "pilot" ile simüle edildi

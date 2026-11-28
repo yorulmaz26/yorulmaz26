@@ -69,8 +69,10 @@ class MainActivity : Activity() {
     }
 
     /** Oyundayken geri tuşu menüye döner; menüdeyken uygulamadan çıkar. */
+    // Yalnızca Android 12 ve öncesi için; 13+ sürümlerde yukarıdaki OnBackInvokedCallback kullanılır
     @Deprecated("Deprecated in Java")
     @Suppress("DEPRECATION")
+    @android.annotation.SuppressLint("GestureBackNavigation")
     override fun onBackPressed() {
         if (!gameView.onBack()) super.onBackPressed()
     }
