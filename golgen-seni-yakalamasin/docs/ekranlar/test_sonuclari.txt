@@ -9,7 +9,7 @@ GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
 GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (2)
-GEÇTİ  | Kayıt: rekor kaydedildi (91)
+GEÇTİ  | Kayıt: rekor kaydedildi (58)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Hazır ekranında duraklat → devam: oyun dokunuş bekliyor (8 sn)
