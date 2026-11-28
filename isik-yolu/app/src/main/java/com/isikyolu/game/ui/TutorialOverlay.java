@@ -8,11 +8,12 @@ import android.widget.TextView;
 import com.isikyolu.engine.Chapters;
 import com.isikyolu.engine.GameSession;
 import com.isikyolu.engine.Level;
+import com.isikyolu.game.i18n.L;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** Türkçe öğretici: sayfalar halinde açıklama + canlı örnek tahta. */
+/** Öğretici: sayfalar halinde açıklama + canlı örnek tahta. Metinler {@code tutorial.*} ve motor dizilerinin anahtarlarıdır. */
 public final class TutorialOverlay extends Overlay {
 
     private static final class Page {
@@ -26,6 +27,7 @@ public final class TutorialOverlay extends Overlay {
     private final BoardView board;
     private final LinearLayout dots;
     private final TextView nextBtnLabel;
+    private final LinearLayout nextBtn;
     private Runnable done;
 
     private TutorialOverlay(Context c, List<Page> pages) {
@@ -33,6 +35,7 @@ public final class TutorialOverlay extends Overlay {
         this.pages = pages;
         tag = Ui.text(c, "", 13, Palette.TURQUOISE, Ui.BOLD);
         tag.setLetterSpacing(0.08f);
+        tag.setGravity(Gravity.CENTER); // uzun dillerde iki satıra inerse ortalı kalır
         card.addView(tag);
         title = Ui.text(c, "", 24, Palette.WHITE, Ui.BOLD);
         title.setGravity(Gravity.CENTER);
@@ -48,8 +51,9 @@ public final class TutorialOverlay extends Overlay {
         dots.setGravity(Gravity.CENTER);
         card.addView(dots, Ui.lpMargins(c, -1, Ui.dp(c, 16), 0, 4, 0, 4));
         LinearLayout row = Ui.horizontal(c);
-        LinearLayout prev = Ui.button(c, "Geri", Ui.SECONDARY, -1, v -> go(-1));
-        LinearLayout next = Ui.button(c, "İleri", Ui.PRIMARY, -1, v -> go(1));
+        LinearLayout prev = Ui.button(c, L.t("common.back"), Ui.SECONDARY, -1, v -> go(-1));
+        LinearLayout next = Ui.button(c, L.t("tutorial.next"), Ui.PRIMARY, -1, v -> go(1));
+        nextBtn = next;
         nextBtnLabel = (TextView) next.getChildAt(0);
         LinearLayout.LayoutParams l1 = new LinearLayout.LayoutParams(0, -2, 1f);
         l1.rightMargin = Ui.dp(c, 6);
@@ -84,7 +88,9 @@ public final class TutorialOverlay extends Overlay {
         board.bind(new GameSession(p.demo));
         board.setAlpha(0f);
         board.animate().alpha(1f).setDuration(250).start();
-        nextBtnLabel.setText(index == pages.size() - 1 ? "Başla" : "İleri");
+        String nextLabel = index == pages.size() - 1 ? L.t("tutorial.start") : L.t("tutorial.next");
+        nextBtnLabel.setText(nextLabel);
+        nextBtn.setContentDescription(nextLabel);
         dots.removeAllViews();
         Context c = getContext();
         for (int i = 0; i < pages.size(); i++) {
@@ -98,26 +104,32 @@ public final class TutorialOverlay extends Overlay {
 
     private static List<Page> basics() {
         List<Page> l = new ArrayList<>();
-        l.add(new Page("ÖĞRETİCİ · 1/4", "Hoş geldin!", "Işık kaynağından çıkan ışını hedef halkaya ulaştır. Bütün hedefler yandığında bölüm tamamlanır. Duvarlar ışığı durdurur.", Demos.intro()));
-        l.add(new Page("ÖĞRETİCİ · 2/4", "Aynaları döndür", "Turkuaz halkalı aynalara dokun: her dokunuş aynayı 90° çevirir. Cıvatalı koyu yuvadaki aynalar sabittir, dönmez.", Demos.chapter(1)));
-        l.add(new Page("ÖĞRETİCİ · 3/4", "Yıldızları topla", "En az hamleyle bitirirsen 3 yıldız kazanırsın. Takılırsan İpucu bir sonraki doğru hamleyi (gerekirse önce Geri Al'ı) gösterir.", Demos.chapter(2)));
-        l.add(new Page("ÖĞRETİCİ · 4/4", "Hamle hakkı ve canlar", "Her bölümde sınırlı hamle hakkın var (sağ üstte HAK). Geri Al hakkı geri vermez. "
-                + "İlk hamlede 1 can düşer, bölümü bitirince geri gelir; hak bitince, yeniden başlayınca ya da çıkınca can gider. Canlar " + com.isikyolu.engine.Lives.regenMinutes() + " dakikada bir yenilenir.", Demos.chapter(7)));
+        final int n = 4;
+        l.add(new Page(L.t("tutorial.tag", 1, n), L.t("tutorial.welcome_title"), L.t("tutorial.welcome_text"), Demos.intro()));
+        l.add(new Page(L.t("tutorial.tag", 2, n), L.t("tutorial.rotate_title"), L.t("tutorial.rotate_text"), Demos.chapter(1)));
+        l.add(new Page(L.t("tutorial.tag", 3, n), L.t("tutorial.stars_title"), L.t("tutorial.stars_text"), Demos.chapter(2)));
+        l.add(new Page(L.t("tutorial.tag", 4, n), L.t("tutorial.lives_title"),
+                L.n("tutorial.lives_text", com.isikyolu.engine.Lives.regenMinutes()), Demos.chapter(7)));
         return l;
     }
 
+    /** Yeni mekanik kartı: ch = ilk dünyanın grubu (1–10); konu ve açıklama mekanik numarasıyla (1–10) aranır. */
     private static Page mechanic(int ch) {
-        return new Page("YENİ MEKANİK · " + Chapters.TOPICS[ch - 1].toUpperCase(new java.util.Locale("tr", "TR")),
-                Chapters.NAMES[ch - 1], Chapters.MECHANICS[ch - 1], Demos.chapter(ch));
+        int m = Chapters.mechanicOf(ch);
+        return new Page(L.t("tutorial.new_mechanic", L.t(key("topic.", m, "")).toUpperCase(L.locale())),
+                L.t(key("chapter.", ch, ".name")), L.t(key("mechanic.", m, "")), Demos.chapter(ch));
     }
 
     /** Yeni dünyaya giriş kartı (101, 201, ...). */
     public static TutorialOverlay world(Context c, int w) {
         List<Page> l = new ArrayList<>();
-        l.add(new Page("YENİ DÜNYA · " + w + "/" + Chapters.WORLDS, Chapters.WORLD_NAMES[w - 1],
-                Chapters.WORLD_INTROS[w - 1], Demos.chapter(10)));
+        l.add(new Page(L.t("tutorial.new_world", w, Chapters.WORLDS), L.t(key("world.", w, ".name")),
+                L.t(key("world.", w, ".intro")), Demos.chapter(10)));
         return new TutorialOverlay(c, l);
     }
+
+    /** Dinamik anahtar ("chapter.<n>.name", "topic.<n>", "mechanic.<n>", "world.<n>.name|intro"). */
+    private static String key(String prefix, int n, String suffix) { return prefix + n + suffix; }
 
     public static TutorialOverlay first(Context c) { return new TutorialOverlay(c, basics()); }
 

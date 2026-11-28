@@ -9,6 +9,12 @@ public final class DailyPuzzle {
 
     public static String keyFor(int epochDay) { return LocalDate.ofEpochDay(epochDay).toString(); }
 
+    /**
+     * Günlük bulmacanın kararlı adı ({@code daily:YYYY-MM-DD}). Arayüz bunu göstermez;
+     * yerelleştirilmiş başlığı ({@code game.daily_title}) ve tarihi kendisi yazar.
+     */
+    public static String nameFor(int epochDay) { return "daily:" + keyFor(epochDay); }
+
     public static int today() { return (int) LocalDate.now().toEpochDay(); }
 
     public static Level generate(int epochDay) {
@@ -24,14 +30,14 @@ public final class DailyPuzzle {
             if (c.blocks > 0) c.maxRot = 8;
             Level l = new LevelGenerator(c, new Random(r.nextLong())).generate(300);
             if (l != null) {
-                l.id = 0; l.chapter = 0; l.name = "Günlük Bulmaca · " + keyFor(epochDay);
+                l.id = 0; l.chapter = 0; l.name = nameFor(epochDay);
                 return l;
             }
         }
         // güvenli yedek: basit iki aynalı bulmaca
         LevelGenerator.Config c = Chapters.configFor(15);
         Level l = new LevelGenerator(c, new Random(seed)).generate(2000);
-        l.id = 0; l.chapter = 0; l.name = "Günlük Bulmaca · " + keyFor(epochDay);
+        l.id = 0; l.chapter = 0; l.name = nameFor(epochDay);
         return l;
     }
 }

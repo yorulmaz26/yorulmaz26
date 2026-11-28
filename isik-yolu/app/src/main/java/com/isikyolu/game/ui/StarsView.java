@@ -26,6 +26,7 @@ public final class StarsView extends View {
         animate = animated;
         startMs = SystemClock.uptimeMillis();
         played = 0;
+        setContentDescription(com.isikyolu.game.i18n.L.n("common.stars", n)); // ekran okuyucu için
         invalidate();
     }
 

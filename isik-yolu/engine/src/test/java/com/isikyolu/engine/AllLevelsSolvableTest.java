@@ -31,6 +31,7 @@ public class AllLevelsSolvableTest {
         int day = 20_410;
         Level a = DailyPuzzle.generate(day), b = DailyPuzzle.generate(day);
         assertEquals(a.toJson(), b.toJson());
+        assertEquals("kararlı, dilden bağımsız ad", "daily:" + DailyPuzzle.keyFor(day), a.name);
         Solver.Solution s = Solver.solve(new Board(a), 200_000);
         assertTrue(s.solvable);
         assertEquals(a.optimal, s.optimal);
