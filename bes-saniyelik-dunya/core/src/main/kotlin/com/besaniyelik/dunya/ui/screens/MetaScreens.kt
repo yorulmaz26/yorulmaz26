@@ -360,7 +360,8 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         side.add(kit.label(L.t("settings.about", "app" to L.t("app.name_main"), "ver" to APP_VERSION, "dev" to L.t("app.developer")), a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(12f)
         val body = Table()
         body.add(p).width(640f).padRight(24f)
-        body.add(side).top()
+        // uzun dillerde sağ sütun ekrana sığmazsa kaydırılır (alt bilgi metni kesilmez)
+        body.add(scroll(side)).width(440f).maxHeight(stage.height - 150f).top()
         root.add(body).expand().center()
     }
 

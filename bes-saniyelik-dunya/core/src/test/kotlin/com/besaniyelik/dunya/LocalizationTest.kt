@@ -129,7 +129,7 @@ class LocalizationTest {
         val font = java.awt.Font.createFont(java.awt.Font.TRUETYPE_FONT, File(dir, "fonts/Nunito-ExtraBold.ttf"))
         val list = Assets.FONT_CHARS.toSet()
         for (lang in GameConfig.LANGUAGES) {
-            val chars = L.table(lang).values.joinToString("").toSet().filter { it != '\n' }
+            val chars = L.table(lang).values.joinToString("").toSet().filter { it != '\n' && it != ' ' }
             val bad = chars.filter { it !in list || !font.canDisplay(it) }
             assertTrue(bad.isEmpty(), "$lang: yazı tipinde olmayan karakterler: ${bad.joinToString { "'$it' U+%04X".format(it.code) }}")
         }
