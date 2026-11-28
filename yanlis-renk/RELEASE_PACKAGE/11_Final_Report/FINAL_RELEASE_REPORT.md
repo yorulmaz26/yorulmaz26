@@ -83,7 +83,8 @@ Durum kodları: TAMAMLANDI · TEST EDİLDİ · EKSİK · ERİŞİM GEREKLİ · U
 3. İlerlemeyi sıfırlayarak aynı gün tekrar günlük ödül alma — engellendi.
 4. Hiç internete çıkmamış cihazda yeniden başlatma sonrası can süresinin kalıcı kaybı — giderildi.
 5. Kullanımdan kaldırılmış reklam SDK'sı (23.x) — güncellendi.
-6. Ana menüde can sayacı etiketinin ilk karede yanlış yükseklikle ölçülmesi — düzeltildi.
+6. **Başlıkların dev boyutta çizilmesi** (kullanıcı ekran görüntüsüyle bildirdi: "WRONG COLOR!" kartın dışına taşıyordu). Kök neden: libGDX'te yazı ölçeği bir kez değiştirilince 1 değeri mutlak uygulanıyor; sığan metin 1'e döndürülünce ~2 kat büyüyordu. Düzeltildi; 1080×2400 telefon çözünürlüğünde Almanca 46 ekran yeniden gezildi, taşma yok. Mağaza görselleri ve videolar düzeltilmiş sürümle yeniden üretildi.
+7. Ana menüde can sayacı etiketinin ilk karede yanlış yükseklikle ölçülmesi — düzeltildi.
 
 ## 9. Performans
 | Ölçüm | Değer | Durum |
@@ -98,7 +99,7 @@ Durum kodları: TAMAMLANDI · TEST EDİLDİ · EKSİK · ERİŞİM GEREKLİ · U
 |---|---|
 | JUnit (logic + server): 50 test | 50 geçti, 0 başarısız |
 | Bölüm denetimi (500 + 500 ustalık, geçilemeyen bölüm) | 0 hata |
-| Masaüstü ekran gezintisi DE/FR (46 ekran) | 0 hata |
+| Masaüstü ekran gezintisi DE/FR (46 ekran, 480×1040) + DE 1080×2400 | 0 hata |
 | Android 11 emülatör: kurulum, açılış, öğretici, günlük ödül, ana menü, ayarlar, dil değişimi | Çökme yok |
 | Gerçek reklam tıklaması / gerçek satın alma | Yapılmadı (talimat gereği) |
 | Gerçek cihaz testi | MANUEL KONTROL GEREKLİ |

@@ -209,10 +209,22 @@ class FitLabel(text: CharSequence, style: LabelStyle) : Label(text, style) {
     private var measured: String? = null
     private var natural = 0f
 
+    /** Yazı tipinin yoğunluğa göre temel ölçeği; etiket oluşturulurken (başka bir etiketin geçici ölçeği yokken) alınır. */
+    private var baseScale = 0f
+    init { baseScale = style.font.data.scaleX }
+
     private fun naturalWidth(): Float {
         val t = text.toString()
         val m = measure ?: com.badlogic.gdx.graphics.g2d.GlyphLayout().also { measure = it }
-        if (t != measured) { m.setText(style.font, t); natural = m.width; measured = t }
+        if (t != measured) {
+            // Ölçümü her zaman temel ölçekte yap (Label.layout sırasında yazı tipi geçici olarak ölçeklenmiş olabilir).
+            val d = style.font.data
+            val ox = d.scaleX; val oy = d.scaleY
+            if (baseScale > 0f) d.setScale(baseScale)
+            m.setText(style.font, t)
+            d.setScale(ox, oy)
+            natural = m.width; measured = t
+        }
         val bg = style.background
         return natural + (bg?.leftWidth ?: 0f) + (bg?.rightWidth ?: 0f)
     }
@@ -224,8 +236,10 @@ class FitLabel(text: CharSequence, style: LabelStyle) : Label(text, style) {
         if (!wrap && width > 0f) {
             val nat = naturalWidth()
             val s = if (nat > width + 0.5f) maxOf(minScale, width / nat) else 1f
-            // Label.setFontScale yazı tipinin temel ölçeğini (yoğunluğa göre 1/scale) EZER; bu yüzden çarparak veriyoruz.
-            val target = if (s >= 0.999f) 1f else s * style.font.data.scaleX
+            // Label.setFontScale değeri MUTLAK uygulanır (temel ölçeği ezer) ve bir kez ayarlanınca 1 de
+            // "değişmedi" anlamına gelmez; bu yüzden hep temel ölçekle çarpıp veriyoruz.
+            val base = if (baseScale > 0f) baseScale else style.font.data.scaleX
+            val target = if (s >= 0.999f && fontScaleX == 1f) 1f else s * base
             if (kotlin.math.abs(fontScaleX - target) > 0.0001f) setFontScale(target)
         }
         super.layout()
