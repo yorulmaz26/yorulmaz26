@@ -7,6 +7,7 @@ import android.widget.TextView;
 
 import com.isikyolu.engine.Progress;
 import com.isikyolu.game.Game;
+import com.isikyolu.game.i18n.L;
 
 /** Işık Kristali ve Prizma Taşı bakiyesi; değişince sayı canlanarak güncellenir. */
 public final class CurrencyBar extends LinearLayout {
@@ -43,7 +44,7 @@ public final class CurrencyBar extends LinearLayout {
         animateTo(gem, shownGem, p.gems);
         shownKr = p.crystals;
         shownGem = p.gems;
-        setContentDescription(p.crystals + " kristal, " + p.gems + " prizma taşı");
+        setContentDescription(L.t("market.balance_cd", L.n("common.crystals", p.crystals), L.n("market.gems_cd", p.gems)));
     }
 
     private static void animateTo(TextView t, int from, int to) {

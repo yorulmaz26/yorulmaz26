@@ -488,7 +488,8 @@ public final class GameScreen extends Screen implements BoardView.Host {
                         }));
             }
             o.button(L.t("game.hint_buy", L.n("common.crystals", hp)), Ui.GOLD, Icon.CRYSTAL, v -> {
-                if (Economy.blockReason(Game.progress(), hi, Game.shopDay()) != null) { Game.audio().play(Audio.LOCKED); act.toast(hintBlockText(hi)); return; }
+                String why = Economy.blockReason(Game.progress(), hi, Game.shopDay());
+                if (why != null) { Game.audio().play(Audio.LOCKED); act.toast(com.isikyolu.game.i18n.EconomyTexts.blockReason(why, hi)); return; }
                 Economy.buy(Game.progress(), hi, Game.shopDay(), Game.clock());
                 Game.save();
                 o.dismiss();
@@ -502,13 +503,6 @@ public final class GameScreen extends Screen implements BoardView.Host {
 
     /** Ayrı cümleleri alt alta dizer. */
     private static String lines(String... parts) { return String.join("\n", parts); }
-
-    /** İpucu satın alınamama nedeni (motorun metni yerine): bu üründe yalnızca günlük sınır ya da kristal yetmezliği olur. */
-    private static String hintBlockText(Economy.Item it) {
-        Progress p = Game.progress();
-        if (it.dailyLimit > 0 && Economy.boughtToday(p, it.id, Game.shopDay()) >= it.dailyLimit) return L.t("game.hint_limit");
-        return L.t("game.hint_no_crystals");
-    }
 
     private void useHint() {
         if (thinking || finished) return;
@@ -582,24 +576,18 @@ public final class GameScreen extends Screen implements BoardView.Host {
         boolean first = false;
         int hintsBefore = p.hints;
         Economy.Reward reward;
-        List<String> why = new ArrayList<>(); // ödülün nedenleri (Economy.Reward.lines Türkçe olduğu için burada anahtarlarla)
         if (daily) {
             // ödül yalnızca güvenilir "bugün"ün bulmacası için ve o gün ilk kez çözülünce
             boolean isToday = epochDay == startDay || epochDay == Game.today();
             boolean firstToday = isToday && !p.dailyDone.contains(DailyPuzzle.keyFor(epochDay));
             if (isToday) p.dailyDone.add(DailyPuzzle.keyFor(epochDay)); // başka günün bulmacası seriye/başarılara sayılmaz
             reward = firstToday ? Economy.onDailyComplete(p, p.dailyStreak(epochDay)) : new Economy.Reward();
-            if (firstToday) why.add(L.t("game.reward_daily"));
         } else {
             int oldStars = p.stars[level.id];
             first = p.recordLevel(level.id, stars, session.moves(), session.hintsUsed() > 0);
             Lives.winAttempt(p, Game.clock(), level.id);
             int newStars = p.stars[level.id];
             reward = Economy.onLevelComplete(p, level.id, oldStars, newStars);
-            // Economy.onLevelComplete ile aynı koşullar ve sıra
-            if (oldStars == 0) why.add(L.t("game.reward_first"));
-            if (newStars == 3 && oldStars < 3) why.add(L.n("common.stars", 3));
-            if (reward.gems > 0) why.add(L.t("game.reward_perfect_chapter"));
         }
         boolean rewarded = p.hints > hintsBefore;
         AdPolicy.onLevelCompleted(p, daily ? 0 : level.id);
@@ -609,14 +597,14 @@ public final class GameScreen extends Screen implements BoardView.Host {
         pendingOverlay = () -> {
             pendingOverlay = null;
             if (!onScreen()) return;
-            showComplete(stars, firstF, rewarded, reward, why);
+            showComplete(stars, firstF, rewarded, reward);
         };
         postDelayed(pendingOverlay, 1100);
     }
 
     private void checkAchievements() { act.checkAchievements(); }
 
-    private void showComplete(int stars, boolean first, boolean rewarded, Economy.Reward reward, List<String> rewardWhy) {
+    private void showComplete(int stars, boolean first, boolean rewarded, Economy.Reward reward) {
         Overlay o = new Overlay(act).setCancelable(false);
         Context c = act;
         String[] titles = {"", L.t("game.complete_1"), L.t("game.complete_2"), L.t("game.complete_3")};
@@ -653,7 +641,7 @@ public final class GameScreen extends Screen implements BoardView.Host {
                 gain.addView(Ui.text(c, " +" + reward.gems, 16, Palette.WHITE, Ui.BOLD));
             }
             o.cardView().addView(gain, Ui.lpMargins(c, -2, -2, 0, 0, 0, 4));
-            TextView why = Ui.text(c, String.join(" · ", rewardWhy), 12, Palette.TEXT_DIM, Ui.MEDIUM);
+            TextView why = Ui.text(c, com.isikyolu.game.i18n.EconomyTexts.rewardSummary(reward), 12, Palette.TEXT_DIM, Ui.MEDIUM);
             why.setGravity(Gravity.CENTER);
             o.cardView().addView(why, Ui.lpMargins(c, -2, -2, 0, 0, 0, 6));
         }

@@ -354,7 +354,7 @@ public final class MainActivity extends Activity {
         }
         o.button("+1 can al · " + lp + " kristal", Ui.GOLD, com.isikyolu.game.ui.Icon.CRYSTAL, v -> {
             String why = com.isikyolu.engine.Economy.blockReason(Game.progress(), life, Game.shopDay());
-            if (why != null) { Game.audio().play(Audio.LOCKED); toast(why); return; }
+            if (why != null) { Game.audio().play(Audio.LOCKED); toast(com.isikyolu.game.i18n.EconomyTexts.blockReason(why, life)); return; }
             com.isikyolu.engine.Economy.buy(Game.progress(), life, Game.shopDay(), Game.clock());
             Game.save();
             o.dismiss();

@@ -21,6 +21,10 @@ public final class Economy {
     public enum Kind { HINT, HINT3, TICKET, SHIELD, LIFE, LIFE_FULL, CONVERT, MIRROR, BOARD, BEAM }
 
     public static final class Item {
+        /**
+         * id kalıcıdır (kayıt ve metin anahtarı). name/description yalnızca Türkçe kaynak metindir (araçlar ve testler);
+         * arayüz bunları göstermez, {@code item.<id>.name} / {@code item.<id>.desc} anahtarlarını kullanır.
+         */
         public final String id, name, description;
         public final int category; // 0 güçlendirici, 1 can, 2 görünüm
         public final Kind kind;
@@ -138,14 +142,34 @@ public final class Economy {
 
     public static int balance(Progress p, int currency) { return currency == GEM ? p.gems : p.crystals; }
 
-    /** Satın alınamıyorsa nedenini, alınabiliyorsa null döndürür. */
+    // Satın alma engeli kodları: motor metin üretmez, arayüz kodu dile göre metne çevirir (econ.block.<kod>).
+    /** Görünüme zaten sahip. */
+    public static final String BLOCK_OWNED = "owned";
+    /** Görünüm kilitli: önce {@link Item#unlockLevel} bölümü bitirilmeli. */
+    public static final String BLOCK_LOCKED = "locked";
+    /** Ürünün bugünkü alım sınırı doldu. */
+    public static final String BLOCK_DAILY_LIMIT = "daily_limit";
+    /** Canlar zaten dolu. */
+    public static final String BLOCK_LIVES_FULL = "lives_full";
+    /** Yetersiz Prizma Taşı. */
+    public static final String BLOCK_NOT_ENOUGH_GEMS = "not_enough_gems";
+    /** Yetersiz kristal. */
+    public static final String BLOCK_NOT_ENOUGH_CRYSTALS = "not_enough_crystals";
+    /** Günlük teklifin tek adet stoku alındı. */
+    public static final String BLOCK_SOLD_OUT = "sold_out";
+    /** {@link #blockReason} ve {@link #dealBlockReason} sonuçlarının tamamı (null hariç). */
+    public static final List<String> BLOCK_CODES = Collections.unmodifiableList(Arrays.asList(BLOCK_OWNED, BLOCK_LOCKED,
+            BLOCK_DAILY_LIMIT, BLOCK_LIVES_FULL, BLOCK_NOT_ENOUGH_GEMS, BLOCK_NOT_ENOUGH_CRYSTALS, BLOCK_SOLD_OUT));
+
+    private static String noMoney(Item it) { return it.currency == GEM ? BLOCK_NOT_ENOUGH_GEMS : BLOCK_NOT_ENOUGH_CRYSTALS; }
+
+    /** Satın alınamıyorsa nedeninin kodunu ({@code BLOCK_*}), alınabiliyorsa null döndürür. */
     public static String blockReason(Progress p, Item it, int day, int price) {
-        if (it.cosmetic() && p.owned.contains(it.skin)) return "Sahipsin";
-        if (it.unlockLevel > 0 && p.stars[Math.min(it.unlockLevel, Progress.LEVEL_COUNT)] == 0)
-            return "Bölüm " + it.unlockLevel + "'u bitir";
-        if (it.dailyLimit > 0 && boughtToday(p, it.id, day) >= it.dailyLimit) return "Bugünlük sınır doldu";
-        if ((it.kind == Kind.LIFE || it.kind == Kind.LIFE_FULL) && p.lives >= Lives.MAX) return "Canların dolu";
-        if (balance(p, it.currency) < price) return it.currency == GEM ? "Yetersiz Prizma Taşı" : "Yetersiz kristal";
+        if (it.cosmetic() && p.owned.contains(it.skin)) return BLOCK_OWNED;
+        if (it.unlockLevel > 0 && p.stars[Math.min(it.unlockLevel, Progress.LEVEL_COUNT)] == 0) return BLOCK_LOCKED;
+        if (it.dailyLimit > 0 && boughtToday(p, it.id, day) >= it.dailyLimit) return BLOCK_DAILY_LIMIT;
+        if ((it.kind == Kind.LIFE || it.kind == Kind.LIFE_FULL) && p.lives >= Lives.MAX) return BLOCK_LIVES_FULL;
+        if (balance(p, it.currency) < price) return noMoney(it);
         return null;
     }
 
@@ -229,14 +253,17 @@ public final class Economy {
         return out;
     }
 
-    /** Teklifte günlük ürün sınırı uygulanmaz; yalnızca teklifin tek adet stoku vardır. */
+    /**
+     * Teklifte günlük ürün sınırı uygulanmaz; yalnızca teklifin tek adet stoku vardır.
+     * @return engel kodu ({@code BLOCK_*}) ya da alınabiliyorsa null
+     */
     public static String dealBlockReason(Progress p, Deal d, int day) {
         Item it = d.item;
-        if (boughtToday(p, d.key(), day) >= 1) return "Tükendi";
-        if (it.cosmetic() && p.owned.contains(it.skin)) return "Sahipsin";
-        if (it.unlockLevel > 0 && p.stars[Math.min(it.unlockLevel, Progress.LEVEL_COUNT)] == 0) return "Bölüm " + it.unlockLevel + "'u bitir";
-        if ((it.kind == Kind.LIFE || it.kind == Kind.LIFE_FULL) && p.lives >= Lives.MAX) return "Canların dolu";
-        if (balance(p, it.currency) < d.price) return it.currency == GEM ? "Yetersiz Prizma Taşı" : "Yetersiz kristal";
+        if (boughtToday(p, d.key(), day) >= 1) return BLOCK_SOLD_OUT;
+        if (it.cosmetic() && p.owned.contains(it.skin)) return BLOCK_OWNED;
+        if (it.unlockLevel > 0 && p.stars[Math.min(it.unlockLevel, Progress.LEVEL_COUNT)] == 0) return BLOCK_LOCKED;
+        if ((it.kind == Kind.LIFE || it.kind == Kind.LIFE_FULL) && p.lives >= Lives.MAX) return BLOCK_LIVES_FULL;
+        if (balance(p, it.currency) < d.price) return noMoney(it);
         return null;
     }
 
@@ -284,8 +311,21 @@ public final class Economy {
 
     // ---------- kazanç ----------
 
+    // Kazanç satırı kodları (Reward.lines): arayüz dile göre metne çevirir (econ.reward.<kod>).
+    /** Bölüm ilk kez tamamlandı. */
+    public static final String REWARD_FIRST_CLEAR = "first_clear";
+    /** Bölüm ilk kez 3 yıldıza çıktı. */
+    public static final String REWARD_THREE_STARS = "three_stars";
+    /** Bir grubun 10 bölümü 3 yıldızla bitti (30/30). */
+    public static final String REWARD_PERFECT_CHAPTER = "perfect_chapter";
+    /** Günlük bulmaca. */
+    public static final String REWARD_DAILY = "daily";
+    /** Başarı ödülü: kod {@code "ach:" + başarı id}. */
+    public static final String REWARD_ACHIEVEMENT_PREFIX = "ach:";
+
     public static final class Reward {
         public int crystals, gems;
+        /** Kazancın nedenleri, kod olarak ({@code REWARD_*}; başarılar için {@code "ach:<id>"}). */
         public final List<String> lines = new ArrayList<>();
 
         void add(int kr, int gm, String why) {
@@ -300,13 +340,13 @@ public final class Economy {
     public static Reward onLevelComplete(Progress p, int levelId, int oldStars, int newStars) {
         Reward r = new Reward();
         int world = Chapters.worldOf(levelId);
-        if (oldStars == 0) r.add(4 + 2 * (world - 1), 0, "İlk tamamlama");
-        if (newStars == 3 && oldStars < 3) r.add(3, 0, "3 yıldız");
+        if (oldStars == 0) r.add(4 + 2 * (world - 1), 0, REWARD_FIRST_CLEAR);
+        if (newStars == 3 && oldStars < 3) r.add(3, 0, REWARD_THREE_STARS);
         int ch = Chapters.chapterOf(levelId);
         if (!p.perfectChapters.contains(ch)) {
             boolean perfect = true;
             for (int i = (ch - 1) * 10 + 1; i <= ch * 10; i++) if (p.stars[i] < 3) { perfect = false; break; }
-            if (perfect) { p.perfectChapters.add(ch); r.add(0, 1, "Grup 30/30 yıldız"); }
+            if (perfect) { p.perfectChapters.add(ch); r.add(0, 1, REWARD_PERFECT_CHAPTER); }
         }
         apply(p, r);
         return r;
@@ -315,7 +355,7 @@ public final class Economy {
     /** Günlük bulmaca o gün ilk kez çözüldü. */
     public static Reward onDailyComplete(Progress p, int streak) {
         Reward r = new Reward();
-        r.add(20 + 3 * Math.min(Math.max(0, streak - 1), 10), 0, "Günlük bulmaca");
+        r.add(20 + 3 * Math.min(Math.max(0, streak - 1), 10), 0, REWARD_DAILY);
         apply(p, r);
         return r;
     }
@@ -329,7 +369,7 @@ public final class Economy {
             case "efsane": case "kusursuz": gems = 3; break;
             default: break;
         }
-        r.add(30, gems, d.title);
+        r.add(30, gems, REWARD_ACHIEVEMENT_PREFIX + d.id);
         apply(p, r);
         return r;
     }

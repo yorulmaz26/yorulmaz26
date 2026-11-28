@@ -17,6 +17,8 @@ import com.isikyolu.engine.Progress;
 import com.isikyolu.game.Audio;
 import com.isikyolu.game.Game;
 import com.isikyolu.game.MainActivity;
+import com.isikyolu.game.i18n.EconomyTexts;
+import com.isikyolu.game.i18n.L;
 import com.isikyolu.game.ui.BoardView;
 import com.isikyolu.game.ui.CurrencyBar;
 import com.isikyolu.game.ui.Demos;
@@ -30,7 +32,6 @@ import java.util.List;
 
 /** Market: günlük teklifler, güçlendiriciler, canlar, görünümler ve kazanç rehberi. */
 public final class MarketScreen extends Screen {
-    private static final String[] TABS = {"Teklifler", "Güçlendiriciler", "Canlar", "Görünüm", "Nasıl Kazanılır"};
     private static final int[] TAB_ICONS = {Icon.TAG, Icon.BULB, Icon.HEART, Icon.BRUSH, Icon.CRYSTAL};
 
     private final LinearLayout tabs, list;
@@ -46,7 +47,7 @@ public final class MarketScreen extends Screen {
         tab = startTab;
         LinearLayout root = Ui.vertical(a);
         bar = new CurrencyBar(a);
-        root.addView(Ui.header(a, "Market", v -> a.goMenu(), bar));
+        root.addView(Ui.header(a, L.t("market.title"), v -> a.goMenu(), bar));
         hs = new HorizontalScrollView(a);
         hs.setHorizontalScrollBarEnabled(false);
         tabs = Ui.horizontal(a);
@@ -66,10 +67,17 @@ public final class MarketScreen extends Screen {
 
     private int day() { return Game.shopDay(); }
 
+    /** Sekme adları (seçili dilde; sıra TAB_ICONS ile aynı). */
+    private static String[] tabLabels() {
+        return new String[]{L.t("market.tab.deals"), L.t("market.tab.boosts"), L.t("market.tab.lives"), L.t("market.tab.looks"),
+                L.t("market.tab.earn")};
+    }
+
     private void buildTabs() {
         Context c = getContext();
         tabs.removeAllViews();
-        for (int i = 0; i < TABS.length; i++) {
+        String[] labels = tabLabels();
+        for (int i = 0; i < labels.length; i++) {
             final int ti = i;
             boolean sel = i == tab;
             LinearLayout t = Ui.horizontal(c);
@@ -79,7 +87,8 @@ public final class MarketScreen extends Screen {
             bg.setCornerRadius(Ui.dp(c, 16));
             t.setBackground(bg);
             t.addView(Ui.icon(c, TAB_ICONS[i], sel ? Palette.NIGHT : Palette.WHITE, 16));
-            TextView n = Ui.text(c, " " + TABS[i], 14, sel ? Palette.NIGHT : Palette.WHITE, Ui.BOLD);
+            TextView n = Ui.text(c, " " + labels[i], 14, sel ? Palette.NIGHT : Palette.WHITE, Ui.BOLD);
+            n.setSingleLine(true);
             t.addView(n);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
             lp.rightMargin = Ui.dp(c, 8);
@@ -113,11 +122,12 @@ public final class MarketScreen extends Screen {
     private void renderDeals() {
         Context c = getContext();
         LinearLayout head = Ui.horizontal(c);
-        head.addView(Ui.text(c, "Günün teklifleri", 18, Palette.WHITE, Ui.BOLD), new LinearLayout.LayoutParams(0, -2, 1f));
+        head.addView(Ui.text(c, L.t("market.deals_title"), 18, Palette.WHITE, Ui.BOLD), new LinearLayout.LayoutParams(0, -2, 1f));
         countdown = Ui.text(c, "", 13, Palette.GOLD, Ui.MEDIUM);
+        countdown.setSingleLine(true); // her saniye değişir: satır sayısı oynamasın (başlık yanında sıkışırsa başlık kırılır)
         head.addView(countdown);
         list.addView(head, Ui.lpMargins(c, -1, -2, 4, 4, 4, 2));
-        list.addView(note("Her gün 3 indirimli ürün, her biri tek adet. Teklifte günlük ürün sınırı uygulanmaz."));
+        list.addView(note(L.t("market.deals_note")));
         // video yuvası: video yüklenirken yer tutar (liste kaymaz, yanlış dokunuş satın almaya dönmez)
         videoSlot = null;
         if (act.videosLeft(com.isikyolu.engine.AdPolicy.Reward.CRYSTALS) > 0) {
@@ -130,8 +140,8 @@ public final class MarketScreen extends Screen {
         List<Economy.Deal> deals = Economy.deals(d);
         for (Economy.Deal deal : deals) {
             String reason = Economy.dealBlockReason(p, deal, d);
-            String info = "%" + deal.discount + " indirim · normal fiyat " + deal.item.basePrice;
-            list.addView(card(deal.item, info, deal.price, reason, "%" + deal.discount, () -> confirmBuy(deal.item.name, deal.item.currency, deal.price, () -> {
+            String info = L.t("market.deal_info", deal.discount, deal.item.basePrice);
+            list.addView(card(deal.item, info, deal.price, reason, L.t("market.deal_badge", deal.discount), () -> confirmBuy(EconomyTexts.itemName(deal.item), deal.item.currency, deal.price, () -> {
                 if (Economy.buyDeal(Game.progress(), deal, day(), Game.clock())) bought(deal.item);
             })), Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
         }
@@ -142,7 +152,7 @@ public final class MarketScreen extends Screen {
         Context c = getContext();
         Progress p = Game.progress();
         list.addView(inventory(), Ui.lpMargins(c, -1, -2, 0, 4, 0, 6));
-        list.addView(note("Aynı gün tekrar alınan ürünlerin fiyatı her alımda artar. Sayaçlar gece yarısı sıfırlanır."));
+        list.addView(note(L.t("market.boosts_note")));
         for (Economy.Item it : Economy.ITEMS) {
             if (it.category != cat) continue;
             list.addView(itemCard(p, it), Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
@@ -156,17 +166,17 @@ public final class MarketScreen extends Screen {
         row.setGravity(Gravity.CENTER);
         row.addView(new LivesBadge(c));
         list.addView(row, Ui.lpMargins(c, -1, -2, 0, 4, 0, 6));
-        list.addView(note("Canlar " + com.isikyolu.engine.Lives.regenMinutes() + " dakikada bir kendiliğinden yenilenir. Beklemek istemezsen buradan alabilirsin."));
+        list.addView(note(L.n("market.lives_note", Lives.regenMinutes())));
         for (Economy.Item it : Economy.ITEMS) if (it.category == Economy.CAT_LIVES) list.addView(itemCard(p, it), Ui.lpMargins(c, -1, -2, 0, 6, 0, 6));
     }
 
     private void renderLooks() {
         Context c = getContext();
         Progress p = Game.progress();
-        list.addView(note("Görünümler bir kez alınır ve kalıcıdır. Kartlara dokunarak önizleyebilirsin."));
-        String[] titles = {"Ayna Kaplamaları", "Tahta Temaları", "Işın Efektleri"};
+        list.addView(note(L.t("market.looks_note")));
+        String[] titles = {L.t("market.looks.mirrors"), L.t("market.looks.boards"), L.t("market.looks.beams")};
         Economy.Kind[] kinds = {Economy.Kind.MIRROR, Economy.Kind.BOARD, Economy.Kind.BEAM};
-        String[] defaults = {"Gümüş Aynalar (varsayılan)", "Gece Tahtası (varsayılan)", "Klasik Işın (varsayılan)"};
+        String[] defaults = {L.t("market.default.mirror"), L.t("market.default.board"), L.t("market.default.beam")};
         for (int k = 0; k < 3; k++) {
             list.addView(Ui.text(c, titles[k], 17, Palette.WHITE, Ui.BOLD), Ui.lpMargins(c, -2, -2, 4, 12, 0, 2));
             final Economy.Kind kind = kinds[k];
@@ -181,17 +191,17 @@ public final class MarketScreen extends Screen {
     private void renderGuide() {
         Context c = getContext();
         String[][] rows = {
-                {"Bölümü ilk kez bitirmek", "4 kristal (her dünyada +2: 5. dünyada 12)"},
-                {"Bir bölümü ilk kez 3 yıldıza çıkarmak", "+3 kristal"},
-                {"Bir grubun 10 bölümünü 3 yıldızla bitirmek", "1 Prizma Taşı"},
-                {"Günlük bulmaca", "20 kristal + seri başına 3 (en fazla +30)"},
-                {"Her başarı", "30 kristal"},
-                {"Dünya başarıları, 900 yıldız, 100 kusursuz bölüm, 30 günlük bulmaca", "+1 Prizma Taşı"},
-                {"Işık Yolu Efsanesi, Kusursuz Işık", "+3 Prizma Taşı"},
-                {"Ödüllü video (isteğe bağlı, internet gerekir)", "Teklifler'de +25 kristal (günde 3) · can bitince +1 can (günde 3) · ipucu bitince +1 ipucu (günde 3) · hak bitince ek hak (günde 5)"},
-                {"Aynı bölümü tekrar oynamak", "kazandırmaz"},
+                {L.t("market.guide.first_clear"), L.t("market.guide.first_clear_gain")},
+                {L.t("market.guide.three_stars"), L.t("market.guide.three_stars_gain")},
+                {L.t("market.guide.perfect_chapter"), L.t("market.guide.perfect_chapter_gain")},
+                {L.t("market.guide.daily"), L.t("market.guide.daily_gain")},
+                {L.t("market.guide.achievement"), L.t("market.guide.achievement_gain")},
+                {L.t("market.guide.big_achievements"), L.t("market.guide.big_achievements_gain")},
+                {L.t("market.guide.top_achievements"), L.t("market.guide.top_achievements_gain")},
+                {L.t("market.guide.video"), L.t("market.guide.video_gain")},
+                {L.t("market.guide.replay"), L.t("market.guide.replay_gain")},
         };
-        list.addView(Ui.text(c, "Kazanç rehberi", 18, Palette.WHITE, Ui.BOLD), Ui.lpMargins(c, -2, -2, 4, 4, 0, 6));
+        list.addView(Ui.text(c, L.t("market.guide_title"), 18, Palette.WHITE, Ui.BOLD), Ui.lpMargins(c, -2, -2, 4, 4, 0, 6));
         LinearLayout card = Ui.vertical(c);
         card.setBackground(Ui.card(c));
         card.setPadding(Ui.dp(c, 16), Ui.dp(c, 10), Ui.dp(c, 16), Ui.dp(c, 10));
@@ -204,8 +214,8 @@ public final class MarketScreen extends Screen {
         }
         list.addView(card);
         Progress p = Game.progress();
-        list.addView(note("Şimdiye kadar kazandığın toplam kristal: " + p.crystalsEarned + " · alışveriş sayısı: " + p.purchases));
-        list.addView(note("Market tamamen oyun içi para kullanır; gerçek para ile satın alma yoktur."));
+        list.addView(note(L.t("market.guide_stats", p.crystalsEarned, p.purchases)));
+        list.addView(note(L.t("market.no_real_money")));
     }
 
     // ---------- kartlar ----------
@@ -216,17 +226,21 @@ public final class MarketScreen extends Screen {
         LinearLayout r = Ui.horizontal(c);
         r.setBackground(Ui.card(c));
         r.setPadding(Ui.dp(c, 12), Ui.dp(c, 10), Ui.dp(c, 12), Ui.dp(c, 10));
-        r.addView(invCell(c, Icon.BULB, Palette.GOLD, p.hints, "İpucu"), new LinearLayout.LayoutParams(0, -2, 1f));
-        r.addView(invCell(c, Icon.TICKET, 0xFF7DF0E0, p.tickets, "Bilet"), new LinearLayout.LayoutParams(0, -2, 1f));
-        r.addView(invCell(c, Icon.SHIELD, 0xFFFF8FA3, p.shields, "Kalkan"), new LinearLayout.LayoutParams(0, -2, 1f));
+        r.addView(invCell(c, Icon.BULB, Palette.GOLD, L.n("market.inv.hints", p.hints)), new LinearLayout.LayoutParams(0, -2, 1f));
+        r.addView(invCell(c, Icon.TICKET, 0xFF7DF0E0, L.n("market.inv.tickets", p.tickets)), new LinearLayout.LayoutParams(0, -2, 1f));
+        r.addView(invCell(c, Icon.SHIELD, 0xFFFF8FA3, L.n("market.inv.shields", p.shields)), new LinearLayout.LayoutParams(0, -2, 1f));
         return r;
     }
 
-    private static View invCell(Context c, int icon, int color, int n, String label) {
+    /** @param countLabel sayı ve birim birlikte (ör. "3 İpucu") */
+    private static View invCell(Context c, int icon, int color, String countLabel) {
         LinearLayout l = Ui.horizontal(c);
         l.setGravity(Gravity.CENTER);
         l.addView(Ui.icon(c, icon, color, 20));
-        l.addView(Ui.text(c, " " + n + " " + label, 14, Palette.WHITE, Ui.MEDIUM));
+        TextView t = Ui.text(c, " " + countLabel, 14, Palette.WHITE, Ui.MEDIUM);
+        t.setMaxLines(2); // uzun dillerde iki satıra iner, taşmaz
+        t.setGravity(Gravity.CENTER);
+        l.addView(t);
         return l;
     }
 
@@ -264,29 +278,32 @@ public final class MarketScreen extends Screen {
         int d = day();
         int price = Economy.price(p, it, d);
         String reason = Economy.blockReason(p, it, d, price);
-        StringBuilder info = new StringBuilder();
+        String info;
         if (it.cosmetic()) {
-            if (p.owned.contains(it.skin)) info.append(Economy.equipped(p, it) ? "Kullanılıyor" : "Sahipsin");
-            else if (it.unlockLevel > 0 && p.stars[it.unlockLevel] == 0) info.append("Bölüm ").append(it.unlockLevel).append(" gerekli");
-            else info.append(it.currency == Economy.GEM ? "Nadir görünüm" : "Kalıcı görünüm");
+            if (p.owned.contains(it.skin)) info = Economy.equipped(p, it) ? L.t("market.in_use") : L.t("market.owned");
+            else if (it.unlockLevel > 0 && p.stars[it.unlockLevel] == 0) info = L.t("market.needs_level", it.unlockLevel);
+            else info = it.currency == Economy.GEM ? L.t("market.rare_skin") : L.t("market.permanent_skin");
         } else {
-            if (it.dailyLimit > 0) info.append("Bugün ").append(Economy.boughtToday(p, it.id, d)).append("/").append(it.dailyLimit);
-            if (it.step > 0) info.append(" · her alımda +").append(it.step);
+            int today = Economy.boughtToday(p, it.id, d);
+            if (it.dailyLimit > 0 && it.step > 0) info = L.t("market.today_step", today, it.dailyLimit, it.step);
+            else if (it.dailyLimit > 0) info = L.t("market.today", today, it.dailyLimit);
+            else if (it.step > 0) info = L.t("market.step", it.step);
+            else info = "";
         }
         if (it.cosmetic() && p.owned.contains(it.skin)) {
             boolean on = Economy.equipped(p, it);
-            return card(it, info.toString(), -1, null, null, on ? null : () -> { Economy.equip(Game.progress(), it); Game.save(); Game.audio().play(Audio.CLICK); render(false); },
-                    on ? "Kullanılıyor" : "Kullan");
+            return card(it, info, -1, null, null, on ? null : () -> { Economy.equip(Game.progress(), it); Game.save(); Game.audio().play(Audio.CLICK); render(false); },
+                    on ? L.t("market.in_use") : L.t("market.use"));
         }
-        Runnable buy = () -> confirmBuy(it.name, it.currency, price, () -> {
+        Runnable buy = () -> confirmBuy(EconomyTexts.itemName(it), it.currency, price, () -> {
             if (Economy.buy(Game.progress(), it, day(), Game.clock())) bought(it);
         });
         if (it.cosmetic()) {
-            View cardV = card(it, info.toString(), price, reason, null, buy);
+            View cardV = card(it, info, price, reason, null, buy);
             Ui.clickable(cardV, v -> preview(it, price, reason));
             return cardV;
         }
-        return card(it, info.toString(), price, reason, null, buy);
+        return card(it, info, price, reason, null, buy);
     }
 
     private View defaultCard(String name, boolean on, Runnable use) {
@@ -295,7 +312,7 @@ public final class MarketScreen extends Screen {
         r.setBackground(Ui.card(c));
         r.setPadding(Ui.dp(c, 14), Ui.dp(c, 12), Ui.dp(c, 12), Ui.dp(c, 12));
         r.addView(Ui.text(c, name, 15, Palette.WHITE, Ui.MEDIUM), new LinearLayout.LayoutParams(0, -2, 1f));
-        r.addView(actionButton(on ? "Kullanılıyor" : "Kullan", !on, on ? null : use));
+        r.addView(actionButton(on ? L.t("market.in_use") : L.t("market.use"), !on, on ? null : use));
         return r;
     }
 
@@ -303,9 +320,13 @@ public final class MarketScreen extends Screen {
         return card(it, info, price, reason, badge, onBuy, null);
     }
 
-    /** Ürün kartı: ikon, ad, açıklama, bilgi satırı ve fiyat/eylem butonu. */
+    /**
+     * Ürün kartı: ikon, ad, açıklama, bilgi satırı ve fiyat/eylem butonu.
+     * @param reason satın alma engeli kodu (Economy.BLOCK_*), alınabiliyorsa null
+     */
     private View card(Economy.Item it, String info, int price, String reason, String badge, Runnable onAction, String actionLabel) {
         Context c = getContext();
+        String why = EconomyTexts.blockReason(reason, it);
         LinearLayout r = Ui.horizontal(c);
         r.setBackground(Ui.card(c));
         r.setPadding(Ui.dp(c, 12), Ui.dp(c, 12), Ui.dp(c, 12), Ui.dp(c, 12));
@@ -315,6 +336,7 @@ public final class MarketScreen extends Screen {
         ic.addView(Ui.icon(c, iconFor(it), col, 26), new FrameLayout.LayoutParams(Ui.dp(c, 26), Ui.dp(c, 26), Gravity.CENTER));
         if (badge != null) {
             TextView b = Ui.text(c, badge, 10, Palette.WHITE, Ui.BOLD);
+            b.setSingleLine(true);
             b.setBackground(Ui.round(0xFFFF5C7A, Ui.dp(c, 8)));
             b.setPadding(Ui.dp(c, 5), Ui.dp(c, 1), Ui.dp(c, 5), Ui.dp(c, 1));
             ic.addView(b, new FrameLayout.LayoutParams(-2, -2, Gravity.TOP | Gravity.END));
@@ -322,14 +344,14 @@ public final class MarketScreen extends Screen {
         r.addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 50), Ui.dp(c, 50)));
         LinearLayout tc = Ui.vertical(c);
         tc.setPadding(Ui.dp(c, 12), 0, Ui.dp(c, 8), 0);
-        tc.addView(Ui.text(c, it.name, 16, Palette.WHITE, Ui.BOLD));
-        tc.addView(Ui.text(c, it.description, 13, Palette.TEXT_DIM, Ui.REGULAR));
+        tc.addView(Ui.text(c, EconomyTexts.itemName(it), 16, Palette.WHITE, Ui.BOLD));
+        tc.addView(Ui.text(c, EconomyTexts.itemDesc(it), 13, Palette.TEXT_DIM, Ui.REGULAR));
         if (info != null && !info.isEmpty()) tc.addView(Ui.text(c, info, 12, Palette.GOLD, Ui.MEDIUM));
-        if (reason != null && price >= 0) tc.addView(Ui.text(c, reason, 12, 0xFFFF9AA8, Ui.MEDIUM));
+        if (why != null && price >= 0) tc.addView(Ui.text(c, why, 12, 0xFFFF9AA8, Ui.MEDIUM));
         r.addView(tc, new LinearLayout.LayoutParams(0, -2, 1f));
         if (price < 0) r.addView(actionButton(actionLabel, onAction != null, onAction));
         else r.addView(priceButton(it.currency, price, reason == null, () -> {
-            if (reason != null) { Game.audio().play(Audio.LOCKED); Game.haptics().error(); act.toast(reason); return; }
+            if (why != null) { Game.audio().play(Audio.LOCKED); Game.haptics().error(); act.toast(why); return; }
             onAction.run();
         }));
         return r;
@@ -347,6 +369,7 @@ public final class MarketScreen extends Screen {
         b.addView(Ui.icon(c, currency == Economy.GEM ? Icon.GEM : Icon.CRYSTAL, currency == Economy.GEM ? CurrencyBar.GEM_COLOR : CurrencyBar.CRYSTAL_COLOR, 16));
         b.addView(Ui.text(c, " " + price, 15, enabled ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
         b.setMinimumWidth(Ui.dp(c, 76));
+        b.setContentDescription(currency == Economy.GEM ? L.n("common.gems", price) : L.n("common.crystals", price));
         Ui.clickable(b, v -> r.run());
         return b;
     }
@@ -357,6 +380,10 @@ public final class MarketScreen extends Screen {
         b.setGravity(Gravity.CENTER);
         b.setBackground(Ui.round(enabled ? 0xFF6D5DFB : 0xFF314064, Ui.dp(c, 14)));
         b.setPadding(Ui.dp(c, 14), Ui.dp(c, 9), Ui.dp(c, 14), Ui.dp(c, 9));
+        // uzun dillerde kartın metnini sıkıştırmasın: en fazla iki satır
+        b.setMaxWidth(Ui.dp(c, 150));
+        b.setMaxLines(2);
+        b.setEllipsize(android.text.TextUtils.TruncateAt.END);
         if (enabled && r != null) Ui.clickable(b, v -> r.run());
         return b;
     }
@@ -368,10 +395,10 @@ public final class MarketScreen extends Screen {
         if (!expensive) { doBuy.run(); return; }
         Overlay o = new Overlay(act);
         o.title(name);
-        o.body("Fiyat: " + price + (currency == Economy.GEM ? " Prizma Taşı" : " kristal")
-                + "\nBakiye: " + Economy.balance(Game.progress(), currency) + "\n\nSatın almak istiyor musun?");
-        o.button("Satın Al", Ui.GOLD, Icon.BAG, v -> { o.dismiss(); doBuy.run(); });
-        o.button("Vazgeç", Ui.SECONDARY, -1, v -> o.dismiss());
+        String cost = currency == Economy.GEM ? L.n("common.gems", price) : L.n("common.crystals", price);
+        o.body(L.t("market.confirm_body", cost, Economy.balance(Game.progress(), currency)));
+        o.button(L.t("market.buy"), Ui.GOLD, Icon.BAG, v -> { o.dismiss(); doBuy.run(); });
+        o.button(L.t("common.cancel"), Ui.SECONDARY, -1, v -> o.dismiss());
         o.show(act.overlayLayer());
     }
 
@@ -379,19 +406,23 @@ public final class MarketScreen extends Screen {
         Game.save();
         Game.audio().play(Audio.ACHIEVE);
         Game.haptics().success();
-        act.toast(it.name + " alındı!");
+        act.toast(L.t("market.bought", EconomyTexts.itemName(it)));
         act.checkAchievements();
         render(false);
     }
 
-    /** Görünüm önizlemesi: örnek tahta seçilen görünümle çizilir. */
+    /**
+     * Görünüm önizlemesi: örnek tahta seçilen görünümle çizilir.
+     * @param reason satın alma engeli kodu (Economy.BLOCK_*), alınabiliyorsa null
+     */
     private void preview(Economy.Item it, int price, String reason) {
         Context c = getContext();
+        String why = EconomyTexts.blockReason(reason, it);
         Overlay o = new Overlay(act);
-        TextView tag = Ui.text(c, "ÖNİZLEME", 13, Palette.TURQUOISE, Ui.BOLD);
+        TextView tag = Ui.text(c, L.t("market.preview").toUpperCase(L.locale()), 13, Palette.TURQUOISE, Ui.BOLD);
         tag.setLetterSpacing(0.08f);
         o.cardView().addView(tag);
-        o.title(it.name);
+        o.title(EconomyTexts.itemName(it));
         BoardView bv = new BoardView(c);
         bv.setInputEnabled(false);
         bv.bind(new GameSession(it.kind == Economy.Kind.BOARD ? Demos.chapter(4) : Demos.chapter(2)));
@@ -399,18 +430,18 @@ public final class MarketScreen extends Screen {
         bv.setSkinOverride(it.kind == Economy.Kind.MIRROR ? it.skin : null, it.kind == Economy.Kind.BOARD ? it.skin : null,
                 it.kind == Economy.Kind.BEAM ? it.skin : null);
         o.cardView().addView(bv, new LinearLayout.LayoutParams(-1, Ui.dp(c, 200)));
-        o.body(it.description + (reason != null ? "\n" + reason : ""));
+        o.body(EconomyTexts.itemDesc(it) + (why != null ? "\n" + why : ""));
         if (p.owned.contains(it.skin)) {
-            o.button(Economy.equipped(p, it) ? "Kullanılıyor" : "Kullan", Ui.PRIMARY, Icon.CHECK, v -> { o.dismiss(); Economy.equip(Game.progress(), it); Game.save(); render(false); });
+            o.button(Economy.equipped(p, it) ? L.t("market.in_use") : L.t("market.use"), Ui.PRIMARY, Icon.CHECK, v -> { o.dismiss(); Economy.equip(Game.progress(), it); Game.save(); render(false); });
         } else {
-            o.button((it.currency == Economy.GEM ? "Satın Al · " + price + " taş" : "Satın Al · " + price + " kristal"),
-                    reason == null ? Ui.GOLD : Ui.SECONDARY, Icon.BAG, v -> {
-                        if (reason != null) { act.toast(reason); return; }
+            o.button((it.currency == Economy.GEM ? L.n("market.buy_gems", price) : L.n("market.buy_crystals", price)),
+                    why == null ? Ui.GOLD : Ui.SECONDARY, Icon.BAG, v -> {
+                        if (why != null) { act.toast(why); return; }
                         o.dismiss();
                         if (Economy.buy(Game.progress(), it, day(), Game.clock())) bought(it);
                     });
         }
-        o.button("Kapat", Ui.SECONDARY, -1, v -> o.dismiss());
+        o.button(L.t("common.close"), Ui.SECONDARY, -1, v -> o.dismiss());
         o.show(act.overlayLayer());
     }
 
@@ -418,7 +449,7 @@ public final class MarketScreen extends Screen {
         if (countdown == null) return;
         long ms = Game.msUntilNextDay();
         long s = ms / 1000;
-        countdown.setText(String.format(java.util.Locale.ROOT, "Yenilenme: %02d:%02d:%02d", s / 3600, (s / 60) % 60, s % 60));
+        countdown.setText(L.t("market.refresh_in", String.format(java.util.Locale.ROOT, "%02d:%02d:%02d", s / 3600, (s / 60) % 60, s % 60)));
         postDelayed(tick, 1000);
     }
 
@@ -435,17 +466,17 @@ public final class MarketScreen extends Screen {
         int left = act.videosLeft(r);
         View b;
         if (left <= 0) {
-            b = Ui.button(c, "Bugünkü video ödülleri bitti", Ui.SECONDARY, Icon.PLAY, v -> act.toast("Yarın yine izleyebilirsin"));
+            b = Ui.button(c, L.t("market.video_done"), Ui.SECONDARY, Icon.PLAY, v -> act.toast(L.t("market.video_tomorrow")));
             b.setAlpha(0.55f);
         } else if (act.videoAvailable(r)) {
-            b = Ui.button(c, "Video izle · +" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal (bugün " + left + ")", Ui.PRIMARY, Icon.PLAY,
+            b = Ui.button(c, L.n("market.video_watch", com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS, left), Ui.PRIMARY, Icon.PLAY,
                     v -> act.watchVideo(r, () -> {
-                        act.toast("+" + com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS + " kristal kazandın");
+                        act.toast(L.n("market.video_reward", com.isikyolu.engine.AdPolicy.VIDEO_CRYSTALS));
                         bar.refresh();
                         fillVideoSlot();
                     }));
         } else {
-            b = Ui.button(c, "Video hazırlanıyor…", Ui.SECONDARY, Icon.PLAY, v -> act.toast("Video yükleniyor. İnternet bağlantısı gerekir."));
+            b = Ui.button(c, L.t("market.video_loading"), Ui.SECONDARY, Icon.PLAY, v -> act.toast(L.t("market.video_loading_toast")));
             b.setAlpha(0.55f);
         }
         videoSlot.addView(b, new FrameLayout.LayoutParams(-1, -2));

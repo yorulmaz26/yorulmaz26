@@ -64,8 +64,6 @@
   },
   "game.hint_video": "Video izle · +1 ipucu (bugün {0})",
   "game.hint_buy": "1 ipucu al · {0}",
-  "game.hint_limit": "Bugünlük sınır doldu",
-  "game.hint_no_crystals": "Yetersiz kristal",
   "game.hint_thinking": "Işık yolu hesaplanıyor…",
   "game.hint_not_found": "İpucu bulunamadı. Sıfırlayıp tekrar dene.",
   "game.hint_not_enough": {
@@ -80,9 +78,6 @@
     "one": "Önce {0} kez daha Geri Al'a dokun, sonra sıradaki hamle gösterilecek",
     "other": "Önce {0} kez daha Geri Al'a dokun, sonra sıradaki hamle gösterilecek"
   },
-  "game.reward_daily": "Günlük bulmaca",
-  "game.reward_first": "İlk tamamlama",
-  "game.reward_perfect_chapter": "Grup 30/30 yıldız",
   "game.complete_1": "Tamamlandı!",
   "game.complete_2": "Harika!",
   "game.complete_3": "Kusursuz!",

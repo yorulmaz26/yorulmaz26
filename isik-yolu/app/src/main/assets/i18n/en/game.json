@@ -64,8 +64,6 @@
   },
   "game.hint_video": "Watch video · +1 hint ({0} left today)",
   "game.hint_buy": "Buy 1 hint · {0}",
-  "game.hint_limit": "Daily limit reached",
-  "game.hint_no_crystals": "Not enough crystals",
   "game.hint_thinking": "Tracing the light path…",
   "game.hint_not_found": "No hint found. Reset and try again.",
   "game.hint_not_enough": {
@@ -80,9 +78,6 @@
     "one": "Tap Undo {0} more time, then you'll see the next move",
     "other": "Tap Undo {0} more times, then you'll see the next move"
   },
-  "game.reward_daily": "Daily puzzle",
-  "game.reward_first": "First clear",
-  "game.reward_perfect_chapter": "Chapter 30/30 stars",
   "game.complete_1": "Complete!",
   "game.complete_2": "Great!",
   "game.complete_3": "Perfect!",
