@@ -228,7 +228,7 @@ jobs:
           command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null)
           mkdir -p paket/klipler paket/goruntuler
           for d in medya/raw/v_*; do
-            [ -d "$d" ] || continue
+            [ -f "$d/00000.jpg" ] || { echo "kare yok: $d"; continue; }
             ffmpeg -loglevel error -y -framerate 60 -i "$d/%05d.jpg" -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p "paket/klipler/$(basename "$d").mp4"
           done
           for d in medya/raw/ss_* medya/raw/tab*; do

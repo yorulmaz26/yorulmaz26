@@ -414,6 +414,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
             running = false;
             Choreographer.getInstance().removeFrameCallback(this);
         } else {
+            capturing = false;
             onResume();
         }
     }
@@ -556,6 +557,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
     // ---------------- Yaşam döngüsü ----------------
     public void onResume() {
         progress.energy.tick(clock);
+        if (capturing) return;   // debug çekimi sürerken döngü yeniden başlamaz (aynı dünya iki iş parçacığında güncellenmesin)
         ads.onResume();
         running = true;
         lastNanos = 0;
