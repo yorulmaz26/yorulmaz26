@@ -1,0 +1,40 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:R;font-weight:900;src:url(../fonts/Roboto-900.ttf)}
+@font-face{font-family:R;font-weight:700;src:url(../fonts/Roboto-700.ttf)}
+@font-face{font-family:R;font-weight:500;src:url(../fonts/Roboto-500.ttf)}
+html,body{margin:0;width:1024px;height:500px;overflow:hidden;font-family:R;background:#0A101C}
+.bg{position:absolute;inset:-30px;background-size:cover;background-position:center 38%;filter:blur(3px) saturate(1.15) brightness(.55)}
+.shade{position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,13,24,.97) 0%,rgba(8,13,24,.86) 46%,rgba(8,13,24,.15) 78%,rgba(8,13,24,.35) 100%)}
+.logo{position:absolute;z-index:1;left:56px;top:0;bottom:0;display:flex;flex-direction:column;justify-content:center;width:560px}
+.big{font-weight:900;color:#fff;line-height:.95;letter-spacing:.005em;position:relative;white-space:nowrap;text-shadow:0 0 18px rgba(109,93,251,.7)}
+.big .t{color:#20B8A6;text-shadow:0 0 18px rgba(32,184,166,.6)}
+.echo{position:absolute;left:0;top:0;transform:translate(-.05em,.06em);color:transparent!important;-webkit-text-stroke:2px rgba(148,136,255,.5);text-shadow:none;z-index:-1}
+.mid{font-weight:700;color:#20B8A6;letter-spacing:.06em;margin-top:6px;text-shadow:0 0 14px rgba(32,184,166,.5)}
+.small{font-weight:700;color:#9488FF;letter-spacing:.22em;margin-top:14px}
+.tag{margin-top:26px;font-weight:500;color:#D8DEF0;font-size:30px}
+.chars{position:absolute;z-index:1;right:40px;top:40px;width:420px;height:420px}
+</style></head><body>
+<div class="bg" id="bg"></div><div class="shade"></div>
+<svg class="chars" viewBox="0 0 512 512">
+ <defs><filter id="gT" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="22"/></filter>
+ <filter id="gP" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="20"/></filter>
+ <filter id="sf" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+ <linearGradient id="tr" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6D5DFB" stop-opacity="0"/><stop offset=".6" stop-color="#6D5DFB" stop-opacity=".8"/><stop offset="1" stop-color="#9488FF"/></linearGradient></defs>
+ <path d="M20 500 C 110 380, 140 340, 205 318 S 300 250, 318 205" fill="none" stroke="url(#tr)" stroke-width="16" stroke-linecap="round" filter="url(#sf)" opacity=".8"/>
+ <path d="M20 500 C 110 380, 140 340, 205 318 S 300 250, 318 205" fill="none" stroke="url(#tr)" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 18"/>
+ <g transform="translate(196 318) rotate(8)"><rect x="-78" y="-78" width="156" height="156" rx="34" fill="#6D5DFB" filter="url(#gP)" opacity=".85"/>
+  <rect x="-66" y="-66" width="132" height="132" rx="28" fill="#05070D" stroke="#9488FF" stroke-width="9"/>
+  <circle cx="-22" cy="-8" r="11" fill="#B9B1FF"/><circle cx="22" cy="-8" r="11" fill="#B9B1FF"/></g>
+ <g transform="translate(326 198) rotate(-10)"><rect x="-92" y="-92" width="184" height="184" rx="40" fill="#20B8A6" filter="url(#gT)" opacity=".95"/>
+  <rect x="-74" y="-74" width="148" height="148" rx="32" fill="#fff" stroke="#20B8A6" stroke-width="10"/><rect x="-48" y="-52" width="54" height="16" rx="8" fill="#20B8A6" opacity=".25"/></g>
+ <g transform="translate(430 420)"><circle r="34" fill="#D6AD60" opacity=".35" filter="url(#sf)"/><path d="M-26 -7 L-14 -21 L14 -21 L26 -7 L0 25 Z" fill="#D6AD60"/><path d="M-26 -7 L26 -7 L14 -21 L-14 -21 Z" fill="#F3DDA6"/></g>
+</svg>
+<div class="logo" id="logo"></div>
+<script>
+const q=new URLSearchParams(location.search), lang=q.get('lang')||'en';
+document.getElementById('bg').style.backgroundImage=`url("${q.get('img')}")`;
+const tag=q.get('tag')||'';
+document.getElementById('logo').innerHTML = lang==='tr'
+ ? `<div class="big" style="font-size:96px"><span class="echo">GÖLGEN</span>GÖLGEN</div><div class="mid" style="font-size:40px">SENİ YAKALAMASIN</div><div class="small" style="font-size:22px">DOPPELGLOW</div><div class="tag">${tag}</div>`
+ : `<div class="big" style="font-size:88px"><span class="echo">DOPPELGLOW</span>DOPPEL<span class="t">GLOW</span></div><div class="small" style="font-size:21px;letter-spacing:.16em">GÖLGEN SENİ YAKALAMASIN</div><div class="tag">${tag}</div>`;
+</script></body></html>

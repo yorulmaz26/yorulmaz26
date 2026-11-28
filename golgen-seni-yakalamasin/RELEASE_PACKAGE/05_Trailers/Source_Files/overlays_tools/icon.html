@@ -1,0 +1,42 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;padding:0;background:transparent}
+svg{display:block}
+</style></head><body>
+<svg id="s" width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <radialGradient id="bg" cx="58%" cy="40%" r="75%">
+   <stop offset="0" stop-color="#1E2A4F"/><stop offset="0.55" stop-color="#121B33"/><stop offset="1" stop-color="#080D18"/>
+  </radialGradient>
+  <filter id="glowT" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="22"/></filter>
+  <filter id="glowP" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="soft" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6"/></filter>
+  <linearGradient id="trail" x1="0" y1="1" x2="1" y2="0">
+   <stop offset="0" stop-color="#6D5DFB" stop-opacity="0"/><stop offset="0.55" stop-color="#6D5DFB" stop-opacity="0.75"/><stop offset="1" stop-color="#9488FF" stop-opacity="0.95"/>
+  </linearGradient>
+  <pattern id="grid" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="#2C3A5E" stroke-width="2" opacity="0.55"/></pattern>
+ </defs>
+ <rect width="512" height="512" fill="url(#bg)"/>
+ <rect width="512" height="512" fill="url(#grid)" opacity="0.6"/>
+ <!-- hareket izi: gölgenin tekrar ettiği yol -->
+ <path d="M60 470 C 120 360, 150 330, 205 318 S 300 250, 318 205" fill="none" stroke="url(#trail)" stroke-width="16" stroke-linecap="round" filter="url(#soft)" opacity="0.8"/>
+ <path d="M60 470 C 120 360, 150 330, 205 318 S 300 250, 318 205" fill="none" stroke="url(#trail)" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 18"/>
+ <!-- gölge -->
+ <g transform="translate(196 318) rotate(8)">
+  <rect x="-78" y="-78" width="156" height="156" rx="34" fill="#6D5DFB" filter="url(#glowP)" opacity="0.85"/>
+  <rect x="-66" y="-66" width="132" height="132" rx="28" fill="#05070D" stroke="#9488FF" stroke-width="9"/>
+  <circle cx="-22" cy="-8" r="11" fill="#B9B1FF"/><circle cx="22" cy="-8" r="11" fill="#B9B1FF"/>
+  <circle cx="-22" cy="-8" r="20" fill="#9488FF" opacity="0.35" filter="url(#soft)"/><circle cx="22" cy="-8" r="20" fill="#9488FF" opacity="0.35" filter="url(#soft)"/>
+ </g>
+ <!-- oyuncu -->
+ <g transform="translate(326 198) rotate(-10)">
+  <rect x="-92" y="-92" width="184" height="184" rx="40" fill="#20B8A6" filter="url(#glowT)" opacity="0.95"/>
+  <rect x="-74" y="-74" width="148" height="148" rx="32" fill="#FFFFFF" stroke="#20B8A6" stroke-width="10"/>
+  <rect x="-48" y="-52" width="54" height="16" rx="8" fill="#20B8A6" opacity="0.25"/>
+ </g>
+ <!-- altın elmas -->
+ <g transform="translate(418 412)">
+  <circle r="34" fill="#D6AD60" opacity="0.35" filter="url(#soft)"/>
+  <path d="M-26 -7 L-14 -21 L14 -21 L26 -7 L0 25 Z" fill="#D6AD60"/>
+  <path d="M-26 -7 L26 -7 L14 -21 L-14 -21 Z" fill="#F3DDA6"/>
+ </g>
+</svg></body></html>

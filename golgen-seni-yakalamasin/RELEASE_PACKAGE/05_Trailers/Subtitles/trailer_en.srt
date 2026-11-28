@@ -1,0 +1,23 @@
+1
+00:00:00,100 --> 00:00:02,950
+Your shadow is coming!
+
+2
+00:00:03,100 --> 00:00:07,950
+It repeats every move you make
+
+3
+00:00:08,100 --> 00:00:14,950
+Dodge close, grab the stars
+
+4
+00:00:15,100 --> 00:00:21,700
+100 maps, 500 levels
+
+5
+00:00:21,850 --> 00:00:26,700
+Earn crowns and rewards
+
+6
+00:00:26,850 --> 00:00:30,000
+Your toughest rival: past you

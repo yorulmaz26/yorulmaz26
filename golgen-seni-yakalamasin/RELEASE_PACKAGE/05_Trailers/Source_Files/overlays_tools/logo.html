@@ -1,0 +1,41 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face{font-family:R;font-weight:900;src:url(../fonts/Roboto-900.ttf)}
+@font-face{font-family:R;font-weight:700;src:url(../fonts/Roboto-700.ttf)}
+@font-face{font-family:R;font-weight:500;src:url(../fonts/Roboto-500.ttf)}
+html,body{margin:0;width:100%;height:100%}
+body{display:flex;align-items:center;justify-content:center;font-family:R}
+body.dark{background:radial-gradient(ellipse at 50% 45%,#1E2A4F 0%,#121B33 50%,#080D18 100%)}
+body.light{background:#F4F6FB}
+body.transparent{background:transparent}
+.wrap{text-align:center;line-height:1}
+.big{font-weight:900;letter-spacing:.01em;position:relative;display:inline-block}
+.big .echo{position:absolute;left:0;top:0;transform:translate(-.055em,.06em);color:transparent!important;text-shadow:none!important;-webkit-text-stroke:.022em rgba(148,136,255,.55);z-index:-1;white-space:nowrap}
+.light .big .echo,.onLight .big .echo{-webkit-text-stroke:.02em rgba(91,75,224,.35)}
+.row{display:block}
+.mid{font-weight:700;letter-spacing:.06em;margin-top:.12em}
+.small{font-weight:700;letter-spacing:.32em;margin-top:.9em;text-indent:.32em}
+/* koyu zemin (oyun içi görünüm) */
+.dark .w,.transparent.onDark .w{color:#fff;text-shadow:0 0 .18em rgba(109,93,251,.75),0 0 .5em rgba(109,93,251,.45)}
+.dark .t,.transparent.onDark .t{color:#20B8A6;text-shadow:0 0 .25em rgba(32,184,166,.6)}
+.dark .s,.transparent.onDark .s{color:#9488FF;text-shadow:0 0 .3em rgba(109,93,251,.6)}
+/* açık zemin */
+.light .w,.transparent.onLight .w{color:#101827}
+.light .t,.transparent.onLight .t{color:#13897B}
+.light .s,.transparent.onLight .s{color:#5B4BE0}
+</style></head><body><div class="wrap" id="logo"></div>
+<script>
+const q=new URLSearchParams(location.search);
+const v=q.get('v'), theme=q.get('theme')||'dark', on=q.get('on')||'onDark', EN=q.get('name')||'DOPPELGLOW';
+document.body.className=theme+' '+(theme==='transparent'?on:'');
+const W=innerWidth, H=innerHeight, k=Math.min(W/2000,H/1000);
+const split=n=>{const i=Math.ceil(n.length*0.6);return [n.slice(0,6),n.slice(6)]};
+const [a,b]=EN.length>6?[EN.slice(0,6),EN.slice(6)]:[EN,''];
+const enBig=s=>`<div class="row"><div class="big" style="font-size:${s}px"><span class="echo">${EN}</span><span class="w">${a}</span><span class="t">${b}</span></div></div>`;
+const trBig=s=>`<div class="row"><div class="big w" style="font-size:${s}px"><span class="echo">GÖLGEN</span>GÖLGEN</div></div><div class="mid t" style="font-size:${s*0.41}px">SENİ YAKALAMASIN</div>`;
+let html='';
+if(v==='tr') html=trBig(330*k);
+else if(v==='en') html=enBig(250*k);
+else if(v==='bi_tr') html=trBig(300*k)+`<div class="small s" style="font-size:${62*k}px">${EN}</div>`;
+else if(v==='bi_en') html=enBig(240*k)+`<div class="small s" style="font-size:${58*k}px;letter-spacing:.18em;text-indent:.18em">GÖLGEN SENİ YAKALAMASIN</div>`;
+document.getElementById('logo').innerHTML=html;
+</script></body></html>
