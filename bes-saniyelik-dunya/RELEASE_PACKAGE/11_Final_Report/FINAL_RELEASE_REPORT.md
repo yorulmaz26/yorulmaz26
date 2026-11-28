@@ -75,6 +75,7 @@ Türkçe, İngilizce, Almanca, İtalyanca, Fransızca, İspanyolca — **eksik �
 - Bölüm sonu "Sonraki" düğmesinde simge yazının altında kalıyordu → düğme genişletildi.
 - Bölüm içi "can" ile kalıcı can karışıklığı → "kalp" terimi.
 - Ana menü dışındaki ekranlarda can göstergesi, mağazada can kartı eklendi.
+- **Telefonda yazıların aşırı büyümesi (kullanıcı bildirimi, 28 Kasım):** sığdırma etiketi ölçeği libGDX'te mutlak uygulandığı için yoğun ekranlı telefonlarda düğme yazıları 2–3 kat büyüyordu (masaüstünde yoğunluk 1 olduğu için görünmüyordu). Ölçek artık ekran yoğunluğuyla çarpılıyor; yoğunluk 2'de (2560×1440) İngilizce ve Almanca menülerle doğrulandı. Mağaza görüntüleri, sosyal medya görselleri ve videolar düzeltilmiş sürümle yeniden üretildi.
 
 ## 8. Performans
 Masaüstünde 12 bölüm art arda: ort. 16,7 ms/kare, p95 ≤ 20,6 ms; bellek 4 → 8 MB'ta sabit (sızıntı yok); ilk kare 1,2 sn. Paket: APK 58,6 MB, AAB 58,3 MB (çoğu yüksek çözünürlüklü görseller). Grafik kalitesi düşürülmedi. Batarya, ısınma ve düşük donanımlı cihaz ölçümü **MANUEL KONTROL GEREKLİ**. Reklam kitaplığının gereksiz dillerdeki metinleri pakette duruyor (zararsız; dil filtresi uygulanmadı).
