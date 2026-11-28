@@ -9,14 +9,14 @@ JUnit 4. **Emülatör ve fiziksel cihaz yok.**
 
 | | Sayı |
 |---|---|
-| Toplam test | **154** |
-| Geçen | **150** |
+| Toplam test | **155** |
+| Geçen | **151** |
 | Başarısız | **0** |
 | Atlanan | 4 — `PromoCaptureTest` ve `TabletCaptureTest`, yalnızca `-PpromoDir` ile kayıt yapar. Bu çalışmada 6 dilde ayrıca çalıştırıldı. |
 
 | Test sınıfı | Test | Kapsam |
 |---|---|---|
-| **LivesTest** | 21 | Can sistemi (aşağıda ayrıntılı) |
+| **LivesTest** | 22 | Can sistemi (aşağıda ayrıntılı) |
 | **UiFlowTest** | 33 | Arayüz akışları: bütün ekranlar, 500 bölümün arayüzden oynanması, can akışı, reklamlar, market, dil değişimi … |
 | **LocalizedUiTest** | 6 | 6 dilde 13 ekran/pencerede metin taşması |
 | **LanguageDetectionTest** | 7 | Sistem dili, İngilizce yedek, kalıcı seçim, çoğul, sayı biçimi, iki dilli ad |
@@ -46,8 +46,9 @@ JUnit 4. **Emülatör ve fiziksel cihaz yok.**
 | Tarih değişikliği, saat dilimi | `timeZoneChangeHasNoEffect` (UTC/monoton saat; 1 gün ileri almak can vermez) | geçti |
 | Negatif / maksimum üstü | `livesNeverNegativeOrAboveMax` (kayıtta −5 → 0, 50 → 4) | geçti |
 | Reklam/market ödülü sonrası | `winningOrRewardKeepsTimerProgress` (yarım sayaç korunur, ödül maksimumu aşmaz); UiFlowTest `rewardedVideoGivesLife` | geçti |
-| Kayıt dosyası değiştirme | `editedSaveIsDetectedButProgressKept` (canlar 0'dan dolar; yıldız, kristal ve ürünler korunur; imzayı silmek de algılanır) | geçti |
+| Kayıt dosyası değiştirme | `editedSaveIsDetectedButProgressKept` (canlar 0'dan dolar, oyun parası başlangıç değerine döner; bölüm ilerlemesi, yıldızlar ve görünümler korunur; imzayı silmek de algılanır) | geçti |
 | Güncelleme (eski kayıt) | `oldUnsignedSaveMigratesWithoutPenalty` (1.7.1 kaydı cezasız yüklenir, sonraki kayıt imzalı) | geçti |
+| Eski sürüme geri dönüş | `newSaveReadableByOldParser` (kayıt düz JSON; imza ayrı anahtarda) | geçti |
 | Kayıt/yükleme | `stateSurvivesSaveAndLoad` | geçti |
 
 **Sınır:** Tamamen çevrimdışı bir oyunda saat hilesine karşı kusursuz koruma yoktur.
@@ -84,6 +85,7 @@ JUnit 4. **Emülatör ve fiziksel cihaz yok.**
 - **Dil değişimi** (`languageSwitch`):
   - Ayarlar'dan İngilizceye geçilir, ekran yeniden başlatılmadan İngilizce olur.
   - Türkçeye geri dönülür.
+  - "Telefonun dili" (otomatik) seçilince oyuncu seçimi kalkar.
   - Yıldızlar, kristal, Prizma Taşı, can ve ipucu değişmez.
 - **Dil algılama:**
   - Almanca telefon → Almanca.
@@ -125,8 +127,8 @@ Masaüstü JVM'de ölçüldü. Telefon değerleri farklıdır; yalnızca göster
 
 | Ölçüm | Değer |
 |---|---|
-| Release APK | **2,84 MB** (1.7.1: 4,41 MB → −%36) |
-| Release AAB | bkz. `01_Game_Build` |
+| Release APK | **2,86 MB** (1.7.1: 4,41 MB → −%35) |
+| Release AAB | 5,18 MB |
 | `levels.json` (500 bölüm) ayrıştırma | 12,4 ms; açılışta arka plan iş parçacığında |
 | Hamle başına ışın izleme (bölüm 457, 8×11) | 1,7 µs |
 | Bölümler yüklüyken yığın | ~4,3 MB |

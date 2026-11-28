@@ -13,7 +13,7 @@ Prizmalarla renkleri ayır
 
 4
 00:00:08,533 --> 00:00:11,300
-Her bölüm yeni bir bulmaca
+Her bölüm farklı bir bulmaca
 
 5
 00:00:11,333 --> 00:00:14,133
@@ -34,4 +34,9 @@ Kendi tarzın
 9
 00:00:21,333 --> 00:00:26,900
 3 yıldızı topla
+
+10
+00:00:26,933 --> 00:00:29,967
+Işık Yolu · Prismway
+Işığı yönlendir, yolu bul.
 

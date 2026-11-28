@@ -20,7 +20,7 @@ sesleridir (ticari kullanım engeli yok). Yazı tipi Roboto (Apache 2.0).
 |---|---|---|---|
 | 0–3 sn | Dikkat çekme | Mantık bölümü 169: son hamlede beş hedef birden yanar | Işığı yönlendir! / Guide the light! |
 | 3–8 sn | Oynanış | Bölüm 12, aynalar döndürülür (dokunuşlar halkayla gösterilir) + prizma bölümü 52 | Aynaları döndür · Bütün hedefleri yak / Rotate the mirrors · Light up every target; Prizmalarla renkleri ayır / Split colors with prisms |
-| 8–14 sn | Deneyim | Karma bölüm 95 (prizma, süzgeç, taş), taş itme bölümü 74 | Her bölüm yeni bir bulmaca / Every level, a new puzzle; Taşları kaydır / Slide the stones |
+| 8–14 sn | Deneyim | Karma bölüm 95 (prizma, süzgeç, blok), blok itme bölümü 74 | Her bölüm farklı bir bulmaca / Every level, a different puzzle; Taşları kaydır / Slide the blocks |
 | 14–21 sn | Çeşitlilik | Dünyalar ve bölüm seçimi, anahtar/kapı bölümü 86, görünümler | 5 dünya · 500 bölüm; Anahtarlar ve kapılar; Kendi tarzın / 5 worlds · 500 levels; Keys and doors; Your own style |
 | 21–27 sn | Başarı | Renk bölümü 40 çözülür, "Kusursuz!" penceresi, 3 yıldız | 3 yıldızı topla / Collect all 3 stars |
 | 27–30 sn | Marka | Amblem, iki dilli ad, slogan, Magic Lumos Software | Işığı yönlendir, yolu bul. / Guide the light, find the way. |
@@ -29,15 +29,11 @@ Gerçek oynanış oranı: ~%89 (son ~3,2 sn marka kartı).
 
 ## Düzenlenebilir kaynaklar (`Source_Files/`)
 
-- **`timeline_<dil>.json`:** her bölümün başlangıç/bitiş süresi, başlığı ve geçiş uzunluğu (8 kare). Bir kurgu
+- `timeline_<dil>.json`: her bölümün başlangıç/bitiş süresi, ekrandaki yazısı ve geçiş uzunluğu (8 kare); bir kurgu
   programında aynı kesimi kurmak için.
-- **`clips_<tr|en>/*.mp4`:** fragmanda kullanılan ham oynanış klipleri. 1080×1920, 30 FPS, başlıksız. Her klibin
-  dokunuş, hamle ve kazanma kareleri `*.events.json` dosyasında.
-- **Yeniden üretim:**
-  ```
-  ./gradlew :app:testDebugUnitTest --tests '*PromoCaptureTest*' -PpromoDir=KAYIT/tr -PpromoLang=tr   # (en için en)
-  python3 tools/magaza/release_media.py --rec KAYIT --fonts ROBOTO --sounds app/src/main/res/raw \
-      --texts RELEASE_PACKAGE/06_Store_Descriptions --out RELEASE_PACKAGE --langs tr,en --only video,social
-  ```
-  Ekrandaki yazılar `06_Store_Descriptions/store_texts.<dil>.json` → `trailer_captions` alanındadır. Yazıyı
-  değiştirip betiği yeniden çalıştırmak yeterli.
+- `clips_<tr|en>/*.mp4`: fragmanda kullanılan ham oynanış klipleri (1080×1920, 30 FPS, yazısız); her klibin
+  dokunuş, hamle ve kazanma kareleri `*.events.json` içinde.
+- `kit/`: Roboto yazı tipleri (Apache 2.0), üretim betikleri ve kullanım notu; amblemin vektörü
+  `03_Logos/Vector/emblem.svg`.
+- Ekrandaki yazılar `06_Store_Descriptions/store_texts.<dil>.json` dosyasındaki `trailer_captions` ve üç bölümde
+  `screenshot_captions` (bloklar, anahtar/kapı, görünümler) alanlarından gelir; ayrıntı `kit/README.md` içinde.

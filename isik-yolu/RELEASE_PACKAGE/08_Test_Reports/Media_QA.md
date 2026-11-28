@@ -46,39 +46,39 @@ Komut: `python3 tools/magaza/media_qa.py RELEASE_PACKAGE` · Sonuç: **TÜMÜ UY
 | `03_Logos/Turkish/logo_tr_light.png` | 2048×2048 | RGB | 155 KB | şeffaf sürüm alfalı, diğerleri opak; ≥1000 px | ✓ |
 | `03_Logos/Turkish/logo_tr_transparent.png` | 2048×2048 | RGBA | 257 KB | şeffaf sürüm alfalı, diğerleri opak; ≥1000 px | ✓ |
 | `07_Social_Media/Turkish/instagram_post_1080x1080_tr.png` | 1080×1080 | RGB | 281 KB | 1080×1080 | ✓ |
-| `07_Social_Media/Turkish/instagram_portrait_1080x1350_tr.png` | 1080×1350 | RGB | 225 KB | 1080×1350 | ✓ |
-| `07_Social_Media/Turkish/instagram_story_1080x1920_tr.png` | 1080×1920 | RGB | 429 KB | 1080×1920 | ✓ |
+| `07_Social_Media/Turkish/instagram_portrait_1080x1350_tr.png` | 1080×1350 | RGB | 226 KB | 1080×1350 | ✓ |
+| `07_Social_Media/Turkish/instagram_story_1080x1920_tr.png` | 1080×1920 | RGB | 428 KB | 1080×1920 | ✓ |
 | `07_Social_Media/Turkish/reels_cover_1080x1920_tr.png` | 1080×1920 | RGB | 376 KB | 1080×1920 | ✓ |
 | `07_Social_Media/Turkish/tiktok_cover_1080x1920_tr.png` | 1080×1920 | RGB | 362 KB | 1080×1920 | ✓ |
-| `07_Social_Media/Turkish/youtube_thumbnail_1280x720_tr.png` | 1280×720 | RGB | 201 KB | 1280×720 | ✓ |
+| `07_Social_Media/Turkish/youtube_thumbnail_1280x720_tr.png` | 1280×720 | RGB | 202 KB | 1280×720 | ✓ |
 | `07_Social_Media/Turkish/facebook_1200x630_tr.png` | 1200×630 | RGB | 235 KB | 1200×630 | ✓ |
-| `07_Social_Media/Turkish/launch_poster_1080x1920_tr.png` | 1080×1920 | RGB | 487 KB | 1080×1920 | ✓ |
+| `07_Social_Media/Turkish/launch_poster_1080x1920_tr.png` | 1080×1920 | RGB | 462 KB | 1080×1920 | ✓ |
 | `07_Social_Media/English/instagram_post_1080x1080_en.png` | 1080×1080 | RGB | 281 KB | 1080×1080 | ✓ |
-| `07_Social_Media/English/instagram_portrait_1080x1350_en.png` | 1080×1350 | RGB | 228 KB | 1080×1350 | ✓ |
+| `07_Social_Media/English/instagram_portrait_1080x1350_en.png` | 1080×1350 | RGB | 227 KB | 1080×1350 | ✓ |
 | `07_Social_Media/English/instagram_story_1080x1920_en.png` | 1080×1920 | RGB | 425 KB | 1080×1920 | ✓ |
-| `07_Social_Media/English/reels_cover_1080x1920_en.png` | 1080×1920 | RGB | 371 KB | 1080×1920 | ✓ |
+| `07_Social_Media/English/reels_cover_1080x1920_en.png` | 1080×1920 | RGB | 370 KB | 1080×1920 | ✓ |
 | `07_Social_Media/English/tiktok_cover_1080x1920_en.png` | 1080×1920 | RGB | 361 KB | 1080×1920 | ✓ |
 | `07_Social_Media/English/youtube_thumbnail_1280x720_en.png` | 1280×720 | RGB | 201 KB | 1280×720 | ✓ |
-| `07_Social_Media/English/facebook_1200x630_en.png` | 1200×630 | RGB | 237 KB | 1200×630 | ✓ |
-| `07_Social_Media/English/launch_poster_1080x1920_en.png` | 1080×1920 | RGB | 486 KB | 1080×1920 | ✓ |
+| `07_Social_Media/English/facebook_1200x630_en.png` | 1200×630 | RGB | 236 KB | 1200×630 | ✓ |
+| `07_Social_Media/English/launch_poster_1080x1920_en.png` | 1080×1920 | RGB | 461 KB | 1080×1920 | ✓ |
 | `05_Trailers/Social_Media/youtube_cover_tr_1280x720.png` | 1280×720 | RGB | 202 KB | 1280×720 | ✓ |
 | `05_Trailers/Social_Media/reels_cover_tr_1080x1920.png` | 1080×1920 | RGB | 375 KB | 1080×1920 | ✓ |
-| `05_Trailers/Social_Media/youtube_cover_en_1280x720.png` | 1280×720 | RGB | 202 KB | 1280×720 | ✓ |
-| `05_Trailers/Social_Media/reels_cover_en_1080x1920.png` | 1080×1920 | RGB | 371 KB | 1080×1920 | ✓ |
-| `05_Trailers/Subtitles/trailer_tr.srt` | 9 satır | SRT UTF-8 |  | çakışmasız, ≤30 sn | ✓ |
-| `05_Trailers/Subtitles/trailer_en.srt` | 9 satır | SRT UTF-8 |  | çakışmasız, ≤30 sn | ✓ |
+| `05_Trailers/Social_Media/youtube_cover_en_1280x720.png` | 1280×720 | RGB | 201 KB | 1280×720 | ✓ |
+| `05_Trailers/Social_Media/reels_cover_en_1080x1920.png` | 1080×1920 | RGB | 370 KB | 1080×1920 | ✓ |
+| `05_Trailers/Subtitles/trailer_tr.srt` | 10 satır | SRT UTF-8 |  | çakışmasız, ≤30 sn | ✓ |
+| `05_Trailers/Subtitles/trailer_en.srt` | 10 satır | SRT UTF-8 |  | çakışmasız, ≤30 sn | ✓ |
 
 ## Videolar
 
 | Dosya | Çözünürlük | Süre | Video | FPS | Ses | Boyut | Uygun |
 |---|---|---|---|---|---|---|---|
-| `05_Trailers/Vertical/trailer_tr_vertical.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.1 MB | ✓ |
-| `05_Trailers/Horizontal/trailer_tr_horizontal.mp4` | 1920×1080 | 30.00 sn | h264 High | 30/1 | aac | 3.6 MB | ✓ |
+| `05_Trailers/Vertical/trailer_tr_vertical.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.0 MB | ✓ |
+| `05_Trailers/Horizontal/trailer_tr_horizontal.mp4` | 1920×1080 | 30.00 sn | h264 High | 30/1 | aac | 3.7 MB | ✓ |
 | `05_Trailers/Social_Media/trailer_tr_vertical_social_cta1.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.1 MB | ✓ |
 | `05_Trailers/Social_Media/trailer_tr_vertical_social_cta2.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.1 MB | ✓ |
 | `05_Trailers/Vertical/trailer_en_vertical.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.0 MB | ✓ |
 | `05_Trailers/Horizontal/trailer_en_horizontal.mp4` | 1920×1080 | 30.00 sn | h264 High | 30/1 | aac | 3.7 MB | ✓ |
-| `05_Trailers/Social_Media/trailer_en_vertical_social_cta1.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.0 MB | ✓ |
+| `05_Trailers/Social_Media/trailer_en_vertical_social_cta1.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.1 MB | ✓ |
 | `05_Trailers/Social_Media/trailer_en_vertical_social_cta2.mp4` | 1080×1920 | 30.00 sn | h264 High | 30/1 | aac | 6.1 MB | ✓ |
 
 ## ZIP arşivleri (≤ 30 MB)
@@ -93,8 +93,8 @@ Komut: `python3 tools/magaza/media_qa.py RELEASE_PACKAGE` · Sonuç: **TÜMÜ UY
 | `ZIP/04_PlayStore_Phone_Screenshots_FR.zip` | 3.4 MB | ✓ |
 | `ZIP/04_PlayStore_Phone_Screenshots_IT.zip` | 3.4 MB | ✓ |
 | `ZIP/04_PlayStore_Phone_Screenshots_TR.zip` | 3.4 MB | ✓ |
-| `ZIP/04_PlayStore_Tablet_10_Inch.zip` | 10.4 MB | ✓ |
-| `ZIP/04_PlayStore_Tablet_7_Inch.zip` | 8.1 MB | ✓ |
+| `ZIP/04_PlayStore_Tablet_10_Inch.zip` | 11.2 MB | ✓ |
+| `ZIP/04_PlayStore_Tablet_7_Inch.zip` | 8.5 MB | ✓ |
 | `ZIP/05_Trailers_Covers_Subtitles.zip` | 1.1 MB | ✓ |
 | `ZIP/07_Social_Media_English.zip` | 2.5 MB | ✓ |
 | `ZIP/07_Social_Media_Turkish.zip` | 2.5 MB | ✓ |

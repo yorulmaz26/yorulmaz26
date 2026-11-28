@@ -2,8 +2,8 @@
 
 | Dosya | Boyut | SHA-256 | Durum |
 |---|---|---|---|
-| `APK/Prismway-IsikYolu-1.8.0-test.apk` | 2,86 MB | `93eab5131d41e819c1b145c59c651534ce2e2ab5995aa8ab2b033d11af2ee1cc` | Test APK'sı. R8 ile küçültülmüş release derlemesi, **debug anahtarıyla** imzalı (APK Signature Scheme v2). Telefona doğrudan kurulabilir. |
-| `AAB/Prismway-IsikYolu-1.8.0-debug-signed.aab` | 5,18 MB | `6b4f4aba8a890d9e1f2224a6719da7c3d230da8e554de79189b6b84cb1c8e04d` | Play biçiminde paket, ama **debug anahtarıyla imzalı**. **Play Console'a yüklenmemeli.** |
+| `APK/Prismway-IsikYolu-1.8.0-test.apk` | 2,86 MB (2.861.637 bayt) | `bbac175006684c60a327039b0c2288f3c250ba0916acc4877b7d514977833c07` | Test APK'sı. R8 ile küçültülmüş release derlemesi, **debug anahtarıyla** imzalı (APK Signature Scheme v2). Telefona doğrudan kurulabilir. |
+| `AAB/Prismway-IsikYolu-1.8.0-debug-signed.aab` | 5,18 MB (5.183.437 bayt) | `f61e42283879bdfe92b653709e5ae1c57f4accea5b41449bf45cd0f02da3689f` | Play biçiminde paket, ama **debug anahtarıyla imzalı**. **Play Console'a yüklenmemeli.** |
 
 ## Doğrulananlar
 

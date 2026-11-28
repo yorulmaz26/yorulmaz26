@@ -13,11 +13,11 @@ Split colors with prisms
 
 4
 00:00:08,533 --> 00:00:11,300
-Every level, a new puzzle
+Every level, a different puzzle
 
 5
 00:00:11,333 --> 00:00:14,133
-Slide the stones
+Slide the blocks
 
 6
 00:00:14,167 --> 00:00:17,367
@@ -34,4 +34,9 @@ Your own style
 9
 00:00:21,333 --> 00:00:26,900
 Collect all 3 stars
+
+10
+00:00:26,933 --> 00:00:29,967
+Prismway · Işık Yolu
+Guide the light, find the way.
 

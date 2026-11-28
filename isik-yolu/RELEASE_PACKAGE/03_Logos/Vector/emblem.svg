@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="1024" height="1024">
+  <!-- Prismway / Işık Yolu amblemi: kaynaktan çıkan ışın iki aynadan yansıyıp hedefe ulaşır (oyundaki LogoView ile aynı geometri) -->
+  <defs>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="5"/></filter>
+  </defs>
+  <g filter="url(#glow)" opacity="0.6">
+    <polyline points="24,72 58,72 58,36 84,36" fill="none" stroke="#F5C542" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="88" cy="36" r="17" fill="#20B8A6" opacity="0.8"/>
+  </g>
+  <polyline points="24,72 58,72 58,36 84,36" fill="none" stroke="#F5C542" stroke-opacity="0.35" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="24,72 58,72 58,36 84,36" fill="none" stroke="#F5C542" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="24,72 58,72 58,36 84,36" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="46" y="70" width="24" height="4.5" rx="2" fill="#E3EAF6" transform="rotate(-45 58 72)"/>
+  <rect x="46" y="34" width="24" height="4.5" rx="2" fill="#E3EAF6" transform="rotate(-45 58 36)"/>
+  <rect x="10" y="62" width="24" height="20" rx="5" fill="#6D5DFB"/>
+  <circle cx="22" cy="72" r="4.5" fill="#FFFFFF"/>
+  <circle cx="88" cy="36" r="9" fill="none" stroke="#20B8A6" stroke-width="4"/>
+  <circle cx="88" cy="36" r="4" fill="#BFFFF6"/>
+</svg>

@@ -15,7 +15,7 @@
 | Gereksinim | Resmî kural | Projedeki durum | Sonuç |
 |---|---|---|---|
 | Hedef API | 31 Ağustos 2026'dan beri yeni uygulamalar ve güncellemeler **Android 16 (API 36)** hedeflemeli | `targetSdk 36`, `compileSdk 36`, `minSdk 26` | TEST EDİLDİ |
-| Android App Bundle | Yeni uygulamalar AAB ile yüklenir | `bundleRelease` ile `app-release.aab` üretildi (6,3 MB) | TEST EDİLDİ (imza: bkz. aşağı) |
+| Android App Bundle | Yeni uygulamalar AAB ile yüklenir | `bundleRelease` ile `app-release.aab` üretildi (5,18 MB) | TEST EDİLDİ (imza: bkz. aşağı) |
 | 64 bit | Yerel kod varsa 64 bit sürümü gerekir | APK/AAB'de hiç `.so` yok (yalnızca Java/Kotlin) | UYGULANAMAZ (yerel kod yok) |
 | 16 KB sayfa boyutu | API 35+ hedefleyen uygulamalar 64 bit cihazlarda 16 KB'ı desteklemeli; 1 Şubat 2027'den sonra desteklemeyen güncellemeler yayınlanamaz. Yalnızca Java/Kotlin kullanan uygulama "zaten destekler" | Yerel kod yok. `zipalign -c -P 16 -v 4` → "Verification succesful" | TEST EDİLDİ |
 | İzinler | Gereksiz izin olmamalı | Uygulamanın kendi izinleri: `VIBRATE`, `INTERNET`, `ACCESS_NETWORK_STATE`. Diğerleri AdMob SDK'sının birleşik manifestinden gelir: `AD_ID`, `ACCESS_ADSERVICES_*`, `WAKE_LOCK`, `FOREGROUND_SERVICE`. Konum, kamera, depolama, kişiler gibi izin **yok** | TAMAMLANDI |
@@ -32,7 +32,7 @@
 | Paket adı / applicationId | Değişmemeli | `com.isikyolu.game` (aynı) | TAMAMLANDI |
 | İmza | Play App Signing; yükleme anahtarı geliştiricide | Gradle `uploadStoreFile` … ile kendi anahtarını kullanır. Verilmezse debug anahtarı (yalnızca test). Teslimdeki AAB **debug imzalı** | ERİŞİM GEREKLİ (yükleme anahtarı) |
 | Uygulama adı | ≤ 30 karakter, emoji/büyük harf/"en iyi" yok | Mağaza başlıkları 20 karakter; `store_texts.py` denetimi geçti | TEST EDİLDİ |
-| Kısa/uzun açıklama | 80 / 4000 karakter | En uzun: kısa 78 (fr), uzun 1669 (fr) | TEST EDİLDİ |
+| Kısa/uzun açıklama | 80 / 4000 karakter | En uzun: kısa 80/80 (fr), uzun 1.709 (fr) | TEST EDİLDİ |
 | Simge | 512×512, 32 bit PNG (alfa), ≤ 1024 KB | `app_icon_512.png` | bkz. `Media_QA.md` |
 | Öne çıkan görsel | 1024×500, JPEG ya da 24 bit PNG (alfa yok) | `feature_graphic_tr/en.png` | bkz. `Media_QA.md` |
 | Telefon ekran görüntüleri | 2–8 adet; kenarlar 320–3840 px; uzun kenar ≤ 2,3 × kısa kenar. Oyunlarda öne çıkmak için en az 3 adet 9:16 (≥1080×1920), gerçek oyun deneyimi | Her dilde 8 adet 1080×1920; ilk üçü oynanış | bkz. `Media_QA.md` |
