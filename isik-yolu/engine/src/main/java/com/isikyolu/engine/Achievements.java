@@ -8,6 +8,7 @@ import java.util.List;
 public final class Achievements {
 
     public static final class Def {
+        /** title/description Türkçe kaynak metindir; arayüz {@code ach.<id>.title} ve {@code ach.<id>.desc} anahtarlarını gösterir. */
         public final String id, title, description;
         final int kind, goal;
 

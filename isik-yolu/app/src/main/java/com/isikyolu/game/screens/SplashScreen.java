@@ -10,6 +10,8 @@ import android.widget.TextView;
 import com.isikyolu.game.Game;
 import com.isikyolu.game.GameLoader;
 import com.isikyolu.game.MainActivity;
+import com.isikyolu.game.i18n.Brand;
+import com.isikyolu.game.i18n.L;
 import com.isikyolu.game.ui.LogoView;
 import com.isikyolu.game.ui.Palette;
 import com.isikyolu.game.ui.Ui;
@@ -25,15 +27,15 @@ public final class SplashScreen extends Screen {
         col.setGravity(Gravity.CENTER);
         LogoView logo = new LogoView(a);
         col.addView(logo, new LinearLayout.LayoutParams(Ui.dp(a, 170), Ui.dp(a, 170)));
-        TextView title = Ui.text(a, "Işık Yolu", 44, Palette.WHITE, Ui.BOLD);
+        TextView title = Ui.text(a, Brand.NAME_TR, 44, Palette.WHITE, Ui.BOLD);
         title.setLetterSpacing(0.04f);
         Ui.gradientText(title, 0xFFFFE08A, 0xFFFFFFFF, 0xFF7DF0E0);
         title.setShadowLayer(Ui.dp(a, 16), 0, 0, 0x6620B8A6);
         col.addView(title);
-        TextView sub = Ui.text(a, "Işığı yönlendir, yolu bul", 16, Palette.TURQUOISE, Ui.MEDIUM);
+        TextView sub = Ui.text(a, L.t("menu.tagline"), 16, Palette.TURQUOISE, Ui.MEDIUM);
         col.addView(sub);
         col.addView(Ui.space(a, 40));
-        status = Ui.text(a, "Yükleniyor…", 14, Palette.TEXT_DIM, Ui.REGULAR);
+        status = Ui.text(a, L.t("splash.loading"), 14, Palette.TEXT_DIM, Ui.REGULAR);
         col.addView(status);
         addView(col, new LayoutParams(-1, -1));
         title.setAlpha(0f); title.setTranslationY(Ui.dp(a, 12));
@@ -44,7 +46,7 @@ public final class SplashScreen extends Screen {
 
     @Override public void onShow() {
         GameLoader.load(act, ok -> {
-            if (!ok) { status.setText("Bölümler yüklenemedi. Uygulamayı yeniden başlatın."); return; }
+            if (!ok) { status.setText(L.t("splash.load_failed")); return; }
             long wait = Math.max(0, 1500 - (SystemClock.uptimeMillis() - start));
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 if (Game.levels() != null) act.goMenu();

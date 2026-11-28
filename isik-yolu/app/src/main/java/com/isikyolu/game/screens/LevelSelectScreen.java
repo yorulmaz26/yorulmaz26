@@ -14,6 +14,8 @@ import com.isikyolu.engine.Progress;
 import com.isikyolu.game.Audio;
 import com.isikyolu.game.Game;
 import com.isikyolu.game.MainActivity;
+import com.isikyolu.game.i18n.L;
+import com.isikyolu.game.i18n.WorldText;
 import com.isikyolu.game.ui.Icon;
 import com.isikyolu.game.ui.MiniStars;
 import com.isikyolu.game.ui.Palette;
@@ -43,7 +45,7 @@ public final class LevelSelectScreen extends Screen {
         LinearLayout.LayoutParams pl = new LinearLayout.LayoutParams(-2, -2);
         pl.leftMargin = Ui.dp(a, 6);
         right.addView(pill, pl);
-        root.addView(Ui.header(a, "Bölümler", v -> a.goMenu(), right));
+        root.addView(Ui.header(a, L.t("common.levels"), v -> a.goMenu(), right));
 
         android.widget.HorizontalScrollView hs = new android.widget.HorizontalScrollView(a);
         hs.setHorizontalScrollBarEnabled(false);
@@ -83,9 +85,9 @@ public final class LevelSelectScreen extends Screen {
             bg.setCornerRadius(Ui.dp(c, 16));
             if (!sel) bg.setStroke(Ui.dp(c, 1), 0x33A9C1FF);
             t.setBackground(bg);
-            TextView n = Ui.text(c, Chapters.WORLD_NAMES[w - 1], 14, sel ? Palette.WHITE : (open ? Palette.WHITE : Palette.TEXT_FAINT), Ui.BOLD);
+            TextView n = Ui.text(c, WorldText.worldName(w), 14, sel ? Palette.WHITE : (open ? Palette.WHITE : Palette.TEXT_FAINT), Ui.BOLD);
             t.addView(n);
-            TextView sub = Ui.text(c, open ? p.completedInWorld(w) + "/100" : "Kilitli", 11, sel ? 0xDDFFFFFF : Palette.TEXT_DIM, Ui.MEDIUM);
+            TextView sub = Ui.text(c, open ? p.completedInWorld(w) + "/100" : L.t("levels.locked"), 11, sel ? 0xDDFFFFFF : Palette.TEXT_DIM, Ui.MEDIUM);
             t.addView(sub);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(-2, -2);
             lp.rightMargin = Ui.dp(c, 8);
@@ -101,7 +103,7 @@ public final class LevelSelectScreen extends Screen {
         Context c = getContext();
         list.removeAllViews();
         currentChapterView = null;
-        TextView intro = Ui.text(c, Chapters.WORLD_INTROS[w - 1], 14, Palette.TEXT_DIM, Ui.REGULAR);
+        TextView intro = Ui.text(c, WorldText.worldIntro(w), 14, Palette.TEXT_DIM, Ui.REGULAR);
         intro.setGravity(Gravity.CENTER);
         list.addView(intro, Ui.lpMargins(c, -1, -2, 8, 4, 8, 6));
         int next = p.nextLevel();
@@ -135,8 +137,8 @@ public final class LevelSelectScreen extends Screen {
         head.addView(num, new LinearLayout.LayoutParams(Ui.dp(c, 36), Ui.dp(c, 36)));
         LinearLayout tc = Ui.vertical(c);
         tc.setPadding(Ui.dp(c, 12), 0, 0, 0);
-        tc.addView(Ui.text(c, Chapters.NAMES[ch - 1], 17, open ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
-        tc.addView(Ui.text(c, first + "–" + (first + 9) + " · " + Chapters.topic(ch), 13, Palette.TEXT_DIM, Ui.REGULAR));
+        tc.addView(Ui.text(c, WorldText.chapterName(ch), 17, open ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
+        tc.addView(Ui.text(c, L.t("levels.chapter_sub", first, first + 9, WorldText.topic(ch)), 13, Palette.TEXT_DIM, Ui.REGULAR));
         head.addView(tc, new LinearLayout.LayoutParams(0, -2, 1f));
         head.addView(Ui.icon(c, open ? Icon.STAR : Icon.LOCK, open ? Palette.GOLD : Palette.TEXT_FAINT, 16));
         head.addView(Ui.text(c, " " + stars + "/30", 13, open ? Palette.GOLD : Palette.TEXT_FAINT, Ui.MEDIUM));
@@ -191,10 +193,10 @@ public final class LevelSelectScreen extends Screen {
                 v.animate().translationX(Ui.dp(c, 4)).setDuration(50).withEndAction(() ->
                         v.animate().translationX(-Ui.dp(c, 4)).setDuration(50).withEndAction(() ->
                                 v.animate().translationX(0).setDuration(50).start()).start()).start();
-                a.toast("Önce " + (id - 1) + ". bölümü tamamla");
+                a.toast(L.t("levels.complete_first", id - 1));
             });
         }
-        f.setContentDescription("Bölüm " + id + (open ? ", " + stars + " yıldız" : ", kilitli"));
+        f.setContentDescription(open ? L.n("levels.tile_desc", stars, id) : L.t("levels.tile_locked_desc", id));
         return f;
     }
 

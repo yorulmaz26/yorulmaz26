@@ -12,6 +12,8 @@ import com.isikyolu.engine.Achievements;
 import com.isikyolu.engine.Progress;
 import com.isikyolu.game.Game;
 import com.isikyolu.game.MainActivity;
+import com.isikyolu.game.i18n.L;
+import com.isikyolu.game.i18n.WorldText;
 import com.isikyolu.game.ui.Icon;
 import com.isikyolu.game.ui.Palette;
 import com.isikyolu.game.ui.Ui;
@@ -26,7 +28,7 @@ public final class AchievementsScreen extends Screen {
         a.checkAchievements(); // yeni başarılar ödülleriyle birlikte verilir
         LinearLayout root = Ui.vertical(c);
         TextView count = Ui.text(c, p.achievements.size() + "/" + Achievements.ALL.size(), 15, Palette.GOLD, Ui.BOLD);
-        root.addView(Ui.header(c, "Başarılar", v -> a.goMenu(), count));
+        root.addView(Ui.header(c, L.t("achievements.title"), v -> a.goMenu(), count));
         ScrollView sv = new ScrollView(c);
         LinearLayout list = Ui.vertical(c);
         int pad = Ui.dp(c, 16);
@@ -51,8 +53,8 @@ public final class AchievementsScreen extends Screen {
         row.addView(ic, new LinearLayout.LayoutParams(Ui.dp(c, 48), Ui.dp(c, 48)));
         LinearLayout col = Ui.vertical(c);
         col.setPadding(Ui.dp(c, 14), 0, 0, 0);
-        col.addView(Ui.text(c, d.title, 16, got ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
-        col.addView(Ui.text(c, d.description, 13, Palette.TEXT_DIM, Ui.REGULAR));
+        col.addView(Ui.text(c, WorldText.achievementTitle(d), 16, got ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
+        col.addView(Ui.text(c, WorldText.achievementDesc(d), 13, Palette.TEXT_DIM, Ui.REGULAR));
         int cur = Math.min(d.current(p), d.target()), tgt = d.target();
         FrameLayout bar = new FrameLayout(c);
         bar.setBackground(Ui.round(0xFF45567D, Ui.dp(c, 4)));

@@ -11,6 +11,8 @@ public final class Chapters {
     public static final int MECHANIC_COUNT = 10;
     public static final int WORLDS = 5;
 
+    // Aşağıdaki Türkçe metinler araçlar ve testler içindir. Arayüz bunları göstermez; çeviri anahtarlarını kullanır:
+    // world.<1-5>.name|level|intro, chapter.<1-50>.name, topic.<1-10>, mechanic.<1-10> (dizi sırasıyla, 1'den başlar).
     public static final String[] WORLD_NAMES = {"Işık Bahçesi", "Kristal Mağaralar", "Gece Bahçesi", "Yıldız Atölyesi", "Işık Tapınağı"};
     public static final String[] WORLD_LEVELS = {"Başlangıç", "Zor", "Uzman", "Usta", "Efsane"};
     public static final String[] WORLD_INTROS = {
@@ -64,7 +66,7 @@ public final class Chapters {
     /** Grubun mekanik konusu (1–10). */
     public static int mechanicOf(int chapter) { return (chapter - 1) % 10 + 1; }
 
-    /** Grup konusu, dünya zorluğuyla birlikte. */
+    /** Grup konusu, dünya zorluğuyla birlikte (Türkçe; araçlar için). */
     public static String topic(int chapter) {
         int w = worldOfChapter(chapter);
         String t = TOPICS[mechanicOf(chapter) - 1];
