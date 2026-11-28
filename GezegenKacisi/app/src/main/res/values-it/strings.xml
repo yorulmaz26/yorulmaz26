@@ -1,0 +1,216 @@
+<resources>
+    <!-- Italiano (Italian) -->
+    <string name="app_name">Planet Gap</string>
+    <!-- Codice lingua di questo file (mostra la lingua attiva nelle Impostazioni) -->
+    <string name="lang_code" translatable="false">it</string>
+    <!-- Nome del gioco: nome principale su due righe grandi, l’altro nome (turco) piccolo sotto -->
+    <string name="title_line1">PLANET</string>
+    <string name="title_line2">GAP</string>
+    <string name="title_secondary">GEZEGEN KAÇIŞI</string>
+    <string name="tap_to_start">Tocca per iniziare</string>
+    <string name="hint">Fai passare il razzo nei varchi tra i pianeti</string>
+    <string name="best_format">RECORD: %1$d</string>
+    <string name="game_over">FINE MISSIONE</string>
+    <string name="score_label">PUNTI</string>
+    <string name="best_label">RECORD</string>
+    <string name="new_record">NUOVO RECORD!</string>
+    <string name="paused">IN PAUSA</string>
+    <string name="tap_to_continue">Tocca per continuare</string>
+
+    <!-- Menu -->
+    <string name="label_map">MAPPA</string>
+    <string name="label_level">DIFFICOLTÀ</string>
+    <string name="start">INIZIA</string>
+    <string name="retry">RIPROVA</string>
+    <string name="menu">MENU</string>
+
+    <!-- Difficoltà -->
+    <string name="diff_easy">FACILE</string>
+    <string name="diff_normal">NORMALE</string>
+    <string name="diff_hard">DIFFICILE</string>
+
+    <!-- Mappe -->
+    <string name="map_earth">Orbita Terrestre</string>
+    <string name="map_earth_desc">Rotta classica · pianeti blu</string>
+    <string name="map_earth_tip">Vola nel varco tra i pianeti</string>
+    <string name="map_ice">Fascia di Ghiaccio</string>
+    <string name="map_ice_desc">Gravità bassissima · cristalli di ghiaccio</string>
+    <string name="map_ice_tip">Il razzo plana: tocca con delicatezza!</string>
+    <string name="map_lava">Mare di Lava</string>
+    <string name="map_lava_desc">Palle di fuoco che schizzano · ritmo veloce</string>
+    <string name="map_lava_tip">Dove il suolo brilla sbucano palle di fuoco. Schivale!</string>
+    <string name="map_gas">Giganti Gassosi</string>
+    <string name="map_gas_desc">Venti variabili · pianeti giganti con anelli</string>
+    <string name="map_gas_tip">Il vento ti spinge dove punta la freccia</string>
+    <string name="map_asteroid">Fascia degli Asteroidi</string>
+    <string name="map_asteroid_desc">Asteroidi che ruotano e oscillano</string>
+    <string name="map_asteroid_tip">Le torri salgono e scendono. Scegli il momento giusto!</string>
+    <string name="wind">VENTO</string>
+
+    <!-- Multigiocatore -->
+    <string name="two_players">2-4 GIOCATORI</string>
+    <string name="mp_info1">Collega tutti i telefoni alla stessa rete Wi-Fi</string>
+    <string name="mp_info2">oppure attiva l’hotspot su uno dei telefoni</string>
+    <string name="mp_host">CREA STANZA</string>
+    <string name="mp_join">ENTRA IN STANZA</string>
+    <string name="back">INDIETRO</string>
+    <string name="mp_leave">ESCI</string>
+    <string name="mp_room_open">Stanza creata</string>
+    <string name="mp_waiting">In attesa dei giocatori</string>
+    <string name="mp_searching">Cerco una stanza</string>
+    <string name="mp_join_hint">Sugli altri telefoni: 2-4&#160;GIOCATORI › ENTRA&#160;IN&#160;STANZA</string>
+    <string name="mp_start">AVVIA</string>
+    <string name="mp_wait_host">L’host avvierà la partita</string>
+    <string name="mp_you">TU</string>
+    <string name="mp_you_crashed">SCHIANTO!</string>
+    <string name="mp_watching">Stai guardando il tuo rivale</string>
+    <string name="mp_win">HAI VINTO!</string>
+    <string name="mp_lose">HAI PERSO</string>
+    <string name="mp_draw">PAREGGIO</string>
+    <string name="mp_disconnected">DISCONNESSO</string>
+    <string name="mp_retry_wait">In attesa che l’host avvii la rivincita</string>
+    <string name="mp_failed">Impossibile connettersi alla rete. Il Wi-Fi è attivo?</string>
+    <string name="mp_pick">Scegli mappa e difficoltà, poi crea la stanza</string>
+    <string name="mp_help_title">COME GIOCARE INSIEME</string>
+    <string name="mp_help_1">Installa il gioco su ogni telefono.</string>
+    <string name="mp_help_2">Collega i telefoni alla stessa rete Wi-Fi. Niente Wi-Fi? Attiva l’hotspot su un telefono e collega gli altri a quello. Non serve internet.</string>
+    <string name="mp_help_3">Telefono 1: 2-4&#160;GIOCATORI&#160;›&#160;CREA&#160;STANZA</string>
+    <string name="mp_help_4">Altri telefoni (fino a 3): 2-4&#160;GIOCATORI&#160;›&#160;ENTRA&#160;IN&#160;STANZA. I telefoni si trovano tra loro in automatico.</string>
+    <string name="mp_help_5">Chiunque può cambiare mappa e difficoltà. Quando ci sono tutti, l’host tocca AVVIA.</string>
+    <string name="mp_help_6">Scegli la visuale: con SCHERMO&#160;DIVISO le partite di tutti appaiono affiancate. Con SCHERMO&#160;INTERO la tua partita è in grande e i punteggi degli altri compaiono nell’angolo in alto a destra.</string>
+    <string name="mp_help_7">Chi si schianta continua a guardare gli altri (a schermo intero, tocca per cambiare giocatore). Vince il punteggio più alto.</string>
+    <string name="mp_help_tip">I telefoni non si trovano? Controlla che siano sulla stessa rete. Le reti per ospiti e quelle scolastiche possono impedire ai dispositivi di vedersi: in quel caso usa un hotspot.</string>
+    <string name="mp_help_close">Tocca per chiudere</string>
+    <string name="mp_view_label">VISUALE</string>
+    <string name="mp_view_split">SCHERMO DIVISO</string>
+    <string name="mp_view_full">SCHERMO INTERO</string>
+    <string name="mp_playing">in gioco</string>
+    <string name="mp_crashed_short">SCHIANTATO</string>
+    <string name="mp_player_format">GIOCATORE %1$d</string>
+    <string name="mp_left">USCITO</string>
+    <string name="mp_place_format">%1$d° POSTO</string>
+    <string name="mp_watch_format">STAI GUARDANDO %1$s</string>
+    <string name="mp_tap_switch">Tocca per guardare un altro giocatore</string>
+    <string name="mp_nobody_left">Nella stanza non è rimasto nessun altro</string>
+    <string name="mp_players_count">%1$d/%2$d</string>
+    <string name="mp_watching_many">Stai guardando gli altri</string>
+    <!-- Posizione nella classifica finale del multigiocatore -->
+    <string name="mp_rank">%1$d°</string>
+
+    <!-- Altre mappe -->
+    <string name="map_blackhole">Buco Nero</string>
+    <string name="map_blackhole_desc">La gravità attira il razzo verso il centro</string>
+    <string name="map_blackhole_tip">Il buco nero ti attira al centro dello schermo</string>
+    <string name="map_storm">Tempesta Elettrica</string>
+    <string name="map_storm_desc">Fulmini che cadono dall’alto</string>
+    <string name="map_storm_tip">Resta sotto la punta della linea tratteggiata!</string>
+    <string name="map_meteor">Pioggia di Meteore</string>
+    <string name="map_meteor_desc">Meteore che cadono dal cielo</string>
+    <string name="map_meteor_tip">Segno rosso in alto: arriva una meteora!</string>
+    <string name="map_toxic">Nebulosa Tossica</string>
+    <string name="map_toxic_desc">Vento e torri oscillanti</string>
+    <string name="map_toxic_tip">Tieni d’occhio vento e torri allo stesso tempo</string>
+    <string name="map_core">Nucleo Galattico</string>
+    <string name="map_core_desc">Finale: torri oscillanti e fuoco insieme</string>
+    <string name="map_core_tip">Tutto in una volta. Vola con attenzione!</string>
+
+    <!-- Schermata principale -->
+    <string name="hub_levels">LIVELLI</string>
+    <string name="hub_endless">MODALITÀ INFINITA</string>
+    <string name="hub_market">NEGOZIO</string>
+    <string name="hub_hint">Raccogli monete in volo e compra navicelle nel negozio</string>
+
+    <!-- Livelli -->
+    <string name="level_progress">LIVELLO %1$d / %2$d</string>
+    <string name="level_title">LIVELLO %1$d</string>
+    <string name="level_round">Round %1$d</string>
+    <string name="level_target">OBIETTIVO: %1$d PUNTI</string>
+    <string name="level_practice">Livello di allenamento: nessuna regola speciale</string>
+    <string name="level_final">GRAN FINALE</string>
+    <string name="level_reward">Premio: +%1$d monete</string>
+    <string name="level_replay">Già superato: +3 monete</string>
+    <string name="level_failed">LIVELLO FALLITO</string>
+    <string name="level_done">LIVELLO SUPERATO!</string>
+    <string name="level_all_done">COMPLIMENTI!</string>
+    <string name="level_all_done_desc">Hai completato tutti i 500 livelli!</string>
+    <string name="level_locked">Supera prima i livelli precedenti</string>
+    <string name="next">AVANTI</string>
+    <string name="target_label">OBIETTIVO</string>
+    <string name="reward_label">PREMIO</string>
+    <string name="coins_collected">Monete raccolte: %1$d</string>
+
+    <!-- Modificatori dei livelli -->
+    <string name="mod_fast">⚡ Ritmo veloce</string>
+    <string name="mod_narrow">↕ Varchi stretti</string>
+    <string name="mod_dense">▮▮ Torri fitte</string>
+    <string name="mod_heavy">⬇ Gravità alta</string>
+    <string name="mod_light">⬆ Gravità bassa</string>
+    <string name="mod_gold">● Corsa all’oro: 2 monete per varco</string>
+    <string name="mod_wind">≋ Vento variabile</string>
+    <string name="mod_fire">▲ Palle di fuoco dal basso</string>
+    <string name="mod_meteor">▼ Pioggia di meteore</string>
+    <string name="mod_sway">⇅ Torri oscillanti</string>
+    <string name="mod_pull">◎ Attrazione del buco nero</string>
+    <string name="mod_lightning">ϟ Fulmini</string>
+
+    <!-- Negozio -->
+    <string name="market_selected">IN USO</string>
+    <string name="market_select">SCEGLI</string>
+    <string name="market_no_money">Monete insufficienti! Te ne servono altre %1$d</string>
+    <string name="market_bought">Acquisto completato: ora è in uso!</string>
+    <string name="skin_classic">Razzo Classico</string>
+    <string name="skin_night">Razzo Notturno</string>
+    <string name="skin_emerald">Razzo Smeraldo</string>
+    <string name="skin_shuttle">Navetta Spaziale</string>
+    <string name="skin_comet">Cometa</string>
+    <string name="skin_ufo">UFO</string>
+    <string name="skin_gold">Razzo d’Oro</string>
+    <string name="skin_ring_planet">Pianeta ad Anelli</string>
+    <string name="skin_lava_planet">Pianeta di Lava</string>
+    <string name="skin_crystal">Nave di Cristallo</string>
+
+    <!-- Vite -->
+    <string name="lives_rule">Iniziare costa 1 vita, ma se vinci la riavrai · 1 vita ogni %1$d min</string>
+
+    <!-- Schermata iniziale -->
+    <string name="splash_skip">Tocca per saltare</string>
+
+    <!-- Pubblicità -->
+    <string name="ad_reward_life">GUARDA UN VIDEO: +1 VITA</string>
+    <string name="ad_reward_double">GUARDA UN VIDEO: PREMIO DOPPIO</string>
+    <string name="ad_reward_coins">GUARDA UN VIDEO: MONETE DOPPIE</string>
+    <string name="ad_got_life">Hai ottenuto +1 vita!</string>
+    <string name="ad_privacy">Impostazioni privacy annunci</string>
+    <plurals name="ad_got_coins">
+        <item quantity="one">Hai ottenuto +%1$d moneta!</item>
+        <item quantity="many">Hai ottenuto +%1$d monete!</item>
+        <item quantity="other">Hai ottenuto +%1$d monete!</item>
+    </plurals>
+
+    <!-- Impostazioni -->
+    <string name="settings_title">IMPOSTAZIONI</string>
+    <string name="settings_language">LINGUA</string>
+    <string name="settings_lang_auto">Lingua del dispositivo</string>
+    <string name="settings_sound">SUONI</string>
+    <string name="settings_music">MUSICA</string>
+    <string name="settings_on">ON</string>
+    <string name="settings_off">OFF</string>
+    <string name="settings_version">Versione %1$s</string>
+
+    <!-- Indicatore delle vite e finestra "vite esaurite" -->
+    <string name="lives_full">PIENE</string>
+    <string name="lives_count">%1$d/%2$d</string>
+    <string name="lives_next">Prossima vita: %1$s</string>
+    <string name="lives_refilled">Una vita si è ricaricata!</string>
+    <string name="lives_all_full">Vite al completo!</string>
+    <string name="lives_dialog_title">VITE ESAURITE</string>
+    <string name="lives_buy">+1 VITA</string>
+    <string name="lives_bought">+1 vita acquistata!</string>
+    <string name="lives_wait">ASPETTA</string>
+    <string name="lives_coins_have">Le tue monete: %1$d</string>
+    <plurals name="lives_regen_info">
+        <item quantity="one">1 vita si ricarica ogni minuto.</item>
+        <item quantity="many">1 vita si ricarica ogni %1$d minuti.</item>
+        <item quantity="other">1 vita si ricarica ogni %1$d minuti.</item>
+    </plurals>
+</resources>

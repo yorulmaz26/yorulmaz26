@@ -1,0 +1,214 @@
+<resources>
+    <!-- Sprache: Deutsch (German) -->
+    <string name="app_name">Planet Gap</string>
+    <!-- Sprachcode dieser Datei (zeigt die aktive Sprache in den Einstellungen) -->
+    <string name="lang_code" translatable="false">de</string>
+    <!-- Spielname: Hauptname groß in zwei Zeilen, der andere Name (Türkisch) klein darunter -->
+    <string name="title_line1">PLANET</string>
+    <string name="title_line2">GAP</string>
+    <string name="title_secondary">GEZEGEN KAÇIŞI</string>
+    <string name="tap_to_start">Tippe zum Starten</string>
+    <string name="hint">Steuere deine Rakete zwischen den Planeten hindurch</string>
+    <string name="best_format">REKORD: %1$d</string>
+    <string name="game_over">MISSION BEENDET</string>
+    <string name="score_label">PUNKTE</string>
+    <string name="best_label">REKORD</string>
+    <string name="new_record">NEUER REKORD!</string>
+    <string name="paused">PAUSE</string>
+    <string name="tap_to_continue">Tippe zum Weiterspielen</string>
+
+    <!-- Menü -->
+    <string name="label_map">KARTE</string>
+    <string name="label_level">SCHWIERIGKEIT</string>
+    <string name="start">START</string>
+    <string name="retry">NOCHMAL</string>
+    <string name="menu">MENÜ</string>
+
+    <!-- Schwierigkeit -->
+    <string name="diff_easy">LEICHT</string>
+    <string name="diff_normal">NORMAL</string>
+    <string name="diff_hard">SCHWER</string>
+
+    <!-- Karten -->
+    <string name="map_earth">Erdorbit</string>
+    <string name="map_earth_desc">Klassische Route · blaue Planeten</string>
+    <string name="map_earth_tip">Flieg durch die Lücke zwischen den Planeten</string>
+    <string name="map_ice">Eisgürtel</string>
+    <string name="map_ice_desc">Sehr geringe Schwerkraft · Eiskristalle</string>
+    <string name="map_ice_tip">Deine Rakete gleitet, also tippe sanft!</string>
+    <string name="map_lava">Lavameer</string>
+    <string name="map_lava_desc">Hochschießende Feuerbälle · hohes Tempo</string>
+    <string name="map_lava_tip">Wo der Boden glüht, kommt ein Feuerball. Weich aus!</string>
+    <string name="map_gas">Gasriesen</string>
+    <string name="map_gas_desc">Wechselnde Winde · riesige Ringplaneten</string>
+    <string name="map_gas_tip">Der Wind schiebt dich in Pfeilrichtung</string>
+    <string name="map_asteroid">Asteroidengürtel</string>
+    <string name="map_asteroid_desc">Rotierende, schwankende Asteroiden</string>
+    <string name="map_asteroid_tip">Die Türme gleiten auf und ab. Timing ist alles!</string>
+    <string name="wind">WIND</string>
+
+    <!-- Mehrspieler -->
+    <string name="two_players">2-4 SPIELER</string>
+    <string name="mp_info1">Verbinde alle Handys mit demselben WLAN</string>
+    <string name="mp_info2">oder schalte auf einem davon einen Hotspot ein</string>
+    <string name="mp_host">RAUM ERSTELLEN</string>
+    <string name="mp_join">RAUM BEITRETEN</string>
+    <string name="back">ZURÜCK</string>
+    <string name="mp_leave">VERLASSEN</string>
+    <string name="mp_room_open">Raum erstellt</string>
+    <string name="mp_waiting">Warte auf Spieler</string>
+    <string name="mp_searching">Suche nach einem Raum</string>
+    <string name="mp_join_hint">Auf den anderen Handys: 2-4&#160;SPIELER › RAUM&#160;BEITRETEN</string>
+    <string name="mp_start">START</string>
+    <string name="mp_wait_host">Der Host startet das Spiel</string>
+    <string name="mp_you">DU</string>
+    <string name="mp_you_crashed">BRUCHLANDUNG!</string>
+    <string name="mp_watching">Du schaust deinem Gegner zu</string>
+    <string name="mp_win">GEWONNEN!</string>
+    <string name="mp_lose">VERLOREN</string>
+    <string name="mp_draw">UNENTSCHIEDEN</string>
+    <string name="mp_disconnected">VERBINDUNG GETRENNT</string>
+    <string name="mp_retry_wait">Warte, bis der Host eine neue Runde startet</string>
+    <string name="mp_failed">Keine Verbindung zum Netzwerk. Ist das WLAN an?</string>
+    <string name="mp_pick">Wähle Karte und Schwierigkeit, dann erstelle den Raum</string>
+    <string name="mp_help_title">SO SPIELT IHR ZUSAMMEN</string>
+    <string name="mp_help_1">Installiere das Spiel auf jedem Handy.</string>
+    <string name="mp_help_2">Verbinde die Handys mit demselben WLAN. Kein WLAN? Schalte auf einem Handy einen Hotspot ein und verbinde die anderen damit. Internet brauchst du nicht.</string>
+    <string name="mp_help_3">Handy 1: 2-4&#160;SPIELER&#160;›&#160;RAUM&#160;ERSTELLEN</string>
+    <string name="mp_help_4">Andere Handys (bis zu 3): 2-4&#160;SPIELER&#160;›&#160;RAUM&#160;BEITRETEN. Die Handys finden sich automatisch.</string>
+    <string name="mp_help_5">Jeder kann Karte und Schwierigkeit ändern. Sind alle im Raum, tippt der Host auf START.</string>
+    <string name="mp_help_6">Wähle eine Ansicht: Im Modus GETEILTES&#160;BILD siehst du alle Spiele nebeneinander. Im Modus VOLLBILD ist dein eigenes Spiel groß und die Punkte der anderen stehen oben rechts.</string>
+    <string name="mp_help_7">Wer abstürzt, schaut den anderen weiter zu (im Vollbild tippen, um den Spieler zu wechseln). Wer die meisten Punkte hat, gewinnt.</string>
+    <string name="mp_help_tip">Die Handys finden sich nicht? Prüfe, ob alle im selben Netzwerk sind. Gast- und Schulnetzwerke können Geräte voreinander verstecken – nimm dann lieber einen Hotspot.</string>
+    <string name="mp_help_close">Tippe zum Schließen</string>
+    <string name="mp_view_label">ANSICHT</string>
+    <string name="mp_view_split">GETEILTES BILD</string>
+    <string name="mp_view_full">VOLLBILD</string>
+    <string name="mp_playing">spielt</string>
+    <string name="mp_crashed_short">ABGESTÜRZT</string>
+    <string name="mp_player_format">SPIELER %1$d</string>
+    <string name="mp_left">GEGANGEN</string>
+    <string name="mp_place_format">DU BIST AUF PLATZ %1$d</string>
+    <string name="mp_watch_format">DU SCHAUST %1$s ZU</string>
+    <string name="mp_tap_switch">Tippe, um einem anderen Spieler zuzuschauen</string>
+    <string name="mp_nobody_left">Keine anderen Spieler mehr im Raum</string>
+    <string name="mp_players_count">%1$d/%2$d</string>
+    <string name="mp_watching_many">Du schaust den anderen zu</string>
+    <!-- Platzierung in der Mehrspieler-Ergebnisliste -->
+    <string name="mp_rank">%1$d.</string>
+
+    <!-- Weitere Karten -->
+    <string name="map_blackhole">Schwarzes Loch</string>
+    <string name="map_blackhole_desc">Die Schwerkraft zieht deine Rakete zur Mitte</string>
+    <string name="map_blackhole_tip">Das Schwarze Loch zieht dich zur Bildschirmmitte</string>
+    <string name="map_storm">Elektrosturm</string>
+    <string name="map_storm_desc">Blitze schlagen von oben ein</string>
+    <string name="map_storm_tip">Bleib unter der Spitze der gestrichelten Linie!</string>
+    <string name="map_meteor">Meteorschauer</string>
+    <string name="map_meteor_desc">Meteore stürzen vom Himmel</string>
+    <string name="map_meteor_tip">Rote Markierung oben: Ein Meteor kommt!</string>
+    <string name="map_toxic">Giftnebel</string>
+    <string name="map_toxic_desc">Wind und schwankende Türme</string>
+    <string name="map_toxic_tip">Behalte Wind und Türme gleichzeitig im Blick</string>
+    <string name="map_core">Galaktischer Kern</string>
+    <string name="map_core_desc">Finale: schwankende Türme und Feuer zugleich</string>
+    <string name="map_core_tip">Alles auf einmal. Flieg vorsichtig!</string>
+
+    <!-- Startbildschirm -->
+    <string name="hub_levels">LEVELS</string>
+    <string name="hub_endless">ENDLOSMODUS</string>
+    <string name="hub_market">SHOP</string>
+    <string name="hub_hint">Sammle im Flug Münzen und kauf im Shop neue Raumschiffe</string>
+
+    <!-- Level -->
+    <string name="level_progress">LEVEL %1$d / %2$d</string>
+    <string name="level_title">LEVEL %1$d</string>
+    <string name="level_round">Runde %1$d</string>
+    <string name="level_target">ZIEL: %1$d PUNKTE</string>
+    <string name="level_practice">Übungslevel: keine Sonderregeln</string>
+    <string name="level_final">KARTENFINALE</string>
+    <string name="level_reward">Belohnung: +%1$d Münzen</string>
+    <string name="level_replay">Wiederholung: +3 Münzen</string>
+    <string name="level_failed">NICHT GESCHAFFT</string>
+    <string name="level_done">LEVEL GESCHAFFT!</string>
+    <string name="level_all_done">GLÜCKWUNSCH!</string>
+    <string name="level_all_done_desc">Du hast alle 500 Levels geschafft!</string>
+    <string name="level_locked">Schaffe zuerst die vorherigen Levels</string>
+    <string name="next">WEITER</string>
+    <string name="target_label">ZIEL</string>
+    <string name="reward_label">BELOHNUNG</string>
+    <string name="coins_collected">Gesammelte Münzen: %1$d</string>
+
+    <!-- Level-Besonderheiten -->
+    <string name="mod_fast">⚡ Hohes Tempo</string>
+    <string name="mod_narrow">↕ Enge Lücken</string>
+    <string name="mod_dense">▮▮ Dichte Türme</string>
+    <string name="mod_heavy">⬇ Hohe Schwerkraft</string>
+    <string name="mod_light">⬆ Geringe Schwerkraft</string>
+    <string name="mod_gold">● Goldrausch: 2 Münzen pro Lücke</string>
+    <string name="mod_wind">≋ Wechselnder Wind</string>
+    <string name="mod_fire">▲ Feuerbälle von unten</string>
+    <string name="mod_meteor">▼ Meteorschauer</string>
+    <string name="mod_sway">⇅ Schwankende Türme</string>
+    <string name="mod_pull">◎ Sog des Schwarzen Lochs</string>
+    <string name="mod_lightning">ϟ Blitze</string>
+
+    <!-- Shop -->
+    <string name="market_selected">AUSGEWÄHLT</string>
+    <string name="market_select">WÄHLEN</string>
+    <string name="market_no_money">Nicht genug Münzen! Dir fehlen noch %1$d</string>
+    <string name="market_bought">Gekauft und ausgewählt!</string>
+    <string name="skin_classic">Klassische Rakete</string>
+    <string name="skin_night">Nachtrakete</string>
+    <string name="skin_emerald">Smaragdrakete</string>
+    <string name="skin_shuttle">Spaceshuttle</string>
+    <string name="skin_comet">Komet</string>
+    <string name="skin_ufo">UFO</string>
+    <string name="skin_gold">Goldene Rakete</string>
+    <string name="skin_ring_planet">Ringplanet</string>
+    <string name="skin_lava_planet">Lavaplanet</string>
+    <string name="skin_crystal">Kristallschiff</string>
+
+    <!-- Leben -->
+    <string name="lives_rule">Start kostet 1 Leben, ein Sieg bringt es zurück · 1 Leben alle %1$d Min.</string>
+
+    <!-- Startbild -->
+    <string name="splash_skip">Tippe zum Überspringen</string>
+
+    <!-- Werbung -->
+    <string name="ad_reward_life">VIDEO ANSEHEN: +1 LEBEN</string>
+    <string name="ad_reward_double">VIDEO ANSEHEN: DOPPELTE BELOHNUNG</string>
+    <string name="ad_reward_coins">VIDEO ANSEHEN: DOPPELTE MÜNZEN</string>
+    <string name="ad_got_life">Du hast +1 Leben bekommen!</string>
+    <string name="ad_privacy">Datenschutz für Werbung</string>
+    <plurals name="ad_got_coins">
+        <item quantity="one">Du hast +%1$d Münze bekommen!</item>
+        <item quantity="other">Du hast +%1$d Münzen bekommen!</item>
+    </plurals>
+
+    <!-- Einstellungen -->
+    <string name="settings_title">EINSTELLUNGEN</string>
+    <string name="settings_language">SPRACHE</string>
+    <string name="settings_lang_auto">Gerätesprache</string>
+    <string name="settings_sound">SOUND</string>
+    <string name="settings_music">MUSIK</string>
+    <string name="settings_on">AN</string>
+    <string name="settings_off">AUS</string>
+    <string name="settings_version">Version %1$s</string>
+
+    <!-- Lebensanzeige und Fenster „Keine Leben mehr“ -->
+    <string name="lives_full">VOLL</string>
+    <string name="lives_count">%1$d/%2$d</string>
+    <string name="lives_next">Nächstes Leben: %1$s</string>
+    <string name="lives_refilled">Ein Leben ist wieder da!</string>
+    <string name="lives_all_full">Alle Leben sind voll!</string>
+    <string name="lives_dialog_title">KEINE LEBEN MEHR</string>
+    <string name="lives_buy">+1 LEBEN</string>
+    <string name="lives_bought">Du hast +1 Leben bekommen!</string>
+    <string name="lives_wait">WARTEN</string>
+    <string name="lives_coins_have">Deine Münzen: %1$d</string>
+    <plurals name="lives_regen_info">
+        <item quantity="one">Jede Minute füllt sich 1 Leben auf.</item>
+        <item quantity="other">Alle %1$d Minuten füllt sich 1 Leben auf.</item>
+    </plurals>
+</resources>
