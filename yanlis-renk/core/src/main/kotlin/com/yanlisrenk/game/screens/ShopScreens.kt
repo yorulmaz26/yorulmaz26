@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.Actor
 import com.badlogic.gdx.scenes.scene2d.ui.Table
@@ -31,35 +34,35 @@ abstract class ShopBase(game: YanlisRenkGame) : BaseScreen(game) {
         }
     }
 
-    fun priceText(item: ShopItem) = if (item.price == 0) "Ücretsiz" else item.price.toString()
+    fun priceText(item: ShopItem) = if (item.price == 0) L.t("shop.ucretsiz") else item.price.toString()
 
     fun actionButton(item: ShopItem, onChange: () -> Unit): Actor {
         val owned = session.owns(item.id)
         val equipable = item.category in ShopCatalog.equipCategories
         return when {
             item.consumable -> ui.button(priceText(item), if (item.currency == Currency.GOLD) Pal.ORANGE else Pal.TURQ, if (item.currency == Currency.GOLD) "coin" else "diamond", Ui.Size.S) { buy(item, onChange) }
-            owned && equipable && session.equipped(item.category).id == item.id -> ui.button("Seçili", Pal.GREY, "check", Ui.Size.S, Pal.TEXT) {}
-            owned && equipable -> ui.button("Seç", Pal.GREEN, null, Ui.Size.S) { session.equip(item); game.audio.play("unlock"); onChange() }
-            owned -> ui.button("Sende", Pal.GREY, "check", Ui.Size.S, Pal.TEXT) {}
-            item.rewardOnly -> ui.button("Başarı", Pal.GREY, "lock", Ui.Size.S, Pal.TEXT) { ui.toast(stage, "500. bölümü tamamlayınca açılır", "trophy") }
-            item.requiredLevel > session.data.playerLevel -> ui.button("Sv. ${item.requiredLevel}", Pal.GREY, "lock", Ui.Size.S, Pal.TEXT) { ui.toast(stage, "Seviye ${item.requiredLevel} gerekli", "lock") }
+            owned && equipable && session.equipped(item.category).id == item.id -> ui.button(L.t("shop.secili"), Pal.GREY, "check", Ui.Size.S, Pal.TEXT) {}
+            owned && equipable -> ui.button(L.t("shop.sec"), Pal.GREEN, null, Ui.Size.S) { session.equip(item); game.audio.play("unlock"); onChange() }
+            owned -> ui.button(L.t("shop.sende"), Pal.GREY, "check", Ui.Size.S, Pal.TEXT) {}
+            item.rewardOnly -> ui.button(L.t("shop.basari"), Pal.GREY, "lock", Ui.Size.S, Pal.TEXT) { ui.toast(stage, L.t("shop.500_bolumu_tamamlayinca_acilir"), "trophy") }
+            item.requiredLevel > session.data.playerLevel -> ui.button(L.f("shop.sv", item.requiredLevel), Pal.GREY, "lock", Ui.Size.S, Pal.TEXT) { ui.toast(stage, L.f("shop.seviye_gerekli", item.requiredLevel), "lock") }
             else -> ui.button(priceText(item), if (item.currency == Currency.GOLD) Pal.ORANGE else Pal.TURQ, if (item.currency == Currency.GOLD) "coin" else "diamond", Ui.Size.S) { buy(item, onChange) }
         }
     }
 
     private fun buy(item: ShopItem, onChange: () -> Unit) {
         val title = item.name
-        ui.confirm(stage, title, "${item.description}\n\nFiyat: ${item.price} ${item.currency.tr}", "Satın Al", yesColor = Pal.GREEN) {
+        ui.confirm(stage, title, L.f("shop.fiyat", item.description, item.price, item.currency.display), L.t("shop.satin_al"), yesColor = Pal.GREEN) {
             when (session.buy(item)) {
                 PurchaseResult.OK -> {
                     game.audio.play("purchase")
-                    ui.toast(stage, "$title alındı!", "check")
+                    ui.toast(stage, L.f("shop.alindi", title), "check")
                     if (item.category in ShopCatalog.equipCategories) session.equip(item)
                     refreshTopBar(); onChange(); flushAchievementToasts()
                 }
-                PurchaseResult.NOT_ENOUGH -> ui.toast(stage, "Yeterli ${item.currency.tr.lowercase()} yok", if (item.currency == Currency.GOLD) "coin" else "diamond", Pal.RED)
-                PurchaseResult.LOCKED_LEVEL -> ui.toast(stage, "Seviye ${item.requiredLevel} gerekli", "lock")
-                else -> ui.toast(stage, "Bu ürün satın alınamaz", "info")
+                PurchaseResult.NOT_ENOUGH -> ui.toast(stage, L.t(if (item.currency == Currency.GOLD) "common.not_enough_gold" else "common.not_enough_diamonds"), if (item.currency == Currency.GOLD) "coin" else "diamond", Pal.RED)
+                PurchaseResult.LOCKED_LEVEL -> ui.toast(stage, L.f("shop.seviye_gerekli", item.requiredLevel), "lock")
+                else -> ui.toast(stage, L.t("shop.urun_satin_alinamaz"), "info")
             }
         }
     }
@@ -69,7 +72,7 @@ abstract class ShopBase(game: YanlisRenkGame) : BaseScreen(game) {
         c.add(preview(item, 150f)).size(170f, 150f).row()
         c.add(ui.label(item.name, Ui.Size.M, Pal.TEXT, wrap = true)).width(width - 40f).row()
         c.add(ui.label(item.description, Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(width - 40f).height(64f).row()
-        if (item.consumable) c.add(ui.label("Sende: ${session.count(item.id)}", Ui.Size.S, Pal.BLUE)).row()
+        if (item.consumable) c.add(ui.label(L.f("shop.sende_2", session.count(item.id)), Ui.Size.S, Pal.BLUE)).row()
         c.add(actionButton(item, onChange)).width(width - 60f).padTop(6f)
         return c
     }
@@ -90,7 +93,7 @@ class ShopScreen(game: YanlisRenkGame, private var category: ShopCategory = Shop
     private val content = Table()
     override fun build() {
         root.top()
-        root.add(topBar("Market")).growX().row()
+        root.add(topBar(L.t("common.market"))).growX().row()
         val tabs = Table()
         for (cat in ShopCategory.entries) {
             val sel = cat == category
@@ -106,12 +109,12 @@ class ShopScreen(game: YanlisRenkGame, private var category: ShopCategory = Shop
         content.clear()
         content.add(ui.label(category.title, Ui.Size.L)).padBottom(6f).row()
         if (category == ShopCategory.LIFE) {
-            content.add(ui.label("Canlar: ${session.lives.lives}/4. Can destekleri görevlerden ve günlük ödüllerden de kazanılır.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(640f).padBottom(6f).row()
-            content.add(ui.button("Sahip olduklarını kullan", Pal.PINK, "heart_full", Ui.Size.S, Pal.TEXT) { game.go({ LivesScreen(game) }) }).padBottom(6f).row()
+            content.add(ui.label(L.f("shop.lives_info", session.lives.lives, com.yanlisrenk.logic.config.GameConfig.MAX_LIVES), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(640f).padBottom(6f).row()
+            content.add(ui.button(L.t("shop.sahip_olduklarini_kullan"), Pal.PINK, "heart_full", Ui.Size.S, Pal.TEXT) { game.go({ LivesScreen(game) }) }).padBottom(6f).row()
         }
         content.add(ui.scroll(grid(ShopCatalog.inCategory(category)) { refreshTopBar(); fill() })).grow()
         // sekmeleri güncelle
-        root.clear(); root.top(); root.add(topBar("Market")).growX().row()
+        root.clear(); root.top(); root.add(topBar(L.t("common.market"))).growX().row()
         val tabs = Table()
         for (cat in ShopCategory.entries) {
             val sel = cat == category
@@ -127,15 +130,15 @@ class CharactersScreen(game: YanlisRenkGame) : ShopBase(game) {
     override val recreate: (() -> BaseScreen) = { CharactersScreen(game) }
     override fun build() {
         root.top()
-        root.add(topBar("Karakterler")).growX().row()
+        root.add(topBar(L.t("common.karakterler"))).growX().row()
         val eq = session.equipped(ShopCategory.CHARACTER)
         val head = ui.card(pad = 20f)
         head.add(CharacterActor(game, eq, session.equipped(ShopCategory.COSTUME).style, 0, cycleColors = true)).size(240f, 240f).padRight(16f)
         val tx = Table()
         tx.add(ui.label(eq.name, Ui.Size.L, Pal.TEXT, Align.left)).left().row()
         tx.add(ui.label(eq.description, Ui.Size.S, Pal.TEXT_SOFT, Align.left, true)).width(320f).left().row()
-        tx.add(ui.label("${session.data.owned.count { it.startsWith("char_") }}/30 karakter", Ui.Size.S, Pal.BLUE, Align.left)).left().padTop(8f).row()
-        tx.add(ui.button("Kostümler", Pal.PURPLE, "costume", Ui.Size.S) { game.go({ CostumesScreen(game) }) }).left().padTop(10f)
+        tx.add(ui.label(L.f("shop.30_karakter", session.data.owned.count { it.startsWith("char_") }), Ui.Size.S, Pal.BLUE, Align.left)).left().padTop(8f).row()
+        tx.add(ui.button(L.t("shop.kostumler"), Pal.PURPLE, "costume", Ui.Size.S) { game.go({ CostumesScreen(game) }) }).left().padTop(10f)
         head.add(tx)
         root.add(head).width(680f).padBottom(10f).row()
         root.add(ui.scroll(grid(ShopCatalog.characters) { game.go({ CharactersScreen(game) }, remember = false) })).grow()
@@ -147,8 +150,8 @@ class CostumesScreen(game: YanlisRenkGame) : ShopBase(game) {
     override val recreate: (() -> BaseScreen) = { CostumesScreen(game) }
     override fun build() {
         root.top()
-        root.add(topBar("Kostümler")).growX().row()
-        root.add(ui.label("Kostümler görünümü değiştirir, oyun dengesini değiştirmez.", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(8f).row()
+        root.add(topBar(L.t("shop.kostumler"))).growX().row()
+        root.add(ui.label(L.t("shop.kostumler_gorunumu_degistirir_oyun"), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(8f).row()
         root.add(ui.scroll(grid(ShopCatalog.costumes) { game.go({ CostumesScreen(game) }, remember = false) })).grow()
     }
 }

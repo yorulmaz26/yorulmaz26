@@ -88,7 +88,7 @@ class TrustedClock(private val platform: PlatformClock, val state: ClockState) {
     private fun updateLenient(wall: Long) {
         // günlük ödüller için: doğrulanmamışsa duvar saatine en fazla 36 saat önden gitme izni ver
         val strict = state.anchor
-        val candidate = if (state.verified) strict else maxOf(strict, minOf(wall, strict + 36L * 3_600_000L))
+        val candidate = if (state.verified) strict else maxOf(strict, minOf(wall, strict + com.yanlisrenk.logic.config.GameConfig.LENIENT_WALL_AHEAD_MS))
         state.lenientDayNow = maxOf(state.lenientDayNow, candidate)
     }
 
@@ -107,7 +107,12 @@ class TrustedClock(private val platform: PlatformClock, val state: ClockState) {
         tick()
         var credit = 0L
         val diff = serverNow - state.anchor
-        if (state.rebootPending && state.pendingFromVerified && diff > 0) credit = diff
+        // Yeniden başlatma sonrası doğrulanamayan süre: sunucu saati gelince geriye dönük verilir.
+        // Önceki çapa doğrulanmamışsa (hiç internete çıkmamış cihaz) da verilir ama üst sınırla.
+        if (state.rebootPending && diff > 0) {
+            credit = if (state.pendingFromVerified) diff
+            else minOf(diff, com.yanlisrenk.logic.config.GameConfig.MAX_OFFLINE_GAP_CREDIT_MS)
+        }
         state.anchor = serverNow
         state.verified = true
         state.rebootPending = false

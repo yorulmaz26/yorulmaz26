@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.ui
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -49,7 +52,7 @@ object Pal {
     fun lighter(c: Color, f: Float = 0.35f) = Color(c.r + (1 - c.r) * f, c.g + (1 - c.g) * f, c.b + (1 - c.b) * f, c.a)
 }
 
-fun String.trUpper(): String = uppercase(Locale.forLanguageTag("tr-TR"))
+fun String.lupper(): String = uppercase(Locale.forLanguageTag("tr-TR"))
 
 /** Programatik arayüz bileşenleri (Scene2D). */
 class Ui(val assets: Assets, val audio: Audio) {
@@ -60,7 +63,7 @@ class Ui(val assets: Assets, val audio: Audio) {
     }
 
     fun label(text: String, size: Size = Size.M, color: Color = Pal.TEXT, align: Int = Align.center, wrap: Boolean = false): Label {
-        val l = Label(text, Label.LabelStyle(font(size), Color.WHITE))
+        val l = FitLabel(text, Label.LabelStyle(font(size), Color.WHITE))
         l.color = color
         l.setAlignment(align)
         l.wrap = wrap
@@ -182,7 +185,7 @@ class Ui(val assets: Assets, val audio: Audio) {
         stage.addActor(t)
     }
 
-    fun confirm(stage: Stage, title: String, message: String, yes: String, no: String = "Vazgeç", yesColor: Color = Pal.RED, onYes: () -> Unit) {
+    fun confirm(stage: Stage, title: String, message: String, yes: String, no: String = L.t("common.vazgec"), yesColor: Color = Pal.RED, onYes: () -> Unit) {
         val c = card(pad = 40f)
         lateinit var ov: Table
         c.add(label(title, Size.L)).padBottom(16f).row()
@@ -192,6 +195,38 @@ class Ui(val assets: Assets, val audio: Audio) {
         row.add(button(yes, yesColor, size = Size.M) { ov.remove(); onYes() })
         c.add(row)
         ov = overlay(stage, c) { ov.remove() }
+    }
+}
+
+/**
+ * Tek satırlık metin sığmadığında yazı boyutunu (en fazla [minScale]'e kadar) küçülten etiket.
+ * Uzun çeviriler (ör. Almanca) butonlardan ve kartlardan taşmaz; satır kaydırmalı etiketler aynen davranır.
+ */
+class FitLabel(text: CharSequence, style: LabelStyle) : Label(text, style) {
+    var minScale = 0.55f
+    // Not: üst sınıf kurucusu getPrefWidth() çağırır; bu alanlar o anda henüz atanmamıştır.
+    private var measure: com.badlogic.gdx.graphics.g2d.GlyphLayout? = null
+    private var measured: String? = null
+    private var natural = 0f
+
+    private fun naturalWidth(): Float {
+        val t = text.toString()
+        val m = measure ?: com.badlogic.gdx.graphics.g2d.GlyphLayout().also { measure = it }
+        if (t != measured) { m.setText(style.font, t); natural = m.width; measured = t }
+        val bg = style.background
+        return natural + (bg?.leftWidth ?: 0f) + (bg?.rightWidth ?: 0f)
+    }
+
+    override fun getPrefWidth(): Float = if (wrap) super.getPrefWidth() else naturalWidth()
+    override fun getMinWidth(): Float = if (wrap) super.getMinWidth() else naturalWidth() * minScale
+
+    override fun layout() {
+        if (!wrap && width > 0f) {
+            val nat = naturalWidth()
+            val s = if (nat > width + 0.5f) maxOf(minScale, width / nat) else 1f
+            if (kotlin.math.abs(fontScaleX - s) > 0.001f) setFontScale(s)
+        }
+        super.layout()
     }
 }
 

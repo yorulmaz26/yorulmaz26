@@ -1,6 +1,8 @@
 package com.yanlisrenk.logic.shop
 
-enum class ShopCategory(val title: String, val icon: String) {
+import com.yanlisrenk.logic.i18n.L
+
+enum class ShopCategory(val titleTr: String, val icon: String) {
     CHARACTER("Karakterler", "character"),
     COSTUME("Kostümler", "costume"),
     COLOR_FX("Renk Efektleri", "palette"),
@@ -10,10 +12,16 @@ enum class ShopCategory(val title: String, val icon: String) {
     BOOST("Güçlendirmeler", "bolt"),
     LIFE("Can Destekleri", "heart_full"),
     THEME("Tema Paketleri", "map"),
-    COLLECTIBLE("Koleksiyon", "box"),
+    COLLECTIBLE("Koleksiyon", "box");
+
+    val title: String get() = L.tOr("shopcat.$name", titleTr)
 }
 
-enum class Currency(val tr: String) { GOLD("Altın"), DIAMOND("Elmas") }
+enum class Currency(val trName: String) {
+    GOLD("Altın"), DIAMOND("Elmas");
+    /** Seçili dildeki para birimi adı. */
+    val display: String get() = L.tOr("currency.$name", trName)
+}
 
 enum class Body { SQUARE, CIRCLE, TRIANGLE, DIAMOND, STAR, HEART, HEXAGON, CLOUD, EGG, GHOST, DROP, TALL }
 enum class Eyes { ROUND, VISOR, SLEEPY, BIG, THREE, HAPPY }
@@ -27,8 +35,8 @@ enum class Idle { BOUNCE, WOBBLE, SPIN, FLOAT, PULSE }
 data class ShopItem(
     val id: String,
     val category: ShopCategory,
-    val name: String,
-    val description: String,
+    val nameTr: String,
+    val descriptionTr: String,
     val price: Int,
     val currency: Currency,
     /** Gereken oyuncu seviyesi (0 yok). */
@@ -43,7 +51,10 @@ data class ShopItem(
     /** Tüketilebilir (güçlendirme/can) mi? */
     val consumable: Boolean = false,
     val free: Boolean = false,
-)
+) {
+    val name: String get() = L.tOr("item.$id.name", nameTr)
+    val description: String get() = L.tOr("item.$id.desc", descriptionTr)
+}
 
 object ShopCatalog {
     private fun ch(id: String, name: String, desc: String, price: Int, cur: Currency, body: Body, eyes: Eyes, f: Feature, idle: Idle, lvl: Int = 0, reward: Boolean = false, free: Boolean = false) =

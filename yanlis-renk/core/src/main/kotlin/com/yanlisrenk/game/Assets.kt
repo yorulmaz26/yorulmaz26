@@ -43,7 +43,7 @@ class Assets : Disposable {
         val ICONS = listOf("heart_full", "heart_empty", "coin", "diamond", "star_full", "star_empty", "lock", "play", "pause", "settings",
             "shop", "trophy", "missions", "gift", "profile", "back", "close", "check", "music_on", "music_off", "sound_on", "sound_off",
             "infinity", "map", "calendar", "crown", "shield", "bolt", "puzzle", "sparkle", "refresh", "home", "character", "costume",
-            "info", "clock", "medal", "flag", "palette", "trail", "magic", "box", "plus", "minus", "film")
+            "info", "clock", "medal", "flag", "palette", "trail", "magic", "box", "plus", "minus", "film", "globe")
         val UI = listOf("panel", "button", "pill", "circle", "ring", "glow", "particle", "shadow", "shape_circle", "shape_square",
             "shape_triangle", "shape_star", "sym_equal", "sym_notequal", "sym_next", "sym_prev", "sym_repeat", "sym_question",
             "sym_word", "sym_paint", "gradient_v", "white")
@@ -52,7 +52,7 @@ class Assets : Disposable {
         val MUSIC = listOf("menu", "garden", "candy", "sky", "crystal", "space", "carnival", "final", "endless")
         /** Kullanıcı görselleri: (doku adı, yol) */
         val ART = listOf(
-            "ui2_button" to "ui2/button.png", "ui2_panel" to "ui2/panel.png", "ui2_logo" to "ui2/logo.png",
+            "ui2_button" to "ui2/button.png", "ui2_panel" to "ui2/panel.png", "ui2_logo" to "ui2/logo.png", "ui2_logo_en" to "ui2/logo_en.png", "ui2_logo_tr" to "ui2/logo_tr.png",
             "ui2_stars" to "ui2/stars_reward.png", "ui2_chest" to "ui2/chest.png",
             "obj_coin" to "objects/coin.png", "obj_diamond" to "objects/diamond.png", "obj_shield" to "objects/shield.png",
             "obj_pad" to "objects/pad_shift.png", "obj_gate_hidden" to "objects/gate_hidden.png",
@@ -64,7 +64,11 @@ class Assets : Disposable {
         )
         /** Görseli olabilecek tüm karakterler (dosyası olmayanlar vektör çizimle kalır). */
         val SPRITE_CHARS: List<String> get() = com.yanlisrenk.logic.shop.ShopCatalog.characters.map { it.id }
-        const val CHARS = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ★•→←–—’“”…₺"
+        /** Desteklenen tüm diller (tr, en, de, it, fr, es) için gereken karakterler. */
+        const val LATIN_EXTRA = "çÇğĞıİöÖşŞüÜâÂîÎûÛäÄëËïÏßẞàÀáÁãÃèÈéÉêÊìÌíÍòÒóÓôÔùÙúÚñÑœŒæÆÿŸ¡¿«»‹›„“”‘’·°\u00A0"
+        const val CHARS = FreeTypeFontGenerator.DEFAULT_CHARS + LATIN_EXTRA + "★•→←–—…₺€"
+        /** Dev başlık yazı tipi yalnızca büyük harf + rakam + noktalama içerir (bellek tasarrufu). */
+        const val HUGE_CHARS = "\u0000ABCÇDEFGĞHIİJKLMNOÖPQRSŞTUÜVWXYZÄËÏẞÀÁÂÃÈÉÊÌÍÎÒÓÔÙÚÛÑŒÆŸ0123456789!?¡¿.,:;-–+×%/'’«» \u00A0"
     }
 
     fun load() {
@@ -146,7 +150,7 @@ class Assets : Disposable {
         fontM = make(32)
         fontL = make(44)
         fontXL = make(64)
-        fontHuge = make(96, 4f, Color.WHITE, "\u0000ABCÇDEFGĞHIİJKLMNOÖPRSŞTUÜVYZXWQ0123456789!?.,:-+×%/ ")
+        fontHuge = make(96, 4f, Color.WHITE, HUGE_CHARS)
         fontWorld = make(40)
         gen.dispose()
     }

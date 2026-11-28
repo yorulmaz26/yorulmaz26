@@ -63,7 +63,7 @@ class AndroidLauncher : AndroidApplication() {
             runCatching {
                 val sw = java.io.StringWriter()
                 e.printStackTrace(java.io.PrintWriter(sw))
-                crashFile.writeText("Yanlış Renk 1.3.0 · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
+                crashFile.writeText("Yanlış Renk ${BuildConfig.VERSION_NAME} · Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}) · ${Build.MANUFACTURER} ${Build.MODEL}\n\n$sw")
             }
             prev?.uncaughtException(t, e)
         }
@@ -76,13 +76,13 @@ class AndroidLauncher : AndroidApplication() {
         f.delete()
         runOnUiThread {
             android.app.AlertDialog.Builder(this)
-                .setTitle("Önceki açılışta hata oluştu")
-                .setMessage("Bu metni kopyalayıp geliştiriciye gönderebilirsin:\n\n" + text.take(3000))
-                .setPositiveButton("Kopyala") { _, _ ->
+                .setTitle(getString(R.string.crash_title))
+                .setMessage(getString(R.string.crash_message) + "\n\n" + text.take(3000))
+                .setPositiveButton(getString(R.string.crash_copy)) { _, _ ->
                     val cm = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                     cm.setPrimaryClip(android.content.ClipData.newPlainText("Yanlış Renk hata", text))
                 }
-                .setNegativeButton("Kapat", null)
+                .setNegativeButton(getString(R.string.crash_close), null)
                 .show()
         }
     }

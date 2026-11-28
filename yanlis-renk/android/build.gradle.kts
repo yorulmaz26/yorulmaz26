@@ -1,4 +1,5 @@
 import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
@@ -14,14 +15,14 @@ val keystoreProps = Properties().also { p ->
 
 android {
     namespace = "com.yanlisrenk.android"
-    compileSdk = 35
+    compileSdk = 36
     buildFeatures { buildConfig = true }
     defaultConfig {
         applicationId = "com.yanlisrenk.oyun"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 14
-        versionName = "1.3.0"
+        targetSdk = 36
+        versionCode = 15
+        versionName = "1.4.0"
         // AdMob kimlikleri: gradle.properties ya da -P ile verin. Varsayılanlar Google'ın resmî TEST kimlikleridir.
         fun prop(n: String, d: String) = (project.findProperty(n) as String?) ?: d
         manifestPlaceholders["admobAppId"] = prop("admobAppId", "ca-app-pub-3940256099942544~3347511713")
@@ -29,6 +30,8 @@ android {
         buildConfigField("String", "ADMOB_INTERSTITIAL", "\"" + prop("admobInterstitial", "ca-app-pub-3940256099942544/1033173712") + "\"")
         buildConfigField("String", "ADMOB_REWARDED", "\"" + prop("admobRewarded", "ca-app-pub-3940256099942544/5224354917") + "\"")
     }
+    // Yalnızca oyunun desteklediği dillerin kaynakları pakete girer (kütüphanelerin diğer dilleri atılır).
+    androidResources { localeFilters += listOf("en", "tr", "de", "it", "fr", "es") }
     sourceSets["main"].apply {
         manifest.srcFile("AndroidManifest.xml")
         java.srcDirs("src/main/kotlin")
@@ -60,15 +63,16 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
     packaging { resources.excludes += setOf("META-INF/*.kotlin_module", "META-INF/AL2.0", "META-INF/LGPL2.1") }
 }
+
+kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
 
 dependencies {
     implementation(project(":core"))
     implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
-    implementation("com.google.android.gms:play-services-ads:23.6.0")
-    implementation("com.google.android.ump:user-messaging-platform:3.1.0")
+    implementation("com.google.android.gms:play-services-ads:25.5.0")
+    implementation("com.google.android.ump:user-messaging-platform:4.0.0")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a")
     natives("com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86")

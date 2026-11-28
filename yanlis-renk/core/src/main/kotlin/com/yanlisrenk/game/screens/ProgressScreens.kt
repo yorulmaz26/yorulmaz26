@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.yanlisrenk.game.YanlisRenkGame
@@ -21,15 +24,15 @@ class MissionsScreen(game: YanlisRenkGame, private var weekly: Boolean = false) 
     override val recreate: (() -> BaseScreen) = { MissionsScreen(game, weekly) }
     override fun build() {
         root.top()
-        root.add(topBar("Görevler")).growX().row()
+        root.add(topBar(L.t("common.gorevler"))).growX().row()
         val tabs = Table()
-        tabs.add(ui.button("Günlük", if (!weekly) Pal.ORANGE else Pal.WHITE, "calendar", Ui.Size.S, if (!weekly) Pal.WHITE else Pal.TEXT) { weekly = false; rebuild() }).width(300f).padRight(12f)
-        tabs.add(ui.button("Haftalık", if (weekly) Pal.ORANGE else Pal.WHITE, "flag", Ui.Size.S, if (weekly) Pal.WHITE else Pal.TEXT) { weekly = true; rebuild() }).width(300f)
+        tabs.add(ui.button(L.t("common.gunluk"), if (!weekly) Pal.ORANGE else Pal.WHITE, "calendar", Ui.Size.S, if (!weekly) Pal.WHITE else Pal.TEXT) { weekly = false; rebuild() }).width(300f).padRight(12f)
+        tabs.add(ui.button(L.t("common.haftalik"), if (weekly) Pal.ORANGE else Pal.WHITE, "flag", Ui.Size.S, if (weekly) Pal.WHITE else Pal.TEXT) { weekly = true; rebuild() }).width(300f)
         root.add(tabs).padBottom(10f).row()
         val dayMs = 86_400_000L
         val now = session.clock.dayNow() + game.platform.tzOffsetMillis()
         val left = if (weekly) (session.weekKey() + 1) * 7 * dayMs - 3 * dayMs - now else (session.dayKey() + 1) * dayMs - now
-        root.add(ui.label("Yenilenmesine: ${formatMs(left.coerceAtLeast(0))}", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(10f).row()
+        root.add(ui.label(L.f("prog.yenilenmesine", formatMs(left.coerceAtLeast(0))), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(10f).row()
         val list = Table()
         val slots = if (weekly) session.data.missions.weekly else session.data.missions.daily
         for (s in slots) list.add(missionCard(s)).width(660f).padBottom(12f).row()
@@ -47,12 +50,12 @@ class MissionsScreen(game: YanlisRenkGame, private var weekly: Boolean = false) 
         rw.add(ui.label("${s.progress}/${s.target}", Ui.Size.S, Pal.TEXT_SOFT)).padRight(14f)
         rw.add(ui.icon("coin", 30f)).size(30f); rw.add(ui.label(s.rewardGold.toString(), Ui.Size.S)).padRight(8f)
         if (s.rewardDiamonds > 0) { rw.add(ui.icon("diamond", 30f)).size(30f); rw.add(ui.label(s.rewardDiamonds.toString(), Ui.Size.S)).padRight(8f) }
-        rw.add(ui.label("+${s.rewardXp} XP", Ui.Size.S, Pal.TEXT_SOFT))
+        rw.add(ui.label(L.f("common.xp", s.rewardXp), Ui.Size.S, Pal.TEXT_SOFT))
         tx.add(rw).left().padTop(4f)
         c.add(tx).expandX().left()
         when {
             s.claimed -> c.add(ui.icon("check", 70f)).size(70f)
-            s.progress >= s.target -> c.add(ui.button("Al", Pal.GREEN, "gift", Ui.Size.S) {
+            s.progress >= s.target -> c.add(ui.button(L.t("prog.al"), Pal.GREEN, "gift", Ui.Size.S) {
                 if (session.claimMission(s, weekly)) { game.audio.play("purchase"); refreshTopBar(); flushAchievementToasts(); rebuild() }
             })
             else -> c.add(ui.icon("lock", 54f)).size(54f)
@@ -66,9 +69,9 @@ class AchievementsScreen(game: YanlisRenkGame) : BaseScreen(game) {
     override val recreate: (() -> BaseScreen) = { AchievementsScreen(game) }
     override fun build() {
         root.top()
-        root.add(topBar("Başarılar")).growX().row()
+        root.add(topBar(L.t("common.basarilar"))).growX().row()
         val total = Achievements.all.size
-        root.add(ui.label("${session.data.achievementsUnlocked.size}/$total rozet", Ui.Size.M, Pal.TEXT_SOFT)).padBottom(10f).row()
+        root.add(ui.label(L.f("prog.rozet", session.data.achievementsUnlocked.size, total), Ui.Size.M, Pal.TEXT_SOFT)).padBottom(10f).row()
         val list = Table()
         val sorted = Achievements.all.sortedBy {
             when { it.id in session.data.achievementsUnlocked && it.id !in session.data.achievementsClaimed -> 0; it.id !in session.data.achievementsUnlocked -> 1; else -> 2 }
@@ -100,8 +103,8 @@ class CollectionScreen(game: YanlisRenkGame) : BaseScreen(game) {
     override val recreate: (() -> BaseScreen) = { CollectionScreen(game) }
     override fun build() {
         root.top()
-        root.add(topBar("Koleksiyon")).growX().row()
-        root.add(ui.label("${session.data.collection.size}/100 parça · Her alanı bitirince bir parça kazanırsın. Bir dünyanın 5 parçası = +20 elmas.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(640f).padBottom(10f).row()
+        root.add(topBar(L.t("common.koleksiyon"))).growX().row()
+        root.add(ui.label(L.f("prog.100_parca_her_alani", session.data.collection.size), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(640f).padBottom(10f).row()
         val list = Table()
         for (w in AreaCatalog.worlds) {
             val c = ui.card(pad = 18f)
@@ -122,7 +125,7 @@ class CollectionScreen(game: YanlisRenkGame) : BaseScreen(game) {
         }
         // markette alınan koleksiyon ürünleri rafı
         val shelf = ui.card(pad = 18f)
-        shelf.add(ui.label("Rafım", Ui.Size.M, Pal.TEXT, Align.left)).left().colspan(5).padBottom(8f).row()
+        shelf.add(ui.label(L.t("prog.rafim"), Ui.Size.M, Pal.TEXT, Align.left)).left().colspan(5).padBottom(8f).row()
         ShopCatalog.collectibles.forEachIndexed { i, it ->
             val got = session.owns(it.id)
             val p = Table(); p.add(ui.icon("box", 56f).also { im -> if (!got) im.color.a = 0.3f }).size(56f).row()
@@ -130,7 +133,7 @@ class CollectionScreen(game: YanlisRenkGame) : BaseScreen(game) {
             shelf.add(p).width(122f).pad(2f)
             if (i % 5 == 4) shelf.row()
         }
-        shelf.row(); shelf.add(ui.button("Markete git", Pal.ORANGE, "shop", Ui.Size.S) { game.go({ ShopScreen(game, ShopCategory.COLLECTIBLE) }) }).colspan(5).padTop(8f)
+        shelf.row(); shelf.add(ui.button(L.t("prog.markete_git"), Pal.ORANGE, "shop", Ui.Size.S) { game.go({ ShopScreen(game, ShopCategory.COLLECTIBLE) }) }).colspan(5).padTop(8f)
         list.add(shelf).width(670f).padBottom(20f).row()
         root.add(ui.scroll(list)).grow()
     }
@@ -140,7 +143,7 @@ class CollectionScreen(game: YanlisRenkGame) : BaseScreen(game) {
 class DailyRewardScreen(game: YanlisRenkGame) : BaseScreen(game) {
     override fun build() {
         root.top()
-        root.add(topBar("Günlük Ödül")).growX().row()
+        root.add(topBar(L.t("prog.gunluk_odul"))).growX().row()
         val today = session.dailyIndexToday()
         val can = session.canClaimDaily()
         val grid = Table()
@@ -148,7 +151,7 @@ class DailyRewardScreen(game: YanlisRenkGame) : BaseScreen(game) {
             val claimedInCycle = i < today || (!can && i == (today - 1 + 7) % 7 && today != 0)
             val isToday = i == today && can
             val c = ui.card(if (isToday) Pal.hex(0xFFF4D6) else if (i < today) Pal.hex(0xEEF6EE) else Pal.WHITE, 16f)
-            c.add(ui.label("${i + 1}. Gün", Ui.Size.S, Pal.TEXT_SOFT)).row()
+            c.add(ui.label(L.f("prog.gun", i + 1), Ui.Size.S, Pal.TEXT_SOFT)).row()
             c.add(ui.icon(when { r.item == "boost_shield" -> "shield"; r.item == "life_full" -> "heart_full"; r.diamonds > 0 && r.gold > 0 -> "gift"; r.diamonds > 0 -> "diamond"; else -> "coin" }, 80f)).size(80f).pad(6f).row()
             c.add(ui.label(r.label, Ui.Size.S, Pal.TEXT, wrap = true)).width(170f).row()
             if (i < today) c.add(ui.icon("check", 40f)).size(40f)
@@ -157,13 +160,13 @@ class DailyRewardScreen(game: YanlisRenkGame) : BaseScreen(game) {
             if (claimedInCycle) Unit
         }
         root.add(grid).padTop(20f).row()
-        root.add(ui.label("Seri: ${session.data.daily.currentStreak} gün · Bir gün kaçırırsan döngü baştan başlar.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(620f).padTop(10f).row()
-        if (can) root.add(ui.button("Ödülü Al", Pal.GREEN, "gift", Ui.Size.XL) {
+        root.add(ui.label(L.f("prog.seri_gun_gun_kacirirsan", session.data.daily.currentStreak), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(620f).padTop(10f).row()
+        if (can) root.add(ui.button(L.t("prog.odulu_al"), Pal.GREEN, "gift", Ui.Size.XL) {
             val r = session.claimDaily()
-            if (r != null) { game.audio.play("unlock"); ui.toast(stage, "Kazandın: ${r.label}", "gift"); refreshTopBar(); flushAchievementToasts(); root.clear(); build() }
+            if (r != null) { game.audio.play("unlock"); ui.toast(stage, L.f("prog.kazandin", r.label), "gift"); refreshTopBar(); flushAchievementToasts(); root.clear(); build() }
         }).width(480f).padTop(20f).row()
-        else root.add(ui.label("Bugünün ödülünü aldın. Yarın tekrar gel!", Ui.Size.M, Pal.TEXT_SOFT)).padTop(20f).row()
-        if (session.clock.hasUnverifiedGap) root.add(ui.label("Not: Cihaz yeniden başlatıldı; internet bağlantısıyla zaman doğrulanınca yeni gün açılır.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(600f).padTop(10f)
+        else root.add(ui.label(L.t("prog.bugunun_odulunu_aldin_yarin"), Ui.Size.M, Pal.TEXT_SOFT)).padTop(20f).row()
+        if (session.clock.hasUnverifiedGap) root.add(ui.label(L.t("prog.not_cihaz_yeniden_baslatildi"), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(600f).padTop(10f)
     }
 }
 
@@ -172,7 +175,7 @@ class WeeklyChallengeScreen(game: YanlisRenkGame) : BaseScreen(game) {
     override val recreate: (() -> BaseScreen) = { WeeklyChallengeScreen(game) }
     override fun build() {
         root.top()
-        root.add(topBar("Haftalık Mücadele")).growX().row()
+        root.add(topBar(L.t("common.haftalik_mucadele"))).growX().row()
         val wk = session.weekKey()
         val (title, mechs) = WeeklyChallenge.theme(wk)
         val w = session.data.weekly
@@ -180,25 +183,25 @@ class WeeklyChallengeScreen(game: YanlisRenkGame) : BaseScreen(game) {
         val card = ui.card(pad = 30f)
         card.add(ui.icon("flag", 110f)).size(110f).row()
         card.add(ui.label(title, Ui.Size.XL, Pal.ORANGE)).row()
-        card.add(ui.label("Bu hafta herkes aynı parkuru oynar. Her koşuda: " + mechs.joinToString { it.title }, Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(580f).padBottom(12f).row()
-        card.add(ui.label("Haftalık en iyin: $best", Ui.Size.L)).padBottom(4f).row()
-        card.add(ui.label("Deneme: ${if (w.weekKey == wk) w.attempts else 0} · Canların harcanmaz", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(16f).row()
+        card.add(ui.label(L.t("prog.hafta_herkes_ayni_parkuru") + mechs.joinToString { it.title }, Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(580f).padBottom(12f).row()
+        card.add(ui.label(L.f("prog.haftalik_en_iyin", best), Ui.Size.L)).padBottom(4f).row()
+        card.add(ui.label(L.f("prog.deneme_canlarin_harcanmaz", if (w.weekKey == wk) w.attempts else 0), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(16f).row()
         WeeklyChallenge.tiers.forEachIndexed { i, (need, rew) ->
             val r = Table(); r.background = ui.panel(Pal.hex(0xF4F8FD)); r.pad(12f)
-            r.add(ui.label("$need puan", Ui.Size.M, Pal.TEXT, Align.left)).width(180f).left()
+            r.add(ui.label(L.f("prog.puan", need), Ui.Size.M, Pal.TEXT, Align.left)).width(180f).left()
             r.add(ui.chip("coin", rew.first.toString())).padRight(6f)
             if (rew.second > 0) r.add(ui.chip("diamond", rew.second.toString())).padRight(6f)
             r.add().expandX()
             val claimed = w.weekKey == wk && i in w.rewardTiersClaimed
             when {
                 claimed -> r.add(ui.icon("check", 56f)).size(56f)
-                best >= need -> r.add(ui.button("Al", Pal.GREEN, null, Ui.Size.S) { if (session.claimWeeklyTier(i)) { game.audio.play("purchase"); refreshTopBar(); root.clear(); build() } })
+                best >= need -> r.add(ui.button(L.t("prog.al"), Pal.GREEN, null, Ui.Size.S) { if (session.claimWeeklyTier(i)) { game.audio.play("purchase"); refreshTopBar(); root.clear(); build() } })
                 else -> r.add(ui.icon("lock", 48f)).size(48f)
             }
             card.add(r).width(600f).padBottom(8f).row()
         }
-        card.add(ui.button("Mücadeleye Başla", Pal.GREEN, "play") { game.go({ GameScreen(game, Mode.WEEKLY) }) }).width(460f).padTop(14f).row()
-        card.add(ui.label("Gerçek oyuncu sıralaması için sunucu bağlantısı gerekir; bu sürümde yalnızca kişisel rekorların gösterilir.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(560f).padTop(12f)
+        card.add(ui.button(L.t("prog.mucadeleye_basla"), Pal.GREEN, "play") { game.go({ GameScreen(game, Mode.WEEKLY) }) }).width(460f).padTop(14f).row()
+        card.add(ui.label(L.t("prog.gercek_oyuncu_siralamasi_icin"), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(560f).padTop(12f)
         root.add(ui.scroll(card)).width(680f).grow().padBottom(20f)
     }
 }
@@ -210,25 +213,25 @@ class LivesScreen(game: YanlisRenkGame) : BaseScreen(game) {
     private lateinit var full: com.badlogic.gdx.scenes.scene2d.ui.Label
     override fun build() {
         root.top()
-        root.add(topBar("Canlar", showLives = false)).growX().row()
+        root.add(topBar(L.t("common.canlar"), showLives = false)).growX().row()
         val l = session.lives
         val card = ui.card(pad = 34f)
         val hearts = Table()
-        for (i in 0 until 4) hearts.add(ui.icon(if (i < l.lives) "heart_full" else "heart_empty", 110f)).size(110f).pad(6f)
+        for (i in 0 until com.yanlisrenk.logic.config.GameConfig.MAX_LIVES) hearts.add(ui.icon(if (i < l.lives) "heart_full" else "heart_empty", 110f)).size(110f).pad(6f)
         card.add(hearts).row()
-        card.add(ui.label("Can: ${l.lives}/4", Ui.Size.XL)).padTop(6f).row()
+        card.add(ui.label(L.f("prog.lives_count", l.lives, com.yanlisrenk.logic.config.GameConfig.MAX_LIVES), Ui.Size.XL)).padTop(6f).row()
         timer = ui.label("", Ui.Size.L, Pal.ORANGE); full = ui.label("", Ui.Size.S, Pal.TEXT_SOFT)
         card.add(timer).row(); card.add(full).padBottom(10f).row()
-        if (l.state.shieldArmed) card.add(ui.label("Can kalkanı aktif: sıradaki başarısızlıkta can gitmez.", Ui.Size.S, Pal.BLUE, wrap = true)).width(560f).padBottom(8f).row()
-        card.add(ui.label("Her eksik can 15 dakikada dolar. Oyunu kapatsan da süre işler.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(560f).padBottom(16f).row()
+        if (l.state.shieldArmed) card.add(ui.label(L.t("prog.can_kalkani_aktif_siradaki"), Ui.Size.S, Pal.BLUE, wrap = true)).width(560f).padBottom(8f).row()
+        card.add(ui.label(L.f("prog.lives_regen_info", com.yanlisrenk.logic.config.GameConfig.LIFE_REGEN_SECONDS / 60), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(560f).padBottom(16f).row()
         // sahip olunan destekler
         val owned = listOf("life_single", "life_single_d", "life_full", "boost_shield").filter { session.count(it) > 0 }
         if (owned.isNotEmpty()) {
-            card.add(ui.label("Kazandığın destekler", Ui.Size.M)).padBottom(8f).row()
+            card.add(ui.label(L.t("prog.kazandigin_destekler"), Ui.Size.M)).padBottom(8f).row()
             for (id in owned) {
                 val it = ShopCatalog.item(id)!!
                 card.add(ui.button("${it.name} (${session.count(id)})", Pal.PINK, if (id == "boost_shield") "shield" else "heart_full", Ui.Size.S, Pal.TEXT) {
-                    if (session.useConsumable(id)) { game.audio.play(if (id == "boost_shield") "shield" else "life_refill"); root.clear(); build(); } else ui.toast(stage, "Şu an kullanılamaz", "info")
+                    if (session.useConsumable(id)) { game.audio.play(if (id == "boost_shield") "shield" else "life_refill"); root.clear(); build(); } else ui.toast(stage, L.t("prog.su_an_kullanilamaz"), "info")
                 }).width(520f).padBottom(8f).row()
             }
         }
@@ -236,42 +239,35 @@ class LivesScreen(game: YanlisRenkGame) : BaseScreen(game) {
             val single = ShopCatalog.item("life_single")!!
             val fullItem = ShopCatalog.item("life_full")!!
             val row = Table()
-            row.add(ui.button("1 Can · ${single.price}", Pal.ORANGE, "coin", Ui.Size.S) { buyAndUse(single.id) }).padRight(10f)
-            row.add(ui.button("Tam Can · ${fullItem.price}", Pal.TURQ, "diamond", Ui.Size.S) { buyAndUse(fullItem.id) })
+            row.add(ui.button(L.f("prog.1_can", single.price), Pal.ORANGE, "coin", Ui.Size.S) { buyAndUse(single.id) }).padRight(10f)
+            row.add(ui.button(L.f("prog.tam_can", fullItem.price), Pal.TURQ, "diamond", Ui.Size.S) { buyAndUse(fullItem.id) })
             card.add(row).padBottom(14f).row()
         }
         if (!l.isFull && game.rewardedLeftToday() > 0) {
-            card.add(ui.button("Reklam izle: +1 can", Pal.PURPLE, "film", Ui.Size.M) {
+            card.add(ui.button(L.t("prog.reklam_izle_1_can"), Pal.PURPLE, "film", Ui.Size.M) {
                 val started = game.watchRewarded {
-                    session.lives.addLives(1); session.save()
-                    game.audio.play("life_refill"); ui.toast(stage, "+1 can!", "heart_full")
+                    session.grantAdLife()
+                    game.audio.play("life_refill"); ui.toast(stage, L.t("prog.1_can_2"), "heart_full")
                     root.clear(); build()
                 }
-                if (!started) ui.toast(stage, "Reklam şu an hazır değil, biraz sonra dene", "info")
+                if (!started) ui.toast(stage, L.t("prog.reklam_su_an_hazir"), "info")
             }).width(520f).padBottom(6f).row()
-            card.add(ui.label("Bugün kalan reklam ödülü: ${game.rewardedLeftToday()}", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(12f).row()
+            card.add(ui.label(L.f("prog.bugun_kalan_reklam_odulu", game.rewardedLeftToday()), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(12f).row()
         }
-        card.add(ui.label("Beklerken:", Ui.Size.M)).padTop(6f).padBottom(8f).row()
-        card.add(ui.button("Sonsuz Mod (ücretsiz)", Pal.GREEN, "infinity", Ui.Size.M) { game.go({ GameScreen(game, Mode.ENDLESS) }) }).width(520f).padBottom(10f).row()
-        card.add(ui.button("Günlük Görevler", Pal.BLUE, "missions", Ui.Size.M) { game.go({ MissionsScreen(game) }) }).width(520f).padBottom(10f).row()
-        if (l.canPlay) card.add(ui.button("Oyna", Pal.GREEN, "play", Ui.Size.M) { game.go({ SagaMapScreen(game) }) }).width(520f)
+        card.add(ui.label(L.t("prog.beklerken"), Ui.Size.M)).padTop(6f).padBottom(8f).row()
+        card.add(ui.button(L.t("prog.sonsuz_mod_ucretsiz"), Pal.GREEN, "infinity", Ui.Size.M) { game.go({ GameScreen(game, Mode.ENDLESS) }) }).width(520f).padBottom(10f).row()
+        card.add(ui.button(L.t("prog.gunluk_gorevler"), Pal.BLUE, "missions", Ui.Size.M) { game.go({ MissionsScreen(game) }) }).width(520f).padBottom(10f).row()
+        if (l.canPlay) card.add(ui.button(L.t("prog.oyna"), Pal.GREEN, "play", Ui.Size.M) { game.go({ SagaMapScreen(game) }) }).width(520f)
         root.add(ui.scroll(card)).width(680f).grow().padBottom(20f)
     }
 
-    private fun buyAndUse(id: String) {
-        val item = ShopCatalog.item(id)!!
-        ui.confirm(stage, item.name, "${item.description}\nFiyat: ${item.price} ${item.currency.tr}", "Al ve Kullan", yesColor = Pal.GREEN) {
-            if (session.buy(item) == com.yanlisrenk.logic.PurchaseResult.OK && session.useConsumable(id)) {
-                game.audio.play("life_refill"); refreshTopBar(); root.clear(); build()
-            } else ui.toast(stage, "Yeterli ${item.currency.tr.lowercase()} yok", if (item.currency == Currency.GOLD) "coin" else "diamond", Pal.RED)
-        }
-    }
+    private fun buyAndUse(id: String) = buyLife(id)
 
     override fun afterDraw(delta: Float) {
         val l = session.lives
         if (!::timer.isInitialized) return
-        timer.setText(if (l.isFull) "Canların dolu!" else "Sonraki can: ${formatMs(l.nextLifeIn)}")
-        full.setText(if (l.isFull) "" else "Tümü dolana kadar: ${formatMs(l.fullIn)}")
+        timer.setText(if (l.isFull) L.t("prog.canlarin_dolu") else L.f("common.sonraki_can", formatMs(l.nextLifeIn)))
+        full.setText(if (l.isFull) "" else L.f("prog.tumu_dolana_kadar", formatMs(l.fullIn)))
     }
 
     override fun onLivesChanged() { root.clear(); build() }

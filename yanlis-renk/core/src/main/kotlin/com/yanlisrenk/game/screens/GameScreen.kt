@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.InputProcessor
@@ -19,7 +22,6 @@ import com.yanlisrenk.game.render.WorldRenderer
 import com.yanlisrenk.game.ui.Pal
 import com.yanlisrenk.game.ui.ProgressBarActor
 import com.yanlisrenk.game.ui.Ui
-import com.yanlisrenk.game.ui.trUpper
 import com.yanlisrenk.logic.LevelResult
 import com.yanlisrenk.logic.level.AreaCatalog
 import com.yanlisrenk.logic.model.GameColor
@@ -144,7 +146,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         mid.pad(6f, 24f, 8f, 24f)
         if (level != null) {
             val a = AreaCatalog.area(level.area)
-            val title = (if (mode == Mode.MASTERY) "Ustalık · " else "") + "Bölüm ${level.id}" + if (level.isFinal) " · FİNAL" else ""
+            val title = (if (mode == Mode.MASTERY) L.t("game.ustalik") else "") + L.f("common.bolum", level.id) + if (level.isFinal) L.t("game.final") else ""
             mid.add(ui.label(title, Ui.Size.M)).row()
             progress = ProgressBarActor(ui, 0f, if (level.isFinal) Pal.ORANGE else Pal.TURQ).also { it.setSize(330f, 24f) }
             mid.add(progress).size(330f, 24f).padTop(4f).row()
@@ -152,7 +154,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
             scoreLabel = ui.label("", Ui.Size.S)
         } else {
             scoreLabel = ui.label("0", Ui.Size.XL)
-            mid.add(ui.label(if (mode == Mode.WEEKLY) WeeklyChallenge.theme(session.weekKey()).first else "SONSUZ", Ui.Size.S, Pal.TEXT_SOFT)).row()
+            mid.add(ui.label(if (mode == Mode.WEEKLY) WeeklyChallenge.theme(session.weekKey()).first else L.t("game.sonsuz"), Ui.Size.S, Pal.TEXT_SOFT)).row()
             mid.add(scoreLabel).row()
             progress = ProgressBarActor(ui, 0f, Pal.TURQ)
         }
@@ -183,40 +185,40 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         }
         if (level != null) {
             val a = AreaCatalog.area(level.area)
-            if (level.isFinal) card.add(ui.label("ALAN FİNALİ", Ui.Size.M, Pal.ORANGE)).row()
-            card.add(ui.label(if (level.isFinal) a.finalTitle else "Bölüm ${level.id}", Ui.Size.XL)).padBottom(6f).row()
+            if (level.isFinal) card.add(ui.label(L.t("common.alan_finali"), Ui.Size.M, Pal.ORANGE)).row()
+            card.add(ui.label(if (level.isFinal) a.finalTitle else L.f("common.bolum", level.id), Ui.Size.XL)).padBottom(6f).row()
             card.add(ui.stars(if (mode == Mode.MASTERY) session.data.masteryStars[level.id] ?: 0 else session.stars(level.id), size = 46f)).padBottom(10f).row()
             val goals = Table()
-            goals.add(ui.icon("star_full", 34f)).size(34f).padRight(8f); goals.add(ui.label("Bitir", Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().row()
-            goals.add(ui.icon("coin", 34f)).size(34f).padRight(8f); goals.add(ui.label("En az ${level.coinTarget} altın topla", Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().row()
-            goals.add(ui.icon("palette", 34f)).size(34f).padRight(8f); goals.add(ui.label("En fazla ${level.tapPar} dokunuş", Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().row()
+            goals.add(ui.icon("star_full", 34f)).size(34f).padRight(8f); goals.add(ui.label(L.t("game.bitir"), Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().row()
+            goals.add(ui.icon("coin", 34f)).size(34f).padRight(8f); goals.add(ui.label(L.f("game.en_az_altin_topla", level.coinTarget), Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().row()
+            goals.add(ui.icon("palette", 34f)).size(34f).padRight(8f); goals.add(ui.label(L.f("game.en_fazla_dokunus", level.tapPar), Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().row()
             card.add(goals).padBottom(12f).row()
             for (m in intros.take(2)) {
                 val t = Table(); t.background = ui.panel(Pal.hex(0xEAF6FF)); t.pad(16f)
                 t.add(MechanicActor(game, m)).size(150f, 120f).padRight(14f)
                 val tx = Table()
-                tx.add(ui.label("YENİ: ${m.title.trUpper()}", Ui.Size.M, Pal.BLUE, Align.left)).left().row()
+                tx.add(ui.label(L.f("game.yeni", m.title.lupper()), Ui.Size.M, Pal.BLUE, Align.left)).left().row()
                 tx.add(ui.label(m.hint, Ui.Size.S, Pal.TEXT, Align.left, wrap = true)).width(360f).left()
                 t.add(tx)
                 card.add(t).padBottom(10f).row()
             }
-            if (level.id <= 2 && mode == Mode.LEVEL) card.add(ui.label("Ekrana dokun: Kırmızı > Mavi > Yeşil > Sarı", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(520f).padBottom(10f).row()
+            if (level.id <= 2 && mode == Mode.LEVEL) card.add(ui.label(L.t("game.ekrana_dokun_kirmizi_mavi"), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(520f).padBottom(10f).row()
         } else {
-            card.add(ui.label(if (mode == Mode.WEEKLY) "Haftalık Mücadele" else "Sonsuz Mod", Ui.Size.XL)).row()
+            card.add(ui.label(if (mode == Mode.WEEKLY) L.t("common.haftalik_mucadele") else L.t("game.sonsuz_mod"), Ui.Size.XL)).row()
             if (mode == Mode.WEEKLY) card.add(ui.label(WeeklyChallenge.theme(session.weekKey()).first, Ui.Size.M, Pal.ORANGE)).row()
-            card.add(ui.label("En iyi: ${if (mode == Mode.WEEKLY) session.data.weekly.best else session.data.endlessBest}", Ui.Size.M, Pal.TEXT_SOFT)).padBottom(10f).row()
-            card.add(ui.label("Hız sürekli artar. Kombo yaptıkça puan çarpanın büyür!", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(500f).padBottom(12f).row()
+            card.add(ui.label(L.f("game.en_iyi", if (mode == Mode.WEEKLY) session.data.weekly.best else session.data.endlessBest), Ui.Size.M, Pal.TEXT_SOFT)).padBottom(10f).row()
+            card.add(ui.label(L.t("game.hiz_surekli_artar_kombo"), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(500f).padBottom(12f).row()
             val boosts = Table()
             if (session.count("boost_endless_shield") > 0) {
                 lateinit var b: com.badlogic.gdx.scenes.scene2d.ui.Button
-                b = ui.button("Kalkan (${session.count("boost_endless_shield")})", Pal.BLUE, "shield", Ui.Size.S) {
+                b = ui.button(L.f("game.kalkan", session.count("boost_endless_shield")), Pal.BLUE, "shield", Ui.Size.S) {
                     if (session.useConsumable("boost_endless_shield")) { world.shields++; b.isDisabled = true; game.audio.play("shield") }
                 }
                 boosts.add(b).pad(6f)
             }
             if (session.count("boost_magnet") > 0) {
                 lateinit var b: com.badlogic.gdx.scenes.scene2d.ui.Button
-                b = ui.button("Altın ×2 (${session.count("boost_magnet")})", Pal.ORANGE, "coin", Ui.Size.S) {
+                b = ui.button(L.f("game.altin_2", session.count("boost_magnet")), Pal.ORANGE, "coin", Ui.Size.S) {
                     if (session.useConsumable("boost_magnet")) { magnet = true; b.isDisabled = true; game.audio.play("purchase") }
                 }
                 boosts.add(b).pad(6f)
@@ -224,7 +226,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
             card.add(boosts).padBottom(6f).row()
         }
         lateinit var ov: Table
-        card.add(ui.button("BAŞLA", Pal.GREEN, "play") { ov.remove(); hintCard = null; startCountdown() }).width(400f).padTop(8f)
+        card.add(ui.button(L.t("common.basla"), Pal.GREEN, "play") { ov.remove(); hintCard = null; startCountdown() }).width(400f).padTop(8f)
         ov = ui.overlay(stage, card, 0.25f)
         hintCard = ov
     }
@@ -241,17 +243,17 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
     private fun showPause() {
         val card = ui.card(pad = 40f)
         lateinit var ov: Table
-        card.add(ui.label("DURAKLATILDI", Ui.Size.XL)).padBottom(24f).row()
-        card.add(ui.button("Devam Et", Pal.GREEN, "play") { ov.remove(); state = State.COUNTDOWN; countdown = 3f; lastBeep = 4 }).width(440f).padBottom(14f).row()
+        card.add(ui.label(L.t("common.duraklatildi"), Ui.Size.XL)).padBottom(24f).row()
+        card.add(ui.button(L.t("common.devam_et"), Pal.GREEN, "play") { ov.remove(); state = State.COUNTDOWN; countdown = 3f; lastBeep = 4 }).width(440f).padBottom(14f).row()
         val st = session.data.settings
         val row = Table()
         row.add(ui.iconButton(if (st.musicVolume > 0f) "music_on" else "music_off", 100f) { st.musicVolume = if (st.musicVolume > 0f) 0f else 0.6f; game.audio.applyVolume(); ov.remove(); showPause() }).size(100f).pad(8f)
         row.add(ui.iconButton(if (st.sfxVolume > 0f) "sound_on" else "sound_off", 100f) { st.sfxVolume = if (st.sfxVolume > 0f) 0f else 0.9f; ov.remove(); showPause() }).size(100f).pad(8f)
         card.add(row).padBottom(14f).row()
-        val leaveText = if (level != null) "Çık (1 can gider)" else "Koşuyu Bitir"
-        if (level != null) card.add(ui.button("Yeniden Başlat", Pal.ORANGE, "refresh") {
+        val leaveText = if (level != null) L.t("game.cik_1_can_gider") else L.t("game.kosuyu_bitir")
+        if (level != null) card.add(ui.button(L.t("game.yeniden_baslat"), Pal.ORANGE, "refresh") {
             ov.remove()
-            ui.confirm(stage, "Yeniden başlat?", "Bölümü yeniden başlatmak başarısız deneme sayılır ve 1 can götürür.", "Başlat", yesColor = Pal.ORANGE,) {
+            ui.confirm(stage, L.t("game.yeniden_baslat_2"), L.t("game.bolumu_yeniden_baslatmak_basarisiz"), L.t("game.baslat"), yesColor = Pal.ORANGE,) {
                 session.failLevel(levelId, world.gatesPassed, world.taps, world.coins)
                 game.go({ if (session.lives.canPlay) GameScreen(game, mode, levelId) else LivesScreen(game) }, remember = false)
             }
@@ -259,7 +261,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         card.add(ui.button(leaveText, Pal.RED, "home") {
             ov.remove()
             if (level != null) {
-                ui.confirm(stage, "Bölümden çık?", "Çıkarsan bu deneme başarısız sayılır ve 1 can kaybedersin.", "Çık") {
+                ui.confirm(stage, L.t("game.bolumden_cik"), L.t("game.cikarsan_deneme_basarisiz_sayilir"), L.t("game.cik")) {
                     session.failLevel(levelId, world.gatesPassed, world.taps, world.coins)
                     game.go({ mapScreen(game, level.id, mode == Mode.MASTERY) }, remember = false)
                 }
@@ -292,22 +294,22 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
                     game.audio.play("gate_ok", 1f + minOf(world.combo, 20) * 0.015f)
                     fx.gateEffect(gateFx, e.color, g.y, true)
                     if (level == null && world.combo > 0 && world.combo % 10 == 0) {
-                        game.audio.play("combo"); comboLabel.setText("KOMBO ×${world.multiplier}")
+                        game.audio.play("combo"); comboLabel.setText(L.f("game.kombo", world.multiplier))
                         comboLabel.clearActions(); comboLabel.color.a = 1f; comboLabel.setScale(1f)
                         comboLabel.addAction(Actions.sequence(Actions.delay(1.2f), Actions.fadeOut(0.5f)))
                     }
                 } else {
                     fx.gateEffect(gateFx, e.color, g.y, false)
-                    if (e.shielded) { game.audio.play("shield"); ui.toast(stage, "Kalkan seni korudu!", "shield") }
+                    if (e.shielded) { game.audio.play("shield"); ui.toast(stage, L.t("game.kalkan_seni_korudu"), "shield") }
                     else failInfo = describeRequirement(e.gate)
                 }
                 prevGateColor = e.color
             }
             is RunEvent.Coin -> if (e.collected) { game.audio.play("coin", 1f + MathUtils.random(0.1f)); fx.coinEffect(track.pickups[e.index].y) }
             is RunEvent.Diamond -> { game.audio.play("diamond"); fx.diamondEffect(track.pickups[e.index].y) }
-            is RunEvent.Shield -> { game.audio.play("shield"); ui.toast(stage, "Kalkan!", "shield") }
+            is RunEvent.Shield -> { game.audio.play("shield"); ui.toast(stage, L.t("game.kalkan_2"), "shield") }
             is RunEvent.Pad -> { game.audio.play("whoosh"); fx.tapEffect(2, e.color, world.y) }
-            is RunEvent.ZoneEnter -> { val z = track.zones[e.zone]; if (z.type == com.yanlisrenk.logic.model.ZoneType.MIRROR) ui.toast(stage, "Ayna: sıra ters!", "refresh"); if (z.type == com.yanlisrenk.logic.model.ZoneType.LOCK) ui.toast(stage, "Kilitli renk!", "lock") }
+            is RunEvent.ZoneEnter -> { val z = track.zones[e.zone]; if (z.type == com.yanlisrenk.logic.model.ZoneType.MIRROR) ui.toast(stage, L.t("game.ayna_sira_ters"), "refresh"); if (z.type == com.yanlisrenk.logic.model.ZoneType.LOCK) ui.toast(stage, L.t("game.kilitli_renk"), "lock") }
             is RunEvent.ZoneExit -> {}
             is RunEvent.Failed -> onFail()
             is RunEvent.Finished -> onFinish()
@@ -322,7 +324,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         val te = track.timeline.timeAt(g.y)
         val mask = g.validMask(te, prevGateColor)
         val names = (0..3).filter { mask and (1 shl it) != 0 }.map { GameColor.of(it).tr }
-        return if (names.size == 1) "Bu kapı ${names[0].trUpper()} istiyordu." else "Bu kapı ${names.joinToString(" / ") { it.trUpper() }} istiyordu."
+        return if (names.size == 1) L.f("game.kapi_istiyordu", names[0].lupper()) else L.f("game.kapi_istiyordu", names.joinToString(" / ") { it.lupper() })
     }
 
     private fun onFail() {
@@ -347,7 +349,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         val lvl = level!!
         val card = ui.card(pad = 40f)
         lateinit var ov: Table
-        card.add(ui.label(if (lvl.isFinal) "ALAN FİNALİ GEÇİLDİ!" else "BÖLÜM TAMAM!", Ui.Size.XL, Pal.GREEN)).padBottom(10f).row()
+        card.add(ui.label(if (lvl.isFinal) L.t("game.alan_finali_gecildi") else L.t("game.bolum_tamam"), Ui.Size.XL, Pal.GREEN)).padBottom(10f).row()
         val st = Table()
         for (i in 0 until 3) {
             val img = ui.icon(if (i < stars) "star_full" else "star_empty", 110f)
@@ -360,14 +362,14 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         card.add(st).padBottom(10f).row()
         val goals = Table()
         fun goal(ok: Boolean, text: String) { goals.add(ui.icon(if (ok) "check" else "close", 36f)).size(36f).padRight(10f); goals.add(ui.label(text, Ui.Size.S, Pal.TEXT, Align.left)).left().padBottom(4f).row() }
-        goal(true, "Bölümü bitir")
-        goal(world.coins >= lvl.coinTarget, "Altın: ${world.coins}/${lvl.coinTarget}")
-        goal(world.taps <= lvl.tapPar, "Dokunuş: ${world.taps} (en fazla ${lvl.tapPar})")
+        goal(true, L.t("game.bolumu_bitir"))
+        goal(world.coins >= lvl.coinTarget, L.f("game.altin", world.coins, lvl.coinTarget))
+        goal(world.taps <= lvl.tapPar, L.f("game.dokunus_en_fazla", world.taps, lvl.tapPar))
         card.add(goals).padBottom(16f).row()
         val rw = Table()
         rw.add(ui.chip("coin", "+${reward.gold}")).pad(6f)
         if (reward.diamonds > 0) rw.add(ui.chip("diamond", "+${reward.diamonds}")).pad(6f)
-        rw.add(ui.chip("sparkle", "+${reward.xp} XP")).pad(6f)
+        rw.add(ui.chip("sparkle", L.f("common.xp", reward.xp))).pad(6f)
         card.add(rw).padBottom(14f).row()
         doubleGoldButton(reward.gold, "lvl${lvl.id}")?.let { card.add(it).padBottom(14f).row() }
         val special = reward.areaCompleted > 0 || reward.levelUps.isNotEmpty() || reward.worldCompleted > 0
@@ -378,8 +380,8 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         buttons.add(ui.iconButton("map", 110f, Pal.WHITE) { adNav({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }) }).size(110f).padRight(16f)
         val nextId = lvl.id + 1
         when {
-            special -> buttons.add(ui.button("Ödüller", Pal.ORANGE, "gift") { adNav({ RewardScreen(game, reward, lvl.id, mode == Mode.MASTERY) }) })
-            mode == Mode.LEVEL && nextId <= 500 -> buttons.add(ui.button("Sonraki", Pal.GREEN, "play") {
+            special -> buttons.add(ui.button(L.t("game.oduller"), Pal.ORANGE, "gift") { adNav({ RewardScreen(game, reward, lvl.id, mode == Mode.MASTERY) }) })
+            mode == Mode.LEVEL && nextId <= 500 -> buttons.add(ui.button(L.t("game.sonraki"), Pal.GREEN, "play") {
                 val nextArea = AreaCatalog.areaOfLevel(nextId)
                 game.go({
                     when {
@@ -389,7 +391,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
                     }
                 }, remember = false)
             })
-            else -> buttons.add(ui.button("Devam", Pal.GREEN, "play") { adNav({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }) })
+            else -> buttons.add(ui.button(L.t("common.devam"), Pal.GREEN, "play") { adNav({ mapScreen(game, lvl.id, mode == Mode.MASTERY) }) })
         }
         card.add(buttons)
         ov = ui.overlay(stage, card, 0.3f)
@@ -403,14 +405,14 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
     private fun doubleGoldButton(amount: Int, tag: String): com.badlogic.gdx.scenes.scene2d.Actor? {
         if (amount <= 0 || game.rewardedLeftToday() <= 0 || !game.ads.isRewardedReady()) return null
         lateinit var b: com.badlogic.gdx.scenes.scene2d.ui.Button
-        b = ui.button("Reklam izle: +$amount altın", Pal.PURPLE, "film", Ui.Size.S) {
+        b = ui.button(L.f("game.reklam_izle_altin", amount), Pal.PURPLE, "film", Ui.Size.S) {
             if (b.isDisabled) return@button
             val started = game.watchRewarded {
                 session.credit(com.yanlisrenk.logic.shop.Currency.GOLD, amount, "reklam 2x", "ad2x:$tag:${session.clock.now()}")
-                game.audio.play("purchase"); ui.toast(stage, "+$amount altın!", "coin")
+                game.audio.play("purchase"); ui.toast(stage, L.f("game.altin_3", amount), "coin")
                 b.isDisabled = true
             }
-            if (!started) ui.toast(stage, "Reklam şu an hazır değil", "info")
+            if (!started) ui.toast(stage, L.t("game.reklam_su_an_hazir"), "info")
         }
         return b
     }
@@ -418,21 +420,21 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
     private fun showLevelFailed() {
         val lost = session.failLevel(levelId, world.gatesPassed, world.taps, world.coins)
         val card = ui.card(pad = 40f)
-        card.add(ui.label("YANLIŞ RENK!", Ui.Size.XL, Pal.RED)).padBottom(8f).row()
+        card.add(ui.label(L.t("game.yanlis_renk"), Ui.Size.XL, Pal.RED)).padBottom(8f).row()
         if (failInfo.isNotEmpty()) card.add(ui.label(failInfo, Ui.Size.M, Pal.TEXT, wrap = true)).width(520f).padBottom(14f).row()
         val hearts = Table()
         for (i in 0 until 4) hearts.add(ui.icon(if (i < session.lives.lives) "heart_full" else "heart_empty", 64f)).size(64f).pad(3f)
         card.add(hearts).padBottom(6f).row()
-        card.add(ui.label(if (lost) "1 can kaybettin" else "Can kalkanı canını korudu!", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(6f).row()
+        card.add(ui.label(if (lost) L.t("game.1_can_kaybettin") else L.t("game.can_kalkani_canini_korudu"), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(6f).row()
         val pct = ((world.y / level!!.length) * 100).toInt().coerceIn(0, 99)
-        card.add(ui.label("İlerleme: %$pct · Geçilen kapı: ${world.gatesPassed}/${level.gates.size}", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(20f).row()
+        card.add(ui.label(L.f("game.ilerleme_gecilen_kapi", pct, world.gatesPassed, level.gates.size), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(20f).row()
         if (session.lives.canPlay) {
-            card.add(ui.button("Tekrar Dene", Pal.GREEN, "refresh") { adNav({ GameScreen(game, mode, levelId) }) }).width(460f).padBottom(12f).row()
+            card.add(ui.button(L.t("game.tekrar_dene"), Pal.GREEN, "refresh") { adNav({ GameScreen(game, mode, levelId) }) }).width(460f).padBottom(12f).row()
         } else {
-            card.add(ui.button("Canlar", Pal.PINK, "heart_full", textColor = Pal.TEXT) { adNav({ LivesScreen(game) }) }).width(460f).padBottom(12f).row()
-            card.add(ui.button("Sonsuz Mod", Pal.TURQ, "infinity") { adNav({ GameScreen(game, Mode.ENDLESS) }) }).width(460f).padBottom(12f).row()
+            card.add(ui.button(L.t("common.canlar"), Pal.PINK, "heart_full", textColor = Pal.TEXT) { adNav({ LivesScreen(game) }) }).width(460f).padBottom(12f).row()
+            card.add(ui.button(L.t("game.sonsuz_mod"), Pal.TURQ, "infinity") { adNav({ GameScreen(game, Mode.ENDLESS) }) }).width(460f).padBottom(12f).row()
         }
-        card.add(ui.button("Harita", Pal.BLUE, "map") { adNav({ mapScreen(game, level.id, mode == Mode.MASTERY) }) }).width(460f)
+        card.add(ui.button(L.t("common.harita"), Pal.BLUE, "map") { adNav({ mapScreen(game, level.id, mode == Mode.MASTERY) }) }).width(460f)
         ui.overlay(stage, card, 0.3f)
     }
 
@@ -442,21 +444,21 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
         endShown = true
         val r = session.completeEndless(world.score, world.gatesPassed, world.coins, world.maxCombo, world.taps, mode == Mode.WEEKLY, magnet)
         val card = ui.card(pad = 40f)
-        card.add(ui.label(if (r.newBest || r.weeklyBest) "YENİ REKOR!" else "KOŞU BİTTİ", Ui.Size.XL, if (r.newBest) Pal.ORANGE else Pal.TEXT)).padBottom(6f).row()
+        card.add(ui.label(if (r.newBest || r.weeklyBest) L.t("game.yeni_rekor") else L.t("game.kosu_bitti"), Ui.Size.XL, if (r.newBest) Pal.ORANGE else Pal.TEXT)).padBottom(6f).row()
         if (failInfo.isNotEmpty()) card.add(ui.label(failInfo, Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(500f).padBottom(8f).row()
         card.add(ui.label(world.score.toString(), Ui.Size.HUGE, Pal.TEXT)).row()
-        card.add(ui.label("Puan", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(10f).row()
+        card.add(ui.label(L.t("game.puan"), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(10f).row()
         val stats = Table()
         fun s(k: String, v: String) { stats.add(ui.label(k, Ui.Size.S, Pal.TEXT_SOFT, Align.left)).left().padRight(30f); stats.add(ui.label(v, Ui.Size.M, Pal.TEXT, Align.right)).right().row() }
-        s("Geçilen kapı", world.gatesPassed.toString())
-        s("En yüksek kombo", world.maxCombo.toString())
-        s("En iyi skor", (if (mode == Mode.WEEKLY) session.data.weekly.best else session.data.endlessBest).toString())
+        s(L.t("common.gecilen_kapi"), world.gatesPassed.toString())
+        s(L.t("common.en_yuksek_kombo"), world.maxCombo.toString())
+        s(L.t("game.en_iyi_skor"), (if (mode == Mode.WEEKLY) session.data.weekly.best else session.data.endlessBest).toString())
         card.add(stats).padBottom(12f).row()
-        val rw = Table(); rw.add(ui.chip("coin", "+${r.gold}")).pad(6f); rw.add(ui.chip("sparkle", "+${r.xp} XP")).pad(6f)
+        val rw = Table(); rw.add(ui.chip("coin", "+${r.gold}")).pad(6f); rw.add(ui.chip("sparkle", L.f("common.xp", r.xp))).pad(6f)
         card.add(rw).padBottom(14f).row()
         doubleGoldButton(r.gold, "endless")?.let { card.add(it).padBottom(14f).row() }
-        card.add(ui.button("Tekrar", Pal.GREEN, "refresh") { adNav({ GameScreen(game, mode) }) }).width(440f).padBottom(12f).row()
-        card.add(ui.button("Menü", Pal.BLUE, "home") { game.clearHistory(); adNav({ MainMenuScreen(game) }) }).width(440f)
+        card.add(ui.button(L.t("game.tekrar"), Pal.GREEN, "refresh") { adNav({ GameScreen(game, mode) }) }).width(440f).padBottom(12f).row()
+        card.add(ui.button(L.t("common.menu"), Pal.BLUE, "home") { game.clearHistory(); adNav({ MainMenuScreen(game) }) }).width(440f)
         ui.overlay(stage, card, 0.3f)
         flushAchievementToasts()
     }
@@ -493,7 +495,7 @@ class GameScreen(game: YanlisRenkGame, val mode: Mode, val levelId: Int = 1) : B
                 countdown -= dt
                 val n = kotlin.math.ceil(countdown).toInt()
                 if (n != lastBeep && n >= 1) { lastBeep = n; game.audio.play("countdown"); centerLabel.setText(n.toString()); pop(centerLabel) }
-                if (countdown <= 0f) { state = State.PLAYING; game.audio.play("go"); centerLabel.setText("BAŞLA!"); pop(centerLabel); centerLabel.addAction(Actions.delay(0.5f, Actions.fadeOut(0.3f))) }
+                if (countdown <= 0f) { state = State.PLAYING; game.audio.play("go"); centerLabel.setText(L.t("game.basla").lupper()); pop(centerLabel); centerLabel.addAction(Actions.delay(0.5f, Actions.fadeOut(0.3f))) }
             }
             State.PLAYING -> {
                 accumulator += dt

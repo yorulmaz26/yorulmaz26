@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.InputProcessor
@@ -225,7 +228,7 @@ class IntroScreen(game: YanlisRenkGame) : BaseScreen(game) {
             val s = ui.font(com.yanlisrenk.game.ui.Ui.Size.S)
             stage.batch.begin()
             s.setColor(0.6f, 0.7f, 0.85f, a * 0.8f)
-            layout.setText(s, "Dokunarak geç")
+            layout.setText(s, L.t("intro.dokunarak_gec"))
             s.draw(stage.batch, layout, cx - layout.width / 2, y0 + 70f)
             s.setColor(Color.WHITE)
             stage.batch.end()

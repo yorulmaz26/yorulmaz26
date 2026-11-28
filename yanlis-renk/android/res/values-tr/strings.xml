@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Yanlış Renk</string>
+    <string name="crash_title">Önceki açılışta hata oluştu</string>
+    <string name="crash_message">Bu metni kopyalayıp geliştiriciye gönderebilirsin:</string>
+    <string name="crash_copy">Kopyala</string>
+    <string name="crash_close">Kapat</string>
+</resources>

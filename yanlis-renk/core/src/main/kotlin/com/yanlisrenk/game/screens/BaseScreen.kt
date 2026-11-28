@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputAdapter
@@ -195,7 +198,7 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
             val lt = Table()
             heartTable = Table()
             lt.add(heartTable).left().row()
-            timerLabel = ui.label("", Ui.Size.S, Pal.TEXT_SOFT)
+            timerLabel = ui.label(session.lives.let { l -> if (l.isFull) L.t("hud.canlar_dolu") else L.f("common.sonraki_can", formatMs(l.nextLifeIn)) }, Ui.Size.S, Pal.TEXT_SOFT)
             lt.add(timerLabel).left().padLeft(6f)
             bar.add(lt).left()
             fillHearts()
@@ -217,18 +220,99 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
         return t
     }
 
+    private var shownLives = -1
+
     private fun fillHearts() {
         val ht = heartTable ?: return
         ht.clear()
         val lives = session.lives.lives
-        for (i in 0 until 4) ht.add(ui.icon(if (i < lives) "heart_full" else "heart_empty", 48f)).size(48f).padRight(2f)
-        ht.add(ui.label("$lives/4", Ui.Size.S)).padLeft(6f)
+        val max = com.yanlisrenk.logic.config.GameConfig.MAX_LIVES
+        for (i in 0 until max) {
+            val img = ui.icon(if (i < lives) "heart_full" else "heart_empty", 48f)
+            ht.add(img).size(48f).padRight(2f)
+            if (shownLives in 0 until lives && i in shownLives until lives) popIn(img, (i - shownLives) * 0.12f)
+        }
+        ht.add(ui.label("$lives/$max", Ui.Size.S)).padLeft(6f)
         ui.onTap(ht) { if (this !is LivesScreen) game.go({ LivesScreen(game) }) }
+        shownLives = lives
+    }
+
+    /** Can dolduğunda kısa "kalp" animasyonu: küçükten büyüyüp yerine oturur. */
+    fun popIn(a: Actor, delay: Float = 0f) {
+        a.addAction(Actions.sequence(
+            Actions.run { a.setOrigin(Align.center); a.setScale(0.2f) },
+            Actions.delay(0.02f + delay),
+            Actions.run { a.setOrigin(Align.center) },
+            Actions.scaleTo(1.35f, 1.35f, 0.22f, com.badlogic.gdx.math.Interpolation.swingOut),
+            Actions.scaleTo(1f, 1f, 0.14f),
+        ))
+    }
+
+    /**
+     * Canlar bittiğinde açılan pencere: kalan süre, ödüllü reklamla +1 can, altın/elmasla can alma,
+     * ücretsiz sonsuz mod. Hiçbir seçenek oyuncuyu zorlamaz; "Kapat" her zaman var.
+     */
+    fun showOutOfLives() {
+        val l = session.lives
+        val card = ui.card(pad = 34f)
+        lateinit var ov: Table
+        card.add(ui.icon("heart_empty", 120f)).size(120f).padBottom(6f).row()
+        card.add(ui.label(L.t("lives.out_title"), Ui.Size.L)).padBottom(6f).row()
+        val timer = ui.label(L.f("common.sonraki_can", formatMs(l.nextLifeIn)), Ui.Size.M, Pal.ORANGE)
+        timer.addAction(Actions.forever(Actions.sequence(Actions.delay(0.5f), Actions.run {
+            timer.setText(if (l.canPlay) L.t("lives.ready") else L.f("common.sonraki_can", formatMs(l.nextLifeIn)))
+        })))
+        card.add(timer).padBottom(6f).row()
+        card.add(ui.label(L.f("lives.out_body", com.yanlisrenk.logic.config.GameConfig.LIFE_REGEN_SECONDS / 60), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(540f).padBottom(18f).row()
+        if (game.rewardedLeftToday() > 0) {
+            card.add(ui.button(L.t("prog.reklam_izle_1_can"), Pal.PURPLE, "film", Ui.Size.M) {
+                val started = game.watchRewarded {
+                    if (session.grantAdLife()) { game.audio.play("life_refill"); ui.toast(stage, L.t("prog.1_can_2"), "heart_full") }
+                    ov.remove(); refreshTopBar(); onLivesChanged()
+                }
+                if (!started) ui.toast(stage, L.t("prog.reklam_su_an_hazir"), "info")
+            }).width(520f).padBottom(10f).row()
+        }
+        val single = com.yanlisrenk.logic.shop.ShopCatalog.item("life_single")!!
+        val full = com.yanlisrenk.logic.shop.ShopCatalog.item("life_full")!!
+        val row = Table()
+        row.add(ui.button(L.f("prog.1_can", single.price), Pal.ORANGE, "coin", Ui.Size.S) { ov.remove(); buyLife(single.id) }).padRight(10f)
+        row.add(ui.button(L.f("prog.tam_can", full.price), Pal.TURQ, "diamond", Ui.Size.S) { ov.remove(); buyLife(full.id) })
+        card.add(row).padBottom(10f).row()
+        card.add(ui.button(L.t("prog.sonsuz_mod_ucretsiz"), Pal.GREEN, "infinity", Ui.Size.M) { ov.remove(); game.go({ GameScreen(game, Mode.ENDLESS) }) }).width(520f).padBottom(10f).row()
+        card.add(ui.button(L.t("menu.kapat"), Pal.GREY, textColor = Pal.TEXT, size = Ui.Size.M) { ov.remove() }).width(520f)
+        ov = ui.overlay(stage, card) { ov.remove() }
+    }
+
+    /**
+     * Marka logosu + alt başlık (ikinci dildeki ad). Türkçede "Yanlış Renk" logosu + "Miscolor";
+     * diğer dillerde "Miscolor" logosu + "Yanlış Renk".
+     */
+    fun brandLogo(into: Table, w: Float, h: Float, subSize: Float, subPadTop: Float = -6f) {
+        val key = com.yanlisrenk.game.Brand.logo(game.assets)
+        if (game.assets.has(key)) {
+            into.add(Image(game.assets.drawable(key), com.badlogic.gdx.utils.Scaling.fit)).size(w, h).row()
+        } else {
+            into.add(ui.label(com.yanlisrenk.game.Brand.mainName.lupper(), Ui.Size.XL, Pal.TEXT)).row()
+        }
+        val sub = ui.label(com.yanlisrenk.game.Brand.subName, if (subSize >= 36f) Ui.Size.L else Ui.Size.M, Pal.TEXT)
+        into.add(sub).padTop(subPadTop).row()
+    }
+
+    /** Altın/elmasla can satın alıp hemen kullanır (onay penceresiyle). */
+    fun buyLife(id: String) {
+        val item = com.yanlisrenk.logic.shop.ShopCatalog.item(id)!!
+        val gold = item.currency == com.yanlisrenk.logic.shop.Currency.GOLD
+        ui.confirm(stage, item.name, L.f("prog.fiyat", item.description, item.price, item.currency.display), L.t("prog.al_kullan"), yesColor = Pal.GREEN) {
+            if (session.buy(item) == com.yanlisrenk.logic.PurchaseResult.OK && session.useConsumable(id)) {
+                game.audio.play("life_refill"); refreshTopBar(); onLivesChanged()
+            } else ui.toast(stage, L.t(if (gold) "common.not_enough_gold" else "common.not_enough_diamonds"), if (gold) "coin" else "diamond", Pal.RED)
+        }
     }
 
     private fun updateTimer() {
         val l = session.lives
-        timerLabel?.setText(if (l.isFull) "Canlar dolu" else "Sonraki can: ${formatMs(l.nextLifeIn)}")
+        timerLabel?.setText(if (l.isFull) L.t("hud.canlar_dolu") else L.f("common.sonraki_can", formatMs(l.nextLifeIn)))
         if (heartTable != null && heartTable!!.children.size > 0) {
             val shown = heartTable!!.children.count { (it as? Image)?.drawable == null }.let { 0 }
             if (shown < 0) fillHearts()
@@ -245,7 +329,7 @@ abstract class BaseScreen(val game: YanlisRenkGame) : ScreenAdapter() {
     fun flushAchievementToasts() {
         val list = session.pendingAchievementToasts
         list.forEachIndexed { i, a ->
-            stage.addAction(Actions.delay(i * 2.4f, Actions.run { game.audio.play("achievement"); ui.toast(stage, "Başarı: ${a.title}", "trophy") }))
+            stage.addAction(Actions.delay(i * 2.4f, Actions.run { game.audio.play("achievement"); ui.toast(stage, L.f("hud.basari", a.title), "trophy") }))
         }
         list.clear()
     }

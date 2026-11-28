@@ -4,11 +4,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /** Oyunun dört temel rengi. Sıra: Kırmızı → Mavi → Yeşil → Sarı → Kırmızı. */
-enum class GameColor(val tr: String, val upper: String, val shape: String, val rgb: Int) {
+enum class GameColor(val trName: String, val trUpper: String, val shape: String, val rgb: Int) {
     RED("Kırmızı", "KIRMIZI", "circle", 0xFF5A5F),
     BLUE("Mavi", "MAVİ", "square", 0x3D8BFF),
     GREEN("Yeşil", "YEŞİL", "triangle", 0x3CC46B),
     YELLOW("Sarı", "SARI", "star", 0xFFC933);
+
+    /** Seçili dildeki renk adı. */
+    val tr: String get() = com.yanlisrenk.logic.i18n.L.tOr("color.$name", trName)
+    /** Seçili dildeki büyük harfli renk adı (kapı yazıları). */
+    val upper: String get() = com.yanlisrenk.logic.i18n.L.tOr("color.$name.upper", trUpper)
 
     companion object {
         const val COUNT = 4
@@ -203,7 +208,7 @@ data class LevelData(
 
 /** Tekrar kullanılabilir oynanış mekanikleri. */
 @Serializable
-enum class Mechanic(val title: String, val hint: String) {
+enum class Mechanic(val titleTr: String, val hintTr: String) {
     SAME("Renk Eşleştirme", "= işaretli kapıdan AYNI renkte geç. Rengini değiştirmek için ekrana dokun."),
     DIFF("Ters Kapı", "Eşit değil işaretli kapıdan FARKLI bir renkte geç."),
     DOUBLE("Çift Kapı", "İki kapı art arda geliyor. İkisini de düşünerek hazırlan."),
@@ -233,4 +238,7 @@ enum class Mechanic(val title: String, val hint: String) {
     FOG("Sis", "Sis bölgesinde uzağı göremezsin."),
     COINS("Renkli Altınlar", "Renkli altınları yalnızca aynı renkteyken toplarsın."),
     WAVE("Dalga Hızı", "Hız sürekli artıp azalıyor. Ritmi yakala.");
+
+    val title: String get() = com.yanlisrenk.logic.i18n.L.tOr("mech.$name.title", titleTr)
+    val hint: String get() = com.yanlisrenk.logic.i18n.L.tOr("mech.$name.hint", hintTr)
 }

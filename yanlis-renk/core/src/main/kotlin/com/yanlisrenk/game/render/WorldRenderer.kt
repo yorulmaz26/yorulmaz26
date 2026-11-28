@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.render
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.GL20
@@ -103,7 +106,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
     private class Glyph(var region: TextureRegion, var x: Float, var y: Float, var w: Float, var h: Float, val color: Color = Color())
     private val glyphs = ArrayList<Glyph>()
     private var glyphCount = 0
-    private class Txt(var text: String, var x: Float, var y: Float, var scale: Float, val color: Color = Color())
+    private class Txt(var text: String, var x: Float, var y: Float, var scale: Float, val color: Color = Color(), var maxW: Float = 99f)
     private val texts = ArrayList<Txt>()
     private var textCount = 0
 
@@ -123,10 +126,11 @@ class WorldRenderer(private val assets: Assets) : Disposable {
     /** Görsel varsa onun adını, yoksa yedeğini döndürür. */
     private fun art(name: String, fallback: String) = if (assets.has(name)) name else fallback
 
-    private fun text(s: String, cx: Float, cy: Float, scale: Float, color: Color, alpha: Float = 1f) {
+    /** Dünya yazısı; [maxW] dünya biriminde en geniş alan (uzun çeviriler orantılı küçültülür). */
+    private fun text(s: String, cx: Float, cy: Float, scale: Float, color: Color, alpha: Float = 1f, maxW: Float = ROAD_W - 0.4f) {
         if (textCount >= texts.size) texts.add(Txt("", 0f, 0f, 1f))
         val t = texts[textCount++]
-        t.text = s; t.x = cx; t.y = cy; t.scale = scale; t.color.set(color.r, color.g, color.b, color.a * alpha)
+        t.text = s; t.x = cx; t.y = cy; t.scale = scale; t.maxW = maxW; t.color.set(color.r, color.g, color.b, color.a * alpha)
     }
 
     class Look(
@@ -229,11 +233,11 @@ class WorldRenderer(private val assets: Assets) : Disposable {
                         }
                         cy += 1.4f
                     }
-                    if (z.y1 in bottom..top) text(if (fast) "HIZ ×${"%.1f".format(z.value)}" else "YAVAŞ", CX, z.y1 + 0.55f, 0.012f, dark)
+                    if (z.y1 in bottom..top) text(if (fast) L.f("world.hiz", "%.1f".format(z.value)) else L.t("world.yavas"), CX, z.y1 + 0.55f, 0.012f, dark)
                 }
                 ZoneType.MIRROR -> {
                     sr.color = tmp.set(0.75f, 0.65f, 1f, 0.25f); sr.rect(ROAD_L, y1, ROAD_W, y2 - y1)
-                    if (z.y1 in bottom..top) { sr.color = tmp.set(0.66f, 0.55f, 1f, 0.95f); Shapes.roundRect(sr, CX - 1.6f, z.y1 + 0.05f, 3.2f, 0.75f, 0.35f); text("AYNA", CX, z.y1 + 0.44f, 0.012f, Pal.WHITE) }
+                    if (z.y1 in bottom..top) { sr.color = tmp.set(0.66f, 0.55f, 1f, 0.95f); Shapes.roundRect(sr, CX - 1.6f, z.y1 + 0.05f, 3.2f, 0.75f, 0.35f); text(L.t("world.ayna"), CX, z.y1 + 0.44f, 0.012f, Pal.WHITE, 1f, 2.9f) }
                 }
                 ZoneType.LOCK -> {
                     sr.color = tmp.set(0.55f, 0.6f, 0.7f, 0.18f); sr.rect(ROAD_L, y1, ROAD_W, y2 - y1)
@@ -268,7 +272,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
                 sr.color = tmp.set(Pal.gameColor(p.value)).also { it.a = a }
                 Shapes.roundRect(sr, CX - 1.1f, p.y - 0.32f, 2.2f, 0.64f, 0.3f)
                 if (look.colorBlind) glyph(shapeIcons[p.value], CX, p.y, 0.42f, alpha = a)
-                text("RENK", CX - 1.75f, p.y + 0.12f, 0.009f, dark, a)
+                text(L.t("world.renk"), CX - 1.75f, p.y + 0.12f, 0.009f, dark, a, 1.5f)
             } else {
                 if (assets.has("obj_pad")) glyphWH("obj_pad", CX, p.y, 3.0f, 0.75f, a)
                 else for (k in 0 until 4) { sr.color = tmp.set(Pal.game[k]).also { it.a = a }; sr.rect(CX - 1.1f + k * 0.55f, p.y - 0.3f, 0.55f, 0.6f) }
@@ -371,6 +375,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             f.data.setScale(t.scale)
             f.color = t.color
             layout.setText(f, t.text)
+            if (layout.width > t.maxW) { f.data.setScale(t.scale * t.maxW / layout.width); layout.setText(f, t.text) }
             f.draw(batch, layout, t.x - layout.width / 2, t.y + layout.height / 2)
             f.data.setScale(old)
         }
@@ -418,7 +423,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             // sahte kapı: kesik çizgili
             var x = ROAD_L
             while (x < ROAD_R) { Shapes.roundRect(sr, x, y0 + h * 0.3f, 0.45f, h * 0.4f, 0.12f); x += 0.7f }
-            text("SAHTE", CX, g.y + 0.02f, 0.012f, dark, alpha)
+            text(L.t("world.sahte"), CX, g.y + 0.02f, 0.012f, dark, alpha)
             posts(style, g.y, Pal.GREY, alpha)
             return
         }
@@ -508,7 +513,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
                     while (x < ROAD_R - 0.5f) { sr.triangle(x, y0 + 0.05f, x + 0.25f, y0 + 0.05f, x + 0.5f, y0 + h - 0.05f); x += 0.7f }
                 }
                 if (g.word >= 0) {
-                    text(GameColor.of(g.word).upper, CX + 0.2f, g.y + 0.02f, 0.017f, Pal.WHITE, alpha)
+                    text(GameColor.of(g.word).upper, CX + 0.2f, g.y + 0.02f, 0.017f, Pal.WHITE, alpha, 3.5f)
                     // neye bakılacağını gösteren göz rozeti
                     glyph("circle", ROAD_R - 0.62f, g.y, 0.84f, Pal.WHITE, alpha)
                     glyph(if (g.readBy == 1) "sym_word" else "sym_paint", ROAD_R - 0.62f, g.y, 0.6f, dark, alpha)
@@ -537,7 +542,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
         if (g.rule == RuleType.FREE) {
             gateSprite("gate_sahte_body", g.y, Pal.hex(0xE3E8F2), alpha * 0.85f)
             gateSprite("gate_sahte_deco", g.y, Pal.WHITE, alpha)
-            text("SAHTE", CX, g.y + 0.02f, 0.012f, dark, alpha)
+            text(L.t("world.sahte"), CX, g.y + 0.02f, 0.012f, dark, alpha)
             return true
         }
         if (hideColors) return false
@@ -571,7 +576,7 @@ class WorldRenderer(private val assets: Assets) : Disposable {
             else -> gateSprite("gate_posts_deco", g.y, Pal.WHITE, alpha)
         }
         if (g.word >= 0) {
-            text(GameColor.of(g.word).upper, CX + 0.2f, g.y + 0.02f, 0.017f, Pal.WHITE, alpha)
+            text(GameColor.of(g.word).upper, CX + 0.2f, g.y + 0.02f, 0.017f, Pal.WHITE, alpha, 3.5f)
             glyph("circle", ROAD_R - 0.62f, g.y, 0.84f, Pal.WHITE, alpha)
             glyph(if (g.readBy == 1) "sym_word" else "sym_paint", ROAD_R - 0.62f, g.y, 0.6f, dark, alpha)
             if (look.colorBlind && g.readBy == 0) glyph(shapeIcons[c], ROAD_R - 1.45f, g.y, 0.4f, alpha = alpha)

@@ -1,6 +1,7 @@
 package com.yanlisrenk.logic.progress
 
 import com.yanlisrenk.logic.save.MissionSlot
+import com.yanlisrenk.logic.i18n.L
 import kotlin.random.Random
 
 /** İstatistik anahtarları (SaveData.stats). */
@@ -52,7 +53,9 @@ object Missions {
     private val byId = templates.associateBy { it.id }
     fun template(id: String) = byId[id]!!
 
-    fun title(slot: MissionSlot): String = template(slot.templateId).title.format(slot.target)
+    /** Seçili dilde görev metni ([MissionTemplate.title] Türkçe kaynaktır; %d → {0}). */
+    fun title(slot: MissionSlot): String =
+        L.fOr("mission.${slot.templateId}", template(slot.templateId).title.replace("%d", "{0}"), slot.target)
 
     /** Günlük 3 görev (gün anahtarına göre tohumlu). */
     fun daily(dayKey: Long, playerLevel: Int, masteryUnlocked: Boolean): MutableList<MissionSlot> =
@@ -80,8 +83,9 @@ object Missions {
 
 data class Achievement(
     val id: String,
-    val title: String,
-    val description: String,
+    /** Türkçe kaynak başlık / açıklama. Gösterimde [title] ve [description] kullanılır. */
+    val titleTr: String,
+    val descriptionTr: String,
     val stat: String,
     val target: Long,
     val gold: Int,
@@ -89,12 +93,35 @@ data class Achievement(
     val icon: String,
     /** Ödül olarak açılan ürün (opsiyonel). */
     val unlockItem: String? = null,
-)
+    /** Aile anahtarı (ör. "lvl", "star", "world") ve kademe numarası (1..). */
+    val family: String = "",
+    val tierNo: Int = 0,
+    /** Türkçe kaynak aile adı ve açıklama kalıbı ({0} = hedef). */
+    val familyTitleTr: String = "",
+    val descPatternTr: String = "",
+) {
+    val title: String get() = when {
+        family == "world" -> AreaCatalogRef.worldName(tierNo, titleTr)
+        family.isNotEmpty() -> L.tOr("ach.$family.title", familyTitleTr) + " " + Achievements.roman(tierNo)
+        else -> titleTr
+    }
+    val description: String get() = when {
+        family == "world" -> L.fOr("ach.world.desc", descPatternTr, AreaCatalogRef.worldName(tierNo, titleTr))
+        family.isNotEmpty() -> L.fOr("ach.$family.desc", descPatternTr, target)
+        else -> descriptionTr
+    }
+}
+
+private object AreaCatalogRef {
+    fun worldName(id: Int, def: String): String =
+        com.yanlisrenk.logic.level.AreaCatalog.worlds.firstOrNull { it.id == id }?.name ?: def
+}
 
 object Achievements {
     private fun tier(prefix: String, title: String, desc: String, stat: String, icon: String, targets: List<Long>, goldBase: Int, unlockAt: Map<Long, String> = emptyMap()): List<Achievement> =
         targets.mapIndexed { i, t ->
-            Achievement("${prefix}_$t", "$title ${roman(i + 1)}", desc.format(t), stat, t, goldBase * (i + 1), (i + 1) * 2, icon, unlockAt[t])
+            Achievement("${prefix}_$t", "$title ${roman(i + 1)}", desc.format(t), stat, t, goldBase * (i + 1), (i + 1) * 2, icon, unlockAt[t],
+                family = prefix, tierNo = i + 1, familyTitleTr = title, descPatternTr = desc.replace("%d", "{0}"))
         }
 
     val all: List<Achievement> by lazy {
@@ -117,14 +144,15 @@ object Achievements {
         list += tier("flawless", "Hatasız", "%d bölümü ilk denemede bitir.", Stat.FLAWLESS, "shield", listOf(10, 50, 150), 90)
         // dünyalar
         com.yanlisrenk.logic.level.AreaCatalog.worlds.forEach { w ->
-            list += Achievement("world_${w.id}", w.name, "${w.name} dünyasının 5 alanını tamamla.", "#world_${w.id}", 1, 200 + w.id * 20, 5, "trophy")
+            list += Achievement("world_${w.id}", w.nameTr, "${w.nameTr} dünyasının 5 alanını tamamla.", "#world_${w.id}", 1, 200 + w.id * 20, 5, "trophy",
+                family = "world", tierNo = w.id, familyTitleTr = w.nameTr, descPatternTr = "{0} dünyasının 5 alanını tamamla.")
         }
         list
     }
     private val byId by lazy { all.associateBy { it.id } }
     fun get(id: String) = byId[id]
 
-    private fun roman(i: Int) = arrayOf("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII").getOrElse(i - 1) { i.toString() }
+    fun roman(i: Int) = arrayOf("I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII").getOrElse(i - 1) { i.toString() }
 }
 
 object PlayerLevels {
@@ -134,17 +162,26 @@ object PlayerLevels {
     fun reward(level: Int): Pair<Int, Int> = (100 + level * 20) to (if (level % 5 == 0) 5 + level / 5 else 0)
 }
 
-data class DailyReward(val day: Int, val gold: Int = 0, val diamonds: Int = 0, val item: String? = null, val itemCount: Int = 0, val label: String)
+data class DailyReward(val day: Int, val gold: Int = 0, val diamonds: Int = 0, val item: String? = null, val itemCount: Int = 0, val labelTr: String) {
+    /** Seçili dilde ödül etiketi (ör. "150 Altın", "500 Altın + 15 Elmas", "Tam Can"). */
+    val label: String get() {
+        val parts = ArrayList<String>()
+        if (gold > 0) parts += L.fOr("reward.gold", "{0} Altın", gold)
+        if (diamonds > 0) parts += L.fOr("reward.diamonds", "{0} Elmas", diamonds)
+        item?.let { id -> parts += (com.yanlisrenk.logic.shop.ShopCatalog.item(id)?.name ?: id) }
+        return if (parts.isEmpty()) labelTr else parts.joinToString(" + ")
+    }
+}
 
 object DailyRewards {
     val cycle = listOf(
-        DailyReward(1, gold = 150, label = "150 Altın"),
-        DailyReward(2, gold = 250, label = "250 Altın"),
-        DailyReward(3, item = "boost_shield", itemCount = 1, label = "Can Kalkanı"),
-        DailyReward(4, gold = 400, label = "400 Altın"),
-        DailyReward(5, diamonds = 5, label = "5 Elmas"),
-        DailyReward(6, item = "life_full", itemCount = 1, label = "Tam Can"),
-        DailyReward(7, gold = 500, diamonds = 15, label = "500 Altın + 15 Elmas"),
+        DailyReward(1, gold = 150, labelTr = "150 Altın"),
+        DailyReward(2, gold = 250, labelTr = "250 Altın"),
+        DailyReward(3, item = "boost_shield", itemCount = 1, labelTr = "Can Kalkanı"),
+        DailyReward(4, gold = 400, labelTr = "400 Altın"),
+        DailyReward(5, diamonds = 5, labelTr = "5 Elmas"),
+        DailyReward(6, item = "life_full", itemCount = 1, labelTr = "Tam Can"),
+        DailyReward(7, gold = 500, diamonds = 15, labelTr = "500 Altın + 15 Elmas"),
     )
 }
 
@@ -160,5 +197,9 @@ object WeeklyChallenge {
         "Bilmece Haftası" to listOf(com.yanlisrenk.logic.model.Mechanic.NEXT, com.yanlisrenk.logic.model.Mechanic.PREV, com.yanlisrenk.logic.model.Mechanic.REPEAT),
         "Gizem Haftası" to listOf(com.yanlisrenk.logic.model.Mechanic.HIDDEN, com.yanlisrenk.logic.model.Mechanic.FLICKER, com.yanlisrenk.logic.model.Mechanic.DECOY),
     )
-    fun theme(weekKey: Long) = themes[Math.floorMod(weekKey, themes.size.toLong()).toInt()]
+    /** Haftanın teması: (seçili dildeki ad, mekanikler). */
+    fun theme(weekKey: Long): Pair<String, List<com.yanlisrenk.logic.model.Mechanic>> {
+        val i = Math.floorMod(weekKey, themes.size.toLong()).toInt()
+        return L.tOr("weekly.theme.$i", themes[i].first) to themes[i].second
+    }
 }

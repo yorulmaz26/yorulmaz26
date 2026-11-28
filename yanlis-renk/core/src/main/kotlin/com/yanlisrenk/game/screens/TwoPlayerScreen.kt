@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputAdapter
 import com.badlogic.gdx.InputProcessor
@@ -34,7 +37,7 @@ import com.yanlisrenk.logic.shop.ShopCategory
  */
 class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nanoTime(), private val pace: Pace = Pace.RAHAT) : BaseScreen(game) {
     /** Oyun hızı seçeneği: hız çarpanı. */
-    enum class Pace(val title: String, val scale: Float) { RAHAT("Rahat", 0.68f), NORMAL("Normal", 0.82f), HIZLI("Hızlı", 1f) }
+    enum class Pace(val key: String, val scale: Float) { RAHAT("duel.rahat", 0.68f), NORMAL("duel.normal", 0.82f), HIZLI("duel.hizli", 1f); val title: String get() = L.t(key) }
 
     private enum class State { READY, COUNTDOWN, PLAYING, PAUSED, ENDED }
 
@@ -49,7 +52,7 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
         val events = ArrayList<RunEvent>()
         var out = false
         val top get() = index == 1
-        val label get() = if (index == 0) "1. OYUNCU" else "2. OYUNCU"
+        val label get() = if (index == 0) L.t("duel.1_oyuncu") else L.t("duel.2_oyuncu")
         val tint: Color get() = if (index == 0) Pal.BLUE else Pal.ORANGE
     }
 
@@ -145,11 +148,11 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
 
     private fun showReady() {
         val card = ui.card(pad = 34f)
-        card.add(ui.label("İki Kişilik Kapışma", Ui.Size.XL)).padBottom(10f).row()
-        card.add(ui.label("Telefonu masaya koyun ve karşılıklı oturun.\nAlt yarı 1. oyuncu, üst yarı 2. oyuncu.\nKendi yarınıza dokunarak renk değiştirin.\nYanlış kapıdan ilk geçen elenir!", Ui.Size.M, Pal.TEXT_SOFT, wrap = true))
+        card.add(ui.label(L.t("duel.iki_kisilik_kapisma"), Ui.Size.XL)).padBottom(10f).row()
+        card.add(ui.label(L.t("duel.telefonu_masaya_koyun_karsilikli"), Ui.Size.M, Pal.TEXT_SOFT, wrap = true))
             .width(560f).padBottom(14f).row()
-        card.add(ui.label("İkiniz de aynı pisti oynarsınız · Can harcanmaz", Ui.Size.S, Pal.BLUE, wrap = true)).width(560f).padBottom(14f).row()
-        card.add(ui.label("Hız", Ui.Size.M)).padBottom(6f).row()
+        card.add(ui.label(L.t("duel.ikiniz_ayni_pisti_oynarsiniz"), Ui.Size.S, Pal.BLUE, wrap = true)).width(560f).padBottom(14f).row()
+        card.add(ui.label(L.t("duel.hiz"), Ui.Size.M)).padBottom(6f).row()
         val pr = Table()
         lateinit var ov: Table
         for (pc in Pace.entries) {
@@ -159,7 +162,7 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
             }).width(180f).pad(4f)
         }
         card.add(pr).padBottom(16f).row()
-        card.add(ui.button("BAŞLA", Pal.GREEN, "play") { ov.remove(); readyCard = null; startCountdown() }).width(400f)
+        card.add(ui.button(L.t("common.basla"), Pal.GREEN, "play") { ov.remove(); readyCard = null; startCountdown() }).width(400f)
         ov = ui.overlay(stage, card, 0.3f)
         readyCard = ov
     }
@@ -171,9 +174,9 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
         state = State.PAUSED
         val card = ui.card(pad = 36f)
         lateinit var ov: Table
-        card.add(ui.label("DURAKLATILDI", Ui.Size.XL)).padBottom(20f).row()
-        card.add(ui.button("Devam Et", Pal.GREEN, "play") { ov.remove(); startCountdown() }).width(420f).padBottom(12f).row()
-        card.add(ui.button("Menü", Pal.BLUE, "home") { game.clearHistory(); game.go({ MainMenuScreen(game) }, remember = false) }).width(420f)
+        card.add(ui.label(L.t("common.duraklatildi"), Ui.Size.XL)).padBottom(20f).row()
+        card.add(ui.button(L.t("common.devam_et"), Pal.GREEN, "play") { ov.remove(); startCountdown() }).width(420f).padBottom(12f).row()
+        card.add(ui.button(L.t("common.menu"), Pal.BLUE, "home") { game.clearHistory(); game.go({ MainMenuScreen(game) }, remember = false) }).width(420f)
         ov = ui.overlay(stage, card)
     }
 
@@ -216,6 +219,9 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
     }
 
     /** QA: hazır kartını kapatıp [seconds] sn ileri sarar; [loser] verilirse o oyuncu dokunmaz. */
+    /** Yalnızca tanıtım videosu / QA: iki oyuncuyu da otomatik oynatır. */
+    var autoPlay = false
+
     fun debugPlay(seconds: Float, loser: Int = -1) {
         readyCard?.remove(); readyCard = null
         state = State.PLAYING
@@ -246,7 +252,10 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
             }
             State.PLAYING -> {
                 accumulator += dt
-                while (accumulator >= 1f / 120f && state == State.PLAYING) { step(1f / 120f); accumulator -= 1f / 120f }
+                while (accumulator >= 1f / 120f && state == State.PLAYING) {
+                    if (autoPlay) for (p in players) oracle(p)
+                    step(1f / 120f); accumulator -= 1f / 120f
+                }
             }
             State.ENDED -> {
                 endTimer += dt
@@ -316,13 +325,13 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
         hudBatch.begin()
         val fs = ui.font(Ui.Size.S); val fm = ui.font(Ui.Size.L); val fx = ui.font(Ui.Size.HUGE)
         fs.color = Pal.TEXT_SOFT; fs.draw(hudBatch, p.label, hw - 245f, hh - 26f)
-        fm.color = Pal.TEXT; fm.draw(hudBatch, "${p.world.gatesPassed} kapı", hw - 245f, hh - 48f)
+        fm.color = Pal.TEXT; fm.draw(hudBatch, L.f("duel.kapi", p.world.gatesPassed), hw - 245f, hh - 48f)
         val big = when (state) {
             State.COUNTDOWN -> kotlin.math.ceil(countdown).toInt().coerceAtLeast(1).toString()
             State.ENDED -> when {
-                winner == -1 -> "BERABERE"
-                winner == p.index -> "KAZANDIN!"
-                else -> "ELENDİN"
+                winner == -1 -> L.t("duel.berabere")
+                winner == p.index -> L.t("duel.kazandin")
+                else -> L.t("duel.elendin")
             }
             else -> null
         }
@@ -338,11 +347,11 @@ class TwoPlayerScreen(game: YanlisRenkGame, private val seed: Long = System.nano
 
     private fun showResult() {
         val card = ui.card(pad = 34f)
-        val title = when (winner) { -1 -> "Berabere!"; 0 -> "1. Oyuncu kazandı!"; else -> "2. Oyuncu kazandı!" }
+        val title = when (winner) { -1 -> L.t("duel.berabere_2"); 0 -> L.t("duel.1_oyuncu_kazandi"); else -> L.t("duel.2_oyuncu_kazandi") }
         card.add(ui.label(title, Ui.Size.XL, if (winner == -1) Pal.ORANGE else Pal.GREEN)).padBottom(8f).row()
-        card.add(ui.label("1. Oyuncu: ${players[0].world.gatesPassed} kapı   ·   2. Oyuncu: ${players[1].world.gatesPassed} kapı", Ui.Size.S, Pal.TEXT_SOFT)).padBottom(18f).row()
-        card.add(ui.button("Rövanş", Pal.GREEN, "refresh") { game.go({ TwoPlayerScreen(game, pace = pace) }, remember = false) }).width(420f).padBottom(12f).row()
-        card.add(ui.button("Menü", Pal.BLUE, "home") { game.clearHistory(); game.go({ MainMenuScreen(game) }, remember = false) }).width(420f)
+        card.add(ui.label(L.f("duel.1_oyuncu_kapi_2", players[0].world.gatesPassed, players[1].world.gatesPassed), Ui.Size.S, Pal.TEXT_SOFT)).padBottom(18f).row()
+        card.add(ui.button(L.t("duel.rovans"), Pal.GREEN, "refresh") { game.go({ TwoPlayerScreen(game, pace = pace) }, remember = false) }).width(420f).padBottom(12f).row()
+        card.add(ui.button(L.t("common.menu"), Pal.BLUE, "home") { game.clearHistory(); game.go({ MainMenuScreen(game) }, remember = false) }).width(420f)
         val ov = ui.overlay(stage, card, 0.2f)
         ov.addAction(Actions.fadeIn(0.2f))
     }

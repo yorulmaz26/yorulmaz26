@@ -779,6 +779,20 @@ def _(cv):
     cv.fill(i, WHITE)
 
 
+@icon("globe")
+def _(cv):
+    badge(cv, GBLUE)
+    ring = sub(circle(64, 64, 34), circle(64, 64, 28.5))
+    mer = sub(ellipse(64, 64, 15, 34), ellipse(64, 64, 10, 28.5))
+    vert = box(64, 64, 5.5, 62, 2.5)
+    eq = box(64, 64, 62, 5.5, 2.5)
+    lat1 = inter(box(64, 47, 58, 4.8, 2.4), circle(64, 64, 31))
+    lat2 = inter(box(64, 81, 58, 4.8, 2.4), circle(64, 64, 31))
+    g = union(ring, mer, vert, eq, lat1, lat2)
+    cv.fill(move(g, 0, 3), mix(GBLUE, BLACK, 0.35), 0.5)
+    cv.fill(g, WHITE)
+
+
 @icon("clock")
 def _(cv):
     yel = cv.vgrad(H("#FFE27A"), H("#FFB52E"), 10, 50)

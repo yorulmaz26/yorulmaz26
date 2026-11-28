@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.GlyphLayout
@@ -48,7 +51,7 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
         val back = Table()
         back.setFillParent(true)
         back.bottom().right().pad(0f, 0f, 30f, 24f)
-        backButton = ui.button("Bölümüme dön", Pal.ORANGE, "flag", Ui.Size.S) { scrollTo(session.currentLevel, true) }
+        backButton = ui.button(L.t("saga.bolumume_don"), Pal.ORANGE, "flag", Ui.Size.S) { scrollTo(session.currentLevel, true) }
         back.add(backButton)
         back.touchable = com.badlogic.gdx.scenes.scene2d.Touchable.childrenOnly
         stage.addActor(back)
@@ -201,7 +204,7 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
                 batch.setColor(1f, 1f, 1f, 0.92f * parentAlpha)
                 ui.panel(Pal.WHITE).draw(batch, ox + width / 2 - 250f, oy + by - 40f, 500f, 80f)
                 fM.color = Pal.TEXT
-                layout.setText(fM, "Dünya $w · ${wi.name}")
+                layout.setText(fM, L.f("saga.dunya", w, wi.name))
                 fM.draw(batch, layout, ox + width / 2 - layout.width / 2, oy + by + layout.height / 2)
             }
             // 4) bölüm düğmeleri
@@ -217,7 +220,7 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
                 // alan etiketi (alanın ilk bölümünde)
                 if ((lv - 1) % 5 == 0) {
                     val a = AreaCatalog.area(area)
-                    val text = "Alan ${a.id} · ${a.name}"
+                    val text = L.f("saga.alan", a.id, a.name)
                     fS.color = if (open) Pal.TEXT else Pal.TEXT_SOFT
                     layout.setText(fS, text)
                     val lw = layout.width + 36f
@@ -286,11 +289,11 @@ class SagaMapScreen(game: YanlisRenkGame, private val focusLevel: Int = -1) : Ba
     }
 
     private fun openLevel(id: Int) {
-        if (id > session.data.unlockedLevel) { ui.toast(stage, "Önce ${session.data.unlockedLevel}. bölümü geç", "lock"); return }
+        if (id > session.data.unlockedLevel) { ui.toast(stage, L.f("saga.once_bolumu_gec", session.data.unlockedLevel), "lock"); return }
         val area = AreaCatalog.areaOfLevel(id)
         game.audio.play("button")
         when {
-            !session.lives.canPlay -> game.go({ LivesScreen(game) })
+            !session.lives.canPlay -> showOutOfLives()
             area !in session.data.areaIntroSeen -> game.go({ AreaIntroScreen(game, area) })
             id % 5 == 0 -> game.go({ AreaFinalScreen(game, id) })
             else -> game.go({ GameScreen(game, Mode.LEVEL, id) })

@@ -1,5 +1,6 @@
 package com.yanlisrenk.logic.life
 
+import com.yanlisrenk.logic.config.GameConfig
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,13 +15,14 @@ data class LifeState(
 /**
  * Dört can sistemi. Zaman yalnızca güvenilir saatten gelen süre ([credit]) ile ilerler.
  * - Başarısız bölüm 1 can götürür; başarılı bölüm can götürmez.
- * - Her eksik can 15 dakikada, sırayla dolar.
+ * - Her eksik can [GameConfig.LIFE_REGEN_SECONDS] saniyede (20 dk), sırayla dolar.
+ * - Canlar tamken sayaç durur; ilk kayıpta başlar.
  * - Yeni bir kayıp mevcut sayacı sıfırlamaz.
  */
 class LifeManager(val state: LifeState) {
     companion object {
-        const val MAX_LIVES = 4
-        const val REGEN_MS = 15 * 60_000L
+        const val MAX_LIVES = GameConfig.MAX_LIVES
+        const val REGEN_MS = GameConfig.LIFE_REGEN_MS
     }
 
     val lives: Int get() = state.lives
@@ -33,8 +35,16 @@ class LifeManager(val state: LifeState) {
     /** Tüm canların dolmasına kalan süre. */
     val fullIn: Long get() = if (isFull) 0L else state.regenRemaining + (MAX_LIVES - 1 - state.lives) * REGEN_MS
 
+    /** Bozuk/eski değerleri güvenli aralığa çeker (eksi can, aşırı sayaç vb.). */
+    fun normalize() {
+        state.lives = state.lives.coerceIn(0, MAX_LIVES)
+        if (state.regenRemaining !in 1..REGEN_MS) state.regenRemaining = REGEN_MS
+        if (isFull) state.regenRemaining = REGEN_MS
+    }
+
     /** Geçen güvenilir süreyi uygular. Dolan can sayısını döndürür. */
     fun credit(ms: Long): Int {
+        normalize()
         if (ms <= 0 || isFull) return 0
         var left = ms
         var gained = 0
@@ -66,7 +76,8 @@ class LifeManager(val state: LifeState) {
     }
 
     fun addLives(n: Int) {
-        state.lives = minOf(MAX_LIVES, state.lives + n)
+        if (n <= 0) return
+        state.lives = minOf(MAX_LIVES, maxOf(0, state.lives) + n)
         if (isFull) state.regenRemaining = REGEN_MS
     }
 

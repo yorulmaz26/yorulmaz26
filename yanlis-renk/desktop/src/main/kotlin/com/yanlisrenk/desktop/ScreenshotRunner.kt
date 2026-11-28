@@ -17,7 +17,7 @@ import java.io.File
  * Ayrıca her ekranı birkaç kare çalıştırarak çökme olmadığını doğrular (menü geçiş testi).
  * Kullanım: xvfb-run ./gradlew :desktop:screenshots
  */
-class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.badlogic.gdx.ApplicationListener {
+class ScreenshotGame(platform: DesktopPlatform, private val outDir: File, private val lang: String = "tr", private val only: List<String> = emptyList()) : com.badlogic.gdx.ApplicationListener {
     val game = YanlisRenkGame(platform)
     private var step = 0
     private var frames = 0
@@ -32,6 +32,8 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
         game.create()
         outDir.mkdirs()
         val s = game.session
+        s.data.settings.language = lang
+        com.yanlisrenk.logic.i18n.L.setLanguage(lang)
         // örnek ilerleme: ilk 37 bölüm, biraz para, birkaç karakter
         for (i in 1..37) s.data.levelStars[i] = 1 + (i * 7) % 3
         s.data.unlockedLevel = 38
@@ -128,6 +130,7 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
             game.go({ GameScreen(game, Mode.LEVEL, 20) }, remember = false)
             Gdx.app.postRunnable { (game.screen as? GameScreen)?.let { it.debugStart(5f); it.pause() } }
         })
+        if (only.isNotEmpty()) shots.retainAll { sh -> only.any { sh.first.startsWith(it) } }
         shots[0].second()
     }
 
@@ -176,15 +179,23 @@ class ScreenshotGame(platform: DesktopPlatform, private val outDir: File) : com.
     override fun dispose() { game.dispose() }
 }
 
+/**
+ * Argümanlar: <çıktı klasörü> [lang=tr|en|de|it|fr|es] [size=480x1040] [only=02,05b] [banner=110]
+ */
 fun main(args: Array<String>) {
     val out = File(args.firstOrNull() ?: "build/screenshots")
+    val opts = args.drop(1).filter { '=' in it }.associate { it.substringBefore('=') to it.substringAfter('=') }
+    val lang = opts["lang"]?.takeIf { it.isNotBlank() } ?: "tr"
+    val (w, h) = (opts["size"]?.takeIf { it.isNotBlank() } ?: "480x1040").split('x').map { it.toInt() }
+    val only = opts["only"]?.split(',')?.map { it.trim() }?.filter { it.isNotEmpty() } ?: emptyList()
+    val banner = opts["banner"]?.toIntOrNull() ?: 110
     val tmp = kotlin.io.path.createTempDirectory("yrqa").toFile()
-    val platform = DesktopPlatform(tmp).also { it.allowNetwork = false; it.fakeAds = FakeAds(bannerPx = 110) }
+    val platform = DesktopPlatform(tmp).also { it.allowNetwork = false; it.fakeAds = FakeAds(bannerPx = banner) }
     val cfg = Lwjgl3ApplicationConfiguration()
     cfg.setTitle("Yanlış Renk QA")
-    cfg.setWindowedMode(480, 1040) // telefon oranı (~0,46)
+    cfg.setWindowedMode(w, h) // varsayılan telefon oranı (~0,46)
     cfg.setBackBufferConfig(8, 8, 8, 8, 16, 0, 4)
     cfg.setForegroundFPS(60)
     cfg.useVsync(false)
-    Lwjgl3Application(ScreenshotGame(platform, out), cfg)
+    Lwjgl3Application(ScreenshotGame(platform, out, lang, only), cfg)
 }

@@ -52,6 +52,8 @@ data class Settings(
     var reducedMotion: Boolean = false,
     var showTimers: Boolean = true,
     var leftHanded: Boolean = false,
+    /** Arayüz dili: "" = cihaz diline göre otomatik; aksi halde "tr","en","de","it","fr","es". */
+    var language: String = "",
 )
 
 @Serializable
@@ -106,6 +108,9 @@ data class SaveData(
     var achievementsClaimed: MutableSet<String> = mutableSetOf(),
     var stats: MutableMap<String, Long> = mutableMapOf(),
     var daily: DailyLoginState = DailyLoginState(),
+    /** Saat dilimi hilesine karşı gün koruması: son kabul edilen gün anahtarı ve o günün başlangıcı (güvenilir ms). */
+    var dayGuardKey: Long = -1,
+    var dayGuardStart: Long = 0,
     // sonsuz mod
     var endlessBest: Int = 0,
     var endlessBestGates: Int = 0,

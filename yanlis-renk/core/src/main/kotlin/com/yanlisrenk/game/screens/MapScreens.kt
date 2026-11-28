@@ -1,5 +1,8 @@
 package com.yanlisrenk.game.screens
 
+import com.yanlisrenk.logic.i18n.L
+import com.yanlisrenk.logic.i18n.lupper
+
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.scenes.scene2d.actions.Actions
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
@@ -8,7 +11,6 @@ import com.badlogic.gdx.utils.Align
 import com.yanlisrenk.game.YanlisRenkGame
 import com.yanlisrenk.game.ui.Pal
 import com.yanlisrenk.game.ui.Ui
-import com.yanlisrenk.game.ui.trUpper
 import com.yanlisrenk.logic.Reward
 import com.yanlisrenk.logic.level.AreaCatalog
 
@@ -20,8 +22,8 @@ class WorldMapScreen(game: YanlisRenkGame, private val mastery: Boolean = false)
     override val backgroundImage: String? get() = "ui2/map_bg.jpg"
     override fun build() {
         root.top()
-        root.add(topBar(if (mastery) "Ustalık Modu" else "Harita")).growX().row()
-        if (mastery) root.add(ui.label("Tamamladığın alanları daha hızlı ve hafıza kapılarıyla tekrar oyna.", Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(620f).padBottom(10f).row()
+        root.add(topBar(if (mastery) L.t("map.ustalik_modu") else L.t("common.harita"))).growX().row()
+        if (mastery) root.add(ui.label(L.t("map.tamamladigin_alanlari_daha_hizli"), Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(620f).padBottom(10f).row()
         val list = Table()
         var focus: Table? = null
         val curArea = AreaCatalog.areaOfLevel(session.currentLevel)
@@ -29,7 +31,7 @@ class WorldMapScreen(game: YanlisRenkGame, private val mastery: Boolean = false)
             val worldAreas = AreaCatalog.areas.filter { it.world == w.id }
             val head = Table()
             head.background = ui.pill(Pal.hex(w.skyTop))
-            head.add(ui.label("Dünya ${w.id}", Ui.Size.S, Pal.TEXT_SOFT)).padRight(12f)
+            head.add(ui.label(L.f("map.dunya", w.id), Ui.Size.S, Pal.TEXT_SOFT)).padRight(12f)
             head.add(ui.label(w.name, Ui.Size.L))
             val done = worldAreas.count { session.isAreaComplete(it.id) }
             head.add().expandX()
@@ -46,7 +48,7 @@ class WorldMapScreen(game: YanlisRenkGame, private val mastery: Boolean = false)
                 card.add(num).padRight(16f)
                 val tx = Table()
                 tx.add(ui.label(a.name, Ui.Size.M, if (usable) Pal.TEXT else Pal.TEXT_SOFT, Align.left)).left().row()
-                tx.add(ui.label(if (usable) a.description else if (mastery) "Önce alanı tamamla" else "Bölüm ${a.firstLevel} ile açılır", Ui.Size.S, Pal.TEXT_SOFT, Align.left, true)).width(330f).left()
+                tx.add(ui.label(if (usable) a.description else if (mastery) L.t("map.once_alani_tamamla") else L.f("map.bolum_acilir", a.firstLevel), Ui.Size.S, Pal.TEXT_SOFT, Align.left, true)).width(330f).left()
                 card.add(tx).expandX().left()
                 val right = Table()
                 if (!usable) right.add(ui.icon("lock", 60f)).size(60f)
@@ -75,9 +77,9 @@ class AreaScreen(game: YanlisRenkGame, private val areaId: Int, private val mast
         val w = AreaCatalog.world(a.world)
         root.top()
         root.add(topBar(null)).growX().row()
-        root.add(ui.label("${w.name} · Alan ${a.id}", Ui.Size.S, Pal.TEXT_SOFT)).row()
+        root.add(ui.label(L.f("map.alan", w.name, a.id), Ui.Size.S, Pal.TEXT_SOFT)).row()
         root.add(ui.label(a.name, Ui.Size.XL)).row()
-        root.add(ui.label(if (mastery) "Ustalık: daha hızlı, hafıza kapılı sürümler" else a.description, Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(620f).padBottom(14f).row()
+        root.add(ui.label(if (mastery) L.t("map.ustalik_daha_hizli_hafiza") else a.description, Ui.Size.S, Pal.TEXT_SOFT, wrap = true)).width(620f).padBottom(14f).row()
         val path = Table()
         for (i in 0 until 5) {
             val id = a.firstLevel + i
@@ -89,30 +91,30 @@ class AreaScreen(game: YanlisRenkGame, private val areaId: Int, private val mast
             val c = if (!unlocked) Pal.GREY else if (final) Pal.ORANGE else areaColor(areaId)
             val b = ui.button("", c) {
                 when {
-                    !session.lives.canPlay -> game.go({ LivesScreen(game) })
+                    !session.lives.canPlay -> showOutOfLives()
                     final && !mastery -> game.go({ AreaFinalScreen(game, id) })
                     else -> game.go({ GameScreen(game, if (mastery) Mode.MASTERY else Mode.LEVEL, id) })
                 }
             }
             b.clearChildren()
             if (!unlocked) b.add(ui.icon("lock", 70f)).size(70f)
-            else if (final) { b.add(ui.icon("crown", 70f)).size(70f).row(); b.add(ui.label("FİNAL", Ui.Size.S, Pal.WHITE)) }
+            else if (final) { b.add(ui.icon("crown", 70f)).size(70f).row(); b.add(ui.label(L.t("map.final"), Ui.Size.S, Pal.WHITE)) }
             else b.add(ui.label(id.toString(), Ui.Size.XL, Pal.WHITE))
             b.isDisabled = !unlocked
             node.add(b).size(size).row()
             node.add(ui.stars(stars, size = 40f)).padTop(4f).row()
-            if (unlocked) node.add(ui.label(if (final) a.finalTitle else "Bölüm $id", Ui.Size.S, Pal.TEXT_SOFT)).row()
+            if (unlocked) node.add(ui.label(if (final) a.finalTitle else L.f("common.bolum", id), Ui.Size.S, Pal.TEXT_SOFT)).row()
             val offset = if (i % 2 == 0) -120f else 120f
             path.add(node).padLeft(if (offset > 0) offset * 2 else 0f).padRight(if (offset < 0) -offset * 2 else 0f).padBottom(14f).row()
         }
         root.add(path).expandY().row()
         val info = ui.card(pad = 20f)
-        info.add(ui.label("Alan ödülü:", Ui.Size.S, Pal.TEXT_SOFT)).padRight(10f)
+        info.add(ui.label(L.t("map.alan_odulu"), Ui.Size.S, Pal.TEXT_SOFT)).padRight(10f)
         info.add(ui.chip("coin", a.rewardGold.toString())).padRight(8f)
         info.add(ui.chip("diamond", a.rewardDiamonds.toString())).padRight(8f)
         info.add(ui.chip("box", if (a.id in session.data.collection) "✓" else "?"))
         root.add(info).padBottom(20f).row()
-        if (!mastery && session.isAreaComplete(areaId)) root.add(ui.button("Ustalık Modu", Pal.PURPLE, "medal", Ui.Size.S) { game.go({ AreaScreen(game, areaId, true) }) }).padBottom(20f)
+        if (!mastery && session.isAreaComplete(areaId)) root.add(ui.button(L.t("map.ustalik_modu"), Pal.PURPLE, "medal", Ui.Size.S) { game.go({ AreaScreen(game, areaId, true) }) }).padBottom(20f)
     }
 }
 
@@ -124,8 +126,8 @@ class AreaIntroScreen(game: YanlisRenkGame, private val areaId: Int) : BaseScree
         val w = AreaCatalog.world(a.world)
         session.data.areaIntroSeen.add(areaId); session.save()
         val card = ui.card(pad = 40f)
-        card.add(ui.label("DÜNYA ${w.id} · ${w.name.trUpper()}", Ui.Size.S, Pal.TEXT_SOFT)).row()
-        card.add(ui.label("Alan ${a.id}", Ui.Size.M, Pal.ORANGE)).padTop(6f).row()
+        card.add(ui.label(L.f("map.dunya_2", w.id, w.name.lupper()), Ui.Size.S, Pal.TEXT_SOFT)).row()
+        card.add(ui.label(L.f("map.alan_2", a.id), Ui.Size.M, Pal.ORANGE)).padTop(6f).row()
         card.add(ui.label(a.name, Ui.Size.XL)).padBottom(10f).row()
         card.add(ui.label(a.description, Ui.Size.M, Pal.TEXT_SOFT, wrap = true)).width(560f).padBottom(18f).row()
         val mech = a.introduces.ifEmpty { a.focus.filter { it != com.yanlisrenk.logic.model.Mechanic.EXAM }.take(2) }
@@ -133,13 +135,13 @@ class AreaIntroScreen(game: YanlisRenkGame, private val areaId: Int) : BaseScree
             val t = Table(); t.background = ui.panel(Pal.hex(0xEAF6FF)); t.pad(14f)
             t.add(MechanicActor(game, m)).size(150f, 120f).padRight(14f)
             val tx = Table()
-            tx.add(ui.label((if (m in a.introduces) "YENİ: " else "") + m.title, Ui.Size.M, Pal.BLUE, Align.left)).left().row()
+            tx.add(ui.label((if (m in a.introduces) L.t("map.yeni") else "") + m.title, Ui.Size.M, Pal.BLUE, Align.left)).left().row()
             tx.add(ui.label(m.hint, Ui.Size.S, Pal.TEXT, Align.left, true)).width(380f).left()
             t.add(tx)
             card.add(t).width(580f).padBottom(10f).row()
         }
-        card.add(ui.label("Toplanacak parça: ${a.collectible}", Ui.Size.S, Pal.TEXT_SOFT)).padTop(6f).padBottom(18f).row()
-        card.add(ui.button("Alana Gir", Pal.GREEN, "play") { game.go({ SagaMapScreen(game, a.firstLevel) }, remember = false) }).width(420f)
+        card.add(ui.label(L.f("map.toplanacak_parca", a.collectible), Ui.Size.S, Pal.TEXT_SOFT)).padTop(6f).padBottom(18f).row()
+        card.add(ui.button(L.t("map.alana_gir"), Pal.GREEN, "play") { game.go({ SagaMapScreen(game, a.firstLevel) }, remember = false) }).width(420f)
         root.add(card).width(660f)
     }
 }
@@ -151,9 +153,9 @@ class AreaFinalScreen(game: YanlisRenkGame, private val levelId: Int) : BaseScre
         val lvl = game.levels.level(levelId)
         val card = ui.card(pad = 40f)
         card.add(ui.icon("crown", 120f)).size(120f).row()
-        card.add(ui.label("ALAN FİNALİ", Ui.Size.L, Pal.ORANGE)).row()
+        card.add(ui.label(L.t("common.alan_finali"), Ui.Size.L, Pal.ORANGE)).row()
         card.add(ui.label(a.finalTitle, Ui.Size.XL)).padBottom(10f).row()
-        card.add(ui.label("Bu alanda öğrendiğin her şeyi ölçen ${lvl.gates.size} kapılık büyük sınav.", Ui.Size.M, Pal.TEXT_SOFT, wrap = true)).width(540f).padBottom(14f).row()
+        card.add(ui.label(L.f("map.alanda_ogrendigin_her_seyi", lvl.gates.size), Ui.Size.M, Pal.TEXT_SOFT, wrap = true)).width(540f).padBottom(14f).row()
         val m = Table()
         lvl.mechanics.filter { it != com.yanlisrenk.logic.model.Mechanic.SAME }.take(6).forEach { mm ->
             val p = Table(); p.background = ui.pill(Pal.hex(0xEAF6FF)); p.add(ui.label(mm.title, Ui.Size.S, Pal.BLUE)).pad(4f, 14f, 4f, 14f)
@@ -162,12 +164,12 @@ class AreaFinalScreen(game: YanlisRenkGame, private val levelId: Int) : BaseScre
         }
         card.add(m).padBottom(16f).row()
         val r = Table()
-        r.add(ui.label("Ödül", Ui.Size.S, Pal.TEXT_SOFT)).colspan(2).row()
+        r.add(ui.label(L.t("map.odul"), Ui.Size.S, Pal.TEXT_SOFT)).colspan(2).row()
         r.add(ui.chip("coin", a.rewardGold.toString())).padRight(8f); r.add(ui.chip("diamond", (a.rewardDiamonds + 2).toString())).row()
         r.add(ui.chip("box", a.collectible)).colspan(2).padTop(6f)
         card.add(r).padBottom(24f).row()
-        card.add(ui.button("Finale Başla", Pal.ORANGE, "play") { game.go({ if (session.lives.canPlay) GameScreen(game, Mode.LEVEL, levelId) else LivesScreen(game) }, remember = false) }).width(440f).padBottom(10f).row()
-        card.add(ui.button("Geri", Pal.GREY, textColor = Pal.TEXT, size = Ui.Size.M) { onBack() }).width(300f)
+        card.add(ui.button(L.t("map.finale_basla"), Pal.ORANGE, "play") { game.go({ if (session.lives.canPlay) GameScreen(game, Mode.LEVEL, levelId) else LivesScreen(game) }, remember = false) }).width(440f).padBottom(10f).row()
+        card.add(ui.button(L.t("common.geri"), Pal.GREY, textColor = Pal.TEXT, size = Ui.Size.M) { onBack() }).width(300f)
         root.add(card).width(660f)
     }
 }
@@ -184,24 +186,24 @@ class RewardScreen(game: YanlisRenkGame, private val reward: Reward, private val
         } else card.add(ui.icon(if (reward.areaCompleted > 0) "trophy" else "gift", 150f)).size(150f).row()
         if (reward.areaCompleted > 0) {
             val a = AreaCatalog.area(reward.areaCompleted)
-            card.add(ui.label("ALAN TAMAMLANDI!", Ui.Size.L, Pal.GREEN)).row()
+            card.add(ui.label(L.t("map.alan_tamamlandi"), Ui.Size.L, Pal.GREEN)).row()
             card.add(ui.label(a.name, Ui.Size.XL)).padBottom(10f).row()
             reward.collectible?.let {
                 val c = Table(); c.background = ui.panel(Pal.hex(0xFFF4D6)); c.pad(16f)
                 c.add(ui.icon("box", 70f)).size(70f).padRight(12f)
-                c.add(ui.label("Koleksiyon parçası:\n$it", Ui.Size.M, Pal.TEXT, Align.left))
+                c.add(ui.label(L.f("map.koleksiyon_parcasi", it), Ui.Size.M, Pal.TEXT, Align.left))
                 card.add(c).padBottom(12f).row()
             }
         }
-        if (reward.worldCompleted > 0) card.add(ui.label("${AreaCatalog.world(reward.worldCompleted).name} seti tamam! +20 elmas", Ui.Size.M, Pal.ORANGE, wrap = true)).width(540f).padBottom(10f).row()
-        reward.levelUps.forEach { lv -> card.add(ui.label("Seviye atladın: $lv", Ui.Size.L, Pal.ORANGE)).padBottom(6f).row() }
+        if (reward.worldCompleted > 0) card.add(ui.label(L.f("map.seti_tamam_20_elmas", AreaCatalog.world(reward.worldCompleted).name), Ui.Size.M, Pal.ORANGE, wrap = true)).width(540f).padBottom(10f).row()
+        reward.levelUps.forEach { lv -> card.add(ui.label(L.f("map.seviye_atladin", lv), Ui.Size.L, Pal.ORANGE)).padBottom(6f).row() }
         val rw = Table()
         rw.add(ui.chip("coin", "+${reward.gold}")).pad(6f)
         if (reward.diamonds > 0) rw.add(ui.chip("diamond", "+${reward.diamonds}")).pad(6f)
-        rw.add(ui.chip("sparkle", "+${reward.xp} XP")).pad(6f)
+        rw.add(ui.chip("sparkle", L.f("common.xp", reward.xp))).pad(6f)
         card.add(rw).padBottom(20f).row()
         val next = levelId + 1
-        card.add(ui.button("Devam", Pal.GREEN, "play") {
+        card.add(ui.button(L.t("common.devam"), Pal.GREEN, "play") {
             game.go({
                 if (!mastery && next <= 500 && reward.areaCompleted > 0) {
                     val na = AreaCatalog.areaOfLevel(next)

@@ -118,8 +118,8 @@ class SaveManager(private val storage: SaveStorage, private val newInstallId: ()
     private fun sanitize(d: SaveData): SaveData {
         if (d.gold < 0) d.gold = 0
         if (d.diamonds < 0) d.diamonds = 0
-        d.lives.lives = d.lives.lives.coerceIn(0, 4)
-        d.lives.regenRemaining = d.lives.regenRemaining.coerceIn(1, 15 * 60_000L)
+        d.lives.lives = d.lives.lives.coerceIn(0, com.yanlisrenk.logic.config.GameConfig.MAX_LIVES)
+        d.lives.regenRemaining = d.lives.regenRemaining.coerceIn(1, com.yanlisrenk.logic.config.GameConfig.LIFE_REGEN_MS)
         d.unlockedLevel = d.unlockedLevel.coerceIn(1, 500)
         ShopCatalog.defaults.forEach { (cat, id) -> d.owned.add(id); if (d.equipped[cat.name] !in d.owned) d.equipped[cat.name] = id }
         return d

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Miscolor</string>
+    <string name="crash_title">Si è verificato un errore all\'ultimo avvio</string>
+    <string name="crash_message">Puoi copiare questo testo e inviarlo allo sviluppatore:</string>
+    <string name="crash_copy">Copia</string>
+    <string name="crash_close">Chiudi</string>
+</resources>

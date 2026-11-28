@@ -34,6 +34,9 @@ class YanlisRenkGame(val platform: PlatformServices) : Game() {
         assets.load()
         com.yanlisrenk.game.render.CharacterPainter.spriteFor = { id -> assets.characterSprite(id) }
         session = GameSession(SaveManager(platform.storage) { platform.newInstallId() }, platform.clock) { platform.tzOffsetMillis() }
+        // dil: kayıtlı tercih yoksa cihaz dili (desteklenmiyorsa İngilizce)
+        com.yanlisrenk.logic.i18n.L.install { code -> runCatching { Gdx.files.internal("localization/$code.json").readString("UTF-8") }.getOrNull() }
+        com.yanlisrenk.logic.i18n.L.setLanguage(com.yanlisrenk.logic.i18n.L.resolve(session.data.settings.language, java.util.Locale.getDefault().language))
         audio = Audio(assets) { session.data.settings }
         ui = Ui(assets, audio)
         levels = LevelRepository { name -> runCatching { Gdx.files.internal("levels/$name").readString("UTF-8") }.getOrNull() }

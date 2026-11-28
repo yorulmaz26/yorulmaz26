@@ -26,6 +26,7 @@ class FakeClock(var wall: Long = 1_763_500_000_000L, var elapsed: Long = 50_000L
 
 class MetaTests {
     private val MIN = 60_000L
+    private val R = LifeManager.REGEN_MS
     private fun session(storage: SaveStorage = MemoryStorage(), clock: FakeClock = FakeClock()) =
         GameSession(SaveManager(storage) { "test-install" }, clock)
 
@@ -47,23 +48,48 @@ class MetaTests {
         assertEquals(3, s.lives.lives)
     }
 
-    @Test fun onBesDakikalikYenileme() {
+    @Test fun yirmiDakikalikYenileme() {
+        assertEquals(1200, com.yanlisrenk.logic.config.GameConfig.LIFE_REGEN_SECONDS)
+        assertEquals(20 * MIN, R)
+        assertEquals(4, LifeManager.MAX_LIVES)
         val lm = LifeManager(LifeState())
         repeat(4) { lm.onLevelFailed() }
-        assertEquals(60 * MIN, lm.fullIn)
-        lm.credit(15 * MIN - 1); assertEquals(0, lm.lives)
-        lm.credit(1); assertEquals(1, lm.lives); assertEquals(45 * MIN, lm.fullIn)
-        lm.credit(45 * MIN); assertEquals(4, lm.lives); assertEquals(0L, lm.nextLifeIn)
-        // sayaç sıfırlanmaz: 3 can varken 10 dk geçti, sonra yeni kayıp
+        assertEquals(80 * MIN, lm.fullIn)
+        lm.credit(R - 1); assertEquals(0, lm.lives)
+        lm.credit(1); assertEquals(1, lm.lives); assertEquals(60 * MIN, lm.fullIn)
+        lm.credit(60 * MIN); assertEquals(4, lm.lives); assertEquals(0L, lm.nextLifeIn)
+        // sayaç sıfırlanmaz: 3 can varken 12 dk geçti, sonra yeni kayıp
         val l2 = LifeManager(LifeState())
-        l2.onLevelFailed(); l2.credit(10 * MIN); l2.onLevelFailed()
-        assertEquals(2, l2.lives); assertEquals(5 * MIN, l2.nextLifeIn)
-        l2.credit(5 * MIN); assertEquals(3, l2.lives); assertEquals(15 * MIN, l2.nextLifeIn)
-        // örnekler: 0→60, 1→45, 2→30, 3→15 dk
+        l2.onLevelFailed(); l2.credit(12 * MIN); l2.onLevelFailed()
+        assertEquals(2, l2.lives); assertEquals(8 * MIN, l2.nextLifeIn)
+        l2.credit(8 * MIN); assertEquals(3, l2.lives); assertEquals(R, l2.nextLifeIn)
+        // örnekler: 0→80, 1→60, 2→40, 3→20 dk
         for (start in 0..3) {
-            val l = LifeManager(LifeState(lives = start, regenRemaining = 15 * MIN))
-            assertEquals((4 - start) * 15 * MIN, l.fullIn)
+            val l = LifeManager(LifeState(lives = start, regenRemaining = R))
+            assertEquals((4 - start) * R, l.fullIn)
         }
+    }
+
+    @Test fun canlarTamkenSayacDurur() {
+        val lm = LifeManager(LifeState())
+        lm.credit(5 * 60 * MIN)
+        assertEquals(4, lm.lives); assertEquals(0L, lm.nextLifeIn); assertEquals(R, lm.state.regenRemaining)
+        // ilk kayıpta sayaç tam süreden başlar
+        lm.onLevelFailed(); assertEquals(R, lm.nextLifeIn)
+    }
+
+    @Test fun canEksiyeDusmezMaksimumuAsmaz() {
+        val lm = LifeManager(LifeState(lives = 0, regenRemaining = R))
+        repeat(5) { lm.onLevelFailed() }
+        assertEquals(0, lm.lives)
+        lm.addLives(10); assertEquals(4, lm.lives)
+        lm.addLives(-3); assertEquals(4, lm.lives)
+        // bozuk kayıt değerleri düzeltilir
+        val bad = LifeManager(LifeState(lives = -7, regenRemaining = -5))
+        bad.normalize(); assertEquals(0, bad.lives); assertEquals(R, bad.nextLifeIn)
+        val big = LifeManager(LifeState(lives = 99, regenRemaining = 99 * R))
+        big.normalize(); assertEquals(4, big.lives); assertEquals(0L, big.nextLifeIn)
+        big.credit(Long.MAX_VALUE / 4); assertEquals(4, big.lives)
     }
 
     @Test fun saatIleriAlmaCanDoldurmaz() {
@@ -76,7 +102,7 @@ class MetaTests {
         s.update()
         assertEquals(0, s.lives.lives)
         assertTrue(s.data.clock.wallJumps >= 1)
-        c.pass(15 * MIN); s.update()
+        c.pass(R); s.update()
         assertEquals(1, s.lives.lives) // gerçek geçen süre işler
     }
 
@@ -84,8 +110,8 @@ class MetaTests {
         val c = FakeClock(); val s = session(MemoryStorage(), c)
         s.startLevel(1); s.failLevel(1)
         c.wall -= 5 * 60 * MIN; c.elapsed += 10 * MIN; s.update()
-        assertEquals(5 * MIN, s.lives.nextLifeIn)
-        c.pass(5 * MIN); s.update()
+        assertEquals(R - 10 * MIN, s.lives.nextLifeIn)
+        c.pass(R - 10 * MIN); s.update()
         assertEquals(4, s.lives.lives)
     }
 
@@ -94,7 +120,7 @@ class MetaTests {
         val s = session(st, c)
         s.startLevel(1); s.failLevel(1); s.startLevel(1); s.failLevel(1)
         assertEquals(2, s.lives.lives)
-        c.pass(20 * MIN) // uygulama kapalı, cihaz açık
+        c.pass(30 * MIN) // uygulama kapalı, cihaz açık
         val s2 = session(st, c)
         assertEquals(3, s2.lives.lives); assertEquals(10 * MIN, s2.lives.nextLifeIn)
     }
@@ -104,18 +130,95 @@ class MetaTests {
         val s = session(st, c)
         s.applyServerTime(c.wall) // doğrulanmış çapa
         repeat(4) { s.startLevel(1); s.failLevel(1) }
-        c.reboot(offMs = 50 * MIN, upMs = 10 * MIN) // 50 dk kapalı, 10 dk önce açıldı, saat ileri alınmış olabilir
+        c.reboot(offMs = 70 * MIN, upMs = 10 * MIN) // 70 dk kapalı, 10 dk önce açıldı, saat ileri alınmış olabilir
         c.wall += 300 * MIN
         val s2 = session(st, c)
-        // çevrimdışı: yalnızca açılıştan beri geçen 10 dk kesin → can yok, 5 dk kaldı
-        assertEquals(0, s2.lives.lives); assertEquals(5 * MIN, s2.lives.nextLifeIn)
+        // çevrimdışı: yalnızca açılıştan beri geçen 10 dk kesin → can yok, 10 dk kaldı
+        assertEquals(0, s2.lives.lives); assertEquals(10 * MIN, s2.lives.nextLifeIn)
         assertTrue(s2.clock.hasUnverifiedGap)
-        // internet geldi: gerçek zaman = çapa + 60 dk (saat hilesi yok sayılır)
+        // internet geldi: gerçek zaman = çapa + 80 dk (saat hilesi yok sayılır)
         val realNow = c.wall - 300 * MIN
         val credit = s2.applyServerTime(realNow)
-        assertEquals(50 * MIN, credit)
+        assertEquals(70 * MIN, credit)
         assertEquals(4, s2.lives.lives)
         assertFalse(s2.clock.hasUnverifiedGap)
+    }
+
+    @Test fun hicDogrulanmamisCihazYenidenBaslatma() {
+        // hiç internete çıkmamış cihaz: kapalı kalınan süre bekletilir, ilk sunucu saatinde verilir
+        val c = FakeClock(); val st = MemoryStorage()
+        val s = session(st, c)
+        repeat(4) { s.startLevel(1); s.failLevel(1) }
+        c.reboot(offMs = 75 * MIN, upMs = 5 * MIN)
+        val s2 = session(st, c)
+        assertEquals(0, s2.lives.lives); assertEquals(15 * MIN, s2.lives.nextLifeIn)
+        val credit = s2.applyServerTime(c.wall)
+        assertEquals(75 * MIN, credit); assertEquals(4, s2.lives.lives)
+    }
+
+    @Test fun tekrarliYenidenAcmaZamaniKatlamaz() {
+        // uygulamayı art arda kapatıp açmak (zorla durdurma dahil) süreyi iki kez saymaz
+        val c = FakeClock(); val st = MemoryStorage()
+        var s = session(st, c)
+        repeat(4) { s.startLevel(1); s.failLevel(1) }
+        repeat(30) { c.pass(30_000L); s = session(st, c) } // 30 × 30 sn = 15 dk
+        assertEquals(0, s.lives.lives); assertEquals(5 * MIN, s.lives.nextLifeIn)
+        c.pass(5 * MIN); s = session(st, c)
+        assertEquals(1, s.lives.lives); assertEquals(R, s.lives.nextLifeIn)
+    }
+
+    @Test fun reklamSonrasiCan() {
+        val s = session()
+        assertFalse(s.grantAdLife()) // canlar tam: verilmez
+        s.startLevel(1); s.failLevel(1); s.startLevel(1); s.failLevel(1)
+        val timer = s.lives.nextLifeIn
+        assertTrue(s.grantAdLife()); assertEquals(3, s.lives.lives)
+        assertEquals(timer, s.lives.nextLifeIn) // sayaç sıfırlanmaz
+        assertTrue(s.grantAdLife()); assertEquals(4, s.lives.lives); assertEquals(0L, s.lives.nextLifeIn)
+        assertFalse(s.grantAdLife()); assertEquals(4, s.lives.lives)
+    }
+
+    @Test fun saatDilimiDegistirmeGunlukOdulVermez() {
+        val c = FakeClock(wall = 1_763_510_400_000L) // 19.11.2025 00:00 UTC → TR 03:00
+        var tz = 3 * 60 * MIN
+        val st = MemoryStorage()
+        val s = GameSession(SaveManager(st) { "t" }, c) { tz }
+        s.applyServerTime(c.wall)
+        assertNotNull(s.claimDaily())
+        c.pass(11 * 60 * MIN) // TR 14:00 (UTC 11:00)
+        tz = 14 * 60 * MIN // saat dilimi UTC+14 → yerel saat ertesi gün 01:00 görünür
+        s.update()
+        assertFalse(s.canClaimDaily()); assertNull(s.claimDaily())
+        tz = 3 * 60 * MIN
+        c.pass(10 * 60 * MIN) // TR ertesi gün 00:00
+        s.update()
+        assertTrue(s.canClaimDaily()); assertNotNull(s.claimDaily())
+        // batıya yolculuk: gün anahtarı geri gitmez, ikinci kez alınamaz
+        tz = -10 * 60 * MIN
+        s.update(); assertNull(s.claimDaily())
+    }
+
+    @Test fun tarihIleriAlmaDogrulanmisCihazdaGunlukOdulVermez() {
+        val c = FakeClock(); val s = session(MemoryStorage(), c)
+        s.applyServerTime(c.wall)
+        assertNotNull(s.claimDaily())
+        c.wall += 3 * 24 * 60 * MIN; c.elapsed += 1000 // tarih 3 gün ileri
+        s.update()
+        assertNull(s.claimDaily())
+    }
+
+    @Test fun guncellemeSonrasiCanDurumuKorunur() {
+        // eski sürüm (15 dk) kaydı: 2 can, 9 dk kalan → yeni sürümde aynen korunur
+        val st = MemoryStorage(); val c = FakeClock()
+        val s = session(st, c)
+        s.lives.state.lives = 2; s.lives.state.regenRemaining = 9 * MIN; s.save()
+        val s2 = session(st, c)
+        assertEquals(2, s2.lives.lives); assertEquals(9 * MIN, s2.lives.nextLifeIn)
+        // kurcalanmış kayıt: HMAC tutmaz → yedekten/yeni kayıtla açılır, can eksi olamaz
+        val raw = st.read(SaveManager.FILE)!!
+        st.write(SaveManager.FILE, raw.replace("\"lives\":2", "\"lives\":99"))
+        val s3 = session(st, c)
+        assertTrue(s3.lives.lives in 0..4)
     }
 
     @Test fun yarimKalanBolumBasarisizSayilir() {

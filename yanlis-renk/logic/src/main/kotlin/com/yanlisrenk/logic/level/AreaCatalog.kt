@@ -2,13 +2,16 @@ package com.yanlisrenk.logic.level
 
 import com.yanlisrenk.logic.model.Mechanic
 import com.yanlisrenk.logic.model.Mechanic.*
+import com.yanlisrenk.logic.i18n.L
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /** Dünya (5 alanlık tema ailesi). [deco] görsel süsleme ailesinin anahtarıdır. */
 @Serializable
 data class WorldInfo(
     val id: Int,
-    val name: String,
+    /** Türkçe ad (kaynak metin). Gösterimde [name] kullanılır. */
+    @SerialName("name") val nameTr: String,
     val deco: String,
     val music: String,
     val skyTop: Int,
@@ -17,20 +20,23 @@ data class WorldInfo(
     val accent1: Int,
     val accent2: Int,
     val accent3: Int,
-)
+) {
+    /** Seçili dildeki ad. */
+    val name: String get() = L.tOr("world.$id.name", nameTr)
+}
 
 @Serializable
 data class AreaInfo(
     val id: Int,
     val world: Int,
-    val name: String,
-    val description: String,
+    @SerialName("name") val nameTr: String,
+    @SerialName("description") val descriptionTr: String,
     /** Bu alanda öne çıkan (ve ilkse tanıtılan) mekanikler. */
     val focus: List<Mechanic>,
     /** Bu alanda ilk kez öğretilen mekanikler. */
     val introduces: List<Mechanic>,
-    val finalTitle: String,
-    val collectible: String,
+    @SerialName("finalTitle") val finalTitleTr: String,
+    @SerialName("collectible") val collectibleTr: String,
     val rewardGold: Int,
     val rewardDiamonds: Int,
     /** Görsel varyant 0..4 (aynı dünyadaki alanlar farklı görünür). */
@@ -48,6 +54,10 @@ data class AreaInfo(
     val gapMul: Float = 1f,
     val coinDensity: Float = 1f,
 ) {
+    val name: String get() = L.tOr("area.$id.name", nameTr)
+    val description: String get() = L.tOr("area.$id.desc", descriptionTr)
+    val finalTitle: String get() = L.tOr("area.$id.final", finalTitleTr)
+    val collectible: String get() = L.tOr("area.$id.collectible", collectibleTr)
     val firstLevel: Int get() = (id - 1) * 5 + 1
     val lastLevel: Int get() = id * 5
 }
@@ -226,8 +236,8 @@ object AreaCatalog {
             val tint = variantTints[variant]
             val amt = if (variant == 0) 0f else 0.18f
             AreaInfo(
-                id = id, world = w.id, name = d.name, description = d.desc,
-                focus = d.focus, introduces = intro, finalTitle = d.finalTitle, collectible = d.collectible,
+                id = id, world = w.id, nameTr = d.name, descriptionTr = d.desc,
+                focus = d.focus, introduces = intro, finalTitleTr = d.finalTitle, collectibleTr = d.collectible,
                 rewardGold = 150 + id * 12, rewardDiamonds = if (variant == 4) 10 + id / 10 else 1 + id / 25,
                 variant = variant,
                 skyTop = mix(w.skyTop, tint, amt), skyBottom = mix(w.skyBottom, tint, amt * 0.4f), path = mix(w.path, tint, amt * 0.3f),

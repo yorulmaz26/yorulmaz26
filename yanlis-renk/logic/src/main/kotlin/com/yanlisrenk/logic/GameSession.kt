@@ -1,5 +1,7 @@
 package com.yanlisrenk.logic
 
+import com.yanlisrenk.logic.config.GameConfig
+
 import com.yanlisrenk.logic.level.AreaCatalog
 import com.yanlisrenk.logic.life.LifeManager
 import com.yanlisrenk.logic.progress.Achievement
@@ -51,6 +53,8 @@ enum class PurchaseResult { OK, NOT_ENOUGH, ALREADY_OWNED, LOCKED_LEVEL, NOT_FOR
  * Oyunun tüm meta sistemlerini (ekonomi, market, can, görev, başarı, ilerleme) tek yerde
  * toplayan, arayüzden bağımsız yönetici. Arayüz yalnızca bu sınıfın metotlarını çağırır.
  */
+private const val DAY_MS = 86_400_000L
+
 class GameSession(
     private val saveManager: SaveManager,
     platformClock: PlatformClock,
@@ -66,6 +70,7 @@ class GameSession(
     val pendingAchievementToasts = ArrayList<Achievement>()
 
     init {
+        lives.normalize()
         val d = clock.tick()
         lives.credit(d)
         if (data.createdAt == 0L) data.createdAt = clock.now()
@@ -81,7 +86,26 @@ class GameSession(
 
     // ---------- zaman ----------
 
-    fun dayKey(): Long = Math.floorDiv(clock.dayNow() + tzOffsetMillis(), 86_400_000L)
+    /**
+     * Yerel gün anahtarı. Saat dilimi değiştirilerek aynı gün içinde yeni güne geçilemez:
+     * ilerleme için kayıtlı günün başlangıcından bu yana en az [GameConfig.DAY_ADVANCE_MIN_MS]
+     * güvenilir süre geçmiş olmalıdır. Gün anahtarı asla geri gitmez.
+     */
+    fun dayKey(): Long {
+        val now = clock.dayNow()
+        val tz = tzOffsetMillis()
+        val raw = Math.floorDiv(now + tz, DAY_MS)
+        if (data.dayGuardKey < 0) {
+            data.dayGuardKey = raw
+            data.dayGuardStart = raw * DAY_MS - tz
+            dirty = true
+        } else if (raw > data.dayGuardKey && now - data.dayGuardStart >= GameConfig.DAY_ADVANCE_MIN_MS) {
+            data.dayGuardKey = raw
+            data.dayGuardStart = minOf(now, raw * DAY_MS - tz)
+            dirty = true
+        }
+        return data.dayGuardKey
+    }
     fun weekKey(): Long = Math.floorDiv(dayKey() + 3, 7L)
 
     /** Kare başına değil, ~1 sn'de bir çağrılır. Dolan can sayısını döndürür. */
@@ -99,6 +123,14 @@ class GameSession(
         dirty = true
         save()
         return credit
+    }
+
+    /** Ödüllü reklam tamamlandı: 1 can verir (canlar tamsa vermez). Her reklam için bir kez çağrılır. */
+    fun grantAdLife(): Boolean {
+        if (lives.isFull) return false
+        lives.addLives(1)
+        save()
+        return true
     }
 
     fun save() {
@@ -476,12 +508,14 @@ class GameSession(
     fun resetProgress() {
         val fresh = saveManager.fresh()
         val keepSettings = data.settings
-        // tüm alanları kopyala
+        val keepLastDaily = data.daily.lastClaimDay
+        // tüm alanları kopyala (zaman/gün koruması ve can durumu hariç)
         SaveData::class.java.declaredFields.forEach { f ->
-            if (java.lang.reflect.Modifier.isStatic(f.modifiers) || f.name == "lives" || f.name == "clock") return@forEach
+            if (java.lang.reflect.Modifier.isStatic(f.modifiers) || f.name in setOf("lives", "clock", "dayGuardKey", "dayGuardStart")) return@forEach
             f.isAccessible = true; f.set(data, f.get(fresh))
         }
         data.settings = keepSettings
+        data.daily.lastClaimDay = keepLastDaily // sıfırlama ile aynı gün ikinci günlük ödül alınamaz
         lives.state.lives = LifeManager.MAX_LIVES
         lives.state.regenRemaining = LifeManager.REGEN_MS
         lives.state.shieldArmed = false

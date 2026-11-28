@@ -1,4 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Yanlış Renk</string>
+    <string name="app_name">Miscolor</string>
+    <string name="crash_title">An error occurred last time</string>
+    <string name="crash_message">You can copy this text and send it to the developer:</string>
+    <string name="crash_copy">Copy</string>
+    <string name="crash_close">Close</string>
 </resources>
