@@ -58,7 +58,7 @@ public class PromoCaptureTest {
     // geçerli klip
     private File clipDir;
     private int frame;
-    private StringBuilder events;
+    private StringBuilder events, uptimes;
 
     private void idle(long ms) { shadowOf(Looper.getMainLooper()).idleFor(Duration.ofMillis(ms)); }
 
@@ -86,6 +86,7 @@ public class PromoCaptureTest {
         for (File old : clipDir.listFiles()) old.delete();
         frame = 0;
         events = new StringBuilder();
+        uptimes = new StringBuilder();
     }
 
     private void rec(double seconds) throws Exception {
@@ -93,6 +94,7 @@ public class PromoCaptureTest {
         for (int i = 0; i < n; i++) {
             idle(FRAME_MS);
             draw();
+            uptimes.append(',').append(android.os.SystemClock.uptimeMillis());
             try (FileOutputStream o = new FileOutputStream(new File(clipDir, String.format(Locale.ROOT, "%05d.jpg", frame)))) {
                 bmp.compress(Bitmap.CompressFormat.JPEG, 93, o);
             }
@@ -103,7 +105,8 @@ public class PromoCaptureTest {
     private void end() throws Exception {
         try (FileWriter w = new FileWriter(new File(clipDir, "events.json"), StandardCharsets.UTF_8)) {
             w.write("{\"fps\":" + FPS + ",\"frames\":" + frame + ",\"w\":" + bmp.getWidth() + ",\"h\":" + bmp.getHeight()
-                    + ",\"events\":[" + (events.length() > 0 ? events.substring(1) : "") + "]}");
+                    + ",\"events\":[" + (events.length() > 0 ? events.substring(1) : "") + "]"
+                    + ",\"uptime\":[" + (uptimes.length() > 0 ? uptimes.substring(1) : "") + "]}");
         }
     }
 
@@ -166,7 +169,8 @@ public class PromoCaptureTest {
         for (int i = 0; i < sol.size(); i++) {
             play(gs, l, sol.get(i));
             boolean lastMove = i == sol.size() - 1;
-            if (lastMove && i + 1 == shotAfter) { rec(0.55); shot(shotName); rec(0.70); } // bütün hedefler yanarken
+            // bütün hedefler yanarken (Robolectric kazanmadan hemen sonra test saatini ileri sarabildiği için kısa bekleme)
+            if (lastMove && i + 1 == shotAfter) { rec(0.10); shot(shotName); rec(1.15); }
             else {
                 rec(lastMove ? 1.25 : perMove);
                 if (i + 1 == shotAfter) shot(shotName);

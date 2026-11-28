@@ -47,7 +47,7 @@ https://policies.google.com/technologies/ads
 ## Kinder
 
 Das Spiel richtet sich an ein allgemeines Publikum und nicht gezielt an Kinder. Werbeinhalte sind auf die Einstufung
-„PG“ (allgemeines Publikum) beschränkt. Das Spiel erhebt nicht wissentlich personenbezogene Daten von Kindern unter
+„PG“ (elterliche Begleitung empfohlen; keine Inhalte für Erwachsene) beschränkt. Das Spiel erhebt nicht wissentlich personenbezogene Daten von Kindern unter
 13 Jahren.
 
 ## Löschen deiner Daten

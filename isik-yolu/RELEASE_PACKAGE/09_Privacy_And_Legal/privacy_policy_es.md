@@ -47,7 +47,7 @@ Estos datos se cifran en tránsito (TLS). Cómo utiliza Google los datos: https:
 ## Niños
 
 El juego está pensado para un público general y no está dirigido a niños. El contenido de los anuncios está limitado a
-la clasificación «PG» (público general). El juego no recopila a sabiendas datos personales de niños menores de 13
+la clasificación «PG» (se recomienda orientación parental; sin contenido para adultos). El juego no recopila a sabiendas datos personales de niños menores de 13
 años.
 
 ## Eliminación de tus datos

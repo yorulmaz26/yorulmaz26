@@ -17,9 +17,30 @@
   ],
   "gameplay": "Jedes Level hat eine oder mehrere Lichtquellen und Zielringe. Tippe auf drehbare Spiegel, um die Richtung des Strahls zu ändern, schiebe Steine beiseite, um den Weg freizumachen, und nutze Prismen und Filter, um die richtige Farbe zu erhalten. Sobald alle Ziele leuchten, ist das Level geschafft. Je weniger Züge du brauchst, desto mehr Sterne bekommst du.",
   "target_audience": "Spielerinnen und Spieler jeden Alters, die Logik- und Rätselspiele mögen, und alle, die ein entspanntes Offline-Spiel für kurze Pausen suchen. Die Inhalte sind für ein allgemeines Publikum geeignet.",
-  "keywords": ["Licht Puzzle", "Spiegel Rätsel", "Laser Puzzle", "Logikspiel", "Logikrätsel", "Denkspiel", "Knobelspiel", "Rätselspiel", "Gehirnjogging", "Spiele ohne Internet", "Offline Spiele", "Farbrätsel", "Tagesrätsel", "Prisma"],
+  "keywords": [
+    "Licht Puzzle",
+    "Spiegel Rätsel",
+    "Laser Puzzle",
+    "Logikspiel",
+    "Logikrätsel",
+    "Denkspiel",
+    "Knobelspiel",
+    "Rätselspiel",
+    "Gehirnjogging",
+    "Spiele ohne Internet",
+    "Offline Spiele",
+    "Farbrätsel",
+    "Tagesrätsel",
+    "Prisma"
+  ],
   "category": "Spiele › Puzzles",
-  "tags": ["Puzzles", "Logik", "Denkspiele", "Einzelspieler", "Offline"],
+  "tags": [
+    "Puzzles",
+    "Logik",
+    "Denkspiele",
+    "Einzelspieler",
+    "Offline"
+  ],
   "release_notes": "Prismway (Işık Yolu) ist da!\n• 500 Level in 5 Welten\n• Tagesrätsel und Erfolge\n• In 6 Sprachen verfügbar\n• Alle 20 Minuten füllt sich 1 Leben auf",
   "video_title": "Prismway (Işık Yolu) – Gameplay-Trailer",
   "youtube_description": "Prismway (Işık Yolu) ist ein Logik-Rätselspiel, in dem du Licht mit Spiegeln lenkst. Drehe Spiegel, zerlege Licht mit Prismen in seine Farben, verschiebe Steine und öffne Türen mit Schlüsseln.\n\n• 500 Level in 5 Welten\n• Jeden Tag ein neues Rätsel\n• Offline spielbar\n• 6 Sprachen\n\nAlle Szenen in diesem Video zeigen echtes Gameplay.\nMagic Lumos Software",
@@ -29,14 +50,38 @@
     "Jeden Tag ein neues Rätsel! Halte deine Serie am Laufen und sammle Belohnungen. ☀️ Prismway (Işık Yolu) von Magic Lumos Software"
   ],
   "screenshot_captions": [
-    ["Lenke das Licht", "Dreh die Spiegel, lass jedes Ziel leuchten"],
-    ["Prismen und Farben", "Zerlege weißes Licht in seine Farben"],
-    ["Sammle die Sterne", "3 Sterne für die wenigsten Züge"],
-    ["5 Welten, 500 Level", "Vom leichten Einstieg zur Meisterschaft"],
-    ["Schlüssel und Türen", "Beleuchte den Schlüssel, öffne die Tür"],
-    ["Verschiebe die Steine", "Schieb Blöcke, mach dem Licht den Weg frei"],
-    ["Täglich ein neues Rätsel", "Halte deine Serie, sammle Belohnungen"],
-    ["Dein eigener Stil", "Designs für Spiegel, Bretter und Strahlen"]
+    [
+      "Lenke das Licht",
+      "Dreh die Spiegel, lass jedes Ziel leuchten"
+    ],
+    [
+      "Prismen und Farben",
+      "Zerlege weißes Licht in seine Farben"
+    ],
+    [
+      "Sammle die Sterne",
+      "3 Sterne für die wenigsten Züge"
+    ],
+    [
+      "5 Welten, 500 Level",
+      "Vom leichten Einstieg zur Meisterschaft"
+    ],
+    [
+      "Schlüssel und Türen",
+      "Beleuchte den Schlüssel, öffne die Tür"
+    ],
+    [
+      "Verschiebe die Steine",
+      "Schieb Blöcke, mach dem Licht den Weg frei"
+    ],
+    [
+      "Täglich ein neues Rätsel",
+      "Halte deine Serie, sammle Belohnungen"
+    ],
+    [
+      "Dein eigener Stil",
+      "Designs für Spiegel, Bretter und Strahlen"
+    ]
   ],
   "screenshot_alt_texts": [
     "Auf dem Spielbrett wird ein goldener Strahl von zwei Spiegeln reflektiert und erreicht die türkisfarbenen Zielringe.",
@@ -54,6 +99,7 @@
     "mechanic": "Dreh die Spiegel",
     "mechanic2": "Lass jedes Ziel leuchten",
     "experience": "Zerlege Licht in Farben",
+    "experience2": "Jedes Level ein neues Rätsel",
     "variety": "5 Welten · 500 Level",
     "variety2": "Steine, Schlüssel und Türen",
     "success": "Hol dir alle 3 Sterne",

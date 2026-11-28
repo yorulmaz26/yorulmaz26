@@ -17,9 +17,28 @@
   ],
   "gameplay": "Her bölümde bir ya da daha fazla ışık kaynağı ve hedef halka var. Dönebilen aynalara dokunarak ışığın yönünü değiştirir, taşları iterek yol açar, prizma ve süzgeçlerle doğru rengi elde edersin. Bütün hedefler yandığında bölüm biter. Ne kadar az hamle, o kadar çok yıldız.",
   "target_audience": "Mantık ve bulmaca oyunlarını seven her yaştan oyuncu; kısa molalarda oynanacak, internetsiz, sakin bir oyun arayanlar. İçerik genel kitleye uygundur.",
-  "keywords": ["ışık bulmacası", "ayna bulmacası", "mantık oyunu", "lazer bulmaca", "prizma", "zeka oyunu", "beyin oyunu", "internetsiz oyun", "çevrimdışı bulmaca", "renk bulmacası", "günlük bulmaca", "yansıma"],
+  "keywords": [
+    "ışık bulmacası",
+    "ayna bulmacası",
+    "mantık oyunu",
+    "lazer bulmaca",
+    "prizma",
+    "zeka oyunu",
+    "beyin oyunu",
+    "internetsiz oyun",
+    "çevrimdışı bulmaca",
+    "renk bulmacası",
+    "günlük bulmaca",
+    "yansıma"
+  ],
   "category": "Oyun › Bulmaca",
-  "tags": ["Bulmaca", "Mantık", "Beyin oyunları", "Tek oyunculu", "Çevrimdışı"],
+  "tags": [
+    "Bulmaca",
+    "Mantık",
+    "Beyin oyunları",
+    "Tek oyunculu",
+    "Çevrimdışı"
+  ],
   "release_notes": "Işık Yolu (Prismway) yayında!\n• 500 bölüm, 5 dünya\n• Günlük bulmaca ve başarılar\n• 6 dil desteği\n• Canlar 20 dakikada bir yenilenir",
   "video_title": "Işık Yolu (Prismway) – Oynanış Fragmanı",
   "youtube_description": "Işık Yolu (Prismway), ışığı aynalarla yönlendirdiğin bir mantık bulmacası. Aynaları döndür, prizmalarla ışığı renklerine ayır, taşları kaydır, anahtarlarla kapıları aç.\n\n• 500 bölüm, 5 dünya\n• Her gün yeni bulmaca\n• İnternetsiz oynanır\n• 6 dil\n\nVideodaki tüm görüntüler oyunun gerçek oynanışıdır.\nMagic Lumos Software",
@@ -29,14 +48,38 @@
     "Her gün yeni bir bulmaca! Serini sürdür, ödülleri topla. ☀️ Işık Yolu (Prismway) – Magic Lumos Software"
   ],
   "screenshot_captions": [
-    ["Işığı yönlendir", "Aynaları döndür, bütün hedefleri yak"],
-    ["Prizmalar ve renkler", "Beyaz ışığı renklerine ayır"],
-    ["Yıldızları topla", "En az hamleyle bitir, 3 yıldız kazan"],
-    ["5 dünya, 500 bölüm", "Kolaydan ustalığa adım adım"],
-    ["Anahtarlar ve kapılar", "Anahtarı ışıkla yak, kapı açılsın"],
-    ["Taşları kaydır", "Işığa yol açmak için blokları it"],
-    ["Her gün yeni bulmaca", "Seriyi sürdür, ödülleri topla"],
-    ["Kendi tarzın", "Ayna, tahta ve ışın görünümleri"]
+    [
+      "Işığı yönlendir",
+      "Aynaları döndür, bütün hedefleri yak"
+    ],
+    [
+      "Prizmalar ve renkler",
+      "Beyaz ışığı renklerine ayır"
+    ],
+    [
+      "Yıldızları topla",
+      "En az hamleyle bitir, 3 yıldız kazan"
+    ],
+    [
+      "5 dünya, 500 bölüm",
+      "Kolaydan ustalığa adım adım"
+    ],
+    [
+      "Anahtarlar ve kapılar",
+      "Anahtarı ışıkla yak, kapı açılsın"
+    ],
+    [
+      "Taşları kaydır",
+      "Işığa yol açmak için blokları it"
+    ],
+    [
+      "Her gün yeni bulmaca",
+      "Seriyi sürdür, ödülleri topla"
+    ],
+    [
+      "Kendi tarzın",
+      "Ayna, tahta ve ışın görünümleri"
+    ]
   ],
   "screenshot_alt_texts": [
     "Oyun tahtasında altın renkli ışın iki aynadan yansıyarak turkuaz hedef halkalara ulaşıyor.",
@@ -54,6 +97,7 @@
     "mechanic": "Aynaları döndür",
     "mechanic2": "Bütün hedefleri yak",
     "experience": "Prizmalarla renkleri ayır",
+    "experience2": "Her bölüm yeni bir bulmaca",
     "variety": "5 dünya · 500 bölüm",
     "variety2": "Taşlar, anahtarlar, kapılar",
     "success": "3 yıldızı topla",

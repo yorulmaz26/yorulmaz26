@@ -42,7 +42,7 @@ https://policies.google.com/technologies/ads
 
 ## Çocuklar
 
-Oyun genel kitleye yöneliktir ve özellikle çocuklara yönelik değildir. Reklam içeriği "PG" (genel izleyici) düzeyiyle
+Oyun genel kitleye yöneliktir ve özellikle çocuklara yönelik değildir. Reklam içeriği "PG" (ebeveyn rehberliği; yetişkin içeriği yok) düzeyiyle
 sınırlandırılmıştır. Oyun bilerek 13 yaşından küçük çocuklardan kişisel veri toplamaz.
 
 ## Verilerin silinmesi

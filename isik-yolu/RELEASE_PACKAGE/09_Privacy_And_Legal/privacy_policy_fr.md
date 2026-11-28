@@ -10,11 +10,11 @@ confidentialité.
 
 - Il ne te demande pas de créer de compte et ne te demande aucune information personnelle telle que ton nom, ton
   adresse e-mail ou ton numéro de téléphone.
-- Ta progression, tes étoiles, tes paramètres, ton choix de langue, tes vies, ta monnaie de jeu et tes objets de jeu
+- Ta progression, tes étoiles, tes paramètres, ton choix de langue, tes vies, ta monnaie virtuelle et tes objets du jeu
   sont stockés uniquement sur ton appareil. Ils ne sont jamais envoyés à un serveur nous appartenant ; nous
   n’exploitons aucun serveur.
 - Pour calculer les délais de recharge des vies, le jeu lit, sur l’appareil, les horloges propres à l’appareil
-  (horloge système, temps écoulé depuis le démarrage et, si elle est disponible, heure réseau). Ces informations ne
+  (horloge système, temps écoulé depuis le démarrage et, si elle est disponible, heure du réseau). Ces informations ne
   quittent jamais l’appareil.
 - Le jeu peut se jouer entièrement hors ligne.
 - Il n’y a aucun achat intégré. Les objets de la boutique ne peuvent être achetés qu’avec des cristaux gagnés dans le
@@ -49,7 +49,7 @@ https://policies.google.com/technologies/ads
 ## Enfants
 
 Le jeu est destiné au grand public et ne s’adresse pas aux enfants. Le contenu publicitaire est limité à la
-classification « PG » (grand public). Le jeu ne collecte pas sciemment de données personnelles auprès d’enfants de
+classification « PG » (accompagnement parental conseillé ; aucun contenu pour adultes). Le jeu ne collecte pas sciemment de données personnelles auprès d’enfants de
 moins de 13 ans.
 
 ## Suppression de tes données

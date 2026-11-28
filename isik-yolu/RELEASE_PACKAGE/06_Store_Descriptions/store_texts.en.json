@@ -17,9 +17,28 @@
   ],
   "gameplay": "Each level has one or more light sources and target rings. Tap rotatable mirrors to change the beam's direction, push stones to clear a path, and use prisms and filters to get the right color. When every target is lit, the level is complete. The fewer moves you use, the more stars you earn.",
   "target_audience": "Players of all ages who enjoy logic and puzzle games, and anyone looking for a calm, offline game for short breaks. The content is suitable for a general audience.",
-  "keywords": ["light puzzle", "mirror puzzle", "logic game", "laser puzzle", "prism", "brain teaser", "brain game", "offline game", "offline puzzle", "color puzzle", "daily puzzle", "reflection"],
+  "keywords": [
+    "light puzzle",
+    "mirror puzzle",
+    "logic game",
+    "laser puzzle",
+    "prism",
+    "brain teaser",
+    "brain game",
+    "offline game",
+    "offline puzzle",
+    "color puzzle",
+    "daily puzzle",
+    "reflection"
+  ],
   "category": "Games › Puzzle",
-  "tags": ["Puzzle", "Logic", "Brain games", "Single player", "Offline"],
+  "tags": [
+    "Puzzle",
+    "Logic",
+    "Brain games",
+    "Single player",
+    "Offline"
+  ],
   "release_notes": "Prismway (Işık Yolu) is here!\n• 500 levels in 5 worlds\n• Daily puzzle and achievements\n• Available in 6 languages\n• Lives refill every 20 minutes",
   "video_title": "Prismway (Işık Yolu) – Gameplay Trailer",
   "youtube_description": "Prismway (Işık Yolu) is a logic puzzle game where you guide light with mirrors. Rotate mirrors, split light into colors with prisms, slide stones and open doors with keys.\n\n• 500 levels in 5 worlds\n• A new puzzle every day\n• Play offline\n• 6 languages\n\nAll footage in this video is real gameplay.\nMagic Lumos Software",
@@ -29,14 +48,38 @@
     "A new puzzle every day! Keep your streak going and collect rewards. ☀️ Prismway (Işık Yolu) by Magic Lumos Software"
   ],
   "screenshot_captions": [
-    ["Guide the light", "Rotate mirrors, light up every target"],
-    ["Prisms and colors", "Split white light into colors"],
-    ["Collect the stars", "Finish in the fewest moves for 3 stars"],
-    ["5 worlds, 500 levels", "From easy steps to mastery"],
-    ["Keys and doors", "Light up the key to open the door"],
-    ["Slide the stones", "Push blocks to clear the light's path"],
-    ["A new puzzle every day", "Keep your streak, collect rewards"],
-    ["Your own style", "Mirror, board and beam skins"]
+    [
+      "Guide the light",
+      "Rotate mirrors, light up every target"
+    ],
+    [
+      "Prisms and colors",
+      "Split white light into colors"
+    ],
+    [
+      "Collect the stars",
+      "Finish in the fewest moves for 3 stars"
+    ],
+    [
+      "5 worlds, 500 levels",
+      "From easy steps to mastery"
+    ],
+    [
+      "Keys and doors",
+      "Light up the key to open the door"
+    ],
+    [
+      "Slide the stones",
+      "Push blocks to clear the light's path"
+    ],
+    [
+      "A new puzzle every day",
+      "Keep your streak, collect rewards"
+    ],
+    [
+      "Your own style",
+      "Mirror, board and beam skins"
+    ]
   ],
   "screenshot_alt_texts": [
     "On the game board, a golden beam reflects off two mirrors and reaches the turquoise target rings.",
@@ -54,6 +97,7 @@
     "mechanic": "Rotate the mirrors",
     "mechanic2": "Light up every target",
     "experience": "Split colors with prisms",
+    "experience2": "Every level, a new puzzle",
     "variety": "5 worlds · 500 levels",
     "variety2": "Stones, keys and doors",
     "success": "Collect all 3 stars",

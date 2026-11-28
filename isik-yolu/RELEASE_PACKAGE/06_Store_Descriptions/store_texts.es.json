@@ -17,9 +17,29 @@
   ],
   "gameplay": "Cada nivel tiene una o varias fuentes de luz y anillos objetivo. Toca los espejos giratorios para cambiar la dirección del rayo, empuja las piedras para abrir camino y usa prismas y filtros para conseguir el color correcto. Cuando iluminas todos los objetivos, completas el nivel. Cuantos menos movimientos uses, más estrellas ganarás.",
   "target_audience": "Jugadores de todas las edades a los que les gustan los juegos de lógica y de puzles, y cualquiera que busque un juego tranquilo y sin conexión para pausas cortas. El contenido es apto para todos los públicos.",
-  "keywords": ["juegos de lógica", "rompecabezas", "puzzle de luz", "puzzle de espejos", "puzzle láser", "prisma", "juegos de ingenio", "juegos mentales", "juegos para pensar", "juegos sin internet", "juegos offline", "puzzle de colores", "reflejo de luz"],
+  "keywords": [
+    "juegos de lógica",
+    "rompecabezas",
+    "puzzle de luz",
+    "puzzle de espejos",
+    "puzzle láser",
+    "prisma",
+    "juegos de ingenio",
+    "juegos mentales",
+    "juegos para pensar",
+    "juegos sin internet",
+    "juegos offline",
+    "puzzle de colores",
+    "reflejo de luz"
+  ],
   "category": "Juegos › Puzles",
-  "tags": ["Puzles", "Lógica", "Juegos de ingenio", "Un jugador", "Sin conexión"],
+  "tags": [
+    "Puzles",
+    "Lógica",
+    "Juegos de ingenio",
+    "Un jugador",
+    "Sin conexión"
+  ],
   "release_notes": "¡Prismway (Işık Yolu) ya está aquí!\n• 500 niveles en 5 mundos\n• Puzle diario y logros\n• Disponible en 6 idiomas\n• Las vidas se recargan cada 20 minutos",
   "video_title": "Prismway (Işık Yolu) – Tráiler de gameplay",
   "youtube_description": "Prismway (Işık Yolu) es un juego de puzles de lógica en el que guías la luz con espejos. Gira los espejos, descompón la luz en colores con prismas, desliza piedras y abre puertas con llaves.\n\n• 500 niveles en 5 mundos\n• Un puzle nuevo cada día\n• Juega sin conexión\n• 6 idiomas\n\nTodas las imágenes de este vídeo son del juego real.\nMagic Lumos Software",
@@ -29,14 +49,38 @@
     "¡Un puzle nuevo cada día! Mantén tu racha y consigue recompensas. ☀️ Prismway (Işık Yolu), de Magic Lumos Software"
   ],
   "screenshot_captions": [
-    ["Guía la luz", "Gira los espejos, ilumina cada objetivo"],
-    ["Prismas y colores", "Descompón la luz blanca en colores"],
-    ["Consigue las estrellas", "3 estrellas con el mínimo de movimientos"],
-    ["5 mundos, 500 niveles", "De los primeros pasos a la maestría"],
-    ["Llaves y puertas", "Ilumina la llave para abrir la puerta"],
-    ["Desliza las piedras", "Empuja los bloques y abre paso a la luz"],
-    ["Un puzle nuevo cada día", "Mantén tu racha y gana recompensas"],
-    ["Tu propio estilo", "Aspectos para espejos, tableros y rayos"]
+    [
+      "Guía la luz",
+      "Gira los espejos, ilumina cada objetivo"
+    ],
+    [
+      "Prismas y colores",
+      "Descompón la luz blanca en colores"
+    ],
+    [
+      "Consigue las estrellas",
+      "3 estrellas con el mínimo de movimientos"
+    ],
+    [
+      "5 mundos, 500 niveles",
+      "De los primeros pasos a la maestría"
+    ],
+    [
+      "Llaves y puertas",
+      "Ilumina la llave para abrir la puerta"
+    ],
+    [
+      "Desliza las piedras",
+      "Empuja los bloques y abre paso a la luz"
+    ],
+    [
+      "Un puzle nuevo cada día",
+      "Mantén tu racha y gana recompensas"
+    ],
+    [
+      "Tu propio estilo",
+      "Aspectos para espejos, tableros y rayos"
+    ]
   ],
   "screenshot_alt_texts": [
     "En el tablero de juego, un rayo dorado se refleja en dos espejos y llega a los anillos objetivo de color turquesa.",
@@ -54,6 +98,7 @@
     "mechanic": "Gira los espejos",
     "mechanic2": "Ilumina cada objetivo",
     "experience": "Descompón la luz con prismas",
+    "experience2": "Cada nivel, un nuevo reto",
     "variety": "5 mundos · 500 niveles",
     "variety2": "Piedras, llaves y puertas",
     "success": "Consigue las 3 estrellas",

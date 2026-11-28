@@ -48,7 +48,7 @@ https://policies.google.com/technologies/ads
 ## Bambini
 
 Il gioco è destinato a un pubblico generale e non è rivolto ai bambini. I contenuti pubblicitari sono limitati alla
-classificazione “PG” (pubblico generale). Il gioco non raccoglie consapevolmente dati personali da bambini di età
+classificazione “PG” (si consiglia la guida dei genitori; nessun contenuto per adulti). Il gioco non raccoglie consapevolmente dati personali da bambini di età
 inferiore ai 13 anni.
 
 ## Eliminazione dei tuoi dati

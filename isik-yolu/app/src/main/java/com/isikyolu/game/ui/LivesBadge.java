@@ -66,18 +66,36 @@ public final class LivesBadge extends LinearLayout {
         if (isAttachedToWindow()) postDelayed(tick, 1000);
     }
 
-    /** Yenilenme animasyonu: kalp büyüyüp küçülür, "+1" yukarı süzülerek kaybolur. */
+    /**
+     * Yenilenme animasyonu: kalp büyüyüp küçülür, "+1" yukarı süzülerek kaybolur. Kare kare (saat tabanlı) çizilir;
+     * ViewPropertyAnimator kullanılmaz (test ortamında saati ileri sarıp kayıtları bozuyordu).
+     */
     private void regenAnimation() {
-        heart.animate().cancel();
-        heart.animate().scaleX(1.45f).scaleY(1.45f).setDuration(150)
-                .withEndAction(() -> heart.animate().scaleX(1f).scaleY(1f).setDuration(220).start()).start();
-        plus.animate().cancel();
-        plus.setTranslationY(0);
-        plus.setAlpha(1f);
-        plus.animate().translationY(-Ui.dp(getContext(), 22)).alpha(0f).setDuration(900).start();
+        animStart = android.os.SystemClock.uptimeMillis();
+        removeCallbacks(animStep);
+        postOnAnimation(animStep);
+    }
+
+    private long animStart;
+    private final Runnable animStep = this::animStep;
+
+    private void animStep() {
+        float t = android.os.SystemClock.uptimeMillis() - animStart;
+        float sc = t < 150 ? 1f + 0.45f * (t / 150f) : t < 370 ? 1.45f - 0.45f * ((t - 150) / 220f) : 1f;
+        heart.setScaleX(sc);
+        heart.setScaleY(sc);
+        float p = Math.min(1f, t / 900f);
+        plus.setTranslationY(-Ui.dp(getContext(), 22) * p);
+        plus.setAlpha(1f - p);
+        if (t < 900 && isAttachedToWindow()) postOnAnimation(animStep);
     }
 
     @Override protected void onAttachedToWindow() { super.onAttachedToWindow(); refresh(); }
 
-    @Override protected void onDetachedFromWindow() { super.onDetachedFromWindow(); removeCallbacks(tick); }
+    @Override protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        removeCallbacks(tick);
+        removeCallbacks(animStep);
+        heart.setScaleX(1f); heart.setScaleY(1f); plus.setAlpha(0f);
+    }
 }

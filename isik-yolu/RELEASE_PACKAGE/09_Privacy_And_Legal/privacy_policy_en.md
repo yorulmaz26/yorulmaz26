@@ -42,8 +42,7 @@ This data is encrypted in transit (TLS). How Google uses data: https://policies.
 
 ## Children
 
-The game is intended for a general audience and is not directed at children. Ad content is limited to the "PG"
-(general audience) rating. The game does not knowingly collect personal data from children under 13.
+The game is intended for a general audience and is not directed at children. Ad content is limited to the "PG" (parental guidance; no adult content) rating. The game does not knowingly collect personal data from children under 13.
 
 ## Deleting your data
 
