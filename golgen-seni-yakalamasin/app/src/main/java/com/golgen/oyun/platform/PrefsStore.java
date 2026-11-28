@@ -24,6 +24,13 @@ public final class PrefsStore implements KeyValueStore {
     @Override public String getString(String key, String def) { return prefs.getString(key, def); }
     @Override public void putString(String key, String value) { ed().putString(key, value); }
 
+    @Override public void commit() {
+        if (editor != null) {
+            editor.commit();
+            editor = null;
+        }
+    }
+
     @Override public void apply() {
         if (editor != null) {
             editor.apply();

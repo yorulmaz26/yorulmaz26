@@ -13,7 +13,7 @@ public final class AdPolicy {
     public static final int EVERY_RUNS = 3;
     public static final long MIN_GAP_MS = 150_000L;
     public static final float MIN_RUN_SECONDS = 12f;
-    public static final int REWARDED_LIVES_PER_DAY = 3;
+    public static final int REWARDED_LIVES_PER_DAY = GameConfig.REWARDED_LIVES_PER_DAY;
 
     private int runsSince;
     private long lastShownElapsed = Long.MIN_VALUE / 4;

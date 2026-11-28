@@ -17,7 +17,6 @@ public final class MissionDef {
     public final int mapIndex;    // 0..19
     public final int sub;         // haritadaki sıra 0..4
     public final MapTheme map;
-    public final String title;
     public final int type = STAR_STAGES;
     public final int target = STARS_PER_STAGE * STAGES;
     public final float timeOffset;
@@ -26,13 +25,25 @@ public final class MissionDef {
     public final boolean boss;    // haritanın son bölümü
     public final float intensity; // özellik gücü 0.6..1.2
 
+    /**
+     * @deprecated {@link #title()} kullanın. Eski çağıranlar ({@code "…" + m.title}) derlenmeye devam etsin diye
+     * dize birleştirmede o anki dildeki başlığa dönüşen köprü; metin saklanmaz, her seferinde üretilir.
+     */
+    @Deprecated
+    public final Object title = new Object() {
+        @Override public String toString() { return title(); }
+    };
+
+    // Yerelleştirilmiş metin önbelleği (dil değişince yeniden üretilir)
+    private String cTitle, cDesc;
+    private volatile int cVer = Integer.MIN_VALUE;
+
     public MissionDef(int index, MapTheme map, int sub) {
         this.index = index;
         this.map = map;
         this.mapIndex = map.id;
         this.sub = sub;
         this.boss = sub == 4;
-        this.title = "Bölüm " + (index + 1);
         // 500 bölüm boyunca yavaş artan zorluk (erken tavana vurmaz)
         this.timeOffset = Math.min(150f, map.id * 1.5f + sub * 4f);
         this.reward = Math.min(150, 20 + map.id + sub * 4 + (boss ? 30 : 0));
@@ -49,20 +60,38 @@ public final class MissionDef {
         return map.has(feature);
     }
 
+    /** Bölüm başlığı o anki dilde ("Bölüm 12"). */
+    public String title() {
+        refresh();
+        return cTitle;
+    }
+
+    /** Bölüm hedefi ("2 aşama · her aşamada 20 yıldız topla"). */
     public String goal() {
-        return "2 aşama · her aşamada " + STARS_PER_STAGE + " yıldız topla";
+        return L10n.p("level.goal", STARS_PER_STAGE, STAGES);
     }
 
     public String modsText() {
         return map.featuresText();
     }
 
+    /** "Harita adı — hedef". */
     public String description() {
-        return map.name + " — " + goal();
+        refresh();
+        return cDesc;
     }
 
+    /** Üç taç koşulu: tamamla · çarpmadan bitir · N kombo. */
     public String crownText() {
-        return "Tamamla · Çarpmadan bitir · " + starCombo + " kombo";
+        return L10n.p("level.crowns", starCombo);
+    }
+
+    private void refresh() {
+        int v = L10n.version();
+        if (v == cVer) return;
+        cTitle = L10n.f("level.title", index + 1);
+        cDesc = L10n.f("level.desc", map.name(), goal());
+        cVer = v;
     }
 
     /** Toplam yıldız ilerlemesi (0..40). */

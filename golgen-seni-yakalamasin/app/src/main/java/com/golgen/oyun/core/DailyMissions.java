@@ -51,17 +51,14 @@ public final class DailyMissions {
         return base + tier * 10;
     }
 
+    /** Görev türlerinin çoğul yerelleştirme anahtarları (tür sırasıyla; {n} = hedef). */
+    private static final String[] TEXT_KEYS = {"daily.play", "daily.collect", "daily.survive", "daily.dodge",
+            "daily.score", "daily.powerups", "daily.level_wins", "daily.combo"};
+
+    /** Görev metni o anki dilde (ör. "3 oyun oyna"). */
     public static String text(int type, int target) {
-        switch (type) {
-            case PLAY: return target + " oyun oyna";
-            case COLLECT: return "Toplam " + target + " elmas topla";
-            case SURVIVE_SINGLE: return "Tek oyunda " + target + " sn hayatta kal";
-            case DODGE: return "Toplam " + target + " kez gölgeden kaç";
-            case POWERUPS: return target + " güçlendirme topla";
-            case MISSION_WINS: return target + " bölüm tamamla";
-            case COMBO_SINGLE: return "Tek oyunda " + target + " kombo yap";
-            default: return "Tek oyunda " + target + " puan yap";
-        }
+        int t = (type >= 0 && type < TEXT_KEYS.length) ? type : SCORE_SINGLE;
+        return L10n.p(TEXT_KEYS[t], target);
     }
 
     /** Bir oyun sonucunun bu görev türüne katkısını mevcut ilerlemeye uygular. */

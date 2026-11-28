@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Uyarlanabilir simge arka planı: gece laciverti radyal ışık + ince ızgara (mağaza simgesiyle aynı tasarım) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <path android:fillColor="#101827" android:pathData="M0,0h108v108h-108z" />
-    <path android:strokeColor="#1E2A50" android:strokeWidth="0.8"
-        android:pathData="M18,0v108M36,0v108M54,0v108M72,0v108M90,0v108M0,18h108M0,36h108M0,54h108M0,72h108M0,90h108" />
+    <path android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="62" android:centerY="44" android:gradientRadius="90"
+                android:startColor="#1E2A4F" android:centerColor="#121B33" android:endColor="#080D18" />
+        </aapt:attr>
+    </path>
+    <path android:strokeColor="#2C3A5E" android:strokeAlpha="0.45" android:strokeWidth="0.5"
+        android:pathData="M13.5,0v108M27,0v108M40.5,0v108M54,0v108M67.5,0v108M81,0v108M94.5,0v108M0,13.5h108M0,27h108M0,40.5h108M0,54h108M0,67.5h108M0,81h108M0,94.5h108" />
 </vector>

@@ -108,8 +108,38 @@ public final class Ui {
         text.setTypeface(tf);
         text.setTextSize(size);
         float w = text.measureText(s);
-        if (w > maxW && w > 0) size *= maxW / w;
+        if (w > maxW && w > 0) {
+            float k = maxW / w;
+            if (k < OVERFLOW_SCALE) reportOverflow(s, k);
+            size *= k;
+        }
         text(c, s, x, y, size, color, align, tf);
+    }
+
+    // ---------------- Taşma denetimi (yalnızca debug) ----------------
+    /** Metin bu orandan fazla küçültülmek zorunda kalırsa "taşma" sayılır (okunabilirlik sınırı). */
+    public static final float OVERFLOW_SCALE = 0.72f;
+    /** Debug build'de açılır; taşmalar GolgenTasma etiketiyle bir kez loglanır (UI testi tarar). */
+    public static boolean debugOverflow;
+    private static final java.util.HashSet<String> reported = new java.util.HashSet<>();
+
+    public static void reportOverflow(String s, float scale) {
+        if (!debugOverflow || !reported.add(com.golgen.oyun.core.L10n.code() + "|" + s)) return;
+        android.util.Log.w("GolgenTasma", String.format(java.util.Locale.ROOT, "dil=%s olcek=%.2f metin=%s",
+                com.golgen.oyun.core.L10n.code(), scale, s.replace('\n', ' ')));
+    }
+
+    /** Satır kaydırıp gerekirse küçülterek en fazla maxLines satıra sığdırır; satırları döndürür, boyutu out[0]'a yazar. */
+    public static String[] wrapFit(String s, float size, float maxW, int maxLines, Typeface tf, float[] outSize) {
+        float sz = size;
+        String[] lines = wrap(s, sz, maxW, tf);
+        while (lines.length > maxLines && sz > size * 0.6f) {
+            sz *= 0.92f;
+            lines = wrap(s, sz, maxW, tf);
+        }
+        if (lines.length > maxLines || sz < size * OVERFLOW_SCALE) reportOverflow(s, sz / size);
+        if (outSize != null) outSize[0] = sz;
+        return lines;
     }
 
     public static float measure(String s, float size, Typeface tf) {
@@ -129,18 +159,22 @@ public final class Ui {
         text.setTextSize(size);
         java.util.ArrayList<String> lines = new java.util.ArrayList<>();
         StringBuilder line = new StringBuilder();
-        for (String word : s.split(" ")) {
-            String cand = line.length() == 0 ? word : line + " " + word;
-            if (text.measureText(cand) > maxW && line.length() > 0) {
-                lines.add(line.toString());
-                line.setLength(0);
-                line.append(word);
-            } else {
-                line.setLength(0);
-                line.append(cand);
+        for (String para : s.split("\n")) {          // açık satır sonları korunur
+            line.setLength(0);
+            for (String word : para.split(" ")) {
+                if (word.isEmpty()) continue;
+                String cand = line.length() == 0 ? word : line + " " + word;
+                if (text.measureText(cand) > maxW && line.length() > 0) {
+                    lines.add(line.toString());
+                    line.setLength(0);
+                    line.append(word);
+                } else {
+                    line.setLength(0);
+                    line.append(cand);
+                }
             }
+            if (line.length() > 0) lines.add(line.toString());
         }
-        if (line.length() > 0) lines.add(line.toString());
         return lines.toArray(new String[0]);
     }
 
@@ -285,6 +319,61 @@ public final class Ui {
             if (i == 0) path.moveTo(x, y); else path.lineTo(x, y);
         }
         path.close();
+    }
+
+    // ---------------- Marka başlığı (iki dilli) ----------------
+    public static final String TITLE_TR_1 = "GÖLGEN", TITLE_TR_2 = "SENİ YAKALAMASIN", TITLE_TR_FULL = "GÖLGEN SENİ YAKALAMASIN";
+    public static final String TITLE_EN_A = "DOPPEL", TITLE_EN_B = "GLOW", TITLE_EN = "DOPPELGLOW";
+
+    /**
+     * Oyunun iki dilli başlığı. Türkçe seçiliyse Türkçe ad büyük, İngilizce ad (Doppelglow) küçük;
+     * diğer dillerde İngilizce ad büyük, Türkçe ad küçük. ty: büyük yazının taban çizgisi.
+     * Arkasında hafif mor "yankı" (gölge kopyası) çizilir. Döndürür: başlığın alt sınırı.
+     */
+    public static float brandTitle(Canvas c, float cx, float ty, float big, float maxW, float alpha) {
+        int white = Theme.alpha(Theme.WHITE, alpha), teal = Theme.alpha(Theme.TEAL, alpha), sub = Theme.alpha(Theme.PURPLE_LIGHT, alpha);
+        if ("tr".equals(com.golgen.oyun.core.L10n.code())) {
+            float s1 = fitSize(TITLE_TR_1, big, maxW, DISPLAY);
+            echo(c, TITLE_TR_1, cx, ty, s1, alpha, Paint.Align.CENTER);
+            text(c, TITLE_TR_1, cx, ty, s1, white, Paint.Align.CENTER, DISPLAY);
+            float y2 = ty + s1 * 0.56f, s2 = fitSize(TITLE_TR_2, s1 * 0.41f, maxW, BOLD);
+            text(c, TITLE_TR_2, cx, y2, s2, teal, Paint.Align.CENTER, BOLD);
+            float y3 = y2 + s1 * 0.30f;
+            spaced(c, TITLE_EN, cx, y3, s1 * 0.19f, sub, 0.32f);
+            return y3 + s1 * 0.06f;
+        }
+        float s = fitSize(TITLE_EN, big * 0.86f, maxW, DISPLAY);
+        float wa = measure(TITLE_EN_A, s, DISPLAY), wb = measure(TITLE_EN_B, s, DISPLAY);
+        float x0 = cx - (wa + wb) / 2f;
+        echo(c, TITLE_EN, x0, ty, s, alpha, Paint.Align.LEFT);
+        text(c, TITLE_EN_A, x0, ty, s, white, Paint.Align.LEFT, DISPLAY);
+        text(c, TITLE_EN_B, x0 + wa, ty, s, teal, Paint.Align.LEFT, DISPLAY);
+        float y2 = ty + s * 0.42f;
+        spaced(c, TITLE_TR_FULL, cx, y2, Math.min(s * 0.22f, fitSize(TITLE_TR_FULL, s * 0.22f, maxW * 0.8f, BOLD)), sub, 0.16f);
+        return y2 + s * 0.06f;
+    }
+
+    private static float fitSize(String s, float size, float maxW, Typeface tf) {
+        float w = measure(s, size, tf);
+        return w > maxW && w > 0 ? size * maxW / w : size;
+    }
+
+    private static void echo(Canvas c, String s, float x, float y, float size, float alpha, Paint.Align align) {
+        text.setTypeface(DISPLAY);
+        text.setTextSize(size);
+        text.setTextAlign(align);
+        text.setShader(null);
+        text.setStyle(Paint.Style.STROKE);
+        text.setStrokeWidth(size * 0.022f);
+        text.setColor(Theme.alpha(Theme.PURPLE_LIGHT, 0.5f * alpha));
+        c.drawText(s, x - size * 0.05f, y + size * 0.06f, text);
+        text.setStyle(Paint.Style.FILL);
+    }
+
+    private static void spaced(Canvas c, String s, float cx, float y, float size, int color, float spacing) {
+        text.setLetterSpacing(spacing);
+        text(c, s, cx, y, size, color, Paint.Align.CENTER, BOLD);
+        text.setLetterSpacing(0f);
     }
 
     /** Altın elmas simgesi. */

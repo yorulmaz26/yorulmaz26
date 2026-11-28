@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import com.golgen.oyun.GameView;
 import com.golgen.oyun.core.Achievements;
 import com.golgen.oyun.core.DailyMissions;
+import com.golgen.oyun.core.Energy;
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.Maps;
 import com.golgen.oyun.core.MissionDef;
 import com.golgen.oyun.core.Missions;
@@ -41,6 +43,9 @@ public final class MissionsScreen extends Screen {
     private final String[] dailyProg = new String[DailyMissions.PER_DAY];
     private String resetText = "";
     private final String[] achReward = new String[Achievements.COUNT];
+    private final String[] achTitle = new String[Achievements.COUNT];
+    private final String[] achDesc = new String[Achievements.COUNT];
+    private String title = "", achEarned = "";
     private final String[] chapterTitle = new String[Missions.CHAPTERS];
     private final float[] levelY = new float[Missions.ALL.length];
     private final float[] chapterY = new float[Missions.CHAPTERS];
@@ -55,64 +60,81 @@ public final class MissionsScreen extends Screen {
     public MissionsScreen(GameView g) {
         super(g);
         back = add(makeBackButton());
-        String[] names = {"Haritalar", "Günlük", "Başarılar"};
+        String[] tabKeys = {"missions.tab.maps", "missions.tab.daily", "missions.tab.achievements"};
         for (int i = 0; i < 3; i++) {
             final int k = i;
-            tabs[i] = add(new Button(names[i], Icons.NONE, Button.GHOST, () -> showTab(k)));
+            tabs[i] = add(new Button(null, Icons.NONE, Button.GHOST, () -> showTab(k)).key(tabKeys[i]));
         }
         for (int i = 0; i < claim.length; i++) {
             final int k = i;
-            claim[i] = add(new Button("ÖDÜLÜ AL", Icons.NONE, Button.GOLD, () -> {
+            claim[i] = add(new Button(null, Icons.NONE, Button.GOLD, () -> {
                 int got = g.progress.claimDaily(k);
                 if (got > 0) {
                     g.sound.play(Synth.PURCHASE);
                     g.haptics.medium();
-                    g.toast("+" + got + " elmas kazandın", Icons.CALENDAR);
+                    g.toast(L10n.p("missions.daily.reward_toast", got), Icons.CALENDAR);
                     g.save();
                 }
                 refresh();
                 dumpTargets();
             }));
+            claim[i].id = "gorev-odul-" + i;   // etiket dinamik (ÖDÜLÜ AL / ALINDI / +N): sabit test kimliği
         }
-        refillBtn = add(new Button("DOLDUR · " + Progress.REFILL_COST, Icons.HEART, Button.GOLD, () -> {
+        refillBtn = add(new Button(null, Icons.HEART, Button.GOLD, () -> {
             if (g.progress.buyRefill(g.clock)) {
                 g.sound.play(Synth.PURCHASE);
                 g.haptics.medium();
-                g.toast("Canlar doldu!", Icons.HEART);
+                g.noteLivesChanged();
+                g.toast(L10n.t("lives.refilled"), Icons.HEART);
                 g.save();
             } else {
-                g.toast(Progress.REFILL_COST + " elmas gerekli", Icons.LOCK);
+                g.toast(L10n.f("lives.need_diamonds", Progress.REFILL_COST), Icons.LOCK);
             }
             dumpTargets();
         }));
         refillBtn.id = "can-doldur";
-        videoLifeBtn = add(new Button("VİDEO · +1 CAN", Icons.PLAY, Button.PRIMARY, () -> {
+        videoLifeBtn = add(new Button(null, Icons.PLAY, Button.PRIMARY, () -> {
             if (!g.progress.canWatchForLife(g.epochDay(), g.clock)) {
-                g.toast("Bugünlük video hakkın bitti", Icons.LOCK);
+                g.toast(L10n.t("lives.video_none_left"), Icons.LOCK);
                 return;
             }
             g.ads.showRewarded(() -> {
                 if (g.progress.onWatchedForLife(g.epochDay(), g.clock)) {
                     g.sound.play(Synth.SUCCESS);
-                    g.toast("+1 can! (bugün " + g.progress.rewardedLivesLeft(g.epochDay()) + " hak kaldı)", Icons.HEART);
+                    g.noteLivesChanged();
+                    g.toast(L10n.p("lives.video_reward", g.progress.rewardedLivesLeft(g.epochDay())), Icons.HEART);
                     g.save();
                 }
             }, this::dumpTargets);
-        }));
+        }).key("lives.video_short"));
         videoLifeBtn.id = "video-can";
         videoLifeBtn.visible = false;
-        for (int c = 0; c < Missions.MAPS; c++) {
-            chapterTitle[c] = "HARİTA " + (c + 1) + "  ·  " + Maps.ALL[c].name.toUpperCase(new java.util.Locale("tr"));
-            mapDesc[c] = Maps.ALL[c].desc + "  ·  " + Maps.ALL[c].featuresText();
-        }
         for (int i = 0; i < Achievements.COUNT; i++) achReward[i] = "+" + Achievements.REWARDS[i];
         for (int i = 0; i < Missions.ALL.length; i++) {
-            levelDesc[i] = Missions.ALL[i].description();
             levelReward[i] = Integer.toString(Missions.ALL[i].reward);
             levelNum[i] = Integer.toString(i + 1);
+        }
+    }
+
+    /** Dil değişince (ve ilk kurulumda) önbellekli metinler yeniden üretilir. */
+    @Override
+    protected void onLocalize() {
+        title = L10n.t("missions.title");
+        achEarned = L10n.t("missions.ach.earned");
+        for (int c = 0; c < Missions.MAPS; c++) {
+            chapterTitle[c] = L10n.f("missions.map_title", c + 1, L10n.upper(Maps.ALL[c].name()));
+            mapDesc[c] = Maps.ALL[c].desc() + "  ·  " + Maps.ALL[c].featuresText();
+        }
+        for (int i = 0; i < Achievements.COUNT; i++) {
+            achTitle[i] = Achievements.title(i);
+            achDesc[i] = Achievements.desc(i);
+        }
+        for (int i = 0; i < Missions.ALL.length; i++) {
+            levelDesc[i] = Missions.ALL[i].description();
             levelGoal[i] = Missions.ALL[i].goal();
             levelMods[i] = Missions.ALL[i].modsText();
         }
+        refresh();   // günlük görev metinleri, ödül butonları ve sıfırlama geri sayımı
     }
 
     public void showTab(int t) {
@@ -145,14 +167,15 @@ public final class MissionsScreen extends Screen {
             claim[i].visible = tab == TAB_DAILY;
             boolean done = p.dailyDone(i), claimed = p.dailyIsClaimed(i);
             claim[i].enabled = done && !claimed;
-            claim[i].label = claimed ? "ALINDI" : (done ? "ÖDÜLÜ AL" : "+" + DailyMissions.reward(type, p.dailyDay));
+            claim[i].label = claimed ? L10n.t("missions.daily.claimed")
+                    : (done ? L10n.t("missions.daily.claim") : "+" + DailyMissions.reward(type, p.dailyDay));
             claim[i].style = claimed ? Button.GHOST : (done ? Button.GOLD : Button.SECONDARY);
         }
         for (int c = 0; c < Missions.CHAPTERS; c++) {
             chapterStarText[c] = p.chapterStars(c) + " / " + (Missions.PER_MAP * 3);
         }
         long m = g.minutesToMidnight();
-        resetText = "Yeni görevler " + (m / 60) + " sa " + (m % 60) + " dk sonra";
+        resetText = L10n.f("missions.daily.reset", m / 60, m % 60);
         layoutClaims();
     }
 
@@ -235,7 +258,7 @@ public final class MissionsScreen extends Screen {
             g.sound.play(Synth.TAP);
             g.startMission(idx);
         } else {
-            g.toast("Önce " + idx + ". bölümü tamamla", Icons.LOCK);
+            g.toast(L10n.f("missions.locked_toast", idx), Icons.LOCK);
         }
     }
 
@@ -252,7 +275,8 @@ public final class MissionsScreen extends Screen {
     public void update(float dt) {
         super.update(dt);
         bg.update(dt, 0f);
-        refillBtn.visible = tab == TAB_LEVELS && g.lives() < com.golgen.oyun.core.Energy.MAX;
+        refillBtn.visible = tab == TAB_LEVELS && g.lives() < Energy.MAX;
+        if (refillLang != L10n.version()) { refillLang = L10n.version(); refillBtn.label = L10n.f("lives.refill_short", Progress.REFILL_COST); }
         boolean vl = refillBtn.visible && g.ads.isRewardedReady() && g.progress.canWatchForLife(g.epochDay(), g.clock);
         if (vl != videoLifeBtn.visible) { videoLifeBtn.visible = vl; dumpTargets(); }
         if (!isDragging() && Math.abs(scrollVel) > 5f) {
@@ -264,7 +288,7 @@ public final class MissionsScreen extends Screen {
     @Override
     public void draw(Canvas c) {
         bg.drawBackground(c, w, h, time * 40f);
-        drawHeader(c, "GÖREVLER");
+        drawHeader(c, title);
         if (tab == TAB_LEVELS) drawLives(c);
         c.save();
         c.clipRect(0, listTop - 10f * u, w, listBottom);
@@ -277,13 +301,32 @@ public final class MissionsScreen extends Screen {
         drawButtons(c);
     }
 
+    private int livesShown = -1, livesLang = -1, refillLang = -1;
+    private String livesCount = "";
+
+    /** ❤ 3/4 + "Sonraki can: 19:42" (dk:sn, canlı) / "Canlar dolu"; can yenilenince kalp atar. */
     private void drawLives(Canvas c) {
         int lives = g.lives();
-        for (int i = 0; i < com.golgen.oyun.core.Energy.MAX; i++) {
-            Icons.draw(c, Icons.HEART, colL + 34f * u + i * 58f * u, livesY - 16f * u, 22f * u, i < lives ? HEART : Theme.alpha(Theme.LINE, 0.9f));
+        if (lives != livesShown || livesLang != L10n.version()) {
+            livesShown = lives;
+            livesLang = L10n.version();
+            livesCount = L10n.f("lives.count", lives, Energy.MAX);
         }
-        String t = lives >= com.golgen.oyun.core.Energy.MAX ? "Canlar dolu" : "Sonraki can " + g.energyTimer();
-        Ui.text(c, t, colL + 10f * u, livesY + 40f * u, 28f * u, lives > 0 ? Theme.WHITE : HEART, Paint.Align.LEFT, Ui.BOLD);
+        float pulse = g.livesPulse;
+        float hy = livesY - 18f * u;
+        for (int i = 0; i < Energy.MAX; i++) {
+            float x = colL + 34f * u + i * 58f * u;
+            boolean full = i < lives;
+            float sz = 22f * u * (full && i == lives - 1 ? 1f + 0.45f * pulse : 1f);
+            if (full && i == lives - 1 && pulse > 0f) Ui.glow(c, x, hy, 70f * u * (1f + pulse), HEART, 0.5f * pulse);
+            Icons.draw(c, Icons.HEART, x, hy, sz, full ? HEART : Theme.alpha(Theme.LINE, 0.9f));
+        }
+        float cx = colL + 34f * u + Energy.MAX * 58f * u - 10f * u;
+        Ui.text(c, livesCount, cx, Ui.centerY(hy, 40f * u), 40f * u, lives > 0 ? Theme.WHITE : HEART, Paint.Align.LEFT, Ui.NUMBERS);
+        String t = lives >= Energy.MAX ? L10n.t("lives.full") : L10n.f("lives.next", g.energyTimer());
+        float right = videoLifeBtn.visible ? videoLifeBtn.rect.left : (refillBtn.visible ? refillBtn.rect.left : colR);
+        Ui.textFit(c, t, colL + 10f * u, livesY + 40f * u, 30f * u, right - colL - 30f * u,
+                lives > 0 ? (lives >= Energy.MAX ? Theme.TEAL : Theme.WHITE) : HEART, Paint.Align.LEFT, Ui.BOLD);
     }
 
     private void drawLevels(Canvas c) {
@@ -345,7 +388,7 @@ public final class MissionsScreen extends Screen {
 
     private void drawDaily(Canvas c) {
         Progress p = g.progress;
-        Ui.text(c, resetText, w / 2f, listTop + 10f * u, 30f * u, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
+        Ui.textFit(c, resetText, w / 2f, listTop + 10f * u, 30f * u, colR - colL, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
         for (int i = 0; i < DailyMissions.PER_DAY; i++) {
             float top = listTop + i * (rowH + 70f * u) + 40f * u;
             float bottom = top + rowH + 30f * u;
@@ -378,9 +421,9 @@ public final class MissionsScreen extends Screen {
             } else {
                 Icons.draw(c, Icons.LOCK, colL + 80f * u, cy, 26f * u, Theme.MUTED);
             }
-            Ui.text(c, Achievements.TITLES[i], colL + 150f * u, cy - 10f * u, 40f * u, has ? Theme.WHITE : Theme.MUTED, Paint.Align.LEFT, Ui.BOLD);
-            Ui.textFit(c, Achievements.DESCS[i], colL + 150f * u, cy + 40f * u, 30f * u, colR - colL - 330f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
-            Ui.text(c, has ? "Kazanıldı" : achReward[i], colR - 40f * u, Ui.centerY(cy, 34f * u), 34f * u, has ? Theme.TEAL : Theme.GOLD, Paint.Align.RIGHT, Ui.BOLD);
+            Ui.textFit(c, achTitle[i], colL + 150f * u, cy - 10f * u, 40f * u, colR - colL - 330f * u, has ? Theme.WHITE : Theme.MUTED, Paint.Align.LEFT, Ui.BOLD);
+            Ui.textFit(c, achDesc[i], colL + 150f * u, cy + 40f * u, 30f * u, colR - colL - 330f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
+            Ui.textFit(c, has ? achEarned : achReward[i], colR - 40f * u, Ui.centerY(cy, 34f * u), 34f * u, 180f * u, has ? Theme.TEAL : Theme.GOLD, Paint.Align.RIGHT, Ui.BOLD);
         }
     }
 }

@@ -4,7 +4,12 @@ package com.golgen.oyun.core;
 public final class PowerUp {
     public static final int SHIELD = 0, SLOW = 1, MAGNET = 2;
     public static final int COUNT = 3;
-    public static final String[] NAMES = {"Kalkan", "Yavaş Zaman", "Mıknatıs"};
+    private static final String[] KEYS = {"powerup.shield", "powerup.slow", "powerup.magnet"};
+
+    /** Güçlendirmenin o anki dildeki adı (Kalkan / Yavaş Zaman / Mıknatıs). */
+    public static String name(int type) {
+        return L10n.t(KEYS[type]);
+    }
 
     public int type;
     public float x, y, phase;

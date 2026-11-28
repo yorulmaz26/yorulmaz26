@@ -1,10 +1,13 @@
 package com.golgen.oyun.core;
 
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /** Uzun süreli oynanış sistemleri: güçlendirmeler, kombo, aşamalar, yıldızlar, XP, giriş serisi, 60 görev. */
 public class LongevityTest {
+    @BeforeClass public static void setUp() { L10nTestSupport.load("tr"); }
+
     private static GameWorld quiet() {
         GameWorld w = new GameWorld(3);
         w.setArenaHeight(1778f);
@@ -181,7 +184,10 @@ public class LongevityTest {
 
     @Test public void achievementsTwentyOneWithRewards() {
         assertEquals(21, Achievements.COUNT);
-        assertEquals(Achievements.COUNT, Achievements.DESCS.length);
+        for (int i = 0; i < Achievements.COUNT; i++) {
+            assertNotEquals("ach." + i + ".title", Achievements.title(i));
+            assertFalse(Achievements.desc(i), Achievements.desc(i).startsWith("ach."));
+        }
         assertEquals(Achievements.COUNT, Achievements.REWARDS.length);
         assertEquals(12, Skins.ALL.length);
     }

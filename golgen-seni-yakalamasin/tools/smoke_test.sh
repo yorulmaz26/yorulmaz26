@@ -63,7 +63,7 @@ adb shell getprop ro.build.version.release | sed 's/^/Android /' | tee -a "$OUT/
 adb uninstall $PKG >/dev/null 2>&1 || true
 if adb install -r "$APK" >/dev/null; then ok "APK kurulumu"; else bad "APK kurulumu"; fi
 clear_log
-adb shell am start -W -n $ACT --ez reklamsiz true >/dev/null
+adb shell am start -W -n $ACT --ez reklamsiz true --es dil tr >/dev/null
 sleep 1.6; shot 00_logo_a
 sleep 3.4; shot 00_logo_b
 if log | grep -q "ekran=LogoScreen"; then ok "Magic Lumos logo animasyonu gösterildi"; else bad "Logo animasyonu gösterilmedi"; fi
@@ -75,7 +75,7 @@ sleep 0.5
 # Öğretici: sürükleyerek 1. adımı geç
 for i in 1 2 3 4; do adb shell input swipe 300 1700 800 1500 250; adb shell input swipe 800 1500 300 1800 250; done
 sleep 0.8; shot 02_ogretici_golge
-tap_target TutorialScreen Atla
+tap_target TutorialScreen tutorial.skip
 expect_screen MenuScreen "Öğretici → Ana menü"
 sleep 1.0
 if log | grep -q "hedef ekran=MenuScreen ad=gunluk-odul"; then
@@ -89,7 +89,7 @@ fi
 sleep 0.6; shot 03_ana_menu
 
 # 2) Sonsuz mod
-tap_target MenuScreen OYNA
+tap_target MenuScreen menu.play
 expect_screen PlayScreen "OYNA butonu"
 sleep 0.8; shot 04_oyun_hazir
 # Daireler çizerek oyna (gölgeden kaç)
@@ -100,12 +100,12 @@ for i in $(seq 1 3); do
   adbt shell input swipe 300 1900 300 1500 220
 done
 shot 05_oyun_ortasi
-count_pause() { log | grep -c "hedef ekran=PlayScreen ad=DEVAM ET"; }
+count_pause() { log | grep -c "hedef ekran=PlayScreen ad=play.pause.resume"; }
 PAUSED=0
 for attempt in 1 2 3; do
   if [ "$(current_screen)" != "PlayScreen" ]; then
     echo "Not: oyun hareket sırasında bitti; yeniden başlatılıyor"
-    wait_screen GameOverScreen 5; sleep 1.5; tap_target GameOverScreen "TEKRAR OYNA"; wait_screen PlayScreen 5; sleep 0.5
+    wait_screen GameOverScreen 5; sleep 1.5; tap_target GameOverScreen gameover.play_again; wait_screen PlayScreen 5; sleep 0.5
   fi
   BEFORE=$(count_pause)
   tap_target PlayScreen ikon-1
@@ -117,7 +117,7 @@ if [ "$PAUSED" = "1" ]; then ok "Duraklatma menüsü açıldı"; else bad "Durak
 # Duraklatılmışken bekle: oyun sonu gelmemeli (gölge zamanı ilerlememeli)
 sleep 6
 if [ "$(current_screen)" = "PlayScreen" ]; then ok "Duraklatmada oyun ilerlemiyor (6 sn)"; else bad "Duraklatmada oyun bitti"; fi
-tap_target PlayScreen "DEVAM ET"
+tap_target PlayScreen play.pause.resume
 # Başlamadan önce duraklatıldıysa oyun yine "dokun ve başla" bekler: tek dokunuşla başlat, sonra hareketsiz kal
 adbt shell input tap 540 1500
 # Hareketsiz kal → gölge yakalamalı
@@ -127,33 +127,33 @@ GP=$(pref_int gamesPlayed)
 if [ "${GP:-0}" -ge 1 ]; then ok "Kayıt: oynanan oyun sayısı kaydedildi ($GP)"; else bad "Kayıt: gamesPlayed=$GP"; fi
 BS=$(pref_int bestScore)
 if [ "${BS:-0}" -gt 0 ]; then ok "Kayıt: rekor kaydedildi ($BS)"; else bad "Kayıt: bestScore=$BS"; fi
-tap_target GameOverScreen "TEKRAR OYNA"
+tap_target GameOverScreen gameover.play_again
 expect_screen PlayScreen "Tekrar oyna"
 clear_log
 adbt shell input keyevent KEYCODE_BACK; sleep 0.8
-if log | grep -q "hedef ekran=PlayScreen ad=ANA MENÜ"; then ok "Geri tuşu oyunu duraklatır"; else bad "Geri tuşu duraklatma"; fi
+if log | grep -q "hedef ekran=PlayScreen ad=play.pause.main_menu"; then ok "Geri tuşu oyunu duraklatır"; else bad "Geri tuşu duraklatma"; fi
 # Oyun "dokun ve başla" ekranındayken duraklatıldı: devam edince kendiliğinden başlamamalı.
 # Başlasaydı hareketsiz oyuncuyu gölge ~5 sn içinde yakalar ve oyun sonu gelirdi.
 # (clear_log sonrası ekran değişmediği için current_screen boş döner; olaylar doğrudan günlükten okunur)
-tap_target PlayScreen "DEVAM ET"
+tap_target PlayScreen play.pause.resume
 sleep 8
-N0=$(log | grep -c "hedef ekran=PlayScreen ad=ANA MENÜ")
+N0=$(log | grep -c "hedef ekran=PlayScreen ad=play.pause.main_menu")
 adbt shell input keyevent KEYCODE_BACK; sleep 0.8
-N1=$(log | grep -c "hedef ekran=PlayScreen ad=ANA MENÜ")
+N1=$(log | grep -c "hedef ekran=PlayScreen ad=play.pause.main_menu")
 if ! log | grep -q 'ekran=GameOverScreen$' && [ "$N1" -gt "$N0" ]; then ok "Hazır ekranında duraklat → devam: oyun dokunuş bekliyor (8 sn)"
 else bad "Hazır ekranında devam: oyun sonu=$(log | grep -c 'ekran=GameOverScreen$') duraklatma menüsü $N0→$N1"; fi
-tap_target PlayScreen "ANA MENÜ"
+tap_target PlayScreen play.pause.main_menu
 expect_screen MenuScreen "Duraklatma → Ana menü"
 
 # 3) Karakterler (debug ekstrasıyla 500 elmas ver, satın al, seç)
 adbt shell am start -n $ACT --ei elmas 500 >/dev/null; sleep 1
-tap_target MenuScreen Karakter
+tap_target MenuScreen menu.character
 expect_screen SkinsScreen "Karakter butonu"
 sleep 0.6
 tap_target SkinsScreen kart-2
 sleep 0.4; shot 08_karakterler
 D0=$(pref_int diamonds)
-tap_target SkinsScreen "SATIN AL  ·  120"
+tap_target SkinsScreen karakter-satin-al
 sleep 0.8
 D1=$(pref_int diamonds); SEL=$(pref_int selectedSkin); UNL=$(pref_int unlockedSkins)
 if [ "$SEL" = "2" ] && [ $(( ${UNL:-0} & 4 )) -ne 0 ]; then ok "Karakter satın alındı ve seçildi (elmas $D0 → $D1)"; else bad "Satın alma: seçili=$SEL açık=$UNL elmas $D0→$D1"; fi
@@ -162,23 +162,23 @@ adbt shell input keyevent KEYCODE_BACK
 expect_screen MenuScreen "Geri tuşu → Ana menü"
 
 # 4) Görevler: günlük, görev modu, başarılar
-tap_target MenuScreen "Görevler"
+tap_target MenuScreen menu.tasks
 expect_screen MissionsScreen "Görevler butonu"
 sleep 0.6; shot 10_gunluk_gorevler
-tap_target MissionsScreen "Haritalar"; sleep 0.4; shot 11_haritalar
-tap_target MissionsScreen "Başarılar"; sleep 0.4; shot 12_basarilar
-tap_target MissionsScreen "Haritalar"
+tap_target MissionsScreen missions.tab.maps; sleep 0.4; shot 11_haritalar
+tap_target MissionsScreen missions.tab.achievements; sleep 0.4; shot 12_basarilar
+tap_target MissionsScreen missions.tab.maps
 tap_target MissionsScreen bolum-0
 expect_screen PlayScreen "Bölüm 1 başlatma (harita düğümü)"
 sleep 0.5
 if [ "$(pref_int enLives)" = "3" ]; then ok "Bölüm başlatınca 1 can harcandı (4 → 3)"; else bad "Can harcama: enLives=$(pref_int enLives)"; fi
 sleep 0.5; shot 13_gorev_oyun
 adbt shell input keyevent KEYCODE_BACK; sleep 0.5
-tap_target PlayScreen "ANA MENÜ"
+tap_target PlayScreen play.pause.main_menu
 expect_screen MenuScreen "Görev → Ana menü"
 
 # 5) Rekorlar
-tap_target MenuScreen Rekorlar
+tap_target MenuScreen menu.records
 expect_screen RecordsScreen "Rekorlar butonu"
 sleep 0.6; shot 14_rekorlar
 tap_target RecordsScreen ikon-3
@@ -192,12 +192,12 @@ tap_target SettingsScreen ayar-titresim
 sleep 0.5; shot 15_ayarlar
 if [ "$(pref_int sound)" = "0" ] && [ "$(pref_int vibration)" = "0" ]; then ok "Ayarlar: ses ve titreşim kapatıldı ve kaydedildi"; else bad "Ayarlar kaydı: ses=$(pref_int sound) titreşim=$(pref_int vibration)"; fi
 tap_target SettingsScreen ayar-ses
-tap_target SettingsScreen "İLERLEMEYİ SIFIRLA"; sleep 0.4; shot 16_sifirlama_onay
-tap_target SettingsScreen "VAZGEÇ"
-tap_target SettingsScreen "ÖĞRETİCİYİ OYNA"
+tap_target SettingsScreen settings.reset; sleep 0.4; shot 16_sifirlama_onay
+tap_target SettingsScreen common.cancel
+tap_target SettingsScreen settings.tutorial
 expect_screen TutorialScreen "Ayarlar → Öğretici"
 sleep 0.6; shot 17_ogretici
-tap_target TutorialScreen Kapat
+tap_target TutorialScreen tutorial.close
 expect_screen SettingsScreen "Öğretici kapat → açıldığı Ayarlar ekranına döner"
 adbt shell input keyevent KEYCODE_BACK
 expect_screen MenuScreen "Ayarlar → geri → Ana menü"
@@ -226,12 +226,41 @@ done
 adbt shell am start -n $ACT --es ekran menu >/dev/null
 if wait_screen MenuScreen 8; then ok "Harita bölümlerinden ana menüye dönüş"; else bad "Harita bölümlerinden menüye dönüş"; fi
 
+# 6c) Çoklu dil: dil seçici, 6 dilde tüm ekranlar, metin taşması ve eksik çeviri taraması
+step diller
+pref_str() { prefs | grep "name=\"$1\"" | sed -E 's/.*>([^<]*)<.*/\1/'; }
+adbt shell am start -n $ACT --es ekran ayarlar >/dev/null
+wait_screen SettingsScreen 8; sleep 0.8
+tap_target SettingsScreen ayar-dil; sleep 0.6
+tap_target SettingsScreen dil-de; sleep 0.8
+if log | grep -q "dil=de" && [ "$(pref_str lang)" = "de" ]; then ok "Ayarlar → Dil: Deutsch seçildi, yeniden başlatmadan uygulandı ve kaydedildi"; else bad "Dil seçici: log=$(log | grep -c 'dil=de') kayıt=$(pref_str lang)"; fi
+shot 24_ayarlar_de
+for L in tr en de it fr es; do
+  for E in menu gorevler gunluk basarilar karakter rekorlar ayarlar ogretici gorev:0; do
+    adbt shell am start -n $ACT --es dil $L --es ekran $E >/dev/null; sleep 1.5
+    case "$E" in menu|gorevler|gorev:0) shot "25_dil_${L}_${E%%:*}";; esac
+  done
+done
+TAS=$(timeout 20 adb logcat -d -s GolgenTasma:W 2>/dev/null | grep "olcek=" | sed -E 's/.*GolgenTasma[^:]*: //' | sort -u)
+echo "$TAS" > "$OUT/metin_tasmalari.txt"
+if [ -z "$TAS" ]; then ok "6 dilde 9 ekran: metin taşması yok"; else bad "Metin taşması ($(echo "$TAS" | wc -l)): $(echo "$TAS" | head -3 | tr '\n' ';')"; fi
+EKS=$(timeout 20 adb logcat -d -s GolgenL10n:W 2>/dev/null | grep "eksik=" | tail -1)
+if [ -z "$EKS" ]; then ok "Eksik çeviri anahtarı yok (çalışma anı)"; else bad "Eksik çeviri: $EKS"; fi
+# Can kalmadı penceresi
+adbt shell am start -n $ACT --es dil tr --ei canlar 0 --es ekran gorevler >/dev/null; sleep 1.5
+tap_target MissionsScreen bolum-0; sleep 1.0
+if log | grep -q "hedef ekran=LivesDialog ad=can-kapat"; then ok "Can yokken bölüme dokununca 'Canın kalmadı' penceresi açıldı"; else bad "Can kalmadı penceresi açılmadı"; fi
+shot 26_can_kalmadi
+tap_target LivesDialog can-kapat; sleep 0.6
+adbt shell am start -n $ACT --es dil tr --ei canlar 4 --es ekran menu >/dev/null; sleep 1.2
+
 # 7) Kalıcılık: uygulamayı öldür ve yeniden aç → öğretici tekrar gelmemeli, veriler korunmalı
 adb shell am force-stop $PKG
 clear_log
 adb shell am start -W -n $ACT >/dev/null
 expect_screen MenuScreen "Yeniden açılış (öğretici atlanır, kayıt yüklenir)" 20
 if [ "$(pref_int selectedSkin)" = "2" ]; then ok "Kalıcılık: seçili karakter korundu"; else bad "Kalıcılık: selectedSkin=$(pref_int selectedSkin)"; fi
+if [ "$(pref_str lang)" = "tr" ]; then ok "Kalıcılık: dil tercihi korundu"; else bad "Kalıcılık: lang=$(pref_str lang)"; fi
 sleep 1; shot 18_yeniden_acilis
 
 # 7b) Reklamlar (ağ gerektirir: yükleme adımları BİLGİ olarak raporlanır, çökme/donma ise hata sayılır)
@@ -244,9 +273,9 @@ if adlog | grep -q "SDK hazır"; then ok "Reklam SDK'sı başlatıldı (AdMob te
 for i in $(seq 1 25); do adlog | grep -q "banner yüklendi" && break; sleep 1; done
 if adlog | grep -q "banner yüklendi"; then soft "Banner yüklendi (yalnızca menülerde)"; else soft "Banner yüklenemedi: $(adlog | grep banner | tail -1)"; fi
 sleep 1; shot 20_reklam_banner_menu
-tap_target MenuScreen OYNA
+tap_target MenuScreen menu.play
 if wait_screen PlayScreen 8; then sleep 1; shot 21_reklam_oyunda_banner_yok; ok "Oyun ekranına geçildi (banner gizli olmalı)"; fi
-adbt shell input keyevent KEYCODE_BACK; sleep 0.6; tap_target PlayScreen "ANA MENÜ"; wait_screen MenuScreen 8
+adbt shell input keyevent KEYCODE_BACK; sleep 0.6; tap_target PlayScreen play.pause.main_menu; wait_screen MenuScreen 8
 for i in $(seq 1 20); do adlog | grep -q "geçiş reklamı hazır" && break; sleep 1; done
 adbt shell am start -n $ACT --es reklam gecis >/dev/null; sleep 4
 if adlog | grep -q "geçiş reklamı gösterildi"; then soft "Geçiş (görsel) reklamı gösterildi"; shot 22_reklam_gecis; else soft "Geçiş reklamı gösterilemedi: $(adlog | grep -i 'geçiş' | tail -1)"; fi

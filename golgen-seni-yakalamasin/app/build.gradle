@@ -4,14 +4,17 @@ plugins {
 
 android {
     namespace 'com.golgen.oyun'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId 'com.golgen.oyun'
         minSdk 26
-        targetSdk 35
-        versionCode 1
-        versionName '1.0.0'
+        // Google Play: 31 Ağustos 2026'dan itibaren yeni uygulama ve güncellemeler API 36 hedeflemeli
+        targetSdk 36
+        versionCode 2
+        versionName '1.1.0'
+        // Yalnızca desteklenen 6 dilin kaynakları paketlenir (kütüphanelerin diğer dilleri APK'yı şişirmez)
+        resourceConfigurations += ['tr', 'en', 'de', 'it', 'fr', 'es']
 
         // ---- Reklam kimlikleri ----
         // Varsayılanlar Google'ın resmî TEST kimlikleridir (gerçek gelir getirmez, hesap riski yoktur).
@@ -27,13 +30,27 @@ android {
         buildConfig true
     }
 
+    // Play Console'a yükleme anahtarı: gradle.properties veya komut satırından verilirse kullanılır
+    // (-PuploadStoreFile=... -PuploadStorePassword=... -PuploadKeyAlias=... -PuploadKeyPassword=...).
+    // Anahtar ve şifreler depoya KONULMAZ. Verilmezse release debug anahtarıyla imzalanır (yalnızca doğrudan kurulum için).
+    signingConfigs {
+        upload {
+            if (project.hasProperty('uploadStoreFile')) {
+                storeFile file(project.property('uploadStoreFile'))
+                storePassword project.property('uploadStorePassword')
+                keyAlias project.property('uploadKeyAlias')
+                keyPassword project.property('uploadKeyPassword')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // Yerel/CI kurulumu için debug anahtarıyla imzalanır; mağaza yayını için kendi keystore'unuzu tanımlayın.
-            signingConfig signingConfigs.debug
+            signingConfig project.hasProperty('uploadStoreFile') ? signingConfigs.upload : signingConfigs.debug
         }
     }
 

@@ -13,6 +13,8 @@ public final class Button {
     public final RectF rect = new RectF();
     public String label;
     public String id;           // otomatik testler için ad
+    /** Yerelleştirme anahtarı: dil değişince etiket {@link Screen#localize()} ile yenilenir; test kimliği olarak da kullanılır. */
+    public String key;
     public String sub;          // ikinci satır (ör. fiyat)
     public int icon = Icons.NONE;
     public int style;
@@ -32,6 +34,13 @@ public final class Button {
         this.icon = icon;
         this.style = style;
         this.onClick = onClick;
+    }
+
+    /** Etiketi yerelleştirme anahtarından alır (dil değişiminde otomatik yenilenir). */
+    public Button key(String k) {
+        key = k;
+        label = com.golgen.oyun.core.L10n.t(k);
+        return this;
     }
 
     public Button set(float l, float t, float r, float b) {
@@ -118,6 +127,7 @@ public final class Button {
             float total = textW + iconSpace;
             float maxW = rect.width() - h * 0.5f;
             if (total > maxW) {
+                if (maxW / total < Ui.OVERFLOW_SCALE) Ui.reportOverflow(label, maxW / total);
                 ts *= maxW / total;
                 textW = Ui.measure(label, ts, Ui.BOLD);
                 total = textW + iconSpace;

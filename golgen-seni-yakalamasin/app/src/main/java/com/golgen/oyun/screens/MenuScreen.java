@@ -4,6 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import com.golgen.oyun.GameView;
+import com.golgen.oyun.core.Achievements;
+import com.golgen.oyun.core.Energy;
+import com.golgen.oyun.core.L10n;
+import com.golgen.oyun.core.Missions;
 import com.golgen.oyun.core.Progress;
 import com.golgen.oyun.core.Synth;
 import com.golgen.oyun.ui.Button;
@@ -28,26 +32,31 @@ public final class MenuScreen extends Screen {
     private float modalT;
     private String levelText = "";
     private int lastLevel = -1, lastXp = -1;
-    private static final String[] DAY_TEXT = {"1. gün", "2. gün", "3. gün", "4. gün", "5. gün", "6. gün", "7. gün"};
+    private int lastLang = -1;
+    private final String[] dayText = new String[Progress.LOGIN_REWARDS.length];
+    private String loginTitle = "", loginDesc = "";
+    private String[] loginDescLines = new String[0];
+    private float loginDescSize;
+    private final float[] fit = new float[1];
     private static final String[] DAY_REWARD = new String[Progress.LOGIN_REWARDS.length];
     static { for (int i = 0; i < DAY_REWARD.length; i++) DAY_REWARD[i] = Integer.toString(Progress.LOGIN_REWARDS[i]); }
 
     public MenuScreen(GameView g) {
         super(g);
-        playBtn = add(new Button("OYNA", Icons.PLAY, Button.PRIMARY, g::startEndless));
-        playBtn.sub = "Sonsuz Mod";
-        missionBtn = add(new Button("HARİTALAR · 500 BÖLÜM", Icons.TARGET, Button.SECONDARY, () -> {
+        playBtn = add(new Button(null, Icons.PLAY, Button.PRIMARY, g::startEndless).key("menu.play"));
+        missionBtn = add(new Button(null, Icons.TARGET, Button.SECONDARY, () -> {
             g.missions.showTab(MissionsScreen.TAB_LEVELS);
             g.go(g.missions);
         }));
-        skinsBtn = add(new Button("Karakter", Icons.PERSON, Button.SECONDARY, () -> g.go(g.skins)));
-        tasksBtn = add(new Button("Görevler", Icons.CALENDAR, Button.SECONDARY, () -> {
+        missionBtn.id = "haritalar";
+        skinsBtn = add(new Button(null, Icons.PERSON, Button.SECONDARY, () -> g.go(g.skins)).key("menu.character"));
+        tasksBtn = add(new Button(null, Icons.CALENDAR, Button.SECONDARY, () -> {
             g.missions.showTab(MissionsScreen.TAB_DAILY);
             g.go(g.missions);
-        }));
-        recordsBtn = add(new Button("Rekorlar", Icons.TROPHY, Button.SECONDARY, () -> g.go(g.records)));
+        }).key("menu.tasks"));
+        recordsBtn = add(new Button(null, Icons.TROPHY, Button.SECONDARY, () -> g.go(g.records)).key("menu.records"));
         skinsBtn.vertical = tasksBtn.vertical = recordsBtn.vertical = true;
-        loginBtn = add(new Button("ÖDÜLÜ AL", Icons.GIFT, Button.GOLD, this::claimLogin));
+        loginBtn = add(new Button(null, Icons.GIFT, Button.GOLD, this::claimLogin).key("login.claim"));
         loginBtn.id = "gunluk-odul";
         loginBtn.visible = false;
         settingsBtn = add(new Button(null, Icons.GEAR, Button.ICON, () -> g.go(g.settings)));
@@ -55,6 +64,23 @@ public final class MenuScreen extends Screen {
             g.tutorial.setFromSettings(true);
             g.go(g.tutorial);
         }));
+    }
+
+    @Override
+    protected void onLocalize() {
+        playBtn.sub = L10n.t("menu.play_sub");
+        missionBtn.label = L10n.p("menu.maps", Missions.ALL.length);
+        for (int i = 0; i < dayText.length; i++) dayText[i] = L10n.f("login.day", i + 1);
+        loginTitle = L10n.t("login.title");
+        loginDesc = L10n.t("login.desc");
+        if (w > 0) wrapLoginDesc();
+        lastLang = -1;          // sayılı metinler (skor, seviye, can) bir sonraki refresh'te yeniden üretilir
+    }
+
+    private void wrapLoginDesc() {
+        float pw = Math.min(w - 60f * u, 960f * u);
+        loginDescLines = Ui.wrapFit(loginDesc, 30f * u, pw - 80f * u, 2, Ui.MEDIUM, fit);
+        loginDescSize = fit[0];
     }
 
     @Override
@@ -79,6 +105,7 @@ public final class MenuScreen extends Screen {
         bg.s = w / 1000f;
         float bw = Math.min(w - 200f * u, 600f * u);
         loginBtn.set(w / 2f - bw / 2f, h * 0.62f, w / 2f + bw / 2f, h * 0.62f + 130f * u);
+        wrapLoginDesc();
     }
 
     private void setModal(boolean on) {
@@ -95,10 +122,10 @@ public final class MenuScreen extends Screen {
         if (r > 0) {
             g.sound.play(Synth.SUCCESS);
             g.haptics.medium();
-            g.toast("Günlük ödül: +" + r + " elmas", Icons.GIFT);
+            g.toast(L10n.p("login.toast", r), Icons.GIFT);
             int gained = g.progress.checkAchievements(null, null);
-            for (int id = 0; id < com.golgen.oyun.core.Achievements.COUNT; id++) {
-                if ((gained & (1 << id)) != 0) g.toast("Başarı: " + com.golgen.oyun.core.Achievements.TITLES[id], Icons.STAR);
+            for (int id = 0; id < Achievements.COUNT; id++) {
+                if ((gained & (1 << id)) != 0) g.toast(L10n.f("menu.achievement_toast", Achievements.title(id)), Icons.STAR);
             }
             g.save();
         }
@@ -118,26 +145,29 @@ public final class MenuScreen extends Screen {
     }
 
     private void refresh() {
+        boolean langChanged = lastLang != L10n.version();
+        lastLang = L10n.version();
         if (g.progress.diamonds != lastDiamonds) {
             lastDiamonds = g.progress.diamonds;
             diamondText = Integer.toString(lastDiamonds);
         }
-        if (g.progress.bestScore != lastBest) {
+        if (g.progress.bestScore != lastBest || langChanged) {
             lastBest = g.progress.bestScore;
-            bestText = lastBest > 0 ? "EN İYİ SKOR  " + lastBest : "İlk rekorunu kır!";
+            bestText = lastBest > 0 ? L10n.f("menu.best", lastBest) : L10n.t("menu.best_none");
         }
         tasksBtn.badge = g.progress.claimableDailyCount();
         int lives = g.lives();
-        String timer = lives < com.golgen.oyun.core.Energy.MAX ? g.energyTimer() : "";
-        if (lives != lastLives || !timer.equals(lastTimer)) {
+        String timer = lives < Energy.MAX ? g.energyTimer() : "";
+        if (lives != lastLives || !timer.equals(lastTimer) || langChanged) {
             lastLives = lives;
             lastTimer = timer;
-            missionBtn.sub = "Can " + lives + "/4" + (timer.isEmpty() ? "" : " · " + timer);
+            missionBtn.sub = timer.isEmpty() ? L10n.f("menu.lives_sub", lives, Energy.MAX)
+                    : L10n.f("menu.lives_sub_timer", lives, Energy.MAX, timer);
         }
-        if (g.progress.level != lastLevel || g.progress.xp != lastXp) {
+        if (g.progress.level != lastLevel || g.progress.xp != lastXp || langChanged) {
             lastLevel = g.progress.level;
             lastXp = g.progress.xp;
-            levelText = "Seviye " + lastLevel;
+            levelText = L10n.f("menu.level", lastLevel);
         }
     }
 
@@ -170,8 +200,13 @@ public final class MenuScreen extends Screen {
         Ui.glow(c, cx, (top + bottom) / 2f, pw * 0.6f, Theme.GOLD, 0.2f * k);
         Ui.panel(c, cx - pw / 2f, top, cx + pw / 2f, bottom, 48f * u, Theme.alpha(Theme.PANEL, 0.98f * k), Theme.alpha(Theme.GOLD, k), 3f * u);
         Icons.draw(c, Icons.GIFT, cx, top + 90f * u, 44f * u, Theme.alpha(Theme.GOLD, k));
-        Ui.text(c, "GÜNLÜK ÖDÜL", cx, top + 200f * u, 60f * u, Theme.alpha(Theme.WHITE, k), Paint.Align.CENTER, Ui.DISPLAY);
-        Ui.text(c, "Her gün gel, seriyi bozma! 7. gün büyük ödül.", cx, top + 255f * u, 30f * u, Theme.alpha(Theme.MUTED, k), Paint.Align.CENTER, Ui.MEDIUM);
+        Ui.textFit(c, loginTitle, cx, top + 200f * u, 60f * u, pw - 80f * u, Theme.alpha(Theme.WHITE, k), Paint.Align.CENTER, Ui.DISPLAY);
+        // Açıklama: tek satırsa eski konumunda, iki satırsa aynı merkez etrafında
+        float lineH = loginDescSize * 1.25f;
+        float dy = top + 255f * u - (loginDescLines.length - 1) * lineH / 2f;
+        for (int i = 0; i < loginDescLines.length; i++) {
+            Ui.text(c, loginDescLines[i], cx, dy + i * lineH, loginDescSize, Theme.alpha(Theme.MUTED, k), Paint.Align.CENTER, Ui.MEDIUM);
+        }
         // 7 gün hücreleri: 4 + 3
         float cellW = (pw - 100f * u) / 4f, cellH = 170f * u;
         for (int i = 0; i < 7; i++) {
@@ -182,7 +217,7 @@ public final class MenuScreen extends Screen {
             int border = today ? Theme.GOLD : (past ? Theme.alpha(Theme.TEAL, 0.6f) : Theme.LINE);
             Ui.panel(c, l, t, l + cellW - 16f * u, t + cellH, 26f * u, Theme.alpha(today ? Theme.CARD : Theme.NAVY_DEEP, k), Theme.alpha(border, k), today ? 4f * u : 2f * u);
             float ccx = l + (cellW - 16f * u) / 2f;
-            Ui.text(c, DAY_TEXT[i], ccx, t + 46f * u, 26f * u, Theme.alpha(today ? Theme.GOLD : Theme.MUTED, k), Paint.Align.CENTER, Ui.BOLD);
+            Ui.textFit(c, dayText[i], ccx, t + 46f * u, 26f * u, cellW - 40f * u, Theme.alpha(today ? Theme.GOLD : Theme.MUTED, k), Paint.Align.CENTER, Ui.BOLD);
             if (past) {
                 Icons.draw(c, Icons.CHECK, ccx, t + 100f * u, 26f * u, Theme.alpha(Theme.TEAL, k));
             } else {
@@ -210,20 +245,19 @@ public final class MenuScreen extends Screen {
         // Başlık
         float ty = safeT + 290f * u;
         Ui.glow(c, cx, ty - 40f * u, 520f * u, Theme.PURPLE, 0.35f);
-        Ui.text(c, "GÖLGEN", cx, ty, 150f * u, Theme.WHITE, Paint.Align.CENTER, Ui.DISPLAY);
-        Ui.text(c, "SENİ YAKALAMASIN", cx, ty + 84f * u, 62f * u, Theme.TEAL, Paint.Align.CENTER, Ui.BOLD);
+        Ui.brandTitle(c, cx, ty, 150f * u, w - 120f * u, 1f);
 
         // Üst çubuk: elmaslar + seviye
         float pw = Ui.diamondPill(c, safeL + 40f * u, safeT + 40f * u, 96f * u, diamondText, false);
         float lx = safeL + 40f * u + pw + 24f * u, lw = 190f * u;
-        Ui.text(c, levelText, lx, safeT + 80f * u, 30f * u, Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
+        Ui.textFit(c, levelText, lx, safeT + 80f * u, 30f * u, Math.max(lw, helpBtn.rect.left - 24f * u - lx), Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
         Ui.panel(c, lx, safeT + 98f * u, lx + lw, safeT + 110f * u, 6f * u, Theme.alpha(Theme.NAVY_DEEP, 0.9f), Theme.LINE, 1.5f * u);
         float xk = lastXp / (float) Progress.xpForLevel(Math.max(1, lastLevel));
         if (xk > 0f) Ui.panel(c, lx, safeT + 98f * u, lx + lw * Math.min(1f, xk), safeT + 110f * u, 6f * u, Theme.TEAL, 0, 0);
 
         // En iyi skor
         float by = playBtn.rect.top - 70f * u;
-        Ui.text(c, bestText, cx, by, 38f * u, Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
+        Ui.textFit(c, bestText, cx, by, 38f * u, playBtn.rect.width(), Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
         if (loginModal) {
             for (int i = 0; i < buttons.size(); i++) if (buttons.get(i) != loginBtn) buttons.get(i).draw(c, u);
             drawLoginModal(c);

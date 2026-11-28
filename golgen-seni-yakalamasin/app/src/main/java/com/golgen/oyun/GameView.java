@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.Progress;
 import com.golgen.oyun.core.RunResult;
 import com.golgen.oyun.core.Skins;
@@ -65,6 +66,12 @@ public final class GameView extends View implements Choreographer.FrameCallback,
     public final RecordsScreen records;
     public final SettingsScreen settings;
     public final TutorialScreen tutorial;
+    public final com.golgen.oyun.screens.LivesDialog livesDialog;
+    private final Screen[] allScreens;
+    /** Can yenilendiğinde 1'e çıkar ve söner (can göstergelerindeki kısa animasyon). */
+    public float livesPulse;
+    private int livesSeen = -1, regenSeen;
+    private float livesCheckT;
 
     private Screen current;
     private Screen pending;
@@ -98,8 +105,10 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         progress.load(store);
         // Saat kaynağı, güvenilir güne (epochDay) ve canlara erişen her şeyden ÖNCE kurulmalı
         clock = new com.golgen.oyun.platform.SystemTime(activity.getContentResolver());
-        progress.energy.tick(clock); // ilk kurulumda 4 can
+        progress.energy.tick(clock); // ilk kurulumda tam can
         progress.ensureDaily(epochDay());
+        Ui.debugOverflow = debuggable;
+        initLanguage();
         save();
         sound = new SoundSystem(activity);
         haptics = new Haptics(activity);
@@ -115,6 +124,11 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         records = new RecordsScreen(this);
         settings = new SettingsScreen(this);
         tutorial = new TutorialScreen(this);
+        livesDialog = new com.golgen.oyun.screens.LivesDialog(this);
+        allScreens = new Screen[]{logo, splash, menu, play, gameOver, skins, missions, records, settings, tutorial, livesDialog};
+        for (Screen s : allScreens) s.localize();
+        livesSeen = progress.energy.lives;
+        if (progress.saveTampered) toast(L10n.t("save.tampered"), Icons.LOCK);
         current = logo;
         current.enter();
         android.util.Log.i("GolgenUI", "ekran=LogoScreen");
@@ -128,6 +142,70 @@ public final class GameView extends View implements Choreographer.FrameCallback,
 
     public void save() {
         progress.save(store);
+    }
+
+    // ---------------- Dil ----------------
+    /** İlk açılışta sistem dilini algılar (desteklenmiyorsa İngilizce) ve tercihi kalıcı kaydeder. */
+    private void initLanguage() {
+        String lang = progress.language;
+        if (!L10n.isSupported(lang)) {
+            lang = L10n.pickForSystem(java.util.Locale.getDefault().getLanguage());
+            progress.language = lang;
+        }
+        loadLanguage(L10n.DEFAULT);
+        loadLanguage(lang);
+        L10n.use(lang);
+    }
+
+    private void loadLanguage(String code) {
+        if (L10n.isLoaded(code)) return;
+        try (java.io.InputStream in = activity.getAssets().open("localization/" + code + ".json")) {
+            java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream(64 * 1024);
+            byte[] buf = new byte[16 * 1024];
+            int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            L10n.load(code, new String(out.toByteArray(), java.nio.charset.StandardCharsets.UTF_8));
+        } catch (java.io.IOException | RuntimeException e) {
+            android.util.Log.e("GolgenL10n", "dil dosyası okunamadı: " + code, e);
+        }
+    }
+
+    /** Oyun içinden dil değişimi: yeniden başlatma gerekmez, ilerleme etkilenmez. */
+    public void setLanguage(String code) {
+        if (!L10n.isSupported(code)) return;
+        loadLanguage(code);
+        L10n.use(code);
+        progress.language = code;
+        save();
+        for (Screen s : allScreens) s.localize();
+        layoutScreen(current);
+        layoutOverlay();
+        android.util.Log.i("GolgenUI", "dil=" + code);
+    }
+
+    // ---------------- Canlar ----------------
+    /** Can sayısı açık bir işlemle (video, elmas, bölüm) değiştiğinde: animasyon var, "yenilendi" bildirimi yok. */
+    public void noteLivesChanged() {
+        livesSeen = lives();
+        livesPulse = 1f;
+    }
+
+    private void watchLives(float dt) {
+        if (livesPulse > 0f) livesPulse = Math.max(0f, livesPulse - dt * 1.6f);
+        livesCheckT += dt;
+        if (livesCheckT < 0.5f) return;
+        livesCheckT = 0f;
+        int l = lives();
+        int regen = progress.energy.regenTotal;
+        if (regen > regenSeen) {                      // zamanla yenilendi: kısa animasyon + bildirim
+            livesPulse = 1f;
+            sound.play(com.golgen.oyun.core.Synth.DIAMOND, 0.6f, 1.2f);
+            toast(l >= com.golgen.oyun.core.Energy.MAX ? L10n.t("lives.full_toast") : L10n.t("lives.regen_toast"), Icons.HEART);
+        } else if (livesSeen >= 0 && l > livesSeen) {
+            livesPulse = 1f;                          // video / elmas / bölüm kazanımı
+        }
+        regenSeen = regen;
+        livesSeen = l;
     }
 
     public SkinDef skin() {
@@ -174,11 +252,12 @@ public final class GameView extends View implements Choreographer.FrameCallback,
     public boolean startMission(int index) {
         if (index < 0 || index >= com.golgen.oyun.core.Missions.ALL.length) return false;
         if (!progress.energy.consume(clock)) {
-            toast("Canın kalmadı · sonraki can " + energyTimer(), Icons.HEART);
-            if (current != missions) { missions.showTab(MissionsScreen.TAB_LEVELS); go(missions); }
+            if (current != missions && current != play) { missions.showTab(MissionsScreen.TAB_LEVELS); go(missions); }
+            livesDialog.show(index);
             return false;
         }
-        save();
+        livesSeen = progress.energy.lives;
+        progress.saveNow(store);   // zorla kapatmaya karşı can harcaması hemen diske yazılır
         play.setup(RunResult.MODE_MISSION, index);
         go(play);
         return true;
@@ -230,16 +309,21 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         return debuggable && store.getInt("testReklamsiz", 0) == 1;
     }
 
-    /** Sonraki cana kalan süre "dd:ss" (saniyede bir yeniden üretilir). */
+    /** Sonraki cana kalan süre "dd:ss" (saniyede bir yeniden üretilir; dolu ise "Canlar dolu"). */
     public String energyTimer() {
         long ms = progress.energy.msToNext(clock);
         int sec = (int) ((ms + 999) / 1000);
-        if (sec != lastEnergySec) {
+        if (sec != lastEnergySec || lastEnergyLang != L10n.version()) {
             lastEnergySec = sec;
-            energyText = sec <= 0 ? "dolu" : (sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60);
+            lastEnergyLang = L10n.version();
+            energyText = sec <= 0 ? L10n.t("lives.full")
+                    : String.format(java.util.Locale.ROOT, "%02d:%02d", sec / 60, sec % 60);
         }
         return energyText;
     }
+
+    private int lastEnergyLang = -1;
+    private int lastMissing;
 
     public Screen current() { return current; }
 
@@ -264,11 +348,30 @@ public final class GameView extends View implements Choreographer.FrameCallback,
      */
     public void handleDebugIntent(android.content.Intent intent) {
         if (!debuggable || intent == null) return;
+        if (intent.getIntExtra("demo", 0) == 1) debugDemoProgress();
+        String cekim = intent.getStringExtra("cekim");
+        if (cekim != null) {
+            try {
+                Class.forName("com.golgen.oyun.debug.Capture").getMethod("run", GameView.class, String.class).invoke(null, this, cekim);
+            } catch (Exception ex) {
+                android.util.Log.e("GolgenCekim", "çekim modu yok", ex);
+            }
+            return;
+        }
         if (intent.hasExtra("reklamsiz")) {
             boolean off = intent.getBooleanExtra("reklamsiz", false);
             store.putInt("testReklamsiz", off ? 1 : 0);
             store.apply();
             if (activity instanceof MainActivity) ((MainActivity) activity).setupAds(!off);
+        }
+        String dil = intent.getStringExtra("dil");
+        if (dil != null) setLanguage(dil);
+        if (intent.hasExtra("canlar")) {           // test: can sayısını ayarla (0..MAX)
+            progress.energy.tick(clock);
+            progress.energy.lives = Math.max(0, Math.min(com.golgen.oyun.core.Energy.MAX, intent.getIntExtra("canlar", 0)));
+            progress.energy.progressMs = 0;
+            noteLivesChanged();
+            save();
         }
         String reklam = intent.getStringExtra("reklam");
         if ("gecis".equals(reklam)) ads.showInterstitial(null);
@@ -297,6 +400,92 @@ public final class GameView extends View implements Choreographer.FrameCallback,
                     try { startMission(Integer.parseInt(e.substring(6))); } catch (NumberFormatException ignored) { }
                 }
                 break;
+        }
+    }
+
+    // ---------------- Debug çekim modu kancaları (yalnızca debug build kullanır) ----------------
+    private volatile boolean capturing;
+
+    /** Çekim sırasında oyun döngüsü durur ve ekrana çizim askıya alınır (durum tek iş parçacığından değişir). */
+    public void debugSetCapturing(boolean on) {
+        if (!debuggable) return;
+        capturing = on;
+        if (on) {
+            running = false;
+            Choreographer.getInstance().removeFrameCallback(this);
+        } else {
+            onResume();
+        }
+    }
+
+    public void debugStep(float dt) { step(dt); }
+
+    public void debugDraw(Canvas c) {
+        current.draw(c);
+        livesDialog.draw(c);
+        drawToast(c);
+        if (fade > 0f) c.drawColor(Theme.alpha(Theme.NAVY_DEEP, fade));
+    }
+
+    public boolean debugCurrentIsPlay() { return current == play; }
+
+    public void debugStartEndless() {
+        play.setup(RunResult.MODE_ENDLESS, 0);
+        switchNow(play);
+        fade = 0f; fadeDir = 0; pending = null;
+    }
+
+    public void debugStartMission(int index) {
+        progress.energy.refill(clock);
+        progress.missionsCompleted = Math.max(progress.missionsCompleted, index);
+        play.setup(RunResult.MODE_MISSION, index);
+        switchNow(play);
+        fade = 0f; fadeDir = 0; pending = null;
+    }
+
+    /** Çekim için ekran aç: menu (ödül penceresi kapalı), gunluk_odul, karakter, gorevler, gunluk, basarilar, rekorlar, ayarlar, canyok. */
+    public void debugShow(String name) {
+        progress.tutorialDone = true;
+        Screen s = menu;
+        switch (name) {
+            case "menu": progress.lastLoginClaimDay = epochDay(); break;
+            case "gunluk_odul": progress.lastLoginClaimDay = epochDay() - 1; break;
+            case "karakter": s = skins; break;
+            case "gorevler": missions.showTab(MissionsScreen.TAB_LEVELS); s = missions; break;
+            case "gunluk": missions.showTab(MissionsScreen.TAB_DAILY); s = missions; break;
+            case "basarilar": missions.showTab(MissionsScreen.TAB_ACH); s = missions; break;
+            case "rekorlar": s = records; break;
+            case "ayarlar": s = settings; break;
+            case "ogretici": tutorial.setFromSettings(true); s = tutorial; break;
+            case "canyok": progress.energy.lives = 0; progress.energy.progressMs = 0; s = missions; break;
+            default: break;
+        }
+        switchNow(s);
+        fade = 0f; fadeDir = 0; pending = null;
+        if ("canyok".equals(name)) livesDialog.show(Math.min(progress.missionsCompleted, com.golgen.oyun.core.Missions.ALL.length - 1));
+    }
+
+    /** Mağaza görselleri için örnek ilerleme: açık bölümler, taçlar, elmas, birkaç karakter, rekorlar. */
+    public void debugDemoProgress() {
+        progress.tutorialDone = true;
+        progress.missionsCompleted = Math.max(progress.missionsCompleted, 37);
+        for (int i = 0; i < 37; i++) progress.missionStars[i] = (byte) (i % 5 == 4 ? 2 : 3);
+        progress.diamonds = Math.max(progress.diamonds, 1240);
+        progress.unlockedSkins |= 0b1011;
+        progress.level = Math.max(progress.level, 12);
+        progress.bestScore = Math.max(progress.bestScore, 18450);
+        int[] top = {18450, 15210, 12980, 11040, 9875, 8120, 7340, 6010, 5225, 4180};
+        for (int i = 0; i < top.length; i++) progress.topScores[i] = Math.max(progress.topScores[i], top[i]);
+        progress.gamesPlayed = Math.max(progress.gamesPlayed, 48);
+        progress.loginStreak = Math.max(progress.loginStreak, 4);
+        save();
+    }
+
+    /** Üst katman (can penceresi) yerleşimi ve test hedefleri. */
+    public void layoutOverlay() {
+        if (getWidth() > 0) {
+            livesDialog.resize(getWidth(), getHeight(), u, safeL, safeT, safeR, safeB);
+            if (livesDialog.isOpen()) livesDialog.dumpTargets();
         }
     }
 
@@ -340,9 +529,29 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         Ui.glow(c, w / 2f, top + bh / 2f, bw * 0.55f, Theme.GOLD, 0.25f * ease);
         Ui.panel(c, l, top, l + bw, top + bh, bh / 2f, Theme.alpha(Theme.PANEL, 0.97f * ease), Theme.alpha(Theme.GOLD, ease), 3f * u);
         Icons.draw(c, toastIcon[0], l + bh * 0.55f, top + bh / 2f, bh * 0.22f, Theme.alpha(Theme.GOLD, ease));
-        Ui.textFit(c, toastText[0], l + bh, Ui.centerY(top + bh / 2f, 38f * u), 38f * u, bw - bh * 1.3f,
-                Theme.alpha(Theme.WHITE, ease), Paint.Align.LEFT, Ui.BOLD);
+        float maxW = bw - bh * 1.3f;
+        String s = toastText[0];
+        if (s != toastWrapSrc || maxW != toastWrapW) {      // uzun çeviriler iki satıra kaydırılır (bildirim başına bir kez)
+            toastWrapSrc = s;
+            toastWrapW = maxW;
+            toastLines = Ui.measure(s, 38f * u, Ui.BOLD) * 0.85f <= maxW ? null : Ui.wrapFit(s, 34f * u, maxW, 2, Ui.BOLD, toastFit);
+        }
+        if (toastLines == null || toastLines.length != 2) {   // tek satır (veya aşırı uzunsa küçültülmüş tek satır)
+            Ui.textFit(c, s, l + bh, Ui.centerY(top + bh / 2f, 38f * u), 38f * u, maxW,
+                    Theme.alpha(Theme.WHITE, ease), Paint.Align.LEFT, Ui.BOLD);
+        } else {
+            float ts = toastFit[0], lh = ts * 1.15f;
+            for (int i = 0; i < 2; i++) {
+                Ui.textFit(c, toastLines[i], l + bh, Ui.centerY(top + bh / 2f + (i - 0.5f) * lh, ts), ts, maxW,
+                        Theme.alpha(Theme.WHITE, ease), Paint.Align.LEFT, Ui.BOLD);
+            }
+        }
     }
+
+    private String toastWrapSrc;
+    private float toastWrapW;
+    private String[] toastLines;
+    private final float[] toastFit = new float[1];
 
     // ---------------- Yaşam döngüsü ----------------
     public void onResume() {
@@ -372,6 +581,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
     /** Geri tuşu: ekran ele almazsa uygulamadan çıkılır. */
     public void handleBack() {
         if (fadeDir != 0) return;
+        if (livesDialog.isOpen()) { livesDialog.onBack(); return; }
         if (!current.onBack()) activity.finish();
     }
 
@@ -401,12 +611,18 @@ public final class GameView extends View implements Choreographer.FrameCallback,
             }
         }
         current.update(dt);
+        livesDialog.update(dt);
+        watchLives(dt);
         updateToasts(dt);
         fpsFrames++;
         fpsTime += dt;
         if (fpsTime >= 5f) {
             lastFps = fpsFrames / fpsTime;
             android.util.Log.i("GolgenFPS", String.format(java.util.Locale.US, "fps=%.1f ekran=%s", lastFps, current.getClass().getSimpleName()));
+            if (debuggable) {
+                java.util.Set<String> miss = L10n.missingSeen();
+                if (miss.size() != lastMissing) { lastMissing = miss.size(); android.util.Log.w("GolgenL10n", "eksik=" + miss); }
+            }
             fpsFrames = 0;
             fpsTime = 0f;
         }
@@ -414,7 +630,9 @@ public final class GameView extends View implements Choreographer.FrameCallback,
 
     @Override
     protected void onDraw(Canvas c) {
+        if (capturing) { c.drawColor(Theme.NAVY_DEEP); return; }
         current.draw(c);
+        livesDialog.draw(c);
         drawToast(c);
         if (fade > 0f) c.drawColor(Theme.alpha(Theme.NAVY_DEEP, fade));
     }
@@ -427,6 +645,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         }
         if (fadeDir == 1) return true; // geçiş sırasında girişi yut
         if (e.getActionMasked() == MotionEvent.ACTION_UP) performClick();
+        if (livesDialog.isOpen()) return livesDialog.onTouch(e);
         return current.onTouch(e);
     }
 
@@ -441,6 +660,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         super.onSizeChanged(w, h, oldw, oldh);
         u = Math.min(w / 1080f, h / 1920f);
         layoutScreen(current);
+        layoutOverlay();
     }
 
     @Override
@@ -467,6 +687,7 @@ public final class GameView extends View implements Choreographer.FrameCallback,
         safeL = l; safeT = t; safeR = r; safeB = b;
         ads.setBottomMargin(b);
         layoutScreen(current);
+        layoutOverlay();
         return super.onApplyWindowInsets(in);
     }
 }

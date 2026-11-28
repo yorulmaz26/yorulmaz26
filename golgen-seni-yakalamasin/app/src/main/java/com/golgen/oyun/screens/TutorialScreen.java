@@ -9,6 +9,7 @@ import com.golgen.oyun.core.DifficultyProfile;
 import com.golgen.oyun.core.GameEvents;
 import com.golgen.oyun.core.GameWorld;
 import com.golgen.oyun.core.Geometry;
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.Shadow;
 import com.golgen.oyun.core.Synth;
 import com.golgen.oyun.ui.Button;
@@ -22,6 +23,8 @@ import com.golgen.oyun.ui.WorldRenderer;
 public final class TutorialScreen extends Screen implements GameEvents {
     private static final int MOVE = 0, SHADOW = 1, OBSTACLES = 2, DONE = 3;
     private static final float SHADOW_DELAY = 2.0f, SURVIVE = 7f;
+    private static final int DIAMOND_GOAL = 2;
+    private static final int PROG_PERCENT = 0, PROG_SECONDS = 1, PROG_DIAMONDS = 2;
 
     private final GameWorld world = new GameWorld(5);
     private final WorldRenderer renderer = new WorldRenderer();
@@ -32,22 +35,60 @@ public final class TutorialScreen extends Screen implements GameEvents {
     private float lastX, lastY;
     private boolean fromSettings;
     private final Button skipBtn, playBtn, menuBtn;
-    private final String[] titles = {"1 / 3  ·  Hareket", "2 / 3  ·  Gölgen", "3 / 3  ·  Engeller ve Elmaslar", "Hazırsın!"};
-    private final String[] texts = {
-            "Parmağını ekranın herhangi bir yerine bas ve sürükle. Karakterin parmağının hareketini izler.",
-            "Bu senin gölgen: 2 saniye önceki hareketlerini aynen tekrarlar. Durursan seni yakalar, hareket etmeye devam et!",
-            "Mor neon engellere çarpma, boşluklarından geç. Altın elmasları topla: 2 elmas topla.",
-            "Gölgen ve engeller zamanla çoğalır. Ne kadar uzun dayanırsan o kadar çok puan!"
-    };
-    private String[][] wrapped = new String[4][];
+    // Yerelleştirilmiş metinler: onLocalize'da yeniden üretilir
+    private final String[] titles = {"", "", "", ""};
+    private final String[] texts = {"", "", "", ""};
+    private final String[][] wrapped = new String[4][];
+    private final float[] wrapSize = new float[4];
+    private final float[] fit = new float[1];
+    private String caughtText = "";
     private String progressText = "";
+    private int progKind = -1, progValue = -1, progVer = Integer.MIN_VALUE;
 
     public TutorialScreen(GameView g) {
         super(g);
         world.setEvents(this);
-        skipBtn = add(new Button("Atla", Icons.NONE, Button.GHOST, this::finish));
-        playBtn = add(new Button("OYNA", Icons.PLAY, Button.PRIMARY, () -> { complete(); g.startEndless(); }));
-        menuBtn = add(new Button("ANA MENÜ", Icons.HOME, Button.SECONDARY, () -> { complete(); g.goMenu(); }));
+        skipBtn = add(new Button(null, Icons.NONE, Button.GHOST, this::finish).key("tutorial.skip"));
+        playBtn = add(new Button(null, Icons.PLAY, Button.PRIMARY, () -> { complete(); g.startEndless(); }).key("tutorial.play"));
+        menuBtn = add(new Button(null, Icons.HOME, Button.SECONDARY, () -> { complete(); g.goMenu(); }).key("tutorial.main_menu"));
+    }
+
+    @Override
+    protected void onLocalize() {
+        titles[MOVE] = L10n.t("tutorial.step1.title");
+        titles[SHADOW] = L10n.t("tutorial.step2.title");
+        titles[OBSTACLES] = L10n.t("tutorial.step3.title");
+        titles[DONE] = L10n.t("tutorial.done.title");
+        texts[MOVE] = L10n.t("tutorial.step1.text");
+        texts[SHADOW] = L10n.p("tutorial.step2.text", (int) SHADOW_DELAY);
+        texts[OBSTACLES] = L10n.p("tutorial.step3.text", DIAMOND_GOAL);
+        texts[DONE] = L10n.t("tutorial.done.text");
+        caughtText = L10n.t("tutorial.caught");
+        progVer = Integer.MIN_VALUE; // ilerleme metni yeni dilde yeniden üretilsin
+        if (w > 0) wrapTexts();
+    }
+
+    /** Talimat metinlerini kart genişliğine sığdırır (uzun dillerde gerekirse küçültür). */
+    private void wrapTexts() {
+        float maxW = Math.min(w - 160f * u, 860f * u);
+        for (int i = 0; i < texts.length; i++) {
+            wrapped[i] = Ui.wrapFit(texts[i], 36f * u, maxW, 4, Ui.MEDIUM, fit);
+            wrapSize[i] = fit[0];
+        }
+    }
+
+    /** İlerleme satırını yalnızca değer veya dil değişince üretir. */
+    private void setProgress(int kind, int value) {
+        int ver = L10n.version();
+        if (kind == progKind && value == progValue && ver == progVer) return;
+        progKind = kind;
+        progValue = value;
+        progVer = ver;
+        switch (kind) {
+            case PROG_PERCENT: progressText = L10n.f("tutorial.progress.percent", value); break;
+            case PROG_SECONDS: progressText = L10n.p("tutorial.progress.seconds", (int) SURVIVE, value); break;
+            default: progressText = L10n.p("tutorial.progress.diamonds", DIAMOND_GOAL, value); break;
+        }
     }
 
     public void setFromSettings(boolean v) {
@@ -82,8 +123,7 @@ public final class TutorialScreen extends Screen implements GameEvents {
         float cx = w / 2f, bw = Math.min(w - 160f * u, 700f * u), bh = 130f * u;
         playBtn.set(cx - bw / 2f, h * 0.56f, cx + bw / 2f, h * 0.56f + bh);
         menuBtn.set(cx - bw / 2f, playBtn.rect.bottom + 30f * u, cx + bw / 2f, playBtn.rect.bottom + 30f * u + bh);
-        float maxW = Math.min(w - 160f * u, 860f * u);
-        for (int i = 0; i < 4; i++) wrapped[i] = Ui.wrap(texts[i], 36f * u, maxW, Ui.MEDIUM);
+        wrapTexts();
     }
 
     @Override
@@ -97,7 +137,7 @@ public final class TutorialScreen extends Screen implements GameEvents {
         world.obstaclesHarmless = true;
         renderer.particles.clear();
         setStep(MOVE);
-        skipBtn.label = fromSettings ? "Kapat" : "Atla";
+        skipBtn.key(fromSettings ? "tutorial.close" : "tutorial.skip");
     }
 
     private void setStep(int s) {
@@ -166,7 +206,7 @@ public final class TutorialScreen extends Screen implements GameEvents {
                 moved += (float) Math.sqrt(Geometry.dist2(world.px, world.py, lastPx, lastPy));
                 lastPx = world.px;
                 lastPy = world.py;
-                progressText = Math.min(100, (int) (moved / 12f)) + "%";
+                setProgress(PROG_PERCENT, Math.min(100, (int) (moved / 12f)));
                 if (moved > 1200f) setStep(SHADOW);
                 break;
             }
@@ -186,7 +226,7 @@ public final class TutorialScreen extends Screen implements GameEvents {
                         safeTime += dt;
                     }
                 }
-                progressText = (int) Math.min(SURVIVE, safeTime) + " / " + (int) SURVIVE + " sn";
+                setProgress(PROG_SECONDS, (int) Math.min(SURVIVE, safeTime));
                 if (safeTime >= SURVIVE) setStep(OBSTACLES);
                 break;
             }
@@ -199,8 +239,8 @@ public final class TutorialScreen extends Screen implements GameEvents {
                     world.addWall(-30f, gx, gap);
                     world.addDiamond(gx, -30f);
                 }
-                progressText = world.diamonds + " / 2 elmas";
-                if (world.diamonds >= 2) setStep(DONE);
+                setProgress(PROG_DIAMONDS, world.diamonds);
+                if (world.diamonds >= DIAMOND_GOAL) setStep(DONE);
                 break;
             }
             default:
@@ -232,21 +272,23 @@ public final class TutorialScreen extends Screen implements GameEvents {
         String[] lines = wrapped[step];
         if (lines != null) {
             float top = step == DONE ? h * 0.22f : safeT + 160f * u;
-            float ch = 130f * u + lines.length * 48f * u + 60f * u;
+            float ts = wrapSize[step], lh = 48f * u * (ts / (36f * u)); // satır aralığı küçülen yazıyla orantılı
+            float ch = 130f * u + lines.length * lh + 60f * u;
             float cw = Math.min(w - 80f * u, 940f * u);
             Ui.panel(c, cx - cw / 2f, top, cx + cw / 2f, top + ch, 40f * u, Theme.alpha(Theme.PANEL, 0.92f), Theme.alpha(Theme.TEAL, 0.7f), 3f * u);
-            Ui.text(c, titles[step], cx, top + 80f * u, step == DONE ? 64f * u : 44f * u, step == DONE ? Theme.GOLD : Theme.TEAL, Paint.Align.CENTER, step == DONE ? Ui.DISPLAY : Ui.BOLD);
+            Ui.textFit(c, titles[step], cx, top + 80f * u, step == DONE ? 64f * u : 44f * u, cw - 80f * u,
+                    step == DONE ? Theme.GOLD : Theme.TEAL, Paint.Align.CENTER, step == DONE ? Ui.DISPLAY : Ui.BOLD);
             for (int i = 0; i < lines.length; i++) {
-                Ui.text(c, lines[i], cx, top + 140f * u + i * 48f * u, 36f * u, Theme.WHITE, Paint.Align.CENTER, Ui.MEDIUM);
+                Ui.text(c, lines[i], cx, top + 140f * u + i * lh, ts, Theme.WHITE, Paint.Align.CENTER, Ui.MEDIUM);
             }
             if (step != DONE) {
-                Ui.text(c, progressText, cx, top + ch - 30f * u, 34f * u, Theme.GOLD, Paint.Align.CENTER, Ui.NUMBERS);
+                Ui.textFit(c, progressText, cx, top + ch - 30f * u, 34f * u, cw - 80f * u, Theme.GOLD, Paint.Align.CENTER, Ui.NUMBERS);
             }
         }
         if (step == MOVE && moved < 60f) drawHandHint(c);
         if (caughtMsg > 0f) {
             float a = Math.min(1f, caughtMsg);
-            Ui.text(c, "Yakalandın! Durmadan hareket et", cx, h * 0.5f, 46f * u, Theme.alpha(Theme.PURPLE_LIGHT, a), Paint.Align.CENTER, Ui.BOLD);
+            Ui.textFit(c, caughtText, cx, h * 0.5f, 46f * u, w - 80f * u, Theme.alpha(Theme.PURPLE_LIGHT, a), Paint.Align.CENTER, Ui.BOLD);
         }
         drawButtons(c);
     }

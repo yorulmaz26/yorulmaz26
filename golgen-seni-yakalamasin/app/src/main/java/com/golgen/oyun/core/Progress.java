@@ -5,7 +5,8 @@ package com.golgen.oyun.core;
  * Kayıt/okuma KeyValueStore üzerinden yapılır.
  */
 public final class Progress {
-    public static final int VERSION = 2;
+    /** 3: kayıt imzası + dil tercihi eklendi. Anahtar kümesi değişirse artırılmalıdır (imza doğrulaması sürüme bağlıdır). */
+    public static final int VERSION = 3;
     public static final int TOP_N = 10;
 
     public int diamonds;
@@ -24,6 +25,10 @@ public final class Progress {
     public boolean music = true;
     public boolean vibration = true;
     public boolean tutorialDone;
+    /** Oyuncunun seçtiği dil kodu; boşsa ilk açılışta sistem dilinden belirlenir. */
+    public String language = "";
+    /** Son yüklemede kayıt imzası tutmadı (dosya elle değiştirilmiş): ekonomi değerleri sıfırlandı. */
+    public boolean saveTampered;
 
     public int dailyDay = -1;
     public final int[] dailyTypes = new int[DailyMissions.PER_DAY];
@@ -39,10 +44,9 @@ public final class Progress {
     public int loginStreak;
     public int lastLoginClaimDay = -1;
 
-    /** Günlük giriş ödülleri (7 günlük döngü, 7. gün büyük ödül). */
-    /** Bölüm modu canları (4 can, 15 dk'da bir yenilenir; saat hilesine dayanıklı). */
+    /** Bölüm modu canları (GameConfig: en fazla 4 can, 20 dk'da bir yenilenir; saat hilesine dayanıklı). */
     public final Energy energy = new Energy();
-    public static final int REFILL_COST = 60;
+    public static final int REFILL_COST = GameConfig.LIFE_REFILL_COST;
     /** Ödüllü video ile alınan günlük can sayacı. */
     public int rewardedLifeDay = -1;
     public int rewardedLivesToday;
@@ -76,6 +80,8 @@ public final class Progress {
         music = s.getInt("music", 1) == 1;
         vibration = s.getInt("vibration", 1) == 1;
         tutorialDone = s.getInt("tutorialDone", 0) == 1;
+        language = s.getString("lang", "");
+        if (language == null || !L10n.isSupported(language)) language = "";
         dailyDay = s.getInt("dailyDay", -1);
         for (int i = 0; i < DailyMissions.PER_DAY; i++) {
             dailyTypes[i] = s.getInt("dailyType" + i, 0);
@@ -98,6 +104,7 @@ public final class Progress {
         rewardedLifeDay = s.getInt("rwLifeDay", -1);
         rewardedLivesToday = s.getInt("rwLives", 0);
         maxSeenDay = s.getInt("maxSeenDay", -1);
+        verifySignature(s);
         // Sürüm 1 (100 bölüm) -> 2 (500 bölüm): kimliği aynı kalıp eşiği büyüyen başarılar yeni koşulu sağlamıyorsa geri alınır
         if (s.getInt("version", 1) < 2) {
             for (int id = 10; id <= 13; id++) {
@@ -107,6 +114,21 @@ public final class Progress {
     }
 
     public void save(KeyValueStore s) {
+        Tee tee = new Tee(s);
+        write(tee);
+        s.putString(SIG_KEY, signature(tee.values));
+        s.apply();
+    }
+
+    /** Can harcama gibi kritik anlarda: zorla kapatmaya karşı diske eşzamanlı yazar. */
+    public void saveNow(KeyValueStore s) {
+        Tee tee = new Tee(s);
+        write(tee);
+        s.putString(SIG_KEY, signature(tee.values));
+        s.commit();
+    }
+
+    private void write(KeyValueStore s) {
         s.putInt("version", VERSION);
         s.putInt("diamonds", diamonds);
         s.putInt("bestScore", bestScore);
@@ -128,6 +150,7 @@ public final class Progress {
         s.putInt("music", music ? 1 : 0);
         s.putInt("vibration", vibration ? 1 : 0);
         s.putInt("tutorialDone", tutorialDone ? 1 : 0);
+        s.putString("lang", language == null ? "" : language);
         s.putInt("dailyDay", dailyDay);
         for (int i = 0; i < DailyMissions.PER_DAY; i++) {
             s.putInt("dailyType" + i, dailyTypes[i]);
@@ -147,7 +170,82 @@ public final class Progress {
         s.putInt("rwLifeDay", rewardedLifeDay);
         s.putInt("rwLives", rewardedLivesToday);
         s.putInt("maxSeenDay", maxSeenDay);
-        s.apply();
+    }
+
+    // ---------- Kayıt imzası (elle değiştirilmiş kayıt tespiti) ----------
+    // Kayıttaki tüm anahtar/değerlerin sıralı listesinin SHA-256 özeti saklanır. Kayıt dosyası elle
+    // değiştirilirse (ör. elmas veya can artırılırsa) imza tutmaz ve ekonomi değerleri (elmas, can)
+    // sıfırlanır; ilerleme, karakterler ve rekorlar korunur. Normal oyuncu hiçbir zaman etkilenmez:
+    // eski sürümlerden gelen imzasız kayıtlar kabul edilip imzalanır. Not: uygulamayı tersine mühendislikle
+    // inceleyen birini durduramaz; amacı sıradan kayıt düzenlemeyi caydırmaktır.
+    static final String SIG_KEY = "sig";
+    private static final String SIG_SALT = "MagicLumos|golgen|kayit|v3|5c1e7a92";
+
+    static String signature(java.util.SortedMap<String, String> entries) {
+        StringBuilder sb = new StringBuilder(4096).append(SIG_SALT);
+        for (java.util.Map.Entry<String, String> e : entries.entrySet()) {
+            sb.append('\n').append(e.getKey()).append('=').append(e.getValue());
+        }
+        try {
+            byte[] d = java.security.MessageDigest.getInstance("SHA-256").digest(sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            StringBuilder hex = new StringBuilder(40);
+            for (int i = 0; i < 20; i++) hex.append(String.format(java.util.Locale.ROOT, "%02x", d[i]));
+            return hex.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            return "";
+        }
+    }
+
+    private void verifySignature(KeyValueStore s) {
+        saveTampered = false;
+        int version = s.getInt("version", 1);
+        String stored = s.getString(SIG_KEY, null);
+        if (version < 3 && stored == null) return;   // eski (imzasız) kayıt: kabul edilir, bir sonraki kayıtta imzalanır
+        if (version > VERSION) return;               // daha yeni sürümün kaydı (uygulama eski sürüme indirildi)
+        // Anahtar listesi ve türleri bu sürümün yazdığı kümeden alınır; değerler depodan ham okunur.
+        Tee keys = new Tee(null);
+        write(keys);
+        java.util.TreeMap<String, String> raw = new java.util.TreeMap<>();
+        try {
+            for (String k : keys.values.keySet()) {
+                if (keys.ints.contains(k)) {
+                    int v = s.getInt(k, Integer.MIN_VALUE);
+                    if (v != Integer.MIN_VALUE) raw.put(k, "i" + v);
+                } else {
+                    String v = s.getString(k, null);
+                    if (v != null) raw.put(k, "s" + v);
+                }
+            }
+        } catch (RuntimeException typeChanged) {
+            raw.clear();
+        }
+        if (stored != null && stored.equals(signature(raw))) return;
+        // İmza yok (sürüm 3+) veya tutmuyor: elle değiştirilmiş kayıt
+        saveTampered = true;
+        diamonds = 0;
+        energy.lives = 0;
+        energy.progressMs = 0;
+        energy.tamperCount++;
+    }
+
+    /** Yazılan her değeri hem hedef depoya iletir hem de imza için kaydeder. */
+    private static final class Tee implements KeyValueStore {
+        final KeyValueStore target;
+        final java.util.TreeMap<String, String> values = new java.util.TreeMap<>();
+        final java.util.HashSet<String> ints = new java.util.HashSet<>();
+        Tee(KeyValueStore target) { this.target = target; }
+        @Override public int getInt(String key, int def) { return def; }
+        @Override public String getString(String key, String def) { return def; }
+        @Override public void putInt(String key, int value) {
+            values.put(key, "i" + value);
+            ints.add(key);
+            if (target != null) target.putInt(key, value);
+        }
+        @Override public void putString(String key, String value) {
+            values.put(key, "s" + value);
+            if (target != null) target.putString(key, value);
+        }
+        @Override public void apply() { }
     }
 
     public void resetAll() {

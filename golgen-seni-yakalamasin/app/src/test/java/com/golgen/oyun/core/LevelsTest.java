@@ -1,10 +1,13 @@
 package com.golgen.oyun.core;
 
 import static org.junit.Assert.*;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /** 100 bölüm / 20 harita / 2 aşama yapısı ve harita özellikleri. */
 public class LevelsTest {
+    @BeforeClass public static void setUp() { L10nTestSupport.load("tr"); }
+
     private static GameWorld level(int index) {
         GameWorld w = new GameWorld(index + 1);
         w.setArenaHeight(1778f);
@@ -42,12 +45,12 @@ public class LevelsTest {
         java.util.HashSet<Integer> looks = new java.util.HashSet<>();
         int[] decoUse = new int[9];
         for (MapTheme t : Maps.ALL) {
-            assertTrue(names.add(t.name));
+            assertTrue(t.name(), names.add(t.name()));
             looks.add(t.bgBottom);
             decoUse[t.deco]++;
             float total = 0f;
             for (float w : t.weights) total += w;
-            assertTrue(t.name, total > 0f);
+            assertTrue(t.name(), total > 0f);
             assertTrue(t.shadowDelay2 > t.shadowDelay1);
         }
         assertEquals(100, names.size());
@@ -186,7 +189,7 @@ public class LevelsTest {
             for (int k = 1; k < Maps.TIERS; k++) {
                 MapTheme t = Maps.ALL[k * 20 + b];
                 assertEquals(k, t.tier());
-                assertTrue(t.name.startsWith(base.name));
+                assertTrue(t.name(), t.name().startsWith(base.name()));
                 assertTrue("kademe yeni özellik ekler", Integer.bitCount(t.features) > Integer.bitCount(base.features)
                         || (t.features != base.features));
                 assertTrue(t.shadowDelay1 < base.shadowDelay1);

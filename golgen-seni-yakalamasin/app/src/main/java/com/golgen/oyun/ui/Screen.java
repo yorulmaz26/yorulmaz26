@@ -43,6 +43,21 @@ public abstract class Screen {
     /** Ekran boyutuna göre öğeleri yerleştirir. */
     protected void layout() {}
 
+    /**
+     * Dil değiştiğinde (ve ilk kurulumda) çağrılır: anahtarlı buton etiketlerini yeniler,
+     * ardından ekrana özgü önbellekli metinler için {@link #onLocalize()} çalışır.
+     */
+    public final void localize() {
+        for (int i = 0; i < buttons.size(); i++) {
+            Button b = buttons.get(i);
+            if (b.key != null) b.label = com.golgen.oyun.core.L10n.t(b.key);
+        }
+        onLocalize();
+    }
+
+    /** Ekranın önbelleğe aldığı yerelleştirilmiş metinleri yeniden üretir. */
+    protected void onLocalize() {}
+
     public void enter() { time = 0f; }
 
     public void exit() {}
@@ -162,7 +177,7 @@ public abstract class Screen {
                     b.pointerId = -1;
                 }
                 if (clicked != null) {
-                    if (g.debuggable) android.util.Log.i("GolgenUI", "tik ad=" + (clicked.id != null ? clicked.id : clicked.label));
+                    if (g.debuggable) android.util.Log.i("GolgenUI", "tik ad=" + (clicked.id != null ? clicked.id : (clicked.key != null ? clicked.key : clicked.label)));
                     g.sound.play(Synth.TAP, 0.7f, 1f);
                     g.haptics.light();
                     if (clicked.onClick != null) clicked.onClick.run();
@@ -187,7 +202,7 @@ public abstract class Screen {
         for (int i = 0; i < buttons.size(); i++) {
             Button b = buttons.get(i);
             if (!b.visible || !b.enabled) continue;
-            String id = b.id != null ? b.id : (b.label != null && !b.label.isEmpty() ? b.label : "ikon-" + b.icon);
+            String id = b.id != null ? b.id : (b.key != null ? b.key : (b.label != null && !b.label.isEmpty() ? b.label : "ikon-" + b.icon));
             g.debugTarget(name, id, b.rect.centerX(), b.rect.centerY());
         }
         dumpExtraTargets(name);

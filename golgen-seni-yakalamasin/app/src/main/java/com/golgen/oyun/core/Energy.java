@@ -1,7 +1,10 @@
 package com.golgen.oyun.core;
 
 /**
- * Bölüm modu canları: en fazla 4, her 15 dakikada 1 yenilenir.
+ * Bölüm modu canları: en fazla {@link GameConfig#MAX_LIVES}, her {@link GameConfig#LIFE_REGEN_SECONDS}
+ * saniyede (20 dk) 1 yenilenir. Yenilenme sayacı can dolunca durur; dolu değilken yeni bir can
+ * kaybedilmesi devam eden sayacı sıfırlamaz. Süre oyun kapalıyken de (kayıttaki kontrol noktasından)
+ * hesaplanır; internet gerekmez.
  *
  * <p>Hileye karşı: yenilenme süresi telefon saatinden değil, cihaz açıldığından beri geçen monoton
  * süreden ({@link TimeSource#elapsedMs()}) ölçülür. Bu süre kullanıcı tarafından değiştirilemez,
@@ -11,15 +14,15 @@ package com.golgen.oyun.core;
  * Aynı açılış içinde duvar saatinin monoton süreden saptığı (saatle oynandığı) tespit edilir ve kaydedilir.
  */
 public final class Energy {
-    public static final int MAX = 4;
-    public static final long REGEN_MS = 15L * 60L * 1000L;
+    public static final int MAX = GameConfig.MAX_LIVES;
+    public static final long REGEN_MS = GameConfig.LIFE_REGEN_SECONDS * 1000L;
     /**
      * Yeniden başlatma sonrası duvar saatine göre açılıştan bu yana geçen sürenin üstüne verilebilecek en fazla ek süre.
      * Bir can kadardır: telefonu yeniden başlatıp saati ileri almak en fazla 1 can kazandırır (tam dolum değil).
      */
-    public static final long MAX_REBOOT_CREDIT_MS = REGEN_MS;
+    public static final long MAX_REBOOT_CREDIT_MS = GameConfig.MAX_REBOOT_CREDIT_SECONDS * 1000L;
     /** Bu kadar sapma "saatle oynandı" sayılır. */
-    public static final long TAMPER_TOLERANCE_MS = 2L * 60L * 1000L;
+    public static final long TAMPER_TOLERANCE_MS = GameConfig.CLOCK_TAMPER_TOLERANCE_SECONDS * 1000L;
 
     public int lives = MAX;
     public long progressMs;      // bir sonraki cana doğru biriken süre
@@ -27,8 +30,10 @@ public final class Energy {
     public long lastElapsed;     // son kontrol noktasındaki monoton süre
     public int lastBoot = -2;    // -2 = hiç başlatılmadı
     public int tamperCount;      // tespit edilen saat oynamaları
+    /** Bu oturumda zamanla (yenilenmeyle) kazanılan can sayısı; kaydedilmez, arayüz bildirimleri için. */
+    public int regenTotal;
 
-    /** İlk kurulum: 4 can. */
+    /** İlk kurulum: tam can. */
     public void init(TimeSource t) {
         lives = MAX;
         progressMs = 0;
@@ -80,6 +85,7 @@ public final class Energy {
         while (progressMs >= REGEN_MS && lives < MAX) {
             progressMs -= REGEN_MS;
             lives++;
+            regenTotal++;
         }
         if (lives >= MAX) progressMs = 0;
     }

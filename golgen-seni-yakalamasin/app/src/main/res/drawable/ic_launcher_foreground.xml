@@ -1,16 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Oyuncu (beyaz kare, turkuaz ışıma) ve onu izleyen gölgesi (koyu kare, mor çerçeve, gözler), hareket izi ve altın elmas.
+     Önemli öğeler 66dp güvenli dairenin içindedir. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp" android:height="108dp"
     android:viewportWidth="108" android:viewportHeight="108">
-    <!-- Gölge: koyu dolgu, neon mor çerçeve -->
-    <path android:fillColor="#336D5DFB" android:pathData="M30,46h26v26h-26z" />
-    <path android:fillColor="#05070D" android:strokeColor="#6D5DFB" android:strokeWidth="2.4"
-        android:pathData="M33,49h20a2,2 0 0 1 2,2v18a2,2 0 0 1 -2,2h-20a2,2 0 0 1 -2,-2v-18a2,2 0 0 1 2,-2z" />
-    <path android:fillColor="#9488FF" android:pathData="M38,56m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0M47,56m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0" />
-    <!-- Oyuncu: beyaz kare, turkuaz ışıma -->
-    <path android:fillColor="#4420B8A6" android:pathData="M50,32h30v30h-30z" />
-    <path android:fillColor="#FFFFFF" android:strokeColor="#20B8A6" android:strokeWidth="2.4"
-        android:pathData="M56,36h18a3,3 0 0 1 3,3v18a3,3 0 0 1 -3,3h-18a3,3 0 0 1 -3,-3v-18a3,3 0 0 1 3,-3z" />
-    <!-- Altın elmas -->
-    <path android:fillColor="#D6AD60" android:pathData="M70,70l4,-4h8l4,4l-8,10z" />
+    <!-- hareket izi -->
+    <path android:fillColor="#6D5DFB" android:fillAlpha="0.35" android:pathData="M26,84m-1.2,0a1.2,1.2 0 1,0 2.4,0a1.2,1.2 0 1,0 -2.4,0" />
+    <path android:fillColor="#6D5DFB" android:fillAlpha="0.55" android:pathData="M30,78m-1.4,0a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0" />
+    <path android:fillColor="#7D6EFF" android:fillAlpha="0.75" android:pathData="M34.5,73m-1.6,0a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0" />
+    <!-- gölge ışıması -->
+    <path android:pathData="M44,63m-22,0a22,22 0 1,0 44,0a22,22 0 1,0 -44,0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="44" android:centerY="63" android:gradientRadius="22"
+                android:startColor="#996D5DFB" android:endColor="#006D5DFB" />
+        </aapt:attr>
+    </path>
+    <group android:rotation="8" android:pivotX="44" android:pivotY="63">
+        <path android:fillColor="#05070D" android:strokeColor="#9488FF" android:strokeWidth="1.9"
+            android:pathData="M37.5,51h13a6,6 0 0 1 6,6v12a6,6 0 0 1 -6,6h-13a6,6 0 0 1 -6,-6v-12a6,6 0 0 1 6,-6z" />
+        <path android:fillColor="#B9B1FF"
+            android:pathData="M39.4,61.5m-2.3,0a2.3,2.3 0 1,0 4.6,0a2.3,2.3 0 1,0 -4.6,0M48.6,61.5m-2.3,0a2.3,2.3 0 1,0 4.6,0a2.3,2.3 0 1,0 -4.6,0" />
+    </group>
+    <!-- oyuncu ışıması -->
+    <path android:pathData="M64,42m-27,0a27,27 0 1,0 54,0a27,27 0 1,0 -54,0">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="radial" android:centerX="64" android:centerY="42" android:gradientRadius="27"
+                android:startColor="#CC20B8A6" android:endColor="#0020B8A6" />
+        </aapt:attr>
+    </path>
+    <group android:rotation="-10" android:pivotX="64" android:pivotY="42">
+        <path android:fillColor="#FFFFFF" android:strokeColor="#20B8A6" android:strokeWidth="2.1"
+            android:pathData="M57,26.5h14a7,7 0 0 1 7,7v14a7,7 0 0 1 -7,7h-14a7,7 0 0 1 -7,-7v-14a7,7 0 0 1 7,-7z" />
+        <path android:fillColor="#3320B8A6" android:pathData="M56.5,31.5h11a1.7,1.7 0 0 1 0,3.4h-11a1.7,1.7 0 0 1 0,-3.4z" />
+    </group>
+    <!-- altın elmas -->
+    <path android:fillColor="#D6AD60" android:pathData="M68.5,72.5l2.6,-3h6l2.6,3l-5.6,6.8z" />
+    <path android:fillColor="#F3DDA6" android:pathData="M68.5,72.5h11.2l-2.6,-3h-6z" />
 </vector>

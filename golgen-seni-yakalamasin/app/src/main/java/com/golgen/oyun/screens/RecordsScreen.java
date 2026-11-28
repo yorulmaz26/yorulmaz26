@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import com.golgen.oyun.GameView;
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.Missions;
 import com.golgen.oyun.core.Progress;
 import com.golgen.oyun.ui.Button;
@@ -18,9 +19,13 @@ public final class RecordsScreen extends Screen {
     private final WorldRenderer bg = new WorldRenderer();
     private final Button back;
     private String best = "0";
-    private final String[] labels = {"En uzun süre", "Toplam elmas", "Oynanan oyun", "Gölgeden kaçış", "Tamamlanan bölüm", "Başarılar",
-            "Oyuncu seviyesi", "Taçlar", "En yüksek kombo", "Güçlendirme", "Giriş serisi", "Karakterler"};
-    private final String[] values = new String[12];
+    private static final String[] LABEL_KEYS = {"records.stat.longest_time", "records.stat.total_diamonds", "records.stat.games_played",
+            "records.stat.shadow_dodges", "records.stat.levels_completed", "records.stat.achievements",
+            "records.stat.player_level", "records.stat.crowns", "records.stat.max_combo", "records.stat.powerups",
+            "records.stat.login_streak", "records.stat.characters"};
+    private final String[] labels = new String[LABEL_KEYS.length];
+    private final String[] values = new String[LABEL_KEYS.length];
+    private String title = "", bestTitle = "", topTitle = "";
     private final String[] top = new String[Progress.TOP_N];
     private float scroll, contentH;
 
@@ -30,9 +35,22 @@ public final class RecordsScreen extends Screen {
     }
 
     @Override
+    protected void onLocalize() {
+        title = L10n.t("records.title");
+        bestTitle = L10n.t("records.best");
+        topTitle = L10n.p("records.top", Progress.TOP_N);
+        for (int i = 0; i < LABEL_KEYS.length; i++) labels[i] = L10n.t(LABEL_KEYS[i]);
+        fillValues();       // değerlerde de yerelleştirilmiş birim var ("3 gün")
+    }
+
+    @Override
     public void enter() {
         super.enter();
         scroll = 0f;
+        fillValues();
+    }
+
+    private void fillValues() {
         Progress p = g.progress;
         best = Integer.toString(p.bestScore);
         int sec = (int) p.bestTime;
@@ -46,7 +64,7 @@ public final class RecordsScreen extends Screen {
         values[7] = p.totalStars() + " / " + (Missions.ALL.length * 3);
         values[8] = Integer.toString(p.maxCombo);
         values[9] = Integer.toString(p.totalPowerups);
-        values[10] = p.loginStreak + " gün";
+        values[10] = L10n.p("records.days", p.loginStreak);
         values[11] = Integer.bitCount(p.unlockedSkins) + " / " + com.golgen.oyun.core.Skins.ALL.length;
         for (int i = 0; i < Progress.TOP_N; i++) top[i] = p.topScores[i] > 0 ? Integer.toString(p.topScores[i]) : "—";
     }
@@ -93,7 +111,7 @@ public final class RecordsScreen extends Screen {
         Ui.glow(c, cx, y + 150f * u, cw * 0.55f, Theme.GOLD, 0.25f);
         Ui.panel(c, l, y, r, y + 300f * u, 44f * u, Theme.alpha(Theme.PANEL, 0.95f), Theme.alpha(Theme.GOLD, 0.7f), 3f * u);
         Icons.draw(c, Icons.TROPHY, cx, y + 70f * u, 36f * u, Theme.GOLD);
-        Ui.text(c, "EN YÜKSEK SKOR", cx, y + 150f * u, 34f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
+        Ui.textFit(c, bestTitle, cx, y + 150f * u, 34f * u, cw - 80f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
         Ui.text(c, best, cx, y + 260f * u, 110f * u, Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
         y += 340f * u;
         // İstatistik ızgarası 2x3
@@ -102,11 +120,11 @@ public final class RecordsScreen extends Screen {
             int col = i % 2, row = i / 2;
             float cl = l + col * (gw + 24f * u), ct = y + row * 190f * u;
             Ui.panel(c, cl, ct, cl + gw, ct + 166f * u, 32f * u, Theme.alpha(Theme.CARD, 0.95f), Theme.LINE, 2f * u);
-            Ui.text(c, values[i], cl + 40f * u, ct + 85f * u, 56f * u, i == 1 ? Theme.GOLD : Theme.WHITE, Paint.Align.LEFT, Ui.NUMBERS);
-            Ui.text(c, labels[i], cl + 40f * u, ct + 132f * u, 30f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
+            Ui.textFit(c, values[i], cl + 40f * u, ct + 85f * u, 56f * u, gw - 80f * u, i == 1 ? Theme.GOLD : Theme.WHITE, Paint.Align.LEFT, Ui.NUMBERS);
+            Ui.textFit(c, labels[i], cl + 40f * u, ct + 132f * u, 30f * u, gw - 80f * u, Theme.MUTED, Paint.Align.LEFT, Ui.MEDIUM);
         }
         y += 6 * 190f * u + 20f * u;
-        Ui.text(c, "EN İYİ 10 SKOR", l + 10f * u, y + 50f * u, 36f * u, Theme.TEAL, Paint.Align.LEFT, Ui.BOLD);
+        Ui.textFit(c, topTitle, l + 10f * u, y + 50f * u, 36f * u, cw - 20f * u, Theme.TEAL, Paint.Align.LEFT, Ui.BOLD);
         y += 90f * u;
         for (int i = 0; i < Progress.TOP_N; i++) {
             float rt = y + i * 86f * u;
@@ -115,7 +133,7 @@ public final class RecordsScreen extends Screen {
             Ui.text(c, top[i], r - 40f * u, Ui.centerY(rt + 36f * u, 36f * u), 36f * u, Theme.WHITE, Paint.Align.RIGHT, Ui.NUMBERS);
         }
         c.restore();
-        drawHeader(c, "REKORLAR");
+        drawHeader(c, title);
         drawButtons(c);
     }
 }

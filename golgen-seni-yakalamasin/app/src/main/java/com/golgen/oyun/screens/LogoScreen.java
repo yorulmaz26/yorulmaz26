@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.util.Log;
 
 import com.golgen.oyun.GameView;
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.Skins;
 import com.golgen.oyun.ui.Particles;
 import com.golgen.oyun.ui.Screen;
@@ -41,6 +42,7 @@ public final class LogoScreen extends Screen {
     private boolean burst, left;
     private android.graphics.Shader fadeTop, fadeBottom, fadeLeft, fadeRight;
     private final Paint fadePaint = new Paint();
+    private String skipText = "";
 
     public LogoScreen(GameView g) {
         super(g);
@@ -53,6 +55,11 @@ public final class LogoScreen extends Screen {
             Log.w("LogoScreen", "Logo yüklenemedi", e);
             logo = null;
         }
+    }
+
+    @Override
+    protected void onLocalize() {
+        skipText = L10n.t("splash.tap_to_skip");
     }
 
     @Override
@@ -242,7 +249,7 @@ public final class LogoScreen extends Screen {
         particles.draw(c, 1f);
 
         if (time > 0.6f && time < T_ARRIVE) {
-            Ui.text(c, "Dokunarak geç", w / 2f, h - safeB - 70f * u, 28f * u, Theme.alpha(Theme.MUTED, 0.6f), Paint.Align.CENTER, Ui.MEDIUM);
+            Ui.textFit(c, skipText, w / 2f, h - safeB - 70f * u, 28f * u, w - 80f * u, Theme.alpha(Theme.MUTED, 0.6f), Paint.Align.CENTER, Ui.MEDIUM);
         }
     }
 }

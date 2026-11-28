@@ -4,6 +4,8 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 
 import com.golgen.oyun.GameView;
+import com.golgen.oyun.core.Achievements;
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.SkinDef;
 import com.golgen.oyun.core.Skins;
 import com.golgen.oyun.core.Synth;
@@ -22,12 +24,21 @@ public final class SkinsScreen extends Screen {
     private float gridTop, cellW, cellH, gridL;
     private final String[] priceText = new String[Skins.ALL.length];
     private String diamondText = "";
+    private String title = "", nameText = "", selectedText = "", ownedText = "";
 
     public SkinsScreen(GameView g) {
         super(g);
         back = add(makeBackButton());
         actionBtn = add(new Button("", Icons.NONE, Button.PRIMARY, this::act));
         for (int i = 0; i < Skins.ALL.length; i++) priceText[i] = Integer.toString(Skins.ALL[i].price);
+    }
+
+    @Override
+    protected void onLocalize() {
+        title = L10n.t("skins.title");
+        selectedText = L10n.t("skins.selected");
+        ownedText = L10n.t("skins.owned");
+        refresh();
     }
 
     @Override
@@ -40,20 +51,24 @@ public final class SkinsScreen extends Screen {
     private void refresh() {
         diamondText = Integer.toString(g.progress.diamonds);
         SkinDef s = Skins.ALL[focus];
+        nameText = s.name();
+        // Etiket durum ve fiyata göre değişir: test kimliği dil/fiyattan bağımsız, duruma göre sabit
         if (g.progress.isUnlocked(focus)) {
             boolean sel = g.progress.selectedSkin == focus;
-            actionBtn.label = sel ? "SEÇİLİ" : "SEÇ";
+            actionBtn.label = sel ? selectedText : L10n.t("skins.select");
+            actionBtn.id = sel ? "karakter-secili" : "karakter-sec";
             actionBtn.icon = sel ? Icons.CHECK : Icons.NONE;
             actionBtn.style = sel ? Button.SECONDARY : Button.PRIMARY;
             actionBtn.enabled = !sel;
             actionBtn.sub = null;
         } else {
             boolean afford = g.progress.diamonds >= s.price;
-            actionBtn.label = "SATIN AL  ·  " + s.price;
+            actionBtn.label = L10n.f("skins.buy", s.price);
+            actionBtn.id = "karakter-satin-al";
             actionBtn.icon = Icons.NONE;
             actionBtn.style = Button.GOLD;
             actionBtn.enabled = afford;
-            actionBtn.sub = afford ? null : (s.price - g.progress.diamonds) + " elmas daha gerekli";
+            actionBtn.sub = afford ? null : L10n.p("skins.need_more", s.price - g.progress.diamonds);
         }
     }
 
@@ -65,10 +80,10 @@ public final class SkinsScreen extends Screen {
             g.progress.select(focus);
             g.sound.play(Synth.PURCHASE);
             g.haptics.medium();
-            g.toast(Skins.ALL[focus].name + " açıldı!", Icons.PERSON);
+            g.toast(L10n.f("skins.unlocked_toast", Skins.ALL[focus].name()), Icons.PERSON);
             int gained = g.progress.checkAchievements(null, null);
-            for (int id = 0; id < com.golgen.oyun.core.Achievements.COUNT; id++) {
-                if ((gained & (1 << id)) != 0) g.toast("Başarı: " + com.golgen.oyun.core.Achievements.TITLES[id], Icons.STAR);
+            for (int id = 0; id < Achievements.COUNT; id++) {
+                if ((gained & (1 << id)) != 0) g.toast(L10n.f("skins.achievement_toast", Achievements.title(id)), Icons.STAR);
             }
             g.save();
         }
@@ -129,7 +144,7 @@ public final class SkinsScreen extends Screen {
     @Override
     public void draw(Canvas c) {
         bg.drawBackground(c, w, h, time * 40f);
-        drawHeader(c, "KARAKTERLER");
+        drawHeader(c, title);
         Ui.diamondPill(c, w - safeR - 40f * u, safeT + 40f * u, 96f * u, diamondText, true);
 
         // Önizleme
@@ -138,7 +153,7 @@ public final class SkinsScreen extends Screen {
         float t = time * 1.4f;
         WorldRenderer.drawSkinPreview(c, s, cx - 150f * u + (float) Math.sin(t - 0.8f) * 40f * u, py + 20f * u, 70f * u, 0f, 0.9f, true);
         WorldRenderer.drawSkinPreview(c, s, cx + (float) Math.sin(t) * 40f * u, py, 90f * u, (float) Math.sin(t) * 0.25f, 1f, false);
-        Ui.text(c, s.name, cx, py + 205f * u, 50f * u, Theme.WHITE, Paint.Align.CENTER, Ui.BOLD);
+        Ui.textFit(c, nameText, cx, py + 205f * u, 50f * u, w - 120f * u, Theme.WHITE, Paint.Align.CENTER, Ui.BOLD);
 
         // Izgara
         for (int i = 0; i < Skins.ALL.length; i++) {
@@ -160,10 +175,11 @@ public final class SkinsScreen extends Screen {
                 Icons.draw(c, Icons.LOCK, ccx, ccy, sz * 0.55f, Theme.WHITE);
             }
             float ly = b - (b - tp) * 0.16f;
+            float lmax = r - l - 16f * u;
             if (selected) {
-                Ui.text(c, "SEÇİLİ", ccx, Ui.centerY(ly, 26f * u), 26f * u, Theme.TEAL, Paint.Align.CENTER, Ui.BOLD);
+                Ui.textFit(c, selectedText, ccx, Ui.centerY(ly, 26f * u), 26f * u, lmax, Theme.TEAL, Paint.Align.CENTER, Ui.BOLD);
             } else if (unlocked) {
-                Ui.text(c, "AÇIK", ccx, Ui.centerY(ly, 26f * u), 26f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
+                Ui.textFit(c, ownedText, ccx, Ui.centerY(ly, 26f * u), 26f * u, lmax, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
             } else {
                 float tw = Ui.measure(priceText[i], 30f * u, Ui.NUMBERS);
                 Ui.diamond(c, ccx - tw / 2f - 8f * u, ly, 13f * u, 1f);

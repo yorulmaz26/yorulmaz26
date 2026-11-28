@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gölgen Seni Yakalamasın</string>
+    <!-- Uygulama adı: Türkçe dışındaki tüm dillerde İngilizce marka adı (values-tr: Türkçe ad) -->
+    <string name="app_name">Doppelglow</string>
 </resources>

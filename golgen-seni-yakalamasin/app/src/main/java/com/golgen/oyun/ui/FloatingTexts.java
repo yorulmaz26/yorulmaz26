@@ -3,6 +3,8 @@ package com.golgen.oyun.ui;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 
+import com.golgen.oyun.core.GameWorld;
+
 /** Yukarı süzülerek kaybolan kısa geri bildirim metinleri ("+25", "Kıl payı!"). Sabit kapasite, tahsis yok. */
 public final class FloatingTexts {
     private static final int CAP = 12;
@@ -30,13 +32,18 @@ public final class FloatingTexts {
         }
     }
 
-    /** s: dünya→piksel ölçeği, u: arayüz ölçeği. */
+    /** s: dünya→piksel ölçeği, u: arayüz ölçeği. Metinler oyun alanı genişliğine sığdırılır (uzun diller). */
     public void draw(Canvas c, float s, float u) {
+        float arenaW = GameWorld.WIDTH * s, maxW = arenaW - 40f * u;
         for (int i = 0; i < count; i++) {
             float k = life[i] / LIFE;
             float a = k > 0.3f ? 1f : k / 0.3f;
             float pop = 1f + 0.25f * Math.max(0f, (k - 0.8f) / 0.2f);
-            Ui.text(c, text[i], x[i] * s, y[i] * s, 40f * u * pop, Theme.alpha(color[i], a), Paint.Align.CENTER, Ui.BOLD);
+            float size = 40f * u * pop;
+            // Kenara yakın uzun yazı ekrandan taşmasın: merkez, yazı yarı genişliği kadar içeri alınır
+            float half = Math.min(Ui.measure(text[i], size, Ui.BOLD), maxW) / 2f;
+            float px = Math.max(20f * u + half, Math.min(arenaW - 20f * u - half, x[i] * s));
+            Ui.textFit(c, text[i], px, y[i] * s, size, maxW, Theme.alpha(color[i], a), Paint.Align.CENTER, Ui.BOLD);
         }
     }
 }

@@ -27,10 +27,19 @@ jobs:
           distribution: temurin
           java-version: "17"
       - uses: gradle/actions/setup-gradle@v4
-      - name: Birim testleri, lint, debug ve release APK
+      - name: Birim testleri, lint, debug/release APK ve AAB
         run: |
           chmod +x gradlew
-          ./gradlew testDebugUnitTest lintDebug assembleDebug assembleRelease --stacktrace
+          ./gradlew testDebugUnitTest lintDebug assembleDebug assembleRelease bundleRelease --stacktrace
+      - name: SDK güncellik raporu (Google Maven'deki son sürümler)
+        run: |
+          echo "### Kullanılan ve en güncel SDK sürümleri" >> $GITHUB_STEP_SUMMARY
+          for a in com/google/android/gms/play-services-ads com/google/android/ump/user-messaging-platform com/android/tools/build/gradle; do
+            v=$(curl -s "https://dl.google.com/dl/android/maven2/$a/maven-metadata.xml" | grep -o '<release>[^<]*' | sed 's/<release>//')
+            echo "- $a: en güncel $v" | tee -a $GITHUB_STEP_SUMMARY
+          done
+          grep -E "play-services-ads|user-messaging-platform" app/build.gradle | tee -a $GITHUB_STEP_SUMMARY
+          ls $ANDROID_HOME/platforms | tee -a $GITHUB_STEP_SUMMARY
       - name: Lint özeti
         run: |
           grep -E "^[^ ].*: (Error|Warning):" app/build/reports/lint-results.txt | sed -E 's/.*: (Error|Warning): .*\[([A-Za-z]+)\]$/\1 \2/' | sort | uniq -c || true
@@ -40,13 +49,18 @@ jobs:
           mkdir -p ../dist
           cp app/build/outputs/apk/debug/app-debug.apk ../dist/GolgenSeniYakalamasin-debug.apk
           cp app/build/outputs/apk/release/app-release.apk ../dist/GolgenSeniYakalamasin.apk
+          cp app/build/outputs/bundle/release/app-release.aab ../dist/GolgenSeniYakalamasin.aab
+          # 64 bit / 16 KB: native (.so) kütüphane var mı?
+          echo "native kütüphaneler: $(unzip -l ../dist/GolgenSeniYakalamasin.apk | grep -c '\.so$')" | tee -a $GITHUB_STEP_SUMMARY
           ls -la ../dist
           echo "### APK boyutları" >> $GITHUB_STEP_SUMMARY
           ls -la ../dist | tail -n +2 >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
         with:
           name: golgen-apk
-          path: dist/*.apk
+          path: |
+            dist/*.apk
+            dist/*.aab
           retention-days: 30
       - name: Test ve lint raporları
         if: always()
@@ -59,12 +73,16 @@ jobs:
           if-no-files-found: ignore
 
   ui-test:
-    name: Emülatörde uçtan uca UI testi
+    name: Emülatörde uçtan uca UI testi (API ${{ matrix.api }})
     needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    timeout-minutes: 40
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [34, 36]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -76,16 +94,16 @@ jobs:
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-      - name: Emülatör (API 34, Pixel 6) üzerinde test
+      - name: Emülatör (Pixel 6) üzerinde test
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 34
+          api-level: ${{ matrix.api }}
           arch: x86_64
           target: google_apis
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: timeout 900 bash golgen-seni-yakalamasin/tools/smoke_test.sh dist/GolgenSeniYakalamasin-debug.apk ui-test-out
+          script: timeout 1500 bash golgen-seni-yakalamasin/tools/smoke_test.sh dist/GolgenSeniYakalamasin-debug.apk ui-test-out
       - name: Ekran görüntülerini günlüğe yaz
         if: always()
         working-directory: .
@@ -94,7 +112,7 @@ jobs:
         if: always()
         working-directory: .
         run: |
-          echo "### UI test sonuçları" >> $GITHUB_STEP_SUMMARY
+          echo "### UI test sonuçları (API ${{ matrix.api }})" >> $GITHUB_STEP_SUMMARY
           cat ui-test-out/test_sonuclari.txt >> $GITHUB_STEP_SUMMARY || true
           echo "----- logcat hataları -----"
           grep -E "AndroidRuntime|FATAL|golgen" ui-test-out/logcat.txt | grep -v GolgenUI | tail -40 || true
@@ -110,7 +128,7 @@ jobs:
           cat ui-test-out/test_sonuclari.txt || true
       - name: Ekran görüntülerini ve sonuçları depoya kaydet
         # İptal edilen çalışmalar yarım sonuç yazmasın
-        if: (success() || failure()) && github.event_name == 'push'
+        if: (success() || failure()) && github.event_name == 'push' && matrix.api == 34
         working-directory: .
         run: |
           command -v convert >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick >/dev/null) || true
@@ -139,7 +157,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: golgen-ui-test
+          name: golgen-ui-test-api${{ matrix.api }}
           path: ui-test-out
           retention-days: 30
 
@@ -156,12 +174,77 @@ jobs:
           path: dist
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: golgen-v1.0.0-b${{ github.run_number }}
+          tag_name: golgen-v1.1.0-b${{ github.run_number }}
           target_commitish: ${{ github.sha }}
-          name: "Gölgen Seni Yakalamasın 1.0.0 (derleme ${{ github.run_number }})"
+          name: "Gölgen Seni Yakalamasın 1.1.0 (derleme ${{ github.run_number }})"
           prerelease: true
           body: |
-            Otomatik derlenmiş Android APK.
+            Otomatik derlenmiş Android APK ve AAB (test sürümü; mağazada yayınlanmadı).
             - `GolgenSeniYakalamasin.apk`: küçültülmüş (R8) sürüm, Android 8.0+ (debug anahtarıyla imzalı; doğrudan kurulabilir).
             - `GolgenSeniYakalamasin-debug.apk`: hata ayıklama sürümü.
-          files: dist/*.apk
+            - `GolgenSeniYakalamasin.aab`: Android App Bundle (yükleme anahtarı CI'da tanımlı değilse debug anahtarıyla imzalıdır; Play Console'a yüklemeden önce kendi yükleme anahtarınızla derleyin).
+          files: |
+            dist/*.apk
+            dist/*.aab
+
+  media:
+    name: Mağaza görselleri ve video kareleri (gerçek oyun, emülatör)
+    needs: build
+    # Uzun sürer: yalnızca elle veya commit mesajında [medya] varsa çalışır
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[medya]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: golgen-apk
+          path: dist
+      - name: KVM erişimi
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Çekim (telefon 1080x1920 ve tablet 7"/10")
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          disable-animations: true
+          disk-size: 6000M
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            timeout 4800 bash golgen-seni-yakalamasin/tools/media_capture.sh dist/GolgenSeniYakalamasin-debug.apk medya telefon
+            timeout 1800 bash golgen-seni-yakalamasin/tools/media_capture.sh dist/GolgenSeniYakalamasin-debug.apk medya tablet
+      - name: Video sahnelerini MP4'e kodla, paketle
+        working-directory: .
+        run: |
+          command -v ffmpeg >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null)
+          mkdir -p paket/klipler paket/goruntuler
+          for d in medya/raw/v_*; do
+            [ -d "$d" ] || continue
+            ffmpeg -loglevel error -y -framerate 60 -i "$d/%05d.jpg" -c:v libx264 -preset slow -crf 16 -pix_fmt yuv420p "paket/klipler/$(basename "$d").mp4"
+          done
+          for d in medya/raw/ss_* medya/raw/tab*; do
+            [ -f "$d/00000.png" ] && cp "$d/00000.png" "paket/goruntuler/$(basename "$d").png"
+          done
+          cp medya/cihaz.txt medya/cekim_logcat.txt paket/ 2>/dev/null || true
+          ls -la paket/klipler paket/goruntuler
+          (cd paket && zip -q -r ../medya_goruntuler.zip goruntuler cihaz.txt cekim_logcat.txt && zip -q -r ../medya_klipler.zip klipler)
+          ls -la medya_*.zip
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: golgen-medya-b${{ github.run_number }}
+          target_commitish: ${{ github.sha }}
+          name: "Mağaza medyası ham çekimleri (derleme ${{ github.run_number }})"
+          prerelease: true
+          body: |
+            Gerçek oyundan (debug APK çekim modu, emülatör) alınmış ham ekran görüntüleri ve 60 FPS video sahneleri.
+            Son mağaza görselleri ve videolar bunlardan üretilip depodaki RELEASE_PACKAGE klasörüne konur. Yayın değildir.
+          files: |
+            medya_goruntuler.zip
+            medya_klipler.zip

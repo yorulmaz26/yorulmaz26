@@ -6,7 +6,9 @@ import android.graphics.Paint;
 import com.golgen.oyun.GameView;
 import com.golgen.oyun.core.Achievements;
 import com.golgen.oyun.core.DailyMissions;
+import com.golgen.oyun.core.Energy;
 import com.golgen.oyun.core.GameWorld;
+import com.golgen.oyun.core.L10n;
 import com.golgen.oyun.core.MissionDef;
 import com.golgen.oyun.core.Missions;
 import com.golgen.oyun.core.Progress;
@@ -26,6 +28,7 @@ public final class GameOverScreen extends Screen {
     private String title = "", subtitle = "", scoreText = "", bestText = "";
     private String[] statLabels = new String[0], statValues = new String[0];
     private String rewardText = "";
+    private String scoreLabel = "", newRecordText = "";
     private final Button videoBtn;
     private int videoBonus;
     private boolean videoUsed;
@@ -39,15 +42,19 @@ public final class GameOverScreen extends Screen {
     private float xpFrac;
     private boolean levelUp;
     private String livesText = "";
+    // Dil değişiminde metinleri yeniden üretmek için gösterilen sonucun ham değerleri
+    private boolean hasResult;
+    private int bestShown, levelShown, xpGained;
 
     public GameOverScreen(GameView g) {
         super(g);
         // Oyun sonundan çıkış = doğal mola: gerekirse (sıklık sınırıyla) geçiş reklamı burada gösterilir.
-        againBtn = add(new Button("TEKRAR OYNA", Icons.RESTART, Button.PRIMARY, () -> g.afterRunBreak(() -> {
+        againBtn = add(new Button(null, Icons.RESTART, Button.PRIMARY, () -> g.afterRunBreak(() -> {
             if (r.mode == RunResult.MODE_MISSION) g.startMission(r.missionIndex); else g.startEndless();
-        })));
-        nextBtn = add(new Button("SONRAKİ BÖLÜM", Icons.NEXT, Button.GOLD, () -> g.afterRunBreak(() -> g.startMission(r.missionIndex + 1))));
-        menuBtn = add(new Button("ANA MENÜ", Icons.HOME, Button.SECONDARY, () -> g.afterRunBreak(g::goMenu)));
+        })).key("gameover.play_again"));
+        nextBtn = add(new Button(null, Icons.NEXT, Button.GOLD, () -> g.afterRunBreak(() -> g.startMission(r.missionIndex + 1)))
+                .key("gameover.next_level"));
+        menuBtn = add(new Button(null, Icons.HOME, Button.SECONDARY, () -> g.afterRunBreak(g::goMenu)).key("gameover.main_menu"));
         // İsteğe bağlı ödüllü video: bu oyunda kazanılan elmasları ikiye katlar
         videoBtn = add(new Button("", Icons.PLAY, Button.SECONDARY, this::watchVideo));
         videoBtn.id = "video-elmas";
@@ -59,63 +66,89 @@ public final class GameOverScreen extends Screen {
         r.diamonds = res.diamonds; r.dodges = res.dodges; r.hits = res.hits; r.won = res.won; r.cause = res.cause;
         won = res.won;
         newRecord = rep.newRecord;
-        if (res.mode == RunResult.MODE_MISSION) {
-            MissionDef m = Missions.ALL[res.missionIndex];
-            title = won ? "BÖLÜM TAMAMLANDI" : "BÖLÜM BAŞARISIZ";
-            subtitle = m.title + " — " + m.description();
-            titleColor = won ? Theme.GOLD : Theme.PURPLE_LIGHT;
-        } else {
-            title = res.cause == GameWorld.CAUSE_SHADOW ? "GÖLGEN SENİ YAKALADI" : "ENGELLER SENİ DURDURDU";
-            subtitle = res.cause == GameWorld.CAUSE_SHADOW ? "Bir yerde durmak gölgeni sana getirir." : "Neon engellerin boşluklarından geç.";
-            titleColor = Theme.PURPLE_LIGHT;
-        }
+        titleColor = res.mode == RunResult.MODE_MISSION && won ? Theme.GOLD : Theme.PURPLE_LIGHT;
         scoreText = Integer.toString(res.score);
-        bestText = res.mode == RunResult.MODE_ENDLESS ? "En iyi: " + g.progress.bestScore : "";
+        bestShown = g.progress.bestScore;
         int sec = (int) res.time;
-        statLabels = new String[]{"Süre", "Elmas", "Kaçış", "Çarpma"};
         statValues = new String[]{(sec / 60) + ":" + (sec % 60 < 10 ? "0" : "") + (sec % 60),
                 Integer.toString(res.diamonds), Integer.toString(res.dodges), Integer.toString(res.hits)};
         int total = rep.diamondsEarned + rep.missionReward + rep.achievementReward;
         total += rep.levelReward;
-        rewardText = "+" + total + " elmas kazandın";
         shownTotal = total;
         videoBonus = rep.diamondsEarned + rep.missionReward;
         videoUsed = false;
-        videoBtn.label = "VİDEO İZLE · +" + videoBonus + " ELMAS";
         videoBtn.visible = false;
         stars = res.mode == RunResult.MODE_MISSION ? res.stars : 0;
-        refreshLives();
         levelUp = rep.levelUps > 0;
-        levelText = "Seviye " + g.progress.level;
-        xpText = "+" + rep.xpGained + " XP";
+        levelShown = g.progress.level;
+        xpGained = rep.xpGained;
         xpFrac = g.progress.xp / (float) Progress.xpForLevel(g.progress.level);
-        if (levelUp) g.toast("Seviye atladın! Seviye " + g.progress.level + "  +" + rep.levelReward, Icons.STAR);
-        if (rep.newStars > 0) g.toast("+" + rep.newStars + " yeni taç", Icons.STAR);
+        hasResult = true;
+        buildTexts();
+        if (levelUp) g.toast(L10n.f("gameover.level_up_toast", g.progress.level, rep.levelReward), Icons.STAR);
+        if (rep.newStars > 0) g.toast(L10n.p("gameover.new_crowns", rep.newStars), Icons.STAR);
         nextBtn.visible = res.mode == RunResult.MODE_MISSION && won && res.missionIndex + 1 < Missions.ALL.length;
-        againBtn.label = res.mode == RunResult.MODE_MISSION && won ? "TEKRAR" : "TEKRAR OYNA";
 
         for (int id = 0; id < Achievements.COUNT; id++) {
-            if ((rep.newAchievements & (1 << id)) != 0) g.toast("Başarı: " + Achievements.TITLES[id] + "  +" + Achievements.REWARDS[id], Icons.STAR);
+            if ((rep.newAchievements & (1 << id)) != 0) {
+                g.toast(L10n.f("gameover.achievement_toast", Achievements.title(id), Achievements.REWARDS[id]), Icons.STAR);
+            }
         }
         for (int i = 0; i < DailyMissions.PER_DAY; i++) {
-            if ((rep.dailyCompleted & (1 << i)) != 0) g.toast("Günlük görev tamamlandı! Ödülünü al", Icons.CALENDAR);
+            if ((rep.dailyCompleted & (1 << i)) != 0) g.toast(L10n.t("gameover.daily_done"), Icons.CALENDAR);
         }
         if (newRecord || won || rep.newAchievements != 0) g.sound.play(Synth.SUCCESS);
         layout();
     }
 
+    @Override
+    protected void onLocalize() {
+        scoreLabel = L10n.t("gameover.score");
+        newRecordText = L10n.t("gameover.new_record");
+        statLabels = new String[]{L10n.t("gameover.stat.time"), L10n.t("gameover.stat.diamonds"),
+                L10n.t("gameover.stat.dodges"), L10n.t("gameover.stat.hits")};
+        buildTexts();
+    }
+
+    /** Gösterilen sonuca ait tüm yerelleştirilmiş metinler (sonuç gelince ve dil değişince). */
+    private void buildTexts() {
+        if (!hasResult) return;
+        if (r.mode == RunResult.MODE_MISSION) {
+            MissionDef m = Missions.ALL[r.missionIndex];
+            title = L10n.t(won ? "gameover.level_complete" : "gameover.level_failed");
+            subtitle = L10n.f("gameover.level_subtitle", m.title(), m.description());
+        } else {
+            boolean shadow = r.cause == GameWorld.CAUSE_SHADOW;
+            title = L10n.t(shadow ? "gameover.caught_by_shadow" : "gameover.stopped_by_obstacles");
+            subtitle = L10n.t(shadow ? "gameover.hint_shadow" : "gameover.hint_obstacles");
+        }
+        bestText = r.mode == RunResult.MODE_ENDLESS ? L10n.f("gameover.best", bestShown) : "";
+        rewardText = L10n.p("gameover.reward", shownTotal);
+        videoBtn.label = L10n.p("gameover.video_bonus", videoBonus);
+        levelText = L10n.f("gameover.level", levelShown);
+        xpText = L10n.f("gameover.xp", xpGained);
+        againBtn.key(r.mode == RunResult.MODE_MISSION && won ? "gameover.again" : "gameover.play_again");
+        lastLivesShown = -1;
+        refreshLives();
+    }
+
     private int lastLivesShown = -1;
     private String lastTimerShown = "";
+    private int lastLivesLang = -1;
 
     /** Can bilgisi canlı güncellenir (sayaç akar, can yenilenince değişir). */
     private void refreshLives() {
         if (r.mode != RunResult.MODE_MISSION) { livesText = ""; return; }
         int l = g.lives();
-        String tm = l < 4 ? g.energyTimer() : "";
-        if (l == lastLivesShown && tm.equals(lastTimerShown) && !livesText.isEmpty()) return;
+        String tm = l < Energy.MAX ? g.energyTimer() : "";
+        int v = L10n.version();
+        if (l == lastLivesShown && tm.equals(lastTimerShown) && v == lastLivesLang && !livesText.isEmpty()) return;
         lastLivesShown = l;
         lastTimerShown = tm;
-        livesText = won ? "Can korundu · " + l + "/4" : "-1 can · kalan " + l + "/4" + (l < 4 ? " · sonraki " + tm : "");
+        lastLivesLang = v;
+        String count = L10n.f("lives.count", l, Energy.MAX);
+        if (won) livesText = L10n.f("gameover.lives_kept", count);
+        else livesText = l < Energy.MAX ? L10n.f("gameover.lives_lost_timer", count, tm) : L10n.f("gameover.lives_lost", count);
     }
 
     private void watchVideo() {
@@ -126,9 +159,9 @@ public final class GameOverScreen extends Screen {
             g.progress.diamonds += videoBonus;
             g.save();
             shownTotal += videoBonus;
-            rewardText = "+" + shownTotal + " elmas kazandın";
+            rewardText = L10n.p("gameover.reward", shownTotal);
             g.sound.play(Synth.PURCHASE);
-            g.toast("Video ödülü: +" + videoBonus + " elmas", Icons.PLAY);
+            g.toast(L10n.p("gameover.video_reward_toast", videoBonus), Icons.PLAY);
         }, () -> dumpTargets());
     }
 
@@ -182,8 +215,10 @@ public final class GameOverScreen extends Screen {
         Ui.textFit(c, title, cx, top, 72f * u, w - 100f * u, titleColor, Paint.Align.CENTER, Ui.DISPLAY);
         Ui.textFit(c, subtitle, cx, top + 66f * u, 34f * u, w - 140f * u, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
         if (!livesText.isEmpty()) {
-            Icons.draw(c, Icons.HEART, cx - Ui.measure(livesText, 30f * u, Ui.BOLD) / 2f - 30f * u, top + 104f * u, 16f * u, MissionsScreen.HEART);
-            Ui.text(c, livesText, cx, top + 114f * u, 30f * u, MissionsScreen.HEART, Paint.Align.CENTER, Ui.BOLD);
+            float lmax = w - 200f * u;
+            float lw = Math.min(Ui.measure(livesText, 30f * u, Ui.BOLD), lmax);
+            Icons.draw(c, Icons.HEART, cx - lw / 2f - 30f * u, top + 104f * u, 16f * u, MissionsScreen.HEART);
+            Ui.textFit(c, livesText, cx, top + 114f * u, 30f * u, lmax, MissionsScreen.HEART, Paint.Align.CENTER, Ui.BOLD);
         }
 
         // Skor kartı
@@ -191,7 +226,7 @@ public final class GameOverScreen extends Screen {
         float cardT = top + 150f * u, cardB = cardT + 400f * u;
         Ui.glow(c, cx, (cardT + cardB) / 2f, cw * 0.6f, won || newRecord ? Theme.GOLD : Theme.PURPLE, 0.25f);
         Ui.panel(c, cx - cw / 2f, cardT, cx + cw / 2f, cardB, 48f * u, Theme.alpha(Theme.PANEL, 0.95f), Theme.alpha(Theme.PURPLE, 0.6f), 3f * u);
-        Ui.text(c, "SKOR", cx, cardT + 80f * u, 34f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
+        Ui.textFit(c, scoreLabel, cx, cardT + 80f * u, 34f * u, cw - 80f * u, Theme.MUTED, Paint.Align.CENTER, Ui.BOLD);
         Ui.text(c, Integer.toString((int) shownScore), cx, cardT + 230f * u, 150f * u, Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
         if (stars > 0) {
             for (int k = 0; k < 3; k++) {
@@ -204,32 +239,38 @@ public final class GameOverScreen extends Screen {
             }
         } else if (newRecord) {
             float pulse = 0.75f + 0.25f * (float) Math.sin(time * 6f);
-            float bw2 = 330f * u, by = cardT + 280f * u;
+            float rs = 34f * u;
+            // Hap, uzun dillerde metne göre genişler (en az eski 330 genişliği)
+            float bw2 = Math.max(330f * u, Math.min(cw - 80f * u, Ui.measure(newRecordText, rs, Ui.BOLD) + 70f * u));
+            float by = cardT + 280f * u;
             Ui.panel(c, cx - bw2 / 2f, by, cx + bw2 / 2f, by + 64f * u, 32f * u, Theme.alpha(Theme.GOLD, pulse), 0, 0);
-            Ui.text(c, "YENİ REKOR!", cx, Ui.centerY(by + 32f * u, 34f * u), 34f * u, Theme.NAVY, Paint.Align.CENTER, Ui.BOLD);
+            Ui.textFit(c, newRecordText, cx, Ui.centerY(by + 32f * u, rs), rs, bw2 - 50f * u, Theme.NAVY, Paint.Align.CENTER, Ui.BOLD);
         } else if (!bestText.isEmpty()) {
-            Ui.text(c, bestText, cx, cardT + 320f * u, 36f * u, Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
+            Ui.textFit(c, bestText, cx, cardT + 320f * u, 36f * u, cw - 80f * u, Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
         }
 
         // İstatistikler
         float st = cardB + 40f * u, sw = cw / 4f;
-        for (int i = 0; i < statLabels.length; i++) {
+        int statCount = Math.min(statLabels.length, statValues.length);
+        for (int i = 0; i < statCount; i++) {
             float x = cx - cw / 2f + sw * i + sw / 2f;
             Ui.text(c, statValues[i], x, st + 60f * u, 56f * u, i == 1 ? Theme.GOLD : Theme.WHITE, Paint.Align.CENTER, Ui.NUMBERS);
-            Ui.text(c, statLabels[i], x, st + 104f * u, 30f * u, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
+            Ui.textFit(c, statLabels[i], x, st + 104f * u, 30f * u, sw - 16f * u, Theme.MUTED, Paint.Align.CENTER, Ui.MEDIUM);
         }
         // Ödül
         float ry = st + 190f * u;
-        float rw = Ui.measure(rewardText, 38f * u, Ui.BOLD) + 110f * u;
+        float rmax = cw - 110f * u;
+        float rw = Math.min(Ui.measure(rewardText, 38f * u, Ui.BOLD), rmax) + 110f * u;
         Ui.panel(c, cx - rw / 2f, ry - 46f * u, cx + rw / 2f, ry + 46f * u, 46f * u, Theme.alpha(Theme.NAVY_DEEP, 0.8f), Theme.alpha(Theme.GOLD, 0.7f), 2.5f * u);
         Ui.diamond(c, cx - rw / 2f + 50f * u, ry, 20f * u, 1f);
-        Ui.text(c, rewardText, cx + 25f * u, Ui.centerY(ry, 38f * u), 38f * u, Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
+        Ui.textFit(c, rewardText, cx + 25f * u, Ui.centerY(ry, 38f * u), 38f * u, rmax, Theme.GOLD, Paint.Align.CENTER, Ui.BOLD);
 
         // Seviye / XP
         float ly = ry + 100f * u;
         float bw3 = Math.min(cw, 620f * u);
-        Ui.text(c, levelText, cx - bw3 / 2f, ly, 32f * u, levelUp ? Theme.GOLD : Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
-        Ui.text(c, xpText, cx + bw3 / 2f, ly, 30f * u, Theme.TEAL, Paint.Align.RIGHT, Ui.NUMBERS);
+        float xw = Math.min(Ui.measure(xpText, 30f * u, Ui.NUMBERS), bw3 / 2f);
+        Ui.textFit(c, levelText, cx - bw3 / 2f, ly, 32f * u, bw3 - xw - 24f * u, levelUp ? Theme.GOLD : Theme.WHITE, Paint.Align.LEFT, Ui.BOLD);
+        Ui.textFit(c, xpText, cx + bw3 / 2f, ly, 30f * u, bw3 / 2f, Theme.TEAL, Paint.Align.RIGHT, Ui.NUMBERS);
         Ui.panel(c, cx - bw3 / 2f, ly + 18f * u, cx + bw3 / 2f, ly + 34f * u, 8f * u, Theme.alpha(Theme.NAVY_DEEP, 0.9f), Theme.LINE, 2f * u);
         float xk = Math.min(1f, xpFrac * Math.min(1f, time / 0.8f));
         if (xk > 0f) Ui.panel(c, cx - bw3 / 2f, ly + 18f * u, cx - bw3 / 2f + bw3 * xk, ly + 34f * u, 8f * u, Theme.TEAL, 0, 0);

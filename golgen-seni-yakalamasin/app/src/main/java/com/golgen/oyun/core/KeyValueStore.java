@@ -7,4 +7,6 @@ public interface KeyValueStore {
     String getString(String key, String def);
     void putString(String key, String value);
     void apply();
+    /** Eşzamanlı yazma (varsayılan: apply). */
+    default void commit() { apply(); }
 }

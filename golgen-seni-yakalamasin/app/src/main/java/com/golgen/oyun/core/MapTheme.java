@@ -3,6 +3,10 @@ package com.golgen.oyun.core;
 /**
  * Harita teması (veri nesnesi, Unity'deki ScriptableObject karşılığı): renkler, arka plan efekti,
  * engel karışımı ve harita özelliği. Her harita 5 bölüm boyunca kullanılır.
+ *
+ * <p>Ad, açıklama ve özellik metinleri {@link L10n} ile o anki dilde üretilir
+ * ({@code map.<temel>.name}, {@code map.<temel>.desc}, {@code tier.<k>.*}, {@code feature.*});
+ * sonuç dil sürümüne ({@link L10n#version()}) bağlı olarak önbelleğe alınır.
  */
 public final class MapTheme {
     // Arka plan efektleri
@@ -17,11 +21,15 @@ public final class MapTheme {
     public static final int F_NARROW = 16;       // yanlardan lazer duvarlar: dar geçit
     public static final int F_RUSH = 32;         // hızlı akış
     public static final int F_FAST_SHADOWS = 64; // gölgeler daha yakından takip eder
-    public static final String[] FEATURE_NAMES = {"Rüzgâr", "Buz", "Karanlık", "Meteor Yağmuru", "Dar Geçit", "Hızlı Akış", "Hızlı Gölgeler"};
+    /** Özellik bitlerinin (1 &lt;&lt; i) yerelleştirme anahtarları; metin {@link #featureName(int)} ile alınır. */
+    private static final String[] FEATURE_KEYS = {"feature.wind", "feature.ice", "feature.dark", "feature.storm",
+            "feature.narrow", "feature.rush", "feature.fast_shadows"};
+    public static final int FEATURE_COUNT = FEATURE_KEYS.length;
+    /** Temel harita sayısı (kademe başına); {@link #tier()} ile aynı bölme. */
+    public static final int BASE_COUNT = 20;
+    private static final String[] ROMAN = {"", "II", "III", "IV", "V"};
 
     public final int id;
-    public final String name;
-    public final String desc;
     public final int bgTop, bgBottom, grid, obstacle, accent;
     public final int deco;
     public final int features;
@@ -31,11 +39,13 @@ public final class MapTheme {
     public final int signature;
     public final float shadowDelay1, shadowDelay2;
 
-    public MapTheme(int id, String name, String desc, int bgTop, int bgBottom, int grid, int obstacle, int accent,
+    // Yerelleştirilmiş metin önbelleği (dil değişince yeniden üretilir)
+    private String cName, cDesc, cFeatures;
+    private volatile int cVer = Integer.MIN_VALUE;
+
+    public MapTheme(int id, int bgTop, int bgBottom, int grid, int obstacle, int accent,
                     int deco, int features, int signature, float shadowDelay1, float shadowDelay2, float... weights) {
         this.id = id;
-        this.name = name;
-        this.desc = desc;
         this.bgTop = bgTop;
         this.bgBottom = bgBottom;
         this.grid = grid;
@@ -83,22 +93,71 @@ public final class MapTheme {
     }
 
     public int tier() {
-        return id / 20;
+        return id / BASE_COUNT;
     }
 
     public boolean has(int f) {
         return (features & f) != 0;
     }
 
+    /** Temel harita sırası (0..19); kademeler aynı temel haritayı yeniden ziyaret eder. */
+    public int baseIndex() {
+        return id % BASE_COUNT;
+    }
+
+    /** Haritanın o anki dildeki adı (ör. "Neon Kapı", kademede "Neon Kapı II · Gece"). */
+    public String name() {
+        refresh();
+        return cName;
+    }
+
+    /** Haritanın o anki dildeki kısa açıklaması. */
+    public String desc() {
+        refresh();
+        return cDesc;
+    }
+
+    /** Özelliklerin " · " ile ayrılmış listesi; özelliksiz haritada "Klasik". */
     public String featuresText() {
-        if (features == 0) return "Klasik";
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < FEATURE_NAMES.length; i++) {
-            if ((features & (1 << i)) != 0) {
-                if (sb.length() > 0) sb.append(" · ");
-                sb.append(FEATURE_NAMES[i]);
-            }
+        refresh();
+        return cFeatures;
+    }
+
+    /** Tek bir özelliğin adı (bit sırası: 0 = Rüzgâr … 6 = Hızlı Gölgeler). */
+    public static String featureName(int bit) {
+        return L10n.t(FEATURE_KEYS[bit]);
+    }
+
+    private void refresh() {
+        int v = L10n.version();
+        if (v == cVer) return;
+        int b = baseIndex(), k = tier();
+        String baseName = L10n.t("map." + b + ".name");
+        String name, desc;
+        if (k == 0) {
+            name = baseName;
+            desc = L10n.t("map." + b + ".desc");
+        } else {
+            name = L10n.f("map.tier_name", baseName, ROMAN[k], Maps.tierName(k));
+            String baseDesc = L10n.t(b == BASE_COUNT - 1 ? "map." + b + ".desc_tier" : "map." + b + ".desc");
+            desc = L10n.f("tier." + k + ".desc", baseDesc);
         }
-        return sb.toString();
+        String feats;
+        if (features == 0) {
+            feats = L10n.t("feature.none");
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < FEATURE_KEYS.length; i++) {
+                if ((features & (1 << i)) != 0) {
+                    if (sb.length() > 0) sb.append(" · ");
+                    sb.append(L10n.t(FEATURE_KEYS[i]));
+                }
+            }
+            feats = sb.toString();
+        }
+        cName = name;
+        cDesc = desc;
+        cFeatures = feats;
+        cVer = v; // metinler yazıldıktan sonra (volatile): başka iş parçacığı yarım önbellek görmez
     }
 }
