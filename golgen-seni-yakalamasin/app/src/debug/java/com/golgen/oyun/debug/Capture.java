@@ -40,6 +40,7 @@ public final class Capture {
 
     private static final float DT = 1f / 60f;
     private static volatile boolean busy;
+    private static boolean pilotErrorLogged;
 
     /** GameView.handleDebugIntent tarafından yansıma ile çağrılır (UI iş parçacığı). */
     public static void run(final GameView g, final String spec) {
@@ -60,7 +61,8 @@ public final class Capture {
                 } catch (Exception ignored) { }
             } finally {
                 busy = false;
-                g.post(() -> g.debugSetCapturing(false));
+                g.play.debugPilot = null;          // pilot normal oyun döngüsünde çalışmasın
+                g.post(() -> { g.debugShow("menu"); g.debugSetCapturing(false); });
             }
         }, "cekim").start();
     }
@@ -79,6 +81,9 @@ public final class Capture {
     }
 
     private static void doRun(GameView g, Map<String, String> m) throws Exception {
+        // Soğuk başlatmada görünüm henüz yerleşmemiş olabilir: boyut gelene kadar bekle
+        for (int i = 0; i < 200 && (g.getWidth() <= 0 || g.getHeight() <= 0); i++) Thread.sleep(50);
+        if (g.getWidth() <= 0) throw new IllegalStateException("görünüm boyutu yok");
         String name = m.containsKey("ad") ? m.get("ad") : "sahne";
         File dir = new File(g.getContext().getExternalFilesDir(null), "cekim/" + name);
         deleteRecursive(dir);
@@ -132,7 +137,13 @@ public final class Capture {
         g.play.debugSeed = seed;
         Bot bot = new Bot(null);
         bot.strong = true;
-        g.play.debugPilot = bot::act;
+        g.play.debugPilot = w -> {
+            try {
+                bot.act(w);
+            } catch (RuntimeException e) {         // pilot hatası oyunu çökertmesin; nedeni günlüğe yazılsın
+                if (!pilotErrorLogged) { pilotErrorLogged = true; Log.e("GolgenCekim", "pilot hatası", e); }
+            }
+        };
         if (endless) g.debugStartEndless(); else g.debugStartMission(level);
         g.play.debugBegin();
     }

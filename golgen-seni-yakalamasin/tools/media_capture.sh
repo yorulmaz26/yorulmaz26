@@ -43,7 +43,7 @@ cek() {
   local t=0
   until adbt shell "[ -f $REMOTE/$ad/bitti ] || [ -f $REMOTE/$ad/hata ] && echo ok" | grep -q ok; do
     sleep 2; t=$((t+2))
-    if [ $t -gt 900 ]; then echo "ZAMAN AŞIMI: $spec"; adb logcat -d -s GolgenCekim:V AndroidRuntime:E | tail -20; return 1; fi
+    if [ $t -gt 300 ]; then echo "ZAMAN AŞIMI: $spec"; adb logcat -d -s GolgenCekim:V AndroidRuntime:E | tail -20; return 1; fi
   done
   mkdir -p "$OUT/raw"
   adbt pull "$REMOTE/$ad" "$OUT/raw/" >/dev/null || timeout 600 adb pull "$REMOTE/$ad" "$OUT/raw/" >/dev/null
