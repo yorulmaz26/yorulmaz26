@@ -357,7 +357,9 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         side.add(kit.button(L.t("settings.privacy"), "white", "g_info", a.f28, Palette.INK) { showPrivacy() }).width(420f).height(88f).padTop(12f).row()
         // Reklam onayı gereken bölgelerde (ör. AB) oyuncu tercihini buradan değiştirebilir
         if (game.ads.privacyOptionsRequired) side.add(kit.button(L.t("settings.ad_prefs"), "white", "g_info", a.f28, Palette.INK) { game.ads.showPrivacyOptions() }).width(420f).height(88f).padTop(10f).row()
-        side.add(kit.label(L.t("settings.about", "app" to L.t("app.name_main"), "ver" to APP_VERSION, "dev" to L.t("app.developer")), a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(12f)
+        val about = Table().apply { background = kit.patch("chip"); pad(10f, 14f, 14f, 14f) }
+        about.add(kit.label(L.t("settings.about", "app" to L.t("app.name_main"), "ver" to APP_VERSION, "dev" to L.t("app.developer")), a.f22, Palette.INK_SOFT, wrap = true)).width(392f)
+        side.add(about).width(420f).padTop(12f)
         val body = Table()
         body.add(p).width(640f).padRight(24f)
         // uzun dillerde sağ sütun ekrana sığmazsa kaydırılır (alt bilgi metni kesilmez)

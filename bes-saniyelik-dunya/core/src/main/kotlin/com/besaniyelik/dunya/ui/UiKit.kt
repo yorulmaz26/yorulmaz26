@@ -97,10 +97,18 @@ class FitLabel(text: CharSequence, style: LabelStyle, private val minScale: Floa
     private fun natural(): Float { val g = gl ?: GlyphLayout().also { gl = it }; g.setText(style.font, text); return g.width }
     override fun getPrefWidth(): Float = natural()
     override fun getMinWidth(): Float = natural() * minScale
+    /**
+     * Yazı tipinin kendi ölçeği (ekran yoğunluğu: 1/density). Label.setFontScale ölçeği MUTLAK uygular, yani bu taban
+     * ölçekle çarpılmazsa yoğun ekranlı telefonlarda yazı küçüleceğine kat kat büyür (masaüstünde taban 1 olduğu için
+     * görünmez). Bu yüzden her zaman taban × küçültme oranı verilir; küçültme gerekmiyorsa ölçeğe hiç dokunulmaz.
+     */
+    private val base: Float = style.font.data.scaleX
     override fun layout() {
         val nw = natural()
         val s = if (nw > 0f && width > 0f) (width / nw).coerceIn(minScale, 1f) else 1f
-        if (kotlin.math.abs(s - fontScaleX) > 0.001f) setFontScale(s)
+        val target = base * s
+        if (s < 0.999f) { if (kotlin.math.abs(target - fontScaleX) > 0.0005f) setFontScale(target) }
+        else if (kotlin.math.abs(fontScaleX - 1f) > 0.0005f && kotlin.math.abs(fontScaleX - base) > 0.0005f) setFontScale(base)
         super.layout()
     }
 }
