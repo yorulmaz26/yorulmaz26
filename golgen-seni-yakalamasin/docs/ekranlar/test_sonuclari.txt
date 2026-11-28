@@ -9,7 +9,7 @@ GEÇTİ  | Duraklatma menüsü açıldı
 GEÇTİ  | Duraklatmada oyun ilerlemiyor (6 sn)
 GEÇTİ  | Hareketsiz kalınca gölge yakalar / oyun sonu → GameOverScreen
 GEÇTİ  | Kayıt: oynanan oyun sayısı kaydedildi (2)
-GEÇTİ  | Kayıt: rekor kaydedildi (58)
+GEÇTİ  | Kayıt: rekor kaydedildi (73)
 GEÇTİ  | Tekrar oyna → PlayScreen
 GEÇTİ  | Geri tuşu oyunu duraklatır
 GEÇTİ  | Hazır ekranında duraklat → devam: oyun dokunuş bekliyor (8 sn)
@@ -44,7 +44,7 @@ GEÇTİ  | Bölüm 450 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Bölüm 500 oynanabilir (girdi işlendi, donma yok)
 GEÇTİ  | Harita bölümlerinden ana menüye dönüş
 GEÇTİ  | Ayarlar → Dil: Deutsch seçildi, yeniden başlatmadan uygulandı ve kaydedildi
-KALDI  | Metin taşması (3): dil=tr olcek=0.48 metin=Gölge Tahtı V · Efsane · Rüzgâr · Buz · Karanlık · Meteor Yağmuru · Hızlı Akış · Hızlı Gölgeler · 2 aşama × 20 yıldız;dil=tr olcek=0.61 metin=Gölge Tahtı · Karanlık · Meteor Yağmuru · Hızlı Akış · Hızlı Gölgeler · 2 aşama × 20 yıldız;dil=tr olcek=0.72 metin=Gece Pazarı IV · Kabus · Rüzgâr · Dar Geçit · Hızlı Akış · 2 aşama × 20 yıldız;
+GEÇTİ  | 6 dilde 9 ekran: metin taşması yok
 GEÇTİ  | Eksik çeviri anahtarı yok (çalışma anı)
 GEÇTİ  | Can yokken bölüme dokununca 'Canın kalmadı' penceresi açıldı
 GEÇTİ  | Yeniden açılış (öğretici atlanır, kayıt yüklenir) → MenuScreen
@@ -57,4 +57,4 @@ BİLGİ  | Geçiş (görsel) reklamı gösterildi
 BİLGİ  | Ödüllü video reklamı gösterildi
 GEÇTİ  | Reklamlar sırasında çökme yok
 GEÇTİ  | Çökme veya ANR yok
-TOPLAM: 55 geçti, 1 kaldı
+TOPLAM: 56 geçti, 0 kaldı
