@@ -1,8 +1,8 @@
-# Gizlilik Politikası — 5 Saniyelik Dünya
+# Gizlilik Politikası — 5 Saniyelik Dünya (Stopwatch Shuffle)
 
-Son güncelleme: 21 Kasım 2026
+Son güncelleme: 28 Kasım 2026
 
-5 Saniyelik Dünya (paket adı: `com.besaniyelik.dunya`) çevrimdışı da oynanabilen bir oyundur. Oyunun kendisi sizden hiçbir kişisel bilgi istemez; hesap açmanız gerekmez.
+5 Saniyelik Dünya / Stopwatch Shuffle (paket adı: `com.besaniyelik.dunya`), Magic Lumos Software tarafından geliştirilen ve çevrimdışı da oynanabilen bir oyundur. Oyunun kendisi sizden hiçbir kişisel bilgi istemez; hesap açmanız gerekmez.
 
 > Yayımlamadan önce: aşağıdaki "Reklam modu" bölümünde, `ads.properties` dosyasındaki `audience` ayarınıza uyan paragrafı bırakıp diğerini silin ve iletişim e-postanızı yazın.
 
@@ -33,7 +33,7 @@ Gerçek parayla satın alma yoktur. Altın ve elmaslar oynayarak ya da isteğe b
 
 ## Kayıt dosyası
 
-İlerlemeniz (açılan bölümler, yıldızlar, ayarlar) yalnızca cihazınızda saklanır. Cihazınızda Android yedeklemesi açıksa bu dosya kendi Google hesabınızın yedeğine dahil edilebilir; geliştirici bu yedeğe erişemez. Kaydı, oyundaki Ayarlar ekranında bulunan "İlerlemeyi Sıfırla" düğmesiyle ya da uygulamayı kaldırarak silebilirsiniz.
+İlerlemeniz (açılan bölümler, yıldızlar, canlar, dil tercihi ve diğer ayarlar) yalnızca cihazınızda saklanır. Cihazınızda Android yedeklemesi açıksa bu dosya kendi Google hesabınızın yedeğine dahil edilebilir; geliştirici bu yedeğe erişemez. Kaydı, oyundaki Ayarlar ekranında bulunan "İlerlemeyi Sıfırla" düğmesiyle ya da uygulamayı kaldırarak silebilirsiniz.
 
 ## İzinler
 
@@ -57,11 +57,11 @@ Sorularınız için: **[GELİŞTİRİCİ E-POSTA ADRESİNİZİ BURAYA YAZIN]** (
 
 ---
 
-# Privacy Policy — 5 Saniyelik Dünya ("5-Second World")
+# Privacy Policy — Stopwatch Shuffle (5 Saniyelik Dünya)
 
-Last updated: 21 November 2026
+Last updated: 28 November 2026
 
-5 Saniyelik Dünya (package name `com.besaniyelik.dunya`) is a game that can also be played offline. The game itself asks you for no personal information and requires no account.
+Stopwatch Shuffle / 5 Saniyelik Dünya (package name `com.besaniyelik.dunya`) is a game developed by Magic Lumos Software that can also be played offline. The game itself asks you for no personal information and requires no account.
 
 ## Ads and data collected
 
@@ -82,7 +82,7 @@ This data is not sent to the developer of the game; it is processed by Google fo
 
 **Purchases:** There are no real-money purchases. Coins and gems are earned by playing or by optionally watching ads.
 
-**Save file:** Your progress (unlocked levels, stars, settings) is stored only on your device. If Android backup is enabled on your device, this file may be included in the backup of your own Google account; the developer has no access to that backup. You can delete the save with the "İlerlemeyi Sıfırla" (Reset progress) button on the Settings screen or by uninstalling the app.
+**Save file:** Your progress (unlocked levels, stars, lives, language preference and other settings) is stored only on your device. If Android backup is enabled on your device, this file may be included in the backup of your own Google account; the developer has no access to that backup. You can delete the save with the "Reset Progress" button on the Settings screen or by uninstalling the app.
 
 **Permissions:** Vibration (can be turned off in Settings); for the ads library: internet access, network state, ad measurement and background work.
 

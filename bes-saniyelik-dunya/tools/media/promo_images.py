@@ -44,33 +44,41 @@ def text_center(bg, txt, y, size, color=(255, 255, 255), stroke=True):
 
 def portrait(W, H, lang, shots, caps, cta=None, stack=1):
     bg = sky(W, H).convert("RGBA")
-    lg = fitw(logo(lang), int(W * 0.82)); shadowed(bg, lg, ((W - lg.width) // 2, int(H * 0.04)), off=6)
-    y = int(H * 0.04) + lg.height + int(H * 0.02)
+    lg = logo(lang)
+    lw = min(int(W * 0.82), int(H * 0.24 * lg.width / lg.height))
+    lg = fitw(lg, lw); top = int(H * 0.035)
+    shadowed(bg, lg, ((W - lg.width) // 2, top), off=6)
+    y = top + lg.height + int(H * 0.02)
+    foot = int(H * 0.07) + (int(H * 0.075) if cta else 0) + int(H * 0.07)  # slogan + çağrı + marka
+    avail = H - y - foot
+    gap = int(H * 0.015)
     cw = int(W * 0.86)
+    ratio = shots[0].height / shots[0].width
+    if stack * (cw * ratio + 16) + (stack - 1) * gap > avail: cw = int((avail - (stack - 1) * gap) / stack / ratio) - 16
     for i in range(stack):
-        c = card(shots[i], cw); shadowed(bg, c, ((W - c.width) // 2, y)); y += c.height + int(H * 0.015)
-    hr = fith(hero(), int(H * (0.16 if stack == 1 else 0.12)))
-    shadowed(bg, hr, (W - hr.width - int(W * 0.02), y - hr.height + int(H * 0.02)))
-    text_center(bg, caps["tagline"], y + int(H * 0.02), int(W * 0.065))
-    if cta: text_center(bg, cta, y + int(H * 0.11), int(W * 0.06), (255, 245, 160))
-    text_center(bg, "Magic Lumos Software", H - int(H * 0.05), int(W * 0.035), NAVY, stroke=False)
+        c = card(shots[i], cw); shadowed(bg, c, ((W - c.width) // 2, y)); y += c.height + gap
+    text_center(bg, caps["tagline"], y + int(H * 0.005), int(min(W, H * 0.6) * 0.075))
+    if cta: text_center(bg, cta, y + int(H * 0.075), int(min(W, H * 0.6) * 0.07), (255, 245, 160))
+    text_center(bg, "Magic Lumos Software", H - int(H * 0.055), int(min(W, H * 0.6) * 0.04), NAVY, stroke=False)
     return bg.convert("RGB")
 
 def landscape(W, H, lang, shot, caps, title=None):
     bg = sky(W, H).convert("RGBA")
-    c = card(shot, int(W * 0.52)); shadowed(bg, c, (W - c.width - int(W * 0.04), (H - c.height) // 2))
-    lg = fitw(logo(lang), int(W * 0.40)); shadowed(bg, lg, (int(W * 0.03), int(H * 0.08)), off=6)
-    hr = fith(hero(), int(H * 0.36)); shadowed(bg, hr, (int(W * 0.04), H - hr.height - int(H * 0.06)))
-    d = ImageDraw.Draw(bg); f = font(int(H * 0.06)); t = title or caps["tagline"]
+    c = card(shot, int(W * 0.54)); shadowed(bg, c, (W - c.width - int(W * 0.035), (H - c.height) // 2))
+    lg = fitw(logo(lang), int(W * 0.38)); shadowed(bg, lg, (int(W * 0.03), int(H * 0.10)), off=6)
+    d = ImageDraw.Draw(bg); f = font(int(H * 0.075)); t = title or caps["tagline"]
     lines = []; cur = ""
     for w in t.split():
         tt = (cur + " " + w).strip()
-        if f.getlength(tt) < W * 0.27: cur = tt
+        if f.getlength(tt) < W * 0.36: cur = tt
         else: lines.append(cur); cur = w
     lines.append(cur)
-    y = int(H * 0.08) + lg.height + int(H * 0.04)
+    y = int(H * 0.10) + lg.height + int(H * 0.05)
     for ln in lines:
-        d.text((int(W * 0.04) + hr.width + 10, y), ln, font=f, fill=(255, 255, 255), stroke_width=max(4, f.size // 9), stroke_fill=NAVY); y += int(f.size * 1.15)
+        x = int(W * 0.03) + (lg.width - f.getlength(ln)) / 2
+        d.text((x, y), ln, font=f, fill=(255, 255, 255), stroke_width=max(4, f.size // 9), stroke_fill=NAVY); y += int(f.size * 1.15)
+    fs = font(int(H * 0.035), 800); b = "Magic Lumos Software"
+    d.text((int(W * 0.03) + (lg.width - fs.getlength(b)) / 2, H - int(H * 0.09)), b, font=fs, fill=NAVY)
     return bg.convert("RGB")
 
 def feature_graphic(lang):
