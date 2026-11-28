@@ -5,11 +5,13 @@ on:
     paths:
       - "golgen-seni-yakalamasin/**"
       - ".github/workflows/golgen-android.yml"
+      - "!golgen-seni-yakalamasin/RELEASE_PACKAGE/**"
+      - "!golgen-seni-yakalamasin/docs/**"
   workflow_dispatch:
 
 concurrency:
   group: golgen-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 defaults:
   run:
