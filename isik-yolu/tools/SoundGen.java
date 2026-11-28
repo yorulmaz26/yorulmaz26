@@ -4,6 +4,9 @@ import java.util.Random;
 /**
  * Işık Yolu ses üreticisi: tüm ses efektlerini ve arka plan müziğini matematiksel olarak sentezler.
  * Kullanım: java tools/SoundGen.java app/src/main/res/raw
+ * Müzik WAV olarak üretilir ve APK boyutu için OGG Vorbis'e çevrilip WAV silinir (aynı adla iki kaynak olamaz):
+ *   ffmpeg -i app/src/main/res/raw/music.wav -c:a libvorbis -q:a 6 -metadata ANDROID_LOOP=true app/src/main/res/raw/music.ogg
+ *   rm app/src/main/res/raw/music.wav
  */
 public class SoundGen {
     static final int SR = 22050;

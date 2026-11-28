@@ -13,6 +13,7 @@ import json
 import math
 import os
 import subprocess
+import tempfile
 import wave
 
 import numpy as np
@@ -327,10 +328,21 @@ def read_wav(path):
         return data / 32768.0
 
 
+def sound_path(sounds, name):
+    """res/raw sesi: WAV ise doğrudan, OGG ise (müzik, APK boyutu için) geçici WAV'a çözülür."""
+    wav = os.path.join(sounds, name + ".wav")
+    if os.path.exists(wav): return wav
+    ogg = os.path.join(sounds, name + ".ogg")
+    out = os.path.join(tempfile.gettempdir(), f"magaza_{name}_{os.getpid()}.wav")
+    if not os.path.exists(out):
+        subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", ogg, "-ac", "1", out], check=True)
+    return out
+
+
 def mix_audio(path, sounds, seconds, sfx):
     sr = 44100
     n = int(seconds * sr)
-    music = read_wav(os.path.join(sounds, "music.wav"))
+    music = read_wav(sound_path(sounds, "music"))
     reps = int(math.ceil(n / len(music)))
     mix = np.tile(music, (reps, 1))[:n] * 0.55
     fade_in, fade_out = int(0.6 * sr), int(1.8 * sr)

@@ -110,6 +110,7 @@ public final class SettingsScreen extends Screen {
         LinearLayout r = rowBase(c, iv, label);
         Switch sw = new Switch(c);
         sw.setChecked(f.get());
+        sw.setContentDescription(label); // ekran okuyucu "Ses efektleri, anahtar, açık" der
         int[][] states = {{android.R.attr.state_checked}, {}};
         sw.setThumbTintList(new ColorStateList(states, new int[]{Palette.TURQUOISE, 0xFF8792A8}));
         sw.setTrackTintList(new ColorStateList(states, new int[]{0x8820B8A6, 0xFF576A94}));

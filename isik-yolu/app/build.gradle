@@ -38,12 +38,24 @@ android {
     defaultConfig.buildConfigField 'String', 'PRIVACY_URL', "\"${privacyUrl}\""
 
     signingConfigs {
-        // Yerel test dağıtımı için sürüm APK'sı da imzalanır (keystore depoya konmaz, debug anahtarı kullanılır).
+        // Google Play'e yüklemek için kendi yükleme anahtarın: ~/.gradle/gradle.properties (depoya KONMAZ) içine
+        //   uploadStoreFile=/yol/upload.jks  uploadStorePassword=…  uploadKeyAlias=upload  uploadKeyPassword=…
+        // ya da aynı adlarla ortam değişkenleri (UPLOAD_STORE_FILE …). Verilmezse yerel test için debug anahtarı kullanılır
+        // (debug anahtarıyla imzalı AAB Play'e yüklenmemelidir).
         release {
-            storeFile file(System.getProperty('user.home') + '/.android/debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
+            def prop = { String k, String env -> project.hasProperty(k) ? project.property(k).toString() : System.getenv(env) }
+            def upload = prop('uploadStoreFile', 'UPLOAD_STORE_FILE')
+            if (upload) {
+                storeFile file(upload)
+                storePassword prop('uploadStorePassword', 'UPLOAD_STORE_PASSWORD')
+                keyAlias prop('uploadKeyAlias', 'UPLOAD_KEY_ALIAS')
+                keyPassword prop('uploadKeyPassword', 'UPLOAD_KEY_PASSWORD')
+            } else {
+                storeFile file(System.getProperty('user.home') + '/.android/debug.keystore')
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
         }
     }
 
@@ -81,6 +93,7 @@ android {
                 systemProperty 'screens.dir', rootProject.file('docs/ekranlar').absolutePath
                 if (project.hasProperty('promoDir')) systemProperty 'promo.dir', project.property('promoDir').toString()
                 if (project.hasProperty('promoLang')) systemProperty 'promo.lang', project.property('promoLang').toString()
+                if (project.hasProperty('i18nDir')) systemProperty 'i18n.dir', project.property('i18nDir').toString()
                 testLogging { events 'passed', 'failed'; exceptionFormat 'full'; showStandardStreams = true }
             }
         }

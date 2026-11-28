@@ -29,7 +29,8 @@ public final class SplashScreen extends Screen {
         com.isikyolu.game.ui.BrandTitle title = new com.isikyolu.game.ui.BrandTitle(a, 44); // iki dilli ad (bkz. Brand)
         col.addView(title);
         TextView sub = Ui.text(a, L.t("menu.tagline"), 16, Palette.TURQUOISE, Ui.MEDIUM);
-        col.addView(sub);
+        sub.setGravity(Gravity.CENTER);
+        col.addView(sub, Ui.lpMargins(a, -1, -2, 0, 8, 0, 0));
         col.addView(Ui.space(a, 40));
         status = Ui.text(a, L.t("splash.loading"), 14, Palette.TEXT_DIM, Ui.REGULAR);
         col.addView(status);

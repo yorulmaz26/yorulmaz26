@@ -6,3 +6,6 @@ local.properties
 captures/
 .cxx/
 __pycache__/
+*.jks
+*.keystore
+keystore.properties

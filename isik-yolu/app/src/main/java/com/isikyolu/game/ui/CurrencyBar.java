@@ -48,7 +48,7 @@ public final class CurrencyBar extends LinearLayout {
     }
 
     private static void animateTo(TextView t, int from, int to) {
-        t.setText(String.valueOf(to));
+        t.setText(java.text.NumberFormat.getIntegerInstance(com.isikyolu.game.i18n.L.locale()).format(to));
         if (from >= 0 && from != to) {
             t.setTextColor(to > from ? 0xFF8CFFB0 : 0xFFFF9AA8);
             t.animate().scaleX(1.25f).scaleY(1.25f).setDuration(140).withEndAction(() -> {

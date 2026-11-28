@@ -367,7 +367,7 @@ public final class MarketScreen extends Screen {
         b.setBackground(bg);
         b.setPadding(Ui.dp(c, 10), Ui.dp(c, 8), Ui.dp(c, 12), Ui.dp(c, 8));
         b.addView(Ui.icon(c, currency == Economy.GEM ? Icon.GEM : Icon.CRYSTAL, currency == Economy.GEM ? CurrencyBar.GEM_COLOR : CurrencyBar.CRYSTAL_COLOR, 16));
-        b.addView(Ui.text(c, " " + price, 15, enabled ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
+        b.addView(Ui.text(c, " " + java.text.NumberFormat.getIntegerInstance(L.locale()).format(price), 15, enabled ? Palette.WHITE : Palette.TEXT_DIM, Ui.BOLD));
         b.setMinimumWidth(Ui.dp(c, 76));
         b.setContentDescription(currency == Economy.GEM ? L.n("common.gems", price) : L.n("common.crystals", price));
         Ui.clickable(b, v -> r.run());
@@ -480,6 +480,9 @@ public final class MarketScreen extends Screen {
             b.setAlpha(0.55f);
         }
         videoSlot.addView(b, new FrameLayout.LayoutParams(-1, -2));
+        // uzun dillerde düğme iki satıra çıkabilir: yuva baştan iki satırlık yükseklikte tutulur, video gelince liste kaymaz
+        videoSlot.setMinimumHeight(Ui.dp(c, 78));
+        ((FrameLayout.LayoutParams) b.getLayoutParams()).gravity = Gravity.CENTER_VERTICAL;
     }
 
     /** Ödüllü video yeniden hazır olunca yalnızca video yuvası güncellenir (liste baştan kurulmaz). */

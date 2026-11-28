@@ -14,7 +14,9 @@ Metinler `app/src/main/assets/i18n/<dil>.json` dosyalarındadır (düz anahtar �
 ## Anahtar adları
 `common.*` ortak, `lives.*` can, `menu.*`, `splash.*`, `settings.*`, `levels.*`, `game.*`, `tutorial.*`, `market.*`,
 `item.<id>.name|desc`, `daily.*`, `ach.<id>.title|desc`, `achievements.*`, `world.<1-5>.name|level|intro`,
-`chapter.<1-50>.name`, `topic.<1-10>`, `mechanic.<1-10>`, `color.<ad>`, `ads.*`, `privacy.*`, `dialog.*`.
+`chapter.<1-50>.name`, `topic.<1-10>`, `mechanic.<1-10>`, `color.<ad>`, `ads.*`, `privacy.*`, `dialog.*`,
+`econ.block.<kod>` (satın alma engeli: motorun `Economy.BLOCK_*` kodları), `econ.reward.<kod>` (ödül satırı:
+`Economy.REWARD_*`). Dinamik anahtarlar (`chapter.`, `ach.`, `item.` …) `WorldKeysTest` ve `EconomyTextsTest` ile denetlenir.
 
 ## Terimler
 | Türkçe | English | Deutsch | Italiano | Français | Español |

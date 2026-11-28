@@ -35,7 +35,9 @@ public final class MenuScreen extends Screen {
         col.addView(new LogoView(a), new LinearLayout.LayoutParams(Ui.dp(a, 130), Ui.dp(a, 130)));
         // iki dilli ad: Türkçede "Işık Yolu" büyük + PRISMWAY küçük; diğer dillerde "Prismway" büyük + IŞIK YOLU küçük
         col.addView(new com.isikyolu.game.ui.BrandTitle(a, 40));
-        col.addView(Ui.text(a, L.t("menu.tagline"), 15, Palette.TURQUOISE, Ui.MEDIUM));
+        TextView tagline = Ui.text(a, L.t("menu.tagline"), 15, Palette.TURQUOISE, Ui.MEDIUM);
+        tagline.setGravity(Gravity.CENTER);
+        col.addView(tagline, Ui.lpMargins(a, -1, -2, 0, 6, 0, 0));
 
         // yıldız ve ilerleme göstergesi
         LinearLayout pill = Ui.horizontal(a);
