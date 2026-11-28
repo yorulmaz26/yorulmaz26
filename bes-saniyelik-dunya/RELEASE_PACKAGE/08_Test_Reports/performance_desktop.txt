@@ -1,0 +1,15 @@
+ilk kare: 1.20 sn
+başlangıç belleği: 4 MB
+bölüm 12: COMPLETE, kare 2220, ort 17.3 ms, p95 20.6 ms, bellek 5 MB, java heap max 3420 MB
+bölüm 61: COMPLETE, kare 1975, ort 16.8 ms, p95 19.2 ms, bellek 5 MB, java heap max 3420 MB
+bölüm 160: COMPLETE, kare 3104, ort 16.7 ms, p95 19.1 ms, bellek 6 MB, java heap max 3420 MB
+bölüm 215: COMPLETE, kare 3204, ort 16.7 ms, p95 18.9 ms, bellek 6 MB, java heap max 3420 MB
+bölüm 280: COMPLETE, kare 3264, ort 16.7 ms, p95 18.8 ms, bellek 7 MB, java heap max 3420 MB
+bölüm 330: COMPLETE, kare 3472, ort 16.8 ms, p95 18.5 ms, bellek 7 MB, java heap max 3420 MB
+bölüm 377: COMPLETE, kare 2556, ort 16.7 ms, p95 18.6 ms, bellek 7 MB, java heap max 3420 MB
+bölüm 420: COMPLETE, kare 3454, ort 16.7 ms, p95 18.4 ms, bellek 8 MB, java heap max 3420 MB
+bölüm 470: COMPLETE, kare 3824, ort 16.7 ms, p95 18.6 ms, bellek 8 MB, java heap max 3420 MB
+bölüm 500: COMPLETE, kare 6074, ort 16.8 ms, p95 19.1 ms, bellek 8 MB, java heap max 3420 MB
+bölüm 12: COMPLETE, kare 2259, ort 16.8 ms, p95 19.2 ms, bellek 8 MB, java heap max 3420 MB
+bölüm 61: COMPLETE, kare 1962, ort 16.9 ms, p95 19.0 ms, bellek 8 MB, java heap max 3420 MB
+menüdeyken bellek: 8 MB

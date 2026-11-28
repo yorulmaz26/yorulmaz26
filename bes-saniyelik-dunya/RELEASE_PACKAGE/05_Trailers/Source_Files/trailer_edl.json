@@ -1,0 +1,15 @@
+{
+ "_aciklama": "30 sn tanıtım videosu kurgusu (düzenlenebilir kaynak). clip: MediaTour RECORD kaydı (dosya adı), start/dur: saniye, caption: video_captions.json anahtarı. Son 3 sn kapanış kartıdır.",
+ "total": 30.0,
+ "segments": [
+  {"clip": "lv470", "start": 8.0, "dur": 3.0, "caption": "hook"},
+  {"clip": "lv002", "start": 2.4, "dur": 5.0, "caption": "tap"},
+  {"clip": "lv280", "start": 6.4, "dur": 2.6, "caption": "rules"},
+  {"clip": "lv470", "start": 16.6, "dur": 2.4, "caption": "rules"},
+  {"clip": "lv280", "start": 8.6, "dur": 2.0, "caption": "dodge"},
+  {"clip": "maps", "start": 0.6, "dur": 2.2, "caption": "maps", "fit": "full"},
+  {"clip": "characters", "start": 0.6, "dur": 2.2, "caption": "chars", "fit": "full"},
+  {"clip": "endless", "start": 0.2, "dur": 2.6, "caption": "endless"},
+  {"clip": "lv120", "start": 47.4, "dur": 5.0, "caption": "win"}
+ ]
+}

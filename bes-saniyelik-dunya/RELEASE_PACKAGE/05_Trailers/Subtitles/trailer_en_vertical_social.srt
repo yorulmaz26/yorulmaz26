@@ -1,0 +1,40 @@
+1
+00:00:00,000 --> 00:00:03,000
+The rules change every 5 seconds!
+
+2
+00:00:03,000 --> 00:00:08,000
+Tap to jump • Hold to jump higher
+
+3
+00:00:08,000 --> 00:00:10,600
+Reverse gravity, ice, ghost platforms…
+
+4
+00:00:10,600 --> 00:00:13,000
+Reverse gravity, ice, ghost platforms…
+
+5
+00:00:13,000 --> 00:00:15,000
+Dodge the saws and spikes!
+
+6
+00:00:15,000 --> 00:00:17,200
+10 maps, 500 levels
+
+7
+00:00:17,200 --> 00:00:19,400
+Pick from 20 characters
+
+8
+00:00:19,400 --> 00:00:22,000
+Endless World: how far can you go?
+
+9
+00:00:22,000 --> 00:00:27,000
+Collect stars, earn rewards!
+
+10
+00:00:27,000 --> 00:00:30,000
+A new world every 5 seconds! Start Your Adventure!
+

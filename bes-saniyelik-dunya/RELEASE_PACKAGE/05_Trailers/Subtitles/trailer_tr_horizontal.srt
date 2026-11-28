@@ -1,0 +1,40 @@
+1
+00:00:00,000 --> 00:00:03,000
+Kurallar her 5 saniyede değişir!
+
+2
+00:00:03,000 --> 00:00:08,000
+Dokun: zıpla • Basılı tut: daha yükseğe
+
+3
+00:00:08,000 --> 00:00:10,600
+Ters yer çekimi, buz, hayalet platformlar…
+
+4
+00:00:10,600 --> 00:00:13,000
+Ters yer çekimi, buz, hayalet platformlar…
+
+5
+00:00:13,000 --> 00:00:15,000
+Testerelerden ve dikenlerden kaç!
+
+6
+00:00:15,000 --> 00:00:17,200
+10 harita, 500 bölüm
+
+7
+00:00:17,200 --> 00:00:19,400
+20 karakterden birini seç
+
+8
+00:00:19,400 --> 00:00:22,000
+Sonsuz Dünya: ne kadar uzağa gidebilirsin?
+
+9
+00:00:22,000 --> 00:00:27,000
+Yıldızları topla, ödülleri kazan!
+
+10
+00:00:27,000 --> 00:00:30,000
+Her 5 saniyede yeni bir dünya!
+

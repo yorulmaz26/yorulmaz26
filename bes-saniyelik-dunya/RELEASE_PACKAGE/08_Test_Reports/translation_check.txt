@@ -1,0 +1,29 @@
+[de] 708 metin, 0 hata, 13 uyarı
+  uyarı  chars.tab_skins: İngilizceyle aynı (çevrilmemiş olabilir): 'Outfits'
+  uyarı  howto.power.title: İngilizceyle aynı (çevrilmemiş olabilir): 'Power-ups'
+  uyarı  level.kind.NORMAL: İngilizceyle aynı (çevrilmemiş olabilir): 'Level'
+  uyarı  level.short: İngilizceyle aynı (çevrilmemiş olabilir): 'Level {n}'
+  uyarı  mech.NORMAL.short: İngilizceyle aynı (çevrilmemiş olabilir): 'Normal'
+  uyarı  menu.shop: İngilizceyle aynı (çevrilmemiş olabilir): 'Shop'
+  uyarı  power.MAGNET.title: İngilizceyle aynı (çevrilmemiş olabilir): 'Magnet'
+  uyarı  reward.item: İngilizceyle aynı (çevrilmemiş olabilir): '{n}× {item}'
+  uyarı  settings.vibration: İngilizceyle aynı (çevrilmemiş olabilir): 'Vibration'
+  uyarı  shop.powerups: İngilizceyle aynı (çevrilmemiş olabilir): 'Power-ups'
+  uyarı  shop.title: İngilizceyle aynı (çevrilmemiş olabilir): 'Shop'
+  uyarı  skin.astronot: İngilizceyle aynı (çevrilmemiş olabilir): 'Astronaut'
+  uyarı  skin.kaos: İngilizceyle aynı (çevrilmemiş olabilir): 'Chaos'
+[en] 708 metin, 0 hata, 0 uyarı
+[es] 708 metin, 0 hata, 2 uyarı
+  uyarı  mech.NORMAL.short: İngilizceyle aynı (çevrilmemiş olabilir): 'Normal'
+  uyarı  skin.robot: İngilizceyle aynı (çevrilmemiş olabilir): 'Robot'
+[fr] 708 metin, 0 hata, 8 uyarı
+  uyarı  ach.stars_300: İngilizceyle aynı (çevrilmemiş olabilir): 'Constellation'
+  uyarı  common.menu: İngilizceyle aynı (çevrilmemiş olabilir): 'Menu'
+  uyarı  endless.distance: İngilizceyle aynı (çevrilmemiş olabilir): 'Distance'
+  uyarı  endless.points_label: İngilizceyle aynı (çevrilmemiş olabilir): 'points'
+  uyarı  mech.NORMAL.short: İngilizceyle aynı (çevrilmemiş olabilir): 'Normal'
+  uyarı  menu.collection: İngilizceyle aynı (çevrilmemiş olabilir): 'Collection'
+  uyarı  skin.kaos: İngilizceyle aynı (çevrilmemiş olabilir): 'Chaos'
+  uyarı  skin.robot: İngilizceyle aynı (çevrilmemiş olabilir): 'Robot'
+[it] 708 metin, 0 hata, 1 uyarı
+  uyarı  common.menu: İngilizceyle aynı (çevrilmemiş olabilir): 'Menu'

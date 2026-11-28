@@ -1,4 +1,4 @@
-# 5 Saniyelik Dünya
+# 5 Saniyelik Dünya (Stopwatch Shuffle)
 
 Her 5 saniyede kuralların değiştiği, renkli bir **yatay** (landscape) Android platform oyunu. Kotlin + libGDX + Box2D.
 

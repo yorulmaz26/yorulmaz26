@@ -77,10 +77,15 @@ class Composer:
             self.cache[text] = caption_img(text, self.W - 140, 84 if self.fmt == "vertical" else 66)
         return self.cache[text]
 
-    def frame(self, src, caption):
+    def frame(self, src, caption, full=False):
         if self.fmt == "vertical":
             # arka plan: aynı karenin bulanık, büyütülmüş hali (siyah kenar yok), ortada kare oyun görüntüsü
             sq = Image.fromarray(src).crop(CROP)
+            if full:  # menü ekranları: tam kare oranı korunarak küçültülür, boşluk bulanık görüntüyle dolar
+                whole = Image.fromarray(src)
+                sq = whole.resize((1080, 1080), Image.BILINEAR).filter(ImageFilter.GaussianBlur(18))
+                sq = Image.blend(sq, Image.new("RGB", sq.size, (235, 246, 255)), 0.3)
+                fw = whole.resize((1080, 608), Image.LANCZOS); sq.paste(fw, (0, (1080 - 608) // 2))
             bg = sq.resize((self.H, self.H), Image.BILINEAR).crop(((self.H - self.W) // 2, 0, (self.H - self.W) // 2 + self.W, self.H))
             bg = bg.resize((self.W // 6, self.H // 6)).filter(ImageFilter.GaussianBlur(4)).resize((self.W, self.H), Image.BILINEAR)
             bg = Image.blend(bg, Image.new("RGB", bg.size, (235, 246, 255)), 0.25)
@@ -129,9 +134,10 @@ def srt_time(s):
     return f"{h:02d}:{m:02d}:{sec:02d},{ms:03d}"
 
 def main():
-    edl_path, clips, lang, fmt, out = sys.argv[1:6]; cta = "--cta" in sys.argv
+    edl_path, clips, lang, fmt, out = sys.argv[1:6]; cta = "--cta" in sys.argv or "--launch" in sys.argv
     edl = json.load(open(edl_path, encoding="utf-8"))
     caps = json.load(open(os.path.join(HERE, "video_captions.json"), encoding="utf-8"))[lang]
+    if "--launch" in sys.argv: caps["cta"] = caps["cta_launch"]  # yayından sonra kullanılacak sürüm
     comp = Composer(fmt, lang, caps)
     music = os.path.join(os.path.dirname(out), "_music.wav")
     subprocess.run([sys.executable, os.path.join(HERE, "music.py"), music, str(edl["total"])], check=True, capture_output=True)
@@ -144,7 +150,7 @@ def main():
         text = caps["captions"].get(seg.get("caption", ""), "")
         if text: srt.append((t, t + seg["dur"], text))
         for i, fr in enumerate(frames):
-            img = comp.frame(fr, text)
+            img = comp.frame(fr, text, seg.get("fit") == "full")
             if prev is not None and i < XF: img = Image.blend(prev, img, (i + 1) / (XF + 1))
             enc.stdin.write(img.tobytes())
             last = img

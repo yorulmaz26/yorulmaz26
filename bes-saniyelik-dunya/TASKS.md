@@ -10,12 +10,16 @@
 - [x] 8 güçlendirme (kalkan, mıknatıs, çift zıplama, dokunulmazlık, ekstra can, altın çarpanı, yıldız algılayıcı, kontrol noktası koruması)
 - [x] 20 ekran, programatik grafikler ve sesler
 - [x] Güvenilir kayıt (CRC, atomik yazma, yedek, sürüm göçü)
-- [x] Otomatik testler (74 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
+- [x] Kalıcı can sistemi (20 dk yenilenme, saat koruması)
+- [x] 6 dil ve İngilizce ad "Stopwatch Shuffle"; mağaza görselleri, videolar, sosyal medya paketi (RELEASE_PACKAGE)
+- [x] Otomatik testler (99 birim/entegrasyon testi + masaüstü arayüz oynatma turu)
 - [x] Reklam: Google AdMob ile isteğe bağlı ödüllü reklamlar, seyrek geçiş reklamı ve yalnızca liste menülerinde afiş (deneme kimlikleriyle)
 - [x] Reklam kodunun bağımsız incelemesi (2 inceleyici + doğrulayıcı); bulunan 19 sorun düzeltildi
 - [x] Debug APK, release APK, release AAB
 
 ## Kullanıcı onayı / erişimi gerektiren
+- [ ] Marka tescil araştırması (Stopwatch Shuffle) ve çevirilerin ana dili konuşanlarca okunması
+- [ ] Tanıtım videosunu YouTube'a yükleyip Play Console'a bağlantı girmek
 - [ ] Google Play yükleme anahtarı: `keystore.properties` (örnek: `keystore.properties.example`) oluşturulup `./gradlew :android:bundleRelease` yeniden çalıştırılmalı. Şu anki release çıktıları **hata ayıklama anahtarıyla** imzalıdır (kurulum ve deneme için uygundur, Play'e yüklenemez).
 - [ ] Play Console: geliştirici hesabı, gizlilik politikası sayfasının yayımlanması, uygulama içeriği formları ve mağaza sayfası. Adım adım: `docs/play_store/YAYIN_REHBERI.md`; metinler `docs/play_store/magaza_metinleri.md`; gizlilik metni `docs/play_store/gizlilik_politikasi.md`; 8 ekran görüntüsü `docs/play_store/ekran_goruntuleri/`; simge `docs/play_icon_512.png`; öne çıkan görsel `docs/play_feature_graphic.png`.
 - [ ] Yeni kişisel hesapta kapalı test: en az 12 kullanıcı, 14 gün kesintisiz; ardından üretim erişimi başvurusu.

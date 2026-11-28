@@ -35,6 +35,7 @@ fun main(args: Array<String>) {
     val record = System.getProperty("record")
     val store = System.getProperty("store")
     when {
+        System.getProperty("perf") != null -> game.debugHook = PerfTour(System.getProperty("perf"))::step
         record != null -> game.debugHook = MediaTour(record, MediaTour.Mode.RECORD)::step
         store != null -> game.debugHook = MediaTour(store, MediaTour.Mode.STORE)::step
         shots != null -> game.debugHook = ScreenshotTour(shots, fakeAds)::step
@@ -444,5 +445,55 @@ class MediaTour(private val dir: String, private val mode: Mode) {
         for (y in 0 until pm.height) flipped.drawPixmap(pm, 0, y, pm.width, 1, 0, pm.height - 1 - y, pm.width, 1)
         PixmapIO.writePNG(Gdx.files.absolute("$dir/$name.png"), flipped)
         pm.dispose(); flipped.dispose()
+    }
+}
+
+/**
+ * Performans ve bellek ölçümü: bölümleri art arda (gerçek hızda) oynatır; her bölüm sonunda çöp toplama sonrası
+ * kullanılan bellek ve kare süreleri yazılır. Bellek bölümden bölüme artmıyorsa sızıntı yoktur.
+ */
+class PerfTour(private val out: String) {
+    private val levels = (System.getProperty("perfLevels") ?: "12,61,160,215,280,330,377,420,470,500,12,61").split(",").map { it.trim().toInt() }
+    private var idx = -1
+    private var screen: GameScreen? = null
+    private var frames = 0
+    private var last = 0L
+    private val times = ArrayList<Long>()
+    private val log = StringBuilder()
+    private val t0 = System.nanoTime()
+    private var waitFrames = 90
+
+    private fun usedMb(): Long { System.gc(); System.gc(); val r = Runtime.getRuntime(); return (r.totalMemory() - r.freeMemory()) / (1024 * 1024) }
+
+    fun step(game: BesSaniyelikDunya, frame: Int) {
+        val now = System.nanoTime()
+        if (last != 0L && screen != null) times.add(now - last)
+        last = now
+        if (frame == 1) log.append("ilk kare: %.2f sn\n".format((now - t0) / 1e9))
+        if (waitFrames > 0) { waitFrames--; return }
+        val s = screen
+        if (s != null) {
+            frames++
+            if (frames == 20) { val p = Gdx.input.inputProcessor; p?.touchDown(10, 10, 0, 0); p?.touchUp(10, 10, 0, 0) }
+            val st = s.simulation.status
+            if (st == com.besaniyelik.dunya.sim.SimStatus.COMPLETE || st == com.besaniyelik.dunya.sim.SimStatus.GAME_OVER || frames > 60 * 120) {
+                val sorted = times.sorted()
+                val avg = times.average() / 1e6; val p95 = sorted[(sorted.size * 0.95).toInt().coerceAtMost(sorted.size - 1)] / 1e6
+                log.append("bölüm ${levels[idx]}: $st, kare ${times.size}, ort %.1f ms, p95 %.1f ms, bellek ${usedMb()} MB, java heap max ${Runtime.getRuntime().maxMemory() / 1048576} MB\n".format(avg, p95))
+                screen = null; times.clear(); waitFrames = 30
+                game.go(MainMenuScreen(game))
+            }
+            return
+        }
+        idx++
+        if (idx >= levels.size) {
+            log.append("menüdeyken bellek: ${usedMb()} MB\n")
+            java.io.File(out).writeText(log.toString()); Gdx.app.exit(); return
+        }
+        if (idx == 0) log.append("başlangıç belleği: ${usedMb()} MB\n")
+        val lv = com.besaniyelik.dunya.level.LevelRepository.level(levels[idx])
+        val g = GameScreen(game, lv, null, emptyList())
+        g.autoplay = com.besaniyelik.dunya.level.InputTrack(lv.solution.toIntArray())
+        game.go(g); screen = g; frames = 0; times.clear(); waitFrames = 0
     }
 }

@@ -48,3 +48,11 @@ Ayrıntılı sonuçlar: `TEST_REPORT.md`. Mimari: `ARCHITECTURE.md`. Kalan işle
 * Reklam kodu iki bağımsız inceleyici ve bir doğrulayıcıyla incelendi (ilk deneme kullanım sınırına takılmıştı); bulunan 19 sorun düzeltildi: reklam açılırken ekran kilidi, mağaza elmas kartının kaybolması, Sonsuz Dünya sonucunun diriliş sorusu sırasında kaybolması, afişin yeniden yüklenmemesi ve içeriğin üstüne binmesi, geri tuşu odağı, yanlış yazılmış reklam kimliğinin derlemede yakalanması, saat geri alınarak günlük sınırın sıfırlanması ve diğerleri.
 * Değiştirilmeyen bilinen sınır: ödüllü reklam açıkken uygulama simgesinden dönülürse reklam ödülsüz kapanır (`launchMode="singleTask"`; gerçek cihazda denenmeden değiştirilmedi).
 * Afişin ve reklamların gerçek cihazdaki davranışı hâlâ denenmedi.
+
+### 28 Kasım — küresel yayın hazırlığı (sürüm 1.1.0)
+
+* Kalıcı can sistemi: en fazla 3 can, 20 dakikada 1 yenilenir (oyun kapalıyken de), saat oynamalarına dayanıklı (monotonik saat + açılış sayacı), "Canların bitti" penceresi, reklamla +1 can, elmasla doldurma. Bölüm içi canların adı "kalp" oldu.
+* 6 dil (tr, en, de, it, fr, es): telefon dilinden otomatik seçim, ayarlardan anında değiştirme, 708 metin, eksik çeviri 0.
+* İngilizce ad "Stopwatch Shuffle" (33 adaylı araştırma), iki dilli logo ve marka paketi, Magic Lumos Software.
+* Mağaza görselleri (48 telefon, 16 tablet, 2 kapak), 16 sosyal medya görseli, 8 tanıtım videosu, 6 dilde mağaza metinleri.
+* Testler 99/99. Ayrıntı: `RELEASE_PACKAGE/11_Final_Report/FINAL_RELEASE_REPORT.md`.

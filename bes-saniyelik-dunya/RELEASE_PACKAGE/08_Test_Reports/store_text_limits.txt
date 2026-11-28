@@ -1,0 +1,6 @@
+store_listing_de.md ad 17/30 | kısa 71/80 | tam 1716/4000 | notlar 209/500
+store_listing_en.md ad 17/30 | kısa 76/80 | tam 1452/4000 | notlar 191/500
+store_listing_es.md ad 17/30 | kısa 80/80 | tam 1750/4000 | notlar 194/500
+store_listing_fr.md ad 17/30 | kısa 80/80 | tam 1746/4000 | notlar 201/500
+store_listing_it.md ad 17/30 | kısa 78/80 | tam 1694/4000 | notlar 195/500
+store_listing_tr.md ad 17/30 | kısa 79/80 | tam 1480/4000 | notlar 159/500
