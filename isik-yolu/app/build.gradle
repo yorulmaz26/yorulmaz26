@@ -31,6 +31,9 @@ android {
         versionName '1.8.0'
     }
 
+    // yalnızca oyunun dilleri: kütüphanelerin diğer dillerdeki kaynakları APK'ya girmez
+    androidResources { localeFilters += ['tr', 'en', 'de', 'it', 'fr', 'es'] }
+
     buildFeatures { buildConfig true }
     defaultConfig.buildConfigField 'String', 'PRIVACY_URL', "\"${privacyUrl}\""
 

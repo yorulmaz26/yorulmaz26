@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+ yedekleme: yalnızca oyun ilerlemesi ve dil seçimi (reklam SDK'sının dosyaları yedeklenmez) -->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="sharedpref" path="isik_yolu.xml" />
+        <include domain="sharedpref" path="isik_yolu_dil.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="sharedpref" path="isik_yolu.xml" />
+        <include domain="sharedpref" path="isik_yolu_dil.xml" />
+    </device-transfer>
+</data-extraction-rules>
