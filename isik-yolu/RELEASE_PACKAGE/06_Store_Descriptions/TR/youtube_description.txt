@@ -1,0 +1,9 @@
+Işık Yolu (Prismway), ışığı aynalarla yönlendirdiğin bir mantık bulmacası. Aynaları döndür, prizmalarla ışığı renklerine ayır, taşları kaydır, anahtarlarla kapıları aç.
+
+• 500 bölüm, 5 dünya
+• Her gün yeni bulmaca
+• İnternetsiz oynanır
+• 6 dil
+
+Videodaki tüm görüntüler oyunun gerçek oynanışıdır.
+Magic Lumos Software
