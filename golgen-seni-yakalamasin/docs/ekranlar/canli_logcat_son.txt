@@ -1,300 +1,300 @@
-11-28 17:54:37.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
-11-28 17:54:37.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
-11-28 17:54:37.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-28 17:54:37.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-28 17:54:37.529 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-28 17:54:37.724 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-28 17:54:37.725 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-28 17:54:37.730 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-28 17:54:37.731 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-28 17:54:37.731 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-28 17:54:37.731 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-28 17:54:37.731 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-28 17:54:37.731 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-28 17:54:37.731 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-28 17:54:37.731 I/GolgenUI( 2719): ekran=MissionsScreen
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-28 17:54:37.732 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-28 17:54:37.733 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-28 17:54:39.359 I/GolgenUI( 2719): dokunma a=0 x=170 y=784 fade=0 ekranAdi=MissionsScreen
-11-28 17:54:39.431 I/GolgenUI( 2719): dokunma a=1 x=170 y=784 fade=0 ekranAdi=MissionsScreen
-11-28 17:54:39.435 I/GolgenUI( 2719): hedef ekran=LivesDialog ad=can-elmas x=540 y=1355
-11-28 17:54:39.435 I/GolgenUI( 2719): hedef ekran=LivesDialog ad=can-kapat x=540 y=1499
-11-28 17:54:39.435 I/GolgenUI( 2719): hedef ekran=LivesDialog ad=can-elmas x=540 y=1355
-11-28 17:54:39.436 I/GolgenUI( 2719): hedef ekran=LivesDialog ad=can-kapat x=540 y=1499
-11-28 17:54:39.436 I/GolgenUI( 2719): hedef ekran=LivesDialog ad=can-elmas x=540 y=1355
-11-28 17:54:39.436 I/GolgenUI( 2719): hedef ekran=LivesDialog ad=can-kapat x=540 y=1499
-11-28 17:54:42.684 I/GolgenUI( 2719): dokunma a=0 x=540 y=1499 fade=0 ekranAdi=MissionsScreen
-11-28 17:54:42.768 I/GolgenUI( 2719): dokunma a=1 x=540 y=1499 fade=0 ekranAdi=MissionsScreen
-11-28 17:54:42.769 I/GolgenUI( 2719): tik ad=can-kapat
-11-28 17:54:42.774 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-28 17:54:42.774 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=can-doldur x=885 y=466
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-28 17:54:42.775 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-28 17:54:42.776 I/GolgenFPS( 2719): fps=22.2 ekran=MissionsScreen
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=can-doldur x=885 y=466
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
-11-28 17:54:44.528 I/GolgenUI( 2719): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
-11-28 17:54:44.529 I/GolgenUI( 2719): dil=tr
-11-28 17:54:44.753 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:54:44.755 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:54:44.755 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:54:44.755 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:54:44.756 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:54:44.757 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:54:44.757 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:54:44.757 I/GolgenUI( 2719): ekran=MenuScreen
-11-28 17:54:44.757 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:54:44.758 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:54:44.758 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:54:44.758 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:54:44.758 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:54:44.758 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:54:44.758 I/GolgenUI( 2719): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:54:46.999 W/ActivityManager(  521): setHasOverlayUi called on unknown pid: 2719
-11-28 17:54:47.497 I/GolgenUI( 8427): ekran=LogoScreen
-11-28 17:54:54.263 I/GolgenFPS( 8427): fps=31.1 ekran=LogoScreen
-11-28 17:54:56.759 I/GolgenUI( 8427): ekran=SplashScreen
-11-28 17:54:59.397 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:54:59.398 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:54:59.398 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:54:59.398 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:54:59.398 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:54:59.398 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:54:59.398 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:54:59.399 I/GolgenUI( 8427): ekran=MenuScreen
-11-28 17:54:59.399 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:54:59.399 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:54:59.403 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:54:59.403 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:54:59.403 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:54:59.403 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:54:59.403 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:54:59.677 I/GolgenFPS( 8427): fps=31.9 ekran=MenuScreen
-11-28 17:55:06.027 I/GolgenAds( 8427): SDK hazır
-11-28 17:55:07.016 I/GolgenFPS( 8427): fps=21.1 ekran=MenuScreen
-11-28 17:55:12.812 I/GolgenAds( 8427): banner yüklendi
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:12.814 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:12.834 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:12.835 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:12.838 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:12.839 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:12.839 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:12.839 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:12.839 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:12.939 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:12.940 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:12.941 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:12.941 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:12.942 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:12.942 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:12.942 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:13.096 I/GolgenAds( 8427): geçiş reklamı hazır
-11-28 17:55:14.984 I/GolgenFPS( 8427): fps=20.6 ekran=MenuScreen
-11-28 17:55:15.912 I/GolgenAds( 8427): ödüllü video hazır
-11-28 17:55:16.294 I/GolgenUI( 8427): dokunma a=0 x=540 y=1595 fade=0 ekranAdi=MenuScreen
-11-28 17:55:16.296 I/GolgenUI( 8427): dokunma a=1 x=540 y=1595 fade=0 ekranAdi=MenuScreen
-11-28 17:55:16.296 I/GolgenUI( 8427): tik ad=menu.play
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.resume x=540 y=1025
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.restart x=540 y=1185
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.main_menu x=540 y=1345
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.resume x=540 y=1025
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.restart x=540 y=1185
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.main_menu x=540 y=1345
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-28 17:55:16.508 I/GolgenUI( 8427): ekran=PlayScreen
-11-28 17:55:16.508 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
-11-28 17:55:19.446 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.resume x=540 y=1025
-11-28 17:55:19.446 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.restart x=540 y=1185
-11-28 17:55:19.446 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=play.pause.main_menu x=540 y=1345
-11-28 17:55:19.446 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
-11-28 17:55:19.447 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
-11-28 17:55:19.450 I/GolgenUI( 8427): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
-11-28 17:55:20.224 I/GolgenUI( 8427): dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
-11-28 17:55:20.273 I/GolgenUI( 8427): dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
-11-28 17:55:20.273 I/GolgenUI( 8427): tik ad=play.pause.main_menu
-11-28 17:55:20.457 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:20.457 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:20.457 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:20.457 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:20.457 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:20.458 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:20.459 I/GolgenUI( 8427): ekran=MenuScreen
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:20.461 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:21.478 I/GolgenFPS( 8427): fps=23.1 ekran=MenuScreen
-11-28 17:55:21.553 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:55:21.553 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:55:21.556 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:55:21.556 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:55:21.556 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:55:21.556 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:21.556 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:21.776 I/GolgenAds( 8427): geçiş reklamı gösterildi
-11-28 17:55:22.020 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:55:22.024 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:55:22.024 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:55:22.024 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:55:22.024 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:55:22.025 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:22.025 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:25.991 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:26.243 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:26.244 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:26.244 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:26.244 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:26.244 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:26.245 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:26.249 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:27.742 I/GolgenAds( 8427): geçiş reklamı hazır
-11-28 17:55:28.377 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:55:28.377 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:55:28.378 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:55:28.378 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:55:28.378 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:55:28.378 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:28.379 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:28.586 I/GolgenAds( 8427): ödüllü video gösterildi
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:28.978 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:35.062 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
-11-28 17:55:35.369 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
-11-28 17:55:35.370 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
-11-28 17:55:35.370 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
-11-28 17:55:35.370 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
-11-28 17:55:35.370 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
-11-28 17:55:35.370 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
-11-28 17:55:35.370 I/GolgenUI( 8427): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:24:49.326 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-28 19:24:49.326 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-28 19:24:49.327 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-28 19:24:49.327 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-28 19:24:49.327 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-28 19:24:49.327 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-28 19:24:49.328 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-28 19:24:49.328 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-28 19:24:49.328 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-28 19:24:49.328 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-28 19:24:49.329 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-28 19:24:49.329 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-28 19:24:49.523 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-28 19:24:49.524 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
+11-28 19:24:49.525 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
+11-28 19:24:49.525 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
+11-28 19:24:49.526 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-28 19:24:49.526 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-28 19:24:49.526 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-28 19:24:49.526 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-28 19:24:49.526 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-28 19:24:49.528 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-28 19:24:49.528 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-28 19:24:49.528 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-28 19:24:49.529 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-28 19:24:49.530 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-28 19:24:49.531 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-28 19:24:49.532 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-28 19:24:49.532 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-28 19:24:49.532 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-28 19:24:49.532 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-28 19:24:49.532 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-28 19:24:49.532 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-28 19:24:49.533 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-28 19:24:49.533 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-28 19:24:49.533 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-28 19:24:49.533 I/GolgenUI( 2565): ekran=MissionsScreen
+11-28 19:24:49.534 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-28 19:24:49.534 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
+11-28 19:24:49.534 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
+11-28 19:24:49.534 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
+11-28 19:24:49.534 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-28 19:24:49.534 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-28 19:24:49.561 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-28 19:24:49.561 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-28 19:24:49.561 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-28 19:24:49.562 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-28 19:24:51.060 I/GolgenUI( 2565): dokunma a=0 x=170 y=784 fade=0 ekranAdi=MissionsScreen
+11-28 19:24:51.130 I/GolgenUI( 2565): dokunma a=1 x=170 y=784 fade=0 ekranAdi=MissionsScreen
+11-28 19:24:51.197 I/GolgenUI( 2565): hedef ekran=LivesDialog ad=can-elmas x=540 y=1355
+11-28 19:24:51.198 I/GolgenUI( 2565): hedef ekran=LivesDialog ad=can-kapat x=540 y=1499
+11-28 19:24:51.198 I/GolgenUI( 2565): hedef ekran=LivesDialog ad=can-elmas x=540 y=1355
+11-28 19:24:51.201 I/GolgenUI( 2565): hedef ekran=LivesDialog ad=can-kapat x=540 y=1499
+11-28 19:24:51.201 I/GolgenUI( 2565): hedef ekran=LivesDialog ad=can-elmas x=540 y=1355
+11-28 19:24:51.202 I/GolgenUI( 2565): hedef ekran=LivesDialog ad=can-kapat x=540 y=1499
+11-28 19:24:51.203 I/GolgenFPS( 2565): fps=22.9 ekran=MissionsScreen
+11-28 19:24:55.122 I/GolgenUI( 2565): dokunma a=0 x=540 y=1499 fade=0 ekranAdi=MissionsScreen
+11-28 19:24:55.226 I/GolgenUI( 2565): dokunma a=1 x=540 y=1499 fade=0 ekranAdi=MissionsScreen
+11-28 19:24:55.227 I/GolgenUI( 2565): tik ad=can-kapat
+11-28 19:24:55.230 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-28 19:24:55.232 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
+11-28 19:24:55.233 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
+11-28 19:24:55.233 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
+11-28 19:24:55.234 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=can-doldur x=885 y=466
+11-28 19:24:55.234 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-28 19:24:55.234 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-28 19:24:55.235 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-28 19:24:55.235 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-28 19:24:55.235 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-28 19:24:55.235 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-28 19:24:55.235 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-28 19:24:55.236 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-28 19:24:56.982 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=ikon-3 x=96 y=216
+11-28 19:24:56.982 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.maps x=226 y=356
+11-28 19:24:56.982 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.daily x=540 y=356
+11-28 19:24:56.983 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=missions.tab.achievements x=853 y=356
+11-28 19:24:56.983 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=can-doldur x=885 y=466
+11-28 19:24:56.983 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-0 x=170 y=784
+11-28 19:24:56.983 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-1 x=355 y=884
+11-28 19:24:56.983 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-2 x=540 y=784
+11-28 19:24:56.983 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-3 x=725 y=884
+11-28 19:24:56.984 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-4 x=910 y=784
+11-28 19:24:56.984 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-5 x=170 y=1282
+11-28 19:24:56.984 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-6 x=355 y=1382
+11-28 19:24:56.984 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-7 x=540 y=1282
+11-28 19:24:56.986 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-8 x=725 y=1382
+11-28 19:24:56.987 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-9 x=910 y=1282
+11-28 19:24:56.987 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-10 x=170 y=1780
+11-28 19:24:56.987 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-11 x=355 y=1880
+11-28 19:24:56.987 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-12 x=540 y=1780
+11-28 19:24:56.987 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-13 x=725 y=1880
+11-28 19:24:56.987 I/GolgenUI( 2565): hedef ekran=MissionsScreen ad=bolum-14 x=910 y=1780
+11-28 19:24:56.988 I/GolgenUI( 2565): dil=tr
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:24:57.275 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:24:57.276 I/GolgenUI( 2565): ekran=MenuScreen
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:24:57.276 I/GolgenUI( 2565): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:24:59.545 W/ActivityManager(  518): setHasOverlayUi called on unknown pid: 2565
+11-28 19:25:00.059 I/GolgenUI( 8460): ekran=LogoScreen
+11-28 19:25:07.641 I/GolgenFPS( 8460): fps=27.8 ekran=LogoScreen
+11-28 19:25:10.240 I/GolgenUI( 8460): ekran=SplashScreen
+11-28 19:25:12.968 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:25:12.968 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:25:12.970 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:25:12.970 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:25:12.970 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:25:12.970 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:12.970 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:12.971 I/GolgenUI( 8460): ekran=MenuScreen
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:12.971 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:13.276 I/GolgenFPS( 8460): fps=29.6 ekran=MenuScreen
+11-28 19:25:21.161 I/GolgenFPS( 8460): fps=20.5 ekran=MenuScreen
+11-28 19:25:21.754 I/GolgenAds( 8460): SDK hazır
+11-28 19:25:22.640 W/ActivityManager(  518): Slow operation: 61ms so far, now at startProcess: returned from zygote!
+11-28 19:25:22.641 W/ActivityManager(  518): Slow operation: 62ms so far, now at startProcess: done updating battery stats
+11-28 19:25:22.641 W/ActivityManager(  518): Slow operation: 62ms so far, now at startProcess: building log message
+11-28 19:25:22.641 W/ActivityManager(  518): Slow operation: 62ms so far, now at startProcess: starting to update pids map
+11-28 19:25:22.642 W/ActivityManager(  518): Slow operation: 62ms so far, now at startProcess: done updating pids map
+11-28 19:25:29.322 I/GolgenFPS( 8460): fps=20.7 ekran=MenuScreen
+11-28 19:25:29.769 I/GolgenAds( 8460): geçiş reklamı hazır
+11-28 19:25:30.941 I/GolgenAds( 8460): banner yüklendi
+11-28 19:25:30.957 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:30.958 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:30.959 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:30.959 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:30.959 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:30.960 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:30.960 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:30.978 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:30.979 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:30.980 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:30.980 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:30.980 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:30.981 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:30.981 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:31.089 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:31.089 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:31.089 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:31.090 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:31.090 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:31.091 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:31.091 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:34.503 I/GolgenAds( 8460): ödüllü video hazır
+11-28 19:25:34.622 I/GolgenUI( 8460): dokunma a=0 x=540 y=1595 fade=0 ekranAdi=MenuScreen
+11-28 19:25:34.625 I/GolgenUI( 8460): dokunma a=1 x=540 y=1595 fade=0 ekranAdi=MenuScreen
+11-28 19:25:34.626 I/GolgenUI( 8460): tik ad=menu.play
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.resume x=540 y=1025
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.restart x=540 y=1185
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.main_menu x=540 y=1345
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-28 19:25:34.836 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.resume x=540 y=1025
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.restart x=540 y=1185
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.main_menu x=540 y=1345
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-28 19:25:34.837 I/GolgenUI( 8460): ekran=PlayScreen
+11-28 19:25:34.837 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-1 x=988 y=214
+11-28 19:25:37.645 I/GolgenFPS( 8460): fps=21.9 ekran=PlayScreen
+11-28 19:25:38.094 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.resume x=540 y=1025
+11-28 19:25:38.094 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.restart x=540 y=1185
+11-28 19:25:38.094 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=play.pause.main_menu x=540 y=1345
+11-28 19:25:38.094 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-7 x=380 y=1530
+11-28 19:25:38.094 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-9 x=540 y=1530
+11-28 19:25:38.095 I/GolgenUI( 8460): hedef ekran=PlayScreen ad=ikon-10 x=700 y=1530
+11-28 19:25:39.027 I/GolgenUI( 8460): dokunma a=0 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-28 19:25:39.091 I/GolgenUI( 8460): dokunma a=1 x=540 y=1345 fade=0 ekranAdi=PlayScreen
+11-28 19:25:39.095 I/GolgenUI( 8460): tik ad=play.pause.main_menu
+11-28 19:25:39.358 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:39.359 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:39.359 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:39.359 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:39.359 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:39.359 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:39.359 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:39.360 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:39.361 I/GolgenUI( 8460): ekran=MenuScreen
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:39.361 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:40.431 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:25:40.432 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:25:40.432 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:25:40.432 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:25:40.432 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:25:40.432 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:40.432 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:40.637 I/GolgenAds( 8460): geçiş reklamı gösterildi
+11-28 19:25:41.097 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:25:41.097 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:25:41.097 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:25:41.097 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:25:41.098 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:25:41.098 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:41.098 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:44.962 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:45.119 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:45.120 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:45.120 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:45.120 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:45.121 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:45.121 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:45.121 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:47.288 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:25:47.289 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:25:47.289 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:25:47.289 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:25:47.289 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:25:47.289 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:47.290 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:47.483 I/GolgenAds( 8460): geçiş reklamı hazır
+11-28 19:25:47.534 I/GolgenAds( 8460): ödüllü video gösterildi
+11-28 19:25:48.075 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1763
+11-28 19:25:48.075 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1962
+11-28 19:25:48.076 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=2167
+11-28 19:25:48.076 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=2167
+11-28 19:25:48.078 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=2167
+11-28 19:25:48.078 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:48.079 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:54.545 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:54.545 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:54.545 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:54.546 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:54.546 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:54.546 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:54.546 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
+11-28 19:25:54.929 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.play x=540 y=1595
+11-28 19:25:54.930 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=haritalar x=540 y=1794
+11-28 19:25:54.930 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.character x=244 y=1999
+11-28 19:25:54.931 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.tasks x=540 y=1999
+11-28 19:25:54.932 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=menu.records x=836 y=1999
+11-28 19:25:54.932 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-2 x=984 y=216
+11-28 19:25:54.933 I/GolgenUI( 8460): hedef ekran=MenuScreen ad=ikon-17 x=848 y=216
