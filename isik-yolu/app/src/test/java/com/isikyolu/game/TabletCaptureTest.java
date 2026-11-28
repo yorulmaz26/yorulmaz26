@@ -97,13 +97,15 @@ public class TabletCaptureTest {
         GameScreen gs = (GameScreen) act.currentScreen();
         Level l = Game.levels().get(id);
         java.util.List<Move> sol = Solver.solve(new Board(l), 500_000).moves;
-        for (int i = 0; i < Math.min(moves, sol.size()); i++) {
+        int n = Math.min(moves, sol.size());
+        for (int i = 0; i < n; i++) {
             Move m = sol.get(i);
             int x = m.cell % l.width, y = m.cell / l.width;
             assertTrue(m.kind == Move.ROTATE ? gs.onRotate(x, y) : gs.onPush(x, y, m.dir));
-            warm(12);
+            // son hamlede kısa bekleme: hedefler yanarken çekilir, "Tamamlandı" penceresi açılmadan
+            // (Robolectric kazanmadan hemen sonra test saatini ileri sarabiliyor)
+            warm(i == n - 1 ? 3 : 12);
         }
-        warm(25);
     }
 
     private void capture(String sub) throws Exception {

@@ -1,0 +1,67 @@
+{
+ "language": "en",
+ "fps": 30,
+ "crossfade_frames": 8,
+ "segments": [
+  {
+   "start": 0.0,
+   "end": 3.1333333333333333,
+   "title": "Guide the light!",
+   "sub": ""
+  },
+  {
+   "start": 3.1333333333333333,
+   "end": 5.833333333333334,
+   "title": "Rotate the mirrors",
+   "sub": "Light up every target"
+  },
+  {
+   "start": 5.833333333333334,
+   "end": 8.533333333333333,
+   "title": "Split colors with prisms",
+   "sub": ""
+  },
+  {
+   "start": 8.533333333333333,
+   "end": 11.333333333333332,
+   "title": "Every level, a new puzzle",
+   "sub": ""
+  },
+  {
+   "start": 11.333333333333332,
+   "end": 14.166666666666666,
+   "title": "Slide the stones",
+   "sub": ""
+  },
+  {
+   "start": 14.166666666666666,
+   "end": 17.4,
+   "title": "5 worlds · 500 levels",
+   "sub": ""
+  },
+  {
+   "start": 17.4,
+   "end": 19.466666666666665,
+   "title": "Keys and doors",
+   "sub": ""
+  },
+  {
+   "start": 19.466666666666665,
+   "end": 21.333333333333332,
+   "title": "Your own style",
+   "sub": ""
+  },
+  {
+   "start": 21.333333333333332,
+   "end": 26.933333333333334,
+   "title": "Collect all 3 stars",
+   "sub": ""
+  },
+  {
+   "start": 26.933333333333334,
+   "end": 30.0,
+   "title": "END",
+   "sub": ""
+  }
+ ]
+}

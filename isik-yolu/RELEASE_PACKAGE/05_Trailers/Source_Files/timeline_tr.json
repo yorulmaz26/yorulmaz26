@@ -1,0 +1,67 @@
+{
+ "language": "tr",
+ "fps": 30,
+ "crossfade_frames": 8,
+ "segments": [
+  {
+   "start": 0.0,
+   "end": 3.1333333333333333,
+   "title": "Işığı yönlendir!",
+   "sub": ""
+  },
+  {
+   "start": 3.1333333333333333,
+   "end": 5.833333333333334,
+   "title": "Aynaları döndür",
+   "sub": "Bütün hedefleri yak"
+  },
+  {
+   "start": 5.833333333333334,
+   "end": 8.533333333333333,
+   "title": "Prizmalarla renkleri ayır",
+   "sub": ""
+  },
+  {
+   "start": 8.533333333333333,
+   "end": 11.333333333333332,
+   "title": "Her bölüm yeni bir bulmaca",
+   "sub": ""
+  },
+  {
+   "start": 11.333333333333332,
+   "end": 14.166666666666666,
+   "title": "Taşları kaydır",
+   "sub": ""
+  },
+  {
+   "start": 14.166666666666666,
+   "end": 17.4,
+   "title": "5 dünya · 500 bölüm",
+   "sub": ""
+  },
+  {
+   "start": 17.4,
+   "end": 19.466666666666665,
+   "title": "Anahtarlar ve kapılar",
+   "sub": ""
+  },
+  {
+   "start": 19.466666666666665,
+   "end": 21.333333333333332,
+   "title": "Kendi tarzın",
+   "sub": ""
+  },
+  {
+   "start": 21.333333333333332,
+   "end": 26.933333333333334,
+   "title": "3 yıldızı topla",
+   "sub": ""
+  },
+  {
+   "start": 26.933333333333334,
+   "end": 30.0,
+   "title": "END",
+   "sub": ""
+  }
+ ]
+}

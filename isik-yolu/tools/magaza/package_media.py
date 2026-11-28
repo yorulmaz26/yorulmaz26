@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import zipfile
 
+from PIL import Image
+
 LANGS = ["tr", "en", "de", "it", "fr", "es"]
 LIMIT = 30 * 1024 * 1024
 TRAILER_CLIPS = ["f_mantik", "a_temel", "b_prizma", "y_karma", "d_blok", "h_bolumler", "e_kapi", "g_gorunum", "c_renk"]
@@ -29,7 +31,8 @@ def tablets(rec, out):
             for i, (k, v) in enumerate(TABLET_NAMES.items(), 1):
                 f = os.path.join(src, k + ".png")
                 if os.path.exists(f):
-                    shutil.copy(f, os.path.join(od, f"{lang}_{sub}_{i:02d}_{v}.png")); n += 1
+                    # kayıt ARGB'dir (tam opak): Play için alfasız 24 bit PNG
+                    Image.open(f).convert("RGB").save(os.path.join(od, f"{lang}_{sub}_{i:02d}_{v}.png"), optimize=True); n += 1
     print("tablet görüntüleri:", n)
 
 
