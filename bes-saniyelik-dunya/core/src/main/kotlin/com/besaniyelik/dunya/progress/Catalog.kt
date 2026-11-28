@@ -1,6 +1,7 @@
 package com.besaniyelik.dunya.progress
 
 import com.besaniyelik.dunya.level.PowerupType
+import com.besaniyelik.dunya.i18n.L
 import kotlinx.serialization.Serializable
 
 /** Kozmetik içeriğin nasıl açılacağı. Hepsi oynayarak elde edilebilir; ücretli güç avantajı yoktur. */
@@ -13,33 +14,44 @@ sealed class Unlock {
     data class TotalStars(val stars: Int) : Unlock()
 
     fun describe(): String = when (this) {
-        Default -> "Başlangıç karakteri"
-        is Coins -> "$price altın"
-        is Gems -> "$price elmas"
-        is PlayerLevel -> "Oyuncu seviyesi $level"
-        is Collection -> "${com.besaniyelik.dunya.level.GameContent.maps[map - 1].name} koleksiyonu"
-        is TotalStars -> "Toplam $stars yıldız"
+        Default -> L.t("unlock.default")
+        is Coins -> L.n("unit.coins", price)
+        is Gems -> L.n("unit.gems", price)
+        is PlayerLevel -> L.t("unlock.level", "n" to level)
+        is Collection -> L.t("unlock.collection", "map" to com.besaniyelik.dunya.level.GameContent.maps[map - 1].name)
+        is TotalStars -> L.n("unlock.stars", stars)
     }
 }
 
 /** Karakter görünümü. Renkler 0xRRGGBB. */
 class Skin(
     val id: String,
-    val name: String,
+    val trName: String,
     val body: Int,
     val belly: Int,
     val accent: Int,
     val accessory: String,
     val pattern: String,
     val unlock: Unlock,
-)
+) {
+    val name: String get() = L.t("skin.$id")
+}
 
-class Trail(val id: String, val name: String, val colors: IntArray, val shape: String, val unlock: Unlock)
+class Trail(val id: String, val trName: String, val colors: IntArray, val shape: String, val unlock: Unlock) {
+    val name: String get() = L.t("trail.$id")
+}
 
-class AchievementDef(val id: String, val title: String, val desc: String, val stat: (SaveData) -> Long, val target: Long, val gems: Int)
+class AchievementDef(val id: String, val trTitle: String, val trDesc: String, val stat: (SaveData) -> Long, val target: Long, val gems: Int) {
+    val title: String get() = L.t("ach.$id")
+    /** Açıklama türü kimliğin ön ekinden gelir: levels_10 → achdesc.levels ("{n} bölüm tamamla"). */
+    val desc: String get() {
+        val kind = if (id == "skins_20") "skins_all" else id.substringBeforeLast('_')
+        return L.n("achdesc.$kind", target)
+    }
+}
 
 @Serializable
-enum class MissionType(val label: String) {
+enum class MissionType(val trLabel: String) {
     COMPLETE_LEVELS("%d bölüm tamamla"),
     COLLECT_COINS("%d altın topla"),
     COLLECT_STARS("%d yıldız topla"),
@@ -52,16 +64,16 @@ enum class MissionType(val label: String) {
     THREE_STAR("%d bölümü 3 yıldızla bitir"),
     COLLECT_PIECE("%d gizli parça bul");
 
-    fun text(target: Int) = label.format(target)
+    fun text(target: Int) = L.n("mission.$name", target)
 }
 
 class MissionTemplate(val type: MissionType, val targets: IntArray, val coins: Int, val gems: Int, val xp: Int)
 
 class LoginReward(val coins: Int = 0, val gems: Int = 0, val powerups: Map<PowerupType, Int> = emptyMap()) {
     fun describe(): String = buildList {
-        if (coins > 0) add("$coins altın")
-        if (gems > 0) add("$gems elmas")
-        powerups.forEach { (t, n) -> add("$n ${t.title}") }
+        if (coins > 0) add(L.n("unit.coins", coins))
+        if (gems > 0) add(L.n("unit.gems", gems))
+        powerups.forEach { (t, n) -> add(L.t("reward.item", "n" to n, "item" to t.title)) }
     }.joinToString(" + ")
 }
 

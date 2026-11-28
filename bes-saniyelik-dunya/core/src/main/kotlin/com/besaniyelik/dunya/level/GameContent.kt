@@ -10,24 +10,34 @@ enum class Pattern {
 
 class MapDef(
     val id: Int,
-    val name: String,
-    val subtitle: String,
+    /** Türkçe kaynak ad (bölüm üretici); ekranda [name] gösterilir. */
+    val trName: String,
+    val trSubtitle: String,
     /** 101+ bölümlerde öne çıkan mekanikler. */
     val focus: List<Mechanic>,
     val nouns: List<String>,
     val adjectives: List<String>,
 ) {
+    val name: String get() = com.besaniyelik.dunya.i18n.L.t("map.$id.name")
+    val subtitle: String get() = com.besaniyelik.dunya.i18n.L.t("map.$id.subtitle")
     val firstLevel get() = (id - 1) * 50 + 1
     val lastLevel get() = id * 50
 }
 
 class StageIdea(
-    val title: String,
-    val desc: String,
+    /** Türkçe kaynak metin (bölüm verisindeki "idea" alanı); ekranda [title] gösterilir. */
+    val trTitle: String,
+    val trDesc: String,
     val patterns: List<Pattern>,
     val favored: List<Mechanic> = emptyList(),
     val combo: Int = 0,
-)
+) {
+    /** Alan numarası (1..100). */
+    var number: Int = 0
+        internal set
+    val title: String get() = com.besaniyelik.dunya.i18n.L.t("area.$number.title")
+    val desc: String get() = com.besaniyelik.dunya.i18n.L.t("area.$number.desc")
+}
 
 object GameContent {
     const val LEVEL_COUNT = 500
@@ -180,7 +190,7 @@ object GameContent {
         area("Efsane Zirve", "Merdivenler ve dikenler.", "STA SG CG", "", 3),
         area("Son Durak", "Her şeyden biraz.", "GB LT MP", "", 3),
         area("Kaosun Kalbi", "Öğrendiğin her şeyi kullan!", "ALL", "", 3),
-    )
+    ).also { list -> list.forEachIndexed { i, s -> s.number = i + 1 } }
 
     private fun area(title: String, desc: String, pats: String, fav: String, combo: Int): StageIdea {
         val map = mapOf("G" to Pattern.GAP, "SP" to Pattern.SPIKES, "ST" to Pattern.STEP, "F" to Pattern.FLOATING, "SA" to Pattern.SAW,
@@ -242,12 +252,24 @@ object GameContent {
     /** Bölümün zorluğu (1..10): hedef zorluğun yuvarlanmış hali (arayüz ve XP için). */
     fun difficulty(levelId: Int): Int = Math.round(targetDifficulty(levelId)).coerceIn(1, 10)
 
+    /**
+     * Bölüm adındaki sıfat ve isim sırası (harita listelerindeki indeksler). Türkçe ad bölüm verisine yazılır;
+     * diğer dillerde aynı indeksler o dilin listelerinden okunur (bkz. LevelText).
+     */
+    fun nameParts(levelId: Int, rngSeed: Long): Pair<Int, Int> {
+        val m = mapOf(levelId)
+        val r = java.util.Random(rngSeed * 31 + levelId)
+        val ai = r.nextInt(m.adjectives.size)
+        val ni = (levelId * 7 + r.nextInt(3)) % m.nouns.size
+        return ai to ni
+    }
+
     fun levelName(levelId: Int, rngSeed: Long): String {
         val kind = kindOf(levelId)
         val m = mapOf(levelId)
         return when (kind) {
             LevelKind.GRAND_FINAL -> "Büyük Final: Kaosun Kalbi"
-            LevelKind.FINAL -> "${m.name} Finali"
+            LevelKind.FINAL -> "${m.trName} Finali"
             else -> {
                 val r = java.util.Random(rngSeed * 31 + levelId)
                 val a = m.adjectives[r.nextInt(m.adjectives.size)]

@@ -173,7 +173,7 @@ class AdDirector(
     /** Günlük sayaç yalnızca YENİ bir güne geçilince sıfırlanır; cihaz tarihini geri almak sınırı sıfırlamaz. */
     private fun rollDay() {
         val today = profile.clock.epochDay()
-        if (today > data.ads.day) { data.ads.day = today; data.ads.gemAdsToday = 0 }
+        if (today > data.ads.day) { data.ads.day = today; data.ads.gemAdsToday = 0; data.ads.lifeAdsToday = 0 }
     }
 
     /** Bugün "reklam izle, elmas kazan" kaç kez daha kullanılabilir. */
@@ -191,6 +191,20 @@ class AdDirector(
         data.gems += GEMS_PER_AD
         profile.save()
         return GEMS_PER_AD
+    }
+
+    /** Bugün "reklam izle: +1 can" kaç kez daha kullanılabilir. */
+    fun lifeAdsLeft(): Int { rollDay(); return (com.besaniyelik.dunya.GameConfig.LIFE_ADS_PER_DAY - data.ads.lifeAdsToday).coerceAtLeast(0) }
+
+    /** Canlar penceresinde "reklam izle: +1 can" düğmesi gösterilsin mi (canlar dolu değilken, hak varken, reklam hazırken)? */
+    fun lifeAdOffer(livesFull: Boolean): Boolean = service.supported() && !livesFull && lifeAdsLeft() > 0 && rewardedReady
+
+    /** Reklam tamamlandıktan sonra can ödülünü verir (en fazla can sınırına kadar). Verildiyse true. */
+    fun grantLifeAd(lives: com.besaniyelik.dunya.progress.LifeService): Boolean {
+        if (lifeAdsLeft() <= 0 || lives.full) return false
+        data.ads.lifeAdsToday++
+        lives.add(com.besaniyelik.dunya.GameConfig.LIFE_AD_REWARD)
+        return true
     }
 
     /** Bugün alınmış olan giriş ödülü (reklam düğmesinde ödülü açıkça yazmak için). */

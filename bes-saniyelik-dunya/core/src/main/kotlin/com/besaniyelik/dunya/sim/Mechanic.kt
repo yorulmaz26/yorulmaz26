@@ -5,8 +5,9 @@ enum class RuleGroup { NONE, GRAVITY, TIME, SURFACE, PLATFORM, JUMP, SIZE, CONTR
 
 /** On temel dünya mekaniği. [unlockLevel] mekaniğin bölümlü modda ilk öğretildiği bölümdür. */
 enum class Mechanic(
-    val title: String,
-    val hint: String,
+    /** Türkçe kaynak metin (bölüm üretici bunu kullanır); ekranda [title] gösterilir. */
+    val trTitle: String,
+    val trHint: String,
     val unlockLevel: Int,
     val group: RuleGroup,
     /** Çakışma durumunda yüksek öncelikli kural kazanır. */
@@ -23,6 +24,13 @@ enum class Mechanic(
     REVERSE_CONTROL("Ters Kontrol", "Karakter kendi zıplar. Basılı tut, yerde kal!", 71, RuleGroup.CONTROL, 8, "m_control"),
     SLOW("Yavaş Zaman", "Zaman yavaşladı. Sakin ol ve zamanla.", 81, RuleGroup.TIME, 7, "m_slow"),
     SHIFTING("Değişen Platformlar", "Oklu platformlar yukarı aşağı kayar!", 91, RuleGroup.PLATFORM, 5, "m_shift");
+
+    /** Oyuncunun dilindeki ad, kısa açıklama ve öğretici ayrıntısı. */
+    val title: String get() = com.besaniyelik.dunya.i18n.L.t("mech.$name.title")
+    val hint: String get() = com.besaniyelik.dunya.i18n.L.t("mech.$name.hint")
+    val detail: String get() = com.besaniyelik.dunya.i18n.L.t("mech.$name.detail")
+    /** Kural seçim kartlarında tek kelimelik kısa ad. */
+    val short: String get() = com.besaniyelik.dunya.i18n.L.t("mech.$name.short")
 
     companion object {
         val learnOrder: List<Mechanic> = entries.sortedBy { it.unlockLevel }

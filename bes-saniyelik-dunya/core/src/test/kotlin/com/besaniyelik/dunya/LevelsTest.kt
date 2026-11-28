@@ -76,12 +76,12 @@ class LevelsTest {
     @DisplayName("100 farklı alan var; her alan 5 bölümden oluşur ve son bölümü meydan okuma ya da finaldir")
     @Test fun hundredAreas() {
         assertEquals(100, GameContent.stages.size)
-        assertEquals(100, GameContent.stages.map { it.title }.toSet().size, "alan adları benzersiz olmalı")
+        assertEquals(100, GameContent.stages.map { it.trTitle }.toSet().size, "alan adları benzersiz olmalı")
         val byArea = all.groupBy { GameContent.areaNumber(it.id) }
         assertEquals(100, byArea.size)
         for ((no, lv) in byArea) {
             assertEquals(5, lv.size)
-            assertTrue(lv.all { it.idea == GameContent.stages[no - 1].title })
+            assertTrue(lv.all { it.idea == GameContent.stages[no - 1].trTitle })
             assertTrue(lv.last().kind == LevelKind.CHALLENGE || lv.last().kind == LevelKind.FINAL || lv.last().kind == LevelKind.GRAND_FINAL, "alan $no")
         }
     }

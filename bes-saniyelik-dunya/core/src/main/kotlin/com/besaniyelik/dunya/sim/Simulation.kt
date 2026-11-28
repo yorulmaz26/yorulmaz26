@@ -10,13 +10,15 @@ import kotlin.math.min
 
 enum class SimStatus { RUNNING, DYING, COMPLETE, GAME_OVER }
 
-enum class DeathCause(val title: String) {
+enum class DeathCause(val trTitle: String) {
     SPIKE("Dikenlere çarptın!"),
     SAW("Testereye yakalandın!"),
     FALL("Boşluğa düştün!"),
     CRUSH("Platformlar arasında sıkıştın!"),
     STUCK("Yolun kapandı, takıldın!"),
-    CHASER("Kaos duvarı seni yakaladı!"),
+    CHASER("Kaos duvarı seni yakaladı!");
+
+    val title: String get() = com.besaniyelik.dunya.i18n.L.t("death.$name")
 }
 
 /** Simülasyon olayları; ses, parçacık ve arayüz bu olayları dinler. Oyun mantığı arayüzden tamamen bağımsızdır. */

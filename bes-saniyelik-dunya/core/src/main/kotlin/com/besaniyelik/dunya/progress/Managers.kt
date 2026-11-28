@@ -42,13 +42,18 @@ object ProgressionManager {
 
     fun levelUpText(level: Int): String = when {
         Catalog.skins.any { (it.unlock as? Unlock.PlayerLevel)?.level == level } ->
-            "Yeni karakter açıldı: ${Catalog.skins.first { (it.unlock as? Unlock.PlayerLevel)?.level == level }.name}!"
+            com.besaniyelik.dunya.i18n.L.t("levelup.skin", "name" to Catalog.skins.first { (it.unlock as? Unlock.PlayerLevel)?.level == level }.name)
         Catalog.trails.any { (it.unlock as? Unlock.PlayerLevel)?.level == level } ->
-            "Yeni iz efekti açıldı: ${Catalog.trails.first { (it.unlock as? Unlock.PlayerLevel)?.level == level }.name}!"
-        level % 10 == 0 -> "Özel seviye ödülü!"
-        level % 5 == 0 -> "Özel ödül: elmas ve güçlendirmeler!"
-        else -> "Seviye atladın!"
+            com.besaniyelik.dunya.i18n.L.t("levelup.trail", "name" to Catalog.trails.first { (it.unlock as? Unlock.PlayerLevel)?.level == level }.name)
+        level % 10 == 0 -> com.besaniyelik.dunya.i18n.L.t("levelup.special10")
+        level % 5 == 0 -> com.besaniyelik.dunya.i18n.L.t("levelup.special5")
+        else -> com.besaniyelik.dunya.i18n.L.t("levelup.plain")
     }
+
+    /** Sıradan seviye atlama mı (özel ödül yok)? */
+    fun isPlainLevelUp(level: Int): Boolean =
+        Catalog.skins.none { (it.unlock as? Unlock.PlayerLevel)?.level == level } &&
+            Catalog.trails.none { (it.unlock as? Unlock.PlayerLevel)?.level == level } && level % 5 != 0
 
     fun addXp(d: SaveData, amount: Int): List<LevelUp> {
         val ups = ArrayList<LevelUp>()
@@ -182,9 +187,10 @@ object CharacterManager {
     }
 }
 
-enum class PurchaseResult(val message: String) {
-    OK("Satın alındı!"), OWNED("Zaten sahipsin."), NOT_ENOUGH_COINS("Yeterli altının yok."),
-    NOT_ENOUGH_GEMS("Yeterli elmasın yok."), LOCKED("Bu içerik oynayarak açılır."),
+enum class PurchaseResult {
+    OK, OWNED, NOT_ENOUGH_COINS, NOT_ENOUGH_GEMS, LOCKED;
+
+    val message: String get() = com.besaniyelik.dunya.i18n.L.t("purchase.$name")
 }
 
 object ShopManager {
@@ -234,9 +240,9 @@ object CollectionManager {
     fun piecesOf(d: SaveData, map: Int): Int = d.pieces.count { (it - 1) / 50 + 1 == map }
 
     fun rewardName(map: Int): String {
-        Catalog.skins.firstOrNull { (it.unlock as? Unlock.Collection)?.map == map }?.let { return "Karakter: ${it.name}" }
-        Catalog.trails.firstOrNull { (it.unlock as? Unlock.Collection)?.map == map }?.let { return "İz efekti: ${it.name}" }
-        return "Ödül"
+        Catalog.skins.firstOrNull { (it.unlock as? Unlock.Collection)?.map == map }?.let { return com.besaniyelik.dunya.i18n.L.t("collection.reward_skin", "name" to it.name) }
+        Catalog.trails.firstOrNull { (it.unlock as? Unlock.Collection)?.map == map }?.let { return com.besaniyelik.dunya.i18n.L.t("collection.reward_trail", "name" to it.name) }
+        return com.besaniyelik.dunya.i18n.L.t("collection.reward")
     }
 
     /** Parça kaydı; harita tamamlandıysa koleksiyonu talep eder. Tamamlanan harita numarasını döndürür. */

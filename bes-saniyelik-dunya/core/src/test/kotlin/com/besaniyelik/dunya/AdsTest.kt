@@ -238,7 +238,7 @@ class AdsTest {
         assertTrue("ads" in body && "pendingEndless" in body)
         val old = kotlinx.serialization.json.JsonObject(body.filterKeys { it != "ads" && it != "pendingEndless" }).toString()
         val rebuilt = kotlinx.serialization.json.JsonObject(mapOf(
-            "v" to env["v"]!!, "crc" to kotlinx.serialization.json.JsonPrimitive(SaveManager.checksum(old)), "data" to kotlinx.serialization.json.JsonPrimitive(old)))
+            "v" to kotlinx.serialization.json.JsonPrimitive(1), "crc" to kotlinx.serialization.json.JsonPrimitive(SaveManager.checksum(old)), "data" to kotlinx.serialization.json.JsonPrimitive(old)))
         file.writeText(rebuilt.toString()); java.io.File(dir, SaveManager.BACKUP).delete()
         val p2 = ProfileService(SaveManager(FileSaveStorage(dir)), clock)
         assertEquals(777, p2.data.coins, "eski kayıt yüklenmeli (yedeğe ya da sıfır kayda düşmemeli)")

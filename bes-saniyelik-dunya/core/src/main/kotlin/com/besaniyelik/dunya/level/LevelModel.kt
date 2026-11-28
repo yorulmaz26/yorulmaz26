@@ -16,15 +16,18 @@ enum class HazardType { SPIKE, SAW }
 enum class PadType { SPRING, BOOST }
 
 @Serializable
-enum class PowerupType(val title: String, val desc: String, val icon: String, val duration: Float) {
+enum class PowerupType(val trTitle: String, val trDesc: String, val icon: String, val duration: Float) {
     SHIELD("Kalkan", "Bir kez hasarı engeller.", "p_shield", 0f),
     MAGNET("Mıknatıs", "Yakındaki altınları çeker.", "p_magnet", 12f),
     DOUBLE_JUMP("Çift Zıplama", "Havada bir kez daha zıplayabilirsin.", "p_double", 12f),
     INVINCIBLE("Dokunulmazlık", "Kısa süre engellerden etkilenmezsin.", "p_invincible", 5f),
-    EXTRA_LIFE("Ekstra Can", "Bir can daha kazanırsın.", "p_life", 0f),
+    EXTRA_LIFE("Ekstra Kalp", "Bir kalp daha kazanırsın.", "p_life", 0f),
     COIN_MULTIPLIER("Altın Çarpanı", "Altınlar iki kat sayılır.", "p_coinx2", 15f),
     STAR_FINDER("Yıldız Algılayıcı", "Yıldızların ve gizli parçaların yerini gösterir.", "p_finder", 20f),
-    CHECKPOINT_GUARD("Kontrol Noktası Koruması", "Bir sonraki ölümde can kaybetmezsin.", "p_guard", 0f);
+    CHECKPOINT_GUARD("Kontrol Noktası Koruması", "Bir sonraki ölümde kalp kaybetmezsin.", "p_guard", 0f);
+
+    val title: String get() = com.besaniyelik.dunya.i18n.L.t("power.$name.title")
+    val desc: String get() = com.besaniyelik.dunya.i18n.L.t("power.$name.desc")
 }
 
 @Serializable

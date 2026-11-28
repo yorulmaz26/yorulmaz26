@@ -27,6 +27,7 @@ import com.besaniyelik.dunya.render.CharacterRenderer
 import com.besaniyelik.dunya.ui.Palette
 import com.besaniyelik.dunya.ui.UiButton
 import com.besaniyelik.dunya.ui.popIn
+import com.besaniyelik.dunya.i18n.L
 
 /** Menülerde arkada kayan, açık renkli tema manzarası. */
 class MenuBackground(private val game: BesSaniyelikDunya, private var map: Int = 1) {
@@ -147,7 +148,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
     protected fun adReadyNow(): Boolean { val r = game.ads.rewardedReady; adReadyKnown = r; return r }
 
     override fun render(delta: Float) {
-        val dt = delta.coerceAtMost(1 / 20f)
+        val dt = (fixedDelta ?: delta).coerceAtMost(1 / 20f)
         syncBanner()
         if (watchesAdReadiness && !adBusy) {
             adPoll -= dt
@@ -210,7 +211,7 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
             debugBanner?.remove(); debugBanner = null
             if (bannerPx > 0) {
                 val box = Table().apply { background = kit.patch("white").tint(Color(0.2f, 0.2f, 0.25f, 0.85f)); touchable = Touchable.disabled }
-                box.add(kit.label("REKLAM ALANI (afiş)", a.f22, Color.WHITE))
+                box.add(kit.label(L.t("ads.banner_area"), a.f22, Color.WHITE))
                 box.setBounds(0f, 0f, stage.width, bannerPx * sy)
                 stage.addActor(box); debugBanner = box
             }
@@ -247,14 +248,14 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         val shield = Table().apply {
             setFillParent(true); touchable = Touchable.enabled
             background = kit.patch("white").tint(Color(0.97f, 0.98f, 1f, 0.7f))
-            add(kit.label("Reklam açılıyor...", a.f36, Palette.INK))
+            add(kit.label(L.t("ads.opening"), a.f36, Palette.INK))
         }
         stage.addActor(shield)
         stage.cancelTouchFocus() // o anda başka bir düğmede duran ikinci parmağın dokunuşu da iptal edilir
         val done = { adBusy = false; shield.remove() }
         game.ads.showRewarded(
             onEarned = { done(); if (game.screen === this) onEarned() },
-            onSkipped = { done(); if (game.screen === this) toast("Reklam tamamlanmadı ya da gösterilemedi; ödül verilmedi.") },
+            onSkipped = { done(); if (game.screen === this) toast(L.t("ads.not_completed")) },
         )
     }
 
@@ -263,6 +264,8 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
         var debugInsets: IntArray? = null
         /** Yalnızca masaüstü denemesi için: afişin kaplayacağı alanı koyu bir şeritle gösterir. */
         var debugBannerOverlay = false
+        /** Yalnızca masaüstü video kaydı için: her kare bu kadar oyun süresi ilerler (gerçek süreden bağımsız). */
+        var fixedDelta: Float? = null
     }
 
     override fun dispose() { stage.dispose() }
@@ -278,7 +281,10 @@ abstract class BaseScreen(val game: BesSaniyelikDunya) : ScreenAdapter() {
             val c = Table()
             c.add(kit.currency("b_coin", game.profile.data.coins.toString(), a.f22)).right().row()
             c.add(kit.currency("b_gem", game.profile.data.gems.toString(), a.f22)).right().padTop(4f)
-            t.add(c).right().padRight(16f).width(160f)
+            val right = Table()
+            if (game.lives.enabled) right.add(livesChip(announce = true)).padRight(10f)
+            right.add(c).right().width(160f)
+            t.add(right).right().padRight(16f)
         } else t.add().width(112f)
         return t
     }

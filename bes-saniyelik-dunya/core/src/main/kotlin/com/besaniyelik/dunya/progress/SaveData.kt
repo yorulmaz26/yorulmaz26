@@ -69,6 +69,22 @@ data class Settings(
     var soundVolume: Float = 0.9f,
     var showFps: Boolean = false,
     var reducedEffects: Boolean = false,
+    /** Oyun dili (tr, en, de, it, fr, es). Boşsa ilk açılışta telefonun dilinden seçilir. */
+    var language: String = "",
+)
+
+/**
+ * Kalıcı canlar (bkz. LifeManager). Süre, son denetim noktasına göre hesaplanır: duvar saati (UTC), monotonik saat
+ * ve cihaz açılış sayacı birlikte saklanır.
+ */
+@Serializable
+data class LivesState(
+    var lives: Int = com.besaniyelik.dunya.GameConfig.MAX_LIVES,
+    /** Bir sonraki cana doğru biriken süre (ms). */
+    var progressMs: Long = 0,
+    var lastWallMs: Long = 0,
+    var lastMonoMs: Long = 0,
+    var lastBoot: Int = -1,
 )
 
 /** Reklam sayaçları: günlük sınırlar ve toplamlar (reklam sıklığı kararları AdDirector'dadır). */
@@ -78,6 +94,8 @@ data class AdState(
     var day: Long = -1,
     /** Bugün "reklam izle, elmas kazan" kaç kez kullanıldı. */
     var gemAdsToday: Int = 0,
+    /** Bugün "reklam izle: +1 can" kaç kez kullanıldı. */
+    var lifeAdsToday: Int = 0,
     /** Giriş ödülünün reklamla ikiye katlandığı son gün. */
     var loginDoubledDay: Long = -1,
     var rewardedTotal: Long = 0,
@@ -127,6 +145,7 @@ data class SaveData(
     var levelRewardsClaimed: Int = 1,
     var ads: AdState = AdState(),
     var pendingEndless: PendingEndless? = null,
+    var lives: LivesState = LivesState(),
 ) {
     val totalStars get() = levels.values.sumOf { it.stars }
     fun stars(id: Int) = levels[id]?.stars ?: 0

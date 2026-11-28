@@ -3,6 +3,7 @@ package com.besaniyelik.dunya.ui
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.BitmapFont
+import com.badlogic.gdx.graphics.g2d.GlyphLayout
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Interpolation
 import com.badlogic.gdx.scenes.scene2d.Actor
@@ -39,8 +40,8 @@ class UiKit(val a: Assets, val audio: AudioManager) {
     fun patch(name: String): NinePatchDrawable = NinePatchDrawable(a.patch(name))
     fun region(name: String): TextureRegionDrawable = TextureRegionDrawable(a.ui(name))
 
-    fun label(text: String, font: BitmapFont = a.f28, color: Color = Palette.INK, align: Int = Align.center, wrap: Boolean = false): Label {
-        val l = Label(text, Label.LabelStyle(font, color))
+    fun label(text: String, font: BitmapFont = a.f28, color: Color = Palette.INK, align: Int = Align.center, wrap: Boolean = false, fit: Boolean = false): Label {
+        val l = if (fit && !wrap) FitLabel(text, Label.LabelStyle(font, color)) else Label(text, Label.LabelStyle(font, color))
         l.setAlignment(align)
         l.wrap = wrap
         return l
@@ -52,7 +53,7 @@ class UiKit(val a: Assets, val audio: AudioManager) {
     fun button(text: String, color: String = "yellow", icon: String? = null, font: BitmapFont = a.f36o, textColor: Color = Color.WHITE, onClick: () -> Unit): UiButton {
         val b = UiButton(patch("btn_$color"), this)
         if (icon != null) b.add(Image(a.ui(icon)).apply { if (color == "white" && icon.startsWith("g_")) this.color = Palette.INK_SOFT }).size(52f).padRight(if (text.isEmpty()) 0f else 10f)
-        if (text.isNotEmpty()) b.add(label(text, font, textColor))
+        if (text.isNotEmpty()) b.add(label(text, font, textColor, fit = true)).minWidth(0f)
         b.pad(14f, 26f, 26f, 26f)
         b.onClick(onClick)
         return b
@@ -84,6 +85,24 @@ class UiKit(val a: Assets, val audio: AudioManager) {
     }
 
     fun click() = audio.play(Sfx.CLICK)
+}
+
+/**
+ * Yer yetmezse yazısını (en fazla [minScale] oranına kadar) küçülten tek satırlık etiket. Almanca gibi uzun kelimeli
+ * dillerde düğme ve sekme yazıları taşmaz; yer varsa normal boyutta kalır.
+ */
+class FitLabel(text: CharSequence, style: LabelStyle, private val minScale: Float = 0.6f) : Label(text, style) {
+    // Label kurucusu boyut sorabildiği için alan tembel oluşturulur (alt sınıf alanları o anda henüz hazır değildir)
+    private var gl: GlyphLayout? = null
+    private fun natural(): Float { val g = gl ?: GlyphLayout().also { gl = it }; g.setText(style.font, text); return g.width }
+    override fun getPrefWidth(): Float = natural()
+    override fun getMinWidth(): Float = natural() * minScale
+    override fun layout() {
+        val nw = natural()
+        val s = if (nw > 0f && width > 0f) (width / nw).coerceIn(minScale, 1f) else 1f
+        if (kotlin.math.abs(s - fontScaleX) > 0.001f) setFontScale(s)
+        super.layout()
+    }
 }
 
 class UiButton(bg: Drawable, private val kit: UiKit) : Table() {

@@ -26,22 +26,33 @@ class FileSaveStorage(private val dir: java.io.File) : SaveStorage {
 private val saveJson = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
 @Serializable
-private class SaveEnvelope(val v: Int, val crc: Long, val data: String)
+private class SaveEnvelope(val v: Int, val crc: Long, val data: String, val sig: String = "")
 
 /**
- * Güvenilir kayıt: veri CRC32 ile imzalanır, önce geçici dosyaya yazılıp sonra yer değiştirilir,
- * önceki sağlam kayıt ".bak" olarak saklanır. Bozuk kayıt algılanırsa yedekten yüklenir.
- * Sürüm alanı sayesinde güncellemelerde eski kayıtlar taşınır, silinmez.
+ * Güvenilir kayıt: veri HMAC-SHA256 ile imzalanır (sürüm 1 kayıtlarında CRC32 vardı; onlar da okunur), önce geçici
+ * dosyaya yazılıp sonra yer değiştirilir, önceki sağlam kayıt ".bak" olarak saklanır. Bozuk ya da elle değiştirilmiş
+ * kayıt algılanırsa yedekten yüklenir. Sürüm alanı sayesinde güncellemelerde eski kayıtlar taşınır, silinmez.
+ * Not: anahtar uygulamanın içindedir; bu, sıradan dosya düzenlemesini engeller, kararlı bir saldırganı değil.
  */
 class SaveManager(private val storage: SaveStorage) {
     companion object {
-        const val CURRENT_VERSION = 1
+        const val CURRENT_VERSION = 2
         const val MAIN = "profile.json"
         const val BACKUP = "profile.bak"
         private const val SALT = "5sn-dunya-v1"
 
         fun checksum(text: String): Long = CRC32().apply { update((SALT + text).toByteArray(Charsets.UTF_8)) }.value
-    }
+
+        private val KEY: ByteArray = run {
+            val a = "ml-5sn"; val b = "dunya"; val c = "kayit-imza"
+            (a + "|" + c.reversed() + "|" + b + "|" + SALT).toByteArray(Charsets.UTF_8)
+        }
+
+        fun signature(text: String): String {
+            val mac = javax.crypto.Mac.getInstance("HmacSHA256")
+            mac.init(javax.crypto.spec.SecretKeySpec(KEY, "HmacSHA256"))
+            return mac.doFinal(text.toByteArray(Charsets.UTF_8)).joinToString("") { "%02x".format(it) }
+        }    }
 
     var lastLoadSource = "yeni"
         private set
@@ -59,7 +70,8 @@ class SaveManager(private val storage: SaveStorage) {
     private fun tryLoad(name: String): SaveData? = try {
         val raw = storage.read(name) ?: return null
         val env = saveJson.decodeFromString(SaveEnvelope.serializer(), raw)
-        if (checksum(env.data) != env.crc) null
+        val genuine = if (env.sig.isNotEmpty()) env.sig == signature(env.data) else env.v <= 1 && checksum(env.data) == env.crc
+        if (!genuine) null
         else saveJson.decodeFromString(SaveData.serializer(), env.data).takeIf { validate(it) }
     } catch (e: Exception) { null }
 
@@ -74,12 +86,13 @@ class SaveManager(private val storage: SaveStorage) {
         if ("toz" !in d.ownedTrails) d.ownedTrails.add("toz")
         if (d.selectedSkin !in d.ownedSkins) d.selectedSkin = "pati"
         if (d.selectedTrail !in d.ownedTrails) d.selectedTrail = "toz"
+        LifeManager.sanitize(d.lives) // eski kayıtta can yoksa varsayılan: dolu
         return d
     }
 
     fun save(d: SaveData) {
         val body = saveJson.encodeToString(SaveData.serializer(), d)
-        val env = saveJson.encodeToString(SaveEnvelope.serializer(), SaveEnvelope(CURRENT_VERSION, checksum(body), body))
+        val env = saveJson.encodeToString(SaveEnvelope.serializer(), SaveEnvelope(CURRENT_VERSION, checksum(body), body, signature(body)))
         // Var olan sağlam ana kaydı yedeğe al
         val current = storage.read(MAIN)
         if (current != null && tryLoad(MAIN) != null) storage.write(BACKUP, current)

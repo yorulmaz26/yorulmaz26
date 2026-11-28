@@ -17,6 +17,9 @@ import com.besaniyelik.dunya.render.rgb
 import com.besaniyelik.dunya.sim.Mechanic
 import com.besaniyelik.dunya.ui.Palette
 import com.besaniyelik.dunya.ui.popIn
+import com.besaniyelik.dunya.GameConfig
+import com.besaniyelik.dunya.i18n.L
+import com.besaniyelik.dunya.i18n.PlayerNames
 
 private fun Table.onTap(kit: com.besaniyelik.dunya.ui.UiKit, f: () -> Unit) {
     touchable = Touchable.enabled
@@ -28,9 +31,9 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     private var tab = 0
     override fun build() {
         val d = game.profile.data
-        root.add(header("Karakterler")).growX().padTop(20f).row()
+        root.add(header(L.t("chars.title"))).growX().padTop(20f).row()
         val tabs = Table()
-        listOf("Görünümler", "İz Efektleri").forEachIndexed { i, t ->
+        listOf(L.t("chars.tab_skins"), L.t("chars.tab_trails")).forEachIndexed { i, t ->
             val b = Table().apply { background = kit.patch(if (tab == i) "tab_sel" else "tab"); pad(10f, 26f, 14f, 26f); add(kit.label(t, a.f28, Palette.INK)) }
             b.onTap(kit) { tab = i; rebuild() }
             tabs.add(b).pad(6f)
@@ -48,18 +51,18 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
         val owned = skin.id in d.ownedSkins
         val unlock = skin.unlock
         when {
-            owned && d.selectedSkin == skin.id -> preview.add(kit.label("Seçili karakter", a.f28, Palette.GRASS)).padTop(6f)
-            owned -> preview.add(kit.button("Seç", "green", "g_check") { game.profile.selectSkin(skin.id); rebuild() }).width(300f).height(110f).padTop(6f)
+            owned && d.selectedSkin == skin.id -> preview.add(kit.label(L.t("chars.selected"), a.f28, Palette.GRASS)).padTop(6f)
+            owned -> preview.add(kit.button(L.t("common.select"), "green", "g_check") { game.profile.selectSkin(skin.id); rebuild() }).width(300f).height(110f).padTop(6f)
             unlock is Unlock.Coins || unlock is Unlock.Gems -> {
                 val icon = if (unlock is Unlock.Coins) "b_coin" else "b_gem"
                 val price = if (unlock is Unlock.Coins) unlock.price else (unlock as Unlock.Gems).price
-                preview.add(kit.button("Satın Al  $price", "yellow", icon) {
+                preview.add(kit.button(L.t("chars.buy", "price" to price), "yellow", icon) {
                     val r = game.profile.buySkin(skin.id)
                     if (r == PurchaseResult.OK) { game.audio.play(Sfx.REWARD); game.profile.selectSkin(skin.id) }
                     toast(r.message, icon); rebuild()
                 }).width(360f).height(110f).padTop(6f)
             }
-            else -> preview.add(kit.label("Kilit: ${unlock.describe()}", a.f28, Palette.INK_SOFT)).padTop(6f)
+            else -> preview.add(kit.label(L.t("chars.locked", "how" to unlock.describe()), a.f28, Palette.INK_SOFT, wrap = true)).width(380f).padTop(6f)
         }
         val grid = Table()
         Catalog.skins.forEachIndexed { i, s ->
@@ -67,7 +70,7 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             val av2 = AvatarActor(game, 96f, s.id)
             if (s.id !in d.ownedSkins) av2.color.a = 0.45f
             cell.add(av2).size(96f).row()
-            cell.add(kit.label(s.name, a.f22, Palette.INK)).row()
+            cell.add(kit.label(s.name, a.f22, Palette.INK, fit = true)).width(128f).row()
             if (s.id !in d.ownedSkins) cell.add(Image(a.ui("g_lock_gray"))).size(26f)
             cell.onTap(kit) { selected = s.id; rebuild() }
             grid.add(cell).size(140f, 168f).pad(5f)
@@ -92,8 +95,8 @@ class CharacterScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             row.add(info).expandX().left()
             when {
                 d.selectedTrail == t.id -> row.add(Image(a.ui("b_star"))).size(64f)
-                t.id in d.ownedTrails -> row.add(kit.button("Seç", "green") { game.profile.selectTrail(t.id); rebuild() }).width(150f).height(96f)
-                t.unlock is Unlock.Coins || t.unlock is Unlock.Gems -> row.add(kit.button("Al", "yellow", if (t.unlock is Unlock.Coins) "b_coin" else "b_gem") {
+                t.id in d.ownedTrails -> row.add(kit.button(L.t("common.select"), "green") { game.profile.selectTrail(t.id); rebuild() }).width(150f).height(96f)
+                t.unlock is Unlock.Coins || t.unlock is Unlock.Gems -> row.add(kit.button(L.t("common.buy"), "yellow", if (t.unlock is Unlock.Coins) "b_coin" else "b_gem") {
                     val r = game.profile.buyTrail(t.id); if (r == PurchaseResult.OK) { game.audio.play(Sfx.REWARD); game.profile.selectTrail(t.id) }
                     toast(r.message); rebuild()
                 }).width(160f).height(96f)
@@ -114,12 +117,20 @@ class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     override fun onAdReadyChanged(ready: Boolean) {
         if (gemButton == null) { if (ready && game.ads.gemCardVisible()) rebuild(); return } // kart ilk kez beliriyor
         gemButton?.enabled = ready
-        gemStatus?.setText(if (ready) "" else "Reklam hazırlanıyor...")
+        gemStatus?.setText(if (ready) "" else L.t("ads.preparing"))
     }
     override fun build() {
         val d = game.profile.data
-        root.add(header("Mağaza")).growX().padTop(20f).row()
+        root.add(header(L.t("shop.title"))).growX().padTop(20f).row()
         val list = Table()
+        // Kalıcı canlar: 20 dakikada bir yenilenir; beklemek istemeyen oyuncu elmasla doldurabilir ya da reklam izleyebilir
+        if (game.lives.enabled) {
+            val lc = Table().apply { background = kit.patch("panel"); pad(14f, 22f, 18f, 22f) }
+            lc.add(livesChip()).padRight(16f)
+            lc.add(kit.label(L.t("shop.lives_text", "min" to GameConfig.LIFE_REGEN_SECONDS / 60), a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(420f).padRight(16f)
+            lc.add(kit.button(L.t("shop.lives_open"), "pink", "b_heart", a.f28) { showLives() }).width(300f).height(92f)
+            list.add(lc).padTop(6f).padBottom(10f).row()
+        }
         // İsteğe bağlı ödüllü reklam: günde sınırlı sayıda ücretsiz elmas. Kart, günlük hak bitene kadar durur; düğme
         // yalnızca reklam yüklüyken açıktır (reklam tek kullanımlıktır, izlendikten sonra yenisi birkaç saniyede yüklenir).
         gemButton = null; gemStatus = null
@@ -128,28 +139,28 @@ class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             val free = Table().apply { background = kit.patch("panel_yellow"); pad(14f, 22f, 18f, 22f) }
             free.add(Image(a.ui("b_gem"))).size(72f).padRight(16f)
             val txt = Table()
-            txt.add(kit.label("Ücretsiz Elmas", a.f28, Palette.INK, Align.left)).left().row()
-            txt.add(kit.label("Kısa bir reklam izle, ${AdDirector.GEMS_PER_AD} elmas kazan. Bugün kalan: ${game.ads.gemAdsLeft()}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(400f).left().row()
-            val status = kit.label(if (ready) "" else "Reklam hazırlanıyor...", a.f22, Palette.INK_SOFT, Align.left)
+            txt.add(kit.label(L.t("shop.free_gems"), a.f28, Palette.INK, Align.left)).left().row()
+            txt.add(kit.label(L.t("shop.free_gems_text", "gems" to L.n("unit.gems", AdDirector.GEMS_PER_AD), "left" to game.ads.gemAdsLeft()), a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(400f).left().row()
+            val status = kit.label(if (ready) "" else L.t("ads.preparing"), a.f22, Palette.INK_SOFT, Align.left)
             txt.add(status).left()
             free.add(txt).padRight(16f)
-            val btn = kit.button("Reklam izle: +${AdDirector.GEMS_PER_AD} elmas", "turq", "g_play", a.f28) {
-                watchAd { val g = game.ads.grantGemAd(); if (g > 0) { game.audio.play(Sfx.REWARD); toast("+$g elmas", "b_gem") }; rebuild() }
+            val btn = kit.button(L.n("ads.watch_gems", AdDirector.GEMS_PER_AD), "turq", "g_play", a.f28) {
+                watchAd { val g = game.ads.grantGemAd(); if (g > 0) { game.audio.play(Sfx.REWARD); toast(L.n("toast.gems", g), "b_gem") }; rebuild() }
             }
             btn.enabled = ready
             free.add(btn).width(380f).height(92f)
             list.add(free).padTop(6f).padBottom(10f).row()
             gemButton = btn; gemStatus = status
         }
-        list.add(kit.label("Güçlendirmeler", a.f36, Palette.INK)).padTop(6f).row()
-        list.add(kit.label("Bölüm başında en fazla 2 tane seçebilirsin. Hepsi oynayarak kazanılır; hiçbir bölüm güçlendirme gerektirmez.", a.f22, Palette.INK_SOFT, wrap = true)).width(620f).row()
+        list.add(kit.label(L.t("shop.powerups"), a.f36, Palette.INK)).padTop(6f).row()
+        list.add(kit.label(L.t("shop.powerups_text"), a.f22, Palette.INK_SOFT, wrap = true)).width(620f).row()
         val grid = Table()
         Catalog.shopPowerups.entries.forEachIndexed { i, (t, price) ->
             val c = Table().apply { background = kit.patch("panel"); pad(20f, 14f, 22f, 14f) }
             c.add(Image(a.ui("b_" + t.icon))).size(84f).row()
             c.add(kit.label(t.title, a.f28, Palette.INK, wrap = true)).width(250f).row()
             c.add(kit.label(t.desc, a.f22, Palette.INK_SOFT, wrap = true)).width(250f).row()
-            c.add(kit.label("Sende: ${d.inventory[t] ?: 0}", a.f22, Palette.INK)).padTop(4f).row()
+            c.add(kit.label(L.t("shop.owned", "n" to (d.inventory[t] ?: 0)), a.f22, Palette.INK)).padTop(4f).row()
             c.add(kit.button("$price", "yellow", "b_coin", a.f36o) {
                 val r = game.profile.buyPowerup(t); if (r == PurchaseResult.OK) game.audio.play(Sfx.REWARD); toast(r.message, "b_" + t.icon); rebuild()
             }).width(220f).height(96f).padTop(6f)
@@ -157,20 +168,20 @@ class ShopScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             if (i % 4 == 3) grid.row()
         }
         list.add(grid).padTop(8f).row()
-        list.add(kit.label("Altın Paketleri (elmasla)", a.f36, Palette.INK)).padTop(20f).row()
+        list.add(kit.label(L.t("shop.coin_packs"), a.f36, Palette.INK)).padTop(20f).row()
         val packs = Table()
         Catalog.coinPacks.forEachIndexed { i, (gems, coins) ->
             val c = Table().apply { background = kit.patch("panel_yellow"); pad(18f) }
             c.add(Image(a.ui("b_coin"))).size(70f).row()
-            c.add(kit.label("$coins altın", a.f28, Palette.INK)).row()
+            c.add(kit.label(L.n("unit.coins", coins), a.f28, Palette.INK)).row()
             c.add(kit.button("$gems", "purple", "b_gem", a.f28) {
                 val r = game.profile.buyCoinPack(i); if (r == PurchaseResult.OK) game.audio.play(Sfx.REWARD); toast(r.message, "b_coin"); rebuild()
             }).width(170f).height(86f).padTop(6f)
             packs.add(c).width(205f).pad(4f)
         }
         list.add(packs).row()
-        list.add(kit.label("Karakterler ve iz efektleri için Karakterler ekranına göz at!", a.f22, Palette.INK_SOFT, wrap = true)).width(600f).padTop(14f).row()
-        list.add(kit.button("Karakterler", "pink", "b_person") { game.go(CharacterScreen(game)) }).width(380f).height(110f).padTop(8f).padBottom(30f)
+        list.add(kit.label(L.t("shop.chars_hint"), a.f22, Palette.INK_SOFT, wrap = true)).width(600f).padTop(14f).row()
+        list.add(kit.button(L.t("menu.characters"), "pink", "b_person") { game.go(CharacterScreen(game)) }).width(380f).height(110f).padTop(8f).padBottom(30f)
         root.add(scroll(list)).grow().padTop(10f)
     }
 }
@@ -180,15 +191,15 @@ class MissionsScreen(game: BesSaniyelikDunya, private var weekly: Boolean) : Bas
     override fun build() {
         game.profile.refreshDaily()
         val d = game.profile.data
-        root.add(header(if (weekly) "Haftalık Görevler" else "Günlük Görevler")).growX().padTop(20f).row()
+        root.add(header(if (weekly) L.t("missions.weekly_title") else L.t("missions.daily_title"))).growX().padTop(20f).row()
         val tabs = Table()
-        listOf("Günlük", "Haftalık").forEachIndexed { i, t ->
+        listOf(L.t("menu.daily"), L.t("menu.weekly")).forEachIndexed { i, t ->
             val b = Table().apply { background = kit.patch(if ((i == 1) == weekly) "tab_sel" else "tab"); pad(10f, 30f, 14f, 30f); add(kit.label(t, a.f28, Palette.INK)) }
             b.onTap(kit) { weekly = i == 1; rebuild() }
             tabs.add(b).pad(6f)
         }
         root.add(tabs).padTop(8f).row()
-        root.add(kit.label(if (weekly) "Her pazartesi yeni görevler gelir." else "Her gün 3 yeni görev seni bekliyor.", a.f22, Palette.INK_SOFT)).padTop(4f).row()
+        root.add(kit.label(if (weekly) L.t("missions.weekly_hint") else L.t("missions.daily_hint"), a.f22, Palette.INK_SOFT)).padTop(4f).row()
         val list = Table()
         val ms = if (weekly) d.missions.weekly else d.missions.daily
         for (m in ms) {
@@ -196,13 +207,13 @@ class MissionsScreen(game: BesSaniyelikDunya, private var weekly: Boolean) : Bas
             val info = Table()
             info.add(kit.label(m.type.text(m.target), a.f28, Palette.INK, Align.left, wrap = true)).width(400f).left().row()
             info.add(kit.bar(m.progress / m.target.toFloat(), "bar_fill", 22f)).width(400f).height(22f).left().padTop(8f).row()
-            val rw = buildList { add("${m.progress.coerceAtMost(m.target)}/${m.target}"); add("${m.rewardCoins} altın"); if (m.rewardGems > 0) add("${m.rewardGems} elmas"); add("${m.rewardXp} XP") }
+            val rw = buildList { add("${m.progress.coerceAtMost(m.target)}/${m.target}"); add(L.n("unit.coins", m.rewardCoins)); if (m.rewardGems > 0) add(L.n("unit.gems", m.rewardGems)); add(L.t("unit.xp", "n" to m.rewardXp)) }
             info.add(kit.label(rw.joinToString("  •  "), a.f22, Palette.INK_SOFT, Align.left)).left().padTop(6f)
             row.add(info).expandX().left()
             when {
                 m.claimed -> row.add(Image(a.ui("b_star"))).size(70f)
-                m.done -> row.add(kit.button("Al", "green", "b_gift") {
-                    game.profile.claimMission(m.id)?.let { r -> game.audio.play(Sfx.REWARD); toast("+${r.coins} altın" + (if (r.gems > 0) ", +${r.gems} elmas" else "") + ", +${r.xp} XP", "b_gift") }
+                m.done -> row.add(kit.button(L.t("missions.claim"), "green", "b_gift") {
+                    game.profile.claimMission(m.id)?.let { r -> game.audio.play(Sfx.REWARD); toast(listOfNotNull("+" + L.n("unit.coins", r.coins), if (r.gems > 0) "+" + L.n("unit.gems", r.gems) else null, "+" + L.t("unit.xp", "n" to r.xp)).joinToString(", "), "b_gift") }
                     rebuild()
                 }).width(160f).height(100f)
                 else -> row.add(Image(a.ui("g_lock_gray"))).size(56f)
@@ -217,9 +228,9 @@ class AchievementsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
     override fun build() {
         val d = game.profile.data
-        root.add(header("Başarılar")).growX().padTop(20f).row()
+        root.add(header(L.t("menu.achievements"))).growX().padTop(20f).row()
         val n = d.achievements.size
-        root.add(kit.label("$n / ${Catalog.achievements.size} başarı açıldı", a.f28, Palette.INK)).padTop(8f).row()
+        root.add(kit.label(L.t("ach.count", "n" to n, "total" to Catalog.achievements.size), a.f28, Palette.INK)).padTop(8f).row()
         root.add(kit.bar(n / Catalog.achievements.size.toFloat(), "bar_fill_y", 22f)).width(520f).height(22f).padTop(6f).row()
         val list = Table()
         val sorted = Catalog.achievements.sortedBy { if (it.id in d.achievements) 1 else 0 }
@@ -247,8 +258,8 @@ class CollectionScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     override val bannerAllowed get() = true // kaydırılabilir liste: afiş içeriğin altında durur
     override fun build() {
         val d = game.profile.data
-        root.add(header("Koleksiyon")).growX().padTop(20f).row()
-        root.add(kit.label("Her haritada 5 gizli parça var. Hepsini bul, özel ödülü aç!", a.f22, Palette.INK_SOFT, wrap = true)).width(600f).padTop(6f).row()
+        root.add(header(L.t("menu.collection"))).growX().padTop(20f).row()
+        root.add(kit.label(L.t("coll.text"), a.f22, Palette.INK_SOFT, wrap = true)).width(600f).padTop(6f).row()
         val list = Table()
         for (m in GameContent.maps) {
             val have = CollectionManager.piecesOf(d, m.id)
@@ -260,8 +271,8 @@ class CollectionScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             val ids = listOf(8, 18, 28, 38, 48).map { m.firstLevel - 1 + it }
             ids.forEach { id -> pcs.add(Image(a.ui("b_puzzle")).apply { if (id !in d.pieces) color = Color(0.6f, 0.65f, 0.75f, 0.35f) }).size(56f).pad(2f) }
             info.add(pcs).left().padTop(4f).row()
-            info.add(kit.label("Ödül: ${CollectionManager.rewardName(m.id)}" + if (done) "  (alındı)" else "", a.f22, if (done) Palette.GRASS else Palette.INK_SOFT, Align.left)).left().padTop(4f).row()
-            info.add(kit.label("Parçalar: ${ids.joinToString(", ") { "Bölüm $it" }}", a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(560f).left()
+            info.add(kit.label(L.t("coll.reward", "reward" to CollectionManager.rewardName(m.id)) + if (done) L.t("coll.claimed") else "", a.f22, if (done) Palette.GRASS else Palette.INK_SOFT, Align.left)).left().padTop(4f).row()
+            info.add(kit.label(L.t("coll.pieces", "list" to ids.joinToString(", ") { L.t("level.short", "n" to it) }), a.f22, Palette.INK_SOFT, Align.left, wrap = true)).width(560f).left()
             row.add(info).expandX().left()
             row.add(kit.label("$have/5", a.f36, Palette.INK))
             list.add(row).width(900f).padBottom(12f).row()
@@ -273,28 +284,29 @@ class CollectionScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
 class ProfileScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     override fun build() {
         val d = game.profile.data
-        root.add(header("Profil")).growX().padTop(20f).row()
+        root.add(header(L.t("profile.title"))).growX().padTop(20f).row()
         val p = kit.panel()
         p.add(AvatarActor(game, 170f, null, CharState.HAPPY)).size(170f).row()
-        p.add(kit.label(d.playerName, a.f48, Palette.INK)).row()
-        p.add(kit.label("Seviye ${d.playerLevel}", a.f28, Palette.INK_SOFT)).row()
+        p.add(kit.label(PlayerNames.display(d.playerName), a.f48, Palette.INK)).row()
+        p.add(kit.label(L.t("profile.level", "n" to d.playerLevel), a.f28, Palette.INK_SOFT)).row()
         val need = ProgressionManager.xpToNext(d.playerLevel)
         p.add(kit.bar(d.xp / need.toFloat(), "bar_fill_b", 24f)).width(420f).height(24f).padTop(8f).row()
-        p.add(kit.label("${d.xp} / $need XP  •  Seviye ${d.playerLevel + 1}: ${ProgressionManager.levelUpText(d.playerLevel + 1).let { if (it == "Seviye atladın!") "${ProgressionManager.rewardFor(d.playerLevel + 1).coins} altın" else it }}", a.f22, Palette.INK_SOFT, wrap = true)).width(480f).padTop(4f).row()
-        val names = listOf("Koşucu", "Zıpzıp", "Hızlı", "Yıldız", "Bulut", "Kaşif", "Şimşek", "Minik")
-        p.add(kit.button("İsmi Değiştir", "white", font = a.f28, textColor = Palette.INK) {
-            d.playerName = names[(names.indexOf(d.playerName) + 1) % names.size]; game.profile.save(); rebuild()
+        val nextLv = d.playerLevel + 1
+        val nextReward = if (ProgressionManager.isPlainLevelUp(nextLv)) L.n("unit.coins", ProgressionManager.rewardFor(nextLv).coins) else ProgressionManager.levelUpText(nextLv)
+        p.add(kit.label(L.t("profile.next", "xp" to d.xp, "need" to need, "level" to nextLv, "reward" to nextReward), a.f22, Palette.INK_SOFT, wrap = true)).width(480f).padTop(4f).row()
+        p.add(kit.button(L.t("profile.rename"), "white", font = a.f28, textColor = Palette.INK) {
+            d.playerName = PlayerNames.next(d.playerName); game.profile.save(); rebuild()
         }).width(300f).height(90f).padTop(10f).row()
         val st = d.stats
         val grid = Table()
         val stats = listOf(
-            "Tamamlanan bölüm" to "${st.levelsCompleted}/500", "Toplam yıldız" to "${d.totalStars}/1500", "Toplanan altın" to "${st.coinsCollected}",
-            "Zıplama" to "${st.jumps}", "Atlatılan kural" to "${st.rulesSurvived}", "Kusursuz bölüm" to "${st.perfectLevels}",
-            "Sonsuz rekor" to "${st.endlessBestScore}", "Sonsuz koşu" to "${st.endlessRuns}", "Gizli parça" to "${d.pieces.size}/50",
-            "Karakter" to "${d.ownedSkins.size}/20", "Başarı" to "${d.achievements.size}/50", "Oyun süresi" to "%.0f dk".format(st.playSeconds / 60f),
+            L.t("stats.levels") to "${st.levelsCompleted}/500", L.t("stats.stars") to "${d.totalStars}/1500", L.t("stats.coins") to "${st.coinsCollected}",
+            L.t("stats.jumps") to "${st.jumps}", L.t("stats.rules") to "${st.rulesSurvived}", L.t("stats.perfect") to "${st.perfectLevels}",
+            L.t("stats.endless_best") to "${st.endlessBestScore}", L.t("stats.endless_runs") to "${st.endlessRuns}", L.t("stats.pieces") to "${d.pieces.size}/50",
+            L.t("stats.skins") to "${d.ownedSkins.size}/20", L.t("stats.achievements") to "${d.achievements.size}/50", L.t("stats.playtime") to L.t("unit.minutes", "v" to L.dec(st.playSeconds / 60f, 0)),
         )
         stats.forEachIndexed { i, (k, v) ->
-            grid.add(Table().apply { background = kit.patch("card"); pad(12f); add(kit.label(v, a.f28, Palette.INK)).row(); add(kit.label(k, a.f22, Palette.INK_SOFT)) }).width(200f).height(100f).pad(5f)
+            grid.add(Table().apply { background = kit.patch("card"); pad(12f); add(kit.label(v, a.f28, Palette.INK)).row(); add(kit.label(k, a.f22, Palette.INK_SOFT, fit = true)).width(176f) }).width(200f).height(100f).pad(5f)
             if (i % 3 == 2) grid.row()
         }
         val body = Table()
@@ -308,7 +320,7 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     private var confirmReset = false
     override fun build() {
         val st = game.profile.data.settings
-        root.add(header("Ayarlar", showCurrency = false)).growX().padTop(20f).row()
+        root.add(header(L.t("settings.title"), showCurrency = false)).growX().padTop(20f).row()
         val p = kit.panel()
         fun toggle(label: String, icon: String, value: Boolean, set: (Boolean) -> Unit) {
             val row = Table()
@@ -320,75 +332,88 @@ class SettingsScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
             row.add(t).size(130f, 68f)
             p.add(row).width(560f).padBottom(12f).row()
         }
-        toggle("Müzik", "g_music", st.music) { st.music = it }
-        toggle("Ses Efektleri", "g_sound", st.sound) { st.sound = it }
-        toggle("Titreşim", "g_vibrate", st.vibration) { st.vibration = it }
-        toggle("Az Efekt (pil tasarrufu)", "g_info", st.reducedEffects) { st.reducedEffects = it }
+        toggle(L.t("settings.music"), "g_music", st.music) { st.music = it }
+        toggle(L.t("settings.sound"), "g_sound", st.sound) { st.sound = it }
+        toggle(L.t("settings.vibration"), "g_vibrate", st.vibration) { st.vibration = it }
+        toggle(L.t("settings.reduced"), "g_info", st.reducedEffects) { st.reducedEffects = it }
         fun slider(label: String, v: Float, set: (Float) -> Unit) {
             val row = Table()
-            row.add(kit.label(label, a.f28, Palette.INK, Align.left)).width(220f).left()
+            row.add(kit.label(label, a.f28, Palette.INK, Align.left, fit = true)).width(220f).left()
             row.add(kit.iconButton("g_back", "white", 80f, 40f) { set((v - 0.1f).coerceAtLeast(0f)); game.audio.applyVolume(); game.profile.save(); rebuild() }).size(80f)
             row.add(kit.bar(v, "bar_fill_b", 24f)).width(180f).height(24f).pad(0f, 10f, 0f, 10f)
             row.add(kit.iconButton("g_next", "white", 80f, 40f) { set((v + 0.1f).coerceAtMost(1f)); game.audio.applyVolume(); game.profile.save(); rebuild() }).size(80f)
             p.add(row).width(560f).padBottom(14f).row()
         }
-        slider("Müzik sesi", st.musicVolume) { st.musicVolume = it }
-        slider("Efekt sesi", st.soundVolume) { st.soundVolume = it }
+        slider(L.t("settings.music_volume"), st.musicVolume) { st.musicVolume = it }
+        slider(L.t("settings.sound_volume"), st.soundVolume) { st.soundVolume = it }
         val side = Table()
-        side.add(kit.button("Nasıl Oynanır?", "turq", "g_info") { game.go(HowToPlayScreen(game)) }).width(420f).height(104f).row()
-        side.add(kit.button(if (confirmReset) "Emin misin? Tekrar dokun" else "İlerlemeyi Sıfırla", "red", "g_retry", a.f28) {
-            if (confirmReset) { game.profile.resetAll(); toast("İlerleme sıfırlandı."); confirmReset = false } else confirmReset = true
+        // Dil: oyun telefonun dilinde açılır; buradan istenildiği an değiştirilir (yeniden başlatma gerekmez)
+        side.add(kit.button(L.t("settings.language") + ": " + (L.NATIVE_NAMES[L.lang] ?: L.lang), "yellow", "b_map", a.f28) { chooseLanguage() }).width(420f).height(96f).row()
+        side.add(kit.button(L.t("settings.howto"), "turq", "g_info", a.f28) { game.go(HowToPlayScreen(game)) }).width(420f).height(96f).padTop(12f).row()
+        side.add(kit.button(if (confirmReset) L.t("settings.reset_confirm") else L.t("settings.reset"), "red", "g_retry", a.f28) {
+            if (confirmReset) { game.profile.resetAll(); toast(L.t("settings.reset_done")); confirmReset = false } else confirmReset = true
             rebuild()
-        }).width(420f).height(96f).padTop(14f).row()
-        side.add(kit.button("Gizlilik Politikası", "white", "g_info", a.f28, Palette.INK) { showPrivacy() }).width(420f).height(88f).padTop(14f).row()
+        }).width(420f).height(92f).padTop(12f).row()
+        side.add(kit.button(L.t("settings.privacy"), "white", "g_info", a.f28, Palette.INK) { showPrivacy() }).width(420f).height(88f).padTop(12f).row()
         // Reklam onayı gereken bölgelerde (ör. AB) oyuncu tercihini buradan değiştirebilir
-        if (game.ads.privacyOptionsRequired) side.add(kit.button("Reklam Tercihleri", "white", "g_info", a.f28, Palette.INK) { game.ads.showPrivacyOptions() }).width(420f).height(88f).padTop(10f).row()
-        side.add(kit.label("5 Saniyelik Dünya • Sürüm 1.0.0\nİnternetsiz de oynanır (reklamlar internet kullanır); ilerlemen cihazında saklanır.\nYazı tipi: Nunito (SIL OFL).", a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(14f)
+        if (game.ads.privacyOptionsRequired) side.add(kit.button(L.t("settings.ad_prefs"), "white", "g_info", a.f28, Palette.INK) { game.ads.showPrivacyOptions() }).width(420f).height(88f).padTop(10f).row()
+        side.add(kit.label(L.t("settings.about", "app" to L.t("app.name_main"), "ver" to APP_VERSION, "dev" to L.t("app.developer")), a.f22, Palette.INK_SOFT, wrap = true)).width(420f).padTop(12f)
         val body = Table()
         body.add(p).width(640f).padRight(24f)
         body.add(side).top()
         root.add(body).expand().center()
     }
 
+    /** Dil seçimi: altı dil kendi dillerindeki adlarıyla; seçim hemen uygulanır ve kaydedilir. */
+    private fun chooseLanguage() {
+        dialog { p, close ->
+            p.add(kit.label(L.t("settings.choose_language"), a.f48, Palette.INK)).padBottom(10f).row()
+            val grid = Table()
+            L.SUPPORTED.forEachIndexed { i, code ->
+                val sel = code == L.lang
+                grid.add(kit.button(L.NATIVE_NAMES[code] ?: code, if (sel) "green" else "white", if (sel) "g_check" else null, a.f36, if (sel) Color.WHITE else Palette.INK) {
+                    close()
+                    if (code != L.lang) { game.setLanguage(code); rebuild(); toast(L.t("settings.language_changed")) }
+                }).width(300f).height(96f).pad(6f)
+                if (i % 2 == 1) grid.row()
+            }
+            p.add(grid).row()
+            p.add(kit.button(L.t("common.close"), "white", font = a.f28, textColor = Palette.INK) { close() }).width(300f).height(88f).padTop(10f)
+        }
+    }
+
     /** Gizlilik politikası uygulamanın içinde de okunabilir (Google Play Kullanıcı Verileri politikası gereği). */
     fun showPrivacy() {
         dialog(resultW, resultH) { p, close ->
             p.top()
-            p.add(kit.label("Gizlilik Politikası", a.f48, Palette.INK)).padTop(4f).row()
+            p.add(kit.label(L.t("settings.privacy"), a.f48, Palette.INK)).padTop(4f).row()
             val box = Table().top().left()
             box.add(kit.label(privacyPolicyText(game.ads.childDirected), a.f22, Palette.INK, Align.left, wrap = true)).width(resultW - 130f).left()
             p.add(scroll(box)).width(resultW - 90f).expandY().fillY().padTop(8f).row()
-            p.add(kit.button("Tamam", "green", "g_check") { close() }).width(300f).height(92f).padTop(10f)
+            p.add(kit.button(L.t("common.ok"), "green", "g_check") { close() }).width(300f).height(92f).padTop(10f)
         }
     }
+
+    companion object { const val APP_VERSION = "1.1.0" }
 }
 
 /**
- * Uygulama içi gizlilik politikası metni; mağaza sayfasına konacak sürümü docs/play_store/gizlilik_politikasi.md
- * dosyasındadır. [childAds]: reklamlar çocuklara uygun modda mı isteniyor (ads.properties: audience).
+ * Uygulama içi gizlilik politikası metni (seçili dilde); mağaza sayfasına konacak sürümü
+ * docs/play_store/gizlilik_politikasi.md dosyasındadır. [childAds]: reklamlar çocuklara uygun modda mı isteniyor.
  */
-fun privacyPolicyText(childAds: Boolean): String = """5 Saniyelik Dünya çevrimdışı da oynanabilen bir oyundur. Oyunun kendisi sizden hiçbir kişisel bilgi istemez; hesap açmanız gerekmez.
-
-REKLAMLAR: Oyunda Google AdMob reklamları gösterilir. Reklamı göstermek, ölçmek ve dolandırıcılığı önlemek için Google'ın reklam kitaplığı şu verileri otomatik olarak toplar ve Google ile paylaşır: IP adresi (yaklaşık konumu tahmin etmek için kullanılabilir), uygulama içi etkileşimler (uygulamanın açılması, dokunuşlar, reklam izlemeleri), tanılama bilgileri (açılış süresi, pil kullanımı gibi) ve cihaz kimlikleri. Google'ın bu verileri nasıl kullandığı: policies.google.com/technologies/partner-sites
-
-${if (childAds) "Bu sürümde reklamlar çocuklara uygun modda istenir: kişiselleştirilmez, cihazın reklam kimliği kullanılmaz ve yalnızca genel izleyiciye uygun reklamlar gösterilir."
-else "Onayınıza bağlı olarak reklamlar ilgi alanlarınıza göre kişiselleştirilebilir ve cihazınızın reklam kimliği kullanılabilir. Reklam kimliğini cihazınızın Ayarlar > Gizlilik > Reklamlar bölümünden sıfırlayabilir ya da silebilirsiniz. Onay gereken ülkelerde tercihinizi Ayarlar ekranındaki Reklam Tercihleri düğmesinden değiştirebilirsiniz."}
-
-ÖDÜLLÜ REKLAMLAR isteğe bağlıdır: yalnızca siz üzerinde "Reklam izle" yazan bir düğmeye bastığınızda gösterilir.
-
-SATIN ALMA: Gerçek parayla satın alma yoktur. Altın ve elmaslar oynayarak ya da isteğe bağlı reklam izleyerek kazanılır.
-
-KAYIT DOSYASI: İlerlemeniz (açılan bölümler, yıldızlar, ayarlar) yalnızca cihazınızda saklanır. Cihazınızda Android yedeklemesi açıksa bu dosya kendi Google hesabınızın yedeğine dahil edilebilir; geliştirici bu yedeğe erişemez. Kaydı Ayarlar ekranındaki İlerlemeyi Sıfırla düğmesiyle ya da uygulamayı kaldırarak silebilirsiniz.
-
-İZİNLER: Titreşim (Ayarlar ekranından kapatılabilir); reklam kitaplığı için internet erişimi, ağ durumu, reklam ölçümü ve arka plan işleri.
-
-ÇOCUKLAR: Oyun çocuklardan bilerek kişisel bilgi istemez.
-
-DEĞİŞİKLİKLER: Bu politika değişirse güncel metin bu ekranda ve mağaza sayfasındaki bağlantıda yayımlanır.
-
-İLETİŞİM: Google Play sayfasında yazan geliştirici e-posta adresi.
-
-Son güncelleme: 21 Kasım 2026"""
+fun privacyPolicyText(childAds: Boolean): String = listOf(
+    L.t("privacy.intro", "app" to L.t("app.name_main"), "dev" to L.t("app.developer")),
+    L.t("privacy.ads"),
+    if (childAds) L.t("privacy.ads_child") else L.t("privacy.ads_general"),
+    L.t("privacy.rewarded"),
+    L.t("privacy.purchases"),
+    L.t("privacy.save"),
+    L.t("privacy.permissions"),
+    L.t("privacy.children"),
+    L.t("privacy.changes"),
+    L.t("privacy.contact", "dev" to L.t("app.developer")),
+    L.t("privacy.updated"),
+).joinToString("\n\n")
 
 class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean = false) : BaseScreen(game) {
     override val watchesAdReadiness get() = true
@@ -396,8 +421,8 @@ class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean
     override fun onAdReadyChanged(ready: Boolean) { if (!game.profile.loginAvailable()) rebuild() }
     override fun build() {
         val d = game.profile.data
-        root.add(header("Günlük Ödül", back = { onBack() })).growX().padTop(20f).row()
-        root.add(kit.label("Her gün giriş yap, ödülleri topla! Bir gün kaçırırsan ilerlemen kaybolmaz.", a.f22, Palette.INK_SOFT, wrap = true)).width(600f).padTop(8f).row()
+        root.add(header(L.t("daily.title"), back = { onBack() })).growX().padTop(20f).row()
+        root.add(kit.label(L.t("daily.text"), a.f22, Palette.INK_SOFT, wrap = true)).width(640f).padTop(8f).row()
         val grid = Table()
         val today = d.login.cycleDay % 7
         val available = game.profile.loginAvailable()
@@ -405,7 +430,7 @@ class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean
             val claimed = i < today || (i == today && !available && false)
             val isToday = i == today && available
             val cell = Table().apply { background = kit.patch(when { isToday -> "card_sel"; i < today -> "panel_yellow"; else -> "card" }); pad(12f) }
-            cell.add(kit.label("${i + 1}. Gün", a.f22, Palette.INK)).row()
+            cell.add(kit.label(L.t("daily.day", "n" to i + 1), a.f22, Palette.INK, fit = true)).width(134f).row()
             val icon = when { r.gems > 0 && r.coins > 0 -> "b_gift"; r.gems > 0 -> "b_gem"; r.coins > 0 -> "b_coin"; else -> "b_" + r.powerups.keys.first().icon }
             cell.add(Image(a.ui(if (claimed) "g_check" else icon)).apply { if (claimed) color = Palette.GRASS }).size(if (i == 6) 90f else 70f).padTop(4f).row()
             cell.add(kit.label(r.describe(), a.f22, Palette.INK_SOFT, wrap = true)).width(134f)
@@ -414,47 +439,48 @@ class DailyRewardScreen(game: BesSaniyelikDunya, private val fromSplash: Boolean
         }
         root.add(grid).padTop(24f).row()
         if (available) {
-            root.add(kit.button("Ödülü Al!", "green", "b_gift", a.f48o) {
+            root.add(kit.button(L.t("daily.claim"), "green", "b_gift", a.f48o) {
                 val r = game.profile.claimLogin()
-                if (r != null) { game.audio.play(Sfx.REWARD); toast("Kazandın: ${r.describe()}", "b_gift") }
+                if (r != null) { game.audio.play(Sfx.REWARD); toast(L.t("daily.won", "r" to r.describe()), "b_gift") }
                 rebuild()
             }).width(460f).height(130f).padTop(24f).row()
         } else {
-            root.add(kit.label("Bugünkü ödülünü aldın. Yarın yine gel!", a.f28, Palette.INK)).padTop(8f).row()
+            root.add(kit.label(L.t("daily.claimed"), a.f28, Palette.INK, wrap = true)).width(900f).padTop(8f).row()
             val row = Table()
             // İsteğe bağlı ödüllü reklam: bugünkü ödülü bir kez daha verir (günde bir kez); ödül düğmenin üstünde açıkça yazar
             val canDouble = adReadyNow() && game.ads.loginDoubleAvailable()
             if (canDouble) {
-                root.add(kit.label("Reklamı izlersen bugünkü ödülü bir kez daha alırsın: ${game.ads.todaysLoginReward().describe()}", a.f22, Palette.INK)).padTop(2f).row()
-                row.add(kit.button("Reklam izle: ödülü tekrar al", "turq", "g_play", a.f28) {
-                    watchAd { game.ads.grantLoginDouble()?.let { r -> game.audio.play(Sfx.REWARD); toast("Kazandın: ${r.describe()}", "b_gift") }; rebuild() }
+                root.add(kit.label(L.t("daily.double_text", "r" to game.ads.todaysLoginReward().describe()), a.f22, Palette.INK, wrap = true)).width(900f).padTop(2f).row()
+                row.add(kit.button(L.t("ads.watch_daily"), "turq", "g_play", a.f28) {
+                    watchAd { game.ads.grantLoginDouble()?.let { r -> game.audio.play(Sfx.REWARD); toast(L.t("daily.won", "r" to r.describe()), "b_gift") }; rebuild() }
                 }).width(500f).height(92f).pad(6f)
             }
-            row.add(kit.button("Devam", "yellow", "g_next") { onBack() }).width(320f).height(92f).pad(6f)
+            row.add(kit.button(L.t("common.continue"), "yellow", "g_next") { onBack() }).width(320f).height(92f).pad(6f)
             root.add(row).padTop(2f).row()
         }
     }
     override fun onBack() { game.go(MainMenuScreen(game)) }
 }
 
-/** Öğretici ekranlar: temel kontroller ve on dünya mekaniği. */
+/** Öğretici ekranlar: temel kontroller, canlar ve on dünya mekaniği. */
 class HowToPlayScreen(game: BesSaniyelikDunya) : BaseScreen(game) {
     private var page = 0
     override fun build() {
-        root.add(header("Nasıl Oynanır?", showCurrency = false)).growX().padTop(20f).row()
+        root.add(header(L.t("settings.howto"), showCurrency = false)).growX().padTop(20f).row()
         val pages = buildList {
-            add(Triple("g_tap", "Dokun ve Zıpla", "Karakterin kendiliğinden koşar. Ekrana dokunduğunda zıplar. Basılı tutarsan daha yükseğe zıplarsın. Kenardan düştükten hemen sonra bile kısa bir süre zıplayabilirsin."))
-            add(Triple("b_m_normal", "5 Saniye Kuralı", "Her 5 saniyede dünyanın kuralları değişir. Değişimden önce ekranın üstünde sıradaki kural yanıp söner. Kural değişimi seni asla haksız yere öldürmez."))
-            add(Triple("b_star", "Yıldızlar ve Altınlar", "Her bölümde 3 yıldız var. 1 yıldız için bölümü bitir, 2 yıldız için en az 2 yıldız topla, 3 yıldız için üç yıldızı da topla ve en fazla 1 kez yanıl. Altınlarla mağazadan alışveriş yap."))
-            add(Triple("b_heart", "Canlar ve Kontrol Noktaları", "Her bölümde 3 canın var. Yeşil bayraklar kontrol noktasıdır: düşersen oradan devam edersin."))
-            add(Triple("b_p_shield", "Güçlendirmeler", "Baloncuklu güçlendirmeleri topla: kalkan, mıknatıs, çift zıplama, dokunulmazlık, ekstra can, altın çarpanı, yıldız algılayıcı ve kontrol noktası koruması."))
-            Mechanic.learnOrder.forEach { add(Triple("b_" + it.icon, it.title, it.hint + "\n(Bölüm ${it.unlockLevel}'de öğrenilir)")) }
+            add(Triple("g_tap", L.t("howto.tap.title"), L.t("howto.tap.text")))
+            add(Triple("b_m_normal", L.t("howto.rule5.title"), L.t("howto.rule5.text")))
+            add(Triple("b_star", L.t("howto.stars.title"), L.t("howto.stars.text")))
+            add(Triple("b_heart", L.t("howto.hearts.title"), L.t("howto.hearts.text", "n" to GameConfig.HEARTS_PER_ATTEMPT)))
+            if (game.lives.enabled) add(Triple("b_heart", L.t("howto.lives.title"), L.t("lives.rules", "min" to GameConfig.LIFE_REGEN_SECONDS / 60, "free" to GameConfig.FREE_LEVELS)))
+            add(Triple("b_p_shield", L.t("howto.power.title"), L.t("howto.power.text")))
+            Mechanic.learnOrder.forEach { add(Triple("b_" + it.icon, it.title, it.hint + "\n" + L.t("howto.learned_at", "n" to it.unlockLevel))) }
         }
         page = page.coerceIn(0, pages.size - 1)
         val (icon, title, text) = pages[page]
         val p = kit.panel()
         p.add(Image(a.ui(icon)).apply { if (icon.startsWith("g_")) color = Palette.ORANGE }).size(120f).row()
-        p.add(kit.label(title, a.f48, Palette.INK)).padTop(10f).row()
+        p.add(kit.label(title, a.f48, Palette.INK, wrap = true)).width(640f).padTop(10f).row()
         p.add(kit.label(text, a.f28, Palette.INK_SOFT, wrap = true)).width(640f).padTop(10f).row()
         p.add(kit.label("${page + 1} / ${pages.size}", a.f22, Palette.INK_SOFT)).padTop(12f)
         p.popIn()

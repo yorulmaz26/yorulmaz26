@@ -85,6 +85,11 @@ class Theme(val map: Int) : Disposable {
 
 /** Bütün ortak varlıklar: atlaslar, yazı tipleri. Yazı tipleri ekran yoğunluğuna göre keskin üretilir. */
 class Assets : Disposable {
+    companion object {
+        /** Türkçe, İngilizce, Almanca, İtalyanca, Fransızca ve İspanyolca için gereken bütün karakterler (Latin-1 + ekler). */
+        val FONT_CHARS: String = FreeTypeFontGenerator.DEFAULT_CHARS + (0xA0..0xFF).map { it.toChar() }.joinToString("") +
+            "çÇğĞıİöÖşŞüÜâÂîÎûÛ•…×→←↑↓★✓–—‘’‚“”„‹›«»ŒœŸ€"
+    }
     val ui = TextureAtlas(Gdx.files.internal("atlas/ui.atlas"))
     val game = TextureAtlas(Gdx.files.internal("atlas/game.atlas"))
     private val regionCache = HashMap<String, TextureRegion>()
@@ -94,7 +99,7 @@ class Assets : Disposable {
     /** UI sanal çözünürlüğü (720x1280) ile gerçek piksel arasındaki oran. */
     val density: Float = (Gdx.graphics.height / 720f).coerceIn(0.5f, 3f).let { if (it.isNaN() || it <= 0f) 1f else it }
 
-    private val chars = FreeTypeFontGenerator.DEFAULT_CHARS + "çÇğĞıİöÖşŞüÜâÂîÎûÛ•…×→←↑↓★✓–—’“”"
+    private val chars = FONT_CHARS
     val f22: BitmapFont
     val f28: BitmapFont
     val f36: BitmapFont
@@ -121,6 +126,19 @@ class Assets : Disposable {
         f36o = make(36, 3f, shadow = true); f48o = make(48, 4f, shadow = true); f72o = make(72, 5f, shadow = true)
         gen.dispose()
     }
+
+    // ------------------------------------------------------------------ marka (iki dilli logo)
+    private val brandTextures = HashMap<String, Texture?>()
+    private fun brandTexture(name: String): Texture? = brandTextures.getOrPut(name) {
+        Gdx.files.internal("brand/$name.png").takeIf { it.exists() }?.let { Texture(it, true).apply { setFilter(Texture.TextureFilter.MipMapLinearLinear, Texture.TextureFilter.Linear) } }
+    }
+
+    /** Dile göre ana logo: Türkçede Türkçe logo, diğer dillerde İngilizce logo (yoksa Türkçe). */
+    fun logo(lang: String): TextureRegion =
+        (if (lang == "tr") null else brandTexture("logo_en"))?.let { TextureRegion(it) } ?: ui("logo")
+
+    /** Logonun altındaki küçük ikincil ad (Türkçede İngilizce ad, diğer dillerde Türkçe ad); görsel yoksa null. */
+    fun logoSecondary(lang: String): TextureRegion? = brandTexture(if (lang == "tr") "sub_en" else "sub_tr")?.let { TextureRegion(it) }
 
     fun ui(name: String): TextureRegion = regionCache.getOrPut("u:$name") { ui.findRegion(name) ?: game.findRegion(name) ?: throw IllegalArgumentException("Bölge yok: $name") }
     fun g(name: String): TextureRegion = regionCache.getOrPut("g:$name") { game.findRegion(name) ?: ui.findRegion(name) ?: throw IllegalArgumentException("Bölge yok: $name") }
@@ -162,7 +180,7 @@ class Assets : Disposable {
     }
 
     override fun dispose() {
-        ui.dispose(); game.dispose(); theme?.dispose(); heroAtlases.values.forEach { it.dispose() }; heroThumbs?.dispose()
+        ui.dispose(); game.dispose(); theme?.dispose(); heroAtlases.values.forEach { it.dispose() }; heroThumbs?.dispose(); brandTextures.values.forEach { it?.dispose() }
         listOf(f22, f28, f36, f48, f36o, f48o, f72o).forEach { it.dispose() }
     }
 }

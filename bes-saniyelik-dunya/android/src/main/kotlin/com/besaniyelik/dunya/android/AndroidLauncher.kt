@@ -28,6 +28,9 @@ class AndroidLauncher : AndroidApplication() {
         val platform = object : Platform {
             override val name = "android"
             override val ads: AdService get() = adService ?: AdService.NONE
+            override val time: com.besaniyelik.dunya.progress.TimeSource = AndroidTimeSource(applicationContext)
+            override fun systemLanguage(): String =
+                if (Build.VERSION.SDK_INT >= 24) resources.configuration.locales[0].language else java.util.Locale.getDefault().language
             override fun vibrate(ms: Int) {
                 val v = vibrator ?: return
                 try {
@@ -68,4 +71,16 @@ class AndroidLauncher : AndroidApplication() {
         androidAds?.onHostDestroyed()
         super.onDestroy()
     }
+}
+
+/**
+ * Can yenilenmesi için güvenilir zaman: elapsedRealtime cihaz açıldığından beri geçen süredir (uykuyu da sayar,
+ * kullanıcı saati değiştirince etkilenmez); açılış sayacı cihazın yeniden başlatıldığını anlamaya yarar.
+ */
+class AndroidTimeSource(private val ctx: Context) : com.besaniyelik.dunya.progress.TimeSource {
+    override fun wallMs(): Long = System.currentTimeMillis()
+    override fun monoMs(): Long = android.os.SystemClock.elapsedRealtime()
+    override fun bootCount(): Int = try {
+        android.provider.Settings.Global.getInt(ctx.contentResolver, android.provider.Settings.Global.BOOT_COUNT, -1)
+    } catch (_: Throwable) { -1 }
 }

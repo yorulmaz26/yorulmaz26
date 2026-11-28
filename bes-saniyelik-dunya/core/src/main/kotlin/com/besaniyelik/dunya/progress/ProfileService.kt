@@ -165,7 +165,7 @@ class ProfileService(private val saves: SaveManager, val clock: GameClock = Syst
         CharacterManager.autoUnlock(data)
         AchievementManager.check(data)
         save()
-        return r.also { if (ups.isNotEmpty()) it.items.add("Seviye ${data.playerLevel}") }
+        return r.also { if (ups.isNotEmpty()) it.items.add(com.besaniyelik.dunya.i18n.L.t("profile.level", "n" to data.playerLevel)) }
     }
 
     fun claimLogin(): LoginReward? = RewardManager.claimLogin(data, clock)?.also { AchievementManager.check(data); save() }

@@ -11,11 +11,12 @@ import com.besaniyelik.dunya.Platform
 import com.besaniyelik.dunya.ads.AdService
 import com.besaniyelik.dunya.level.LevelRepository
 import com.besaniyelik.dunya.ui.screens.*
+import com.besaniyelik.dunya.i18n.L
 
 fun main(args: Array<String>) {
     val shots = System.getProperty("shots")
     val config = Lwjgl3ApplicationConfiguration().apply {
-        setTitle("5 Saniyelik Dünya")
+        setTitle("Stopwatch Shuffle / 5 Saniyelik Dünya")
         setWindowedMode(960, 540)
         useVsync(true)
         setForegroundFPS(60)
@@ -24,12 +25,20 @@ fun main(args: Array<String>) {
     }
     // -Dads=fake : reklam akışlarını masaüstünde denemek için sahte reklam hizmeti (gerçek reklam yalnızca Android'de)
     val fakeAds = if (System.getProperty("ads") == "fake") FakeAds() else null
-    val game = BesSaniyelikDunya(if (fakeAds != null) object : Platform {
+    // -Dlang=de : oyunu o dilde açar (telefon dilinin masaüstü karşılığı; kayıtlı dil tercihi yoksa geçerlidir)
+    val game = BesSaniyelikDunya(object : Platform {
         override val name = "desktop"
         override fun vibrate(ms: Int) {}
-        override val ads: AdService get() = fakeAds
-    } else Platform.NONE)
-    if (shots != null) game.debugHook = ScreenshotTour(shots, fakeAds)::step
+        override val ads: AdService get() = fakeAds ?: AdService.NONE
+        override fun systemLanguage(): String = System.getProperty("lang") ?: java.util.Locale.getDefault().language
+    })
+    val record = System.getProperty("record")
+    val store = System.getProperty("store")
+    when {
+        record != null -> game.debugHook = MediaTour(record, MediaTour.Mode.RECORD)::step
+        store != null -> game.debugHook = MediaTour(store, MediaTour.Mode.STORE)::step
+        shots != null -> game.debugHook = ScreenshotTour(shots, fakeAds)::step
+    }
     Lwjgl3Application(game, config)
 }
 
@@ -156,27 +165,27 @@ class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = nu
         fun killAll(n: Int) { repeat(n) { steps.add(Step.Run { g -> sim(g)?.kill(com.besaniyelik.dunya.sim.DeathCause.STUCK) }); steps.add(Step.Wait(170)) } }
         // mağaza: ücretsiz elmas
         screen("60_reklam_magaza") { it.go(ShopScreen(it)) }
-        steps.add(Step.Run { g -> note(g, "mağaza önce"); click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> note(g, "mağaza önce"); click(g, watchPrefix()) }); steps.add(Step.Wait(70))
         steps.add(Step.Run { g -> note(g, "mağaza sonra") }); steps.add(Step.Shot("61_reklam_magaza_sonra"))
         // ikinci izleme: reklam yeniden yüklenince düğme kendiliğinden açılmalı (ekrandan çıkmadan)
-        steps.add(Step.Wait(100)); steps.add(Step.Run { g -> click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
+        steps.add(Step.Wait(100)); steps.add(Step.Run { g -> click(g, watchPrefix()) }); steps.add(Step.Wait(70))
         steps.add(Step.Run { g -> note(g, "mağaza ikinci izleme sonrası"); bannerCheck(g, "mağazada (açık olmalı)") }); steps.add(Step.Wait(60)); steps.add(Step.Shot("61b_magaza_afis"))
         // günlük ödül: al, sonra ikiye katla
         screen("62_gunluk") { it.go(DailyRewardScreen(it)) }
-        steps.add(Step.Run { g -> click(g, "Ödülü Al") }); steps.add(Step.Wait(40)); steps.add(Step.Shot("63_gunluk_katla"))
-        steps.add(Step.Run { g -> note(g, "günlük önce"); click(g, "ödülü tekrar al") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> click(g, L.t("daily.claim")) }); steps.add(Step.Wait(40)); steps.add(Step.Shot("63_gunluk_katla"))
+        steps.add(Step.Run { g -> note(g, "günlük önce"); click(g, L.t("ads.watch_daily")) }); steps.add(Step.Wait(70))
         steps.add(Step.Run { g -> note(g, "günlük sonra") }); steps.add(Step.Shot("64_gunluk_sonra"))
         // bölüm: canlar bitince reklamla devam
         steps.add(Step.Run { g -> g.go(GameScreen(g, LevelRepository.level(12), null, emptyList())) }); steps.add(Step.Wait(60))
         steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(30))
         killAll(3); steps.add(Step.Wait(60)); steps.add(Step.Shot("65_canlar_bitti"))
-        steps.add(Step.Run { g -> bannerCheck(g, "oyun ekranında (kapalı olmalı)"); note(g, "devam önce"); click(g, "Reklam izle: +2 can") })
+        steps.add(Step.Run { g -> bannerCheck(g, "oyun ekranında (kapalı olmalı)"); note(g, "devam önce"); click(g, L.n("ads.watch_hearts", 2)) })
         // reklam açılırken ikinci bir düğmeye basmak (elmasla devam / tekrar dene) etkisiz olmalı
-        steps.add(Step.Wait(5)); steps.add(Step.Run { g -> click(g, "Tekrar Dene"); log.append("  reklam beklerken 'Tekrar Dene' denendi -> ekran hâlâ oyun mu: ${g.screen is GameScreen}\n") })
+        steps.add(Step.Wait(5)); steps.add(Step.Run { g -> click(g, L.t("over.retry")); log.append("  reklam beklerken 'Tekrar Dene' denendi -> ekran hâlâ oyun mu: ${g.screen is GameScreen}\n") })
         steps.add(Step.Wait(120))
         steps.add(Step.Run { g -> note(g, "devam sonra") }); steps.add(Step.Shot("66_devam_edildi"))
         killAll(2); steps.add(Step.Wait(60)); steps.add(Step.Shot("67_canlar_bitti_ikinci"))
-        steps.add(Step.Run { g -> note(g, "ikinci kez (reklam düğmesi olmamalı)"); if (click(g, "Reklam izle: +2 can")) log.append("  HATA: reklamla devam ikinci kez sunuldu\n") })
+        steps.add(Step.Run { g -> note(g, "ikinci kez (reklam düğmesi olmamalı)"); if (click(g, L.n("ads.watch_hearts", 2))) log.append("  HATA: reklamla devam ikinci kez sunuldu\n") })
         // bölüm sonu: geçiş reklamı (deneyimli oyuncu, sıklık koşulları sağlanmış) + ek altın
         steps.add(Step.Run { g ->
             val fa = fakeAds ?: return@Run
@@ -188,18 +197,21 @@ class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = nu
             log.append("geçiş reklamı koşulları hazırlandı (şu an gösterilebilir mi: ${g.ads.interstitialDue()})\n")
         })
         steps.add(Step.PlayLevel(3, 0))
-        steps.add(Step.Run { g -> note(g, "ek altın önce (kayıtlı tamamlanan bölüm: ${g.profile.data.stats.levelsCompleted})"); click(g, "Reklam izle: +") }); steps.add(Step.Wait(70))
+        steps.add(Step.Run { g -> note(g, "ek altın önce (kayıtlı tamamlanan bölüm: ${g.profile.data.stats.levelsCompleted})"); click(g, watchPrefix()) }); steps.add(Step.Wait(70))
         steps.add(Step.Run { g -> note(g, "2x sonra") }); steps.add(Step.Shot("68_iki_kat_altin"))
         // Sonsuz Dünya: diriliş
         steps.add(Step.Run { g -> g.go(GameScreen(g, null, 42L, emptyList())) }); steps.add(Step.Wait(60))
         steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(60))
         killAll(1); steps.add(Step.Wait(40)); steps.add(Step.Shot("69_sonsuz_dirilis"))
-        steps.add(Step.Run { g -> note(g, "diriliş önce"); click(g, "Reklam izle: devam et") }); steps.add(Step.Wait(120))
+        steps.add(Step.Run { g -> note(g, "diriliş önce"); click(g, L.t("endless.revive_watch")) }); steps.add(Step.Wait(120))
         steps.add(Step.Run { g -> note(g, "diriliş sonra") }); steps.add(Step.Shot("70_sonsuz_devam"))
         killAll(1); steps.add(Step.Wait(60)); steps.add(Step.Run { g -> note(g, "sonsuz bitti") }); steps.add(Step.Shot("71_sonsuz_sonuc"))
         // ayarlar: reklam tercihleri düğmesi
         screen("72_ayarlar_reklam") { it.go(SettingsScreen(it)) }
     }
+
+    /** "Reklam izle: " düğmelerinin seçili dildeki ortak başı. */
+    private fun watchPrefix() = L.t("ads.watch_daily").substringBefore(":") + ":"
 
     private fun tap(down: Boolean) {
         val p = Gdx.input.inputProcessor ?: return
@@ -242,6 +254,187 @@ class ScreenshotTour(private val dir: String, private val fakeAds: FakeAds? = nu
                 playing = s; playId = st.id; playFrames = 0; playShots = 0; doneAt = -1
             }
         }
+    }
+
+    private fun shot(name: String) {
+        val pm: Pixmap = Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.backBufferWidth, Gdx.graphics.backBufferHeight)
+        val flipped = Pixmap(pm.width, pm.height, pm.format)
+        for (y in 0 until pm.height) flipped.drawPixmap(pm, 0, y, pm.width, 1, 0, pm.height - 1 - y, pm.width, 1)
+        PixmapIO.writePNG(Gdx.files.absolute("$dir/$name.png"), flipped)
+        pm.dispose(); flipped.dispose()
+    }
+}
+
+/**
+ * Mağaza görselleri ve tanıtım videosu için gerçek oyun görüntüsü üretir (seçili dilde, -Dlang).
+ *  - STORE: önceden seçilmiş 8 sahnenin ekran görüntüsü (s1..s8.png) + ek sahneler.
+ *  - RECORD: seçili bölümleri ve ekranları sabit 30 kare/sn ile kaydeder (oyun süresi gerçek süreden bağımsız
+ *    ilerler; kareler doğrudan ffmpeg'e akar). Çıktı: <dizin>/<ad>.mp4 (H.264, kayıpsıza yakın).
+ * Kayıt/görüntü sırasında kayıt dosyası vitrin için hazırlanır (ilerleme, altın, karakterler); assets/save sonra silinir.
+ */
+class MediaTour(private val dir: String, private val mode: Mode) {
+    enum class Mode { STORE, RECORD }
+    private sealed class Step {
+        class Run(val action: (BesSaniyelikDunya) -> Unit) : Step()
+        class Wait(val frames: Int) : Step()
+        class Shot(val name: String) : Step()
+        /** Bölümü kayıtlı çözümle oynatır; [shotsAt] tick'lerinde görüntü alır; [rec] verilirse baştan sona kaydeder. */
+        class Play(val id: Int, val shotsAt: Map<Int, String> = emptyMap(), val rec: String? = null, val untilTick: Int = Int.MAX_VALUE, val afterFrames: Int = 120) : Step()
+        class RecStart(val name: String) : Step()
+        class RecStop : Step()
+    }
+    private val steps = ArrayDeque<Step>()
+    private var waitLeft = 0
+    private var playing: GameScreen? = null
+    private var play: Step.Play? = null
+    private var playFrames = 0
+    private var doneAt = -1
+    private var ffmpeg: Process? = null
+    private var recW = 0; private var recH = 0
+    private val log = StringBuilder()
+
+    init {
+        java.io.File(dir).mkdirs()
+        if (mode == Mode.RECORD) BaseScreen.fixedDelta = 1f / 30f
+        fun screen(name: String, wait: Int = 50, f: (BesSaniyelikDunya) -> Unit) { steps.add(Step.Run(f)); steps.add(Step.Wait(wait)); steps.add(Step.Shot(name)) }
+        steps.add(Step.Wait(20))
+        steps.add(Step.Run { g -> showcaseSave(g) })
+        if (mode == Mode.STORE) {
+            val spec = System.getProperty("storeSpec") ?: ""
+            // biçim: ad=bölüm@tick;... (oyun içi sahneler) — boşsa aday taraması yapılır
+            if (spec.isNotEmpty()) {
+                for (item in spec.split(";").filter { it.isNotBlank() }) {
+                    val (name, rest) = item.split("=")
+                    val (lv, tick) = rest.split("@").map { it.trim().toInt() }
+                    steps.add(Step.Play(lv, mapOf(tick to name), untilTick = tick + 1, afterFrames = 0))
+                }
+            } else {
+                val lvls = (System.getProperty("scan") ?: "61,160,215,280,330,377,420,470").split(",").map { it.trim().toInt() }
+                for (lv in lvls) {
+                    val solve = com.besaniyelik.dunya.level.LevelRepository.level(lv).solveTicks
+                    steps.add(Step.Play(lv, (1..9).associate { k -> (solve * k / 10) to "scan_%03d_%d".format(lv, k) }, untilTick = solve, afterFrames = 0))
+                }
+            }
+            // menü ve özellik sahneleri
+            screen("m_menu") { it.go(MainMenuScreen(it)) }
+            screen("m_maps") { it.go(MapSelectScreen(it)) }
+            screen("m_levels", 60) { it.go(LevelSelectScreen(it, 6)) }
+            screen("m_characters") { it.go(CharacterScreen(it)) }
+            screen("m_achievements") { it.go(AchievementsScreen(it)) }
+            screen("m_endless_intro") { it.go(EndlessIntroScreen(it)) }
+            screen("m_shop") { it.go(ShopScreen(it)) }
+            screen("m_daily") { it.go(DailyRewardScreen(it)) }
+            screen("m_howto") { it.go(HowToPlayScreen(it)) }
+            screen("m_newrule", 70) { it.go(GameScreen(it, com.besaniyelik.dunya.level.LevelRepository.level(41), null, emptyList())) }
+            steps.add(Step.Run { g -> (g.screen as? BaseScreen)?.let { s -> s.showLives() } }); steps.add(Step.Wait(40)); steps.add(Step.Shot("m_lives"))
+            steps.add(Step.Run { g -> g.go(SettingsScreen(g)) }); steps.add(Step.Wait(50)); steps.add(Step.Shot("m_settings"))
+            // bölüm sonu (3 yıldız) ve Sonsuz Dünya oyunu
+            steps.add(Step.Play((System.getProperty("completeLevel") ?: "120").toInt(), afterFrames = 150))
+            steps.add(Step.Shot("m_complete"))
+            steps.add(Step.Run { g -> val s = GameScreen(g, null, 42L, emptyList()); g.go(s) }); steps.add(Step.Wait(60))
+            steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) }); steps.add(Step.Wait(330)); steps.add(Step.Shot("m_endless_run"))
+        } else {
+            // kayıt listesi: ad=bölüm,... ve ekran kayıtları
+            val lv = (System.getProperty("recLevels") ?: "2,61,160,215,280,330,377,420,470,120").split(",").map { it.trim().toInt() }
+            for (id in lv) steps.add(Step.Play(id, rec = "lv%03d".format(id), afterFrames = 120))
+            steps.add(Step.Run { g -> g.go(MapSelectScreen(g)) }); steps.add(Step.Wait(30)); steps.add(Step.RecStart("maps")); steps.add(Step.Wait(90)); steps.add(Step.RecStop())
+            steps.add(Step.Run { g -> g.go(CharacterScreen(g)) }); steps.add(Step.Wait(30)); steps.add(Step.RecStart("characters")); steps.add(Step.Wait(90)); steps.add(Step.RecStop())
+            steps.add(Step.Run { g -> g.go(LevelSelectScreen(g, 6)) }); steps.add(Step.Wait(30)); steps.add(Step.RecStart("levelmap")); steps.add(Step.Wait(90)); steps.add(Step.RecStop())
+            steps.add(Step.Run { g -> g.go(GameScreen(g, null, 42L, emptyList())) }); steps.add(Step.Wait(40))
+            steps.add(Step.RecStart("endless")); steps.add(Step.Run { tap(true) }); steps.add(Step.Wait(2)); steps.add(Step.Run { tap(false) })
+            steps.add(Step.Wait(30 * 8)); steps.add(Step.RecStop())
+            steps.add(Step.Run { g -> g.go(MainMenuScreen(g)) }); steps.add(Step.Wait(30)); steps.add(Step.RecStart("menu")); steps.add(Step.Wait(90)); steps.add(Step.RecStop())
+        }
+        steps.add(Step.Run { java.io.File("$dir/media_log.txt").writeText(log.toString()); BaseScreen.fixedDelta = null; Gdx.app.exit() })
+    }
+
+    /** Vitrin kaydı: orta seviyede bir oyuncu (ilerleme, yıldızlar, birkaç karakter). */
+    private fun showcaseSave(g: BesSaniyelikDunya) {
+        val d = g.profile.data
+        d.coins = 2450; d.gems = 85; d.playerLevel = 14; d.xp = 300
+        d.highestUnlocked = 263
+        for (i in 1..262) d.levels[i] = com.besaniyelik.dunya.progress.LevelProgress(completed = true, stars = if (i % 7 == 3) 2 else 3, bestCoins = 30)
+        d.stats.levelsCompleted = 262; d.stats.endlessBestScore = 18420; d.stats.endlessBestSeconds = 214f; d.stats.endlessBestDistance = 1630f
+        d.ownedSkins.addAll(listOf("damla", "cilek", "nane", "bulut", "kedi", "papatya", "kum", "penguen", "mantar"))
+        d.selectedSkin = "pati"
+        d.pieces.addAll(listOf(8, 18, 28, 38, 48, 58, 68, 78, 108, 118, 158, 168, 208))
+        d.collectionsClaimed.add(1)
+        d.achievements.addAll(com.besaniyelik.dunya.progress.Catalog.achievements.take(18).map { it.id })
+        d.inventory[com.besaniyelik.dunya.level.PowerupType.SHIELD] = 2; d.inventory[com.besaniyelik.dunya.level.PowerupType.MAGNET] = 1
+        d.login.lastClaimDay = g.profile.clock.epochDay() - 1; d.login.cycleDay = 3
+        d.seenTutorials.addAll(com.besaniyelik.dunya.sim.Mechanic.entries.map { "m_" + it.name })
+        g.profile.save()
+        log.append("dil: ${L.lang}\n")
+    }
+
+    private fun tap(down: Boolean) {
+        val p = Gdx.input.inputProcessor ?: return
+        val x = Gdx.graphics.width / 2; val y = Gdx.graphics.height / 2
+        if (down) p.touchDown(x, y, 0, 0) else p.touchUp(x, y, 0, 0)
+    }
+
+    fun step(game: BesSaniyelikDunya, frame: Int) {
+        if (ffmpeg != null) writeFrame()
+        val pg = playing
+        val pl = play
+        if (pg != null && pl != null) {
+            playFrames++
+            if (playFrames == 30) { tap(true) }
+            if (playFrames == 32) { tap(false) }
+            val sim = pg.simulation
+            pl.shotsAt.forEach { (t, name) -> if (sim.tick >= t && !taken.contains(name)) { taken.add(name); shot(name) } }
+            if ((sim.status == com.besaniyelik.dunya.sim.SimStatus.COMPLETE || sim.tick >= pl.untilTick) && doneAt < 0) doneAt = playFrames
+            if (doneAt > 0 && playFrames - doneAt >= pl.afterFrames) {
+                log.append("bölüm ${pl.id}: ${sim.status} tick ${sim.tick} yıldız ${sim.starsCollected}\n")
+                if (pl.rec != null) stopRec()
+                playing = null; play = null
+            } else if (playFrames > 30 * 600 || sim.status == com.besaniyelik.dunya.sim.SimStatus.GAME_OVER) {
+                log.append("bölüm ${pl.id}: BAŞARISIZ ${sim.status}\n")
+                if (pl.rec != null) stopRec()
+                playing = null; play = null
+            }
+            return
+        }
+        if (waitLeft > 0) { waitLeft--; return }
+        val st = steps.removeFirstOrNull() ?: return
+        when (st) {
+            is Step.Run -> st.action(game)
+            is Step.Wait -> waitLeft = st.frames
+            is Step.Shot -> shot(st.name)
+            is Step.RecStart -> startRec(st.name)
+            is Step.RecStop -> stopRec()
+            is Step.Play -> {
+                val level = com.besaniyelik.dunya.level.LevelRepository.level(st.id)
+                val s = GameScreen(game, level, null, emptyList())
+                s.autoplay = com.besaniyelik.dunya.level.InputTrack(level.solution.toIntArray())
+                game.go(s)
+                playing = s; play = st; playFrames = 0; doneAt = -1
+                if (st.rec != null) startRec(st.rec)
+            }
+        }
+    }
+
+    private val taken = HashSet<String>()
+
+    private fun startRec(name: String) {
+        stopRec()
+        recW = Gdx.graphics.backBufferWidth; recH = Gdx.graphics.backBufferHeight
+        val pb = ProcessBuilder("ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgba", "-s", "${recW}x$recH", "-r", "30", "-i", "-",
+            "-vf", "vflip", "-c:v", "libx264", "-preset", "veryfast", "-crf", "12", "-pix_fmt", "yuv420p", "$dir/$name.mp4")
+        pb.redirectErrorStream(true); pb.redirectOutput(java.io.File("$dir/$name.ffmpeg.log"))
+        ffmpeg = pb.start()
+        log.append("kayıt: $name ${recW}x$recH\n")
+    }
+
+    private fun writeFrame() {
+        val px = com.badlogic.gdx.utils.ScreenUtils.getFrameBufferPixels(0, 0, recW, recH, false)
+        try { ffmpeg?.outputStream?.write(px) } catch (e: Exception) { log.append("kayıt hatası: ${e.message}\n"); ffmpeg = null }
+    }
+
+    private fun stopRec() {
+        val p = ffmpeg ?: return
+        ffmpeg = null
+        try { p.outputStream.close(); p.waitFor() } catch (_: Exception) {}
     }
 
     private fun shot(name: String) {
